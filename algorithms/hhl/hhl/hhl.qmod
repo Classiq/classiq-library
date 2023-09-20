@@ -1,0 +1,342 @@
+{
+  "types": [],
+  "constants": [],
+  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
+  "classical_functions": [],
+  "execution_preferences": {
+    "amplitude_amplification": {
+      "iterations": []
+    },
+    "random_seed": 2202697077,
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator_statevector",
+      "provider": {}
+    },
+    "num_shots": 1
+  },
+  "kind": "synthesis",
+  "functions": [
+    {
+      "name": "main",
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "direction": "output",
+          "size": {
+            "expr": "1"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        "solution": {
+          "name": "solution",
+          "direction": "output",
+          "size": {
+            "expr": "2"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {},
+      "output_ports_wiring": {
+        "target": "target_output_Identity:target->Output:target",
+        "solution": "solution_output_Identity:solution->Output:solution"
+      },
+      "body": [
+        {
+          "function": "StatePreparation",
+          "params": {},
+          "function_params": {
+            "amplitudes": [
+              0.18257418583505536,
+              0.3651483716701107,
+              0.7302967433402214,
+              0.5477225575051661
+            ],
+            "error_metric": {
+              "L2": {
+                "upper_bound": 0.0
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->PhaseEstimation_cs4id_qhFWCE:IN[0]",
+            "OUT[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->PhaseEstimation_cs4id_qhFWCE:IN[1]"
+          },
+          "name": "StatePreparation_cs4id_iK2ZWe"
+        },
+        {
+          "function": "PhaseEstimation",
+          "params": {},
+          "function_params": {
+            "size": 4,
+            "unitary": "Exponentiation",
+            "unitary_params": {
+              "pauli_operator": {
+                "pauli_list": [
+                  [
+                    "II",
+                    "(0.4075+0j)"
+                  ],
+                  [
+                    "IZ",
+                    "(-0.05249999999999999+0j)"
+                  ],
+                  [
+                    "IX",
+                    "(-0.030000000000000002+0j)"
+                  ],
+                  [
+                    "ZI",
+                    "(-0.017499999999999988+0j)"
+                  ],
+                  [
+                    "ZZ",
+                    "(-0.057499999999999996+0j)"
+                  ],
+                  [
+                    "ZX",
+                    "(0.02+0j)"
+                  ],
+                  [
+                    "XI",
+                    "(-0.025+0j)"
+                  ],
+                  [
+                    "XZ",
+                    "(0.045000000000000005+0j)"
+                  ],
+                  [
+                    "XX",
+                    "(-0.16+0j)"
+                  ],
+                  [
+                    "YY",
+                    "(-0.06+0j)"
+                  ]
+                ],
+                "is_hermitian": true
+              },
+              "evolution_coefficient": -6.283185307179586,
+              "constraints": {}
+            },
+            "exponentiation_specification": {
+              "scaling": {
+                "max_depth": 100
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "IN[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->PhaseEstimation_cs4id_qhFWCE:IN[0]",
+            "IN[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->PhaseEstimation_cs4id_qhFWCE:IN[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "PHASE_ESTIMATION[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[0]",
+            "PHASE_ESTIMATION[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[1]",
+            "PHASE_ESTIMATION[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[2]",
+            "PHASE_ESTIMATION[3]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[3]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[3]",
+            "OUT[0]": "PhaseEstimation_cs4id_qhFWCE:OUT[0]->PhaseEstimation_cs4id_b51yBM:OUT[0]",
+            "OUT[1]": "PhaseEstimation_cs4id_qhFWCE:OUT[1]->PhaseEstimation_cs4id_b51yBM:OUT[1]"
+          },
+          "name": "PhaseEstimation_cs4id_qhFWCE"
+        },
+        {
+          "function": "AmplitudeLoading",
+          "params": {},
+          "function_params": {
+            "size": 4,
+            "expression": "0.0625/(x)",
+            "implementation": "GRAYCODE"
+          },
+          "control_states": [],
+          "inputs": {
+            "AMPLITUDE[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[0]",
+            "AMPLITUDE[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[1]",
+            "AMPLITUDE[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[2]",
+            "AMPLITUDE[3]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[3]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[3]"
+          },
+          "inouts": {},
+          "outputs": {
+            "AMPLITUDE[0]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[0]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[0]",
+            "AMPLITUDE[1]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[1]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[1]",
+            "AMPLITUDE[2]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[2]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[2]",
+            "AMPLITUDE[3]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[3]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[3]",
+            "TARGET[0]": "AmplitudeLoading_cs4id_PyYngF:TARGET[0]->target_output_Identity:target[0]"
+          },
+          "name": "AmplitudeLoading_cs4id_PyYngF"
+        },
+        {
+          "function": "PhaseEstimation",
+          "params": {},
+          "function_params": {
+            "size": 4,
+            "unitary": "Exponentiation",
+            "unitary_params": {
+              "pauli_operator": {
+                "pauli_list": [
+                  [
+                    "II",
+                    "(0.4075+0j)"
+                  ],
+                  [
+                    "IZ",
+                    "(-0.05249999999999999+0j)"
+                  ],
+                  [
+                    "IX",
+                    "(-0.030000000000000002+0j)"
+                  ],
+                  [
+                    "ZI",
+                    "(-0.017499999999999988+0j)"
+                  ],
+                  [
+                    "ZZ",
+                    "(-0.057499999999999996+0j)"
+                  ],
+                  [
+                    "ZX",
+                    "(0.02+0j)"
+                  ],
+                  [
+                    "XI",
+                    "(-0.025+0j)"
+                  ],
+                  [
+                    "XZ",
+                    "(0.045000000000000005+0j)"
+                  ],
+                  [
+                    "XX",
+                    "(-0.16+0j)"
+                  ],
+                  [
+                    "YY",
+                    "(-0.06+0j)"
+                  ]
+                ],
+                "is_hermitian": true
+              },
+              "evolution_coefficient": -6.283185307179586,
+              "constraints": {}
+            },
+            "exponentiation_specification": {
+              "scaling": {
+                "max_depth": 100
+              }
+            }
+          },
+          "is_inverse": true,
+          "release_by_inverse": true,
+          "control_states": [],
+          "inputs": {
+            "PHASE_ESTIMATION[0]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[0]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[0]",
+            "PHASE_ESTIMATION[1]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[1]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[1]",
+            "PHASE_ESTIMATION[2]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[2]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[2]",
+            "PHASE_ESTIMATION[3]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[3]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[3]",
+            "OUT[0]": "PhaseEstimation_cs4id_qhFWCE:OUT[0]->PhaseEstimation_cs4id_b51yBM:OUT[0]",
+            "OUT[1]": "PhaseEstimation_cs4id_qhFWCE:OUT[1]->PhaseEstimation_cs4id_b51yBM:OUT[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "IN[0]": "PhaseEstimation_cs4id_b51yBM:IN[0]->solution_output_Identity:solution[0]",
+            "IN[1]": "PhaseEstimation_cs4id_b51yBM:IN[1]->solution_output_Identity:solution[1]"
+          },
+          "name": "PhaseEstimation_cs4id_b51yBM"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "target"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "target[0]": "AmplitudeLoading_cs4id_PyYngF:TARGET[0]->target_output_Identity:target[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "target": "target_output_Identity:target->Output:target"
+          },
+          "name": "target_output_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 2,
+                "bounds": [
+                  0.0,
+                  3.0
+                ],
+                "name": "solution"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "solution[0]": "PhaseEstimation_cs4id_b51yBM:IN[0]->solution_output_Identity:solution[0]",
+            "solution[1]": "PhaseEstimation_cs4id_b51yBM:IN[1]->solution_output_Identity:solution[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "solution": "solution_output_Identity:solution->Output:solution"
+          },
+          "name": "solution_output_Identity"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "max_gate_count": {}
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": [
+        "id",
+        "s",
+        "u2",
+        "y",
+        "rz",
+        "p",
+        "tdg",
+        "rx",
+        "sx",
+        "sdg",
+        "ry",
+        "cz",
+        "u",
+        "sxdg",
+        "x",
+        "cx",
+        "h",
+        "u1",
+        "z",
+        "t",
+        "cy"
+      ]
+    },
+    "random_seed": -1
+  }
+}

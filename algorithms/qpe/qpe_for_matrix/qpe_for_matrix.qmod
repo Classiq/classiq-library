@@ -1,0 +1,250 @@
+{
+  "types": [],
+  "constants": [],
+  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
+  "classical_functions": [],
+  "execution_preferences": {
+    "amplitude_amplification": {
+      "iterations": []
+    },
+    "random_seed": 2353245956,
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator",
+      "provider": {}
+    },
+    "num_shots": 10000
+  },
+  "kind": "synthesis",
+  "functions": [
+    {
+      "name": "main",
+      "port_declarations": {
+        "phase_result": {
+          "name": "phase_result",
+          "direction": "output",
+          "size": {
+            "expr": "8"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        "out": {
+          "name": "out",
+          "direction": "output",
+          "size": {
+            "expr": "2"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {},
+      "output_ports_wiring": {
+        "phase_result": "phase_result_output_Identity:phase_result->Output:phase_result",
+        "out": "out_output_Identity:out->Output:out"
+      },
+      "body": [
+        {
+          "function": "StatePreparation",
+          "params": {},
+          "function_params": {
+            "amplitudes": [
+              0.3365289404181062,
+              0.3885030317078244,
+              0.3564595976838506,
+              0.7802244688767223
+            ],
+            "error_metric": {
+              "L2": {
+                "upper_bound": 0.0
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->PhaseEstimation_cs4id_qhFWCE:IN[0]",
+            "OUT[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->PhaseEstimation_cs4id_qhFWCE:IN[1]"
+          },
+          "name": "StatePreparation_cs4id_iK2ZWe"
+        },
+        {
+          "function": "PhaseEstimation",
+          "params": {},
+          "function_params": {
+            "size": 8,
+            "unitary": "Exponentiation",
+            "unitary_params": {
+              "pauli_operator": {
+                "pauli_list": [
+                  [
+                    "II",
+                    "(0.582852238955473+0j)"
+                  ],
+                  [
+                    "IZ",
+                    "(0.0031887495290169486+0j)"
+                  ],
+                  [
+                    "IX",
+                    "(0.02263662513086446+0j)"
+                  ],
+                  [
+                    "ZI",
+                    "(0.0035267190456534513+0j)"
+                  ],
+                  [
+                    "ZZ",
+                    "(-0.009065520615911007+0j)"
+                  ],
+                  [
+                    "ZX",
+                    "(0.02679602081343607+0j)"
+                  ],
+                  [
+                    "XI",
+                    "(0.00891670416324194+0j)"
+                  ],
+                  [
+                    "XZ",
+                    "(0.036664847518610696+0j)"
+                  ],
+                  [
+                    "XX",
+                    "(0.033198584096787005+0j)"
+                  ],
+                  [
+                    "YY",
+                    "(0.020224302631005442+0j)"
+                  ]
+                ],
+                "is_hermitian": true
+              },
+              "evolution_coefficient": -6.283185307179586,
+              "constraints": {}
+            },
+            "exponentiation_specification": {
+              "scaling": {
+                "max_depth": 200,
+                "max_depth_scaling_factor": 1.8
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "IN[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->PhaseEstimation_cs4id_qhFWCE:IN[0]",
+            "IN[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->PhaseEstimation_cs4id_qhFWCE:IN[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "PHASE_ESTIMATION[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->phase_result_output_Identity:phase_result[0]",
+            "PHASE_ESTIMATION[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->phase_result_output_Identity:phase_result[1]",
+            "PHASE_ESTIMATION[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->phase_result_output_Identity:phase_result[2]",
+            "PHASE_ESTIMATION[3]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[3]->phase_result_output_Identity:phase_result[3]",
+            "PHASE_ESTIMATION[4]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[4]->phase_result_output_Identity:phase_result[4]",
+            "PHASE_ESTIMATION[5]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[5]->phase_result_output_Identity:phase_result[5]",
+            "PHASE_ESTIMATION[6]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[6]->phase_result_output_Identity:phase_result[6]",
+            "PHASE_ESTIMATION[7]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[7]->phase_result_output_Identity:phase_result[7]",
+            "OUT[0]": "PhaseEstimation_cs4id_qhFWCE:OUT[0]->out_output_Identity:out[0]",
+            "OUT[1]": "PhaseEstimation_cs4id_qhFWCE:OUT[1]->out_output_Identity:out[1]"
+          },
+          "name": "PhaseEstimation_cs4id_qhFWCE"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 8,
+                "bounds": [
+                  0.0,
+                  255.0
+                ],
+                "name": "phase_result"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "phase_result[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->phase_result_output_Identity:phase_result[0]",
+            "phase_result[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->phase_result_output_Identity:phase_result[1]",
+            "phase_result[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->phase_result_output_Identity:phase_result[2]",
+            "phase_result[3]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[3]->phase_result_output_Identity:phase_result[3]",
+            "phase_result[4]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[4]->phase_result_output_Identity:phase_result[4]",
+            "phase_result[5]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[5]->phase_result_output_Identity:phase_result[5]",
+            "phase_result[6]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[6]->phase_result_output_Identity:phase_result[6]",
+            "phase_result[7]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[7]->phase_result_output_Identity:phase_result[7]"
+          },
+          "inouts": {},
+          "outputs": {
+            "phase_result": "phase_result_output_Identity:phase_result->Output:phase_result"
+          },
+          "name": "phase_result_output_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 2,
+                "bounds": [
+                  0.0,
+                  3.0
+                ],
+                "name": "out"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "out[0]": "PhaseEstimation_cs4id_qhFWCE:OUT[0]->out_output_Identity:out[0]",
+            "out[1]": "PhaseEstimation_cs4id_qhFWCE:OUT[1]->out_output_Identity:out[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "out": "out_output_Identity:out->Output:out"
+          },
+          "name": "out_output_Identity"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "max_gate_count": {}
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": [
+        "id",
+        "z",
+        "h",
+        "u1",
+        "cy",
+        "cx",
+        "x",
+        "rx",
+        "t",
+        "sdg",
+        "cz",
+        "sx",
+        "ry",
+        "y",
+        "u",
+        "u2",
+        "tdg",
+        "s",
+        "p",
+        "rz",
+        "sxdg"
+      ]
+    },
+    "random_seed": -1
+  }
+}

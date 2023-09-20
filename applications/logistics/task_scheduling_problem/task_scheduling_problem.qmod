@@ -1,0 +1,185 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "param_decls": {
+        "params_list": {
+          "kind": "array",
+          "element_type": {
+            "kind": "real"
+          },
+          "size": 16
+        }
+      },
+      "body": [
+        {
+          "function": "qaoa_penalty",
+          "params": {
+            "hamiltonian": {
+              "expr": "optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20)"
+            },
+            "params_list": {
+              "expr": "params_list"
+            },
+            "num_qubits": {
+              "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20)[0], 'pauli'))"
+            },
+            "is_st": {
+              "expr": "True"
+            }
+          },
+          "function_params": {}
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "MyCombiProblem",
+      "variables": {
+        "x0_0": {
+          "kind": "int"
+        },
+        "x0_1": {
+          "kind": "int"
+        },
+        "x0_2": {
+          "kind": "int"
+        },
+        "x0_3": {
+          "kind": "int"
+        },
+        "x1_0": {
+          "kind": "int"
+        },
+        "x1_1": {
+          "kind": "int"
+        },
+        "x1_2": {
+          "kind": "int"
+        },
+        "x1_3": {
+          "kind": "int"
+        },
+        "x2_0": {
+          "kind": "int"
+        },
+        "x2_1": {
+          "kind": "int"
+        },
+        "x2_2": {
+          "kind": "int"
+        },
+        "x2_3": {
+          "kind": "int"
+        }
+      },
+      "constraints": [
+        {
+          "expr": "Eq(x0_0 + x1_0 + x2_0, 1)"
+        },
+        {
+          "expr": "Eq(x0_1 + x1_1 + x2_1, 1)"
+        },
+        {
+          "expr": "Eq(x0_2 + x1_2 + x2_2, 1)"
+        },
+        {
+          "expr": "Eq(x0_3 + x1_3 + x2_3, 1)"
+        },
+        {
+          "expr": "x0_0 + x0_1 + x0_2 + x0_3 <= 3.0"
+        },
+        {
+          "expr": "x1_0 + x1_1 + x1_2 + x1_3 <= 3.0"
+        },
+        {
+          "expr": "x2_0 + x2_1 + x2_2 + x2_3 <= 3.0"
+        },
+        {
+          "expr": "Eq(x0_0*x0_1, 0)"
+        },
+        {
+          "expr": "Eq(x0_1*x1_0, 0)"
+        },
+        {
+          "expr": "Eq(x1_0*x1_1, 0)"
+        },
+        {
+          "expr": "Eq(x0_1*x2_0, 0)"
+        },
+        {
+          "expr": "Eq(x1_1*x2_0, 0)"
+        },
+        {
+          "expr": "Eq(x2_0*x2_1, 0)"
+        },
+        {
+          "expr": "Eq(x0_1*x0_3, 0)"
+        },
+        {
+          "expr": "Eq(x0_3*x1_1, 0)"
+        },
+        {
+          "expr": "Eq(x1_1*x1_3, 0)"
+        },
+        {
+          "expr": "Eq(x0_3*x2_1, 0)"
+        },
+        {
+          "expr": "Eq(x1_3*x2_1, 0)"
+        },
+        {
+          "expr": "Eq(x2_1*x2_3, 0)"
+        },
+        {
+          "expr": "Eq(x0_2*x0_3, 0)"
+        },
+        {
+          "expr": "Eq(x0_3*x1_2, 0)"
+        },
+        {
+          "expr": "Eq(x1_2*x1_3, 0)"
+        },
+        {
+          "expr": "Eq(x0_3*x2_2, 0)"
+        },
+        {
+          "expr": "Eq(x1_3*x2_2, 0)"
+        },
+        {
+          "expr": "Eq(x2_2*x2_3, 0)"
+        },
+        {
+          "expr": "Eq(x1_0, 0)"
+        },
+        {
+          "expr": "Eq(x2_0, 0)"
+        },
+        {
+          "expr": "Eq(x0_1, 0)"
+        },
+        {
+          "expr": "Eq(x2_1, 0)"
+        },
+        {
+          "expr": "Eq(x2_2, 0)"
+        },
+        {
+          "expr": "Eq(x0_3, 0)"
+        }
+      ],
+      "objective_type": "Min",
+      "objective_function": {
+        "expr": "x0_3 + 2*x1_3 + 3*x2_3"
+      }
+    }
+  ],
+  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20),\n    maximize=False,\n    initial_point=compute_qaoa_initial_point(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20),8),\n    optimizer=Optimizer.COBYLA,\n    max_iteration=20.0,\n    tolerance=0.0,\n    step_size=0.0,\n    skip_compute_variance=False,\n    alpha_cvar=0.3\n)\nsolution = get_optimization_solution(get_type(MyCombiProblem), vqe_result, 20)\nhamiltonian = optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20)\nsave({'solution': solution, \"vqe_result\": vqe_result, \"hamiltonian\": hamiltonian})\n",
+  "execution_preferences": {
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator"
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "types": [],
+  "constants": [],
+  "classical_functions": [],
+  "execution_preferences": {
+    "amplitude_amplification": {
+      "iterations": []
+    },
+    "random_seed": 3172531168,
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator",
+      "provider": {}
+    }
+  },
+  "kind": "synthesis",
+  "functions": [
+    {
+      "name": "main",
+      "port_declarations": {},
+      "parameters": [],
+      "input_ports_wiring": {},
+      "output_ports_wiring": {},
+      "body": [
+        {
+          "function": "Mcx",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 14,
+                "bounds": [
+                  0.0,
+                  16383.0
+                ],
+                "name": "CTRL_IN"
+              },
+              {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "TARGET_QUBIT"
+              }
+            ],
+            "num_ctrl_qubits": 14,
+            "ctrl_state": "11111111111111"
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {},
+          "name": "Mcx_cs4id_iK2ZWe"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "max_width": 19,
+    "max_gate_count": {},
+    "optimization_parameter": "cx"
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": [
+        "cx",
+        "u"
+      ]
+    },
+    "random_seed": -1
+  }
+}

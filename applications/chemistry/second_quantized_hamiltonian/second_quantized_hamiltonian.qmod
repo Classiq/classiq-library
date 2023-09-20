@@ -1,0 +1,95 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "param_decls": {
+        "t": {
+          "kind": "array",
+          "element_type": {
+            "kind": "real"
+          },
+          "size": 12
+        }
+      },
+      "body": [
+        {
+          "function": "full_hea",
+          "params": {
+            "num_qubits": {
+              "expr": "4"
+            },
+            "is_parametrized": {
+              "expr": "[0, 1, 0]"
+            },
+            "connectivity_map": {
+              "expr": "[[0, 1], [1, 2], [2, 3]]"
+            },
+            "reps": {
+              "expr": "3"
+            },
+            "angle_params": {
+              "expr": "t"
+            }
+          },
+          "function_params": {},
+          "inputs": {},
+          "operands": {
+            "operands_1qubit": [
+              {
+                "body": [
+                  {
+                    "function": "X",
+                    "function_params": {},
+                    "inouts": {
+                      "target": {
+                        "name": "q"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "body": [
+                  {
+                    "function": "RY",
+                    "params": {
+                      "theta": {
+                        "expr": "angle"
+                      }
+                    },
+                    "function_params": {},
+                    "inouts": {
+                      "target": {
+                        "name": "q"
+                      }
+                    }
+                  }
+                ]
+              }
+            ],
+            "operands_2qubit": [
+              {
+                "body": [
+                  {
+                    "function": "CX",
+                    "function_params": {},
+                    "inouts": {
+                      "target": {
+                        "name": "q1"
+                      },
+                      "control": {
+                        "name": "q2"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "local_handles": []
+    }
+  ],
+  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=fock_hamiltonian_problem_to_hamiltonian(struct_literal(FockHamiltonianProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,terms=[\n            struct_literal(LadderTerm,\n                coefficient=0.2,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=0),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=0)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.3,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=1)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.4,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=2)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.5,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=3),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=3)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=-0.1,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=0),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.PLUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=0)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=-0.3,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.PLUS, index=3),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=3)\n                ]\n            )],num_particles=[1, 1])), maximize=False,\ninitial_point=[],\noptimizer=Optimizer.COBYLA,\nmax_iteration=100,\ntolerance=0,\nstep_size=0,\nskip_compute_variance=False,\nalpha_cvar=1.0,\n\n)\nsave({'vqe_result': vqe_result})"
+}

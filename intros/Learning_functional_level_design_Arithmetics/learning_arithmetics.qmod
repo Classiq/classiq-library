@@ -1,0 +1,291 @@
+{
+  "types": [],
+  "constants": [],
+  "classical_functions": [
+    {
+      "name": "cmain",
+      "param_decls": {},
+      "body": [
+        {
+          "name": "result",
+          "var_type": {
+            "kind": "histogram"
+          }
+        },
+        {
+          "invoked_expression": {
+            "function": "sample",
+            "params": {},
+            "target_function": "main",
+            "target_params": {}
+          },
+          "assigned_variable": "result"
+        },
+        {
+          "saved_variable": "result"
+        }
+      ]
+    }
+  ],
+  "execution_preferences": {
+    "amplitude_amplification": {
+      "iterations": []
+    },
+    "random_seed": 1643585681,
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator_statevector",
+      "provider": {}
+    }
+  },
+  "kind": "synthesis",
+  "functions": [
+    {
+      "name": "main",
+      "port_declarations": {
+        "a": {
+          "name": "a",
+          "direction": "output",
+          "size": {
+            "expr": "2"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        "b": {
+          "name": "b",
+          "direction": "output",
+          "size": {
+            "expr": "2"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        "sum": {
+          "name": "sum",
+          "direction": "output",
+          "size": {
+            "expr": "3"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {},
+      "output_ports_wiring": {
+        "a": "a_output_Identity:a->Output:a",
+        "b": "b_output_Identity:b->Output:b",
+        "sum": "sum_output_Identity:sum->Output:sum"
+      },
+      "body": [
+        {
+          "function": "StatePreparation",
+          "params": {},
+          "function_params": {
+            "probabilities": {
+              "pmf": [
+                0.5,
+                0.0,
+                0.0,
+                0.5
+              ]
+            },
+            "error_metric": {
+              "KL": {
+                "upper_bound": 0.01
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "StatePreparation_cs4id_VY7onM:OUT[0]->Adder_cs4id_iLWQCl:left_arg[0]",
+            "OUT[1]": "StatePreparation_cs4id_VY7onM:OUT[1]->Adder_cs4id_iLWQCl:left_arg[1]"
+          },
+          "name": "StatePreparation_cs4id_VY7onM"
+        },
+        {
+          "function": "StatePreparation",
+          "params": {},
+          "function_params": {
+            "probabilities": {
+              "pmf": [
+                0.0,
+                0.5,
+                0.5,
+                0.0
+              ]
+            },
+            "error_metric": {
+              "KL": {
+                "upper_bound": 0.01
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "StatePreparation_cs4id_LPxWCu:OUT[0]->Adder_cs4id_iLWQCl:right_arg[0]",
+            "OUT[1]": "StatePreparation_cs4id_LPxWCu:OUT[1]->Adder_cs4id_iLWQCl:right_arg[1]"
+          },
+          "name": "StatePreparation_cs4id_LPxWCu"
+        },
+        {
+          "function": "Adder",
+          "params": {},
+          "function_params": {
+            "left_arg": {
+              "size": 2,
+              "bounds": [
+                0.0,
+                3.0
+              ]
+            },
+            "right_arg": {
+              "size": 2,
+              "bounds": [
+                0.0,
+                3.0
+              ]
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "left_arg[0]": "StatePreparation_cs4id_VY7onM:OUT[0]->Adder_cs4id_iLWQCl:left_arg[0]",
+            "left_arg[1]": "StatePreparation_cs4id_VY7onM:OUT[1]->Adder_cs4id_iLWQCl:left_arg[1]",
+            "right_arg[0]": "StatePreparation_cs4id_LPxWCu:OUT[0]->Adder_cs4id_iLWQCl:right_arg[0]",
+            "right_arg[1]": "StatePreparation_cs4id_LPxWCu:OUT[1]->Adder_cs4id_iLWQCl:right_arg[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "left_arg[0]": "Adder_cs4id_iLWQCl:left_arg[0]->a_output_Identity:a[0]",
+            "left_arg[1]": "Adder_cs4id_iLWQCl:left_arg[1]->a_output_Identity:a[1]",
+            "right_arg[0]": "Adder_cs4id_iLWQCl:right_arg[0]->b_output_Identity:b[0]",
+            "right_arg[1]": "Adder_cs4id_iLWQCl:right_arg[1]->b_output_Identity:b[1]",
+            "sum[0]": "Adder_cs4id_iLWQCl:sum[0]->sum_output_Identity:sum[0]",
+            "sum[1]": "Adder_cs4id_iLWQCl:sum[1]->sum_output_Identity:sum[1]",
+            "sum[2]": "Adder_cs4id_iLWQCl:sum[2]->sum_output_Identity:sum[2]"
+          },
+          "name": "Adder_cs4id_iLWQCl"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 2,
+                "bounds": [
+                  0.0,
+                  3.0
+                ],
+                "name": "a"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "a[0]": "Adder_cs4id_iLWQCl:left_arg[0]->a_output_Identity:a[0]",
+            "a[1]": "Adder_cs4id_iLWQCl:left_arg[1]->a_output_Identity:a[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "a": "a_output_Identity:a->Output:a"
+          },
+          "name": "a_output_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 2,
+                "bounds": [
+                  0.0,
+                  3.0
+                ],
+                "name": "b"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "b[0]": "Adder_cs4id_iLWQCl:right_arg[0]->b_output_Identity:b[0]",
+            "b[1]": "Adder_cs4id_iLWQCl:right_arg[1]->b_output_Identity:b[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "b": "b_output_Identity:b->Output:b"
+          },
+          "name": "b_output_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "sum"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "sum[0]": "Adder_cs4id_iLWQCl:sum[0]->sum_output_Identity:sum[0]",
+            "sum[1]": "Adder_cs4id_iLWQCl:sum[1]->sum_output_Identity:sum[1]",
+            "sum[2]": "Adder_cs4id_iLWQCl:sum[2]->sum_output_Identity:sum[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "sum": "sum_output_Identity:sum->Output:sum"
+          },
+          "name": "sum_output_Identity"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "max_gate_count": {},
+    "optimization_parameter": "depth"
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": [
+        "cx",
+        "sx",
+        "ry",
+        "x",
+        "rz",
+        "h",
+        "p",
+        "u2",
+        "y",
+        "cz",
+        "u",
+        "s",
+        "sdg",
+        "rx",
+        "cy",
+        "t",
+        "tdg",
+        "z",
+        "id",
+        "sxdg",
+        "u1"
+      ]
+    },
+    "random_seed": 206755496
+  }
+}

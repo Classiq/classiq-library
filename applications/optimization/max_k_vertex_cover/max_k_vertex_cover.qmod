@@ -1,0 +1,89 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "param_decls": {
+        "params_list": {
+          "kind": "array",
+          "element_type": {
+            "kind": "real"
+          },
+          "size": 6
+        }
+      },
+      "body": [
+        {
+          "function": "qaoa_penalty",
+          "params": {
+            "hamiltonian": {
+              "expr": "optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)"
+            },
+            "params_list": {
+              "expr": "params_list"
+            },
+            "num_qubits": {
+              "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)[0], 'pauli'))"
+            },
+            "is_st": {
+              "expr": "True"
+            }
+          },
+          "function_params": {}
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "MyCombiProblem",
+      "variables": {
+        "x0": {
+          "kind": "int"
+        },
+        "x1": {
+          "kind": "int"
+        },
+        "x2": {
+          "kind": "int"
+        },
+        "x3": {
+          "kind": "int"
+        },
+        "x4": {
+          "kind": "int"
+        },
+        "x5": {
+          "kind": "int"
+        },
+        "x6": {
+          "kind": "int"
+        },
+        "x7": {
+          "kind": "int"
+        },
+        "x8": {
+          "kind": "int"
+        },
+        "x9": {
+          "kind": "int"
+        }
+      },
+      "constraints": [
+        {
+          "expr": "Eq(x0 + x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9, 5)"
+        }
+      ],
+      "objective_type": "Min",
+      "objective_function": {
+        "expr": "(1 - x0)*(1 - x1) + (1 - x0)*(1 - x5) + (1 - x0)*(1 - x6) + (1 - x0)*(1 - x7) + (1 - x0)*(1 - x8) + (1 - x1)*(1 - x2) + (1 - x1)*(1 - x4) + (1 - x1)*(1 - x5) + (1 - x1)*(1 - x6) + (1 - x1)*(1 - x9) + (1 - x2)*(1 - x3) + (1 - x2)*(1 - x4) + (1 - x3)*(1 - x6) + (1 - x3)*(1 - x8) + (1 - x4)*(1 - x6) + (1 - x4)*(1 - x7) + (1 - x4)*(1 - x8) + (1 - x4)*(1 - x9) + (1 - x5)*(1 - x6) + (1 - x7)*(1 - x8) + (1 - x8)*(1 - x9)"
+      }
+    }
+  ],
+  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),\n    maximize=False,\n    initial_point=compute_qaoa_initial_point(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),3),\n    optimizer=Optimizer.COBYLA,\n    max_iteration=60,\n    tolerance=0.0,\n    step_size=0.0,\n    skip_compute_variance=False,\n    alpha_cvar=0.7\n)\nsolution = get_optimization_solution(get_type(MyCombiProblem), vqe_result, 2.0)\nhamiltonian = optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)\nsave({'solution': solution, \"vqe_result\": vqe_result, \"hamiltonian\": hamiltonian})\n",
+  "execution_preferences": {
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator"
+    }
+  }
+}

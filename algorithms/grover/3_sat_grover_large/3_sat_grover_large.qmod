@@ -1,0 +1,219 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "port_declarations": {
+        "x1": {
+          "name": "x1",
+          "direction": "output",
+          "size": {
+            "expr": "1"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        "x2": {
+          "name": "x2",
+          "direction": "output",
+          "size": {
+            "expr": "1"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        "x3": {
+          "name": "x3",
+          "direction": "output",
+          "size": {
+            "expr": "1"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        "x4": {
+          "name": "x4",
+          "direction": "output",
+          "size": {
+            "expr": "1"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      },
+      "body": [
+        {
+          "function": "grover_search",
+          "params": {
+            "num_qubits": {
+              "expr": "4"
+            },
+            "reps": {
+              "expr": "1"
+            }
+          },
+          "function_params": {},
+          "outputs": {
+            "gsq": {
+              "name": "gsq"
+            }
+          },
+          "operands": {
+            "oracle_op": {
+              "body": [
+                {
+                  "function": "ArithmeticOracle",
+                  "function_params": {
+                    "expression": "(\n((x2) or (x3) or (x4)) and\n((~x1) or ( x2) or ( x3)) and\n((~x1) or ( x2) or (~x3)) and\n((~x1) or (~x2) or ( x3)) and\n(( x1) or (~x2) or (~x3)) and\n(( x1) or (~x2) or ( x3)) and\n((~x1) or (~x2) or (~x4)) and\n((~x1) or (~x2) or ( x4)) and\n((~x2) or (~x3) or (~x4)) and\n(( x2) or (~x3) or ( x4)) and\n(( x1) or (~x3) or ( x4)) and\n(( x1) or (~x2) or (~x4)) and\n((~x1) or (~x2) or (~x3))\n)",
+                    "definitions": {
+                      "x1": {
+                        "size": 1
+                      },
+                      "x2": {
+                        "size": 1
+                      },
+                      "x3": {
+                        "size": 1
+                      },
+                      "x4": {
+                        "size": 1
+                      }
+                    }
+                  },
+                  "inouts": {
+                    "x1": {
+                      "name": "oq",
+                      "start": {
+                        "expr": "0"
+                      },
+                      "end": {
+                        "expr": "1"
+                      }
+                    },
+                    "x2": {
+                      "name": "oq",
+                      "start": {
+                        "expr": "1"
+                      },
+                      "end": {
+                        "expr": "2"
+                      }
+                    },
+                    "x3": {
+                      "name": "oq",
+                      "start": {
+                        "expr": "2"
+                      },
+                      "end": {
+                        "expr": "3"
+                      }
+                    },
+                    "x4": {
+                      "name": "oq",
+                      "start": {
+                        "expr": "3"
+                      },
+                      "end": {
+                        "expr": "4"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "function": "split",
+          "params": {
+            "out1_size": {
+              "expr": "1"
+            },
+            "out2_size": {
+              "expr": "3"
+            }
+          },
+          "function_params": {},
+          "inputs": {
+            "in": {
+              "name": "gsq"
+            }
+          },
+          "outputs": {
+            "out1": {
+              "name": "x1"
+            },
+            "out2": {
+              "name": "split0"
+            }
+          }
+        },
+        {
+          "function": "split",
+          "params": {
+            "out1_size": {
+              "expr": "1"
+            },
+            "out2_size": {
+              "expr": "2"
+            }
+          },
+          "function_params": {},
+          "inputs": {
+            "in": {
+              "name": "split0"
+            }
+          },
+          "outputs": {
+            "out1": {
+              "name": "x2"
+            },
+            "out2": {
+              "name": "split1"
+            }
+          }
+        },
+        {
+          "function": "split",
+          "params": {
+            "out1_size": {
+              "expr": "1"
+            },
+            "out2_size": {
+              "expr": "1"
+            }
+          },
+          "function_params": {},
+          "inputs": {
+            "in": {
+              "name": "split1"
+            }
+          },
+          "outputs": {
+            "out1": {
+              "name": "x3"
+            },
+            "out2": {
+              "name": "x4"
+            }
+          }
+        }
+      ],
+      "local_handles": [
+        {
+          "name": "gsq"
+        },
+        {
+          "name": "split0"
+        },
+        {
+          "name": "split1"
+        }
+      ]
+    }
+  ],
+  "classical_execution_code": "\nresult = sample()\nsave({'result': result})\n"
+}

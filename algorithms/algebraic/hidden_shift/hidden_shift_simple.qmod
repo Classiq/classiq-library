@@ -1,0 +1,366 @@
+{
+  "types": [],
+  "constants": [],
+  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
+  "classical_functions": [],
+  "execution_preferences": {
+    "amplitude_amplification": {
+      "iterations": []
+    },
+    "random_seed": 2374102167,
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator",
+      "provider": {}
+    }
+  },
+  "kind": "synthesis",
+  "functions": [
+    {
+      "name": "main",
+      "port_declarations": {
+        "s": {
+          "name": "s",
+          "direction": "output",
+          "size": {
+            "expr": "4"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {},
+      "output_ports_wiring": {
+        "s": "s_output_Identity:s->Output:s"
+      },
+      "body": [
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_iK2ZWe:TARGET[0]->ArithmeticOracle_cs4id_WXaSCr:x1[0]"
+          },
+          "name": "HGate_cs4id_iK2ZWe"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_qhFWCE:TARGET[0]->ArithmeticOracle_cs4id_WXaSCr:x2[0]"
+          },
+          "name": "HGate_cs4id_qhFWCE"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_PyYngF:TARGET[0]->ArithmeticOracle_cs4id_WXaSCr:x3[0]"
+          },
+          "name": "HGate_cs4id_PyYngF"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_b51yBM:TARGET[0]->ArithmeticOracle_cs4id_WXaSCr:x4[0]"
+          },
+          "name": "HGate_cs4id_b51yBM"
+        },
+        {
+          "function": "ArithmeticOracle",
+          "params": {},
+          "function_params": {
+            "expression": "((((x1^1) and x2) ^ (x3 and (x4)))) == 1",
+            "definitions": {
+              "x1": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ]
+              },
+              "x2": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ]
+              },
+              "x3": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ]
+              },
+              "x4": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "x1[0]": "HGate_cs4id_iK2ZWe:TARGET[0]->ArithmeticOracle_cs4id_WXaSCr:x1[0]",
+            "x2[0]": "HGate_cs4id_qhFWCE:TARGET[0]->ArithmeticOracle_cs4id_WXaSCr:x2[0]",
+            "x3[0]": "HGate_cs4id_PyYngF:TARGET[0]->ArithmeticOracle_cs4id_WXaSCr:x3[0]",
+            "x4[0]": "HGate_cs4id_b51yBM:TARGET[0]->ArithmeticOracle_cs4id_WXaSCr:x4[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "x1[0]": "ArithmeticOracle_cs4id_WXaSCr:x1[0]->HGate_cs4id_UZoL8g:TARGET[0]",
+            "x2[0]": "ArithmeticOracle_cs4id_WXaSCr:x2[0]->HGate_cs4id_5ubbbP:TARGET[0]",
+            "x3[0]": "ArithmeticOracle_cs4id_WXaSCr:x3[0]->HGate_cs4id_Ia84yR:TARGET[0]",
+            "x4[0]": "ArithmeticOracle_cs4id_WXaSCr:x4[0]->HGate_cs4id_nBUbHo:TARGET[0]"
+          },
+          "name": "ArithmeticOracle_cs4id_WXaSCr"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ArithmeticOracle_cs4id_WXaSCr:x1[0]->HGate_cs4id_UZoL8g:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_UZoL8g:TARGET[0]->ArithmeticOracle_cs4id_WC8FJo:x1[0]"
+          },
+          "name": "HGate_cs4id_UZoL8g"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ArithmeticOracle_cs4id_WXaSCr:x2[0]->HGate_cs4id_5ubbbP:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_5ubbbP:TARGET[0]->ArithmeticOracle_cs4id_WC8FJo:x2[0]"
+          },
+          "name": "HGate_cs4id_5ubbbP"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ArithmeticOracle_cs4id_WXaSCr:x3[0]->HGate_cs4id_Ia84yR:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_Ia84yR:TARGET[0]->ArithmeticOracle_cs4id_WC8FJo:x3[0]"
+          },
+          "name": "HGate_cs4id_Ia84yR"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ArithmeticOracle_cs4id_WXaSCr:x4[0]->HGate_cs4id_nBUbHo:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_nBUbHo:TARGET[0]->ArithmeticOracle_cs4id_WC8FJo:x4[0]"
+          },
+          "name": "HGate_cs4id_nBUbHo"
+        },
+        {
+          "function": "ArithmeticOracle",
+          "params": {},
+          "function_params": {
+            "expression": "(((x1 and x2) ^ (x3 and x4)))==1",
+            "definitions": {
+              "x1": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ]
+              },
+              "x2": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ]
+              },
+              "x3": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ]
+              },
+              "x4": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ]
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "x1[0]": "HGate_cs4id_UZoL8g:TARGET[0]->ArithmeticOracle_cs4id_WC8FJo:x1[0]",
+            "x2[0]": "HGate_cs4id_5ubbbP:TARGET[0]->ArithmeticOracle_cs4id_WC8FJo:x2[0]",
+            "x3[0]": "HGate_cs4id_Ia84yR:TARGET[0]->ArithmeticOracle_cs4id_WC8FJo:x3[0]",
+            "x4[0]": "HGate_cs4id_nBUbHo:TARGET[0]->ArithmeticOracle_cs4id_WC8FJo:x4[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "x1[0]": "ArithmeticOracle_cs4id_WC8FJo:x1[0]->HGate_cs4id_woRoWD:TARGET[0]",
+            "x2[0]": "ArithmeticOracle_cs4id_WC8FJo:x2[0]->HGate_cs4id_8s7bA1:TARGET[0]",
+            "x3[0]": "ArithmeticOracle_cs4id_WC8FJo:x3[0]->HGate_cs4id_6J7Pgl:TARGET[0]",
+            "x4[0]": "ArithmeticOracle_cs4id_WC8FJo:x4[0]->HGate_cs4id_OU3shV:TARGET[0]"
+          },
+          "name": "ArithmeticOracle_cs4id_WC8FJo"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ArithmeticOracle_cs4id_WC8FJo:x1[0]->HGate_cs4id_woRoWD:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_woRoWD:TARGET[0]->s_output_Identity:s[0]"
+          },
+          "name": "HGate_cs4id_woRoWD"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ArithmeticOracle_cs4id_WC8FJo:x2[0]->HGate_cs4id_8s7bA1:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_8s7bA1:TARGET[0]->s_output_Identity:s[1]"
+          },
+          "name": "HGate_cs4id_8s7bA1"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ArithmeticOracle_cs4id_WC8FJo:x3[0]->HGate_cs4id_6J7Pgl:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_6J7Pgl:TARGET[0]->s_output_Identity:s[2]"
+          },
+          "name": "HGate_cs4id_6J7Pgl"
+        },
+        {
+          "function": "HGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ArithmeticOracle_cs4id_WC8FJo:x4[0]->HGate_cs4id_OU3shV:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "HGate_cs4id_OU3shV:TARGET[0]->s_output_Identity:s[3]"
+          },
+          "name": "HGate_cs4id_OU3shV"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 4,
+                "bounds": [
+                  0.0,
+                  15.0
+                ],
+                "name": "s"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "s[0]": "HGate_cs4id_woRoWD:TARGET[0]->s_output_Identity:s[0]",
+            "s[1]": "HGate_cs4id_8s7bA1:TARGET[0]->s_output_Identity:s[1]",
+            "s[2]": "HGate_cs4id_6J7Pgl:TARGET[0]->s_output_Identity:s[2]",
+            "s[3]": "HGate_cs4id_OU3shV:TARGET[0]->s_output_Identity:s[3]"
+          },
+          "inouts": {},
+          "outputs": {
+            "s": "s_output_Identity:s->Output:s"
+          },
+          "name": "s_output_Identity"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "max_gate_count": {},
+    "optimization_parameter": "width"
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": [
+        "y",
+        "cz",
+        "id",
+        "u1",
+        "z",
+        "tdg",
+        "p",
+        "u",
+        "cx",
+        "h",
+        "s",
+        "u2",
+        "sxdg",
+        "ry",
+        "rx",
+        "sdg",
+        "cy",
+        "sx",
+        "t",
+        "rz",
+        "x"
+      ]
+    },
+    "random_seed": -1
+  }
+}

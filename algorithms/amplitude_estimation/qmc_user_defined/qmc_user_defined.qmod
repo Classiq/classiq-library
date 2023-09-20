@@ -1,0 +1,1070 @@
+{
+  "types": [],
+  "constants": [],
+  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
+  "classical_functions": [],
+  "execution_preferences": {
+    "amplitude_amplification": {
+      "iterations": []
+    },
+    "random_seed": 4139756191,
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator",
+      "provider": {}
+    }
+  },
+  "kind": "synthesis",
+  "functions": [
+    {
+      "name": "state_loading",
+      "port_declarations": {
+        "io": {
+          "name": "io",
+          "direction": "inout",
+          "size": {
+            "expr": "3"
+          }
+        },
+        "ind": {
+          "name": "ind",
+          "direction": "inout",
+          "size": {
+            "expr": "1"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {
+        "io": "Input:io->io_input_Identity:io",
+        "ind": "Input:ind->ind_input_Identity:ind"
+      },
+      "output_ports_wiring": {
+        "io": "io_output_Identity:io->Output:io",
+        "ind": "ind_output_Identity:ind->Output:ind"
+      },
+      "body": [
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "io": "Input:io->io_input_Identity:io"
+          },
+          "inouts": {},
+          "outputs": {
+            "io[0]": "io_input_Identity:io[0]->StatePreparation_cs4id_iK2ZWe:IN[0]",
+            "io[1]": "io_input_Identity:io[1]->StatePreparation_cs4id_iK2ZWe:IN[1]",
+            "io[2]": "io_input_Identity:io[2]->StatePreparation_cs4id_iK2ZWe:IN[2]"
+          },
+          "name": "io_input_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "ind": "Input:ind->ind_input_Identity:ind"
+          },
+          "inouts": {},
+          "outputs": {
+            "ind[0]": "ind_input_Identity:ind[0]->LinearPauliRotations_cs4id_qhFWCE:target[0]"
+          },
+          "name": "ind_input_Identity"
+        },
+        {
+          "function": "StatePreparation",
+          "params": {},
+          "function_params": {
+            "probabilities": {
+              "pmf": [
+                0.0,
+                0.03571428571428572,
+                0.07142857142857144,
+                0.10714285714285715,
+                0.14285714285714288,
+                0.17857142857142858,
+                0.2142857142857143,
+                0.25000000000000006
+              ]
+            },
+            "error_metric": {
+              "KL": {
+                "upper_bound": 0.0
+              }
+            }
+          },
+          "strict_zero_ios": false,
+          "control_states": [],
+          "inputs": {
+            "IN[0]": "io_input_Identity:io[0]->StatePreparation_cs4id_iK2ZWe:IN[0]",
+            "IN[1]": "io_input_Identity:io[1]->StatePreparation_cs4id_iK2ZWe:IN[1]",
+            "IN[2]": "io_input_Identity:io[2]->StatePreparation_cs4id_iK2ZWe:IN[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->LinearPauliRotations_cs4id_qhFWCE:state[0]",
+            "OUT[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->LinearPauliRotations_cs4id_qhFWCE:state[1]",
+            "OUT[2]": "StatePreparation_cs4id_iK2ZWe:OUT[2]->LinearPauliRotations_cs4id_qhFWCE:state[2]"
+          },
+          "name": "StatePreparation_cs4id_iK2ZWe"
+        },
+        {
+          "function": "LinearPauliRotations",
+          "params": {},
+          "function_params": {
+            "num_state_qubits": 3,
+            "bases": [
+              "y"
+            ],
+            "slopes": [
+              0.5
+            ],
+            "offsets": [
+              0.4
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "state[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->LinearPauliRotations_cs4id_qhFWCE:state[0]",
+            "state[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->LinearPauliRotations_cs4id_qhFWCE:state[1]",
+            "state[2]": "StatePreparation_cs4id_iK2ZWe:OUT[2]->LinearPauliRotations_cs4id_qhFWCE:state[2]",
+            "target[0]": "ind_input_Identity:ind[0]->LinearPauliRotations_cs4id_qhFWCE:target[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "state[0]": "LinearPauliRotations_cs4id_qhFWCE:state[0]->io_output_Identity:io[0]",
+            "state[1]": "LinearPauliRotations_cs4id_qhFWCE:state[1]->io_output_Identity:io[1]",
+            "state[2]": "LinearPauliRotations_cs4id_qhFWCE:state[2]->io_output_Identity:io[2]",
+            "target[0]": "LinearPauliRotations_cs4id_qhFWCE:target[0]->ind_output_Identity:ind[0]"
+          },
+          "name": "LinearPauliRotations_cs4id_qhFWCE"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "io[0]": "LinearPauliRotations_cs4id_qhFWCE:state[0]->io_output_Identity:io[0]",
+            "io[1]": "LinearPauliRotations_cs4id_qhFWCE:state[1]->io_output_Identity:io[1]",
+            "io[2]": "LinearPauliRotations_cs4id_qhFWCE:state[2]->io_output_Identity:io[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "io": "io_output_Identity:io->Output:io"
+          },
+          "name": "io_output_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "ind[0]": "LinearPauliRotations_cs4id_qhFWCE:target[0]->ind_output_Identity:ind[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "ind": "ind_output_Identity:ind->Output:ind"
+          },
+          "name": "ind_output_Identity"
+        }
+      ]
+    },
+    {
+      "name": "good_state_oracle",
+      "port_declarations": {
+        "io": {
+          "name": "io",
+          "direction": "inout",
+          "size": {
+            "expr": "3"
+          }
+        },
+        "ind": {
+          "name": "ind",
+          "direction": "inout",
+          "size": {
+            "expr": "1"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {
+        "io": "Input:io->io_input_Identity:io",
+        "ind": "Input:ind->ind_input_Identity:ind"
+      },
+      "output_ports_wiring": {
+        "io": "io_output_Identity:io->Output:io",
+        "ind": "ind_output_Identity:ind->Output:ind"
+      },
+      "body": [
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "io": "Input:io->io_input_Identity:io"
+          },
+          "inouts": {},
+          "outputs": {
+            "io[0]": "io_input_Identity:io[0]->io_output_Identity:io[0]",
+            "io[1]": "io_input_Identity:io[1]->io_output_Identity:io[1]",
+            "io[2]": "io_input_Identity:io[2]->io_output_Identity:io[2]"
+          },
+          "name": "io_input_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "ind": "Input:ind->ind_input_Identity:ind"
+          },
+          "inouts": {},
+          "outputs": {
+            "ind[0]": "ind_input_Identity:ind[0]->ZGate_cs4id_iK2ZWe:TARGET[0]"
+          },
+          "name": "ind_input_Identity"
+        },
+        {
+          "function": "ZGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "ind_input_Identity:ind[0]->ZGate_cs4id_iK2ZWe:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "ZGate_cs4id_iK2ZWe:TARGET[0]->ind_output_Identity:ind[0]"
+          },
+          "name": "ZGate_cs4id_iK2ZWe"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "ind[0]": "ZGate_cs4id_iK2ZWe:TARGET[0]->ind_output_Identity:ind[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "ind": "ind_output_Identity:ind->Output:ind"
+          },
+          "name": "ind_output_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "io[0]": "io_input_Identity:io[0]->io_output_Identity:io[0]",
+            "io[1]": "io_input_Identity:io[1]->io_output_Identity:io[1]",
+            "io[2]": "io_input_Identity:io[2]->io_output_Identity:io[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "io": "io_output_Identity:io->Output:io"
+          },
+          "name": "io_output_Identity"
+        }
+      ]
+    },
+    {
+      "name": "zero_oracle",
+      "port_declarations": {
+        "mcz_io": {
+          "name": "mcz_io",
+          "direction": "inout",
+          "size": {
+            "expr": "4"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {
+        "mcz_io": "Input:mcz_io->mcz_io_input_Identity:mcz_io"
+      },
+      "output_ports_wiring": {
+        "mcz_io": "mcz_io_output_Identity:mcz_io->Output:mcz_io"
+      },
+      "body": [
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 4,
+                "bounds": [
+                  0.0,
+                  15.0
+                ],
+                "name": "mcz_io"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "mcz_io": "Input:mcz_io->mcz_io_input_Identity:mcz_io"
+          },
+          "inouts": {},
+          "outputs": {
+            "mcz_io[0]": "mcz_io_input_Identity:mcz_io[0]->XGate_cs4id_qhFWCE:TARGET[0]",
+            "mcz_io[1]": "mcz_io_input_Identity:mcz_io[1]->ZGate_cs4id_PyYngF:ctrl_reg[0]",
+            "mcz_io[2]": "mcz_io_input_Identity:mcz_io[2]->ZGate_cs4id_PyYngF:ctrl_reg[1]",
+            "mcz_io[3]": "mcz_io_input_Identity:mcz_io[3]->ZGate_cs4id_PyYngF:ctrl_reg[2]"
+          },
+          "name": "mcz_io_input_Identity"
+        },
+        {
+          "function": "XGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "should_control": false,
+          "inputs": {
+            "TARGET[0]": "mcz_io_input_Identity:mcz_io[0]->XGate_cs4id_qhFWCE:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "XGate_cs4id_qhFWCE:TARGET[0]->ZGate_cs4id_PyYngF:TARGET[0]"
+          },
+          "name": "XGate_cs4id_qhFWCE"
+        },
+        {
+          "function": "ZGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [
+            {
+              "num_ctrl_qubits": 3,
+              "ctrl_state": "000",
+              "name": "ctrl_reg"
+            }
+          ],
+          "inputs": {
+            "TARGET[0]": "XGate_cs4id_qhFWCE:TARGET[0]->ZGate_cs4id_PyYngF:TARGET[0]",
+            "ctrl_reg[0]": "mcz_io_input_Identity:mcz_io[1]->ZGate_cs4id_PyYngF:ctrl_reg[0]",
+            "ctrl_reg[1]": "mcz_io_input_Identity:mcz_io[2]->ZGate_cs4id_PyYngF:ctrl_reg[1]",
+            "ctrl_reg[2]": "mcz_io_input_Identity:mcz_io[3]->ZGate_cs4id_PyYngF:ctrl_reg[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "ZGate_cs4id_PyYngF:TARGET[0]->XGate_cs4id_b51yBM:TARGET[0]",
+            "ctrl_reg[0]": "ZGate_cs4id_PyYngF:ctrl_reg[0]->mcz_io_output_Identity:mcz_io[1]",
+            "ctrl_reg[1]": "ZGate_cs4id_PyYngF:ctrl_reg[1]->mcz_io_output_Identity:mcz_io[2]",
+            "ctrl_reg[2]": "ZGate_cs4id_PyYngF:ctrl_reg[2]->mcz_io_output_Identity:mcz_io[3]"
+          },
+          "name": "ZGate_cs4id_PyYngF"
+        },
+        {
+          "function": "XGate",
+          "params": {},
+          "function_params": {},
+          "control_states": [],
+          "should_control": false,
+          "inputs": {
+            "TARGET[0]": "ZGate_cs4id_PyYngF:TARGET[0]->XGate_cs4id_b51yBM:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "XGate_cs4id_b51yBM:TARGET[0]->mcz_io_output_Identity:mcz_io[0]"
+          },
+          "name": "XGate_cs4id_b51yBM"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 4,
+                "bounds": [
+                  0.0,
+                  15.0
+                ],
+                "name": "mcz_io"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "mcz_io[0]": "XGate_cs4id_b51yBM:TARGET[0]->mcz_io_output_Identity:mcz_io[0]",
+            "mcz_io[1]": "ZGate_cs4id_PyYngF:ctrl_reg[0]->mcz_io_output_Identity:mcz_io[1]",
+            "mcz_io[2]": "ZGate_cs4id_PyYngF:ctrl_reg[1]->mcz_io_output_Identity:mcz_io[2]",
+            "mcz_io[3]": "ZGate_cs4id_PyYngF:ctrl_reg[2]->mcz_io_output_Identity:mcz_io[3]"
+          },
+          "inouts": {},
+          "outputs": {
+            "mcz_io": "mcz_io_output_Identity:mcz_io->Output:mcz_io"
+          },
+          "name": "mcz_io_output_Identity"
+        }
+      ]
+    },
+    {
+      "name": "grover",
+      "port_declarations": {
+        "io": {
+          "name": "io",
+          "direction": "inout",
+          "size": {
+            "expr": "3"
+          }
+        },
+        "ind": {
+          "name": "ind",
+          "direction": "inout",
+          "size": {
+            "expr": "1"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {
+        "io": "Input:io->io_input_Identity:io",
+        "ind": "Input:ind->ind_input_Identity:ind"
+      },
+      "output_ports_wiring": {
+        "io": "io_output_Identity:io->Output:io",
+        "ind": "ind_output_Identity:ind->Output:ind"
+      },
+      "body": [
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "io": "Input:io->io_input_Identity:io"
+          },
+          "inouts": {},
+          "outputs": {
+            "io[0]": "io_input_Identity:io[0]->good_state_oracle_cs4id_WXaSCr:io[0]",
+            "io[1]": "io_input_Identity:io[1]->good_state_oracle_cs4id_WXaSCr:io[1]",
+            "io[2]": "io_input_Identity:io[2]->good_state_oracle_cs4id_WXaSCr:io[2]"
+          },
+          "name": "io_input_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "ind": "Input:ind->ind_input_Identity:ind"
+          },
+          "inouts": {},
+          "outputs": {
+            "ind[0]": "ind_input_Identity:ind[0]->good_state_oracle_cs4id_WXaSCr:ind[0]"
+          },
+          "name": "ind_input_Identity"
+        },
+        {
+          "function": "good_state_oracle",
+          "params": {},
+          "function_params": {
+            "parameters": [],
+            "input_decls": {
+              "io": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              },
+              "ind": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            },
+            "output_decls": {
+              "io": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              },
+              "ind": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "io[0]": "io_input_Identity:io[0]->good_state_oracle_cs4id_WXaSCr:io[0]",
+            "io[1]": "io_input_Identity:io[1]->good_state_oracle_cs4id_WXaSCr:io[1]",
+            "io[2]": "io_input_Identity:io[2]->good_state_oracle_cs4id_WXaSCr:io[2]",
+            "ind[0]": "ind_input_Identity:ind[0]->good_state_oracle_cs4id_WXaSCr:ind[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "io[0]": "good_state_oracle_cs4id_WXaSCr:io[0]->state_loading_cs4id_UZoL8g:io[0]",
+            "io[1]": "good_state_oracle_cs4id_WXaSCr:io[1]->state_loading_cs4id_UZoL8g:io[1]",
+            "io[2]": "good_state_oracle_cs4id_WXaSCr:io[2]->state_loading_cs4id_UZoL8g:io[2]",
+            "ind[0]": "good_state_oracle_cs4id_WXaSCr:ind[0]->state_loading_cs4id_UZoL8g:ind[0]"
+          },
+          "name": "good_state_oracle_cs4id_WXaSCr"
+        },
+        {
+          "function": "state_loading",
+          "params": {},
+          "function_params": {
+            "parameters": [],
+            "input_decls": {
+              "io": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              },
+              "ind": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            },
+            "output_decls": {
+              "io": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              },
+              "ind": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            }
+          },
+          "is_inverse": true,
+          "control_states": [],
+          "should_control": false,
+          "inputs": {
+            "io[0]": "good_state_oracle_cs4id_WXaSCr:io[0]->state_loading_cs4id_UZoL8g:io[0]",
+            "io[1]": "good_state_oracle_cs4id_WXaSCr:io[1]->state_loading_cs4id_UZoL8g:io[1]",
+            "io[2]": "good_state_oracle_cs4id_WXaSCr:io[2]->state_loading_cs4id_UZoL8g:io[2]",
+            "ind[0]": "good_state_oracle_cs4id_WXaSCr:ind[0]->state_loading_cs4id_UZoL8g:ind[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "io[0]": "state_loading_cs4id_UZoL8g:io[0]->zero_oracle_cs4id_5ubbbP:mcz_io[0]",
+            "io[1]": "state_loading_cs4id_UZoL8g:io[1]->zero_oracle_cs4id_5ubbbP:mcz_io[1]",
+            "io[2]": "state_loading_cs4id_UZoL8g:io[2]->zero_oracle_cs4id_5ubbbP:mcz_io[2]",
+            "ind[0]": "state_loading_cs4id_UZoL8g:ind[0]->zero_oracle_cs4id_5ubbbP:mcz_io[3]"
+          },
+          "name": "state_loading_cs4id_UZoL8g"
+        },
+        {
+          "function": "zero_oracle",
+          "params": {},
+          "function_params": {
+            "parameters": [],
+            "input_decls": {
+              "mcz_io": {
+                "size": 4,
+                "bounds": [
+                  0.0,
+                  15.0
+                ],
+                "name": "mcz_io"
+              }
+            },
+            "output_decls": {
+              "mcz_io": {
+                "size": 4,
+                "bounds": [
+                  0.0,
+                  15.0
+                ],
+                "name": "mcz_io"
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "mcz_io[0]": "state_loading_cs4id_UZoL8g:io[0]->zero_oracle_cs4id_5ubbbP:mcz_io[0]",
+            "mcz_io[1]": "state_loading_cs4id_UZoL8g:io[1]->zero_oracle_cs4id_5ubbbP:mcz_io[1]",
+            "mcz_io[2]": "state_loading_cs4id_UZoL8g:io[2]->zero_oracle_cs4id_5ubbbP:mcz_io[2]",
+            "mcz_io[3]": "state_loading_cs4id_UZoL8g:ind[0]->zero_oracle_cs4id_5ubbbP:mcz_io[3]"
+          },
+          "inouts": {},
+          "outputs": {
+            "mcz_io[0]": "zero_oracle_cs4id_5ubbbP:mcz_io[0]->state_loading_cs4id_Ia84yR:io[0]",
+            "mcz_io[1]": "zero_oracle_cs4id_5ubbbP:mcz_io[1]->state_loading_cs4id_Ia84yR:io[1]",
+            "mcz_io[2]": "zero_oracle_cs4id_5ubbbP:mcz_io[2]->state_loading_cs4id_Ia84yR:io[2]",
+            "mcz_io[3]": "zero_oracle_cs4id_5ubbbP:mcz_io[3]->state_loading_cs4id_Ia84yR:ind[0]"
+          },
+          "name": "zero_oracle_cs4id_5ubbbP"
+        },
+        {
+          "function": "state_loading",
+          "params": {},
+          "function_params": {
+            "parameters": [],
+            "input_decls": {
+              "io": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              },
+              "ind": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            },
+            "output_decls": {
+              "io": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              },
+              "ind": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            }
+          },
+          "control_states": [],
+          "should_control": false,
+          "inputs": {
+            "io[0]": "zero_oracle_cs4id_5ubbbP:mcz_io[0]->state_loading_cs4id_Ia84yR:io[0]",
+            "io[1]": "zero_oracle_cs4id_5ubbbP:mcz_io[1]->state_loading_cs4id_Ia84yR:io[1]",
+            "io[2]": "zero_oracle_cs4id_5ubbbP:mcz_io[2]->state_loading_cs4id_Ia84yR:io[2]",
+            "ind[0]": "zero_oracle_cs4id_5ubbbP:mcz_io[3]->state_loading_cs4id_Ia84yR:ind[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "ind[0]": "state_loading_cs4id_Ia84yR:ind[0]->UGate_cs4id_nBUbHo:TARGET[0]",
+            "io[0]": "state_loading_cs4id_Ia84yR:io[0]->io_output_Identity:io[0]",
+            "io[1]": "state_loading_cs4id_Ia84yR:io[1]->io_output_Identity:io[1]",
+            "io[2]": "state_loading_cs4id_Ia84yR:io[2]->io_output_Identity:io[2]"
+          },
+          "name": "state_loading_cs4id_Ia84yR"
+        },
+        {
+          "function": "UGate",
+          "params": {},
+          "function_params": {
+            "theta": 0.0,
+            "phi": 0.0,
+            "lam": 0.0,
+            "gam": 3.141592653589793
+          },
+          "control_states": [],
+          "inputs": {
+            "TARGET[0]": "state_loading_cs4id_Ia84yR:ind[0]->UGate_cs4id_nBUbHo:TARGET[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "TARGET[0]": "UGate_cs4id_nBUbHo:TARGET[0]->ind_output_Identity:ind[0]"
+          },
+          "name": "UGate_cs4id_nBUbHo"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "io[0]": "state_loading_cs4id_Ia84yR:io[0]->io_output_Identity:io[0]",
+            "io[1]": "state_loading_cs4id_Ia84yR:io[1]->io_output_Identity:io[1]",
+            "io[2]": "state_loading_cs4id_Ia84yR:io[2]->io_output_Identity:io[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "io": "io_output_Identity:io->Output:io"
+          },
+          "name": "io_output_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "ind[0]": "UGate_cs4id_nBUbHo:TARGET[0]->ind_output_Identity:ind[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "ind": "ind_output_Identity:ind->Output:ind"
+          },
+          "name": "ind_output_Identity"
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "port_declarations": {
+        "phase_result": {
+          "name": "phase_result",
+          "direction": "output",
+          "size": {
+            "expr": "3"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {},
+      "output_ports_wiring": {
+        "phase_result": "phase_result_output_Identity:phase_result->Output:phase_result"
+      },
+      "body": [
+        {
+          "function": "state_loading",
+          "params": {},
+          "function_params": {
+            "parameters": [],
+            "input_decls": {
+              "io": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              },
+              "ind": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            },
+            "output_decls": {
+              "io": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "io"
+              },
+              "ind": {
+                "size": 1,
+                "bounds": [
+                  0.0,
+                  1.0
+                ],
+                "name": "ind"
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "io[0]": "state_loading_cs4id_iK2ZWe:io[0]->PhaseEstimation_cs4id_qhFWCE:io[0]",
+            "io[1]": "state_loading_cs4id_iK2ZWe:io[1]->PhaseEstimation_cs4id_qhFWCE:io[1]",
+            "io[2]": "state_loading_cs4id_iK2ZWe:io[2]->PhaseEstimation_cs4id_qhFWCE:io[2]",
+            "ind[0]": "state_loading_cs4id_iK2ZWe:ind[0]->PhaseEstimation_cs4id_qhFWCE:ind[0]"
+          },
+          "name": "state_loading_cs4id_iK2ZWe"
+        },
+        {
+          "function": "PhaseEstimation",
+          "params": {},
+          "function_params": {
+            "size": 3,
+            "unitary": "grover",
+            "unitary_params": {
+              "parameters": [],
+              "input_decls": {
+                "io": {
+                  "size": 3,
+                  "bounds": [
+                    0.0,
+                    7.0
+                  ],
+                  "name": "io"
+                },
+                "ind": {
+                  "size": 1,
+                  "bounds": [
+                    0.0,
+                    1.0
+                  ],
+                  "name": "ind"
+                }
+              },
+              "output_decls": {
+                "io": {
+                  "size": 3,
+                  "bounds": [
+                    0.0,
+                    7.0
+                  ],
+                  "name": "io"
+                },
+                "ind": {
+                  "size": 1,
+                  "bounds": [
+                    0.0,
+                    1.0
+                  ],
+                  "name": "ind"
+                }
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "io[0]": "state_loading_cs4id_iK2ZWe:io[0]->PhaseEstimation_cs4id_qhFWCE:io[0]",
+            "io[1]": "state_loading_cs4id_iK2ZWe:io[1]->PhaseEstimation_cs4id_qhFWCE:io[1]",
+            "io[2]": "state_loading_cs4id_iK2ZWe:io[2]->PhaseEstimation_cs4id_qhFWCE:io[2]",
+            "ind[0]": "state_loading_cs4id_iK2ZWe:ind[0]->PhaseEstimation_cs4id_qhFWCE:ind[0]"
+          },
+          "inouts": {},
+          "outputs": {
+            "PHASE_ESTIMATION[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->phase_result_output_Identity:phase_result[0]",
+            "PHASE_ESTIMATION[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->phase_result_output_Identity:phase_result[1]",
+            "PHASE_ESTIMATION[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->phase_result_output_Identity:phase_result[2]"
+          },
+          "name": "PhaseEstimation_cs4id_qhFWCE"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "phase_result"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "phase_result[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->phase_result_output_Identity:phase_result[0]",
+            "phase_result[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->phase_result_output_Identity:phase_result[1]",
+            "phase_result[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->phase_result_output_Identity:phase_result[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "phase_result": "phase_result_output_Identity:phase_result->Output:phase_result"
+          },
+          "name": "phase_result_output_Identity"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "max_width": 9,
+    "max_gate_count": {}
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": [
+        "t",
+        "cx",
+        "x",
+        "u1",
+        "ry",
+        "rx",
+        "z",
+        "y",
+        "cy",
+        "h",
+        "rz",
+        "cz",
+        "sxdg",
+        "u2",
+        "sx",
+        "id",
+        "s",
+        "tdg",
+        "p",
+        "u",
+        "sdg"
+      ]
+    },
+    "random_seed": -1
+  }
+}

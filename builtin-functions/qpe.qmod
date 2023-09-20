@@ -1,0 +1,36 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "body": [
+        {
+          "function": "XGate",
+          "function_params": {},
+          "outputs": {
+            "TARGET": "x_qpe"
+          }
+        },
+        {
+          "function": "PhaseEstimation",
+          "function_params": {
+            "size": 2,
+            "unitary": "Exponentiation",
+            "unitary_params": {
+              "pauli_operator": {
+                "pauli_list": [
+                  ["ZI", -0.125],
+                  ["IZ", -0.25],
+                  ["II", 0.375]
+                ]
+              },
+              "evolution_coefficient": -6.283185307179586
+            }
+          },
+          "inputs": {
+            "IN[0]": "x_qpe"
+          }
+        }
+      ]
+    }
+  ]
+}

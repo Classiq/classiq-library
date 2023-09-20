@@ -1,0 +1,260 @@
+{
+  "types": [],
+  "constants": [],
+  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
+  "classical_functions": [],
+  "execution_preferences": {
+    "amplitude_amplification": {
+      "iterations": []
+    },
+    "random_seed": 389433152,
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator_statevector",
+      "provider": {}
+    },
+    "num_shots": 1000
+  },
+  "kind": "synthesis",
+  "functions": [
+    {
+      "name": "main",
+      "port_declarations": {
+        "a": {
+          "name": "a",
+          "direction": "output",
+          "size": {
+            "expr": "2"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        "b": {
+          "name": "b",
+          "direction": "output",
+          "size": {
+            "expr": "2"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {},
+      "output_ports_wiring": {
+        "a": "a_output_Identity:a->Output:a",
+        "b": "b_output_Identity:b->Output:b"
+      },
+      "body": [
+        {
+          "function": "StatePreparation",
+          "params": {},
+          "function_params": {
+            "probabilities": {
+              "pmf": [
+                0.0,
+                0.3333333333333333,
+                0.3333333333333333,
+                0.3333333333333333
+              ]
+            },
+            "error_metric": {
+              "KL": {
+                "upper_bound": 0.1
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->GroverOperator_cs4id_PyYngF:a[0]",
+            "OUT[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->GroverOperator_cs4id_PyYngF:a[1]"
+          },
+          "name": "StatePreparation_cs4id_iK2ZWe"
+        },
+        {
+          "function": "StatePreparation",
+          "params": {},
+          "function_params": {
+            "probabilities": {
+              "pmf": [
+                0.0,
+                0.3333333333333333,
+                0.3333333333333333,
+                0.3333333333333333
+              ]
+            },
+            "error_metric": {
+              "KL": {
+                "upper_bound": 0.1
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "StatePreparation_cs4id_qhFWCE:OUT[0]->GroverOperator_cs4id_PyYngF:b[0]",
+            "OUT[1]": "StatePreparation_cs4id_qhFWCE:OUT[1]->GroverOperator_cs4id_PyYngF:b[1]"
+          },
+          "name": "StatePreparation_cs4id_qhFWCE"
+        },
+        {
+          "function": "GroverOperator",
+          "params": {},
+          "function_params": {
+            "oracle_params": {
+              "expression": "a+b==4",
+              "definitions": {
+                "a": {
+                  "size": 2,
+                  "bounds": [
+                    0.0,
+                    3.0
+                  ]
+                },
+                "b": {
+                  "size": 2,
+                  "bounds": [
+                    0.0,
+                    3.0
+                  ]
+                }
+              }
+            },
+            "state_preparation_params": {
+              "probabilities": {
+                "pmf": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.1111111111111111,
+                  0.1111111111111111,
+                  0.1111111111111111,
+                  0.0,
+                  0.1111111111111111,
+                  0.1111111111111111,
+                  0.1111111111111111,
+                  0.0,
+                  0.1111111111111111,
+                  0.1111111111111111,
+                  0.1111111111111111
+                ]
+              },
+              "error_metric": {
+                "KL": {
+                  "upper_bound": 0.1
+                }
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "a[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->GroverOperator_cs4id_PyYngF:a[0]",
+            "a[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->GroverOperator_cs4id_PyYngF:a[1]",
+            "b[0]": "StatePreparation_cs4id_qhFWCE:OUT[0]->GroverOperator_cs4id_PyYngF:b[0]",
+            "b[1]": "StatePreparation_cs4id_qhFWCE:OUT[1]->GroverOperator_cs4id_PyYngF:b[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "a[0]": "GroverOperator_cs4id_PyYngF:a[0]->a_output_Identity:a[0]",
+            "a[1]": "GroverOperator_cs4id_PyYngF:a[1]->a_output_Identity:a[1]",
+            "b[0]": "GroverOperator_cs4id_PyYngF:b[0]->b_output_Identity:b[0]",
+            "b[1]": "GroverOperator_cs4id_PyYngF:b[1]->b_output_Identity:b[1]"
+          },
+          "name": "GroverOperator_cs4id_PyYngF"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 2,
+                "bounds": [
+                  0.0,
+                  3.0
+                ],
+                "name": "a"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "a[0]": "GroverOperator_cs4id_PyYngF:a[0]->a_output_Identity:a[0]",
+            "a[1]": "GroverOperator_cs4id_PyYngF:a[1]->a_output_Identity:a[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "a": "a_output_Identity:a->Output:a"
+          },
+          "name": "a_output_Identity"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 2,
+                "bounds": [
+                  0.0,
+                  3.0
+                ],
+                "name": "b"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "b[0]": "GroverOperator_cs4id_PyYngF:b[0]->b_output_Identity:b[0]",
+            "b[1]": "GroverOperator_cs4id_PyYngF:b[1]->b_output_Identity:b[1]"
+          },
+          "inouts": {},
+          "outputs": {
+            "b": "b_output_Identity:b->Output:b"
+          },
+          "name": "b_output_Identity"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "max_width": 12,
+    "max_gate_count": {},
+    "optimization_parameter": "width"
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": [
+        "y",
+        "cz",
+        "id",
+        "u1",
+        "z",
+        "tdg",
+        "p",
+        "u",
+        "cx",
+        "h",
+        "s",
+        "u2",
+        "sxdg",
+        "ry",
+        "rx",
+        "sdg",
+        "cy",
+        "sx",
+        "t",
+        "rz",
+        "x"
+      ]
+    },
+    "random_seed": -1
+  }
+}
