@@ -1,2727 +1,338 @@
 {
-  "types": [],
-  "constants": [],
-  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
-  "classical_functions": [],
-  "execution_preferences": {
-    "amplitude_amplification": {
-      "iterations": []
-    },
-    "random_seed": 2813949745,
-    "backend_preferences": {
-      "backend_service_provider": "IBM Quantum",
-      "backend_name": "aer_simulator",
-      "provider": {}
-    }
-  },
-  "kind": "synthesis",
   "functions": [
     {
-      "name": "main",
-      "port_declarations": {},
-      "parameters": [],
-      "input_ports_wiring": {},
-      "output_ports_wiring": {},
+      "name": "modular_exponentiation",
+      "param_decls": {
+        "power": {
+          "kind": "int"
+        }
+      },
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "direction": "inout",
+          "size": {
+            "expr": "4"
+          }
+        }
+      },
+      "operand_declarations": {},
+      "positional_param_declarations": [],
       "body": [
         {
-          "function": "HGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "HGate_cs4id_iK2ZWe:TARGET[0]->UnitaryGate_cs4id_WC8FJo:CTRL_0[0]"
-          },
-          "name": "HGate_cs4id_iK2ZWe"
-        },
-        {
-          "function": "HGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "HGate_cs4id_qhFWCE:TARGET[0]->UnitaryGate_cs4id_woRoWD:CTRL_1[0]"
-          },
-          "name": "HGate_cs4id_qhFWCE"
-        },
-        {
-          "function": "HGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "HGate_cs4id_PyYngF:TARGET[0]->UnitaryGate_cs4id_8s7bA1:CTRL_2[0]"
-          },
-          "name": "HGate_cs4id_PyYngF"
-        },
-        {
-          "function": "HGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "HGate_cs4id_b51yBM:TARGET[0]->UnitaryGate_cs4id_6J7Pgl:CTRL_3[0]"
-          },
-          "name": "HGate_cs4id_b51yBM"
-        },
-        {
-          "function": "HGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "HGate_cs4id_WXaSCr:TARGET[0]->UnitaryGate_cs4id_OU3shV:CTRL_4[0]"
-          },
-          "name": "HGate_cs4id_WXaSCr"
-        },
-        {
-          "function": "HGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "HGate_cs4id_UZoL8g:TARGET[0]->UnitaryGate_cs4id_v5UTG7:CTRL_5[0]"
-          },
-          "name": "HGate_cs4id_UZoL8g"
-        },
-        {
-          "function": "HGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "HGate_cs4id_5ubbbP:TARGET[0]->UnitaryGate_cs4id_9BG16Q:CTRL_6[0]"
-          },
-          "name": "HGate_cs4id_5ubbbP"
-        },
-        {
-          "function": "HGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "HGate_cs4id_Ia84yR:TARGET[0]->UnitaryGate_cs4id_mtsL4F:CTRL_7[0]"
-          },
-          "name": "HGate_cs4id_Ia84yR"
-        },
-        {
-          "function": "XGate",
-          "params": {},
-          "function_params": {},
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "XGate_cs4id_nBUbHo:TARGET[0]->UnitaryGate_cs4id_WC8FJo:TARGET[0]"
-          },
-          "name": "XGate_cs4id_nBUbHo"
-        },
-        {
-          "function": "UnitaryGate",
-          "params": {},
-          "function_params": {
-            "data": [
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ]
-            ]
-          },
-          "control_states": [
-            {
-              "ctrl_state": "1",
-              "name": "CTRL_0"
+          "function": "unitary",
+          "params": {
+            "elements": {
+              "expr": "Matrix([[0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power)], [0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0], [0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0], [0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0], [0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0], [0, 0, 0, 0, 0, 1.0*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0], [0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0], [0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0], [0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0*1.0**(2**power), 0, 0, 0, 0, 0], [0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0], [0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0], [0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0], [0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0], [-0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power)]])"
             }
-          ],
-          "inputs": {
-            "CTRL_0[0]": "HGate_cs4id_iK2ZWe:TARGET[0]->UnitaryGate_cs4id_WC8FJo:CTRL_0[0]",
-            "TARGET[0]": "XGate_cs4id_nBUbHo:TARGET[0]->UnitaryGate_cs4id_WC8FJo:TARGET[0]"
           },
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "UnitaryGate_cs4id_WC8FJo:TARGET[0]->UnitaryGate_cs4id_woRoWD:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_WC8FJo:TARGET[1]->UnitaryGate_cs4id_woRoWD:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_WC8FJo:TARGET[2]->UnitaryGate_cs4id_woRoWD:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_WC8FJo:TARGET[3]->UnitaryGate_cs4id_woRoWD:TARGET[3]",
-            "CTRL_0[0]": "UnitaryGate_cs4id_WC8FJo:CTRL_0[0]->QFT_cs4id_28GzL2:OUT[0]"
-          },
-          "name": "UnitaryGate_cs4id_WC8FJo"
-        },
-        {
-          "function": "UnitaryGate",
-          "params": {},
-          "function_params": {
-            "data": [
-              [
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)"
-              ]
-            ]
-          },
-          "control_states": [
-            {
-              "ctrl_state": "1",
-              "name": "CTRL_1"
+          "function_params": {},
+          "inputs": {},
+          "inouts": {
+            "target": {
+              "name": "target"
             }
-          ],
-          "inputs": {
-            "CTRL_1[0]": "HGate_cs4id_qhFWCE:TARGET[0]->UnitaryGate_cs4id_woRoWD:CTRL_1[0]",
-            "TARGET[0]": "UnitaryGate_cs4id_WC8FJo:TARGET[0]->UnitaryGate_cs4id_woRoWD:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_WC8FJo:TARGET[1]->UnitaryGate_cs4id_woRoWD:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_WC8FJo:TARGET[2]->UnitaryGate_cs4id_woRoWD:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_WC8FJo:TARGET[3]->UnitaryGate_cs4id_woRoWD:TARGET[3]"
           },
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "UnitaryGate_cs4id_woRoWD:TARGET[0]->UnitaryGate_cs4id_8s7bA1:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_woRoWD:TARGET[1]->UnitaryGate_cs4id_8s7bA1:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_woRoWD:TARGET[2]->UnitaryGate_cs4id_8s7bA1:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_woRoWD:TARGET[3]->UnitaryGate_cs4id_8s7bA1:TARGET[3]",
-            "CTRL_1[0]": "UnitaryGate_cs4id_woRoWD:CTRL_1[0]->QFT_cs4id_28GzL2:OUT[1]"
-          },
-          "name": "UnitaryGate_cs4id_woRoWD"
-        },
-        {
-          "function": "UnitaryGate",
-          "params": {},
-          "function_params": {
-            "data": [
-              [
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)"
-              ]
-            ]
-          },
-          "control_states": [
-            {
-              "ctrl_state": "1",
-              "name": "CTRL_2"
-            }
-          ],
-          "inputs": {
-            "CTRL_2[0]": "HGate_cs4id_PyYngF:TARGET[0]->UnitaryGate_cs4id_8s7bA1:CTRL_2[0]",
-            "TARGET[0]": "UnitaryGate_cs4id_woRoWD:TARGET[0]->UnitaryGate_cs4id_8s7bA1:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_woRoWD:TARGET[1]->UnitaryGate_cs4id_8s7bA1:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_woRoWD:TARGET[2]->UnitaryGate_cs4id_8s7bA1:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_woRoWD:TARGET[3]->UnitaryGate_cs4id_8s7bA1:TARGET[3]"
-          },
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "UnitaryGate_cs4id_8s7bA1:TARGET[0]->UnitaryGate_cs4id_6J7Pgl:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_8s7bA1:TARGET[1]->UnitaryGate_cs4id_6J7Pgl:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_8s7bA1:TARGET[2]->UnitaryGate_cs4id_6J7Pgl:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_8s7bA1:TARGET[3]->UnitaryGate_cs4id_6J7Pgl:TARGET[3]",
-            "CTRL_2[0]": "UnitaryGate_cs4id_8s7bA1:CTRL_2[0]->QFT_cs4id_28GzL2:OUT[2]"
-          },
-          "name": "UnitaryGate_cs4id_8s7bA1"
-        },
-        {
-          "function": "UnitaryGate",
-          "params": {},
-          "function_params": {
-            "data": [
-              [
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)"
-              ]
-            ]
-          },
-          "control_states": [
-            {
-              "ctrl_state": "1",
-              "name": "CTRL_3"
-            }
-          ],
-          "inputs": {
-            "CTRL_3[0]": "HGate_cs4id_b51yBM:TARGET[0]->UnitaryGate_cs4id_6J7Pgl:CTRL_3[0]",
-            "TARGET[0]": "UnitaryGate_cs4id_8s7bA1:TARGET[0]->UnitaryGate_cs4id_6J7Pgl:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_8s7bA1:TARGET[1]->UnitaryGate_cs4id_6J7Pgl:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_8s7bA1:TARGET[2]->UnitaryGate_cs4id_6J7Pgl:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_8s7bA1:TARGET[3]->UnitaryGate_cs4id_6J7Pgl:TARGET[3]"
-          },
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "UnitaryGate_cs4id_6J7Pgl:TARGET[0]->UnitaryGate_cs4id_OU3shV:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_6J7Pgl:TARGET[1]->UnitaryGate_cs4id_OU3shV:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_6J7Pgl:TARGET[2]->UnitaryGate_cs4id_OU3shV:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_6J7Pgl:TARGET[3]->UnitaryGate_cs4id_OU3shV:TARGET[3]",
-            "CTRL_3[0]": "UnitaryGate_cs4id_6J7Pgl:CTRL_3[0]->QFT_cs4id_28GzL2:OUT[3]"
-          },
-          "name": "UnitaryGate_cs4id_6J7Pgl"
-        },
-        {
-          "function": "UnitaryGate",
-          "params": {},
-          "function_params": {
-            "data": [
-              [
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)"
-              ]
-            ]
-          },
-          "control_states": [
-            {
-              "ctrl_state": "1",
-              "name": "CTRL_4"
-            }
-          ],
-          "inputs": {
-            "CTRL_4[0]": "HGate_cs4id_WXaSCr:TARGET[0]->UnitaryGate_cs4id_OU3shV:CTRL_4[0]",
-            "TARGET[0]": "UnitaryGate_cs4id_6J7Pgl:TARGET[0]->UnitaryGate_cs4id_OU3shV:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_6J7Pgl:TARGET[1]->UnitaryGate_cs4id_OU3shV:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_6J7Pgl:TARGET[2]->UnitaryGate_cs4id_OU3shV:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_6J7Pgl:TARGET[3]->UnitaryGate_cs4id_OU3shV:TARGET[3]"
-          },
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "UnitaryGate_cs4id_OU3shV:TARGET[0]->UnitaryGate_cs4id_v5UTG7:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_OU3shV:TARGET[1]->UnitaryGate_cs4id_v5UTG7:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_OU3shV:TARGET[2]->UnitaryGate_cs4id_v5UTG7:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_OU3shV:TARGET[3]->UnitaryGate_cs4id_v5UTG7:TARGET[3]",
-            "CTRL_4[0]": "UnitaryGate_cs4id_OU3shV:CTRL_4[0]->QFT_cs4id_28GzL2:OUT[4]"
-          },
-          "name": "UnitaryGate_cs4id_OU3shV"
-        },
-        {
-          "function": "UnitaryGate",
-          "params": {},
-          "function_params": {
-            "data": [
-              [
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)"
-              ]
-            ]
-          },
-          "control_states": [
-            {
-              "ctrl_state": "1",
-              "name": "CTRL_5"
-            }
-          ],
-          "inputs": {
-            "CTRL_5[0]": "HGate_cs4id_UZoL8g:TARGET[0]->UnitaryGate_cs4id_v5UTG7:CTRL_5[0]",
-            "TARGET[0]": "UnitaryGate_cs4id_OU3shV:TARGET[0]->UnitaryGate_cs4id_v5UTG7:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_OU3shV:TARGET[1]->UnitaryGate_cs4id_v5UTG7:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_OU3shV:TARGET[2]->UnitaryGate_cs4id_v5UTG7:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_OU3shV:TARGET[3]->UnitaryGate_cs4id_v5UTG7:TARGET[3]"
-          },
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "UnitaryGate_cs4id_v5UTG7:TARGET[0]->UnitaryGate_cs4id_9BG16Q:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_v5UTG7:TARGET[1]->UnitaryGate_cs4id_9BG16Q:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_v5UTG7:TARGET[2]->UnitaryGate_cs4id_9BG16Q:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_v5UTG7:TARGET[3]->UnitaryGate_cs4id_9BG16Q:TARGET[3]",
-            "CTRL_5[0]": "UnitaryGate_cs4id_v5UTG7:CTRL_5[0]->QFT_cs4id_28GzL2:OUT[5]"
-          },
-          "name": "UnitaryGate_cs4id_v5UTG7"
-        },
-        {
-          "function": "UnitaryGate",
-          "params": {},
-          "function_params": {
-            "data": [
-              [
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)"
-              ]
-            ]
-          },
-          "control_states": [
-            {
-              "ctrl_state": "1",
-              "name": "CTRL_6"
-            }
-          ],
-          "inputs": {
-            "CTRL_6[0]": "HGate_cs4id_5ubbbP:TARGET[0]->UnitaryGate_cs4id_9BG16Q:CTRL_6[0]",
-            "TARGET[0]": "UnitaryGate_cs4id_v5UTG7:TARGET[0]->UnitaryGate_cs4id_9BG16Q:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_v5UTG7:TARGET[1]->UnitaryGate_cs4id_9BG16Q:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_v5UTG7:TARGET[2]->UnitaryGate_cs4id_9BG16Q:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_v5UTG7:TARGET[3]->UnitaryGate_cs4id_9BG16Q:TARGET[3]"
-          },
-          "inouts": {},
-          "outputs": {
-            "TARGET[0]": "UnitaryGate_cs4id_9BG16Q:TARGET[0]->UnitaryGate_cs4id_mtsL4F:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_9BG16Q:TARGET[1]->UnitaryGate_cs4id_mtsL4F:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_9BG16Q:TARGET[2]->UnitaryGate_cs4id_mtsL4F:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_9BG16Q:TARGET[3]->UnitaryGate_cs4id_mtsL4F:TARGET[3]",
-            "CTRL_6[0]": "UnitaryGate_cs4id_9BG16Q:CTRL_6[0]->QFT_cs4id_28GzL2:OUT[6]"
-          },
-          "name": "UnitaryGate_cs4id_9BG16Q"
-        },
-        {
-          "function": "UnitaryGate",
-          "params": {},
-          "function_params": {
-            "data": [
-              [
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)",
-                "0j"
-              ],
-              [
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "0j",
-                "(1+0j)"
-              ]
-            ]
-          },
-          "control_states": [
-            {
-              "ctrl_state": "1",
-              "name": "CTRL_7"
-            }
-          ],
-          "inputs": {
-            "CTRL_7[0]": "HGate_cs4id_Ia84yR:TARGET[0]->UnitaryGate_cs4id_mtsL4F:CTRL_7[0]",
-            "TARGET[0]": "UnitaryGate_cs4id_9BG16Q:TARGET[0]->UnitaryGate_cs4id_mtsL4F:TARGET[0]",
-            "TARGET[1]": "UnitaryGate_cs4id_9BG16Q:TARGET[1]->UnitaryGate_cs4id_mtsL4F:TARGET[1]",
-            "TARGET[2]": "UnitaryGate_cs4id_9BG16Q:TARGET[2]->UnitaryGate_cs4id_mtsL4F:TARGET[2]",
-            "TARGET[3]": "UnitaryGate_cs4id_9BG16Q:TARGET[3]->UnitaryGate_cs4id_mtsL4F:TARGET[3]"
-          },
-          "inouts": {},
-          "outputs": {
-            "CTRL_7[0]": "UnitaryGate_cs4id_mtsL4F:CTRL_7[0]->QFT_cs4id_28GzL2:OUT[7]"
-          },
-          "name": "UnitaryGate_cs4id_mtsL4F"
-        },
-        {
-          "function": "QFT",
-          "params": {},
-          "function_params": {
-            "num_qubits": 8
-          },
-          "is_inverse": true,
-          "control_states": [],
-          "inputs": {
-            "OUT[0]": "UnitaryGate_cs4id_WC8FJo:CTRL_0[0]->QFT_cs4id_28GzL2:OUT[0]",
-            "OUT[1]": "UnitaryGate_cs4id_woRoWD:CTRL_1[0]->QFT_cs4id_28GzL2:OUT[1]",
-            "OUT[2]": "UnitaryGate_cs4id_8s7bA1:CTRL_2[0]->QFT_cs4id_28GzL2:OUT[2]",
-            "OUT[3]": "UnitaryGate_cs4id_6J7Pgl:CTRL_3[0]->QFT_cs4id_28GzL2:OUT[3]",
-            "OUT[4]": "UnitaryGate_cs4id_OU3shV:CTRL_4[0]->QFT_cs4id_28GzL2:OUT[4]",
-            "OUT[5]": "UnitaryGate_cs4id_v5UTG7:CTRL_5[0]->QFT_cs4id_28GzL2:OUT[5]",
-            "OUT[6]": "UnitaryGate_cs4id_9BG16Q:CTRL_6[0]->QFT_cs4id_28GzL2:OUT[6]",
-            "OUT[7]": "UnitaryGate_cs4id_mtsL4F:CTRL_7[0]->QFT_cs4id_28GzL2:OUT[7]"
-          },
-          "inouts": {},
           "outputs": {},
-          "name": "QFT_cs4id_28GzL2"
+          "operands": {}
+        }
+      ],
+      "local_handles": []
+    },
+    {
+      "name": "period_finding",
+      "param_decls": {},
+      "port_declarations": {
+        "qv_counting": {
+          "name": "qv_counting",
+          "direction": "output",
+          "size": {
+            "expr": "8"
+          }
+        },
+        "qv_auxilliary": {
+          "name": "qv_auxilliary",
+          "direction": "output",
+          "size": {
+            "expr": "4"
+          }
+        }
+      },
+      "operand_declarations": {},
+      "positional_param_declarations": [],
+      "body": [
+        {
+          "function": "allocate",
+          "params": {
+            "num_qubits": {
+              "expr": "8"
+            }
+          },
+          "function_params": {},
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "out": {
+              "name": "qv_counting"
+            }
+          },
+          "operands": {}
+        },
+        {
+          "function": "uniform_superposition",
+          "params": {
+            "num_qubits": {
+              "expr": "8"
+            }
+          },
+          "function_params": {},
+          "inputs": {},
+          "inouts": {
+            "q": {
+              "name": "qv_counting"
+            }
+          },
+          "outputs": {},
+          "operands": {}
+        },
+        {
+          "function": "allocate",
+          "params": {
+            "num_qubits": {
+              "expr": "4"
+            }
+          },
+          "function_params": {},
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "out": {
+              "name": "qv_auxilliary"
+            }
+          },
+          "operands": {}
+        },
+        {
+          "function": "X",
+          "params": {},
+          "function_params": {},
+          "inputs": {},
+          "inouts": {
+            "target": {
+              "name": "qv_auxilliary",
+              "start": {
+                "expr": "0"
+              },
+              "end": {
+                "expr": "1"
+              }
+            }
+          },
+          "outputs": {},
+          "operands": {}
+        },
+        {
+          "function": "join",
+          "params": {},
+          "function_params": {},
+          "inputs": {
+            "in1": {
+              "name": "qv_counting"
+            },
+            "in2": {
+              "name": "qv_auxilliary"
+            }
+          },
+          "inouts": {},
+          "outputs": {
+            "out": {
+              "name": "qv_all"
+            }
+          },
+          "operands": {}
+        },
+        {
+          "function": "repeat",
+          "params": {
+            "count": {
+              "expr": "4"
+            }
+          },
+          "function_params": {},
+          "inputs": {},
+          "inouts": {
+            "qbv": {
+              "name": "qv_all"
+            }
+          },
+          "outputs": {},
+          "operands": {
+            "iteration": {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "control",
+                  "params": {},
+                  "function_params": {},
+                  "inputs": {},
+                  "inouts": {
+                    "ctrl": {
+                      "name": "qbv",
+                      "start": {
+                        "expr": "index"
+                      },
+                      "end": {
+                        "expr": "index + 1"
+                      }
+                    },
+                    "target": {
+                      "name": "qbv",
+                      "start": {
+                        "expr": "8"
+                      },
+                      "end": {
+                        "expr": "12"
+                      }
+                    }
+                  },
+                  "outputs": {},
+                  "operands": {
+                    "operand": {
+                      "rename_params": {},
+                      "body": [
+                        {
+                          "function": "modular_exponentiation",
+                          "params": {
+                            "power": {
+                              "expr": "index"
+                            }
+                          },
+                          "function_params": {},
+                          "inputs": {},
+                          "inouts": {
+                            "target": {
+                              "name": "target"
+                            }
+                          },
+                          "outputs": {},
+                          "operands": {}
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "function": "split",
+          "params": {
+            "out1_size": {
+              "expr": "8"
+            },
+            "out2_size": {
+              "expr": "4"
+            }
+          },
+          "function_params": {},
+          "inputs": {
+            "in": {
+              "name": "qv_all"
+            }
+          },
+          "inouts": {},
+          "outputs": {
+            "out1": {
+              "name": "qv_counting"
+            },
+            "out2": {
+              "name": "qv_auxilliary"
+            }
+          },
+          "operands": {}
+        },
+        {
+          "function": "invert",
+          "params": {},
+          "function_params": {},
+          "inputs": {},
+          "inouts": {
+            "target": {
+              "name": "qv_counting"
+            }
+          },
+          "outputs": {},
+          "operands": {
+            "operand": {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "qft",
+                  "params": {
+                    "num_qbits": {
+                      "expr": "8"
+                    }
+                  },
+                  "function_params": {},
+                  "inputs": {},
+                  "inouts": {
+                    "qbv": {
+                      "name": "target"
+                    }
+                  },
+                  "outputs": {},
+                  "operands": {}
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "local_handles": [
+        {
+          "name": "qv_all"
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "param_decls": {},
+      "port_declarations": {
+        "qv_counting": {
+          "name": "qv_counting",
+          "direction": "output",
+          "size": {
+            "expr": "8"
+          }
+        }
+      },
+      "operand_declarations": {},
+      "positional_param_declarations": [],
+      "body": [
+        {
+          "function": "period_finding",
+          "params": {},
+          "function_params": {},
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "qv_counting": {
+              "name": "qv_counting"
+            },
+            "qv_auxilliary": {
+              "name": "qv_auxilliary"
+            }
+          },
+          "operands": {}
+        }
+      ],
+      "local_handles": [
+        {
+          "name": "qv_auxilliary"
         }
       ]
     }
   ],
-  "constraints": {
-    "max_gate_count": {}
-  },
-  "preferences": {
-    "custom_hardware_settings": {
-      "basis_gates": [
-        "y",
-        "cz",
-        "id",
-        "u1",
-        "z",
-        "tdg",
-        "p",
-        "u",
-        "cx",
-        "h",
-        "s",
-        "u2",
-        "sxdg",
-        "ry",
-        "rx",
-        "sdg",
-        "cy",
-        "sx",
-        "t",
-        "rz",
-        "x"
-      ]
-    },
-    "random_seed": -1
-  }
+  "types": []
 }

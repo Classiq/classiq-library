@@ -1,0 +1,166 @@
+{
+  "types": [],
+  "constants": [],
+  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
+  "classical_functions": [],
+  "execution_preferences": {
+    "amplitude_amplification": {
+      "iterations": []
+    },
+    "random_seed": 1419268166,
+    "backend_preferences": {
+      "backend_service_provider": "IBM Quantum",
+      "backend_name": "aer_simulator",
+      "provider": {}
+    }
+  },
+  "kind": "synthesis",
+  "functions": [
+    {
+      "name": "main",
+      "port_declarations": {
+        "OUT": {
+          "name": "OUT",
+          "size": {
+            "expr": "3"
+          },
+          "direction": "output",
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      },
+      "parameters": [],
+      "input_ports_wiring": {},
+      "output_ports_wiring": {
+        "OUT": "OUT_output_Identity:OUT->Output:OUT"
+      },
+      "body": [
+        {
+          "function": "HadamardTransform",
+          "params": {},
+          "function_params": {
+            "num_qubits": 3
+          },
+          "control_states": [],
+          "inputs": {},
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "HadamardTransform_cs4id_WvSPDi:OUT[0]->ArithmeticOracle_cs4id_zEQjPS:x[0]",
+            "OUT[1]": "HadamardTransform_cs4id_WvSPDi:OUT[1]->ArithmeticOracle_cs4id_zEQjPS:x[1]",
+            "OUT[2]": "HadamardTransform_cs4id_WvSPDi:OUT[2]->ArithmeticOracle_cs4id_zEQjPS:x[2]"
+          },
+          "name": "HadamardTransform_cs4id_WvSPDi"
+        },
+        {
+          "function": "ArithmeticOracle",
+          "params": {},
+          "function_params": {
+            "expression": "(max(x ^ 3, x & 3)>>2) == 1",
+            "definitions": {
+              "x": {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ]
+              }
+            }
+          },
+          "control_states": [],
+          "inputs": {
+            "x[0]": "HadamardTransform_cs4id_WvSPDi:OUT[0]->ArithmeticOracle_cs4id_zEQjPS:x[0]",
+            "x[1]": "HadamardTransform_cs4id_WvSPDi:OUT[1]->ArithmeticOracle_cs4id_zEQjPS:x[1]",
+            "x[2]": "HadamardTransform_cs4id_WvSPDi:OUT[2]->ArithmeticOracle_cs4id_zEQjPS:x[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "x[0]": "ArithmeticOracle_cs4id_zEQjPS:x[0]->HadamardTransform_cs4id_bAaQyn:IN[0]",
+            "x[1]": "ArithmeticOracle_cs4id_zEQjPS:x[1]->HadamardTransform_cs4id_bAaQyn:IN[1]",
+            "x[2]": "ArithmeticOracle_cs4id_zEQjPS:x[2]->HadamardTransform_cs4id_bAaQyn:IN[2]"
+          },
+          "name": "ArithmeticOracle_cs4id_zEQjPS"
+        },
+        {
+          "function": "HadamardTransform",
+          "params": {},
+          "function_params": {
+            "num_qubits": 3
+          },
+          "control_states": [],
+          "inputs": {
+            "IN[0]": "ArithmeticOracle_cs4id_zEQjPS:x[0]->HadamardTransform_cs4id_bAaQyn:IN[0]",
+            "IN[1]": "ArithmeticOracle_cs4id_zEQjPS:x[1]->HadamardTransform_cs4id_bAaQyn:IN[1]",
+            "IN[2]": "ArithmeticOracle_cs4id_zEQjPS:x[2]->HadamardTransform_cs4id_bAaQyn:IN[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "OUT[0]": "HadamardTransform_cs4id_bAaQyn:OUT[0]->OUT_output_Identity:OUT[0]",
+            "OUT[1]": "HadamardTransform_cs4id_bAaQyn:OUT[1]->OUT_output_Identity:OUT[1]",
+            "OUT[2]": "HadamardTransform_cs4id_bAaQyn:OUT[2]->OUT_output_Identity:OUT[2]"
+          },
+          "name": "HadamardTransform_cs4id_bAaQyn"
+        },
+        {
+          "function": "Identity",
+          "params": {},
+          "function_params": {
+            "arguments": [
+              {
+                "size": 3,
+                "bounds": [
+                  0.0,
+                  7.0
+                ],
+                "name": "OUT"
+              }
+            ]
+          },
+          "control_states": [],
+          "inputs": {
+            "OUT[0]": "HadamardTransform_cs4id_bAaQyn:OUT[0]->OUT_output_Identity:OUT[0]",
+            "OUT[1]": "HadamardTransform_cs4id_bAaQyn:OUT[1]->OUT_output_Identity:OUT[1]",
+            "OUT[2]": "HadamardTransform_cs4id_bAaQyn:OUT[2]->OUT_output_Identity:OUT[2]"
+          },
+          "inouts": {},
+          "outputs": {
+            "OUT": "OUT_output_Identity:OUT->Output:OUT"
+          },
+          "name": "OUT_output_Identity"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "max_width": 15,
+    "max_gate_count": {}
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": [
+        "u1",
+        "id",
+        "u2",
+        "cz",
+        "cy",
+        "p",
+        "tdg",
+        "x",
+        "sdg",
+        "s",
+        "z",
+        "t",
+        "rz",
+        "sxdg",
+        "u",
+        "cx",
+        "sx",
+        "y",
+        "rx",
+        "h",
+        "ry"
+      ]
+    },
+    "random_seed": 3969845774
+  }
+}
