@@ -1,57 +1,128 @@
 {
   "functions": [
     {
+      "name": "expr_predicate",
+      "port_declarations": {
+        "x0": {
+          "name": "x0",
+          "size": {
+            "expr": "1"
+          },
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "inout"
+        },
+        "x1": {
+          "name": "x1",
+          "size": {
+            "expr": "1"
+          },
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "inout"
+        },
+        "x2": {
+          "name": "x2",
+          "size": {
+            "expr": "1"
+          },
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "inout"
+        },
+        "x3": {
+          "name": "x3",
+          "size": {
+            "expr": "1"
+          },
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "inout"
+        },
+        "x4": {
+          "name": "x4",
+          "size": {
+            "expr": "1"
+          },
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "inout"
+        },
+        "res": {
+          "name": "res",
+          "size": {
+            "expr": "1"
+          },
+          "direction": "inout"
+        }
+      },
+      "body": [
+        {
+          "expr_str": "2*x0*x1 + 2*x0*x2 - 2*x0 + 2*x1*x2 + 2*x1*x3 - 3*x1 + 2*x2*x4 - 3*x2 + 2*x3*x4 - 2*x3 - 2*x4 <= -4",
+          "result_var": {
+            "name": "res"
+          },
+          "inplace_result": true
+        }
+      ]
+    },
+    {
       "name": "main",
       "port_declarations": {
         "x0": {
           "name": "x0",
-          "direction": "output",
           "size": {
             "expr": "1"
           },
-          "is_signed": {
-            "expr": "False"
-          }
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "output"
         },
         "x1": {
           "name": "x1",
-          "direction": "output",
           "size": {
             "expr": "1"
           },
-          "is_signed": {
-            "expr": "False"
-          }
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "output"
         },
         "x2": {
           "name": "x2",
-          "direction": "output",
           "size": {
             "expr": "1"
           },
-          "is_signed": {
-            "expr": "False"
-          }
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "output"
         },
         "x3": {
           "name": "x3",
-          "direction": "output",
           "size": {
             "expr": "1"
           },
-          "is_signed": {
-            "expr": "False"
-          }
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "output"
         },
         "x4": {
           "name": "x4",
-          "direction": "output",
           "size": {
             "expr": "1"
           },
-          "is_signed": {
-            "expr": "False"
-          }
+          "quantum_type": {
+            "kind": "quint"
+          },
+          "direction": "output"
         }
       },
       "body": [
@@ -75,72 +146,71 @@
             "oracle_op": {
               "body": [
                 {
-                  "function": "ArithmeticOracle",
-                  "function_params": {
-                    "expression": "2*x0*x1 + 2*x0*x2 - 2*x0 + 2*x1*x2 + 2*x1*x3 - 3*x1 + 2*x2*x4 - 3*x2 + 2*x3*x4 - 2*x3 - 2*x4 <= -4",
-                    "definitions": {
-                      "x0": {
-                        "size": 1
-                      },
-                      "x1": {
-                        "size": 1
-                      },
-                      "x2": {
-                        "size": 1
-                      },
-                      "x3": {
-                        "size": 1
-                      },
-                      "x4": {
-                        "size": 1
-                      }
+                  "function": "simple_oracle",
+                  "function_params": {},
+                  "inouts": {
+                    "target": {
+                      "name": "oq"
                     }
                   },
-                  "inouts": {
-                    "x0": {
-                      "name": "oq",
-                      "start": {
-                        "expr": "0"
-                      },
-                      "end": {
-                        "expr": "1"
-                      }
-                    },
-                    "x1": {
-                      "name": "oq",
-                      "start": {
-                        "expr": "1"
-                      },
-                      "end": {
-                        "expr": "2"
-                      }
-                    },
-                    "x2": {
-                      "name": "oq",
-                      "start": {
-                        "expr": "2"
-                      },
-                      "end": {
-                        "expr": "3"
-                      }
-                    },
-                    "x3": {
-                      "name": "oq",
-                      "start": {
-                        "expr": "3"
-                      },
-                      "end": {
-                        "expr": "4"
-                      }
-                    },
-                    "x4": {
-                      "name": "oq",
-                      "start": {
-                        "expr": "4"
-                      },
-                      "end": {
-                        "expr": "5"
-                      }
+                  "operands": {
+                    "predicate": {
+                      "body": [
+                        {
+                          "function": "expr_predicate",
+                          "function_params": {},
+                          "inouts": {
+                            "x0": {
+                              "name": "vars",
+                              "start": {
+                                "expr": "0"
+                              },
+                              "end": {
+                                "expr": "1"
+                              }
+                            },
+                            "x1": {
+                              "name": "vars",
+                              "start": {
+                                "expr": "1"
+                              },
+                              "end": {
+                                "expr": "2"
+                              }
+                            },
+                            "x2": {
+                              "name": "vars",
+                              "start": {
+                                "expr": "2"
+                              },
+                              "end": {
+                                "expr": "3"
+                              }
+                            },
+                            "x3": {
+                              "name": "vars",
+                              "start": {
+                                "expr": "3"
+                              },
+                              "end": {
+                                "expr": "4"
+                              }
+                            },
+                            "x4": {
+                              "name": "vars",
+                              "start": {
+                                "expr": "4"
+                              },
+                              "end": {
+                                "expr": "5"
+                              }
+                            },
+                            "res": {
+                              "name": "result"
+                            }
+                          }
+                        }
+                      ]
                     }
                   }
                 }

@@ -116,10 +116,6 @@
   ],
   "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=molecule_problem_to_hamiltonian(struct_literal(MoleculeProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,molecule=struct_literal(Molecule,atoms=[struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0)),struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0.735))],spin=1,charge=0),freeze_core=True,remove_orbitals=[])), maximize=False,\ninitial_point=[],\noptimizer=Optimizer.COBYLA,\nmax_iteration=30,\ntolerance=0,\nstep_size=0,\nskip_compute_variance=False,\nalpha_cvar=1.0,\n\n)\n\nmolecule_result = molecule_ground_state_solution_post_process(struct_literal(MoleculeProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,molecule=struct_literal(Molecule,atoms=[struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0)),struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0.735))],spin=1,charge=0),freeze_core=True,remove_orbitals=[]),vqe_result)\nsave({'molecule_result': molecule_result})\n",
   "execution_preferences": {
-    "backend_preferences": {
-      "backend_service_provider": "IBM Quantum",
-      "backend_name": "aer_simulator"
-    },
     "num_shots": 1000
   }
 }

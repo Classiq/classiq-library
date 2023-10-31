@@ -276,33 +276,7 @@
     "version": "0.0.0",
     "types": [],
     "constants": [],
-    "classical_functions": [
-      {
-        "name": "cmain",
-        "param_decls": {},
-        "return_type": null,
-        "body": [
-          {
-            "name": "result",
-            "var_type": {
-              "kind": "histogram"
-            }
-          },
-          {
-            "invoked_expression": {
-              "function": "sample",
-              "params": {},
-              "target_function": "main",
-              "target_params": {}
-            },
-            "assigned_variable": "result"
-          },
-          {
-            "saved_variable": "result"
-          }
-        ]
-      }
-    ],
+    "classical_execution_code": "result = sample()\nsave({'result': result})",
     "execution_preferences": {
       "timeout_sec": null,
       "amplitude_amplification": {
@@ -339,9 +313,7 @@
             "size": {
               "expr": "2"
             },
-            "is_signed": {
-              "expr": "False"
-            },
+            "is_signed": false,
             "fraction_places": {
               "expr": "0"
             }
@@ -352,9 +324,7 @@
             "size": {
               "expr": "2"
             },
-            "is_signed": {
-              "expr": "False"
-            },
+            "is_signed": false,
             "fraction_places": {
               "expr": "0"
             }
@@ -365,9 +335,7 @@
             "size": {
               "expr": "3"
             },
-            "is_signed": {
-              "expr": "False"
-            },
+            "is_signed": false,
             "fraction_places": {
               "expr": "0"
             }

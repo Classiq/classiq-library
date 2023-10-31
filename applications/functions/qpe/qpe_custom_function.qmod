@@ -1,0 +1,32 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "body": [
+        {
+          "function": "PhaseEstimation",
+          "function_params": {
+            "unitary": "my_custom_function",
+            "unitary_params": {
+              "input_decls": {"custom_input": {"size": 1}},
+              "output_decls": {"custom_output": {"size": 1}}
+            },
+            "size": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "my_custom_function",
+      "implementations": [
+        {
+          "serialized_circuit": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[1];\nh q[0];"
+        }
+      ],
+      "register_mapping": {
+        "output_registers": [{"name": "custom_output", "qubits": [0]}],
+        "input_registers": [{"name": "custom_input", "qubits": [0]}]
+      }
+    }
+  ]
+}

@@ -1,17 +1,11 @@
 {
   "types": [],
   "constants": [],
-  "classical_functions": [],
   "execution_preferences": {
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 2039683,
-    "backend_preferences": {
-      "backend_service_provider": "IBM Quantum",
-      "backend_name": "aer_simulator",
-      "provider": {}
-    }
+    "random_seed": 813946065
   },
   "kind": "synthesis",
   "functions": [
@@ -28,10 +22,10 @@
           "function_params": {
             "arguments": [
               {
-                "size": 15,
+                "size": 14,
                 "bounds": [
                   0.0,
-                  32767.0
+                  16383.0
                 ],
                 "name": "CTRL_IN"
               },
@@ -44,8 +38,8 @@
                 "name": "TARGET_QUBIT"
               }
             ],
-            "num_ctrl_qubits": 15,
-            "ctrl_state": "111111111111111"
+            "num_ctrl_qubits": 14,
+            "ctrl_state": "11111111111111"
           },
           "control_states": [],
           "inputs": {},
@@ -57,15 +51,34 @@
     }
   ],
   "constraints": {
-    "max_width": 18,
+    "max_width": 20,
     "max_gate_count": {},
     "optimization_parameter": "depth"
   },
   "preferences": {
     "custom_hardware_settings": {
       "basis_gates": [
+        "id",
+        "s",
+        "u2",
+        "y",
+        "rz",
+        "p",
+        "tdg",
+        "rx",
+        "sx",
+        "sdg",
+        "ry",
+        "cz",
+        "u",
+        "sxdg",
+        "x",
         "cx",
-        "u"
+        "h",
+        "u1",
+        "z",
+        "t",
+        "cy"
       ]
     },
     "random_seed": -1
