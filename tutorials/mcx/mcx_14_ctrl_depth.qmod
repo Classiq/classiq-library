@@ -5,7 +5,7 @@
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 3172531168
+    "random_seed": 813946065
   },
   "kind": "synthesis",
   "functions": [
@@ -18,7 +18,6 @@
       "body": [
         {
           "function": "Mcx",
-          "params": {},
           "function_params": {
             "arguments": [
               {
@@ -51,15 +50,34 @@
     }
   ],
   "constraints": {
-    "max_width": 19,
+    "max_width": 20,
     "max_gate_count": {},
-    "optimization_parameter": "cx"
+    "optimization_parameter": "depth"
   },
   "preferences": {
     "custom_hardware_settings": {
       "basis_gates": [
+        "id",
+        "s",
+        "u2",
+        "y",
+        "rz",
+        "p",
+        "tdg",
+        "rx",
+        "sx",
+        "sdg",
+        "ry",
+        "cz",
+        "u",
+        "sxdg",
+        "x",
         "cx",
-        "u"
+        "h",
+        "u1",
+        "z",
+        "t",
+        "cy"
       ]
     },
     "random_seed": -1

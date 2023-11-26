@@ -15,9 +15,7 @@
       "port_declarations": {
         "OUT": {
           "name": "OUT",
-          "size": {
-            "expr": "3"
-          },
+          "size": 3,
           "direction": "output",
           "is_signed": false
         }
@@ -30,7 +28,6 @@
       "body": [
         {
           "function": "HadamardTransform",
-          "params": {},
           "function_params": {
             "num_qubits": 3
           },
@@ -46,7 +43,6 @@
         },
         {
           "function": "ArithmeticOracle",
-          "params": {},
           "function_params": {
             "expression": "(max(x ^ 3, x & 3)>>2) == 1",
             "definitions": {
@@ -75,7 +71,6 @@
         },
         {
           "function": "HadamardTransform",
-          "params": {},
           "function_params": {
             "num_qubits": 3
           },
@@ -95,7 +90,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {

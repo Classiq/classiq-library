@@ -21,17 +21,13 @@
         "target": {
           "name": "target",
           "direction": "output",
-          "size": {
-            "expr": "1"
-          },
+          "size": 1,
           "is_signed": false
         },
         "solution": {
           "name": "solution",
           "direction": "output",
-          "size": {
-            "expr": "2"
-          },
+          "size": 2,
           "is_signed": false
         }
       },
@@ -44,7 +40,6 @@
       "body": [
         {
           "function": "StatePreparation",
-          "params": {},
           "function_params": {
             "amplitudes": [
               0.18257418583505536,
@@ -69,7 +64,6 @@
         },
         {
           "function": "PhaseEstimation",
-          "params": {},
           "function_params": {
             "size": 4,
             "unitary": "Exponentiation",
@@ -146,7 +140,6 @@
         },
         {
           "function": "AmplitudeLoading",
-          "params": {},
           "function_params": {
             "size": 4,
             "expression": "0.0625/(x)",
@@ -171,7 +164,6 @@
         },
         {
           "function": "PhaseEstimation",
-          "params": {},
           "function_params": {
             "size": 4,
             "unitary": "Exponentiation",
@@ -250,7 +242,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {
@@ -275,7 +266,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {

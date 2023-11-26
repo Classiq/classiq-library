@@ -15,17 +15,13 @@
         "x": {
           "name": "x",
           "direction": "output",
-          "size": {
-            "expr": "6"
-          },
+          "size": 6,
           "is_signed": false
         },
         "y": {
           "name": "y",
           "direction": "output",
-          "size": {
-            "expr": "6"
-          },
+          "size": 6,
           "is_signed": false
         }
       },
@@ -38,7 +34,6 @@
       "body": [
         {
           "function": "UniformDistributionStatePreparation",
-          "params": {},
           "function_params": {
             "num_qubits": 6
           },
@@ -57,7 +52,6 @@
         },
         {
           "function": "UniformDistributionStatePreparation",
-          "params": {},
           "function_params": {
             "num_qubits": 6
           },
@@ -76,7 +70,6 @@
         },
         {
           "function": "GroverOperator",
-          "params": {},
           "function_params": {
             "oracle_params": {
               "expression": "(x + y < 9) and ((x*y) % 4 == 1)",
@@ -4241,7 +4234,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {
@@ -4271,7 +4263,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {

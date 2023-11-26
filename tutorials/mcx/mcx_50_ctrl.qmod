@@ -5,7 +5,7 @@
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 2039683
+    "random_seed": 376164254
   },
   "kind": "synthesis",
   "functions": [
@@ -18,14 +18,13 @@
       "body": [
         {
           "function": "Mcx",
-          "params": {},
           "function_params": {
             "arguments": [
               {
-                "size": 15,
+                "size": 50,
                 "bounds": [
                   0.0,
-                  32767.0
+                  1125899906842623.0
                 ],
                 "name": "CTRL_IN"
               },
@@ -38,8 +37,8 @@
                 "name": "TARGET_QUBIT"
               }
             ],
-            "num_ctrl_qubits": 15,
-            "ctrl_state": "111111111111111"
+            "num_ctrl_qubits": 50,
+            "ctrl_state": "11111111111111111111111111111111111111111111111111"
           },
           "control_states": [],
           "inputs": {},
@@ -51,15 +50,32 @@
     }
   ],
   "constraints": {
-    "max_width": 18,
-    "max_gate_count": {},
-    "optimization_parameter": "depth"
+    "max_gate_count": {}
   },
   "preferences": {
     "custom_hardware_settings": {
       "basis_gates": [
+        "id",
+        "s",
+        "u2",
+        "y",
+        "rz",
+        "p",
+        "tdg",
+        "rx",
+        "sx",
+        "sdg",
+        "ry",
+        "cz",
+        "u",
+        "sxdg",
+        "x",
         "cx",
-        "u"
+        "h",
+        "u1",
+        "z",
+        "t",
+        "cy"
       ]
     },
     "random_seed": -1

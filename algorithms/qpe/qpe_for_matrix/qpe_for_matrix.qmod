@@ -17,17 +17,13 @@
         "phase_result": {
           "name": "phase_result",
           "direction": "output",
-          "size": {
-            "expr": "8"
-          },
+          "size": 8,
           "is_signed": false
         },
         "out": {
           "name": "out",
           "direction": "output",
-          "size": {
-            "expr": "2"
-          },
+          "size": 2,
           "is_signed": false
         }
       },
@@ -40,7 +36,6 @@
       "body": [
         {
           "function": "StatePreparation",
-          "params": {},
           "function_params": {
             "amplitudes": [
               0.3365289404181062,
@@ -65,7 +60,6 @@
         },
         {
           "function": "PhaseEstimation",
-          "params": {},
           "function_params": {
             "size": 8,
             "unitary": "Exponentiation",
@@ -147,7 +141,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {
@@ -179,7 +172,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {

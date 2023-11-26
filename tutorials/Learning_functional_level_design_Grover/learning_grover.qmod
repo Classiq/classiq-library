@@ -21,17 +21,13 @@
         "a": {
           "name": "a",
           "direction": "output",
-          "size": {
-            "expr": "2"
-          },
+          "size": 2,
           "is_signed": false
         },
         "b": {
           "name": "b",
           "direction": "output",
-          "size": {
-            "expr": "2"
-          },
+          "size": 2,
           "is_signed": false
         }
       },
@@ -44,7 +40,6 @@
       "body": [
         {
           "function": "StatePreparation",
-          "params": {},
           "function_params": {
             "probabilities": {
               "pmf": [
@@ -71,7 +66,6 @@
         },
         {
           "function": "StatePreparation",
-          "params": {},
           "function_params": {
             "probabilities": {
               "pmf": [
@@ -98,7 +92,6 @@
         },
         {
           "function": "GroverOperator",
-          "params": {},
           "function_params": {
             "oracle_params": {
               "expression": "a+b==4",
@@ -165,7 +158,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {
@@ -191,7 +183,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {

@@ -17,17 +17,13 @@
         "phase_result": {
           "name": "phase_result",
           "direction": "output",
-          "size": {
-            "expr": "6"
-          },
+          "size": 6,
           "is_signed": false
         },
         "out": {
           "name": "out",
           "direction": "output",
-          "size": {
-            "expr": "1"
-          },
+          "size": 1,
           "is_signed": false
         }
       },
@@ -40,7 +36,6 @@
       "body": [
         {
           "function": "HartreeFock",
-          "params": {},
           "function_params": {
             "gs_problem": {
               "z2_symmetries": true,
@@ -79,7 +74,6 @@
         },
         {
           "function": "PhaseEstimation",
-          "params": {},
           "function_params": {
             "size": 6,
             "unitary": "Exponentiation",
@@ -129,7 +123,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {
@@ -159,7 +152,6 @@
         },
         {
           "function": "Identity",
-          "params": {},
           "function_params": {
             "arguments": [
               {
