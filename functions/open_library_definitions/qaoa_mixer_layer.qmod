@@ -1,0 +1,5 @@
+qfunc qaoa_mixer_layer<num_qubits: int, b: real>(target: qbit[]) {
+  repeat<num_qubits, lambda<index>() {
+    RX<b>(target[index]);
+  }>();
+}

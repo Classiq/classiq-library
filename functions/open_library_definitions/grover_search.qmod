@@ -1,0 +1,10 @@
+qfunc grover_search<num_qubits: int, reps: int, oracle_op: qfunc <num_qubits: int>(oq: qbit[])>(gsq: qbit[]) {
+  hadamard_transform<num_qubits>(gsq);
+  repeat<reps, lambda<index>() {
+    grover_operator<num_qubits, lambda<num_qubits>(oq) {
+      oracle_op<num_qubits>(oq);
+    }, lambda<num_qubits>(spq) {
+      hadamard_transform<num_qubits>(spq);
+    }>(gsq);
+  }>();
+}

@@ -1,0 +1,178 @@
+{
+  "functions": [
+    {
+      "name": "linear_pauli_rotations",
+      "param_decls": {
+        "reg_size": {
+          "kind": "int"
+        },
+        "num_state_qubits": {
+          "kind": "int"
+        },
+        "bases": {
+          "kind": "list",
+          "element_type": {
+            "kind": "pauli"
+          }
+        },
+        "slopes": {
+          "kind": "list",
+          "element_type": {
+            "kind": "real"
+          }
+        },
+        "offsets": {
+          "kind": "list",
+          "element_type": {
+            "kind": "real"
+          }
+        }
+      },
+      "port_declarations": {
+        "x": {
+          "name": "x",
+          "size": {
+            "expr": "reg_size"
+          },
+          "direction": "inout"
+        },
+        "q": {
+          "name": "q",
+          "size": {
+            "expr": "num_state_qubits"
+          },
+          "direction": "inout"
+        }
+      },
+      "body": [
+        {
+          "function": "repeat",
+          "params": {
+            "count": {
+              "expr": "num_state_qubits"
+            }
+          },
+          "function_params": {},
+          "operands": {
+            "iteration": {
+              "body": [
+                {
+                  "function": "single_pauli",
+                  "params": {
+                    "reg_size": {
+                      "expr": "reg_size"
+                    },
+                    "slope": {
+                      "expr": "slopes[index]"
+                    },
+                    "offset": {
+                      "expr": "offsets[index]"
+                    }
+                  },
+                  "function_params": {},
+                  "inouts": {
+                    "x": {
+                      "name": "x"
+                    },
+                    "q": {
+                      "name": "q",
+                      "index": {
+                        "expr": "index"
+                      }
+                    }
+                  },
+                  "operands": {
+                    "q1_qfunc": {
+                      "body": [
+                        {
+                          "function": "switch",
+                          "params": {
+                            "selector": {
+                              "expr": "bases[index]"
+                            }
+                          },
+                          "function_params": {},
+                          "operands": {
+                            "cases": [
+                              {
+                                "body": [
+                                  {
+                                    "function": "IDENTITY",
+                                    "function_params": {},
+                                    "inouts": {
+                                      "target": {
+                                        "name": "target"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "body": [
+                                  {
+                                    "function": "RX",
+                                    "params": {
+                                      "theta": {
+                                        "expr": "theta"
+                                      }
+                                    },
+                                    "function_params": {},
+                                    "inouts": {
+                                      "target": {
+                                        "name": "target"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "body": [
+                                  {
+                                    "function": "RY",
+                                    "params": {
+                                      "theta": {
+                                        "expr": "theta"
+                                      }
+                                    },
+                                    "function_params": {},
+                                    "inouts": {
+                                      "target": {
+                                        "name": "target"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "body": [
+                                  {
+                                    "function": "RZ",
+                                    "params": {
+                                      "theta": {
+                                        "expr": "theta"
+                                      }
+                                    },
+                                    "function_params": {},
+                                    "inouts": {
+                                      "target": {
+                                        "name": "target"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

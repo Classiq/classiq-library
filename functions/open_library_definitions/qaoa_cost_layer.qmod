@@ -1,0 +1,111 @@
+{
+  "functions": [
+    {
+      "name": "qaoa_cost_layer",
+      "param_decls": {
+        "num_qubits": {
+          "kind": "int"
+        },
+        "g": {
+          "kind": "real"
+        },
+        "hamiltonian": {
+          "kind": "list",
+          "element_type": {
+            "kind": "struct_instance",
+            "name": "PauliTerm"
+          }
+        },
+        "is_st": {
+          "kind": "bool"
+        }
+      },
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "size": {
+            "expr": "num_qubits"
+          },
+          "direction": "inout"
+        }
+      },
+      "body": [
+        {
+          "function": "if",
+          "params": {
+            "condition": {
+              "expr": "is_st"
+            }
+          },
+          "function_params": {},
+          "operands": {
+            "then": {
+              "body": [
+                {
+                  "function": "suzuki_trotter",
+                  "params": {
+                    "pauli_operator": {
+                      "expr": "hamiltonian"
+                    },
+                    "evolution_coefficient": {
+                      "expr": "g"
+                    },
+                    "order": {
+                      "expr": "1"
+                    },
+                    "repetitions": {
+                      "expr": "1"
+                    }
+                  },
+                  "function_params": {},
+                  "inouts": {
+                    "qbv": {
+                      "name": "target"
+                    }
+                  }
+                }
+              ]
+            },
+            "else": {
+              "body": [
+                {
+                  "function": "permute",
+                  "function_params": {},
+                  "operands": {
+                    "functions": {
+                      "count": {
+                        "expr": "len(hamiltonian)"
+                      },
+                      "index_var": "index",
+                      "func": {
+                        "body": [
+                          {
+                            "function": "single_pauli_exponent",
+                            "params": {
+                              "pauli_string": {
+                                "expr": "get_field(hamiltonian[index], 'pauli')"
+                              },
+                              "coefficient": {
+                                "expr": "g*get_field(hamiltonian[index], 'coefficient')"
+                              }
+                            },
+                            "function_params": {},
+                            "inouts": {
+                              "qbv": {
+                                "name": "target"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

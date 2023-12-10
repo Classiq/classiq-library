@@ -1,0 +1,13 @@
+qfunc qpe<reg_size: int, qpe_reg_size: int, qfunc: qfunc (target: qbit[])>(x: qbit[], q: qbit[]) {
+  hadamard_transform<qpe_reg_size>(q);
+  repeat<qpe_reg_size, lambda<index>() {
+    control<lambda() {
+      repeat<2**index, lambda<index>() {
+        qfunc(x);
+      }>();
+    }>(q[index]);
+  }>();
+  invert<lambda() {
+    qft<qpe_reg_size>(q);
+  }>();
+}

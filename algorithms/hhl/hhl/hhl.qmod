@@ -1,326 +1,647 @@
 {
-  "types": [],
-  "constants": [],
-  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
-  "execution_preferences": {
-    "amplitude_amplification": {
-      "iterations": []
+  "functions": [
+    {
+      "name": "suzuki_trotter1_with_power_logic",
+      "param_decls": {
+        "hamiltonian": {
+          "kind": "list",
+          "element_type": {
+            "kind": "struct_instance",
+            "name": "PauliTerm"
+          }
+        },
+        "pw": {
+          "kind": "int"
+        },
+        "r0": {
+          "kind": "int"
+        },
+        "reps_scaling_factor": {
+          "kind": "real"
+        },
+        "evolution_coefficient": {
+          "kind": "real"
+        }
+      },
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "hamiltonian",
+          "classical_type": {
+            "kind": "list",
+            "element_type": {
+              "kind": "struct_instance",
+              "name": "PauliTerm"
+            }
+          }
+        },
+        {
+          "name": "pw",
+          "classical_type": {
+            "kind": "int"
+          }
+        },
+        {
+          "name": "r0",
+          "classical_type": {
+            "kind": "int"
+          }
+        },
+        {
+          "name": "reps_scaling_factor",
+          "classical_type": {
+            "kind": "real"
+          }
+        },
+        {
+          "name": "evolution_coefficient",
+          "classical_type": {
+            "kind": "real"
+          }
+        },
+        {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      ],
+      "body": [
+        {
+          "function": "suzuki_trotter",
+          "function_params": {},
+          "positional_args": [
+            {
+              "expr": "hamiltonian"
+            },
+            {
+              "expr": "evolution_coefficient*pw"
+            },
+            {
+              "expr": "1"
+            },
+            {
+              "expr": "r0*ceiling(reps_scaling_factor**(log(pw)/log(2)))"
+            },
+            {
+              "name": "target"
+            }
+          ]
+        }
+      ],
+      "local_handles": []
     },
-    "random_seed": 2202697077,
+    {
+      "name": "qpe_flexible",
+      "param_decls": {
+        "precision": {
+          "kind": "int"
+        }
+      },
+      "port_declarations": {
+        "state": {
+          "name": "state",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        },
+        "phase": {
+          "name": "phase",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
+        }
+      },
+      "operand_declarations": {
+        "unitary_with_power": {
+          "name": "unitary_with_power",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "classical_type": {
+                "kind": "int"
+              }
+            },
+            {
+              "name": "arg1",
+              "quantum_type": {
+                "kind": "qvec"
+              },
+              "direction": "inout"
+            }
+          ]
+        }
+      },
+      "positional_arg_declarations": [
+        {
+          "name": "unitary_with_power",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "classical_type": {
+                "kind": "int"
+              }
+            },
+            {
+              "name": "arg1",
+              "quantum_type": {
+                "kind": "qvec"
+              },
+              "direction": "inout"
+            }
+          ]
+        },
+        {
+          "name": "precision",
+          "classical_type": {
+            "kind": "int"
+          }
+        },
+        {
+          "name": "state",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        },
+        {
+          "name": "phase",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
+        }
+      ],
+      "body": [
+        {
+          "function": "allocate",
+          "function_params": {},
+          "positional_args": [
+            {
+              "expr": "precision"
+            },
+            {
+              "name": "phase"
+            }
+          ]
+        },
+        {
+          "function": "apply_to_all",
+          "function_params": {},
+          "positional_args": [
+            {
+              "expr": "precision"
+            },
+            "H",
+            {
+              "name": "phase"
+            }
+          ]
+        },
+        {
+          "function": "repeat",
+          "function_params": {},
+          "positional_args": [
+            {
+              "expr": "precision"
+            },
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "control",
+                  "function_params": {},
+                  "positional_args": [
+                    {
+                      "rename_params": {},
+                      "body": [
+                        {
+                          "function": "unitary_with_power",
+                          "function_params": {},
+                          "positional_args": [
+                            {
+                              "expr": "2**index"
+                            },
+                            {
+                              "name": "state"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "phase",
+                      "start": {
+                        "expr": "index"
+                      },
+                      "end": {
+                        "expr": "index + 1"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "function": "invert",
+          "function_params": {},
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "qft",
+                  "function_params": {},
+                  "positional_args": [
+                    {
+                      "expr": "precision"
+                    },
+                    {
+                      "name": "phase"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "local_handles": []
+    },
+    {
+      "name": "qpe_flexible_wrapper",
+      "param_decls": {
+        "precision": {
+          "kind": "int"
+        }
+      },
+      "port_declarations": {
+        "qbv": {
+          "name": "qbv",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {
+        "unitary_with_power": {
+          "name": "unitary_with_power",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "classical_type": {
+                "kind": "int"
+              }
+            },
+            {
+              "name": "arg1",
+              "quantum_type": {
+                "kind": "qvec"
+              },
+              "direction": "inout"
+            }
+          ]
+        }
+      },
+      "positional_arg_declarations": [
+        {
+          "name": "unitary_with_power",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "classical_type": {
+                "kind": "int"
+              }
+            },
+            {
+              "name": "arg1",
+              "quantum_type": {
+                "kind": "qvec"
+              },
+              "direction": "inout"
+            }
+          ]
+        },
+        {
+          "name": "precision",
+          "classical_type": {
+            "kind": "int"
+          }
+        },
+        {
+          "name": "qbv",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      ],
+      "body": [
+        {
+          "function": "split",
+          "function_params": {},
+          "positional_args": [
+            {
+              "expr": "len(qbv) - precision"
+            },
+            {
+              "expr": "precision"
+            },
+            {
+              "name": "qbv"
+            },
+            {
+              "name": "state"
+            },
+            {
+              "name": "temp"
+            }
+          ]
+        },
+        {
+          "function": "qpe_flexible",
+          "function_params": {},
+          "positional_args": [
+            "unitary_with_power",
+            {
+              "expr": "precision"
+            },
+            {
+              "name": "state"
+            },
+            {
+              "name": "phase"
+            }
+          ]
+        },
+        {
+          "function": "join",
+          "function_params": {},
+          "positional_args": [
+            {
+              "name": "state"
+            },
+            {
+              "name": "phase"
+            },
+            {
+              "name": "qbv"
+            }
+          ]
+        }
+      ],
+      "local_handles": [
+        {
+          "name": "phase",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "name": "state",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "name": "temp",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "param_decls": {},
+      "port_declarations": {
+        "res": {
+          "name": "res",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
+        },
+        "indicator": {
+          "name": "indicator",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "res",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
+        },
+        {
+          "name": "indicator",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      ],
+      "body": [
+        {
+          "function": "prepare_amplitudes",
+          "function_params": {},
+          "positional_args": [
+            {
+              "expr": "[0.18257418583505536, 0.3651483716701107, 0.7302967433402214, 0.5477225575051661]"
+            },
+            {
+              "expr": "0.0"
+            },
+            {
+              "name": "res"
+            }
+          ]
+        },
+        {
+          "function": "qpe_flexible",
+          "function_params": {},
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "suzuki_trotter1_with_power_logic",
+                  "function_params": {},
+                  "positional_args": [
+                    {
+                      "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I], coefficient=0.4075), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z], coefficient=-0.05249999999999999), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.X], coefficient=-0.030000000000000002), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I], coefficient=-0.017499999999999988), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z], coefficient=-0.057499999999999996), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.X], coefficient=0.02), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.I], coefficient=-0.025), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z], coefficient=0.045000000000000005), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.X], coefficient=-0.16), struct_literal(PauliTerm, pauli=[Pauli.Y, Pauli.Y], coefficient=-0.06)]"
+                    },
+                    {
+                      "expr": "arg0"
+                    },
+                    {
+                      "expr": "4"
+                    },
+                    {
+                      "expr": "1.8"
+                    },
+                    {
+                      "expr": "-6.283185307179586"
+                    },
+                    {
+                      "name": "arg1"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "expr": "4"
+            },
+            {
+              "name": "res"
+            },
+            {
+              "name": "phase"
+            }
+          ]
+        },
+        {
+          "expr_str": "0.0625/phase",
+          "result_var": {
+            "name": "indicator"
+          }
+        },
+        {
+          "function": "join",
+          "function_params": {},
+          "positional_args": [
+            {
+              "name": "res"
+            },
+            {
+              "name": "phase"
+            },
+            {
+              "name": "qbv"
+            }
+          ]
+        },
+        {
+          "function": "invert",
+          "function_params": {},
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "qpe_flexible_wrapper",
+                  "function_params": {},
+                  "positional_args": [
+                    {
+                      "rename_params": {},
+                      "body": [
+                        {
+                          "function": "suzuki_trotter1_with_power_logic",
+                          "function_params": {},
+                          "positional_args": [
+                            {
+                              "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I], coefficient=0.4075), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z], coefficient=-0.05249999999999999), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.X], coefficient=-0.030000000000000002), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I], coefficient=-0.017499999999999988), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z], coefficient=-0.057499999999999996), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.X], coefficient=0.02), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.I], coefficient=-0.025), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z], coefficient=0.045000000000000005), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.X], coefficient=-0.16), struct_literal(PauliTerm, pauli=[Pauli.Y, Pauli.Y], coefficient=-0.06)]"
+                            },
+                            {
+                              "expr": "arg0"
+                            },
+                            {
+                              "expr": "4"
+                            },
+                            {
+                              "expr": "1.8"
+                            },
+                            {
+                              "expr": "-6.283185307179586"
+                            },
+                            {
+                              "name": "arg1"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "expr": "4"
+                    },
+                    {
+                      "name": "qbv"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "function": "split",
+          "function_params": {},
+          "positional_args": [
+            {
+              "expr": "len(qbv) - 4"
+            },
+            {
+              "expr": "4"
+            },
+            {
+              "name": "qbv"
+            },
+            {
+              "name": "res"
+            },
+            {
+              "name": "phase"
+            }
+          ]
+        }
+      ],
+      "local_handles": [
+        {
+          "name": "phase",
+          "quantum_type": {
+            "fraction_places": {
+              "expr": "4"
+            },
+            "kind": "qfixed"
+          }
+        },
+        {
+          "name": "qbv",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        }
+      ]
+    }
+  ],
+  "types": [],
+  "execution_preferences": {
     "backend_preferences": {
       "backend_service_provider": "Classiq",
       "backend_name": "aer_simulator_statevector"
     },
     "num_shots": 1
-  },
-  "kind": "synthesis",
-  "functions": [
-    {
-      "name": "main",
-      "port_declarations": {
-        "target": {
-          "name": "target",
-          "direction": "output",
-          "size": 1,
-          "is_signed": false
-        },
-        "solution": {
-          "name": "solution",
-          "direction": "output",
-          "size": 2,
-          "is_signed": false
-        }
-      },
-      "parameters": [],
-      "input_ports_wiring": {},
-      "output_ports_wiring": {
-        "target": "target_output_Identity:target->Output:target",
-        "solution": "solution_output_Identity:solution->Output:solution"
-      },
-      "body": [
-        {
-          "function": "StatePreparation",
-          "function_params": {
-            "amplitudes": [
-              0.18257418583505536,
-              0.3651483716701107,
-              0.7302967433402214,
-              0.5477225575051661
-            ],
-            "error_metric": {
-              "L2": {
-                "upper_bound": 0.0
-              }
-            }
-          },
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "OUT[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->PhaseEstimation_cs4id_qhFWCE:IN[0]",
-            "OUT[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->PhaseEstimation_cs4id_qhFWCE:IN[1]"
-          },
-          "name": "StatePreparation_cs4id_iK2ZWe"
-        },
-        {
-          "function": "PhaseEstimation",
-          "function_params": {
-            "size": 4,
-            "unitary": "Exponentiation",
-            "unitary_params": {
-              "pauli_operator": {
-                "pauli_list": [
-                  [
-                    "II",
-                    "(0.4075+0j)"
-                  ],
-                  [
-                    "IZ",
-                    "(-0.05249999999999999+0j)"
-                  ],
-                  [
-                    "IX",
-                    "(-0.030000000000000002+0j)"
-                  ],
-                  [
-                    "ZI",
-                    "(-0.017499999999999988+0j)"
-                  ],
-                  [
-                    "ZZ",
-                    "(-0.057499999999999996+0j)"
-                  ],
-                  [
-                    "ZX",
-                    "(0.02+0j)"
-                  ],
-                  [
-                    "XI",
-                    "(-0.025+0j)"
-                  ],
-                  [
-                    "XZ",
-                    "(0.045000000000000005+0j)"
-                  ],
-                  [
-                    "XX",
-                    "(-0.16+0j)"
-                  ],
-                  [
-                    "YY",
-                    "(-0.06+0j)"
-                  ]
-                ],
-                "is_hermitian": true
-              },
-              "evolution_coefficient": -6.283185307179586,
-              "constraints": {}
-            },
-            "exponentiation_specification": {
-              "scaling": {
-                "max_depth": 100
-              }
-            }
-          },
-          "control_states": [],
-          "inputs": {
-            "IN[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->PhaseEstimation_cs4id_qhFWCE:IN[0]",
-            "IN[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->PhaseEstimation_cs4id_qhFWCE:IN[1]"
-          },
-          "inouts": {},
-          "outputs": {
-            "PHASE_ESTIMATION[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[0]",
-            "PHASE_ESTIMATION[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[1]",
-            "PHASE_ESTIMATION[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[2]",
-            "PHASE_ESTIMATION[3]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[3]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[3]",
-            "OUT[0]": "PhaseEstimation_cs4id_qhFWCE:OUT[0]->PhaseEstimation_cs4id_b51yBM:OUT[0]",
-            "OUT[1]": "PhaseEstimation_cs4id_qhFWCE:OUT[1]->PhaseEstimation_cs4id_b51yBM:OUT[1]"
-          },
-          "name": "PhaseEstimation_cs4id_qhFWCE"
-        },
-        {
-          "function": "AmplitudeLoading",
-          "function_params": {
-            "size": 4,
-            "expression": "0.0625/(x)",
-            "implementation": "GRAYCODE"
-          },
-          "control_states": [],
-          "inputs": {
-            "AMPLITUDE[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[0]",
-            "AMPLITUDE[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[1]",
-            "AMPLITUDE[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[2]",
-            "AMPLITUDE[3]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[3]->AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[3]"
-          },
-          "inouts": {},
-          "outputs": {
-            "AMPLITUDE[0]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[0]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[0]",
-            "AMPLITUDE[1]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[1]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[1]",
-            "AMPLITUDE[2]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[2]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[2]",
-            "AMPLITUDE[3]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[3]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[3]",
-            "TARGET[0]": "AmplitudeLoading_cs4id_PyYngF:TARGET[0]->target_output_Identity:target[0]"
-          },
-          "name": "AmplitudeLoading_cs4id_PyYngF"
-        },
-        {
-          "function": "PhaseEstimation",
-          "function_params": {
-            "size": 4,
-            "unitary": "Exponentiation",
-            "unitary_params": {
-              "pauli_operator": {
-                "pauli_list": [
-                  [
-                    "II",
-                    "(0.4075+0j)"
-                  ],
-                  [
-                    "IZ",
-                    "(-0.05249999999999999+0j)"
-                  ],
-                  [
-                    "IX",
-                    "(-0.030000000000000002+0j)"
-                  ],
-                  [
-                    "ZI",
-                    "(-0.017499999999999988+0j)"
-                  ],
-                  [
-                    "ZZ",
-                    "(-0.057499999999999996+0j)"
-                  ],
-                  [
-                    "ZX",
-                    "(0.02+0j)"
-                  ],
-                  [
-                    "XI",
-                    "(-0.025+0j)"
-                  ],
-                  [
-                    "XZ",
-                    "(0.045000000000000005+0j)"
-                  ],
-                  [
-                    "XX",
-                    "(-0.16+0j)"
-                  ],
-                  [
-                    "YY",
-                    "(-0.06+0j)"
-                  ]
-                ],
-                "is_hermitian": true
-              },
-              "evolution_coefficient": -6.283185307179586,
-              "constraints": {}
-            },
-            "exponentiation_specification": {
-              "scaling": {
-                "max_depth": 100
-              }
-            }
-          },
-          "is_inverse": true,
-          "release_by_inverse": true,
-          "control_states": [],
-          "inputs": {
-            "PHASE_ESTIMATION[0]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[0]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[0]",
-            "PHASE_ESTIMATION[1]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[1]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[1]",
-            "PHASE_ESTIMATION[2]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[2]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[2]",
-            "PHASE_ESTIMATION[3]": "AmplitudeLoading_cs4id_PyYngF:AMPLITUDE[3]->PhaseEstimation_cs4id_b51yBM:PHASE_ESTIMATION[3]",
-            "OUT[0]": "PhaseEstimation_cs4id_qhFWCE:OUT[0]->PhaseEstimation_cs4id_b51yBM:OUT[0]",
-            "OUT[1]": "PhaseEstimation_cs4id_qhFWCE:OUT[1]->PhaseEstimation_cs4id_b51yBM:OUT[1]"
-          },
-          "inouts": {},
-          "outputs": {
-            "IN[0]": "PhaseEstimation_cs4id_b51yBM:IN[0]->solution_output_Identity:solution[0]",
-            "IN[1]": "PhaseEstimation_cs4id_b51yBM:IN[1]->solution_output_Identity:solution[1]"
-          },
-          "name": "PhaseEstimation_cs4id_b51yBM"
-        },
-        {
-          "function": "Identity",
-          "function_params": {
-            "arguments": [
-              {
-                "size": 1,
-                "bounds": [
-                  0.0,
-                  1.0
-                ],
-                "name": "target"
-              }
-            ]
-          },
-          "control_states": [],
-          "inputs": {
-            "target[0]": "AmplitudeLoading_cs4id_PyYngF:TARGET[0]->target_output_Identity:target[0]"
-          },
-          "inouts": {},
-          "outputs": {
-            "target": "target_output_Identity:target->Output:target"
-          },
-          "name": "target_output_Identity"
-        },
-        {
-          "function": "Identity",
-          "function_params": {
-            "arguments": [
-              {
-                "size": 2,
-                "bounds": [
-                  0.0,
-                  3.0
-                ],
-                "name": "solution"
-              }
-            ]
-          },
-          "control_states": [],
-          "inputs": {
-            "solution[0]": "PhaseEstimation_cs4id_b51yBM:IN[0]->solution_output_Identity:solution[0]",
-            "solution[1]": "PhaseEstimation_cs4id_b51yBM:IN[1]->solution_output_Identity:solution[1]"
-          },
-          "inouts": {},
-          "outputs": {
-            "solution": "solution_output_Identity:solution->Output:solution"
-          },
-          "name": "solution_output_Identity"
-        }
-      ]
-    }
-  ],
-  "constraints": {
-    "max_gate_count": {}
-  },
-  "preferences": {
-    "custom_hardware_settings": {
-      "basis_gates": [
-        "id",
-        "s",
-        "u2",
-        "y",
-        "rz",
-        "p",
-        "tdg",
-        "rx",
-        "sx",
-        "sdg",
-        "ry",
-        "cz",
-        "u",
-        "sxdg",
-        "x",
-        "cx",
-        "h",
-        "u1",
-        "z",
-        "t",
-        "cy"
-      ]
-    },
-    "random_seed": -1
   }
 }

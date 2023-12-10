@@ -1,0 +1,99 @@
+{
+  "functions": [
+    {
+      "name": "qaoa_penalty",
+      "param_decls": {
+        "num_qubits": {
+          "kind": "int"
+        },
+        "params_list": {
+          "kind": "list",
+          "element_type": {
+            "kind": "real"
+          }
+        },
+        "hamiltonian": {
+          "kind": "list",
+          "element_type": {
+            "kind": "struct_instance",
+            "name": "PauliTerm"
+          }
+        },
+        "is_st": {
+          "kind": "bool"
+        }
+      },
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "size": {
+            "expr": "num_qubits"
+          },
+          "direction": "inout"
+        }
+      },
+      "body": [
+        {
+          "function": "qaoa_init",
+          "params": {
+            "num_qubits": {
+              "expr": "num_qubits"
+            }
+          },
+          "function_params": {},
+          "inputs": {
+            "target": {
+              "name": "target"
+            }
+          },
+          "outputs": {
+            "target": {
+              "name": "target"
+            }
+          }
+        },
+        {
+          "function": "repeat",
+          "params": {
+            "count": {
+              "expr": "len(params_list)/2"
+            }
+          },
+          "function_params": {},
+          "operands": {
+            "iteration": {
+              "body": [
+                {
+                  "function": "qaoa_layer",
+                  "params": {
+                    "num_qubits": {
+                      "expr": "num_qubits"
+                    },
+                    "g": {
+                      "expr": "params_list[2*index]"
+                    },
+                    "b": {
+                      "expr": "params_list[2*index+1]"
+                    },
+                    "hamiltonian": {
+                      "expr": "hamiltonian"
+                    },
+                    "is_st": {
+                      "expr": "is_st"
+                    }
+                  },
+                  "function_params": {},
+                  "inouts": {
+                    "target": {
+                      "name": "target"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

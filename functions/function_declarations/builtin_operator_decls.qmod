@@ -1,0 +1,8 @@
+// Builtin operators
+qfunc repeat<count: int, iteration: qfunc <index: int>()>();
+qfunc invert<operand: qfunc ()>();
+qfunc control<operand: qfunc ()>(ctrl: qbit[]);
+qfunc if<condition: bool, then: qfunc (), else: qfunc ()>();
+qfunc join(input in1: qbit[], input in2: qbit[], output out: qbit[]);
+qfunc split<out1_size: int, out2_size: int>(input in: qbit[], output out1: qbit[], output out2: qbit[]);
+qfunc power<power: int, operand: qfunc ()>();

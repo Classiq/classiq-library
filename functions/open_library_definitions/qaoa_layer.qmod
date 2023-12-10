@@ -1,0 +1,89 @@
+{
+  "functions": [
+    {
+      "name": "qaoa_layer",
+      "param_decls": {
+        "num_qubits": {
+          "kind": "int"
+        },
+        "g": {
+          "kind": "real"
+        },
+        "b": {
+          "kind": "real"
+        },
+        "hamiltonian": {
+          "kind": "list",
+          "element_type": {
+            "kind": "struct_instance",
+            "name": "PauliTerm"
+          }
+        },
+        "is_st": {
+          "kind": "bool"
+        }
+      },
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "size": {
+            "expr": "num_qubits"
+          },
+          "direction": "inout"
+        }
+      },
+      "body": [
+        {
+          "function": "qaoa_cost_layer",
+          "params": {
+            "num_qubits": {
+              "expr": "num_qubits"
+            },
+            "g": {
+              "expr": "g"
+            },
+            "hamiltonian": {
+              "expr": "hamiltonian"
+            },
+            "is_st": {
+              "expr": "is_st"
+            }
+          },
+          "function_params": {},
+          "inputs": {
+            "target": {
+              "name": "target"
+            }
+          },
+          "outputs": {
+            "target": {
+              "name": "target"
+            }
+          }
+        },
+        {
+          "function": "qaoa_mixer_layer",
+          "params": {
+            "num_qubits": {
+              "expr": "num_qubits"
+            },
+            "b": {
+              "expr": "b"
+            }
+          },
+          "function_params": {},
+          "inputs": {
+            "target": {
+              "name": "target"
+            }
+          },
+          "outputs": {
+            "target": {
+              "name": "target"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

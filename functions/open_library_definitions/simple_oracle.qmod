@@ -1,0 +1,10 @@
+qfunc simple_oracle<predicate: qfunc (vars: qbit[], result: qbit)>(target: qbit[]) {
+  result: qbit[];
+  allocate<1>(result);
+  X(result);
+  H(result);
+  predicate(target, result);
+  H(result);
+  X(result);
+  free(result);
+}

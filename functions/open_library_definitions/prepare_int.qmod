@@ -1,0 +1,10 @@
+qfunc prepare_int<val: int>(output out: qint) {
+  allocate<floor(log(val, 2)) + 1>(out);
+  repeat<floor(log(val, 2)) + 1, lambda<index>() {
+    if<Eq(val//2**index % 2, 1), lambda() {
+      X(out[index]);
+    }, lambda() {
+      IDENTITY(out[index]);
+    }>();
+  }>();
+}

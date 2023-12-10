@@ -10,31 +10,40 @@
       "port_declarations": {
         "target": {
           "name": "target",
-          "direction": "inout",
-          "size": {
-            "expr": "4"
-          }
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
         }
       },
       "operand_declarations": {},
-      "positional_arg_declarations": [],
+      "positional_arg_declarations": [
+        {
+          "name": "power",
+          "classical_type": {
+            "kind": "int"
+          }
+        },
+        {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      ],
       "body": [
         {
           "function": "unitary",
-          "params": {
-            "elements": {
-              "expr": "Matrix([[0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power)], [0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0], [0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0], [0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0], [0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0], [0, 0, 0, 0, 0, 1.0*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0], [0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0], [0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0], [0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0*1.0**(2**power), 0, 0, 0, 0, 0], [0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0], [0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0], [0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0], [0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0], [-0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power)]])"
-            }
-          },
           "function_params": {},
-          "inputs": {},
-          "inouts": {
-            "target": {
+          "positional_args": [
+            {
+              "expr": "Matrix([[0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power)], [0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0], [0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0], [0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0], [0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0], [0, 0, 0, 0, 0, 1.0*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0], [0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0], [0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0], [0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0*1.0**(2**power), 0, 0, 0, 0, 0], [0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0], [0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0], [0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0], [0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0], [-0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power)]])"
+            },
+            {
               "name": "target"
             }
-          },
-          "outputs": {},
-          "operands": {}
+          ]
         }
       ],
       "local_handles": []
@@ -45,80 +54,78 @@
       "port_declarations": {
         "qv_counting": {
           "name": "qv_counting",
-          "direction": "output",
-          "size": {
-            "expr": "8"
-          }
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
         },
         "qv_auxilliary": {
           "name": "qv_auxilliary",
-          "direction": "output",
-          "size": {
-            "expr": "4"
-          }
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
         }
       },
       "operand_declarations": {},
-      "positional_arg_declarations": [],
+      "positional_arg_declarations": [
+        {
+          "name": "qv_counting",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
+        },
+        {
+          "name": "qv_auxilliary",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
+        }
+      ],
       "body": [
         {
           "function": "allocate",
-          "params": {
-            "num_qubits": {
-              "expr": "8"
-            }
-          },
           "function_params": {},
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "out": {
+          "positional_args": [
+            {
+              "expr": "8"
+            },
+            {
               "name": "qv_counting"
             }
-          },
-          "operands": {}
+          ]
         },
         {
-          "function": "uniform_superposition",
-          "params": {
-            "num_qubits": {
-              "expr": "8"
-            }
-          },
+          "function": "hadamard_transform",
           "function_params": {},
-          "inputs": {},
-          "inouts": {
-            "q": {
+          "positional_args": [
+            {
+              "expr": "8"
+            },
+            {
               "name": "qv_counting"
             }
-          },
-          "outputs": {},
-          "operands": {}
+          ]
         },
         {
           "function": "allocate",
-          "params": {
-            "num_qubits": {
-              "expr": "4"
-            }
-          },
           "function_params": {},
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "out": {
+          "positional_args": [
+            {
+              "expr": "4"
+            },
+            {
               "name": "qv_auxilliary"
             }
-          },
-          "operands": {}
+          ]
         },
         {
           "function": "X",
-          "params": {},
           "function_params": {},
-          "inputs": {},
-          "inouts": {
-            "target": {
+          "positional_args": [
+            {
               "name": "qv_auxilliary",
               "start": {
                 "expr": "0"
@@ -127,168 +134,79 @@
                 "expr": "1"
               }
             }
-          },
-          "outputs": {},
-          "operands": {}
-        },
-        {
-          "function": "join",
-          "params": {},
-          "function_params": {},
-          "inputs": {
-            "in1": {
-              "name": "qv_counting"
-            },
-            "in2": {
-              "name": "qv_auxilliary"
-            }
-          },
-          "inouts": {},
-          "outputs": {
-            "out": {
-              "name": "qv_all"
-            }
-          },
-          "operands": {}
+          ]
         },
         {
           "function": "repeat",
-          "params": {
-            "count": {
-              "expr": "4"
-            }
-          },
           "function_params": {},
-          "inputs": {},
-          "outputs": {},
-          "operands": {
-            "iteration": {
+          "positional_args": [
+            {
+              "expr": "4"
+            },
+            {
               "rename_params": {},
               "body": [
                 {
                   "function": "control",
-                  "params": {},
                   "function_params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "ctrl": {
-                      "name": "qv_all",
+                  "positional_args": [
+                    {
+                      "rename_params": {},
+                      "body": [
+                        {
+                          "function": "modular_exponentiation",
+                          "function_params": {},
+                          "positional_args": [
+                            {
+                              "expr": "index"
+                            },
+                            {
+                              "name": "qv_auxilliary"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "qv_counting",
                       "start": {
                         "expr": "index"
                       },
                       "end": {
                         "expr": "index + 1"
                       }
-                    },
-                    "target": {
-                      "name": "qv_all",
-                      "start": {
-                        "expr": "8"
-                      },
-                      "end": {
-                        "expr": "12"
-                      }
                     }
-                  },
-                  "outputs": {},
-                  "operands": {
-                    "operand": {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "modular_exponentiation",
-                          "params": {
-                            "power": {
-                              "expr": "index"
-                            }
-                          },
-                          "function_params": {},
-                          "inputs": {},
-                          "inouts": {
-                            "target": {
-                              "name": "target"
-                            }
-                          },
-                          "outputs": {},
-                          "operands": {}
-                        }
-                      ]
-                    }
-                  }
+                  ]
                 }
               ]
             }
-          }
-        },
-        {
-          "function": "split",
-          "params": {
-            "out1_size": {
-              "expr": "8"
-            },
-            "out2_size": {
-              "expr": "4"
-            }
-          },
-          "function_params": {},
-          "inputs": {
-            "in": {
-              "name": "qv_all"
-            }
-          },
-          "inouts": {},
-          "outputs": {
-            "out1": {
-              "name": "qv_counting"
-            },
-            "out2": {
-              "name": "qv_auxilliary"
-            }
-          },
-          "operands": {}
+          ]
         },
         {
           "function": "invert",
-          "params": {},
           "function_params": {},
-          "inputs": {},
-          "inouts": {
-            "target": {
-              "name": "qv_counting"
-            }
-          },
-          "outputs": {},
-          "operands": {
-            "operand": {
+          "positional_args": [
+            {
               "rename_params": {},
               "body": [
                 {
                   "function": "qft",
-                  "params": {
-                    "num_qbits": {
-                      "expr": "8"
-                    }
-                  },
                   "function_params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "qbv": {
-                      "name": "target"
+                  "positional_args": [
+                    {
+                      "expr": "8"
+                    },
+                    {
+                      "name": "qv_counting"
                     }
-                  },
-                  "outputs": {},
-                  "operands": {}
+                  ]
                 }
               ]
             }
-          }
+          ]
         }
       ],
-      "local_handles": [
-        {
-          "name": "qv_all"
-        }
-      ]
+      "local_handles": []
     },
     {
       "name": "main",
@@ -296,35 +214,42 @@
       "port_declarations": {
         "qv_counting": {
           "name": "qv_counting",
-          "direction": "output",
-          "size": {
-            "expr": "8"
-          }
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
         }
       },
       "operand_declarations": {},
-      "positional_arg_declarations": [],
+      "positional_arg_declarations": [
+        {
+          "name": "qv_counting",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
+        }
+      ],
       "body": [
         {
           "function": "period_finding",
-          "params": {},
           "function_params": {},
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "qv_counting": {
+          "positional_args": [
+            {
               "name": "qv_counting"
             },
-            "qv_auxilliary": {
+            {
               "name": "qv_auxilliary"
             }
-          },
-          "operands": {}
+          ]
         }
       ],
       "local_handles": [
         {
-          "name": "qv_auxilliary"
+          "name": "qv_auxilliary",
+          "quantum_type": {
+            "kind": "qvec"
+          }
         }
       ]
     }

@@ -1,0 +1,15 @@
+qfunc grover_diffuser<num_qubits: int>(p: qbit[]) {
+  msbs: qbit[];
+  lsb: qbit[];
+  apply_to_all<num_qubits, lambda(target) {
+    X(target);
+  }>(p);
+  p -> {msbs, lsb};
+  control<lambda() {
+    Z(lsb);
+  }>(msbs);
+  {msbs, lsb} -> p;
+  apply_to_all<num_qubits, lambda(target) {
+    X(target);
+  }>(p);
+}

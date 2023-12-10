@@ -1,0 +1,314 @@
+{
+  "functions": [
+    {
+      "name": "full_hea",
+      "param_decls": {
+        "num_qubits": {
+          "kind": "int"
+        },
+        "is_parametrized": {
+          "kind": "list",
+          "element_type": {
+            "kind": "int"
+          }
+        },
+        "angle_params": {
+          "kind": "list",
+          "element_type": {
+            "kind": "real"
+          }
+        },
+        "connectivity_map": {
+          "kind": "list",
+          "element_type": {
+            "kind": "list",
+            "element_type": {
+              "kind": "int"
+            }
+          }
+        },
+        "reps": {
+          "kind": "int"
+        }
+      },
+      "port_declarations": {
+        "x": {
+          "name": "x",
+          "size": {
+            "expr": "num_qubits"
+          },
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {
+        "operands_1qubit": {
+          "name": "operands_1qubit",
+          "param_decls": {
+            "angle": {
+              "kind": "real"
+            }
+          },
+          "port_declarations": {
+            "q": {
+              "name": "q",
+              "size": {
+                "expr": "1"
+              },
+              "direction": "inout"
+            }
+          },
+          "is_list": true
+        },
+        "operands_2qubit": {
+          "name": "operands_2qubit",
+          "param_decls": {
+            "angle": {
+              "kind": "real"
+            }
+          },
+          "port_declarations": {
+            "q1": {
+              "name": "q1",
+              "size": {
+                "expr": "1"
+              },
+              "direction": "inout"
+            },
+            "q2": {
+              "name": "q2",
+              "size": {
+                "expr": "1"
+              },
+              "direction": "inout"
+            }
+          },
+          "is_list": true
+        }
+      },
+      "body": [
+        {
+          "function": "repeat",
+          "params": {
+            "count": {
+              "expr": "reps"
+            }
+          },
+          "function_params": {},
+          "operands": {
+            "iteration": {
+              "rename_params": {
+                "index": "r"
+              },
+              "body": [
+                {
+                  "function": "repeat",
+                  "params": {
+                    "count": {
+                      "expr": "len(operands_1qubit)"
+                    }
+                  },
+                  "function_params": {},
+                  "operands": {
+                    "iteration": {
+                      "rename_params": {
+                        "index": "i1"
+                      },
+                      "body": [
+                        {
+                          "function": "repeat",
+                          "params": {
+                            "count": {
+                              "expr": "num_qubits"
+                            }
+                          },
+                          "function_params": {},
+                          "operands": {
+                            "iteration": {
+                              "body": [
+                                {
+                                  "function": "if",
+                                  "params": {
+                                    "condition": {
+                                      "expr": "Eq(is_parametrized[i1],1)"
+                                    }
+                                  },
+                                  "function_params": {},
+                                  "operands": {
+                                    "then": {
+                                      "body": [
+                                        {
+                                          "function": {
+                                            "name": "operands_1qubit",
+                                            "index": {
+                                              "expr": "i1"
+                                            }
+                                          },
+                                          "params": {
+                                            "angle": {
+                                              "expr": "angle_params[sum(is_parametrized[0:i1])+len(angle_params)//reps*r+index]"
+                                            }
+                                          },
+                                          "function_params": {},
+                                          "inouts": {
+                                            "q": {
+                                              "name": "x",
+                                              "index": {
+                                                "expr": "index"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    "else": {
+                                      "body": [
+                                        {
+                                          "function": {
+                                            "name": "operands_1qubit",
+                                            "index": {
+                                              "expr": "i1"
+                                            }
+                                          },
+                                          "params": {
+                                            "angle": {
+                                              "expr": "0"
+                                            }
+                                          },
+                                          "function_params": {},
+                                          "inouts": {
+                                            "q": {
+                                              "name": "x",
+                                              "index": {
+                                                "expr": "index"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "function": "repeat",
+                  "params": {
+                    "count": {
+                      "expr": "len(operands_2qubit)"
+                    }
+                  },
+                  "function_params": {},
+                  "operands": {
+                    "iteration": {
+                      "rename_params": {
+                        "index": "i2"
+                      },
+                      "body": [
+                        {
+                          "function": "repeat",
+                          "params": {
+                            "count": {
+                              "expr": "len(connectivity_map)"
+                            }
+                          },
+                          "function_params": {},
+                          "operands": {
+                            "iteration": {
+                              "body": [
+                                {
+                                  "function": "if",
+                                  "params": {
+                                    "condition": {
+                                      "expr": "Eq(is_parametrized[len(operands_1qubit) + i2],1)"
+                                    }
+                                  },
+                                  "function_params": {},
+                                  "operands": {
+                                    "then": {
+                                      "body": [
+                                        {
+                                          "function": {
+                                            "name": "operands_2qubit",
+                                            "index": {
+                                              "expr": "i2"
+                                            }
+                                          },
+                                          "params": {
+                                            "angle": {
+                                              "expr": "angle_params[num_qubits*sum(is_parametrized[0:len(operands_1qubit)])+                                                                                            +len(connectivity_map)*sum(is_parametrized[len(operands_1qubit):len(operands_1qubit)+i2])+len(angle_params)//reps*r+index] "
+                                            }
+                                          },
+                                          "function_params": {},
+                                          "inouts": {
+                                            "q1": {
+                                              "name": "x",
+                                              "index": {
+                                                "expr": "connectivity_map[index][0]"
+                                              }
+                                            },
+                                            "q2": {
+                                              "name": "x",
+                                              "index": {
+                                                "expr": "connectivity_map[index][1]"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    "else": {
+                                      "body": [
+                                        {
+                                          "function": {
+                                            "name": "operands_2qubit",
+                                            "index": {
+                                              "expr": "i2"
+                                            }
+                                          },
+                                          "params": {
+                                            "angle": {
+                                              "expr": "0"
+                                            }
+                                          },
+                                          "function_params": {},
+                                          "inouts": {
+                                            "q1": {
+                                              "name": "x",
+                                              "index": {
+                                                "expr": "connectivity_map[index][0]"
+                                              }
+                                            },
+                                            "q2": {
+                                              "name": "x",
+                                              "index": {
+                                                "expr": "connectivity_map[index][1]"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

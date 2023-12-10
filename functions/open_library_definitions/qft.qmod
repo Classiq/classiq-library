@@ -1,0 +1,8 @@
+qfunc qft<num_qbits: int>(qbv: qbit[]) {
+  repeat<num_qbits//2, lambda<index>() {
+    SWAP(qbv[index], qbv[num_qbits-1-index]);
+  }>();
+  repeat<num_qbits, lambda<index>() {
+    qft_step<num_qbits-index>(qbv[index:num_qbits]);
+  }>();
+}
