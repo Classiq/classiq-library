@@ -25,7 +25,7 @@ flowchart
     ExternalProgram[<a href='https://docs.classiq.io/latest/user-guide/platform/executor/alternative-formats/'>Any Format, e.g QASM</a>]
 
     IBM[IBM]
-    AWS[AWS Braket]
+    AWS[Amazon Braket]
     Azure[Azure Quantum]
     Nvidia[Nvidia]
 
