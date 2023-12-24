@@ -3,9 +3,6 @@
     {
       "name": "qaoa_cost_layer",
       "param_decls": {
-        "num_qubits": {
-          "kind": "int"
-        },
         "g": {
           "kind": "real"
         },
@@ -23,9 +20,6 @@
       "port_declarations": {
         "target": {
           "name": "target",
-          "size": {
-            "expr": "num_qubits"
-          },
           "direction": "inout"
         }
       },
@@ -37,7 +31,6 @@
               "expr": "is_st"
             }
           },
-          "function_params": {},
           "operands": {
             "then": {
               "body": [
@@ -57,7 +50,6 @@
                       "expr": "1"
                     }
                   },
-                  "function_params": {},
                   "inouts": {
                     "qbv": {
                       "name": "target"
@@ -70,7 +62,6 @@
               "body": [
                 {
                   "function": "permute",
-                  "function_params": {},
                   "operands": {
                     "functions": {
                       "count": {
@@ -89,7 +80,6 @@
                                 "expr": "g*get_field(hamiltonian[index], 'coefficient')"
                               }
                             },
-                            "function_params": {},
                             "inouts": {
                               "qbv": {
                                 "name": "target"

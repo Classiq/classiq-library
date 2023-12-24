@@ -3,12 +3,6 @@
     {
       "name": "linear_pauli_rotations",
       "param_decls": {
-        "reg_size": {
-          "kind": "int"
-        },
-        "num_state_qubits": {
-          "kind": "int"
-        },
         "bases": {
           "kind": "list",
           "element_type": {
@@ -31,16 +25,10 @@
       "port_declarations": {
         "x": {
           "name": "x",
-          "size": {
-            "expr": "reg_size"
-          },
           "direction": "inout"
         },
         "q": {
           "name": "q",
-          "size": {
-            "expr": "num_state_qubits"
-          },
           "direction": "inout"
         }
       },
@@ -49,19 +37,15 @@
           "function": "repeat",
           "params": {
             "count": {
-              "expr": "num_state_qubits"
+              "expr": "len(q)"
             }
           },
-          "function_params": {},
           "operands": {
             "iteration": {
               "body": [
                 {
                   "function": "single_pauli",
                   "params": {
-                    "reg_size": {
-                      "expr": "reg_size"
-                    },
                     "slope": {
                       "expr": "slopes[index]"
                     },
@@ -69,7 +53,6 @@
                       "expr": "offsets[index]"
                     }
                   },
-                  "function_params": {},
                   "inouts": {
                     "x": {
                       "name": "x"
@@ -91,14 +74,12 @@
                               "expr": "bases[index]"
                             }
                           },
-                          "function_params": {},
                           "operands": {
                             "cases": [
                               {
                                 "body": [
                                   {
                                     "function": "IDENTITY",
-                                    "function_params": {},
                                     "inouts": {
                                       "target": {
                                         "name": "target"
@@ -116,7 +97,6 @@
                                         "expr": "theta"
                                       }
                                     },
-                                    "function_params": {},
                                     "inouts": {
                                       "target": {
                                         "name": "target"
@@ -134,7 +114,6 @@
                                         "expr": "theta"
                                       }
                                     },
-                                    "function_params": {},
                                     "inouts": {
                                       "target": {
                                         "name": "target"
@@ -152,7 +131,6 @@
                                         "expr": "theta"
                                       }
                                     },
-                                    "function_params": {},
                                     "inouts": {
                                       "target": {
                                         "name": "target"

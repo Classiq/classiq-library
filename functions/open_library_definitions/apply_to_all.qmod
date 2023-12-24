@@ -1,5 +1,5 @@
-qfunc apply_to_all<num_qubits: int, gate_operand: qfunc (target: qbit)>(q: qbit[]) {
-  repeat<num_qubits, lambda<index>() {
-    gate_operand(q[index]);
+qfunc apply_to_all<gate_operand: qfunc (target: qbit)>(target: qbit[]) {
+  repeat<len(target), lambda<index>() {
+    gate_operand(target[index]);
   }>();
 }

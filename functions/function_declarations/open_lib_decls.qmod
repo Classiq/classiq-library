@@ -1,16 +1,16 @@
 // Open library functions
-qfunc qft_step<num_qbits: int>(qbv: qbit[]);
-qfunc qft<num_qbits: int>(qbv: qbit[]);
-qfunc qpe<reg_size: int, qpe_reg_size: int, qfunc: qfunc (target: qbit[])>(x: qbit[], q: qbit[]);
-qfunc single_pauli<reg_size: int, slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit)>(x: qbit[], q: qbit);
-qfunc linear_pauli_rotations<reg_size: int, num_state_qubits: int, bases: Pauli[], slopes: real[], offsets: real[]>(x: qbit[], q: qbit[]);
+qfunc qft_step(target: qbit[]);
+qfunc qft(target: qbit[]);
+qfunc qpe<precision: int, unitary: qfunc ()>(output phase: qbit[]);
+qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit)>(x: qbit[], q: qbit);
+qfunc linear_pauli_rotations<bases: Pauli[], slopes: real[], offsets: real[]>(x: qbit[], q: qbit[]);
 qfunc amplitude_estimation<num_phase_qubits: int, num_unitary_qubits: int, sp_op: qfunc <num_unitary_qubits: int>(spq: qbit[]), oracle_op: qfunc <num_unitary_qubits: int>(oq: qbit[])>(output phase_port: qbit[], output unitary_port: qbit[]);
 qfunc simple_oracle<predicate: qfunc (vars: qbit[], result: qbit)>(target: qbit[]);
 qfunc grover_diffuser<num_qubits: int>(p: qbit[]);
 qfunc grover_operator<num_qubits: int, sp_op: qfunc <num_qubits: int>(spq: qbit[]), oracle_op: qfunc <num_qubits: int>(oq: qbit[])>(p: qbit[]);
-qfunc hadamard_transform<num_qubits: int>(q: qbit[]);
-qfunc apply_to_all<num_qubits: int, gate_operand: qfunc (target: qbit)>(q: qbit[]);
+qfunc hadamard_transform(target: qbit[]);
+qfunc apply_to_all<gate_operand: qfunc (target: qbit)>(target: qbit[]);
 qfunc grover_search<num_qubits: int, reps: int, oracle_op: qfunc <num_qubits: int>(oq: qbit[])>(gsq: qbit[]);
 qfunc prepare_int<val: int>(output out: qint);
-qfunc qaoa_mixer_layer<num_qubits: int, b: real>(target: qbit[]);
-qfunc qaoa_init<num_qubits: int>(target: qbit[]);
+qfunc qaoa_mixer_layer<b: real>(target: qbit[]);
+qfunc qaoa_init(target: qbit[]);
