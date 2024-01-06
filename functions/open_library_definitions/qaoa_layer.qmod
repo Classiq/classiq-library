@@ -3,9 +3,6 @@
     {
       "name": "qaoa_layer",
       "param_decls": {
-        "num_qubits": {
-          "kind": "int"
-        },
         "g": {
           "kind": "real"
         },
@@ -26,9 +23,6 @@
       "port_declarations": {
         "target": {
           "name": "target",
-          "size": {
-            "expr": "num_qubits"
-          },
           "direction": "inout"
         }
       },
@@ -36,9 +30,6 @@
         {
           "function": "qaoa_cost_layer",
           "params": {
-            "num_qubits": {
-              "expr": "num_qubits"
-            },
             "g": {
               "expr": "g"
             },
@@ -49,7 +40,6 @@
               "expr": "is_st"
             }
           },
-          "function_params": {},
           "inputs": {
             "target": {
               "name": "target"
@@ -64,14 +54,10 @@
         {
           "function": "qaoa_mixer_layer",
           "params": {
-            "num_qubits": {
-              "expr": "num_qubits"
-            },
             "b": {
               "expr": "b"
             }
           },
-          "function_params": {},
           "inputs": {
             "target": {
               "name": "target"

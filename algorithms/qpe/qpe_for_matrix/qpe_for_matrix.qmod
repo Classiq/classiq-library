@@ -56,8 +56,7 @@
       "body": [
         {
           "function": "power",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "pw"
             },
@@ -66,8 +65,7 @@
               "body": [
                 {
                   "function": "unitary",
-                  "function_params": {},
-                  "positional_args": [
+                 "positional_args": [
                     {
                       "expr": "matrix"
                     },
@@ -162,8 +160,7 @@
       "body": [
         {
           "function": "suzuki_trotter",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "hamiltonian"
             },
@@ -270,8 +267,7 @@
       "body": [
         {
           "function": "allocate",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "precision"
             },
@@ -282,11 +278,7 @@
         },
         {
           "function": "apply_to_all",
-          "function_params": {},
-          "positional_args": [
-            {
-              "expr": "precision"
-            },
+         "positional_args": [
             "H",
             {
               "name": "phase"
@@ -295,8 +287,7 @@
         },
         {
           "function": "repeat",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "precision"
             },
@@ -305,15 +296,13 @@
               "body": [
                 {
                   "function": "control",
-                  "function_params": {},
-                  "positional_args": [
+                 "positional_args": [
                     {
                       "rename_params": {},
                       "body": [
                         {
                           "function": "unitary_with_power",
-                          "function_params": {},
-                          "positional_args": [
+                         "positional_args": [
                             {
                               "expr": "2**index"
                             },
@@ -341,18 +330,13 @@
         },
         {
           "function": "invert",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "rename_params": {},
               "body": [
                 {
                   "function": "qft",
-                  "function_params": {},
-                  "positional_args": [
-                    {
-                      "expr": "precision"
-                    },
+                 "positional_args": [
                     {
                       "name": "phase"
                     }
@@ -396,8 +380,7 @@
       "body": [
         {
           "function": "prepare_amplitudes",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "[0.41171043413638436, 0.5077112985234067, 0.7141436182081048, 0.25044490082160326]"
             },
@@ -411,15 +394,13 @@
         },
         {
           "function": "qpe_flexible",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "rename_params": {},
               "body": [
                 {
                   "function": "if",
-                  "function_params": {},
-                  "positional_args": [
+                 "positional_args": [
                     {
                       "expr": "True"
                     },
@@ -428,8 +409,7 @@
                       "body": [
                         {
                           "function": "unitary_with_power_logic",
-                          "function_params": {},
-                          "positional_args": [
+                         "positional_args": [
                             {
                               "expr": "arg0"
                             },
@@ -448,8 +428,7 @@
                       "body": [
                         {
                           "function": "suzuki_trotter1_with_power_logic",
-                          "function_params": {},
-                          "positional_args": [
+                         "positional_args": [
                             {
                               "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I], coefficient=0.39999999999999997), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z], coefficient=0.015040319999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.X], coefficient=0.10676978000000001), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I], coefficient=0.016634415000000013), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z], coefficient=-0.042759185000000005), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.X], coefficient=0.12638833), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.I], coefficient=0.042057264999999996), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z], coefficient=0.172936455), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.X], coefficient=0.15658719), struct_literal(PauliTerm, pauli=[Pauli.Y, Pauli.Y], coefficient=0.09539162)]"
                             },

@@ -38,7 +38,7 @@ flowchart
     QuantumProgram --> Analyze;
     QuantumProgram --> Execution;
     Execution --> IBM
-    Execution --> AWS
+    Execution --> Amazon
     Execution --> Azure
     Execution --> Nvidia
 

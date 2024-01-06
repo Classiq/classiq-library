@@ -1,5 +1,5 @@
-qfunc single_pauli<reg_size: int, slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit)>(x: qbit[], q: qbit) {
-  repeat<reg_size, lambda<index>() {
+qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit)>(x: qbit[], q: qbit) {
+  repeat<len(x), lambda<index>() {
     control<lambda() {
       q1_qfunc<2**index*slope>(q);
     }>(x[index]);

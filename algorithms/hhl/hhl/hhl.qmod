@@ -79,8 +79,7 @@
       "body": [
         {
           "function": "suzuki_trotter",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "hamiltonian"
             },
@@ -187,8 +186,7 @@
       "body": [
         {
           "function": "allocate",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "precision"
             },
@@ -199,11 +197,7 @@
         },
         {
           "function": "apply_to_all",
-          "function_params": {},
-          "positional_args": [
-            {
-              "expr": "precision"
-            },
+         "positional_args": [
             "H",
             {
               "name": "phase"
@@ -212,8 +206,7 @@
         },
         {
           "function": "repeat",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "precision"
             },
@@ -222,15 +215,13 @@
               "body": [
                 {
                   "function": "control",
-                  "function_params": {},
-                  "positional_args": [
+                 "positional_args": [
                     {
                       "rename_params": {},
                       "body": [
                         {
                           "function": "unitary_with_power",
-                          "function_params": {},
-                          "positional_args": [
+                         "positional_args": [
                             {
                               "expr": "2**index"
                             },
@@ -258,18 +249,13 @@
         },
         {
           "function": "invert",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "rename_params": {},
               "body": [
                 {
                   "function": "qft",
-                  "function_params": {},
-                  "positional_args": [
-                    {
-                      "expr": "precision"
-                    },
+                 "positional_args": [
                     {
                       "name": "phase"
                     }
@@ -354,8 +340,7 @@
       "body": [
         {
           "function": "split",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "len(qbv) - precision"
             },
@@ -375,8 +360,7 @@
         },
         {
           "function": "qpe_flexible",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             "unitary_with_power",
             {
               "expr": "precision"
@@ -391,8 +375,7 @@
         },
         {
           "function": "join",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "name": "state"
             },
@@ -465,8 +448,7 @@
       "body": [
         {
           "function": "prepare_amplitudes",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "[0.18257418583505536, 0.3651483716701107, 0.7302967433402214, 0.5477225575051661]"
             },
@@ -480,15 +462,13 @@
         },
         {
           "function": "qpe_flexible",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "rename_params": {},
               "body": [
                 {
                   "function": "suzuki_trotter1_with_power_logic",
-                  "function_params": {},
-                  "positional_args": [
+                 "positional_args": [
                     {
                       "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I], coefficient=0.4075), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z], coefficient=-0.05249999999999999), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.X], coefficient=-0.030000000000000002), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I], coefficient=-0.017499999999999988), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z], coefficient=-0.057499999999999996), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.X], coefficient=0.02), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.I], coefficient=-0.025), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z], coefficient=0.045000000000000005), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.X], coefficient=-0.16), struct_literal(PauliTerm, pauli=[Pauli.Y, Pauli.Y], coefficient=-0.06)]"
                     },
@@ -530,8 +510,7 @@
         },
         {
           "function": "join",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "name": "res"
             },
@@ -545,22 +524,19 @@
         },
         {
           "function": "invert",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "rename_params": {},
               "body": [
                 {
                   "function": "qpe_flexible_wrapper",
-                  "function_params": {},
-                  "positional_args": [
+                 "positional_args": [
                     {
                       "rename_params": {},
                       "body": [
                         {
                           "function": "suzuki_trotter1_with_power_logic",
-                          "function_params": {},
-                          "positional_args": [
+                         "positional_args": [
                             {
                               "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I], coefficient=0.4075), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z], coefficient=-0.05249999999999999), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.X], coefficient=-0.030000000000000002), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I], coefficient=-0.017499999999999988), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z], coefficient=-0.057499999999999996), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.X], coefficient=0.02), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.I], coefficient=-0.025), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z], coefficient=0.045000000000000005), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.X], coefficient=-0.16), struct_literal(PauliTerm, pauli=[Pauli.Y, Pauli.Y], coefficient=-0.06)]"
                             },
@@ -597,8 +573,7 @@
         },
         {
           "function": "split",
-          "function_params": {},
-          "positional_args": [
+         "positional_args": [
             {
               "expr": "len(qbv) - 4"
             },

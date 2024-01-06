@@ -35,12 +35,6 @@
       "body": [
         {
           "function": "qaoa_init",
-          "params": {
-            "num_qubits": {
-              "expr": "num_qubits"
-            }
-          },
-          "function_params": {},
           "inputs": {
             "target": {
               "name": "target"
@@ -59,16 +53,12 @@
               "expr": "len(params_list)/2"
             }
           },
-          "function_params": {},
           "operands": {
             "iteration": {
               "body": [
                 {
                   "function": "qaoa_layer",
                   "params": {
-                    "num_qubits": {
-                      "expr": "num_qubits"
-                    },
                     "g": {
                       "expr": "params_list[2*index]"
                     },
@@ -82,7 +72,6 @@
                       "expr": "is_st"
                     }
                   },
-                  "function_params": {},
                   "inouts": {
                     "target": {
                       "name": "target"

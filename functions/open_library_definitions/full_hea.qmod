@@ -93,7 +93,6 @@
               "expr": "reps"
             }
           },
-          "function_params": {},
           "operands": {
             "iteration": {
               "rename_params": {
@@ -107,7 +106,6 @@
                       "expr": "len(operands_1qubit)"
                     }
                   },
-                  "function_params": {},
                   "operands": {
                     "iteration": {
                       "rename_params": {
@@ -121,7 +119,6 @@
                               "expr": "num_qubits"
                             }
                           },
-                          "function_params": {},
                           "operands": {
                             "iteration": {
                               "body": [
@@ -132,7 +129,6 @@
                                       "expr": "Eq(is_parametrized[i1],1)"
                                     }
                                   },
-                                  "function_params": {},
                                   "operands": {
                                     "then": {
                                       "body": [
@@ -148,7 +144,6 @@
                                               "expr": "angle_params[sum(is_parametrized[0:i1])+len(angle_params)//reps*r+index]"
                                             }
                                           },
-                                          "function_params": {},
                                           "inouts": {
                                             "q": {
                                               "name": "x",
@@ -174,7 +169,6 @@
                                               "expr": "0"
                                             }
                                           },
-                                          "function_params": {},
                                           "inouts": {
                                             "q": {
                                               "name": "x",
@@ -203,7 +197,6 @@
                       "expr": "len(operands_2qubit)"
                     }
                   },
-                  "function_params": {},
                   "operands": {
                     "iteration": {
                       "rename_params": {
@@ -217,7 +210,6 @@
                               "expr": "len(connectivity_map)"
                             }
                           },
-                          "function_params": {},
                           "operands": {
                             "iteration": {
                               "body": [
@@ -228,7 +220,6 @@
                                       "expr": "Eq(is_parametrized[len(operands_1qubit) + i2],1)"
                                     }
                                   },
-                                  "function_params": {},
                                   "operands": {
                                     "then": {
                                       "body": [
@@ -244,7 +235,6 @@
                                               "expr": "angle_params[num_qubits*sum(is_parametrized[0:len(operands_1qubit)])+                                                                                            +len(connectivity_map)*sum(is_parametrized[len(operands_1qubit):len(operands_1qubit)+i2])+len(angle_params)//reps*r+index] "
                                             }
                                           },
-                                          "function_params": {},
                                           "inouts": {
                                             "q1": {
                                               "name": "x",
@@ -276,7 +266,6 @@
                                               "expr": "0"
                                             }
                                           },
-                                          "function_params": {},
                                           "inouts": {
                                             "q1": {
                                               "name": "x",
