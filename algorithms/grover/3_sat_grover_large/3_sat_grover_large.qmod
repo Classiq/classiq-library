@@ -5,41 +5,53 @@
       "port_declarations": {
         "x1": {
           "name": "x1",
+          "quantum_type": {
+            "size": {
+              "expr": "1"
+            },
+            "kind": "qint"
+          },
           "size": {
             "expr": "1"
-          },
-          "quantum_type": {
-            "kind": "qint"
           },
           "direction": "inout"
         },
         "x2": {
           "name": "x2",
+          "quantum_type": {
+            "size": {
+              "expr": "1"
+            },
+            "kind": "qint"
+          },
           "size": {
             "expr": "1"
-          },
-          "quantum_type": {
-            "kind": "qint"
           },
           "direction": "inout"
         },
         "x3": {
           "name": "x3",
+          "quantum_type": {
+            "size": {
+              "expr": "1"
+            },
+            "kind": "qint"
+          },
           "size": {
             "expr": "1"
-          },
-          "quantum_type": {
-            "kind": "qint"
           },
           "direction": "inout"
         },
         "x4": {
           "name": "x4",
+          "quantum_type": {
+            "size": {
+              "expr": "1"
+            },
+            "kind": "qint"
+          },
           "size": {
             "expr": "1"
-          },
-          "quantum_type": {
-            "kind": "qint"
           },
           "direction": "inout"
         },
@@ -53,7 +65,9 @@
       },
       "body": [
         {
-          "expr_str": "(\n((x2) or (x3) or (x4)) and\n((~x1) or ( x2) or ( x3)) and\n((~x1) or ( x2) or (~x3)) and\n((~x1) or (~x2) or ( x3)) and\n(( x1) or (~x2) or (~x3)) and\n(( x1) or (~x2) or ( x3)) and\n((~x1) or (~x2) or (~x4)) and\n((~x1) or (~x2) or ( x4)) and\n((~x2) or (~x3) or (~x4)) and\n(( x2) or (~x3) or ( x4)) and\n(( x1) or (~x3) or ( x4)) and\n(( x1) or (~x2) or (~x4)) and\n((~x1) or (~x2) or (~x3))\n)",
+          "expression": {
+            "expr": "(\n((x2) or (x3) or (x4)) and\n((not x1) or ( x2) or ( x3)) and\n((not x1) or ( x2) or (not x3)) and\n((not x1) or (not x2) or ( x3)) and\n(( x1) or (not x2) or (not x3)) and\n(( x1) or (not x2) or ( x3)) and\n((not x1) or (not x2) or (not x4)) and\n((not x1) or (not x2) or ( x4)) and\n((not x2) or (not x3) or (not x4)) and\n(( x2) or (not x3) or ( x4)) and\n(( x1) or (not x3) or ( x4)) and\n(( x1) or (not x2) or (not x4)) and\n((not x1) or (not x2) or (not x3))\n)"
+          },
           "result_var": {
             "name": "res"
           },
@@ -66,41 +80,53 @@
       "port_declarations": {
         "x1": {
           "name": "x1",
+          "quantum_type": {
+            "size": {
+              "expr": "1"
+            },
+            "kind": "qint"
+          },
           "size": {
             "expr": "1"
-          },
-          "quantum_type": {
-            "kind": "qint"
           },
           "direction": "output"
         },
         "x2": {
           "name": "x2",
+          "quantum_type": {
+            "size": {
+              "expr": "1"
+            },
+            "kind": "qint"
+          },
           "size": {
             "expr": "1"
-          },
-          "quantum_type": {
-            "kind": "qint"
           },
           "direction": "output"
         },
         "x3": {
           "name": "x3",
+          "quantum_type": {
+            "size": {
+              "expr": "1"
+            },
+            "kind": "qint"
+          },
           "size": {
             "expr": "1"
-          },
-          "quantum_type": {
-            "kind": "qint"
           },
           "direction": "output"
         },
         "x4": {
           "name": "x4",
+          "quantum_type": {
+            "size": {
+              "expr": "1"
+            },
+            "kind": "qint"
+          },
           "size": {
             "expr": "1"
-          },
-          "quantum_type": {
-            "kind": "qint"
           },
           "direction": "output"
         }

@@ -1,14 +1,4 @@
 qfunc qpe<precision: int, unitary: qfunc ()>(output phase: qbit[]) {
   allocate<precision>(phase);
-  hadamard_transform(phase);
-  repeat<precision, lambda<index>() {
-    control<lambda() {
-      repeat<2**index, lambda<index>() {
-        unitary();
-      }>();
-    }>(phase[index]);
-  }>();
-  invert<lambda() {
-    qft(phase);
-  }>();
+  standard_qpe<precision, unitary>(phase);
 }

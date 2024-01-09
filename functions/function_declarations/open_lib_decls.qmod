@@ -1,6 +1,7 @@
 // Open library functions
 qfunc qft_step(target: qbit[]);
 qfunc qft(target: qbit[]);
+qfunc standard_qpe<precision: int, unitary: qfunc ()>(phase: qbit[]);
 qfunc qpe<precision: int, unitary: qfunc ()>(output phase: qbit[]);
 qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit)>(x: qbit[], q: qbit);
 qfunc linear_pauli_rotations<bases: Pauli[], slopes: real[], offsets: real[]>(x: qbit[], q: qbit[]);
