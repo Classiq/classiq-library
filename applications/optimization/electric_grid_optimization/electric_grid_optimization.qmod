@@ -11,7 +11,27 @@
           "size": 10
         }
       },
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "size": {
+            "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 3.0)[0], 'pauli'))"
+          },
+          "direction": "output"
+        }
+      },
       "body": [
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "len(target)"
+            },
+            {
+              "name": "target"
+            }
+          ]
+        },
         {
           "function": "qaoa_penalty",
           "params": {
@@ -22,10 +42,15 @@
               "expr": "params_list"
             },
             "num_qubits": {
-              "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 3.0)[0], 'pauli'))"
+              "expr": "len(target)"
             },
             "is_st": {
               "expr": "True"
+            }
+          },
+          "inouts": {
+            "target": {
+              "name": "target"
             }
           }
         }

@@ -5,14 +5,17 @@
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 427872535
+    "random_seed": 1503454475,
+    "backend_preferences": {
+      "backend_service_provider": "Classiq",
+      "backend_name": "aer_simulator"
+    }
   },
   "kind": "synthesis",
   "functions": [
     {
       "name": "main",
       "port_declarations": {},
-      "parameters": [],
       "input_ports_wiring": {},
       "output_ports_wiring": {},
       "body": [
@@ -58,27 +61,28 @@
     "backend_name": "ibmq_kolkata",
     "custom_hardware_settings": {
       "basis_gates": [
-        "id",
-        "s",
-        "u2",
         "y",
+        "cz",
+        "x",
+        "z",
+        "r",
         "rz",
-        "p",
-        "tdg",
         "rx",
-        "sx",
         "sdg",
         "ry",
-        "cz",
-        "u",
-        "sxdg",
-        "x",
-        "cx",
+        "sx",
         "h",
-        "u1",
-        "z",
+        "tdg",
+        "s",
         "t",
-        "cy"
+        "id",
+        "u1",
+        "cx",
+        "cy",
+        "p",
+        "u",
+        "u2",
+        "sxdg"
       ]
     },
     "random_seed": -1

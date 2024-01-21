@@ -79,26 +79,25 @@
       "body": [
         {
           "function": "suzuki_trotter",
-         "positional_args": [
+          "positional_args": [
             {
               "expr": "hamiltonian"
             },
             {
-              "expr": "evolution_coefficient*pw"
+              "expr": "(evolution_coefficient) * (pw)"
             },
             {
               "expr": "1"
             },
             {
-              "expr": "r0*ceiling(reps_scaling_factor**(log(pw)/log(2)))"
+              "expr": "(r0) * (ceiling((reps_scaling_factor) ** (log(pw,2))))"
             },
             {
               "name": "target"
             }
           ]
         }
-      ],
-      "local_handles": []
+      ]
     },
     {
       "name": "qpe_flexible",
@@ -186,7 +185,7 @@
       "body": [
         {
           "function": "allocate",
-         "positional_args": [
+          "positional_args": [
             {
               "expr": "precision"
             },
@@ -197,7 +196,7 @@
         },
         {
           "function": "apply_to_all",
-         "positional_args": [
+          "positional_args": [
             "H",
             {
               "name": "phase"
@@ -206,7 +205,7 @@
         },
         {
           "function": "repeat",
-         "positional_args": [
+          "positional_args": [
             {
               "expr": "precision"
             },
@@ -215,15 +214,15 @@
               "body": [
                 {
                   "function": "control",
-                 "positional_args": [
+                  "positional_args": [
                     {
                       "rename_params": {},
                       "body": [
                         {
                           "function": "unitary_with_power",
-                         "positional_args": [
+                          "positional_args": [
                             {
-                              "expr": "2**index"
+                              "expr": "(2) ** (index)"
                             },
                             {
                               "name": "state"
@@ -235,10 +234,10 @@
                     {
                       "name": "phase",
                       "start": {
-                        "expr": "index"
+                        "expr": "(0) + (index)"
                       },
                       "end": {
-                        "expr": "index + 1"
+                        "expr": "((0) + (index)) + (1)"
                       }
                     }
                   ]
@@ -249,13 +248,13 @@
         },
         {
           "function": "invert",
-         "positional_args": [
+          "positional_args": [
             {
               "rename_params": {},
               "body": [
                 {
                   "function": "qft",
-                 "positional_args": [
+                  "positional_args": [
                     {
                       "name": "phase"
                     }
@@ -265,8 +264,7 @@
             }
           ]
         }
-      ],
-      "local_handles": []
+      ]
     },
     {
       "name": "qpe_flexible_wrapper",
@@ -339,10 +337,28 @@
       ],
       "body": [
         {
+          "name": "phase",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "name": "state",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "name": "temp",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
           "function": "split",
-         "positional_args": [
+          "positional_args": [
             {
-              "expr": "len(qbv) - precision"
+              "expr": "(len(qbv)) - (precision)"
             },
             {
               "expr": "precision"
@@ -360,7 +376,7 @@
         },
         {
           "function": "qpe_flexible",
-         "positional_args": [
+          "positional_args": [
             "unitary_with_power",
             {
               "expr": "precision"
@@ -375,7 +391,7 @@
         },
         {
           "function": "join",
-         "positional_args": [
+          "positional_args": [
             {
               "name": "state"
             },
@@ -386,26 +402,6 @@
               "name": "qbv"
             }
           ]
-        }
-      ],
-      "local_handles": [
-        {
-          "name": "phase",
-          "quantum_type": {
-            "kind": "qvec"
-          }
-        },
-        {
-          "name": "state",
-          "quantum_type": {
-            "kind": "qvec"
-          }
-        },
-        {
-          "name": "temp",
-          "quantum_type": {
-            "kind": "qvec"
-          }
         }
       ]
     },
@@ -447,8 +443,14 @@
       ],
       "body": [
         {
+          "name": "phase",
+          "quantum_type": {
+            "kind": "qnum"
+          }
+        },
+        {
           "function": "prepare_amplitudes",
-         "positional_args": [
+          "positional_args": [
             {
               "expr": "[0.18257418583505536, 0.3651483716701107, 0.7302967433402214, 0.5477225575051661]"
             },
@@ -462,13 +464,13 @@
         },
         {
           "function": "qpe_flexible",
-         "positional_args": [
+          "positional_args": [
             {
               "rename_params": {},
               "body": [
                 {
                   "function": "suzuki_trotter1_with_power_logic",
-                 "positional_args": [
+                  "positional_args": [
                     {
                       "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I], coefficient=0.4075), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z], coefficient=-0.05249999999999999), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.X], coefficient=-0.030000000000000002), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I], coefficient=-0.017499999999999988), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z], coefficient=-0.057499999999999996), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.X], coefficient=0.02), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.I], coefficient=-0.025), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z], coefficient=0.045000000000000005), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.X], coefficient=-0.16), struct_literal(PauliTerm, pauli=[Pauli.Y, Pauli.Y], coefficient=-0.06)]"
                     },
@@ -503,14 +505,33 @@
           ]
         },
         {
-          "expression": {"expr": "0.0625/phase"},
+          "target": {
+            "name": "phase"
+          },
+          "fraction_digits": {
+            "expr": "4"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        },
+        {
+          "expression": {
+            "expr": "0.0625 / phase"
+          },
           "result_var": {
             "name": "indicator"
           }
         },
         {
+          "name": "qbv",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
           "function": "join",
-         "positional_args": [
+          "positional_args": [
             {
               "name": "res"
             },
@@ -524,19 +545,19 @@
         },
         {
           "function": "invert",
-         "positional_args": [
+          "positional_args": [
             {
               "rename_params": {},
               "body": [
                 {
                   "function": "qpe_flexible_wrapper",
-                 "positional_args": [
+                  "positional_args": [
                     {
                       "rename_params": {},
                       "body": [
                         {
                           "function": "suzuki_trotter1_with_power_logic",
-                         "positional_args": [
+                          "positional_args": [
                             {
                               "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I], coefficient=0.4075), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z], coefficient=-0.05249999999999999), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.X], coefficient=-0.030000000000000002), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I], coefficient=-0.017499999999999988), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z], coefficient=-0.057499999999999996), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.X], coefficient=0.02), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.I], coefficient=-0.025), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z], coefficient=0.045000000000000005), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.X], coefficient=-0.16), struct_literal(PauliTerm, pauli=[Pauli.Y, Pauli.Y], coefficient=-0.06)]"
                             },
@@ -573,9 +594,9 @@
         },
         {
           "function": "split",
-         "positional_args": [
+          "positional_args": [
             {
-              "expr": "len(qbv) - 4"
+              "expr": "(len(qbv)) - (4)"
             },
             {
               "expr": "4"
@@ -590,23 +611,6 @@
               "name": "phase"
             }
           ]
-        }
-      ],
-      "local_handles": [
-        {
-          "name": "phase",
-          "quantum_type": {
-            "fraction_places": {
-              "expr": "4"
-            },
-            "kind": "qfixed"
-          }
-        },
-        {
-          "name": "qbv",
-          "quantum_type": {
-            "kind": "qvec"
-          }
         }
       ]
     }

@@ -1,12 +1,12 @@
 {
   "types": [],
   "constants": [],
-  "classical_execution_code": "result = sample()\nsave({'result': result})",
+  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
   "execution_preferences": {
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 1643585681,
+    "random_seed": 3458883191,
     "backend_preferences": {
       "backend_service_provider": "Classiq",
       "backend_name": "aer_simulator_statevector"
@@ -19,24 +19,20 @@
       "port_declarations": {
         "a": {
           "name": "a",
-          "direction": "output",
           "size": 2,
-          "is_signed": false
+          "direction": "output"
         },
         "b": {
           "name": "b",
-          "direction": "output",
           "size": 2,
-          "is_signed": false
+          "direction": "output"
         },
         "sum": {
           "name": "sum",
-          "direction": "output",
           "size": 3,
-          "is_signed": false
+          "direction": "output"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {},
       "output_ports_wiring": {
         "a": "a_output_Identity:a->Output:a",
@@ -65,10 +61,10 @@
           "inputs": {},
           "inouts": {},
           "outputs": {
-            "OUT[0]": "StatePreparation_cs4id_VY7onM:OUT[0]->Adder_cs4id_iLWQCl:left_arg[0]",
-            "OUT[1]": "StatePreparation_cs4id_VY7onM:OUT[1]->Adder_cs4id_iLWQCl:left_arg[1]"
+            "OUT[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->Adder_cs4id_PyYngF:left_arg[0]",
+            "OUT[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->Adder_cs4id_PyYngF:left_arg[1]"
           },
-          "name": "StatePreparation_cs4id_VY7onM"
+          "name": "StatePreparation_cs4id_iK2ZWe"
         },
         {
           "function": "StatePreparation",
@@ -91,10 +87,10 @@
           "inputs": {},
           "inouts": {},
           "outputs": {
-            "OUT[0]": "StatePreparation_cs4id_LPxWCu:OUT[0]->Adder_cs4id_iLWQCl:right_arg[0]",
-            "OUT[1]": "StatePreparation_cs4id_LPxWCu:OUT[1]->Adder_cs4id_iLWQCl:right_arg[1]"
+            "OUT[0]": "StatePreparation_cs4id_qhFWCE:OUT[0]->Adder_cs4id_PyYngF:right_arg[0]",
+            "OUT[1]": "StatePreparation_cs4id_qhFWCE:OUT[1]->Adder_cs4id_PyYngF:right_arg[1]"
           },
-          "name": "StatePreparation_cs4id_LPxWCu"
+          "name": "StatePreparation_cs4id_qhFWCE"
         },
         {
           "function": "Adder",
@@ -116,22 +112,22 @@
           },
           "control_states": [],
           "inputs": {
-            "left_arg[0]": "StatePreparation_cs4id_VY7onM:OUT[0]->Adder_cs4id_iLWQCl:left_arg[0]",
-            "left_arg[1]": "StatePreparation_cs4id_VY7onM:OUT[1]->Adder_cs4id_iLWQCl:left_arg[1]",
-            "right_arg[0]": "StatePreparation_cs4id_LPxWCu:OUT[0]->Adder_cs4id_iLWQCl:right_arg[0]",
-            "right_arg[1]": "StatePreparation_cs4id_LPxWCu:OUT[1]->Adder_cs4id_iLWQCl:right_arg[1]"
+            "left_arg[0]": "StatePreparation_cs4id_iK2ZWe:OUT[0]->Adder_cs4id_PyYngF:left_arg[0]",
+            "left_arg[1]": "StatePreparation_cs4id_iK2ZWe:OUT[1]->Adder_cs4id_PyYngF:left_arg[1]",
+            "right_arg[0]": "StatePreparation_cs4id_qhFWCE:OUT[0]->Adder_cs4id_PyYngF:right_arg[0]",
+            "right_arg[1]": "StatePreparation_cs4id_qhFWCE:OUT[1]->Adder_cs4id_PyYngF:right_arg[1]"
           },
           "inouts": {},
           "outputs": {
-            "left_arg[0]": "Adder_cs4id_iLWQCl:left_arg[0]->a_output_Identity:a[0]",
-            "left_arg[1]": "Adder_cs4id_iLWQCl:left_arg[1]->a_output_Identity:a[1]",
-            "right_arg[0]": "Adder_cs4id_iLWQCl:right_arg[0]->b_output_Identity:b[0]",
-            "right_arg[1]": "Adder_cs4id_iLWQCl:right_arg[1]->b_output_Identity:b[1]",
-            "sum[0]": "Adder_cs4id_iLWQCl:sum[0]->sum_output_Identity:sum[0]",
-            "sum[1]": "Adder_cs4id_iLWQCl:sum[1]->sum_output_Identity:sum[1]",
-            "sum[2]": "Adder_cs4id_iLWQCl:sum[2]->sum_output_Identity:sum[2]"
+            "left_arg[0]": "Adder_cs4id_PyYngF:left_arg[0]->a_output_Identity:a[0]",
+            "left_arg[1]": "Adder_cs4id_PyYngF:left_arg[1]->a_output_Identity:a[1]",
+            "right_arg[0]": "Adder_cs4id_PyYngF:right_arg[0]->b_output_Identity:b[0]",
+            "right_arg[1]": "Adder_cs4id_PyYngF:right_arg[1]->b_output_Identity:b[1]",
+            "sum[0]": "Adder_cs4id_PyYngF:sum[0]->sum_output_Identity:sum[0]",
+            "sum[1]": "Adder_cs4id_PyYngF:sum[1]->sum_output_Identity:sum[1]",
+            "sum[2]": "Adder_cs4id_PyYngF:sum[2]->sum_output_Identity:sum[2]"
           },
-          "name": "Adder_cs4id_iLWQCl"
+          "name": "Adder_cs4id_PyYngF"
         },
         {
           "function": "Identity",
@@ -149,8 +145,8 @@
           },
           "control_states": [],
           "inputs": {
-            "a[0]": "Adder_cs4id_iLWQCl:left_arg[0]->a_output_Identity:a[0]",
-            "a[1]": "Adder_cs4id_iLWQCl:left_arg[1]->a_output_Identity:a[1]"
+            "a[0]": "Adder_cs4id_PyYngF:left_arg[0]->a_output_Identity:a[0]",
+            "a[1]": "Adder_cs4id_PyYngF:left_arg[1]->a_output_Identity:a[1]"
           },
           "inouts": {},
           "outputs": {
@@ -174,8 +170,8 @@
           },
           "control_states": [],
           "inputs": {
-            "b[0]": "Adder_cs4id_iLWQCl:right_arg[0]->b_output_Identity:b[0]",
-            "b[1]": "Adder_cs4id_iLWQCl:right_arg[1]->b_output_Identity:b[1]"
+            "b[0]": "Adder_cs4id_PyYngF:right_arg[0]->b_output_Identity:b[0]",
+            "b[1]": "Adder_cs4id_PyYngF:right_arg[1]->b_output_Identity:b[1]"
           },
           "inouts": {},
           "outputs": {
@@ -199,9 +195,9 @@
           },
           "control_states": [],
           "inputs": {
-            "sum[0]": "Adder_cs4id_iLWQCl:sum[0]->sum_output_Identity:sum[0]",
-            "sum[1]": "Adder_cs4id_iLWQCl:sum[1]->sum_output_Identity:sum[1]",
-            "sum[2]": "Adder_cs4id_iLWQCl:sum[2]->sum_output_Identity:sum[2]"
+            "sum[0]": "Adder_cs4id_PyYngF:sum[0]->sum_output_Identity:sum[0]",
+            "sum[1]": "Adder_cs4id_PyYngF:sum[1]->sum_output_Identity:sum[1]",
+            "sum[2]": "Adder_cs4id_PyYngF:sum[2]->sum_output_Identity:sum[2]"
           },
           "inouts": {},
           "outputs": {
@@ -219,27 +215,28 @@
   "preferences": {
     "custom_hardware_settings": {
       "basis_gates": [
-        "cx",
-        "sx",
-        "ry",
-        "x",
-        "rz",
-        "h",
-        "p",
-        "u2",
-        "y",
-        "cz",
-        "u",
-        "s",
         "sdg",
+        "u2",
         "rx",
-        "cy",
-        "t",
+        "u1",
+        "p",
+        "s",
+        "r",
+        "cx",
+        "rz",
         "tdg",
-        "z",
-        "id",
+        "y",
+        "h",
+        "ry",
         "sxdg",
-        "u1"
+        "cy",
+        "u",
+        "cz",
+        "z",
+        "t",
+        "sx",
+        "x",
+        "id"
       ]
     },
     "random_seed": 206755496

@@ -13,17 +13,17 @@
       "port_declarations": {
         "phase_port": {
           "name": "phase_port",
-          "direction": "output",
           "size": {
             "expr": "num_phase_qubits"
-          }
+          },
+          "direction": "output"
         },
         "unitary_port": {
           "name": "unitary_port",
-          "direction": "output",
           "size": {
             "expr": "num_unitary_qubits"
-          }
+          },
+          "direction": "output"
         }
       },
       "operand_declarations": {
@@ -37,17 +37,17 @@
           "port_declarations": {
             "reg": {
               "name": "reg",
-              "direction": "inout",
               "size": {
                 "expr": "num_unitary_qubits-1"
-              }
+              },
+              "direction": "inout"
             },
             "ind": {
               "name": "ind",
-              "direction": "inout",
               "size": {
                 "expr": "1"
-              }
+              },
+              "direction": "inout"
             }
           }
         }
@@ -131,18 +131,21 @@
       "port_declarations": {
         "phase_port": {
           "name": "phase_port",
-          "direction": "output",
           "size": {
             "expr": "2"
-          }
+          },
+          "direction": "output"
         }
       },
       "body": [
         {
+          "name": "unitary_port"
+        },
+        {
           "function": "qmci",
           "params": {
             "num_unitary_qubits": {
-              "expr": "5+1"
+              "expr": "6"
             },
             "num_phase_qubits": {
               "expr": "2"
@@ -151,6 +154,9 @@
           "outputs": {
             "phase_port": {
               "name": "phase_port"
+            },
+            "unitary_port": {
+              "name": "unitary_port"
             }
           },
           "operands": {
@@ -166,15 +172,7 @@
                       "expr": "struct_literal(FinanceFunction, f=FinanceFunctionType.EUROPEAN_CALL_OPTION, threshold=1.9, larger=True, polynomial_degree=0, use_chebyshev_polynomial_approximation=False, tail_probability=0.0)"
                     }
                   },
-                  "inputs": {
-                    "func_port": {
-                      "name": "reg"
-                    },
-                    "obj_port": {
-                      "name": "ind"
-                    }
-                  },
-                  "outputs": {
+                  "inouts": {
                     "func_port": {
                       "name": "reg"
                     },

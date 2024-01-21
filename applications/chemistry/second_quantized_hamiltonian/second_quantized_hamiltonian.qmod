@@ -11,7 +11,35 @@
           "size": 12
         }
       },
+      "port_declarations": {
+        "x": {
+          "name": "x",
+          "direction": "output"
+        }
+      },
       "body": [
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "len(get_field(fock_hamiltonian_problem_to_hamiltonian(struct_literal(FockHamiltonianProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,terms=[\n            struct_literal(LadderTerm,\n                coefficient=0.2,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=0),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=0)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.3,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=1)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.4,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=2)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.5,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=3),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=3)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=-0.1,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=0),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.PLUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=0)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=-0.3,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.PLUS, index=3),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=3)\n                ]\n            )],num_particles=[1, 1]))[0], 'pauli'))"
+            },
+            {
+              "name": "qbv"
+            }
+          ]
+        },
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "4"
+            },
+            {
+              "name": "x"
+            }
+          ]
+        },
         {
           "function": "full_hea",
           "params": {
@@ -31,7 +59,11 @@
               "expr": "t"
             }
           },
-          "inputs": {},
+          "inouts": {
+            "x": {
+              "name": "x"
+            }
+          },
           "operands": {
             "operands_1qubit": [
               {
@@ -84,7 +116,11 @@
           }
         }
       ],
-      "local_handles": []
+      "local_handles": [
+        {
+          "name": "qbv"
+        }
+      ]
     }
   ],
   "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=fock_hamiltonian_problem_to_hamiltonian(struct_literal(FockHamiltonianProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,terms=[\n            struct_literal(LadderTerm,\n                coefficient=0.2,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=0),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=0)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.3,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=1)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.4,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=2)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=0.5,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=3),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=3)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=-0.1,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=0),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.PLUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=1),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=0)\n                ]\n            ),\t\t\n            struct_literal(LadderTerm,\n                coefficient=-0.3,\n                ops=[\n                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.PLUS, index=3),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=2),\n\t\t\t\t\tstruct_literal(LadderOp, op=LadderOperator.MINUS, index=3)\n                ]\n            )],num_particles=[1, 1])), maximize=False,\ninitial_point=[],\noptimizer=Optimizer.COBYLA,\nmax_iteration=100,\ntolerance=0,\nstep_size=0,\nskip_compute_variance=False,\nalpha_cvar=1.0,\n\n)\nsave({'vqe_result': vqe_result})"

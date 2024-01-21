@@ -6,7 +6,11 @@
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 4139756191
+    "random_seed": 1968270057,
+    "backend_preferences": {
+      "backend_service_provider": "Classiq",
+      "backend_name": "aer_simulator"
+    }
   },
   "kind": "synthesis",
   "functions": [
@@ -15,16 +19,15 @@
       "port_declarations": {
         "io": {
           "name": "io",
-          "direction": "inout",
-          "size": 3
+          "size": 3,
+          "direction": "inout"
         },
         "ind": {
           "name": "ind",
-          "direction": "inout",
-          "size": 1
+          "size": 1,
+          "direction": "inout"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {
         "io": "Input:io->io_input_Identity:io",
         "ind": "Input:ind->ind_input_Identity:ind"
@@ -207,16 +210,15 @@
       "port_declarations": {
         "io": {
           "name": "io",
-          "direction": "inout",
-          "size": 3
+          "size": 3,
+          "direction": "inout"
         },
         "ind": {
           "name": "ind",
-          "direction": "inout",
-          "size": 1
+          "size": 1,
+          "direction": "inout"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {
         "io": "Input:io->io_input_Identity:io",
         "ind": "Input:ind->ind_input_Identity:ind"
@@ -346,11 +348,10 @@
       "port_declarations": {
         "mcz_io": {
           "name": "mcz_io",
-          "direction": "inout",
-          "size": 4
+          "size": 4,
+          "direction": "inout"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {
         "mcz_io": "Input:mcz_io->mcz_io_input_Identity:mcz_io"
       },
@@ -472,16 +473,15 @@
       "port_declarations": {
         "io": {
           "name": "io",
-          "direction": "inout",
-          "size": 3
+          "size": 3,
+          "direction": "inout"
         },
         "ind": {
           "name": "ind",
-          "direction": "inout",
-          "size": 1
+          "size": 1,
+          "direction": "inout"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {
         "io": "Input:io->io_input_Identity:io",
         "ind": "Input:ind->ind_input_Identity:ind"
@@ -544,7 +544,6 @@
         {
           "function": "good_state_oracle",
           "function_params": {
-            "parameters": [],
             "input_decls": {
               "io": {
                 "size": 3,
@@ -601,7 +600,6 @@
         {
           "function": "state_loading",
           "function_params": {
-            "parameters": [],
             "input_decls": {
               "io": {
                 "size": 3,
@@ -660,7 +658,6 @@
         {
           "function": "zero_oracle",
           "function_params": {
-            "parameters": [],
             "input_decls": {
               "mcz_io": {
                 "size": 4,
@@ -701,7 +698,6 @@
         {
           "function": "state_loading",
           "function_params": {
-            "parameters": [],
             "input_decls": {
               "io": {
                 "size": 3,
@@ -831,12 +827,10 @@
       "port_declarations": {
         "phase_result": {
           "name": "phase_result",
-          "direction": "output",
           "size": 3,
-          "is_signed": false
+          "direction": "output"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {},
       "output_ports_wiring": {
         "phase_result": "phase_result_output_Identity:phase_result->Output:phase_result"
@@ -845,7 +839,6 @@
         {
           "function": "state_loading",
           "function_params": {
-            "parameters": [],
             "input_decls": {
               "io": {
                 "size": 3,
@@ -900,7 +893,6 @@
             "size": 3,
             "unitary": "grover",
             "unitary_params": {
-              "parameters": [],
               "input_decls": {
                 "io": {
                   "size": 3,
@@ -990,27 +982,28 @@
   "preferences": {
     "custom_hardware_settings": {
       "basis_gates": [
-        "t",
-        "cx",
-        "x",
-        "u1",
-        "ry",
-        "rx",
-        "z",
-        "y",
-        "cy",
         "h",
-        "rz",
-        "cz",
-        "sxdg",
-        "u2",
-        "sx",
-        "id",
-        "s",
-        "tdg",
+        "cy",
+        "y",
+        "cx",
         "p",
+        "sdg",
+        "x",
+        "t",
+        "rz",
+        "ry",
+        "z",
+        "tdg",
+        "id",
+        "r",
+        "cz",
         "u",
-        "sdg"
+        "rx",
+        "u2",
+        "s",
+        "sx",
+        "sxdg",
+        "u1"
       ]
     },
     "random_seed": -1

@@ -159,7 +159,7 @@ from classiq import (
     allocate,
     QFunc,
     X,
-    QInt,
+    QNum,
     synthesize,
     create_model,
     show,
@@ -182,9 +182,9 @@ def get_5(x: Output[QArray]) -> None:
 
 
 @QFunc
-def main(res: Output[QInt]) -> None:
-    a = QInt("a")
-    b = QInt("b")
+def main(res: Output[QNum]) -> None:
+    a = QNum("a")
+    b = QNum("b")
     get_3(a)
     get_5(b)
     res |= a + b  # should be 8

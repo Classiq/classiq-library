@@ -6,7 +6,11 @@
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 1169118840,
+    "random_seed": 2948915013,
+    "backend_preferences": {
+      "backend_service_provider": "Classiq",
+      "backend_name": "aer_simulator"
+    },
     "num_shots": 200000
   },
   "kind": "synthesis",
@@ -16,18 +20,15 @@
       "port_declarations": {
         "phase_result": {
           "name": "phase_result",
-          "direction": "output",
           "size": 6,
-          "is_signed": false
+          "direction": "output"
         },
         "out": {
           "name": "out",
-          "direction": "output",
           "size": 1,
-          "is_signed": false
+          "direction": "output"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {},
       "output_ports_wiring": {
         "phase_result": "phase_result_output_Identity:phase_result->Output:phase_result",
@@ -42,22 +43,18 @@
               "num_qubits": 1,
               "molecule": {
                 "atoms": [
-                  [
-                    "H",
-                    [
-                      0.0,
-                      0.0,
-                      0
-                    ]
-                  ],
-                  [
-                    "H",
-                    [
-                      0.0,
-                      0.0,
-                      0.735
-                    ]
-                  ]
+                  {
+                    "symbol": "H",
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  {
+                    "symbol": "H",
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.735
+                  }
                 ]
               },
               "freeze_core": true,
@@ -68,9 +65,9 @@
           "inputs": {},
           "inouts": {},
           "outputs": {
-            "OUT[0]": "HartreeFock_cs4id_wjxw9O:OUT[0]->PhaseEstimation_cs4id_LNyldk:IN[0]"
+            "OUT[0]": "HartreeFock_cs4id_iK2ZWe:OUT[0]->PhaseEstimation_cs4id_qhFWCE:IN[0]"
           },
-          "name": "HartreeFock_cs4id_wjxw9O"
+          "name": "HartreeFock_cs4id_iK2ZWe"
         },
         {
           "function": "PhaseEstimation",
@@ -93,7 +90,8 @@
                     "(0.04413108211329157+0j)"
                   ]
                 ],
-                "is_hermitian": true
+                "is_hermitian": true,
+                "has_complex_coefficients": false
               },
               "evolution_coefficient": -6.283185307179586,
               "constraints": {}
@@ -107,19 +105,19 @@
           },
           "control_states": [],
           "inputs": {
-            "IN[0]": "HartreeFock_cs4id_wjxw9O:OUT[0]->PhaseEstimation_cs4id_LNyldk:IN[0]"
+            "IN[0]": "HartreeFock_cs4id_iK2ZWe:OUT[0]->PhaseEstimation_cs4id_qhFWCE:IN[0]"
           },
           "inouts": {},
           "outputs": {
-            "PHASE_ESTIMATION[0]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[0]->phase_result_output_Identity:phase_result[0]",
-            "PHASE_ESTIMATION[1]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[1]->phase_result_output_Identity:phase_result[1]",
-            "PHASE_ESTIMATION[2]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[2]->phase_result_output_Identity:phase_result[2]",
-            "PHASE_ESTIMATION[3]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[3]->phase_result_output_Identity:phase_result[3]",
-            "PHASE_ESTIMATION[4]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[4]->phase_result_output_Identity:phase_result[4]",
-            "PHASE_ESTIMATION[5]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[5]->phase_result_output_Identity:phase_result[5]",
-            "OUT[0]": "PhaseEstimation_cs4id_LNyldk:OUT[0]->out_output_Identity:out[0]"
+            "PHASE_ESTIMATION[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->phase_result_output_Identity:phase_result[0]",
+            "PHASE_ESTIMATION[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->phase_result_output_Identity:phase_result[1]",
+            "PHASE_ESTIMATION[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->phase_result_output_Identity:phase_result[2]",
+            "PHASE_ESTIMATION[3]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[3]->phase_result_output_Identity:phase_result[3]",
+            "PHASE_ESTIMATION[4]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[4]->phase_result_output_Identity:phase_result[4]",
+            "PHASE_ESTIMATION[5]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[5]->phase_result_output_Identity:phase_result[5]",
+            "OUT[0]": "PhaseEstimation_cs4id_qhFWCE:OUT[0]->out_output_Identity:out[0]"
           },
-          "name": "PhaseEstimation_cs4id_LNyldk"
+          "name": "PhaseEstimation_cs4id_qhFWCE"
         },
         {
           "function": "Identity",
@@ -137,12 +135,12 @@
           },
           "control_states": [],
           "inputs": {
-            "phase_result[0]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[0]->phase_result_output_Identity:phase_result[0]",
-            "phase_result[1]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[1]->phase_result_output_Identity:phase_result[1]",
-            "phase_result[2]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[2]->phase_result_output_Identity:phase_result[2]",
-            "phase_result[3]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[3]->phase_result_output_Identity:phase_result[3]",
-            "phase_result[4]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[4]->phase_result_output_Identity:phase_result[4]",
-            "phase_result[5]": "PhaseEstimation_cs4id_LNyldk:PHASE_ESTIMATION[5]->phase_result_output_Identity:phase_result[5]"
+            "phase_result[0]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[0]->phase_result_output_Identity:phase_result[0]",
+            "phase_result[1]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[1]->phase_result_output_Identity:phase_result[1]",
+            "phase_result[2]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[2]->phase_result_output_Identity:phase_result[2]",
+            "phase_result[3]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[3]->phase_result_output_Identity:phase_result[3]",
+            "phase_result[4]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[4]->phase_result_output_Identity:phase_result[4]",
+            "phase_result[5]": "PhaseEstimation_cs4id_qhFWCE:PHASE_ESTIMATION[5]->phase_result_output_Identity:phase_result[5]"
           },
           "inouts": {},
           "outputs": {
@@ -166,7 +164,7 @@
           },
           "control_states": [],
           "inputs": {
-            "out[0]": "PhaseEstimation_cs4id_LNyldk:OUT[0]->out_output_Identity:out[0]"
+            "out[0]": "PhaseEstimation_cs4id_qhFWCE:OUT[0]->out_output_Identity:out[0]"
           },
           "inouts": {},
           "outputs": {
@@ -183,30 +181,31 @@
   "preferences": {
     "custom_hardware_settings": {
       "basis_gates": [
-        "y",
-        "sx",
-        "t",
-        "p",
-        "rx",
-        "id",
-        "cx",
-        "z",
-        "cy",
-        "tdg",
         "s",
+        "p",
         "u1",
-        "u",
+        "z",
         "rz",
-        "ry",
-        "x",
+        "cx",
+        "cz",
+        "y",
+        "cy",
         "h",
-        "sdg",
         "sxdg",
+        "r",
+        "rx",
+        "sx",
+        "sdg",
+        "tdg",
+        "t",
+        "u",
+        "id",
         "u2",
-        "cz"
+        "x",
+        "ry"
       ]
     },
     "timeout_seconds": 600,
-    "random_seed": 3734742231
+    "random_seed": -1
   }
 }

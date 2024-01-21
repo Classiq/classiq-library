@@ -11,7 +11,27 @@
           "size": 6
         }
       },
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "size": {
+            "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)[0], 'pauli'))"
+          },
+          "direction": "output"
+        }
+      },
       "body": [
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "len(target)"
+            },
+            {
+              "name": "target"
+            }
+          ]
+        },
         {
           "function": "qaoa_penalty",
           "params": {
@@ -22,10 +42,15 @@
               "expr": "params_list"
             },
             "num_qubits": {
-              "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)[0], 'pauli'))"
+              "expr": "len(target)"
             },
             "is_st": {
               "expr": "True"
+            }
+          },
+          "inouts": {
+            "target": {
+              "name": "target"
             }
           }
         }
@@ -70,9 +95,15 @@
       "constraints": [],
       "objective_type": "Min",
       "objective_function": {
-        "expr": "(14*x0 + 14*x1 + 2*x2 + 14*x3 + 10*x4 + 6*x5 + 20*x6 + 18*x7 + 10*x8 + 4*x9 - 56)**2"
+        "expr": "(2*x0 + 20*x1 + 4*x2 + 12*x3 + 2*x4 + 14*x5 + 4*x6 + 14*x7 + 8*x8 + 16*x9 - 48)**2"
       }
     }
   ],
-  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),\n    maximize=False,\n    initial_point=compute_qaoa_initial_point(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),3),\n    optimizer=Optimizer.COBYLA,\n    max_iteration=60,\n    tolerance=0.0,\n    step_size=0.0,\n    skip_compute_variance=False,\n    alpha_cvar=0.7\n)\nsolution = get_optimization_solution(get_type(MyCombiProblem), vqe_result, 2.0)\nhamiltonian = optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)\nsave({'solution': solution, \"vqe_result\": vqe_result, \"hamiltonian\": hamiltonian})\n"
+  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),\n    maximize=False,\n    initial_point=compute_qaoa_initial_point(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),3),\n    optimizer=Optimizer.COBYLA,\n    max_iteration=60,\n    tolerance=0.0,\n    step_size=0.0,\n    skip_compute_variance=False,\n    alpha_cvar=0.7\n)\nsolution = get_optimization_solution(get_type(MyCombiProblem), vqe_result, 2.0)\nhamiltonian = optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)\nsave({'solution': solution, \"vqe_result\": vqe_result, \"hamiltonian\": hamiltonian})\n",
+  "execution_preferences": {
+    "backend_preferences": {
+      "backend_service_provider": "Classiq",
+      "backend_name": "aer_simulator"
+    }
+  }
 }

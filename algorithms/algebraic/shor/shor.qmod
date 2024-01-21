@@ -44,8 +44,7 @@
             }
           ]
         }
-      ],
-      "local_handles": []
+      ]
     },
     {
       "name": "period_finding",
@@ -145,7 +144,7 @@
                       "body": [
                         {
                           "function": "modular_exponentiation",
-                         "positional_args": [
+                          "positional_args": [
                             {
                               "expr": "index"
                             },
@@ -179,7 +178,7 @@
               "body": [
                 {
                   "function": "qft",
-                 "positional_args": [
+                  "positional_args": [
                     {
                       "name": "qv_counting"
                     }
@@ -189,8 +188,7 @@
             }
           ]
         }
-      ],
-      "local_handles": []
+      ]
     },
     {
       "name": "main",
@@ -216,6 +214,12 @@
       ],
       "body": [
         {
+          "name": "qv_auxilliary",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
           "function": "period_finding",
           "positional_args": [
             {
@@ -225,14 +229,6 @@
               "name": "qv_auxilliary"
             }
           ]
-        }
-      ],
-      "local_handles": [
-        {
-          "name": "qv_auxilliary",
-          "quantum_type": {
-            "kind": "qvec"
-          }
         }
       ]
     }

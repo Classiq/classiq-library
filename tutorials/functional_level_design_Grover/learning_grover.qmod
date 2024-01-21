@@ -6,7 +6,7 @@
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 389433152,
+    "random_seed": 2260401087,
     "backend_preferences": {
       "backend_service_provider": "Classiq",
       "backend_name": "aer_simulator_statevector"
@@ -20,18 +20,15 @@
       "port_declarations": {
         "a": {
           "name": "a",
-          "direction": "output",
           "size": 2,
-          "is_signed": false
+          "direction": "output"
         },
         "b": {
           "name": "b",
-          "direction": "output",
           "size": 2,
-          "is_signed": false
+          "direction": "output"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {},
       "output_ports_wiring": {
         "a": "a_output_Identity:a->Output:a",
@@ -217,27 +214,28 @@
   "preferences": {
     "custom_hardware_settings": {
       "basis_gates": [
-        "y",
-        "cz",
+        "x",
+        "sx",
+        "rz",
         "id",
-        "u1",
-        "z",
-        "tdg",
-        "p",
+        "t",
+        "u2",
         "u",
         "cx",
-        "h",
-        "s",
-        "u2",
-        "sxdg",
-        "ry",
         "rx",
+        "u1",
+        "h",
+        "r",
+        "y",
         "sdg",
         "cy",
-        "sx",
-        "t",
-        "rz",
-        "x"
+        "ry",
+        "z",
+        "tdg",
+        "cz",
+        "p",
+        "sxdg",
+        "s"
       ]
     },
     "random_seed": -1

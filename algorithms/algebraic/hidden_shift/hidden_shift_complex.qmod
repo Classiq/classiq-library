@@ -6,7 +6,11 @@
     "amplitude_amplification": {
       "iterations": []
     },
-    "random_seed": 886692080
+    "random_seed": 324114151,
+    "backend_preferences": {
+      "backend_service_provider": "Classiq",
+      "backend_name": "aer_simulator"
+    }
   },
   "kind": "synthesis",
   "functions": [
@@ -15,12 +19,10 @@
       "port_declarations": {
         "s": {
           "name": "s",
-          "direction": "output",
           "size": 16,
-          "is_signed": false
+          "direction": "output"
         }
       },
-      "parameters": [],
       "input_ports_wiring": {},
       "output_ports_wiring": {
         "s": "s_output_Identity:s->Output:s"
@@ -205,7 +207,7 @@
         {
           "function": "ArithmeticOracle",
           "function_params": {
-            "expression": "((x1 and x14) ^ ((x2^1) and x16) ^ (x3 and x9) ^ ((x4^1) and x11) ^ (x5 and (x10^1)) ^ (x6 and x12) ^ (x7 and x15) ^ (x8 and x13)) ^ (x9 and (x10^1) and x11 and x12 and x13 and x14 and x15 and x16) == 1",
+            "expression": "((x1 and x14) ^ ((x2^1) and (x10^1)) ^ (x3 and x15) ^ ((x4^1) and x9) ^ (x5 and x12) ^ (x6 and x11) ^ (x7 and x13) ^ (x8 and x16)) ^ (x9 and (x10^1) and x11 and x12 and x13 and x14 and x15 and x16) == 1",
             "definitions": {
               "x1": {
                 "size": 1,
@@ -572,7 +574,7 @@
         {
           "function": "ArithmeticOracle",
           "function_params": {
-            "expression": "((x3 and x9) ^ (x5 and x10) ^ (x4 and x11) ^ (x6 and x12) ^ (x8 and x13) ^ (x1 and x14) ^ (x7 and x15) ^ (x2 and x16)) ^ (x3 and x5 and x4 and x6 and x8 and x1 and x7 and x2) == 1",
+            "expression": "((x4 and x9) ^ (x2 and x10) ^ (x6 and x11) ^ (x5 and x12) ^ (x7 and x13) ^ (x1 and x14) ^ (x3 and x15) ^ (x8 and x16)) ^ (x4 and x2 and x6 and x5 and x7 and x1 and x3 and x8) == 1",
             "definitions": {
               "x1": {
                 "size": 1,
@@ -985,27 +987,27 @@
   "preferences": {
     "custom_hardware_settings": {
       "basis_gates": [
-        "y",
-        "cz",
+        "sxdg",
+        "cx",
+        "u2",
+        "s",
         "id",
-        "u1",
+        "rx",
+        "u",
+        "cy",
         "z",
+        "ry",
+        "sx",
+        "rz",
+        "cz",
+        "h",
+        "x",
+        "u1",
+        "t",
+        "sdg",
         "tdg",
         "p",
-        "u",
-        "cx",
-        "h",
-        "s",
-        "u2",
-        "sxdg",
-        "ry",
-        "rx",
-        "sdg",
-        "cy",
-        "sx",
-        "t",
-        "rz",
-        "x"
+        "y"
       ]
     },
     "random_seed": -1
