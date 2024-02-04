@@ -12,6 +12,5 @@ qfunc grover_operator<num_qubits: int, sp_op: qfunc <num_qubits: int>(spq: qbit[
 qfunc hadamard_transform(target: qbit[]);
 qfunc apply_to_all<gate_operand: qfunc (target: qbit)>(target: qbit[]);
 qfunc grover_search<num_qubits: int, reps: int, oracle_op: qfunc <num_qubits: int>(oq: qbit[])>(gsq: qbit[]);
-qfunc prepare_int<val: int>(output out: qint);
 qfunc qaoa_mixer_layer<b: real>(target: qbit[]);
 qfunc qaoa_init(target: qbit[]);
