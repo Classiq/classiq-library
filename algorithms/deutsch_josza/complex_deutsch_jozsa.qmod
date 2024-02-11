@@ -1,151 +1,405 @@
 {
-  "types": [],
-  "constants": [],
-  "classical_execution_code": "\nresult = sample({})\nsave({'result': result})\n",
-  "execution_preferences": {
-    "amplitude_amplification": {
-      "iterations": []
-    },
-    "random_seed": 1419268166
-  },
-  "kind": "synthesis",
   "functions": [
     {
-      "name": "main",
+      "name": "complex_predicate",
+      "param_decls": {},
       "port_declarations": {
-        "OUT": {
-          "name": "OUT",
-          "size": 3,
-          "direction": "output",
-          "is_signed": false
+        "x": {
+          "name": "x",
+          "quantum_type": {
+            "kind": "qnum"
+          },
+          "direction": "inout"
+        },
+        "res": {
+          "name": "res",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "inout"
         }
       },
-      "input_ports_wiring": {},
-      "output_ports_wiring": {
-        "OUT": "OUT_output_Identity:OUT->Output:OUT"
-      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "x",
+          "quantum_type": {
+            "kind": "qnum"
+          },
+          "direction": "inout"
+        },
+        {
+          "name": "res",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "inout"
+        }
+      ],
       "body": [
         {
-          "function": "HadamardTransform",
-          "function_params": {
-            "num_qubits": 3
+          "expression": {
+            "expr": "max(x ^ 4, x & 3) >= 4"
           },
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "OUT[0]": "HadamardTransform_cs4id_WvSPDi:OUT[0]->ArithmeticOracle_cs4id_zEQjPS:x[0]",
-            "OUT[1]": "HadamardTransform_cs4id_WvSPDi:OUT[1]->ArithmeticOracle_cs4id_zEQjPS:x[1]",
-            "OUT[2]": "HadamardTransform_cs4id_WvSPDi:OUT[2]->ArithmeticOracle_cs4id_zEQjPS:x[2]"
+          "result_var": {
+            "name": "res"
           },
-          "name": "HadamardTransform_cs4id_WvSPDi"
-        },
+          "inplace_result": true
+        }
+      ]
+    },
+    {
+      "name": "prep_minus",
+      "param_decls": {},
+      "port_declarations": {
+        "out": {
+          "name": "out",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
         {
-          "function": "ArithmeticOracle",
-          "function_params": {
-            "expression": "(max(x ^ 3, x & 3)>>2) == 1",
-            "definitions": {
-              "x": {
-                "size": 3,
-                "bounds": [
-                  0.0,
-                  7.0
-                ]
-              }
+          "name": "out",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      ],
+      "body": [
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "1"
+            },
+            {
+              "name": "out"
             }
-          },
-          "control_states": [],
-          "inputs": {
-            "x[0]": "HadamardTransform_cs4id_WvSPDi:OUT[0]->ArithmeticOracle_cs4id_zEQjPS:x[0]",
-            "x[1]": "HadamardTransform_cs4id_WvSPDi:OUT[1]->ArithmeticOracle_cs4id_zEQjPS:x[1]",
-            "x[2]": "HadamardTransform_cs4id_WvSPDi:OUT[2]->ArithmeticOracle_cs4id_zEQjPS:x[2]"
-          },
-          "inouts": {},
-          "outputs": {
-            "x[0]": "ArithmeticOracle_cs4id_zEQjPS:x[0]->HadamardTransform_cs4id_bAaQyn:IN[0]",
-            "x[1]": "ArithmeticOracle_cs4id_zEQjPS:x[1]->HadamardTransform_cs4id_bAaQyn:IN[1]",
-            "x[2]": "ArithmeticOracle_cs4id_zEQjPS:x[2]->HadamardTransform_cs4id_bAaQyn:IN[2]"
-          },
-          "name": "ArithmeticOracle_cs4id_zEQjPS"
+          ]
         },
         {
-          "function": "HadamardTransform",
-          "function_params": {
-            "num_qubits": 3
-          },
-          "control_states": [],
-          "inputs": {
-            "IN[0]": "ArithmeticOracle_cs4id_zEQjPS:x[0]->HadamardTransform_cs4id_bAaQyn:IN[0]",
-            "IN[1]": "ArithmeticOracle_cs4id_zEQjPS:x[1]->HadamardTransform_cs4id_bAaQyn:IN[1]",
-            "IN[2]": "ArithmeticOracle_cs4id_zEQjPS:x[2]->HadamardTransform_cs4id_bAaQyn:IN[2]"
-          },
-          "inouts": {},
-          "outputs": {
-            "OUT[0]": "HadamardTransform_cs4id_bAaQyn:OUT[0]->OUT_output_Identity:OUT[0]",
-            "OUT[1]": "HadamardTransform_cs4id_bAaQyn:OUT[1]->OUT_output_Identity:OUT[1]",
-            "OUT[2]": "HadamardTransform_cs4id_bAaQyn:OUT[2]->OUT_output_Identity:OUT[2]"
-          },
-          "name": "HadamardTransform_cs4id_bAaQyn"
+          "function": "X",
+          "positional_args": [
+            {
+              "name": "out"
+            }
+          ]
         },
         {
-          "function": "Identity",
-          "function_params": {
-            "arguments": [
-              {
-                "size": 3,
-                "bounds": [
-                  0.0,
-                  7.0
-                ],
-                "name": "OUT"
-              }
-            ]
+          "function": "H",
+          "positional_args": [
+            {
+              "name": "out"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "my_oracle",
+      "param_decls": {},
+      "port_declarations": {
+        "target": {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qnum"
           },
-          "control_states": [],
-          "inputs": {
-            "OUT[0]": "HadamardTransform_cs4id_bAaQyn:OUT[0]->OUT_output_Identity:OUT[0]",
-            "OUT[1]": "HadamardTransform_cs4id_bAaQyn:OUT[1]->OUT_output_Identity:OUT[1]",
-            "OUT[2]": "HadamardTransform_cs4id_bAaQyn:OUT[2]->OUT_output_Identity:OUT[2]"
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {
+        "predicate": {
+          "name": "predicate",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "quantum_type": {
+                "kind": "qnum"
+              },
+              "direction": "inout"
+            },
+            {
+              "name": "arg1",
+              "quantum_type": {
+                "kind": "qbit"
+              },
+              "direction": "inout"
+            }
+          ]
+        }
+      },
+      "positional_arg_declarations": [
+        {
+          "name": "predicate",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "quantum_type": {
+                "kind": "qnum"
+              },
+              "direction": "inout"
+            },
+            {
+              "name": "arg1",
+              "quantum_type": {
+                "kind": "qbit"
+              },
+              "direction": "inout"
+            }
+          ]
+        },
+        {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qnum"
           },
-          "inouts": {},
-          "outputs": {
-            "OUT": "OUT_output_Identity:OUT->Output:OUT"
+          "direction": "inout"
+        }
+      ],
+      "body": [
+        {
+          "name": "aux",
+          "quantum_type": {
+            "kind": "qbit"
+          }
+        },
+        {
+          "function": "compute",
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "prep_minus",
+                  "positional_args": [
+                    {
+                      "name": "aux"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "function": "apply",
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "predicate",
+                  "positional_args": [
+                    {
+                      "name": "target"
+                    },
+                    {
+                      "name": "aux"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "function": "uncompute",
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "prep_minus",
+                  "positional_args": [
+                    {
+                      "name": "aux"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "deutsch_jozsa",
+      "param_decls": {},
+      "port_declarations": {
+        "x": {
+          "name": "x",
+          "quantum_type": {
+            "kind": "qnum"
           },
-          "name": "OUT_output_Identity"
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {
+        "predicate": {
+          "name": "predicate",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "quantum_type": {
+                "kind": "qnum"
+              },
+              "direction": "inout"
+            },
+            {
+              "name": "arg1",
+              "quantum_type": {
+                "kind": "qbit"
+              },
+              "direction": "inout"
+            }
+          ]
+        }
+      },
+      "positional_arg_declarations": [
+        {
+          "name": "predicate",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "quantum_type": {
+                "kind": "qnum"
+              },
+              "direction": "inout"
+            },
+            {
+              "name": "arg1",
+              "quantum_type": {
+                "kind": "qbit"
+              },
+              "direction": "inout"
+            }
+          ]
+        },
+        {
+          "name": "x",
+          "quantum_type": {
+            "kind": "qnum"
+          },
+          "direction": "inout"
+        }
+      ],
+      "body": [
+        {
+          "function": "hadamard_transform",
+          "positional_args": [
+            {
+              "name": "x"
+            }
+          ]
+        },
+        {
+          "function": "my_oracle",
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "predicate",
+                  "positional_args": [
+                    {
+                      "name": "arg0"
+                    },
+                    {
+                      "name": "arg1"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "x"
+            }
+          ]
+        },
+        {
+          "function": "hadamard_transform",
+          "positional_args": [
+            {
+              "name": "x"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "param_decls": {},
+      "port_declarations": {
+        "x": {
+          "name": "x",
+          "quantum_type": {
+            "size": {
+              "expr": "3"
+            },
+            "kind": "qnum"
+          },
+          "direction": "output"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "x",
+          "quantum_type": {
+            "size": {
+              "expr": "3"
+            },
+            "kind": "qnum"
+          },
+          "direction": "output"
+        }
+      ],
+      "body": [
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "3"
+            },
+            {
+              "name": "x"
+            }
+          ]
+        },
+        {
+          "function": "deutsch_jozsa",
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "complex_predicate",
+                  "positional_args": [
+                    {
+                      "name": "arg0"
+                    },
+                    {
+                      "name": "arg1"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "x"
+            }
+          ]
         }
       ]
     }
   ],
+  "types": [],
   "constraints": {
-    "max_width": 15,
-    "max_gate_count": {}
-  },
-  "preferences": {
-    "custom_hardware_settings": {
-      "basis_gates": [
-        "u1",
-        "id",
-        "u2",
-        "cz",
-        "cy",
-        "p",
-        "tdg",
-        "x",
-        "sdg",
-        "s",
-        "z",
-        "t",
-        "rz",
-        "sxdg",
-        "u",
-        "cx",
-        "sx",
-        "y",
-        "rx",
-        "h",
-        "ry"
-      ]
-    },
-    "random_seed": 3969845774
+    "max_width": 19
   }
 }

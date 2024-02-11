@@ -1,56 +1,142 @@
 {
-  "types": [],
-  "constants": [],
-  "execution_preferences": {
-    "amplitude_amplification": {
-      "iterations": []
-    },
-    "random_seed": 3172531168
-  },
-  "kind": "synthesis",
   "functions": [
     {
-      "name": "main",
-      "port_declarations": {},
-      "input_ports_wiring": {},
-      "output_ports_wiring": {},
+      "name": "my_mcx",
+      "param_decls": {},
+      "port_declarations": {
+        "cntrl": {
+          "name": "cntrl",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        },
+        "target": {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "cntrl",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        },
+        {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "inout"
+        }
+      ],
       "body": [
         {
-          "function": "Mcx",
-          "function_params": {
-            "arguments": [
-              {
-                "size": 14,
-                "bounds": [
-                  0.0,
-                  16383.0
-                ],
-                "name": "CTRL_IN"
-              },
-              {
-                "size": 1,
-                "bounds": [
-                  0.0,
-                  1.0
-                ],
-                "name": "TARGET_QUBIT"
-              }
-            ],
-            "num_ctrl_qubits": 14,
-            "ctrl_state": "11111111111111"
+          "function": "control",
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "X",
+                  "positional_args": [
+                    {
+                      "name": "target"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "cntrl"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "param_decls": {},
+      "port_declarations": {
+        "cntrl": {
+          "name": "cntrl",
+          "quantum_type": {
+            "kind": "qvec"
           },
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {},
-          "name": "Mcx_cs4id_iK2ZWe"
+          "direction": "output"
+        },
+        "target": {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "cntrl",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "output"
+        },
+        {
+          "name": "target",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      ],
+      "body": [
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "14"
+            },
+            {
+              "name": "cntrl"
+            }
+          ]
+        },
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "1"
+            },
+            {
+              "name": "target"
+            }
+          ]
+        },
+        {
+          "function": "my_mcx",
+          "positional_args": [
+            {
+              "name": "cntrl"
+            },
+            {
+              "name": "target"
+            }
+          ]
         }
       ]
     }
   ],
+  "types": [],
+  "classical_execution_code": "result = sample()\nsave({'result': result})",
   "constraints": {
     "max_width": 19,
-    "max_gate_count": {},
     "optimization_parameter": "cx"
   },
   "preferences": {
@@ -59,7 +145,6 @@
         "cx",
         "u"
       ]
-    },
-    "random_seed": -1
+    }
   }
 }

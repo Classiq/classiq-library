@@ -92,8 +92,7 @@
           "outputs": {},
           "operands": {}
         }
-      ],
-      "local_handles": []
+      ]
     },
     {
       "name": "qsvt_step",
@@ -176,6 +175,12 @@
         }
       },
       "body": [
+        {
+          "name": "qbv_reg"
+        },
+        {
+          "name": "qbv_aux"
+        },
         {
           "function": "split",
           "params": {
@@ -372,14 +377,6 @@
           },
           "operands": {}
         }
-      ],
-      "local_handles": [
-        {
-          "name": "qbv_reg"
-        },
-        {
-          "name": "qbv_aux"
-        }
       ]
     },
     {
@@ -467,6 +464,9 @@
         }
       },
       "body": [
+        {
+          "name": "qbv"
+        },
         {
           "function": "H",
           "params": {},
@@ -632,11 +632,6 @@
           },
           "outputs": {},
           "operands": {}
-        }
-      ],
-      "local_handles": [
-        {
-          "name": "qbv"
         }
       ]
     },
@@ -865,8 +860,7 @@
             }
           }
         }
-      ],
-      "local_handles": []
+      ]
     },
     {
       "name": "main",
@@ -896,6 +890,9 @@
       },
       "operand_declarations": {},
       "body": [
+        {
+          "name": "qbv_reg"
+        },
         {
           "function": "prepare_amplitudes",
           "params": {
@@ -1020,11 +1017,6 @@
             }
           },
           "operands": {}
-        }
-      ],
-      "local_handles": [
-        {
-          "name": "qbv_reg"
         }
       ]
     }

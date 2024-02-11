@@ -1,7 +1,8 @@
 qfunc amplitude_estimation<num_phase_qubits: int, num_unitary_qubits: int, sp_op: qfunc <num_unitary_qubits: int>(spq: qbit[]), oracle_op: qfunc <num_unitary_qubits: int>(oq: qbit[])>(output phase_port: qbit[], output unitary_port: qbit[]) {
   allocate<num_unitary_qubits>(unitary_port);
+  allocate<num_phase_qubits>(phase_port);
   sp_op<num_unitary_qubits>(unitary_port);
-  qpe<num_phase_qubits, lambda() {
+  qpe<lambda() {
     grover_operator<num_unitary_qubits, lambda<num_qubits>(oq) {
       oracle_op<num_unitary_qubits>(oq);
     }, lambda<num_qubits>(spq) {

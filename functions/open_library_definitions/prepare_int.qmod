@@ -1,4 +1,4 @@
-qfunc prepare_int<val: int>(output out: qint) {
+qfunc prepare_int<val: int>(output out: qnum) {
   allocate<floor(log(val, 2)) + 1>(out);
   repeat<floor(log(val, 2)) + 1, lambda<index>() {
     if<Eq(val//2**index % 2, 1), lambda() {

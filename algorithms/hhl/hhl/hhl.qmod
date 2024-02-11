@@ -100,7 +100,7 @@
       ]
     },
     {
-      "name": "qpe_flexible",
+      "name": "my_qpe_flexible",
       "param_decls": {
         "precision": {
           "kind": "int"
@@ -222,7 +222,7 @@
                           "function": "unitary_with_power",
                           "positional_args": [
                             {
-                              "expr": "(2) ** (index)"
+                              "expr": "2 ** (index)"
                             },
                             {
                               "name": "state"
@@ -234,10 +234,10 @@
                     {
                       "name": "phase",
                       "start": {
-                        "expr": "(0) + (index)"
+                        "expr": "0 + (index)"
                       },
                       "end": {
-                        "expr": "((0) + (index)) + (1)"
+                        "expr": "(0 + (index)) + 1"
                       }
                     }
                   ]
@@ -375,7 +375,7 @@
           ]
         },
         {
-          "function": "qpe_flexible",
+          "function": "my_qpe_flexible",
           "positional_args": [
             "unitary_with_power",
             {
@@ -463,7 +463,7 @@
           ]
         },
         {
-          "function": "qpe_flexible",
+          "function": "my_qpe_flexible",
           "positional_args": [
             {
               "rename_params": {},
@@ -517,7 +517,7 @@
         },
         {
           "expression": {
-            "expr": "0.0625 / phase"
+            "expr": "0.0625 / (phase)"
           },
           "result_var": {
             "name": "indicator"
@@ -596,7 +596,7 @@
           "function": "split",
           "positional_args": [
             {
-              "expr": "(len(qbv)) - (4)"
+              "expr": "(len(qbv)) - 4"
             },
             {
               "expr": "4"

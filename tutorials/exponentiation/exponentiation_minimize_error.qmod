@@ -1,118 +1,49 @@
 {
-  "types": [],
-  "constants": [],
-  "execution_preferences": {
-    "amplitude_amplification": {
-      "iterations": []
-    },
-    "random_seed": 3278833703,
-    "backend_preferences": {
-      "backend_service_provider": "Classiq",
-      "backend_name": "aer_simulator"
-    }
-  },
-  "kind": "synthesis",
   "functions": [
     {
       "name": "main",
+      "param_decls": {},
       "port_declarations": {},
-      "input_ports_wiring": {},
-      "output_ports_wiring": {},
+      "operand_declarations": {},
+      "positional_arg_declarations": [],
       "body": [
         {
-          "function": "Exponentiation",
-          "function_params": {
-            "pauli_operator": {
-              "pauli_list": [
-                [
-                  "IIZXXXII",
-                  "(0.1+0j)"
-                ],
-                [
-                  "IIXXYYII",
-                  "(0.2+0j)"
-                ],
-                [
-                  "IIIIZZYX",
-                  "(0.3+0j)"
-                ],
-                [
-                  "XZIIIIIX",
-                  "(0.4+0j)"
-                ],
-                [
-                  "IIIIIZXI",
-                  "(0.5+0j)"
-                ],
-                [
-                  "IIIIIIZY",
-                  "(0.6+0j)"
-                ],
-                [
-                  "IIIIIIXY",
-                  "(0.7+0j)"
-                ],
-                [
-                  "IIYXYZII",
-                  "(0.8+0j)"
-                ],
-                [
-                  "IIIIIIXZ",
-                  "(0.9+0j)"
-                ],
-                [
-                  "IIYZYIII",
-                  "(1+0j)"
-                ]
-              ],
-              "is_hermitian": true,
-              "has_complex_coefficients": false
+          "name": "state",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "8"
             },
-            "evolution_coefficient": 0.05,
-            "constraints": {
-              "max_depth": 400
+            {
+              "name": "state"
+            }
+          ]
+        },
+        {
+          "function": "exponentiation_with_depth_constraint",
+          "positional_args": [
+            {
+              "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.X, Pauli.X, Pauli.X, Pauli.I, Pauli.I], coefficient=0.1), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.X, Pauli.X, Pauli.Y, Pauli.Y, Pauli.I, Pauli.I], coefficient=0.2), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.Y, Pauli.X], coefficient=0.3), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.X], coefficient=0.4), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.X, Pauli.I], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Y], coefficient=0.6), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.X, Pauli.Y], coefficient=0.7), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Y, Pauli.X, Pauli.Y, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.8), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.X, Pauli.Z], coefficient=0.9), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Y, Pauli.Z, Pauli.Y, Pauli.I, Pauli.I, Pauli.I], coefficient=1.0)]"
             },
-            "optimization": "MINIMIZE_ERROR"
-          },
-          "control_states": [],
-          "inputs": {},
-          "inouts": {},
-          "outputs": {},
-          "name": "Exponentiation_cs4id_iK2ZWe"
+            {
+              "expr": "0.05"
+            },
+            {
+              "expr": "400"
+            },
+            {
+              "name": "state"
+            }
+          ]
         }
       ]
     }
   ],
-  "constraints": {
-    "max_gate_count": {}
-  },
-  "preferences": {
-    "custom_hardware_settings": {
-      "basis_gates": [
-        "sxdg",
-        "y",
-        "cx",
-        "z",
-        "u1",
-        "r",
-        "cy",
-        "t",
-        "cz",
-        "sdg",
-        "u2",
-        "p",
-        "h",
-        "id",
-        "sx",
-        "u",
-        "tdg",
-        "rz",
-        "x",
-        "s",
-        "rx",
-        "ry"
-      ]
-    },
-    "random_seed": -1
-  }
+  "types": [],
+  "classical_execution_code": "result = sample()\nsave({'result': result})"
 }

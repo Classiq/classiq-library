@@ -1,0 +1,152 @@
+{
+  "functions": [
+    {
+      "name": "qpe_flexible",
+      "param_decls": {},
+      "port_declarations": {
+        "phase": {
+          "name": "phase",
+          "quantum_type": {
+            "kind": "qnum"
+          },
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {
+        "unitary_with_power": {
+          "name": "unitary_with_power",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "classical_type": {
+                "kind": "int"
+              }
+            }
+          ]
+        }
+      },
+      "positional_arg_declarations": [
+        {
+          "name": "unitary_with_power",
+          "positional_arg_declarations": [
+            {
+              "name": "arg0",
+              "classical_type": {
+                "kind": "int"
+              }
+            }
+          ]
+        },
+        {
+          "name": "phase",
+          "quantum_type": {
+            "kind": "qnum"
+          },
+          "direction": "inout"
+        }
+      ],
+      "body": [
+        {
+          "name": "phase_array",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "in_handle": {
+            "name": "phase"
+          },
+          "out_handle": {
+            "name": "phase_array"
+          }
+        },
+        {
+          "function": "apply_to_all",
+          "positional_args": [
+            "H",
+            {
+              "name": "phase_array"
+            }
+          ]
+        },
+        {
+          "function": "repeat",
+          "positional_args": [
+            {
+              "expr": "len(phase_array)"
+            },
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "control",
+                  "positional_args": [
+                    {
+                      "rename_params": {},
+                      "body": [
+                        {
+                          "function": "unitary_with_power",
+                          "positional_args": [
+                            {
+                              "expr": "2 ** (index)"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "phase_array",
+                      "start": {
+                        "expr": "0 + (index)"
+                      },
+                      "end": {
+                        "expr": "(0 + (index)) + 1"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "function": "invert",
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "qft",
+                  "positional_args": [
+                    {
+                      "name": "phase_array"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "in_handle": {
+            "name": "phase_array"
+          },
+          "out_handle": {
+            "name": "phase"
+          }
+        },
+        {
+          "target": {
+            "name": "phase"
+          },
+          "fraction_digits": {
+            "expr": "len(phase_array)"
+          },
+          "is_signed": {
+            "expr": "False"
+          }
+        }
+      ]
+    }
+  ]
+}

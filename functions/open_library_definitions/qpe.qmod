@@ -1,4 +1,5 @@
-qfunc qpe<precision: int, unitary: qfunc ()>(output phase: qbit[]) {
-  allocate<precision>(phase);
-  standard_qpe<precision, unitary>(phase);
+qfunc qpe<unitary: qfunc ()>(phase: qnum) {
+  qpe_flexible<lambda<arg0>() {
+    power<arg0, unitary>();
+  }>(phase);
 }
