@@ -1,0 +1,85 @@
+{
+  "functions": [
+    {
+      "name": "main",
+      "param_decls": {},
+      "port_declarations": {
+        "ancilla": {
+          "name": "ancilla",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "ancilla",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      ],
+      "body": [
+        {
+          "name": "state1",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "name": "state2",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "function": "prepare_amplitudes",
+          "positional_args": [
+            {
+              "expr": "[-0.11824548696203246, -0.00428821336289191, -0.2977099985726734, 0.25018219242510253, -0.2769754330777306, -0.19669250940397007, -0.13061261243810743, -0.38365237424010784, 0.19110578303780593, 0.3709125640004723, -0.10672155491585875, -0.27310609790087137, -0.18571387780148935, 0.37680919114773553, 0.3054125255612198, 0.1590581895437366]"
+            },
+            {
+              "expr": "0.0"
+            },
+            {
+              "name": "state1"
+            }
+          ]
+        },
+        {
+          "function": "prepare_amplitudes",
+          "positional_args": [
+            {
+              "expr": "[-0.178239084909894, -0.34473889575344213, 0.28729251255207916, -0.14984864043354332, -0.19033213986488978, 0.14071457651016206, -0.2764200129121898, -0.2993825738033206, 0.2884489392510885, -0.42846669713134855, 0.022306902289143653, -0.15882046949360892, 0.27520685482577634, -0.2931655049173283, 0.17189360848424878, 0.1964412778251007]"
+            },
+            {
+              "expr": "0.0"
+            },
+            {
+              "name": "state2"
+            }
+          ]
+        },
+        {
+          "function": "swap_test",
+          "positional_args": [
+            {
+              "name": "state1"
+            },
+            {
+              "name": "state2"
+            },
+            {
+              "name": "ancilla"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "types": [],
+  "classical_execution_code": "result = sample()\nsave({'result': result})"
+}
