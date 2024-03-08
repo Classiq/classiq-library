@@ -1,0 +1,264 @@
+{
+  "functions": [
+    {
+      "name": "bit_wise_swap",
+      "param_decls": {},
+      "port_declarations": {
+        "psi": {
+          "name": "psi",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        },
+        "phi": {
+          "name": "phi",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "psi",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        },
+        {
+          "name": "phi",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      ],
+      "body": [
+        {
+          "function": "repeat",
+          "positional_args": [
+            {
+              "expr": "len(psi)"
+            },
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "SWAP",
+                  "positional_args": [
+                    {
+                      "name": "psi",
+                      "start": {
+                        "expr": "0 + (index)"
+                      },
+                      "end": {
+                        "expr": "(0 + (index)) + 1"
+                      }
+                    },
+                    {
+                      "name": "phi",
+                      "start": {
+                        "expr": "0 + (index)"
+                      },
+                      "end": {
+                        "expr": "(0 + (index)) + 1"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "local_swap_test",
+      "param_decls": {},
+      "port_declarations": {
+        "ancilla": {
+          "name": "ancilla",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        },
+        "psi": {
+          "name": "psi",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        },
+        "phi": {
+          "name": "phi",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "ancilla",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        },
+        {
+          "name": "psi",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        },
+        {
+          "name": "phi",
+          "quantum_type": {
+            "kind": "qvec"
+          },
+          "direction": "inout"
+        }
+      ],
+      "body": [
+        {
+          "function": "allocate",
+          "positional_args": [
+            {
+              "expr": "1"
+            },
+            {
+              "name": "ancilla"
+            }
+          ]
+        },
+        {
+          "function": "H",
+          "positional_args": [
+            {
+              "name": "ancilla"
+            }
+          ]
+        },
+        {
+          "function": "control",
+          "positional_args": [
+            {
+              "rename_params": {},
+              "body": [
+                {
+                  "function": "bit_wise_swap",
+                  "positional_args": [
+                    {
+                      "name": "psi"
+                    },
+                    {
+                      "name": "phi"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "ancilla"
+            }
+          ]
+        },
+        {
+          "function": "H",
+          "positional_args": [
+            {
+              "name": "ancilla"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "param_decls": {},
+      "port_declarations": {
+        "ancilla": {
+          "name": "ancilla",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      },
+      "operand_declarations": {},
+      "positional_arg_declarations": [
+        {
+          "name": "ancilla",
+          "quantum_type": {
+            "kind": "qbit"
+          },
+          "direction": "output"
+        }
+      ],
+      "body": [
+        {
+          "name": "psi",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "name": "phi",
+          "quantum_type": {
+            "kind": "qvec"
+          }
+        },
+        {
+          "function": "prepare_state",
+          "positional_args": [
+            {
+              "expr": "[0, 0.333, 0.333, 0.334]"
+            },
+            {
+              "expr": "0.0001"
+            },
+            {
+              "name": "psi"
+            }
+          ]
+        },
+        {
+          "function": "prepare_state",
+          "positional_args": [
+            {
+              "expr": "[0.334, 0.333, 0.333, 0]"
+            },
+            {
+              "expr": "0.0001"
+            },
+            {
+              "name": "phi"
+            }
+          ]
+        },
+        {
+          "function": "local_swap_test",
+          "positional_args": [
+            {
+              "name": "ancilla"
+            },
+            {
+              "name": "psi"
+            },
+            {
+              "name": "phi"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "types": [],
+  "classical_execution_code": "result = sample()\nsave({'result': result})"
+}
