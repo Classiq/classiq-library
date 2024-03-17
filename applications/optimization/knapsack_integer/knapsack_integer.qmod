@@ -1,90 +1,506 @@
-{
-  "functions": [
-    {
-      "name": "main",
-      "param_decls": {
-        "params_list": {
-          "kind": "array",
-          "element_type": {
-            "kind": "real"
-          },
-          "size": 10
-        }
-      },
-      "port_declarations": {
-        "target": {
-          "name": "target",
-          "size": {
-            "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20.0)[0], 'pauli'))"
-          },
-          "direction": "output"
-        }
-      },
-      "body": [
-        {
-          "function": "allocate",
-          "positional_args": [
-            {
-              "expr": "len(target)"
-            },
-            {
-              "name": "target"
-            }
-          ]
-        },
-        {
-          "function": "qaoa_penalty",
-          "params": {
-            "hamiltonian": {
-              "expr": "optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20.0)"
-            },
-            "params_list": {
-              "expr": "params_list"
-            },
-            "num_qubits": {
-              "expr": "len(target)"
-            },
-            "is_st": {
-              "expr": "True"
-            }
-          },
-          "inouts": {
-            "target": {
-              "name": "target"
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "types": [
-    {
-      "name": "MyCombiProblem",
-      "variables": {
-        "x0": {
-          "kind": "int"
-        },
-        "x1": {
-          "kind": "int"
-        }
-      },
-      "variable_upper_bound": 3,
-      "constraints": [
-        {
-          "expr": "2*x0 + 3*x1 <= 12"
-        }
-      ],
-      "objective_type": "Max",
-      "objective_function": {
-        "expr": "3*x0 + 5*x1"
-      }
-    }
-  ],
-  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20.0),\n    maximize=True,\n    initial_point=compute_qaoa_initial_point(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20.0),5),\n    optimizer=Optimizer.COBYLA,\n    max_iteration=60,\n    tolerance=0.0,\n    step_size=0.0,\n    skip_compute_variance=False,\n    alpha_cvar=0.7\n)\nsolution = get_optimization_solution(get_type(MyCombiProblem), vqe_result, 20.0)\nhamiltonian = optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 20.0)\nsave({'solution': solution, \"vqe_result\": vqe_result, \"hamiltonian\": hamiltonian})\n",
-  "execution_preferences": {
-    "backend_preferences": {
-      "backend_service_provider": "Classiq",
-      "backend_name": "aer_simulator"
-    }
+hamiltonian: PauliTerm[] = [
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 588.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -150.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -87.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -175.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -58.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -117.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -60.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -120.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 150.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 300.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 20.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 20.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 40.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 40.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 40.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 80.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 80.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 80.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 80.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 160.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 60.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 60.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 60.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 120.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 120.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 120.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 120.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 240.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 240.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 180.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 50.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 100.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 100.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 200.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 200.0
   }
+];
+
+qfunc main<params_list: real[10]>(output target: qbit[8]) {
+  allocate<len(target)>(target);
+  qaoa_penalty<len(target), params_list, hamiltonian>(target);
 }
+
+cscope ```
+
+vqe_result = vqe(
+hamiltonian=hamiltonian,
+maximize=True,
+initial_point=[0.0, 0.003090659340659341, 0.0007726648351648352, 0.002317994505494506, 0.0015453296703296705, 0.0015453296703296705, 0.002317994505494506, 0.0007726648351648352, 0.003090659340659341, 0.0],
+optimizer=Optimizer.COBYLA,
+max_iteration=60,
+tolerance=0.0,
+step_size=0.0,
+skip_compute_variance=False,
+alpha_cvar=0.7
+)
+
+save({"vqe_result": vqe_result, "hamiltonian": hamiltonian})
+
+```

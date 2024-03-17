@@ -1,15 +1,9 @@
-qfunc grover_diffuser<num_qubits: int>(p: qbit[]) {
-  msbs: qbit[];
-  lsb: qbit[];
-  apply_to_all<lambda(target) {
-    X(target);
-  }>(p);
-  p -> {msbs, lsb};
-  control<lambda() {
-    Z(lsb);
-  }>(msbs);
-  {msbs, lsb} -> p;
-  apply_to_all<lambda(target) {
-    X(target);
-  }>(p);
+qfunc grover_diffuser<space_transform: qfunc (arg0: qbit[])>(packed_vars: qbit[]) {
+  within {
+    invert<lambda() {
+      space_transform(packed_vars);
+    }>();
+  } apply {
+    reflect_about_zero(packed_vars);
+  }
 }

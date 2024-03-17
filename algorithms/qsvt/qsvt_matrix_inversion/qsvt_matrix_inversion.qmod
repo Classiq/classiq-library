@@ -1,1028 +1,186 @@
-{
-  "functions": [
-    {
-      "name": "projector_controlled_phase",
-      "param_decls": {
-        "phase": {
-          "kind": "real"
-        }
-      },
-      "port_declarations": {
-        "qbv_reg": {
-          "name": "qbv_reg",
-          "direction": "inout",
-          "size": {
-            "expr": "3"
-          }
-        },
-        "qbv_aux": {
-          "name": "qbv_aux",
-          "direction": "inout",
-          "size": {
-            "expr": "1"
-          }
-        }
-      },
-      "operand_declarations": {
-        "proj_cnot": {
-          "name": "proj_cnot",
-          "param_decls": {},
-          "port_declarations": {
-            "arg0": {
-              "name": "arg0",
-              "direction": "inout",
-              "size": {
-                "expr": "3"
-              }
-            },
-            "arg1": {
-              "name": "arg1",
-              "direction": "inout",
-              "size": {
-                "expr": "1"
-              }
-            }
-          }
-        }
-      },
-      "body": [
-        {
-          "function": "proj_cnot",
-          "params": {},
-          "inputs": {},
-          "inouts": {
-            "arg0": {
-              "name": "qbv_reg"
-            },
-            "arg1": {
-              "name": "qbv_aux"
-            }
-          },
-          "outputs": {},
-          "operands": {}
-        },
-        {
-          "function": "RZ",
-          "params": {
-            "theta": {
-              "expr": "phase"
-            }
-          },
-          "inputs": {},
-          "inouts": {
-            "target": {
-              "name": "qbv_aux"
-            }
-          },
-          "outputs": {},
-          "operands": {}
-        },
-        {
-          "function": "proj_cnot",
-          "params": {},
-          "inputs": {},
-          "inouts": {
-            "arg0": {
-              "name": "qbv_reg"
-            },
-            "arg1": {
-              "name": "qbv_aux"
-            }
-          },
-          "outputs": {},
-          "operands": {}
-        }
+qfunc projector_controlled_phase<phase: real, proj_cnot: qfunc (arg0: qbit[3], arg1: qbit)>(qbv_reg: qbit[3], qbv_aux: qbit) {
+  proj_cnot(qbv_reg, qbv_aux);
+  RZ<phase>(qbv_aux);
+  proj_cnot(qbv_reg, qbv_aux);
+}
+
+qfunc qsvt_step<phase_seq: real[], num_qubits: int, index: int, proj_cnot_1: qfunc (arg0: qbit[num_qubits], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[num_qubits], arg1: qbit), u: qfunc (arg0: qbit[num_qubits])>(qbv: qbit[num_qubits + 1]) {
+  qbv_reg: qbit[num_qubits];
+  qbv_aux: qbit;
+  qbv -> {qbv_reg, qbv_aux};
+  projector_controlled_phase<phase_seq[2 * index], proj_cnot_1>(qbv_reg, qbv_aux);
+  u(qbv_reg);
+  projector_controlled_phase<phase_seq[(2 * index) + 1], proj_cnot_2>(qbv_reg, qbv_aux);
+  if<((2 * index) + 2) == len(phase_seq), lambda() {
+    IDENTITY(qbv_reg);
+  }, lambda() {
+    invert<lambda() {
+      u(qbv_reg);
+    }>();
+  }>();
+  {qbv_reg, qbv_aux} -> qbv;
+}
+
+qfunc qsvt<num_qubits: int, phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[num_qubits], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[num_qubits], arg1: qbit), u: qfunc (arg0: qbit[num_qubits])>(qbv_reg: qbit[num_qubits], qbv_aux: qbit) {
+  H(qbv_aux);
+  qbv: qbit[];
+  {qbv_reg, qbv_aux} -> qbv;
+  repeat<len(phase_seq) / 2, lambda<index>() {
+    qsvt_step<phase_seq, num_qubits, index, proj_cnot_1, proj_cnot_2, u>(qbv);
+  }>();
+  qbv -> {qbv_reg, qbv_aux};
+  H(qbv_aux);
+}
+
+qfunc qsvt_inversion<num_qubits: int, phase_seq: real[], u: qfunc (arg0: qbit[num_qubits])>(qbv_reg: qbit[num_qubits], output qbv_aux: qbit) {
+  allocate<1>(qbv_aux);
+  qsvt<num_qubits, phase_seq, lambda(arg0, arg1) {
+    X(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1]);
+    CX(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1], arg1);
+    X(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1]);
+  }, lambda(arg0, arg1) {
+    X(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1]);
+    CX(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1], arg1);
+    X(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1]);
+  }, u>(qbv_reg, qbv_aux);
+}
+
+qfunc main(output qbv_state: qbit[2], output qbv_block: qbit, output qbv_aux: qbit) {
+  qbv_reg: qbit[];
+  prepare_amplitudes<[
+    0.0,
+    0.267261241912424,
+    0.534522483824849,
+    0.801783725737273
+  ], 0>(qbv_state);
+  allocate<1>(qbv_block);
+  {qbv_state, qbv_block} -> qbv_reg;
+  qsvt_inversion<3, [
+    2.098749029462422,
+    4.378063130949322,
+    4.65618934541247,
+    1.915655677983328,
+    1.670665754747233,
+    2.49815630434774,
+    5.488152839722767,
+    4.091243526643548,
+    (-1.251115431586672),
+    3.588803809383612,
+    2.783964199395885,
+    7.746319774279469,
+    2.899420239258764,
+    (-0.909666745587832),
+    2.425921233484828,
+    3.623264621185356,
+    8.140076517450122,
+    2.663512896202112,
+    (-1.121647941841156),
+    2.633798480454193,
+    7.414345485988994,
+    1.131160202672302,
+    2.633798488117604,
+    5.161537354859073,
+    2.663512894352896,
+    1.85689118276644,
+    3.623264673505738,
+    2.425921227429656,
+    5.373518550068384,
+    2.899420273087806,
+    1.463134458983303,
+    2.783964230554988,
+    3.58880382903496,
+    5.032069896772624,
+    4.091243528581512,
+    (-0.795032506424254),
+    2.498156269778397,
+    7.953851044282136,
+    1.915655742166561,
+    4.656189377408761,
+    4.378063091889698,
+    (-4.184436319955728)
+  ], lambda(arg0) {
+    unitary<[
+      [
+        (-0.05338002108921),
+        (-0.333041206855177),
+        0.416781702308461,
+        0.268910790661511,
+        0.321804095677854,
+        0.643720859069888,
+        0.19183266236344,
+        (-0.292369520342773)
+      ],
+      [
+        (-0.361036621078321),
+        0.106482281853894,
+        (-0.751805190748706),
+        (-0.05333794951533),
+        0.251318548999773,
+        0.21058686648858,
+        0.01308859177359,
+        (-0.42729257839669)
+      ],
+      [
+        (-0.540164887303392),
+        0.373467040749471,
+        0.175938670385117,
+        (-0.326687871872027),
+        (-0.365177682366094),
+        0.43916737263398,
+        0.150010831803302,
+        0.286947577251258
+      ],
+      [
+        (-0.390261254586894),
+        (-0.339779162196002),
+        0.20944773275685,
+        (-0.336028291944921),
+        0.17944919395356,
+        (-0.096624874569306),
+        (-0.729257755087719),
+        (-0.04590920833063)
+      ],
+      [
+        (-0.313105755142868),
+        (-0.587944254838412),
+        (-0.037373575562276),
+        (-0.281551634602081),
+        (-0.002469626126434),
+        (-0.33323298990461),
+        0.599531548920725,
+        0.071622827619763
+      ],
+      [
+        0.143054978106763,
+        (-0.023276508073744),
+        (-0.208413751156465),
+        (-0.13255088161123),
+        0.602121591716445,
+        0.210578529767679,
+        0.010771339094775,
+        0.714827041575504
+      ],
+      [
+        (-0.292038063152546),
+        0.510972549854361,
+        0.360023583741765,
+        0.061193376490562,
+        0.541200168304301,
+        (-0.412090730179345),
+        0.190375879748413,
+        (-0.145944664604539)
+      ],
+      [
+        (-0.467904913723974),
+        (-0.124516582303648),
+        (-0.108669879077015),
+        0.777570821663385,
+        (-0.110771050314602),
+        (-0.11775384082674),
+        (-0.113629749251151),
+        0.331793873649537
       ]
-    },
-    {
-      "name": "qsvt_step",
-      "param_decls": {
-        "phase_seq": {
-          "kind": "list",
-          "element_type": {
-            "kind": "real"
-          }
-        },
-        "num_qubits": {
-          "kind": "int"
-        },
-        "index": {
-          "kind": "int"
-        }
-      },
-      "port_declarations": {
-        "qbv": {
-          "name": "qbv",
-          "direction": "inout",
-          "size": {
-            "expr": "num_qubits+1"
-          }
-        }
-      },
-      "operand_declarations": {
-        "proj_cnot_1": {
-          "name": "proj_cnot_1",
-          "param_decls": {},
-          "port_declarations": {
-            "arg0": {
-              "name": "arg0",
-              "direction": "inout",
-              "size": {
-                "expr": "num_qubits"
-              }
-            },
-            "arg1": {
-              "name": "arg1",
-              "direction": "inout",
-              "size": {
-                "expr": "1"
-              }
-            }
-          }
-        },
-        "proj_cnot_2": {
-          "name": "proj_cnot_2",
-          "param_decls": {},
-          "port_declarations": {
-            "arg0": {
-              "name": "arg0",
-              "direction": "inout",
-              "size": {
-                "expr": "num_qubits"
-              }
-            },
-            "arg1": {
-              "name": "arg1",
-              "direction": "inout",
-              "size": {
-                "expr": "1"
-              }
-            }
-          }
-        },
-        "u": {
-          "name": "u",
-          "param_decls": {},
-          "port_declarations": {
-            "arg0": {
-              "name": "arg0",
-              "direction": "inout",
-              "size": {
-                "expr": "num_qubits"
-              }
-            }
-          }
-        }
-      },
-      "body": [
-        {
-          "name": "qbv_reg"
-        },
-        {
-          "name": "qbv_aux"
-        },
-        {
-          "function": "split",
-          "params": {
-            "out1_size": {
-              "expr": "num_qubits"
-            },
-            "out2_size": {
-              "expr": "1"
-            }
-          },
-          "inputs": {
-            "in": {
-              "name": "qbv"
-            }
-          },
-          "inouts": {},
-          "outputs": {
-            "out1": {
-              "name": "qbv_reg"
-            },
-            "out2": {
-              "name": "qbv_aux"
-            }
-          },
-          "operands": {}
-        },
-        {
-          "function": "projector_controlled_phase",
-          "params": {
-            "phase": {
-              "expr": "phase_seq[2*index]"
-            }
-          },
-          "inputs": {},
-          "inouts": {
-            "qbv_reg": {
-              "name": "qbv_reg"
-            },
-            "qbv_aux": {
-              "name": "qbv_aux"
-            }
-          },
-          "outputs": {},
-          "operands": {
-            "proj_cnot": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "proj_cnot_1",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "arg0": {
-                      "name": "arg0"
-                    },
-                    "arg1": {
-                      "name": "arg1"
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                }
-              ]
-            }
-          }
-        },
-        {
-          "function": "u",
-          "params": {},
-          "inputs": {},
-          "inouts": {
-            "arg0": {
-              "name": "qbv_reg"
-            }
-          },
-          "outputs": {},
-          "operands": {}
-        },
-        {
-          "function": "projector_controlled_phase",
-          "params": {
-            "phase": {
-              "expr": "phase_seq[2*index + 1]"
-            }
-          },
-          "inputs": {},
-          "inouts": {
-            "qbv_reg": {
-              "name": "qbv_reg"
-            },
-            "qbv_aux": {
-              "name": "qbv_aux"
-            }
-          },
-          "outputs": {},
-          "operands": {
-            "proj_cnot": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "proj_cnot_2",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "arg0": {
-                      "name": "arg0"
-                    },
-                    "arg1": {
-                      "name": "arg1"
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                }
-              ]
-            }
-          }
-        },
-        {
-          "function": "if",
-          "params": {
-            "condition": {
-              "expr": "2 * index +  2 == len(phase_seq)"
-            }
-          },
-          "inputs": {},
-          "outputs": {},
-          "operands": {
-            "then": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "IDENTITY",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "target": {
-                      "name": "qbv_reg"
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                }
-              ]
-            },
-            "else": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "invert",
-                  "params": {},
-                  "inputs": {},
-                  "outputs": {},
-                  "operands": {
-                    "operand": {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "u",
-                          "params": {},
-                          "inputs": {},
-                          "inouts": {
-                            "arg0": {
-                              "name": "qbv_reg"
-                            }
-                          },
-                          "outputs": {},
-                          "operands": {}
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "function": "join",
-          "params": {},
-          "inputs": {
-            "in1": {
-              "name": "qbv_reg"
-            },
-            "in2": {
-              "name": "qbv_aux"
-            }
-          },
-          "inouts": {},
-          "outputs": {
-            "out": {
-              "name": "qbv"
-            }
-          },
-          "operands": {}
-        }
-      ]
-    },
-    {
-      "name": "qsvt",
-      "param_decls": {
-        "num_qubits": {
-          "kind": "int"
-        },
-        "phase_seq": {
-          "kind": "list",
-          "element_type": {
-            "kind": "real"
-          }
-        }
-      },
-      "port_declarations": {
-        "qbv_reg": {
-          "name": "qbv_reg",
-          "direction": "inout",
-          "size": {
-            "expr": "num_qubits"
-          }
-        },
-        "qbv_aux": {
-          "name": "qbv_aux",
-          "direction": "inout",
-          "size": {
-            "expr": "1"
-          }
-        }
-      },
-      "operand_declarations": {
-        "proj_cnot_1": {
-          "name": "proj_cnot_1",
-          "param_decls": {},
-          "port_declarations": {
-            "arg0": {
-              "name": "arg0",
-              "direction": "inout",
-              "size": {
-                "expr": "num_qubits"
-              }
-            },
-            "arg1": {
-              "name": "arg1",
-              "direction": "inout",
-              "size": {
-                "expr": "1"
-              }
-            }
-          }
-        },
-        "proj_cnot_2": {
-          "name": "proj_cnot_2",
-          "param_decls": {},
-          "port_declarations": {
-            "arg0": {
-              "name": "arg0",
-              "direction": "inout",
-              "size": {
-                "expr": "num_qubits"
-              }
-            },
-            "arg1": {
-              "name": "arg1",
-              "direction": "inout",
-              "size": {
-                "expr": "1"
-              }
-            }
-          }
-        },
-        "u": {
-          "name": "u",
-          "param_decls": {},
-          "port_declarations": {
-            "arg0": {
-              "name": "arg0",
-              "direction": "inout",
-              "size": {
-                "expr": "num_qubits"
-              }
-            }
-          }
-        }
-      },
-      "body": [
-        {
-          "name": "qbv"
-        },
-        {
-          "function": "H",
-          "params": {},
-          "inputs": {},
-          "inouts": {
-            "target": {
-              "name": "qbv_aux"
-            }
-          },
-          "outputs": {},
-          "operands": {}
-        },
-        {
-          "function": "join",
-          "params": {},
-          "inputs": {
-            "in1": {
-              "name": "qbv_reg"
-            },
-            "in2": {
-              "name": "qbv_aux"
-            }
-          },
-          "inouts": {},
-          "outputs": {
-            "out": {
-              "name": "qbv"
-            }
-          },
-          "operands": {}
-        },
-        {
-          "function": "repeat",
-          "params": {
-            "count": {
-              "expr": "len(phase_seq) // 2"
-            }
-          },
-          "inputs": {},
-          "outputs": {},
-          "operands": {
-            "iteration": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "qsvt_step",
-                  "params": {
-                    "phase_seq": {
-                      "expr": "phase_seq"
-                    },
-                    "num_qubits": {
-                      "expr": "num_qubits"
-                    },
-                    "index": {
-                      "expr": "index"
-                    }
-                  },
-                  "inputs": {},
-                  "inouts": {
-                    "qbv": {
-                      "name": "qbv"
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {
-                    "proj_cnot_1": {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "proj_cnot_1",
-                          "params": {},
-                          "inputs": {},
-                          "inouts": {
-                            "arg0": {
-                              "name": "arg0"
-                            },
-                            "arg1": {
-                              "name": "arg1"
-                            }
-                          },
-                          "outputs": {},
-                          "operands": {}
-                        }
-                      ]
-                    },
-                    "proj_cnot_2": {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "proj_cnot_2",
-                          "params": {},
-                          "inputs": {},
-                          "inouts": {
-                            "arg0": {
-                              "name": "arg0"
-                            },
-                            "arg1": {
-                              "name": "arg1"
-                            }
-                          },
-                          "outputs": {},
-                          "operands": {}
-                        }
-                      ]
-                    },
-                    "u": {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "u",
-                          "params": {},
-                          "inputs": {},
-                          "inouts": {
-                            "arg0": {
-                              "name": "arg0"
-                            }
-                          },
-                          "outputs": {},
-                          "operands": {}
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "function": "split",
-          "params": {
-            "out1_size": {
-              "expr": "num_qubits"
-            },
-            "out2_size": {
-              "expr": "1"
-            }
-          },
-          "inputs": {
-            "in": {
-              "name": "qbv"
-            }
-          },
-          "inouts": {},
-          "outputs": {
-            "out1": {
-              "name": "qbv_reg"
-            },
-            "out2": {
-              "name": "qbv_aux"
-            }
-          },
-          "operands": {}
-        },
-        {
-          "function": "H",
-          "params": {},
-          "inputs": {},
-          "inouts": {
-            "target": {
-              "name": "qbv_aux"
-            }
-          },
-          "outputs": {},
-          "operands": {}
-        }
-      ]
-    },
-    {
-      "name": "qsvt_inversion",
-      "param_decls": {
-        "num_qubits": {
-          "kind": "int"
-        },
-        "phase_seq": {
-          "kind": "list",
-          "element_type": {
-            "kind": "real"
-          }
-        }
-      },
-      "port_declarations": {
-        "qbv_reg": {
-          "name": "qbv_reg",
-          "direction": "inout",
-          "size": {
-            "expr": "num_qubits"
-          }
-        },
-        "qbv_aux": {
-          "name": "qbv_aux",
-          "direction": "output",
-          "size": {
-            "expr": "1"
-          }
-        }
-      },
-      "operand_declarations": {
-        "u": {
-          "name": "u",
-          "param_decls": {},
-          "port_declarations": {
-            "arg0": {
-              "name": "arg0",
-              "direction": "inout",
-              "size": {
-                "expr": "num_qubits"
-              }
-            }
-          }
-        }
-      },
-      "body": [
-        {
-          "function": "allocate",
-          "params": {
-            "num_qubits": {
-              "expr": "1"
-            }
-          },
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "out": {
-              "name": "qbv_aux"
-            }
-          },
-          "operands": {}
-        },
-        {
-          "function": "qsvt",
-          "params": {
-            "num_qubits": {
-              "expr": "num_qubits"
-            },
-            "phase_seq": {
-              "expr": "phase_seq"
-            }
-          },
-          "inputs": {},
-          "inouts": {
-            "qbv_reg": {
-              "name": "qbv_reg"
-            },
-            "qbv_aux": {
-              "name": "qbv_aux"
-            }
-          },
-          "outputs": {},
-          "operands": {
-            "proj_cnot_1": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "X",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "target": {
-                      "name": "arg0",
-                      "start": {
-                        "expr": "num_qubits - 1"
-                      },
-                      "end": {
-                        "expr": "num_qubits"
-                      }
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                },
-                {
-                  "function": "CX",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "target": {
-                      "name": "arg1"
-                    },
-                    "control": {
-                      "name": "arg0",
-                      "start": {
-                        "expr": "num_qubits - 1"
-                      },
-                      "end": {
-                        "expr": "num_qubits"
-                      }
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                },
-                {
-                  "function": "X",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "target": {
-                      "name": "arg0",
-                      "start": {
-                        "expr": "num_qubits - 1"
-                      },
-                      "end": {
-                        "expr": "num_qubits"
-                      }
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                }
-              ]
-            },
-            "proj_cnot_2": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "X",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "target": {
-                      "name": "arg0",
-                      "start": {
-                        "expr": "num_qubits - 1"
-                      },
-                      "end": {
-                        "expr": "num_qubits"
-                      }
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                },
-                {
-                  "function": "CX",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "target": {
-                      "name": "arg1"
-                    },
-                    "control": {
-                      "name": "arg0",
-                      "start": {
-                        "expr": "num_qubits - 1"
-                      },
-                      "end": {
-                        "expr": "num_qubits"
-                      }
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                },
-                {
-                  "function": "X",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "target": {
-                      "name": "arg0",
-                      "start": {
-                        "expr": "num_qubits - 1"
-                      },
-                      "end": {
-                        "expr": "num_qubits"
-                      }
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                }
-              ]
-            },
-            "u": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "u",
-                  "params": {},
-                  "inputs": {},
-                  "inouts": {
-                    "arg0": {
-                      "name": "arg0"
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "main",
-      "param_decls": {},
-      "port_declarations": {
-        "qbv_state": {
-          "name": "qbv_state",
-          "direction": "output",
-          "size": {
-            "expr": "2"
-          }
-        },
-        "qbv_block": {
-          "name": "qbv_block",
-          "direction": "output",
-          "size": {
-            "expr": "1"
-          }
-        },
-        "qbv_aux": {
-          "name": "qbv_aux",
-          "direction": "output",
-          "size": {
-            "expr": "1"
-          }
-        }
-      },
-      "operand_declarations": {},
-      "body": [
-        {
-          "name": "qbv_reg"
-        },
-        {
-          "function": "prepare_amplitudes",
-          "params": {
-            "amplitudes": {
-              "expr": "[0.0, 0.2672612419124244, 0.5345224838248488, 0.8017837257372732]"
-            },
-            "bound": {
-              "expr": "0"
-            }
-          },
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "out": {
-              "name": "qbv_state"
-            }
-          },
-          "operands": {}
-        },
-        {
-          "function": "allocate",
-          "params": {
-            "num_qubits": {
-              "expr": "1"
-            }
-          },
-          "inputs": {},
-          "inouts": {},
-          "outputs": {
-            "out": {
-              "name": "qbv_block"
-            }
-          },
-          "operands": {}
-        },
-        {
-          "function": "join",
-          "params": {},
-          "inputs": {
-            "in1": {
-              "name": "qbv_state"
-            },
-            "in2": {
-              "name": "qbv_block"
-            }
-          },
-          "inouts": {},
-          "outputs": {
-            "out": {
-              "name": "qbv_reg"
-            }
-          },
-          "operands": {}
-        },
-        {
-          "function": "qsvt_inversion",
-          "params": {
-            "num_qubits": {
-              "expr": "3"
-            },
-            "phase_seq": {
-              "expr": "[2.0874414155417313, 3.61932215117093, 3.0773785895128847, 0.8150778907763967, 9.247720694023577, -3.079014532336931, 3.483083301760836, 7.248004725145036, 4.552650121613876, -0.7850993500319676, 3.8425552916719665, 2.8518840572338418, 2.393867482037055, 4.621025137243003, 3.2024044063238346, 5.654692679153324, 3.435625452887754, 2.0608796627562636, -1.6126424648298343, 3.1116273823632703, 7.6053886555688806, 1.322203354975654, 3.1116273771502607, 4.670542834809914, 2.0608796645736, 3.435625436957877, 5.654692683128786, 3.2024044089697252, -1.6621601685383007, 2.393867493926411, 2.8518840448871896, 3.8425552865075074, 5.498085966750048, 4.552650100998617, 0.9648194213072152, 3.4830833410304924, 3.2041707884072066, 2.9645353757675346, 0.8150778928335152, 3.0773785975766845, 9.90250745171562, -4.195743898475777]"
-            }
-          },
-          "inputs": {},
-          "inouts": {
-            "qbv_reg": {
-              "name": "qbv_reg"
-            }
-          },
-          "outputs": {
-            "qbv_aux": {
-              "name": "qbv_aux"
-            }
-          },
-          "operands": {
-            "u": {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "unitary",
-                  "params": {
-                    "elements": {
-                      "expr": "[[-0.0533800210892101, -0.33304120685517713, 0.4167817023084612, 0.26891079066151147, 0.3218040956778537, 0.6437208590698884, 0.19183266236343938, -0.2923695203427728], [-0.36103662107832113, 0.10648228185389359, -0.7518051907487062, -0.053337949515329997, 0.2513185489997727, 0.21058686648858058, 0.01308859177358983, -0.4272925783966903], [-0.5401648873033914, 0.37346704074947124, 0.17593867038511748, -0.3266878718720269, -0.3651776823660948, 0.4391673726339799, 0.15001083180330324, 0.2869475772512575], [-0.39026125458689415, -0.3397791621960014, 0.2094477327568501, -0.33602829194492173, 0.17944919395355952, -0.09662487456930673, -0.729257755087719, -0.04590920833063023], [-0.3131057551428679, -0.5879442548384126, -0.03737357556227646, -0.28155163460208116, -0.0024696261264335276, -0.3332329899046103, 0.5995315489207254, 0.07162282761976255], [0.14305497810676263, -0.0232765080737438, -0.2084137511564646, -0.13255088161123016, 0.6021215917164444, 0.21057852976767902, 0.010771339094774825, 0.7148270415755034], [-0.2920380631525462, 0.5109725498543604, 0.3600235837417653, 0.06119337649056145, 0.5412001683043007, -0.4120907301793447, 0.19037587974841297, -0.14594466460453911], [-0.46790491372397447, -0.12451658230364807, -0.10866987907701474, 0.777570821663385, -0.11077105031460178, -0.11775384082673997, -0.11362974925115141, 0.3317938736495375]]"
-                    }
-                  },
-                  "inputs": {},
-                  "inouts": {
-                    "target": {
-                      "name": "arg0"
-                    }
-                  },
-                  "outputs": {},
-                  "operands": {}
-                }
-              ]
-            }
-          }
-        },
-        {
-          "function": "split",
-          "params": {
-            "out1_size": {
-              "expr": "2"
-            },
-            "out2_size": {
-              "expr": "1"
-            }
-          },
-          "inputs": {
-            "in": {
-              "name": "qbv_reg"
-            }
-          },
-          "inouts": {},
-          "outputs": {
-            "out1": {
-              "name": "qbv_state"
-            },
-            "out2": {
-              "name": "qbv_block"
-            }
-          },
-          "operands": {}
-        }
-      ]
-    }
-  ],
-  "types": [],
-  "execution_preferences": {
-    "num_shots": 1
-  }
+    ]>(arg0);
+  }>(qbv_reg, qbv_aux);
+  qbv_reg -> {qbv_state, qbv_block};
 }

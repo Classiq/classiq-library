@@ -1,0 +1,24 @@
+qfunc simon_qfunc_with_bipartite_s<partition_index: int>(x: qbit[], output res: qbit[]) {
+  allocate<len(x)>(res);
+  repeat<len(x) - partition_index, lambda<i>() {
+    CX(x[0 + (i):(0 + (i)) + 1], res[0 + (i):(0 + (i)) + 1]);
+  }>();
+  repeat<partition_index - 1, lambda<i>() {
+    CX(x[0 + ((((len(x)) - (partition_index)) + 1) + (i)):(0 + ((((len(x)) - (partition_index)) + 1) + (i))) + 1], res[0 + ((((len(x)) - (partition_index)) + 1) + (i)):(0 + ((((len(x)) - (partition_index)) + 1) + (i))) + 1]);
+    CX(x[0 + ((len(x)) - (partition_index)):(0 + ((len(x)) - (partition_index))) + 1], res[0 + ((((len(x)) - (partition_index)) + 1) + (i)):(0 + ((((len(x)) - (partition_index)) + 1) + (i))) + 1]);
+  }>();
+}
+
+qfunc simon_qfunc<f_qfunc: qfunc (arg0: qnum, output arg1: qnum)>(x: qnum) {
+  res: qnum;
+  hadamard_transform(x);
+  f_qfunc(x, res);
+  hadamard_transform(x);
+}
+
+qfunc main(output x: qnum) {
+  allocate<6>(x);
+  simon_qfunc<lambda(arg0, arg1) {
+    simon_qfunc_with_bipartite_s<4>(arg0, arg1);
+  }>(x);
+}

@@ -1,6 +1,6 @@
 qfunc qft_step(target: qbit[]) {
   H(target[0]);
-  repeat<len(target)-1, lambda<index>() {
-    CPHASE<pi/2**(index+1)>(target[index+1], target[0]);
+  repeat<len(target) - 1, lambda<index>() {
+    CPHASE<pi / (2 ** (index + 1))>(target[index+1], target[0]);
   }>();
 }

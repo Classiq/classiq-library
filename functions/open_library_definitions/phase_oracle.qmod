@@ -1,0 +1,11 @@
+qfunc phase_oracle<predicate: qfunc (arg0: qbit[], arg1: qbit)>(target: qbit[]) {
+  aux: qbit;
+  allocate<1>(aux);
+  within {
+    X(aux);
+    H(aux);
+  } apply {
+    predicate(target, aux);
+  }
+  free(aux);
+}

@@ -1,94 +1,95 @@
-{
-  "functions": [
-    {
-      "name": "main",
-      "param_decls": {
-        "params_list": {
-          "kind": "array",
-          "element_type": {
-            "kind": "real"
-          },
-          "size": 8
-        }
-      },
-      "port_declarations": {
-        "target": {
-          "name": "target",
-          "size": {
-            "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)[0], 'pauli'))"
-          },
-          "direction": "output"
-        }
-      },
-      "body": [
-        {
-          "function": "allocate",
-          "positional_args": [
-            {
-              "expr": "len(target)"
-            },
-            {
-              "name": "target"
-            }
-          ]
-        },
-        {
-          "function": "qaoa_penalty",
-          "params": {
-            "hamiltonian": {
-              "expr": "optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)"
-            },
-            "params_list": {
-              "expr": "params_list"
-            },
-            "num_qubits": {
-              "expr": "len(target)"
-            },
-            "is_st": {
-              "expr": "True"
-            }
-          },
-          "inouts": {
-            "target": {
-              "name": "target"
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "types": [
-    {
-      "name": "MyCombiProblem",
-      "variables": {
-        "x0": {
-          "kind": "int"
-        },
-        "x1": {
-          "kind": "int"
-        },
-        "x2": {
-          "kind": "int"
-        },
-        "x3": {
-          "kind": "int"
-        },
-        "x4": {
-          "kind": "int"
-        }
-      },
-      "constraints": [],
-      "objective_type": "Max",
-      "objective_function": {
-        "expr": "x0*(1 - x1) + x0*(1 - x2) + x1*(1 - x0) + x1*(1 - x2) + x1*(1 - x3) + x2*(1 - x0) + x2*(1 - x1) + x2*(1 - x4) + x3*(1 - x1) + x3*(1 - x4) + x4*(1 - x2) + x4*(1 - x3)"
-      }
-    }
-  ],
-  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),\n    maximize=True,\n    initial_point=compute_qaoa_initial_point(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),4),\n    optimizer=Optimizer.COBYLA,\n    max_iteration=60,\n    tolerance=0.0,\n    step_size=0.0,\n    skip_compute_variance=False,\n    alpha_cvar=0.7\n)\nsolution = get_optimization_solution(get_type(MyCombiProblem), vqe_result, 2.0)\nhamiltonian = optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)\nsave({'solution': solution, \"vqe_result\": vqe_result, \"hamiltonian\": hamiltonian})\n",
-  "execution_preferences": {
-    "backend_preferences": {
-      "backend_service_provider": "Classiq",
-      "backend_name": "aer_simulator"
-    }
+hamiltonian: PauliTerm[] = [
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -3.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 0.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 0.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 0.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 0.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 0.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 0.5
   }
+];
+
+qfunc main<params_list: real[8]>(output target: qbit[5]) {
+  allocate<len(target)>(target);
+  qaoa_penalty<len(target), params_list, hamiltonian>(target);
 }
+
+cscope ```
+
+vqe_result = vqe(
+hamiltonian=[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-3.0), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.5)],
+maximize=True,
+initial_point=[0.0, 1.0, 0.3333333333333333, 0.6666666666666667, 0.6666666666666666, 0.33333333333333337, 1.0, 0.0],
+optimizer=Optimizer.COBYLA,
+max_iteration=60,
+tolerance=0.0,
+step_size=0.0,
+skip_compute_variance=False,
+alpha_cvar=0.7
+)
+
+save({"vqe_result": vqe_result, "hamiltonian": [struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-3.0), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.5)]})
+
+```

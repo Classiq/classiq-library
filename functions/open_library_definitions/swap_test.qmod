@@ -2,8 +2,8 @@ qfunc swap_test(state1: qbit[], state2: qbit[], output test: qbit) {
   allocate<1>(test);
   H(test);
   control<lambda() {
-    repeat<len(state1), lambda<index>() {
-      SWAP(state1[0 + (index):(0 + (index)) + 1], state2[0 + (index):(0 + (index)) + 1]);
+    repeat<len(state1), lambda<i>() {
+      SWAP(state1[0 + (i):(0 + (i)) + 1], state2[0 + (i):(0 + (i)) + 1]);
     }>();
   }>(test);
   H(test);

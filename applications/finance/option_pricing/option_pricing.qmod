@@ -1,195 +1,43 @@
-{
-  "functions": [
-    {
-      "name": "qmci",
-      "param_decls": {
-        "num_phase_qubits": {
-          "kind": "int"
-        },
-        "num_unitary_qubits": {
-          "kind": "int"
-        }
-      },
-      "port_declarations": {
-        "phase_port": {
-          "name": "phase_port",
-          "size": {
-            "expr": "num_phase_qubits"
-          },
-          "direction": "output"
-        },
-        "unitary_port": {
-          "name": "unitary_port",
-          "size": {
-            "expr": "num_unitary_qubits"
-          },
-          "direction": "output"
-        }
-      },
-      "operand_declarations": {
-        "sp_op": {
-          "name": "sp_op",
-          "param_decls": {
-            "num_unitary_qubits": {
-              "kind": "int"
-            }
-          },
-          "port_declarations": {
-            "reg": {
-              "name": "reg",
-              "size": {
-                "expr": "num_unitary_qubits-1"
-              },
-              "direction": "inout"
-            },
-            "ind": {
-              "name": "ind",
-              "size": {
-                "expr": "1"
-              },
-              "direction": "inout"
-            }
-          }
-        }
-      },
-      "body": [
-        {
-          "function": "amplitude_estimation",
-          "params": {
-            "num_unitary_qubits": {
-              "expr": "num_unitary_qubits"
-            },
-            "num_phase_qubits": {
-              "expr": "num_phase_qubits"
-            }
-          },
-          "outputs": {
-            "phase_port": {
-              "name": "phase_port"
-            },
-            "unitary_port": {
-              "name": "unitary_port"
-            }
-          },
-          "operands": {
-            "oracle_op": {
-              "body": [
-                {
-                  "function": "Z",
-                  "inouts": {
-                    "target": {
-                      "name": "oq",
-                      "start": {
-                        "expr": "num_unitary_qubits-1"
-                      },
-                      "end": {
-                        "expr": "num_unitary_qubits"
-                      }
-                    }
-                  }
-                }
-              ]
-            },
-            "sp_op": {
-              "body": [
-                {
-                  "function": "sp_op",
-                  "params": {
-                    "num_unitary_qubits": {
-                      "expr": "num_unitary_qubits"
-                    }
-                  },
-                  "inouts": {
-                    "reg": {
-                      "name": "spq",
-                      "start": {
-                        "expr": "0"
-                      },
-                      "end": {
-                        "expr": "num_unitary_qubits-1"
-                      }
-                    },
-                    "ind": {
-                      "name": "spq",
-                      "start": {
-                        "expr": "num_unitary_qubits-1"
-                      },
-                      "end": {
-                        "expr": "num_unitary_qubits"
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "main",
-      "port_declarations": {
-        "phase_port": {
-          "name": "phase_port",
-          "size": {
-            "expr": "2"
-          },
-          "direction": "output"
-        }
-      },
-      "body": [
-        {
-          "name": "unitary_port"
-        },
-        {
-          "function": "qmci",
-          "params": {
-            "num_unitary_qubits": {
-              "expr": "6"
-            },
-            "num_phase_qubits": {
-              "expr": "2"
-            }
-          },
-          "outputs": {
-            "phase_port": {
-              "name": "phase_port"
-            },
-            "unitary_port": {
-              "name": "unitary_port"
-            }
-          },
-          "operands": {
-            "sp_op": {
-              "body": [
-                {
-                  "function": "log_normal_finance",
-                  "params": {
-                    "finance_model": {
-                      "expr": "struct_literal(LogNormalModel, num_qubits=5, mu=0.7, sigma=0.13)"
-                    },
-                    "finance_function": {
-                      "expr": "struct_literal(FinanceFunction, f=FinanceFunctionType.EUROPEAN_CALL_OPTION, threshold=1.9, larger=True, polynomial_degree=0, use_chebyshev_polynomial_approximation=False, tail_probability=0.0)"
-                    }
-                  },
-                  "inouts": {
-                    "func_port": {
-                      "name": "reg"
-                    },
-                    "obj_port": {
-                      "name": "ind"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "classical_execution_code": "\ndef execute_amplitude_estimation(phase_port_size):\n    result = sample()\n    estimation = qae_with_qpe_result_post_processing(\n        estimation_register_size=phase_port_size,\n        estimation_method=1,\n        result=result\n    )\n    save({\"result\": result, \"estimation\": estimation})\n    return estimation\n\nestimation = execute_amplitude_estimation(2)\nresult = log_normal_finance_post_process(struct_literal(LogNormalModel, num_qubits=5, mu=0.7, sigma=0.13), struct_literal(FinanceFunction, f=FinanceFunctionType.EUROPEAN_CALL_OPTION, threshold=1.9, larger=True, polynomial_degree=0, use_chebyshev_polynomial_approximation=False, tail_probability=0.0), estimation)\nsave({'result': result})\n",
-  "constraints": {
-    "max_width": 20
-  }
+qfunc qmci<num_phase_qubits: int, num_unitary_qubits: int, sp_op: qfunc <num_unitary_qubits: int>(reg: qbit[num_unitary_qubits - 1], ind: qbit)>(output phase_port: qbit[num_phase_qubits], output unitary_port: qbit[num_unitary_qubits]) {
+  amplitude_estimation<num_phase_qubits, num_unitary_qubits, lambda<num_unitary_qubits>(spq) {
+    sp_op<num_unitary_qubits>(spq[0:num_unitary_qubits-1], spq[num_unitary_qubits-1:num_unitary_qubits]);
+  }, lambda<num_unitary_qubits>(oq) {
+    Z(oq[num_unitary_qubits-1:num_unitary_qubits]);
+  }>(phase_port, unitary_port);
 }
+
+qfunc main(output phase_port: qbit[2]) {
+  unitary_port: qbit[];
+  qmci<2, 6, lambda<num_unitary_qubits>(reg, ind) {
+    log_normal_finance<LogNormalModel {
+      num_qubits = 5,
+      mu = 0.7,
+      sigma = 0.13
+    }, FinanceFunction {
+      f = FinanceFunctionType::EUROPEAN_CALL_OPTION,
+      threshold = 1.9,
+      larger = True,
+      polynomial_degree = 0,
+      use_chebyshev_polynomial_approximation = False,
+      tail_probability = 0.0
+    }>(reg, ind);
+  }>(phase_port, unitary_port);
+}
+
+cscope ```
+
+def execute_amplitude_estimation(phase_port_size):
+    result = sample()
+    estimation = qae_with_qpe_result_post_processing(
+        estimation_register_size=phase_port_size,
+        estimation_method=1,
+        result=result
+    )
+    save({"result": result, "estimation": estimation})
+    return estimation
+
+estimation = execute_amplitude_estimation(2)
+result = log_normal_finance_post_process(struct_literal(LogNormalModel, num_qubits=5, mu=0.7, sigma=0.13), struct_literal(FinanceFunction, f=FinanceFunctionType.EUROPEAN_CALL_OPTION, threshold=1.9, larger=True, polynomial_degree=0, use_chebyshev_polynomial_approximation=False, tail_probability=0.0), estimation)
+save({'result': result})
+
+```

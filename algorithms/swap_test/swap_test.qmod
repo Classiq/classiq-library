@@ -1,88 +1,25 @@
-{
-  "functions": [
-    {
-      "name": "main",
-      "param_decls": {},
-      "port_declarations": {
-        "test": {
-          "name": "test",
-          "quantum_type": {
-            "kind": "qbit"
-          },
-          "direction": "output"
-        }
-      },
-      "operand_declarations": {},
-      "positional_arg_declarations": [
-        {
-          "name": "test",
-          "quantum_type": {
-            "kind": "qbit"
-          },
-          "direction": "output"
-        }
-      ],
-      "body": [
-        {
-          "name": "state1",
-          "quantum_type": {
-            "kind": "qvec"
-          }
-        },
-        {
-          "name": "state2",
-          "quantum_type": {
-            "kind": "qvec"
-          }
-        },
-        {
-          "function": "prepare_amplitudes",
-          "positional_args": [
-            {
-              "expr": "[0.34182047230666224, -0.23726166732508336, 0.23393603467598326, -0.03334753113271531, 0.479787125057496, -0.41388351983520677, -0.39606079820071194, 0.4611595499868774]"
-            },
-            {
-              "expr": "0.0"
-            },
-            {
-              "name": "state1"
-            }
-          ]
-        },
-        {
-          "function": "prepare_amplitudes",
-          "positional_args": [
-            {
-              "expr": "[-0.46435486649928936, 0.36867023053833337, 0.21967502375954492, -0.10780241703011303, -0.45142445206079607, -0.358452134839606, 0.5058073813058533, -0.021570025938838663]"
-            },
-            {
-              "expr": "0.0"
-            },
-            {
-              "name": "state2"
-            }
-          ]
-        },
-        {
-          "function": "swap_test",
-          "positional_args": [
-            {
-              "name": "state1"
-            },
-            {
-              "name": "state2"
-            },
-            {
-              "name": "test"
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "types": [],
-  "classical_execution_code": "result = sample()\nsave({'result': result})",
-  "execution_preferences": {
-    "num_shots": 100000
-  }
+qfunc main(output test: qbit) {
+  state1: qbit[];
+  state2: qbit[];
+  prepare_amplitudes<[
+    0.341820472306662,
+    (-0.237261667325083),
+    0.233936034675983,
+    (-0.033347531132715),
+    0.479787125057496,
+    (-0.413883519835207),
+    (-0.396060798200712),
+    0.461159549986877
+  ], 0.0>(state1);
+  prepare_amplitudes<[
+    (-0.464354866499289),
+    0.368670230538333,
+    0.219675023759545,
+    (-0.107802417030113),
+    (-0.451424452060796),
+    (-0.358452134839606),
+    0.505807381305853,
+    (-0.021570025938839)
+  ], 0.0>(state2);
+  swap_test(state1, state2, test);
 }

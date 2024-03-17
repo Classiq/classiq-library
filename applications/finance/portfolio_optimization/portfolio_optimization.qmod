@@ -1,93 +1,669 @@
-{
-  "functions": [
-    {
-      "name": "main",
-      "param_decls": {
-        "params_list": {
-          "kind": "array",
-          "element_type": {
-            "kind": "real"
-          },
-          "size": 2
-        }
-      },
-      "port_declarations": {
-        "target": {
-          "name": "target",
-          "size": {
-            "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)[0], 'pauli'))"
-          },
-          "direction": "output"
-        }
-      },
-      "body": [
-        {
-          "function": "allocate",
-          "positional_args": [
-            {
-              "expr": "len(target)"
-            },
-            {
-              "name": "target"
-            }
-          ]
-        },
-        {
-          "function": "qaoa_penalty",
-          "params": {
-            "hamiltonian": {
-              "expr": "optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)"
-            },
-            "params_list": {
-              "expr": "params_list"
-            },
-            "num_qubits": {
-              "expr": "len(target)"
-            },
-            "is_st": {
-              "expr": "True"
-            }
-          },
-          "inouts": {
-            "target": {
-              "name": "target"
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "types": [
-    {
-      "name": "MyCombiProblem",
-      "variables": {
-        "w0": {
-          "kind": "int"
-        },
-        "w1": {
-          "kind": "int"
-        },
-        "w2": {
-          "kind": "int"
-        }
-      },
-      "variable_upper_bound": 2,
-      "constraints": [
-        {
-          "expr": "w0 + w1 + w2 <= 6"
-        }
-      ],
-      "objective_type": "Min",
-      "objective_function": {
-        "expr": "w0*(0.9*w0 + 0.5*w1 - 0.7*w2) - 3*w0 + w1*(0.5*w0 + 0.9*w1 - 0.2*w2) - 4*w1 + w2*(-0.7*w0 - 0.2*w1 + 0.9*w2) + w2"
-      }
-    }
-  ],
-  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),\n    maximize=False,\n    initial_point=compute_qaoa_initial_point(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0),1),\n    optimizer=Optimizer.COBYLA,\n    max_iteration=60,\n    tolerance=0.0,\n    step_size=0.0,\n    skip_compute_variance=False,\n    alpha_cvar=0.7\n)\nsolution = get_optimization_solution(get_type(MyCombiProblem), vqe_result, 2.0)\nhamiltonian = optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 2.0)\nsave({'solution': solution, \"vqe_result\": vqe_result, \"hamiltonian\": hamiltonian})\n",
-  "execution_preferences": {
-    "backend_preferences": {
-      "backend_service_provider": "Classiq",
-      "backend_name": "aer_simulator"
-    }
+hamiltonian: PauliTerm[] = [
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 7.25
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 0.8
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 0.8
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 0.8
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 0.8
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.5
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 0.65
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 0.65
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 0.65
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 0.65
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 0.9
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 0.9
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 0.9
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 0.9
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 1.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 1.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 1.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 1.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 1.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 1.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 2.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 2.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 2.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 2.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 2.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 2.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 2.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 1.25
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 1.25
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 1.25
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 1.25
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 3.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 3.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 3.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 3.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 3.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 3.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 3.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 6.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 1.45
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 1.45
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 1.45
   }
+];
+
+qfunc main<params_list: real[2]>(output target: qbit[9]) {
+  allocate<len(target)>(target);
+  qaoa_penalty<len(target), params_list, hamiltonian>(target);
 }
+
+cscope ```
+
+vqe_result = vqe(
+hamiltonian=[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=7.249999999999997), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=0.7999999999999985), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.7999999999999985), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.7999999999999986), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.7999999999999986), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-4.9960036108132044e-15), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-0.5000000000000018), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-0.5000000000000018), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-1.6653345369377344e-15), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-3.330669073875469e-15), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=0.6499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=0.6499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.6499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.6499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.8999999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.8999999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.8999999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.8999999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z], coefficient=1.2499999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z], coefficient=1.2499999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I], coefficient=1.2499999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I], coefficient=1.2499999999999996), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=5.999999999999998), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z], coefficient=1.4499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I], coefficient=1.4499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=1.4499999999999995)],
+maximize=False,
+initial_point=[0.0, 0.2239532619279455],
+optimizer=Optimizer.COBYLA,
+max_iteration=60,
+tolerance=0.0,
+step_size=0.0,
+skip_compute_variance=False,
+alpha_cvar=0.7
+)
+
+save({"vqe_result": vqe_result, "hamiltonian": [struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=7.249999999999997), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=0.7999999999999985), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.7999999999999985), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.7999999999999986), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.7999999999999986), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-4.9960036108132044e-15), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-0.5000000000000018), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-0.5000000000000018), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-1.6653345369377344e-15), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=-3.330669073875469e-15), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=0.6499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=0.6499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.6499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.6499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.8999999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.8999999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.8999999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.8999999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=0.9999999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=1.9999999999999991), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z], coefficient=1.2499999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.Z], coefficient=1.2499999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I], coefficient=1.2499999999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.Z, Pauli.I], coefficient=1.2499999999999996), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I, Pauli.I, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=2.999999999999999), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=5.999999999999998), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z], coefficient=1.4499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I], coefficient=1.4499999999999995), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I], coefficient=1.4499999999999995)]})
+
+```

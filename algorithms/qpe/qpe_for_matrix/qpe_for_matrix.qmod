@@ -1,490 +1,107 @@
-{
-  "functions": [
-    {
-      "name": "unitary_with_power_logic",
-      "param_decls": {
-        "pw": {
-          "kind": "int"
+qfunc unitary_with_power_logic<pw: int, matrix: real[][]>(target: qbit[]) {
+  power<pw, lambda() {
+    unitary<matrix>(target);
+  }>();
+}
+
+qfunc suzuki_trotter1_with_power_logic<hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real>(target: qbit[]) {
+  suzuki_trotter<hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2))>(target);
+}
+
+qfunc my_qpe_flexible<unitary_with_power: qfunc <arg0: int>(arg1: qbit[]), precision: int>(state: qbit[], output phase: qbit[precision]) {
+  allocate<precision>(phase);
+  apply_to_all<H>(phase);
+  repeat<precision, lambda<index>() {
+    control<lambda() {
+      unitary_with_power<2 ** index>(state);
+    }>(phase[0 + (index):(0 + (index)) + 1]);
+  }>();
+  invert<lambda() {
+    qft(phase);
+  }>();
+}
+
+qfunc main(output phase_result: qnum<8, False, 8>) {
+  state: qbit[];
+  prepare_amplitudes<[
+    0.513396396241511,
+    0.451402223282909,
+    0.714366707564118,
+    0.149466987209476
+  ], 0.0>(state);
+  phase_array: qbit[];
+  my_qpe_flexible<lambda<pw>(arg1) {
+    if<True, lambda() {
+      unitary_with_power_logic<pw, [
+        [
+          ((-0.800994193328528) - 0.432184369481798j),
+          (0.18481604491471 - 0.230641913600945j),
+          (0.182066604712991 - 0.208198484698175j),
+          (0.010207121446984 - 0.087597188034849j)
+        ],
+        [
+          (0.18481604491471 - 0.230641913600945j),
+          ((-0.74259258995001) - 0.478111274957735j),
+          (0.212289111070001 - 0.243461671831465j),
+          ((-0.07305797727484) + 0.151444613535273j)
+        ],
+        [
+          (0.18206660471299 - 0.208198484698175j),
+          (0.212289111070001 - 0.243461671831465j),
+          ((-0.763886162414103) - 0.484576516522355j),
+          ((-0.026023894036146) + 0.012295427374176j)
+        ],
+        [
+          (0.010207121446984 - 0.087597188034849j),
+          ((-0.073057977274841) + 0.151444613535273j),
+          ((-0.026023894036146) + 0.012295427374176j),
+          ((-0.895413431349899) - 0.401691392328609j)
+        ]
+      ]>(arg1);
+    }, lambda() {
+      suzuki_trotter1_with_power_logic<[
+        PauliTerm {
+          pauli = [Pauli::I, Pauli::I],
+          coefficient = 0.4
         },
-        "matrix": {
-          "kind": "list",
-          "element_type": {
-            "kind": "list",
-            "element_type": {
-              "kind": "real"
-            }
-          }
+        PauliTerm {
+          pauli = [Pauli::I, Pauli::Z],
+          coefficient = 0.01504032
+        },
+        PauliTerm {
+          pauli = [Pauli::I, Pauli::X],
+          coefficient = 0.10676978
+        },
+        PauliTerm {
+          pauli = [Pauli::Z, Pauli::I],
+          coefficient = 0.016634415
+        },
+        PauliTerm {
+          pauli = [Pauli::Z, Pauli::Z],
+          coefficient = -0.042759185
+        },
+        PauliTerm {
+          pauli = [Pauli::Z, Pauli::X],
+          coefficient = 0.12638833
+        },
+        PauliTerm {
+          pauli = [Pauli::X, Pauli::I],
+          coefficient = 0.042057265
+        },
+        PauliTerm {
+          pauli = [Pauli::X, Pauli::Z],
+          coefficient = 0.172936455
+        },
+        PauliTerm {
+          pauli = [Pauli::X, Pauli::X],
+          coefficient = 0.15658719
+        },
+        PauliTerm {
+          pauli = [Pauli::Y, Pauli::Y],
+          coefficient = 0.09539162
         }
-      },
-      "port_declarations": {
-        "target": {
-          "name": "target",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "inout"
-        }
-      },
-      "operand_declarations": {},
-      "positional_arg_declarations": [
-        {
-          "name": "pw",
-          "classical_type": {
-            "kind": "int"
-          }
-        },
-        {
-          "name": "matrix",
-          "classical_type": {
-            "kind": "list",
-            "element_type": {
-              "kind": "list",
-              "element_type": {
-                "kind": "real"
-              }
-            }
-          }
-        },
-        {
-          "name": "target",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "inout"
-        }
-      ],
-      "body": [
-        {
-          "function": "power",
-          "positional_args": [
-            {
-              "expr": "pw"
-            },
-            {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "unitary",
-                  "positional_args": [
-                    {
-                      "expr": "matrix"
-                    },
-                    {
-                      "name": "target"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "suzuki_trotter1_with_power_logic",
-      "param_decls": {
-        "hamiltonian": {
-          "kind": "list",
-          "element_type": {
-            "kind": "struct_instance",
-            "name": "PauliTerm"
-          }
-        },
-        "pw": {
-          "kind": "int"
-        },
-        "r0": {
-          "kind": "int"
-        },
-        "reps_scaling_factor": {
-          "kind": "real"
-        },
-        "evolution_coefficient": {
-          "kind": "real"
-        }
-      },
-      "port_declarations": {
-        "target": {
-          "name": "target",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "inout"
-        }
-      },
-      "operand_declarations": {},
-      "positional_arg_declarations": [
-        {
-          "name": "hamiltonian",
-          "classical_type": {
-            "kind": "list",
-            "element_type": {
-              "kind": "struct_instance",
-              "name": "PauliTerm"
-            }
-          }
-        },
-        {
-          "name": "pw",
-          "classical_type": {
-            "kind": "int"
-          }
-        },
-        {
-          "name": "r0",
-          "classical_type": {
-            "kind": "int"
-          }
-        },
-        {
-          "name": "reps_scaling_factor",
-          "classical_type": {
-            "kind": "real"
-          }
-        },
-        {
-          "name": "evolution_coefficient",
-          "classical_type": {
-            "kind": "real"
-          }
-        },
-        {
-          "name": "target",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "inout"
-        }
-      ],
-      "body": [
-        {
-          "function": "suzuki_trotter",
-          "positional_args": [
-            {
-              "expr": "hamiltonian"
-            },
-            {
-              "expr": "(evolution_coefficient) * (pw)"
-            },
-            {
-              "expr": "1"
-            },
-            {
-              "expr": "(r0) * (ceiling((reps_scaling_factor) ** (log(pw,2))))"
-            },
-            {
-              "name": "target"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "my_qpe_flexible",
-      "param_decls": {
-        "precision": {
-          "kind": "int"
-        }
-      },
-      "port_declarations": {
-        "state": {
-          "name": "state",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "inout"
-        },
-        "phase": {
-          "name": "phase",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "output"
-        }
-      },
-      "operand_declarations": {
-        "unitary_with_power": {
-          "name": "unitary_with_power",
-          "positional_arg_declarations": [
-            {
-              "name": "arg0",
-              "classical_type": {
-                "kind": "int"
-              }
-            },
-            {
-              "name": "arg1",
-              "quantum_type": {
-                "kind": "qvec"
-              },
-              "direction": "inout"
-            }
-          ]
-        }
-      },
-      "positional_arg_declarations": [
-        {
-          "name": "unitary_with_power",
-          "positional_arg_declarations": [
-            {
-              "name": "arg0",
-              "classical_type": {
-                "kind": "int"
-              }
-            },
-            {
-              "name": "arg1",
-              "quantum_type": {
-                "kind": "qvec"
-              },
-              "direction": "inout"
-            }
-          ]
-        },
-        {
-          "name": "precision",
-          "classical_type": {
-            "kind": "int"
-          }
-        },
-        {
-          "name": "state",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "inout"
-        },
-        {
-          "name": "phase",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "output"
-        }
-      ],
-      "body": [
-        {
-          "function": "allocate",
-          "positional_args": [
-            {
-              "expr": "precision"
-            },
-            {
-              "name": "phase"
-            }
-          ]
-        },
-        {
-          "function": "apply_to_all",
-          "positional_args": [
-            "H",
-            {
-              "name": "phase"
-            }
-          ]
-        },
-        {
-          "function": "repeat",
-          "positional_args": [
-            {
-              "expr": "precision"
-            },
-            {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "control",
-                  "positional_args": [
-                    {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "unitary_with_power",
-                          "positional_args": [
-                            {
-                              "expr": "2 ** (index)"
-                            },
-                            {
-                              "name": "state"
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "name": "phase",
-                      "start": {
-                        "expr": "0 + (index)"
-                      },
-                      "end": {
-                        "expr": "(0 + (index)) + 1"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "function": "invert",
-          "positional_args": [
-            {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "qft",
-                  "positional_args": [
-                    {
-                      "name": "phase"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "main",
-      "param_decls": {},
-      "port_declarations": {
-        "phase_result": {
-          "name": "phase_result",
-          "quantum_type": {
-            "size": {
-              "expr": "8"
-            },
-            "kind": "qnum"
-          },
-          "direction": "output"
-        }
-      },
-      "operand_declarations": {},
-      "positional_arg_declarations": [
-        {
-          "name": "phase_result",
-          "quantum_type": {
-            "size": {
-              "expr": "8"
-            },
-            "kind": "qnum"
-          },
-          "direction": "output"
-        }
-      ],
-      "body": [
-        {
-          "name": "state",
-          "quantum_type": {
-            "kind": "qvec"
-          }
-        },
-        {
-          "function": "prepare_amplitudes",
-          "positional_args": [
-            {
-              "expr": "[0.28129788588570265, 0.8454677216230623, 0.014478986415873701, 0.4537027551625749]"
-            },
-            {
-              "expr": "0.0"
-            },
-            {
-              "name": "state"
-            }
-          ]
-        },
-        {
-          "function": "my_qpe_flexible",
-          "positional_args": [
-            {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "if",
-                  "positional_args": [
-                    {
-                      "expr": "True"
-                    },
-                    {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "unitary_with_power_logic",
-                          "positional_args": [
-                            {
-                              "expr": "arg0"
-                            },
-                            {
-                              "expr": "[[(-0.8009941933285284-0.4321843694817978j), (0.18481604491471004-0.2306419136009454j), (0.18206660471299055-0.208198484698175j), (0.010207121446983554-0.08759718803484894j)], [(0.18481604491471-0.23064191360094533j), (-0.7425925899500105-0.4781112749577348j), (0.21228911107000067-0.24346167183146528j), (-0.07305797727484051+0.15144461353527347j)], [(0.1820666047129905-0.208198484698175j), (0.21228911107000073-0.24346167183146525j), (-0.7638861624141031-0.484576516522355j), (-0.026023894036145676+0.012295427374176162j)], [(0.010207121446983552-0.08759718803484894j), (-0.07305797727484055+0.15144461353527344j), (-0.026023894036145676+0.012295427374176162j), (-0.8954134313498988-0.4016913923286093j)]]"
-                            },
-                            {
-                              "name": "arg1"
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "suzuki_trotter1_with_power_logic",
-                          "positional_args": [
-                            {
-                              "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I], coefficient=0.39999999999999997), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.Z], coefficient=0.015040319999999996), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.X], coefficient=0.10676978000000001), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.I], coefficient=0.016634415000000013), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.Z], coefficient=-0.042759185000000005), struct_literal(PauliTerm, pauli=[Pauli.Z, Pauli.X], coefficient=0.12638833), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.I], coefficient=0.042057264999999996), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z], coefficient=0.172936455), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.X], coefficient=0.15658719), struct_literal(PauliTerm, pauli=[Pauli.Y, Pauli.Y], coefficient=0.09539162)]"
-                            },
-                            {
-                              "expr": "arg0"
-                            },
-                            {
-                              "expr": "2"
-                            },
-                            {
-                              "expr": "1.8"
-                            },
-                            {
-                              "expr": "-6.283185307179586"
-                            },
-                            {
-                              "name": "arg1"
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "expr": "8"
-            },
-            {
-              "name": "state"
-            },
-            {
-              "name": "phase_result"
-            }
-          ]
-        },
-        {
-          "target": {
-            "name": "phase_result"
-          },
-          "fraction_digits": {
-            "expr": "8"
-          },
-          "is_signed": {
-            "expr": "False"
-          }
-        }
-      ]
-    }
-  ],
-  "types": [],
-  "execution_preferences": {
-    "num_shots": 10000
-  }
+      ], pw, 2, 1.8, -6.283185307179586>(arg1);
+    }>();
+  }, 8>(state, phase_array);
+  phase_array -> phase_result;
 }

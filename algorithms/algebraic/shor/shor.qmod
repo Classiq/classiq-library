@@ -1,237 +1,314 @@
-{
-  "functions": [
-    {
-      "name": "modular_exponentiation",
-      "param_decls": {
-        "power": {
-          "kind": "int"
-        }
-      },
-      "port_declarations": {
-        "target": {
-          "name": "target",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "inout"
-        }
-      },
-      "operand_declarations": {},
-      "positional_arg_declarations": [
-        {
-          "name": "power",
-          "classical_type": {
-            "kind": "int"
-          }
-        },
-        {
-          "name": "target",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "inout"
-        }
+qfunc modular_exponentiation<exponent: int>(target: qbit[4]) {
+  power<2 ** exponent, lambda() {
+    unitary<[
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
       ],
-      "body": [
-        {
-          "function": "unitary",
-          "positional_args": [
-            {
-              "expr": "Matrix([[0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power)], [0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0], [0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0], [0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0], [0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0], [0, 0, 0, 0, 0, 1.0*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0], [0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0], [0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0], [0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0*1.0**(2**power), 0, 0, 0, 0, 0], [0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0], [0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0, 0], [0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0, 0], [0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*I*(1.0*I)**(2**power) + 0.25*I*(-1.0*I)**(2**power), 0, 0, 0, 0, 0, -0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*I*(1.0*I)**(2**power) - 0.25*I*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) - 0.25*(1.0*I)**(2**power) - 0.25*(-1.0*I)**(2**power), 0, 0, 0.25*(-1.0)**(2**power) + 0.25*1.0**(2**power) + 0.25*(1.0*I)**(2**power) + 0.25*(-1.0*I)**(2**power), 0], [-0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5*(-1.0)**(2**power) + 0.5*1.0**(2**power)]])"
-            },
-            {
-              "name": "target"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "period_finding",
-      "param_decls": {},
-      "port_declarations": {
-        "qv_counting": {
-          "name": "qv_counting",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "output"
-        },
-        "qv_auxilliary": {
-          "name": "qv_auxilliary",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "output"
-        }
-      },
-      "operand_declarations": {},
-      "positional_arg_declarations": [
-        {
-          "name": "qv_counting",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "output"
-        },
-        {
-          "name": "qv_auxilliary",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "output"
-        }
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
       ],
-      "body": [
-        {
-          "function": "allocate",
-          "positional_args": [
-            {
-              "expr": "8"
-            },
-            {
-              "name": "qv_counting"
-            }
-          ]
-        },
-        {
-          "function": "hadamard_transform",
-          "positional_args": [
-            {
-              "name": "qv_counting"
-            }
-          ]
-        },
-        {
-          "function": "allocate",
-          "positional_args": [
-            {
-              "expr": "4"
-            },
-            {
-              "name": "qv_auxilliary"
-            }
-          ]
-        },
-        {
-          "function": "X",
-          "positional_args": [
-            {
-              "name": "qv_auxilliary",
-              "start": {
-                "expr": "0"
-              },
-              "end": {
-                "expr": "1"
-              }
-            }
-          ]
-        },
-        {
-          "function": "repeat",
-          "positional_args": [
-            {
-              "expr": "4"
-            },
-            {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "control",
-                  "positional_args": [
-                    {
-                      "rename_params": {},
-                      "body": [
-                        {
-                          "function": "modular_exponentiation",
-                          "positional_args": [
-                            {
-                              "expr": "index"
-                            },
-                            {
-                              "name": "qv_auxilliary"
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "name": "qv_counting",
-                      "start": {
-                        "expr": "index"
-                      },
-                      "end": {
-                        "expr": "index + 1"
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "function": "invert",
-          "positional_args": [
-            {
-              "rename_params": {},
-              "body": [
-                {
-                  "function": "qft",
-                  "positional_args": [
-                    {
-                      "name": "qv_counting"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "main",
-      "param_decls": {},
-      "port_declarations": {
-        "qv_counting": {
-          "name": "qv_counting",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "output"
-        }
-      },
-      "operand_declarations": {},
-      "positional_arg_declarations": [
-        {
-          "name": "qv_counting",
-          "quantum_type": {
-            "kind": "qvec"
-          },
-          "direction": "output"
-        }
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
-      "body": [
-        {
-          "name": "qv_auxilliary",
-          "quantum_type": {
-            "kind": "qvec"
-          }
-        },
-        {
-          "function": "period_finding",
-          "positional_args": [
-            {
-              "name": "qv_counting"
-            },
-            {
-              "name": "qv_auxilliary"
-            }
-          ]
-        }
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ]
-    }
-  ],
-  "types": []
+    ]>(target);
+  }>();
+}
+
+qfunc period_finding(output qv_counting: qbit[8], output qv_auxilliary: qbit[4]) {
+  allocate<8>(qv_counting);
+  hadamard_transform(qv_counting);
+  allocate<4>(qv_auxilliary);
+  X(qv_auxilliary[0:1]);
+  repeat<4, lambda<index>() {
+    control<lambda() {
+      modular_exponentiation<index>(qv_auxilliary);
+    }>(qv_counting[0 + (index):(0 + (index)) + 1]);
+  }>();
+  invert<lambda() {
+    qft(qv_counting);
+  }>();
+}
+
+qfunc main(output qv_counting: qbit[8]) {
+  qv_auxilliary: qbit[];
+  period_finding(qv_counting, qv_auxilliary);
 }

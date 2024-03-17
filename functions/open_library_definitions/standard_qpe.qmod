@@ -1,8 +1,8 @@
-qfunc standard_qpe<precision: int, unitary: qfunc ()>(phase: qbit[]) {
+qfunc standard_qpe<precision: int, unitary: qfunc ()>(phase: qbit[precision]) {
   hadamard_transform(phase);
   repeat<precision, lambda<index>() {
     control<lambda() {
-      repeat<2**index, lambda<index>() {
+      repeat<2 ** index, lambda<index>() {
         unitary();
       }>();
     }>(phase[index]);

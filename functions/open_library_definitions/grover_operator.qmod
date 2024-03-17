@@ -1,9 +1,7 @@
-qfunc grover_operator<num_qubits: int, sp_op: qfunc <num_qubits: int>(spq: qbit[]), oracle_op: qfunc <num_qubits: int>(oq: qbit[])>(p: qbit[]) {
-  oracle_op<num_qubits>(p);
-  invert<lambda() {
-    sp_op<num_qubits>(p);
-  }>();
-  grover_diffuser<num_qubits>(p);
-  sp_op<num_qubits>(p);
-  U<0, 0, 0, pi>(p[0]);
+qfunc grover_operator<oracle: qfunc (arg0: qbit[]), space_transform: qfunc (arg0: qbit[])>(packed_vars: qbit[]) {
+  oracle(packed_vars);
+  grover_diffuser<lambda(arg0) {
+    space_transform(arg0);
+  }>(packed_vars);
+  U<0, 0, 0, pi>(packed_vars[0:1]);
 }

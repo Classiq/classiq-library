@@ -1,0 +1,27 @@
+qfunc bv_predicate<a: int>(x: qbit[], res: qbit) {
+  repeat<len(x), lambda<i>() {
+    if<(floor(a / (2 ** i)) % 2) == 1, lambda() {
+      CX(x[0 + (i):(0 + (i)) + 1], res);
+    }, lambda() {
+      IDENTITY(res);
+    }>();
+  }>();
+}
+
+qfunc bv_function<a: int>(x: qbit[]) {
+  aux: qbit;
+  hadamard_transform(x);
+  within {
+    allocate<1>(aux);
+    X(aux);
+    H(aux);
+  } apply {
+    bv_predicate<a>(x, aux);
+  }
+  hadamard_transform(x);
+}
+
+qfunc main(output x: qbit[]) {
+  allocate<5>(x);
+  bv_function<13>(x);
+}

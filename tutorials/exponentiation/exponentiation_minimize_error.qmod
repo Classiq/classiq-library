@@ -1,49 +1,136 @@
-{
-  "functions": [
-    {
-      "name": "main",
-      "param_decls": {},
-      "port_declarations": {},
-      "operand_declarations": {},
-      "positional_arg_declarations": [],
-      "body": [
-        {
-          "name": "state",
-          "quantum_type": {
-            "kind": "qvec"
-          }
-        },
-        {
-          "function": "allocate",
-          "positional_args": [
-            {
-              "expr": "8"
-            },
-            {
-              "name": "state"
-            }
-          ]
-        },
-        {
-          "function": "exponentiation_with_depth_constraint",
-          "positional_args": [
-            {
-              "expr": "[struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Z, Pauli.X, Pauli.X, Pauli.X, Pauli.I, Pauli.I], coefficient=0.1), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.X, Pauli.X, Pauli.Y, Pauli.Y, Pauli.I, Pauli.I], coefficient=0.2), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Z, Pauli.Y, Pauli.X], coefficient=0.3), struct_literal(PauliTerm, pauli=[Pauli.X, Pauli.Z, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.X], coefficient=0.4), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.X, Pauli.I], coefficient=0.5), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.Z, Pauli.Y], coefficient=0.6), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.X, Pauli.Y], coefficient=0.7), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Y, Pauli.X, Pauli.Y, Pauli.Z, Pauli.I, Pauli.I], coefficient=0.8), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.I, Pauli.X, Pauli.Z], coefficient=0.9), struct_literal(PauliTerm, pauli=[Pauli.I, Pauli.I, Pauli.Y, Pauli.Z, Pauli.Y, Pauli.I, Pauli.I, Pauli.I], coefficient=1.0)]"
-            },
-            {
-              "expr": "0.05"
-            },
-            {
-              "expr": "400"
-            },
-            {
-              "name": "state"
-            }
-          ]
-        }
-      ]
+qfunc main() {
+  state: qbit[];
+  allocate<8>(state);
+  exponentiation_with_depth_constraint<[
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::X,
+        Pauli::X,
+        Pauli::X,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient = 0.1
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::X,
+        Pauli::X,
+        Pauli::Y,
+        Pauli::Y,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient = 0.2
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::Z,
+        Pauli::Y,
+        Pauli::X
+      ],
+      coefficient = 0.3
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::X,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::X
+      ],
+      coefficient = 0.4
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::X,
+        Pauli::I
+      ],
+      coefficient = 0.5
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::Y
+      ],
+      coefficient = 0.6
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::X,
+        Pauli::Y
+      ],
+      coefficient = 0.7
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::Y,
+        Pauli::X,
+        Pauli::Y,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient = 0.8
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::X,
+        Pauli::Z
+      ],
+      coefficient = 0.9
+    },
+    PauliTerm {
+      pauli = [
+        Pauli::I,
+        Pauli::I,
+        Pauli::Y,
+        Pauli::Z,
+        Pauli::Y,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient = 1.0
     }
-  ],
-  "types": [],
-  "classical_execution_code": "result = sample()\nsave({'result': result})"
+  ], 0.05, 400>(state);
 }

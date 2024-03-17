@@ -1,0 +1,106 @@
+qfunc phase_lad<value: int>(phi_b: qbit[]) {
+  repeat<len(phi_b), lambda<index>() {
+    PHASE<qft_const_adder_phase(index, value, len(phi_b))>(phi_b[0 + (index):(0 + (index)) + 1]);
+  }>();
+}
+
+qfunc my_qft_step(qbv: qbit[]) {
+  H(qbv[0:1]);
+  repeat<len(qbv) - 1, lambda<index>() {
+    CPHASE<pi / (2 ** (index + 1))>(qbv[0:1], qbv[0 + ((index) + 1):(0 + ((index) + 1)) + 1]);
+  }>();
+}
+
+qfunc qft_ns(qbv: qbit[]) {
+  repeat<len(qbv), lambda<index>() {
+    my_qft_step(qbv[0 + (index):0 + (len(qbv))]);
+  }>();
+}
+
+qfunc ctrl_x<ref: int>(ctrl: qnum, aux: qbit) {
+  quantum_if (ctrl == ref) {
+    X(aux);
+  }
+}
+
+qfunc check_msb<ref: int>(x: qbit[], aux: qbit) {
+  within {
+    invert<lambda() {
+      qft_ns(x);
+    }>();
+  } apply {
+    ctrl_x<ref>(x[0:1], aux);
+  }
+}
+
+qfunc ccmod_add<N: int, a: int>(phi_b: qbit[], c1: qbit, c2: qbit, aux: qbit) {
+  ctrl: qbit[];
+  {c1, c2} -> ctrl;
+  control<lambda() {
+    phase_lad<a>(phi_b);
+  }>(ctrl);
+  invert<lambda() {
+    phase_lad<N>(phi_b);
+  }>();
+  check_msb<1>(phi_b, aux);
+  control<lambda() {
+    phase_lad<N>(phi_b);
+  }>(aux);
+  within {
+    invert<lambda() {
+      control<lambda() {
+        phase_lad<a>(phi_b);
+      }>(ctrl);
+    }>();
+  } apply {
+    check_msb<0>(phi_b, aux);
+  }
+  ctrl -> {c1, c2};
+}
+
+qfunc cmod_mult<N: int, a: int>(b: qbit[], x: qbit[], ctrl: qbit, aux: qbit) {
+  within {
+    qft(b);
+  } apply {
+    repeat<len(x), lambda<index>() {
+      ccmod_add<N, (a * (2 ** index)) % N>(b, x[0 + (index):(0 + (index)) + 1], ctrl, aux);
+    }>();
+  }
+}
+
+qfunc multi_swap(x: qbit[], y: qbit[]) {
+  repeat<min(len(x), len(y)), lambda<index>() {
+    SWAP(x[0 + (index):(0 + (index)) + 1], y[0 + (index):(0 + (index)) + 1]);
+  }>();
+}
+
+qfunc cmod_mult_pair<N: int, a: int>(x: qbit[], ctrl: qbit, aux: qbit) {
+  b: qbit[];
+  allocate<len(x) + 1>(b);
+  cmod_mult<N, a>(b, x, ctrl, aux);
+  control<lambda() {
+    multi_swap(x, b);
+  }>(ctrl);
+  invert<lambda() {
+    cmod_mult<N, mod_inverse(a, N)>(b, x, ctrl, aux);
+  }>();
+  free(b);
+}
+
+qfunc mod_exp_func<N: int, a: int>(x: qbit[], m: qbit[], aux: qbit) {
+  repeat<len(m), lambda<index>() {
+    cmod_mult_pair<N, (a ** (2 ** index)) % N>(x, m[0 + (index):(0 + (index)) + 1], aux);
+  }>();
+}
+
+qfunc main(output x: qbit[], output power: qbit[], output aux: qbit) {
+  allocate<3>(x);
+  allocate<6>(power);
+  allocate<1>(aux);
+  hadamard_transform(power);
+  inplace_prepare_int<1>(x);
+  mod_exp_func<6, 5>(x, power, aux);
+  invert<lambda() {
+    qft(power);
+  }>();
+}

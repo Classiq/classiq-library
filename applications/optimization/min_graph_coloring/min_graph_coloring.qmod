@@ -1,143 +1,7905 @@
-{
-  "functions": [
-    {
-      "name": "main",
-      "param_decls": {
-        "params_list": {
-          "kind": "array",
-          "element_type": {
-            "kind": "real"
-          },
-          "size": 12
-        }
-      },
-      "port_declarations": {
-        "target": {
-          "name": "target",
-          "size": {
-            "expr": "len(get_field(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 10.0)[0], 'pauli'))"
-          },
-          "direction": "output"
-        }
-      },
-      "body": [
-        {
-          "function": "allocate",
-          "positional_args": [
-            {
-              "expr": "len(target)"
-            },
-            {
-              "name": "target"
-            }
-          ]
-        },
-        {
-          "function": "qaoa_penalty",
-          "params": {
-            "hamiltonian": {
-              "expr": "optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 10.0)"
-            },
-            "params_list": {
-              "expr": "params_list"
-            },
-            "num_qubits": {
-              "expr": "len(target)"
-            },
-            "is_st": {
-              "expr": "True"
-            }
-          },
-          "inouts": {
-            "target": {
-              "name": "target"
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "types": [
-    {
-      "name": "MyCombiProblem",
-      "variables": {
-        "x0_0": {
-          "kind": "int"
-        },
-        "x0_1": {
-          "kind": "int"
-        },
-        "x0_2": {
-          "kind": "int"
-        },
-        "x0_3": {
-          "kind": "int"
-        },
-        "x0_4": {
-          "kind": "int"
-        },
-        "x1_0": {
-          "kind": "int"
-        },
-        "x1_1": {
-          "kind": "int"
-        },
-        "x1_2": {
-          "kind": "int"
-        },
-        "x1_3": {
-          "kind": "int"
-        },
-        "x1_4": {
-          "kind": "int"
-        },
-        "x2_0": {
-          "kind": "int"
-        },
-        "x2_1": {
-          "kind": "int"
-        },
-        "x2_2": {
-          "kind": "int"
-        },
-        "x2_3": {
-          "kind": "int"
-        },
-        "x2_4": {
-          "kind": "int"
-        }
-      },
-      "constraints": [
-        {
-          "expr": "Eq(x0_0*x0_4 + x0_0*(x0_1 + x0_3 + x0_4) + x0_1*(x0_0 + x0_3) + x0_2*x0_3 + x0_3*(x0_0 + x0_1 + x0_2) + x1_0*x1_4 + x1_0*(x1_1 + x1_3 + x1_4) + x1_1*(x1_0 + x1_3) + x1_2*x1_3 + x1_3*(x1_0 + x1_1 + x1_2) + x2_0*x2_4 + x2_0*(x2_1 + x2_3 + x2_4) + x2_1*(x2_0 + x2_3) + x2_2*x2_3 + x2_3*(x2_0 + x2_1 + x2_2), 0)"
-        },
-        {
-          "expr": "Eq(x0_0 + x1_0 + x2_0, 1)"
-        },
-        {
-          "expr": "Eq(x0_1 + x1_1 + x2_1, 1)"
-        },
-        {
-          "expr": "Eq(x0_2 + x1_2 + x2_2, 1)"
-        },
-        {
-          "expr": "Eq(x0_3 + x1_3 + x2_3, 1)"
-        },
-        {
-          "expr": "Eq(x0_4 + x1_4 + x2_4, 1)"
-        }
-      ],
-      "objective_type": "Min",
-      "objective_function": {
-        "expr": "-(1 - x0_0)*(1 - x0_1)*(1 - x0_2)*(1 - x0_3)*(1 - x0_4) - (1 - x1_0)*(1 - x1_1)*(1 - x1_2)*(1 - x1_3)*(1 - x1_4) - (1 - x2_0)*(1 - x2_1)*(1 - x2_2)*(1 - x2_3)*(1 - x2_4) + 3"
-      }
-    }
-  ],
-  "classical_execution_code": "\nvqe_result = vqe(\n    hamiltonian=optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 10.0),\n    maximize=False,\n    initial_point=compute_qaoa_initial_point(optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 10.0),6),\n    optimizer=Optimizer.COBYLA,\n    max_iteration=0,\n    tolerance=0.0,\n    step_size=0.0,\n    skip_compute_variance=False,\n    alpha_cvar=0.3\n)\nsolution = get_optimization_solution(get_type(MyCombiProblem), vqe_result, 10.0)\nhamiltonian = optimization_problem_to_hamiltonian(get_type(MyCombiProblem), 10.0)\nsave({'solution': solution, \"vqe_result\": vqe_result, \"hamiltonian\": hamiltonian})\n",
-  "execution_preferences": {
-    "backend_preferences": {
-      "backend_service_provider": "Classiq",
-      "backend_name": "aer_simulator"
-    }
+hamiltonian: PauliTerm[] = [
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 832.9062
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -95.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -95.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -95.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -95.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -95.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -95.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -185.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -185.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -185.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -260.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -260.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -260.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -260.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -260.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -260.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 30.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 25.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 25.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 25.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 50.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 50.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 50.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 50.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 50.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 50.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 45.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 45.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 45.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 45.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 45.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 45.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 14.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 14.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 14.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 14.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 14.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 14.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 19.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 19.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 19.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 19.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 19.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 19.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 89.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 89.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 89.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 89.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 89.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 89.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 109.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 109.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 109.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 109.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 109.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 109.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 124.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 124.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 124.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -10.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -5.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -15.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -15.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -15.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -20.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = -20.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -20.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -20.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -20.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -20.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -40.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -40.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -40.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 5.0
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = 4.9688
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0312
+  },
+  PauliTerm {
+    pauli = [
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::Z,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I,
+      Pauli::I
+    ],
+    coefficient = -0.0312
   }
+];
+
+qfunc main<params_list: real[12]>(output target: qbit[15]) {
+  allocate<len(target)>(target);
+  qaoa_penalty<len(target), params_list, hamiltonian>(target);
 }
+
+cscope ```
+
+vqe_result = vqe(
+hamiltonian=hamiltonian,
+maximize=False,
+initial_point=[0.0, 0.013392079468735527, 0.002678415893747106, 0.010713663574988423, 0.005356831787494212, 0.008035247681241316, 0.008035247681241317, 0.00535683178749421, 0.010713663574988423, 0.002678415893747105, 0.013392079468735527, 0.0],
+optimizer=Optimizer.COBYLA,
+max_iteration=0,
+tolerance=0.0,
+step_size=0.0,
+skip_compute_variance=False,
+alpha_cvar=0.3
+)
+
+save({"vqe_result": vqe_result, "hamiltonian": hamiltonian})
+
+```

@@ -1,0 +1,6 @@
+qfunc prepare_bell_state<state_num: int>(output q: qbit[2]) {
+  allocate<2>(q);
+  inplace_prepare_int<state_num>(q);
+  H(q[0:1]);
+  CX(q[0:1], q[1:2]);
+}

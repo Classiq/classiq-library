@@ -1,0 +1,65 @@
+DOMAIN_SIZE_QCONST: int = 4;
+
+qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
+  res ^= (a + b) <= 2;
+}
+
+qfunc iqae_state_preparation(a: qnum, b: qnum, res: qbit) {
+  reg: qbit[];
+  {a, b, res} -> reg;
+  hadamard_transform(reg[0:4]);
+  reg -> {a, b, res};
+  arith_equation(a, b, res);
+}
+
+qfunc reflection_about_zero(x: qbit[]) {
+  lsb: qbit;
+  msbs: qbit[len(x) - 1];
+  apply_to_all<X>(x);
+  x -> {msbs, lsb};
+  control<lambda() {
+    Z(lsb);
+  }>(msbs);
+  {msbs, lsb} -> x;
+  apply_to_all<X>(x);
+}
+
+qfunc my_diffuser<sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
+  within {
+    invert<lambda() {
+      sp_operand(x);
+    }>();
+  } apply {
+    reflection_about_zero(x);
+  }
+}
+
+qfunc my_grover_operator<oracle_operand: qfunc (arg0: qbit[]), sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
+  oracle_operand(x);
+  my_diffuser<sp_operand>(x);
+  U<0, 0, 0, 3.1416>(x[0:1]);
+}
+
+qfunc my_iqae_algorithm<k: int, oracle_operand: qfunc (arg0: qbit[]), sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
+  sp_operand(x);
+  power<k, lambda() {
+    my_grover_operator<oracle_operand, sp_operand>(x);
+  }>();
+}
+
+qfunc main<k: int>(output ind_reg: qbit) {
+  full_reg: qbit[];
+  allocate<5>(full_reg);
+  my_iqae_algorithm<k, lambda(arg0) {
+    Z(arg0[0 + ((len(arg0)) - 1):(0 + ((len(arg0)) - 1)) + 1]);
+  }, lambda(arg0) {
+    iqae_state_preparation(arg0[0:2], arg0[2:0 + ((len(arg0)) - 1)], arg0[0 + ((len(arg0)) - 1):(0 + ((len(arg0)) - 1)) + 1]);
+  }>(full_reg);
+  state_reg: qbit[4];
+  full_reg -> {state_reg, ind_reg};
+}
+
+cscope ```
+iqae_res = iqae(epsilon=1 / (2 ** DOMAIN_SIZE_QCONST * 2), alpha=0.01)
+save({'iqae_res': iqae_res})
+```
