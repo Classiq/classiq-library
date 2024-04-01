@@ -1,4 +1,14 @@
 // Core library functions
+qfunc molecule_ucc<molecule_problem: MoleculeProblem, excitations: int[]>(qbv: qbit[len(molecule_problem_to_hamiltonian(molecule_problem)[0].pauli)]);
+qfunc molecule_hva<molecule_problem: MoleculeProblem, reps: int>(qbv: qbit[len(molecule_problem_to_hamiltonian(molecule_problem)[0].pauli)]);
+qfunc molecule_hartree_fock<molecule_problem: MoleculeProblem>(qbv: qbit[len(molecule_problem_to_hamiltonian(molecule_problem)[0].pauli)]);
+qfunc fock_hamiltonian_ucc<fock_hamiltonian_problem: FockHamiltonianProblem, excitations: int[]>(qbv: qbit[len(fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli)]);
+qfunc fock_hamiltonian_hva<fock_hamiltonian_problem: FockHamiltonianProblem, reps: int>(qbv: qbit[len(fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli)]);
+qfunc fock_hamiltonian_hartree_fock<fock_hamiltonian_problem: FockHamiltonianProblem>(qbv: qbit[len(fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli)]);
+qfunc log_normal_finance<finance_model: LogNormalModel, finance_function: FinanceFunction>(func_port: qbit[finance_model.num_qubits], obj_port: qbit);
+qfunc gaussian_finance<finance_model: GaussianModel, finance_function: FinanceFunction>(func_port: qbit[((finance_model.num_qubits + len(finance_model.rhos)) + floor(log(sum(finance_model.loss), 2))) + 1], obj_port: qbit);
+qfunc pauli_feature_map<feature_map: QSVMFeatureMapPauli>(qbv: qbit[feature_map.feature_dimension]);
+qfunc bloch_sphere_feature_map<feature_dimension: int>(qbv: qbit[ceiling(feature_dimension / 2)]);
 qfunc H(target: qbit);
 qfunc X(target: qbit);
 qfunc Y(target: qbit);
@@ -43,13 +53,3 @@ qfunc single_pauli_exponent<pauli_string: Pauli[], coefficient: real>(qbv: qbit[
 qfunc suzuki_trotter<pauli_operator: PauliTerm[], evolution_coefficient: real, order: int, repetitions: int>(qbv: qbit[len(pauli_operator[0].pauli)]);
 qfunc qdrift<pauli_operator: PauliTerm[], evolution_coefficient: real, num_qdrift: int>(qbv: qbit[len(pauli_operator[0].pauli)]);
 qfunc exponentiation_with_depth_constraint<pauli_operator: PauliTerm[], evolution_coefficient: real, max_depth: int>(qbv: qbit[len(pauli_operator[0].pauli)]);
-qfunc molecule_ucc<molecule_problem: MoleculeProblem, excitations: int[]>(qbv: qbit[len(molecule_problem_to_hamiltonian(molecule_problem)[0].pauli)]);
-qfunc molecule_hva<molecule_problem: MoleculeProblem, reps: int>(qbv: qbit[len(molecule_problem_to_hamiltonian(molecule_problem)[0].pauli)]);
-qfunc molecule_hartree_fock<molecule_problem: MoleculeProblem>(qbv: qbit[len(molecule_problem_to_hamiltonian(molecule_problem)[0].pauli)]);
-qfunc fock_hamiltonian_ucc<fock_hamiltonian_problem: FockHamiltonianProblem, excitations: int[]>(qbv: qbit[len(fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli)]);
-qfunc fock_hamiltonian_hva<fock_hamiltonian_problem: FockHamiltonianProblem, reps: int>(qbv: qbit[len(fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli)]);
-qfunc fock_hamiltonian_hartree_fock<fock_hamiltonian_problem: FockHamiltonianProblem>(qbv: qbit[len(fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli)]);
-qfunc log_normal_finance<finance_model: LogNormalModel, finance_function: FinanceFunction>(func_port: qbit[finance_model.num_qubits], obj_port: qbit);
-qfunc gaussian_finance<finance_model: GaussianModel, finance_function: FinanceFunction>(func_port: qbit[((finance_model.num_qubits + len(finance_model.rhos)) + floor(log(sum(finance_model.loss), 2))) + 1], obj_port: qbit);
-qfunc pauli_feature_map<feature_map: QSVMFeatureMapPauli>(qbv: qbit[feature_map.feature_dimension]);
-qfunc bloch_sphere_feature_map<feature_dimension: int>(qbv: qbit[ceiling(feature_dimension / 2)]);

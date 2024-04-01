@@ -45,9 +45,9 @@ qfunc my_grover_operator(state: qbit[]) {
   state -> {ind, io};
   good_state_oracle(ind);
   within {
-    invert<lambda() {
+    invert {
       state_loading(io, ind);
-    }>();
+    }
   } apply {
     zero_oracle(io, ind);
   }

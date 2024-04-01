@@ -1,7 +1,7 @@
 qfunc unitary_with_power_logic<pw: int, matrix: real[][]>(target: qbit[]) {
-  power<pw, lambda() {
+  power (pw) {
     unitary<matrix>(target);
-  }>();
+  }
 }
 
 qfunc suzuki_trotter1_with_power_logic<hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real>(target: qbit[]) {
@@ -11,27 +11,27 @@ qfunc suzuki_trotter1_with_power_logic<hamiltonian: PauliTerm[], pw: int, r0: in
 qfunc my_qpe_flexible<unitary_with_power: qfunc <arg0: int>(arg1: qbit[]), precision: int>(state: qbit[], output phase: qbit[precision]) {
   allocate<precision>(phase);
   apply_to_all<H>(phase);
-  repeat<precision, lambda<index>() {
-    control<lambda() {
+  repeat (index: precision) {
+    control (phase[index]) {
       unitary_with_power<2 ** index>(state);
-    }>(phase[0 + (index):(0 + (index)) + 1]);
-  }>();
-  invert<lambda() {
+    }
+  }
+  invert {
     qft(phase);
-  }>();
+  }
 }
 
 qfunc main(output phase_result: qnum<8, False, 8>) {
   state: qbit[];
   prepare_amplitudes<[
-    0.513396396241511,
-    0.451402223282909,
-    0.714366707564118,
-    0.149466987209476
+    0.55653745541481,
+    0.17653302146188,
+    0.629197193488002,
+    0.513042926820719
   ], 0.0>(state);
   phase_array: qbit[];
   my_qpe_flexible<lambda<pw>(arg1) {
-    if<True, lambda() {
+    if (True) {
       unitary_with_power_logic<pw, [
         [
           ((-0.800994193328528) - 0.432184369481798j),
@@ -58,7 +58,7 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
           ((-0.895413431349899) - 0.401691392328609j)
         ]
       ]>(arg1);
-    }, lambda() {
+    } else {
       suzuki_trotter1_with_power_logic<[
         PauliTerm {
           pauli = [Pauli::I, Pauli::I],
@@ -101,7 +101,7 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
           coefficient = 0.09539162
         }
       ], pw, 2, 1.8, -6.283185307179586>(arg1);
-    }>();
+    }
   }, 8>(state, phase_array);
   phase_array -> phase_result;
 }

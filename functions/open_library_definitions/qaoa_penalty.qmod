@@ -1,6 +1,6 @@
 qfunc qaoa_penalty<num_qubits: int, params_list: real[], hamiltonian: PauliTerm[]>(target: qbit[num_qubits]) {
   qaoa_init(target);
-  repeat<len(params_list) / 2, lambda<index>() {
+  repeat (index: len(params_list) / 2) {
     qaoa_layer<params_list[2 * index], params_list[(2 * index) + 1], hamiltonian>(target);
-  }>();
+  }
 }

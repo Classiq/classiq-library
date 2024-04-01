@@ -130,9 +130,9 @@ A part of a QML encoder (see the full algirthm [here](/algorithms/qml/quantum_au
 def angle_encoding(
     exe_params: QParam[List[float]], qbv: Output[QArray[QBit, "len(exe_params)"]]
 ) -> None:
-    allocate(exe_params.len(), qbv)
+    allocate(exe_params.len, qbv)
     repeat(
-        count=exe_params.len(),
+        count=exe_params.len,
         iteration=lambda index: RY(pi * exe_params[index], qbv[index]),
     )
 ```

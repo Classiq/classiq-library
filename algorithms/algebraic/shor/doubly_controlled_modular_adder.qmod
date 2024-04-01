@@ -1,20 +1,20 @@
 qfunc phase_lad<value: int>(phi_b: qbit[]) {
-  repeat<len(phi_b), lambda<index>() {
-    PHASE<qft_const_adder_phase(index, value, len(phi_b))>(phi_b[0 + (index):(0 + (index)) + 1]);
-  }>();
+  repeat (index: len(phi_b)) {
+    PHASE<qft_const_adder_phase(index, value, len(phi_b))>(phi_b[index]);
+  }
 }
 
 qfunc my_qft_step(qbv: qbit[]) {
-  H(qbv[0:1]);
-  repeat<len(qbv) - 1, lambda<index>() {
-    CPHASE<pi / (2 ** (index + 1))>(qbv[0:1], qbv[0 + ((index) + 1):(0 + ((index) + 1)) + 1]);
-  }>();
+  H(qbv[0]);
+  repeat (index: len(qbv) - 1) {
+    CPHASE<pi / (2 ** (index + 1))>(qbv[0], qbv[(index) + 1]);
+  }
 }
 
 qfunc qft_ns(qbv: qbit[]) {
-  repeat<len(qbv), lambda<index>() {
-    my_qft_step(qbv[0 + (index):0 + (len(qbv))]);
-  }>();
+  repeat (index: len(qbv)) {
+    my_qft_step(qbv[index:len(qbv)]);
+  }
 }
 
 qfunc ctrl_x<ref: int>(ctrl: qnum, aux: qbit) {
@@ -25,33 +25,33 @@ qfunc ctrl_x<ref: int>(ctrl: qnum, aux: qbit) {
 
 qfunc check_msb<ref: int>(x: qbit[], aux: qbit) {
   within {
-    invert<lambda() {
+    invert {
       qft_ns(x);
-    }>();
+    }
   } apply {
-    ctrl_x<ref>(x[0:1], aux);
+    ctrl_x<ref>(x[0], aux);
   }
 }
 
 qfunc ccmod_add<N: int, a: int>(phi_b: qbit[], c1: qbit, c2: qbit, aux: qbit) {
   ctrl: qbit[];
   {c1, c2} -> ctrl;
-  control<lambda() {
+  control (ctrl) {
     phase_lad<a>(phi_b);
-  }>(ctrl);
-  invert<lambda() {
+  }
+  invert {
     phase_lad<N>(phi_b);
-  }>();
+  }
   check_msb<1>(phi_b, aux);
-  control<lambda() {
+  control (aux) {
     phase_lad<N>(phi_b);
-  }>(aux);
+  }
   within {
-    invert<lambda() {
-      control<lambda() {
+    invert {
+      control (ctrl) {
         phase_lad<a>(phi_b);
-      }>(ctrl);
-    }>();
+      }
+    }
   } apply {
     check_msb<0>(phi_b, aux);
   }
@@ -63,11 +63,11 @@ qfunc main(output b: qnum, output ctrl: qbit[], output aux: qbit) {
   allocate<2>(ctrl);
   allocate<1>(aux);
   inplace_prepare_int<8>(b);
-  X(ctrl[0:1]);
-  X(ctrl[1:2]);
+  X(ctrl[0]);
+  X(ctrl[1]);
   within {
     qft(b);
   } apply {
-    ccmod_add<15, 9>(b, ctrl[0:1], ctrl[1:2], aux);
+    ccmod_add<15, 9>(b, ctrl[0], ctrl[1], aux);
   }
 }
