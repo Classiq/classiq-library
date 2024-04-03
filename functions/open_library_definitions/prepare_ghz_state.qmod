@@ -1,13 +1,13 @@
 qfunc prepare_ghz_state<size: int>(output q: qbit[]) {
   allocate<size>(q);
-  H(q[0:1]);
-  repeat<floor(log(size - 1, 2)) + 1, lambda<step>() {
-    repeat<2 ** step, lambda<control_index>() {
-      if<size <= (control_index + (2 ** step)), lambda() {
-        IDENTITY(q[0:1]);
-      }, lambda() {
-        CX(q[0 + (control_index):(0 + (control_index)) + 1], q[0 + ((control_index) + (2 ** (step))):(0 + ((control_index) + (2 ** (step)))) + 1]);
-      }>();
-    }>();
-  }>();
+  H(q[0]);
+  repeat (step: floor(log(size - 1, 2)) + 1) {
+    repeat (control_index: 2 ** step) {
+      if (size <= (control_index + (2 ** step))) {
+        IDENTITY(q[0]);
+      } else {
+        CX(q[control_index], q[(control_index) + (2 ** (step))]);
+      };
+    }
+  }
 }

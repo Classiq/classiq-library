@@ -17,18 +17,18 @@ qfunc reflection_about_zero(x: qbit[]) {
   msbs: qbit[len(x) - 1];
   apply_to_all<X>(x);
   x -> {msbs, lsb};
-  control<lambda() {
+  control (msbs) {
     Z(lsb);
-  }>(msbs);
+  }
   {msbs, lsb} -> x;
   apply_to_all<X>(x);
 }
 
 qfunc my_diffuser<sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
   within {
-    invert<lambda() {
+    invert {
       sp_operand(x);
-    }>();
+    }
   } apply {
     reflection_about_zero(x);
   }
@@ -37,23 +37,23 @@ qfunc my_diffuser<sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
 qfunc my_grover_operator<oracle_operand: qfunc (arg0: qbit[]), sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
   oracle_operand(x);
   my_diffuser<sp_operand>(x);
-  U<0, 0, 0, 3.1416>(x[0:1]);
+  U<0, 0, 0, 3.1416>(x[0]);
 }
 
 qfunc my_iqae_algorithm<k: int, oracle_operand: qfunc (arg0: qbit[]), sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
   sp_operand(x);
-  power<k, lambda() {
+  power (k) {
     my_grover_operator<oracle_operand, sp_operand>(x);
-  }>();
+  }
 }
 
 qfunc main<k: int>(output ind_reg: qbit) {
   full_reg: qbit[];
   allocate<5>(full_reg);
   my_iqae_algorithm<k, lambda(arg0) {
-    Z(arg0[0 + ((len(arg0)) - 1):(0 + ((len(arg0)) - 1)) + 1]);
+    Z(arg0[(len(arg0)) - 1]);
   }, lambda(arg0) {
-    iqae_state_preparation(arg0[0:2], arg0[2:0 + ((len(arg0)) - 1)], arg0[0 + ((len(arg0)) - 1):(0 + ((len(arg0)) - 1)) + 1]);
+    iqae_state_preparation(arg0[0:2], arg0[2:(len(arg0)) - 1], arg0[(len(arg0)) - 1]);
   }>(full_reg);
   state_reg: qbit[4];
   full_reg -> {state_reg, ind_reg};

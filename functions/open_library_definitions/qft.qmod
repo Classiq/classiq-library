@@ -1,8 +1,8 @@
 qfunc qft(target: qbit[]) {
-  repeat<len(target) / 2, lambda<index>() {
+  repeat (index: len(target) / 2) {
     SWAP(target[index], target[len(target)-1-index]);
-  }>();
-  repeat<len(target), lambda<index>() {
+  }
+  repeat (index: len(target)) {
     qft_step(target[index:len(target)]);
-  }>();
+  }
 }

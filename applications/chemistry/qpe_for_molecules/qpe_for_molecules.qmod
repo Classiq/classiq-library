@@ -1,13 +1,13 @@
 qfunc my_flexible_qpe<unitary_with_power: qfunc <arg0: int>()>(phase: qbit[]) {
   apply_to_all<H>(phase);
-  repeat<len(phase), lambda<index>() {
-    control<lambda() {
+  repeat (index: len(phase)) {
+    control (phase[index]) {
       unitary_with_power<2 ** index>();
-    }>(phase[0 + (index):(0 + (index)) + 1]);
-  }>();
-  invert<lambda() {
+    }
+  }
+  invert {
     qft(phase);
-  }>();
+  }
 }
 
 qfunc main(output reg: qbit[], output phase: qnum) {

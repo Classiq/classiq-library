@@ -1,0 +1,24 @@
+qfunc prepare_minus(output target: qbit) {
+  allocate<1>(target);
+  X(target);
+  H(target);
+}
+
+qfunc oracle_function(target: qbit, x: qnum) {
+  target ^= x == 0;
+}
+
+qfunc oracle_phase_kickback(x: qnum) {
+  target: qbit;
+  within {
+    prepare_minus(target);
+  } apply {
+    oracle_function(target, x);
+  }
+}
+
+qfunc main(output x: qnum) {
+  allocate<4>(x);
+  hadamard_transform(x);
+  oracle_phase_kickback(x);
+}
