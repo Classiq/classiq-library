@@ -5,7 +5,7 @@
     <img src="README_resources/classiq-logo.svg" width="300" height="150">
 </div>
 
-# Classiq
+# Classiq.
 
 Your entry-point for creating & running quantum programs.
 
