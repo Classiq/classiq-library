@@ -38,6 +38,8 @@ If you'd rather work programmatically, using Python, Classiq also provides an SD
 pip install classiq
 ```
 
+Please note that the latest Classiq SDK for Python doesn't work in Python 3.12 yet. Please refer to [Issue #17](https://github.com/Classiq/classiq-library/issues/17).
+
 ## Running This Repository's Demos
 
 This repository has 2 kinds of demos: `.qmod` and `.ipynb`.
