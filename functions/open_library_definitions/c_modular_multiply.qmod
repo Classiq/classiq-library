@@ -1,0 +1,9 @@
+qfunc c_modular_multiply<n: int, a: int>(b: qbit[], x: qbit[], ctrl: qbit, aux: qbit) {
+  within {
+    qft(b);
+  } apply {
+    repeat (index: x.len) {
+      cc_modular_add<n, (a * (2 ** index)) % n>(b, x[index], ctrl, aux);
+    }
+  }
+}

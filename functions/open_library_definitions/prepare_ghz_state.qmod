@@ -6,8 +6,8 @@ qfunc prepare_ghz_state<size: int>(output q: qbit[]) {
       if (size <= (control_index + (2 ** step))) {
         IDENTITY(q[0]);
       } else {
-        CX(q[control_index], q[(control_index) + (2 ** (step))]);
-      };
+        CX(q[control_index], q[control_index + (2 ** step)]);
+      }
     }
   }
 }

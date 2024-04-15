@@ -1,5 +1,5 @@
 qfunc main<t: real[12]>(output qbv: qbit[]) {
-  allocate<len(fock_hamiltonian_problem_to_hamiltonian(FockHamiltonianProblem {
+  allocate<fock_hamiltonian_problem_to_hamiltonian(FockHamiltonianProblem {
     mapping = FermionMapping::JORDAN_WIGNER,
     z2_symmetries = False,
     terms = [
@@ -99,7 +99,7 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
       }
     ],
     num_particles = [1, 1]
-  })[0].pauli)>(qbv);
+  })[0].pauli.len>(qbv);
   full_hea<4, [0, 1, 0], t, [[0, 1], [1, 2], [2, 3]], 3, [lambda<angle>(q) {
     X(q);
   }, lambda<angle>(q) {

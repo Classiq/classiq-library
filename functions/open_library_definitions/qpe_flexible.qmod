@@ -2,7 +2,7 @@ qfunc qpe_flexible<unitary_with_power: qfunc <arg0: int>()>(phase: qnum) {
   phase_array: qbit[];
   phase -> phase_array;
   apply_to_all<H>(phase_array);
-  repeat (index: len(phase_array)) {
+  repeat (index: phase_array.len) {
     control (phase_array[index]) {
       unitary_with_power<2 ** index>();
     }

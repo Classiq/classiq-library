@@ -1,0 +1,5 @@
+qfunc qft_no_swap(qbv: qbit[]) {
+  repeat (index: qbv.len) {
+    qft_step(qbv[index:qbv.len]);
+  }
+}

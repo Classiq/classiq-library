@@ -1,6 +1,6 @@
 qfunc my_flexible_qpe<unitary_with_power: qfunc <arg0: int>()>(phase: qbit[]) {
   apply_to_all<H>(phase);
-  repeat (index: len(phase)) {
+  repeat (index: phase.len) {
     control (phase[index]) {
       unitary_with_power<2 ** index>();
     }

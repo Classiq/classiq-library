@@ -1,5 +1,5 @@
 qfunc prepare_exponential_state<rate: int>(q: qbit[]) {
-  repeat (i: len(q)) {
+  repeat (i: q.len) {
     RY<2.0 * atan(exp(((-rate) * (2.0 ** i)) / 2.0))>(q[i]);
   }
 }

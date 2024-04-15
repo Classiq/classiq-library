@@ -1,0 +1,8 @@
+qfunc modular_exp<n: int, a: int>(x: qbit[], power: qbit[]) {
+  aux: qbit;
+  allocate<1>(aux);
+  repeat (index: power.len) {
+    inplace_c_modular_multiply<n, (a ** (2 ** index)) % n>(x, power[index], aux);
+  }
+  free(aux);
+}

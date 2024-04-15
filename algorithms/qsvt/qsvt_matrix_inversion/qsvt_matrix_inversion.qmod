@@ -11,7 +11,7 @@ qfunc qsvt_step<phase_seq: real[], num_qubits: int, index: int, proj_cnot_1: qfu
   projector_controlled_phase<phase_seq[2 * index], proj_cnot_1>(qbv_reg, qbv_aux);
   u(qbv_reg);
   projector_controlled_phase<phase_seq[(2 * index) + 1], proj_cnot_2>(qbv_reg, qbv_aux);
-  if (((2 * index) + 2) == len(phase_seq)) {
+  if (((2 * index) + 2) == phase_seq.len) {
     IDENTITY(qbv_reg);
   } else {
     invert {
@@ -25,7 +25,7 @@ qfunc qsvt<num_qubits: int, phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[nu
   H(qbv_aux);
   qbv: qbit[];
   {qbv_reg, qbv_aux} -> qbv;
-  repeat (index: len(phase_seq) / 2) {
+  repeat (index: phase_seq.len / 2) {
     qsvt_step<phase_seq, num_qubits, index, proj_cnot_1, proj_cnot_2, u>(qbv);
   }
   qbv -> {qbv_reg, qbv_aux};

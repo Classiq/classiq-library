@@ -1,0 +1,24 @@
+qfunc discrete_log_oracle<g: int, x: int, N: int, order: int>(x1: qbit[], x2: qbit[], output func_res: qbit[]) {
+  allocate<ceiling(log(N, 2))>(func_res);
+  inplace_prepare_int<1>(func_res);
+  modular_exp<N, x>(func_res, x1);
+  modular_exp<N, g>(func_res, x2);
+}
+
+qfunc discrete_log<g: int, x: int, N: int, order: int>(output x1: qbit[], output x2: qbit[], output func_res: qbit[]) {
+  allocate<ceiling(log(order, 2))>(x1);
+  allocate<ceiling(log(order, 2))>(x2);
+  hadamard_transform(x1);
+  hadamard_transform(x2);
+  discrete_log_oracle<g, x, N, order>(x1, x2, func_res);
+  invert {
+    qft(x1);
+  }
+  invert {
+    qft(x2);
+  }
+}
+
+qfunc main(output x1: qnum, output x2: qnum, output func_res: qnum) {
+  discrete_log<3, 2, 5, 4>(x1, x2, func_res);
+}

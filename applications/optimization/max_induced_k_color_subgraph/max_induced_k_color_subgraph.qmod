@@ -6700,8 +6700,8 @@ hamiltonian: PauliTerm[] = [
 ];
 
 qfunc main<params_list: real[16]>(output target: qbit[12]) {
-  allocate<len(target)>(target);
-  qaoa_penalty<len(target), params_list, hamiltonian>(target);
+  allocate<target.len>(target);
+  qaoa_penalty<target.len, params_list, hamiltonian>(target);
 }
 
 cscope ```

@@ -1,18 +1,18 @@
 qfunc full_hea<num_qubits: int, is_parametrized: int[], angle_params: real[], connectivity_map: int[][], reps: int, operands_1qubit: qfunc[] <angle: real>(q: qbit), operands_2qubit: qfunc[] <angle: real>(q1: qbit, q2: qbit)>(x: qbit[num_qubits]) {
   repeat (r: reps) {
-    repeat (i1: len(operands_1qubit)) {
+    repeat (i1: operands_1qubit.len) {
       repeat (index: num_qubits) {
         if (is_parametrized[i1] == 1) {
-          operands_1qubit[i1]<angle_params[(sum(is_parametrized[0:i1]) + floor((len(angle_params) / reps) * r)) + index]>(x[index]);
+          operands_1qubit[i1]<angle_params[(sum(is_parametrized[0:i1]) + floor((angle_params.len / reps) * r)) + index]>(x[index]);
         } else {
           operands_1qubit[i1]<0>(x[index]);
         }
       }
     }
-    repeat (i2: len(operands_2qubit)) {
-      repeat (index: len(connectivity_map)) {
-        if (is_parametrized[len(operands_1qubit) + i2] == 1) {
-          operands_2qubit[i2]<angle_params[(((num_qubits * sum(is_parametrized[0:len(operands_1qubit)])) + ((+len(connectivity_map)) * sum(is_parametrized[len(operands_1qubit):(len(operands_1qubit) + i2)]))) + floor((len(angle_params) / reps) * r)) + index]>(x[connectivity_map[index][0]], x[connectivity_map[index][1]]);
+    repeat (i2: operands_2qubit.len) {
+      repeat (index: connectivity_map.len) {
+        if (is_parametrized[operands_1qubit.len + i2] == 1) {
+          operands_2qubit[i2]<angle_params[(((num_qubits * sum(is_parametrized[0:operands_1qubit.len])) + ((+connectivity_map.len) * sum(is_parametrized[operands_1qubit.len:(operands_1qubit.len + i2)]))) + floor((angle_params.len / reps) * r)) + index]>(x[connectivity_map[index][0]], x[connectivity_map[index][1]]);
         } else {
           operands_2qubit[i2]<0>(x[connectivity_map[index][0]], x[connectivity_map[index][1]]);
         }

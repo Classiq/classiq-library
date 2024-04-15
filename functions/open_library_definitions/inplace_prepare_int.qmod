@@ -1,9 +1,9 @@
 qfunc inplace_prepare_int<value: int>(target: qbit[]) {
-  repeat (index: len(target)) {
+  repeat (index: target.len) {
     if ((floor(value / (2 ** index)) % 2) == 1) {
       X(target[index]);
     } else {
       IDENTITY(target[index]);
-    };
+    }
   }
 }

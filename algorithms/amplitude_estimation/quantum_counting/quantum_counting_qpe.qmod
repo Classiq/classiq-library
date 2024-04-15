@@ -15,7 +15,7 @@ qfunc arith_oracle(a: qnum, b: qnum) {
 
 qfunc reflection_about_zero(x: qbit[]) {
   lsb: qbit;
-  msbs: qbit[len(x) - 1];
+  msbs: qbit[x.len - 1];
   apply_to_all<X>(x);
   x -> {msbs, lsb};
   control (msbs) {
@@ -48,7 +48,7 @@ qfunc main(output phase_reg: qnum) {
   hadamard_transform(state_reg);
   qpe<lambda() {
     my_grover_operator<lambda(arg0) {
-      arith_oracle(arg0[0:2], arg0[2:len(arg0)]);
+      arith_oracle(arg0[0:2], arg0[2:arg0.len]);
     }, lambda(arg0) {
       hadamard_transform(arg0);
     }>(state_reg);

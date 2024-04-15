@@ -1,5 +1,5 @@
 qfunc main(output qbv: qbit[]) {
-  allocate<len(molecule_problem_to_hamiltonian(MoleculeProblem {
+  allocate<molecule_problem_to_hamiltonian(MoleculeProblem {
     mapping = FermionMapping::JORDAN_WIGNER,
     z2_symmetries = False,
     molecule = Molecule {
@@ -26,7 +26,7 @@ qfunc main(output qbv: qbit[]) {
     },
     freeze_core = True,
     remove_orbitals = []
-  })[0].pauli)>(qbv);
+  })[0].pauli.len>(qbv);
   molecule_hartree_fock<MoleculeProblem {
     mapping = FermionMapping::JORDAN_WIGNER,
     z2_symmetries = False,

@@ -6,7 +6,7 @@ qfunc qsvt_step<phase_seq: real[], index: int, proj_ctrl_phase_1: qfunc <arg0: r
   proj_ctrl_phase_1<phase_seq[2 * index]>(qbv_reg, qbv_aux);
   u(qbv_reg);
   proj_ctrl_phase_2<phase_seq[(2 * index) + 1]>(qbv_reg, qbv_aux);
-  if (((2 * index) + 2) == len(phase_seq)) {
+  if (((2 * index) + 2) == phase_seq.len) {
     IDENTITY(qbv_reg);
   } else {
     invert {
@@ -17,7 +17,7 @@ qfunc qsvt_step<phase_seq: real[], index: int, proj_ctrl_phase_1: qfunc <arg0: r
 
 qfunc qsvt<phase_seq: real[], proj_ctrl_phase_1: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), proj_ctrl_phase_2: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], qbv_aux: qbit) {
   H(qbv_aux);
-  repeat (index: len(phase_seq) / 2) {
+  repeat (index: phase_seq.len / 2) {
     qsvt_step<phase_seq, index, proj_ctrl_phase_1, proj_ctrl_phase_2, u>(qbv_reg, qbv_aux);
   }
   H(qbv_aux);

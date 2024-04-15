@@ -33,14 +33,14 @@ qfunc zero_oracle(x: qnum, ind: qbit) {
   within {
     prepare_minus(ind);
   } apply {
-    quantum_if (x == 0) {
+    control (x == 0) {
       X(ind);
     }
   }
 }
 
 qfunc my_grover_operator(state: qbit[]) {
-  io: qbit[len(state) - 1];
+  io: qbit[state.len - 1];
   ind: qbit;
   state -> {ind, io};
   good_state_oracle(ind);

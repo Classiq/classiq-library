@@ -1,5 +1,5 @@
 qfunc bv_predicate<a: int>(x: qbit[], res: qbit) {
-  repeat (i: len(x)) {
+  repeat (i: x.len) {
     if ((floor(a / (2 ** i)) % 2) == 1) {
       CX(x[i], res);
     } else {

@@ -1,5 +1,5 @@
 qfunc qaoa_init(target: qbit[]) {
-  repeat (index: len(target)) {
+  repeat (index: target.len) {
     H(target[index]);
   }
 }

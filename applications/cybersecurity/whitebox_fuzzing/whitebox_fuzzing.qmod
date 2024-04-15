@@ -23,9 +23,9 @@ qfunc my_oracle<predicate: qfunc (arg0: qbit)>() {
 }
 
 qfunc zero_predicate(x: qnum, y: qnum, res: qbit) {
-  joined: qnum<len(x) + len(y), False, 0>;
+  joined: qnum<x.len + y.len, False, 0>;
   {x, y} -> joined;
-  quantum_if (joined == 0) {
+  control (joined == 0) {
     X(res);
   }
   joined -> {x, y};
