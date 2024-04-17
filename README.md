@@ -2,7 +2,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/classiq)
 
 <div align="center">
-    <img src="README_resources/classiq-logo.svg" width="300" height="150">
+    <img src="README_resources/company (1).gif" width="300" height="300">
 </div>
 
 # Classiq
