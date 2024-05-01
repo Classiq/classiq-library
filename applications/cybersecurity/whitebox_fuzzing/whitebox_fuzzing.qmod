@@ -23,9 +23,9 @@ qfunc my_oracle<predicate: qfunc (arg0: qbit)>() {
 }
 
 qfunc zero_predicate(x: qnum, y: qnum, res: qbit) {
-  joined: qnum<len(x) + len(y), False, 0>;
+  joined: qnum<x.len + y.len, False, 0>;
   {x, y} -> joined;
-  quantum_if (joined == 0) {
+  control (joined == 0) {
     X(res);
   }
   joined -> {x, y};
@@ -33,9 +33,9 @@ qfunc zero_predicate(x: qnum, y: qnum, res: qbit) {
 
 qfunc my_diffuser<sp_operand: qfunc (arg0: qnum, arg1: qnum)>(x: qnum, y: qnum) {
   within {
-    invert<lambda() {
+    invert {
       sp_operand(x, y);
-    }>();
+    }
   } apply {
     my_oracle<lambda(arg0) {
       zero_predicate(x, y, arg0);
@@ -52,7 +52,7 @@ qfunc main(output x: qnum, output y: qnum) {
   allocate_num<6, False, 0>(x);
   allocate_num<6, False, 0>(y);
   my_sp(x, y);
-  power<4, lambda() {
+  power (4) {
     my_grover_operator<lambda() {
       my_oracle<lambda(arg0) {
         my_predicate(x, y, arg0);
@@ -62,5 +62,5 @@ qfunc main(output x: qnum, output y: qnum) {
         my_sp(arg0, arg1);
       }>(x, y);
     }>();
-  }>();
+  }
 }

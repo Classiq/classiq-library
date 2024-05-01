@@ -1,0 +1,12 @@
+qfunc inplace_c_modular_multiply<n: int, a: int>(x: qbit[], ctrl: qbit, aux: qbit) {
+  b: qbit[];
+  allocate<x.len + 1>(b);
+  c_modular_multiply<n, a>(b, x, ctrl, aux);
+  control (ctrl) {
+    multiswap(x, b);
+  }
+  invert {
+    c_modular_multiply<n, mod_inverse(a, n)>(b, x, ctrl, aux);
+  }
+  free(b);
+}

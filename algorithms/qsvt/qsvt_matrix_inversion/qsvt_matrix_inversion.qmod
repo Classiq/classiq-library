@@ -11,13 +11,13 @@ qfunc qsvt_step<phase_seq: real[], num_qubits: int, index: int, proj_cnot_1: qfu
   projector_controlled_phase<phase_seq[2 * index], proj_cnot_1>(qbv_reg, qbv_aux);
   u(qbv_reg);
   projector_controlled_phase<phase_seq[(2 * index) + 1], proj_cnot_2>(qbv_reg, qbv_aux);
-  if<((2 * index) + 2) == len(phase_seq), lambda() {
+  if (((2 * index) + 2) == phase_seq.len) {
     IDENTITY(qbv_reg);
-  }, lambda() {
-    invert<lambda() {
+  } else {
+    invert {
       u(qbv_reg);
-    }>();
-  }>();
+    }
+  }
   {qbv_reg, qbv_aux} -> qbv;
 }
 
@@ -25,9 +25,9 @@ qfunc qsvt<num_qubits: int, phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[nu
   H(qbv_aux);
   qbv: qbit[];
   {qbv_reg, qbv_aux} -> qbv;
-  repeat<len(phase_seq) / 2, lambda<index>() {
+  repeat (index: phase_seq.len / 2) {
     qsvt_step<phase_seq, num_qubits, index, proj_cnot_1, proj_cnot_2, u>(qbv);
-  }>();
+  }
   qbv -> {qbv_reg, qbv_aux};
   H(qbv_aux);
 }
@@ -35,13 +35,13 @@ qfunc qsvt<num_qubits: int, phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[nu
 qfunc qsvt_inversion<num_qubits: int, phase_seq: real[], u: qfunc (arg0: qbit[num_qubits])>(qbv_reg: qbit[num_qubits], output qbv_aux: qbit) {
   allocate<1>(qbv_aux);
   qsvt<num_qubits, phase_seq, lambda(arg0, arg1) {
-    X(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1]);
-    CX(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1], arg1);
-    X(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1]);
+    X(arg0[(num_qubits) - 1]);
+    CX(arg0[(num_qubits) - 1], arg1);
+    X(arg0[(num_qubits) - 1]);
   }, lambda(arg0, arg1) {
-    X(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1]);
-    CX(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1], arg1);
-    X(arg0[0 + ((num_qubits) - 1):(0 + ((num_qubits) - 1)) + 1]);
+    X(arg0[(num_qubits) - 1]);
+    CX(arg0[(num_qubits) - 1], arg1);
+    X(arg0[(num_qubits) - 1]);
   }, u>(qbv_reg, qbv_aux);
 }
 

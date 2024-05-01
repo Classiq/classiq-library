@@ -1,0 +1,7 @@
+qfunc main() {
+  q_t: qbit;
+  allocate<1>(q_t);
+  q_c: qbit;
+  allocate<1>(q_c);
+  CRX<1>(q_c, q_t);
+}

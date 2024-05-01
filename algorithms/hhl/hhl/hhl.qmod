@@ -4,7 +4,7 @@ qfunc suzuki_trotter1_with_power_logic<hamiltonian: PauliTerm[], pw: int, r0: in
 
 qfunc simple_eig_inv(phase: qnum, output indicator: qbit) {
   allocate<1>(indicator);
-  indicator *= (1 / (2 ** len(phase))) / phase;
+  indicator *= (1 / (2 ** phase.len)) / phase;
 }
 
 qfunc my_matrix_inversion_flexible<unitary_with_power: qfunc <arg0: int>(arg1: qbit[]), precision: int>(state: qbit[], output indicator: qbit) {

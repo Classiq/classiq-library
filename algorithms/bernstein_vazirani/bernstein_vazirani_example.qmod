@@ -1,11 +1,11 @@
 qfunc bv_predicate<a: int>(x: qbit[], res: qbit) {
-  repeat<len(x), lambda<i>() {
-    if<(floor(a / (2 ** i)) % 2) == 1, lambda() {
-      CX(x[0 + (i):(0 + (i)) + 1], res);
-    }, lambda() {
+  repeat (i: x.len) {
+    if ((floor(a / (2 ** i)) % 2) == 1) {
+      CX(x[i], res);
+    } else {
       IDENTITY(res);
-    }>();
-  }>();
+    }
+  }
 }
 
 qfunc bv_function<a: int>(x: qbit[]) {

@@ -38,6 +38,8 @@ If you'd rather work programmatically, using Python, Classiq also provides an SD
 pip install classiq
 ```
 
+Please note that the latest Classiq SDK for Python doesn't work in Python 3.12 yet. Please refer to [Issue #17](https://github.com/Classiq/classiq-library/issues/17).
+
 ## Running This Repository's Demos
 
 This repository has 2 kinds of demos: `.qmod` and `.ipynb`.
@@ -93,13 +95,13 @@ def main(res: Output[QBit]):
     X(res)
 ```
 
-The 1st line states that the function will be a quantum one. [Further documentation](https://docs.classiq.io/latest/user-guide/platform/qmod/python/functions/).
+The 1st line states that the function will be a quantum one. [Further documentation](https://docs.classiq.io/latest/user-guide/platform/qmod/language-reference/functions/).
 
-The 2nd line defines the type of the output. [Further examples on types](https://docs.classiq.io/latest/user-guide/platform/qmod/python/types/)
+The 2nd line defines the type of the output. [Further examples on types](https://docs.classiq.io/latest/user-guide/platform/qmod/language-reference/quantum-types/)
 
-The 3rd line allocates several qubits (in this example, only 1) in this quantum variable. [Further details on allocate](https://docs.classiq.io/latest/user-guide/platform/qmod/python/quantum-expressions/)
+The 3rd line allocates several qubits (in this example, only 1) in this quantum variable. [Further details on allocate](https://docs.classiq.io/latest/user-guide/platform/qmod/language-reference/quantum-variables/)
 
-The 4th line applies an `X` operator on the quantum variable. [Further details on quantum operators](https://docs.classiq.io/latest/user-guide/platform/qmod/python/operators/)
+The 4th line applies an `X` operator on the quantum variable. [Further details on quantum operators](https://docs.classiq.io/latest/user-guide/platform/qmod/language-reference/operators/)
 
 ### More Examples
 
@@ -127,12 +129,10 @@ A part of a QML encoder (see the full algirthm [here](/algorithms/qml/quantum_au
 
 ```python
 @qfunc
-def angle_encoding(
-    exe_params: QParam[List[float]], qbv: Output[QArray[QBit, "len(exe_params)"]]
-) -> None:
-    allocate(exe_params.len(), qbv)
+def angle_encoding(exe_params: CArray[CReal], qbv: Output[QArray[QBit]]) -> None:
+    allocate(exe_params.len, qbv)
     repeat(
-        count=exe_params.len(),
+        count=exe_params.len,
         iteration=lambda index: RY(pi * exe_params[index], qbv[index]),
     )
 ```

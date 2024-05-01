@@ -1,0 +1,7 @@
+qfunc main(output a: qnum, output b: qnum, output res: qnum) {
+  allocate_num<5, True, 0>(a);
+  allocate_num<3, False, 0>(b);
+  inplace_prepare_int<4>(a);
+  inplace_prepare_int<5>(b);
+  res = a | b;
+}
