@@ -1,0 +1,16 @@
+[tool.pytest.ini_options]
+python_files = "test_*.py"
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+
+known_classiq = "classiq"
+sections = [
+    "FUTURE",
+    "STDLIB",
+    "THIRDPARTY",
+    "FIRSTPARTY",
+    "CLASSIQ",
+    "LOCALFOLDER",
+]
