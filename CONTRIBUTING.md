@@ -7,11 +7,11 @@ We love your input! We want to make contributing to this project as easy and tra
 - Reporting a bug 🐞
 - Discussing the current state of the code
 
-## We Develop with Github
+## We Develop with GitHub
 
 We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
 
-## We Use [Github Flow](https://guides.github.com/introduction/flow/index.html), So All Code Changes Happen Through Pull Requests
+## We Use [GitHub Flow](https://guides.github.com/introduction/flow/index.html), So All Code Changes Happen Through Pull Requests
 
 Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
 
@@ -24,7 +24,7 @@ Pull requests are the best way to propose changes to the codebase. We actively w
 
 In short, when you submit code changes, your submissions are understood to be under the same [MIT License](http://opensource.org/licenses/MIT) that covers the project. Feel free to contact the maintainers if that's a concern.
 
-## Report bugs using Github's [issues](https://github.com/[YourRepo]/issues)
+## Report bugs using GitHub's [issues](https://github.com/[YourRepo]/issues)
 
 We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/[YourRepo]/issues/new); it's that easy!
 
