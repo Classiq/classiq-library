@@ -1,0 +1,5 @@
+qfunc projector_controlled_phase<phase: real, proj_cnot: qfunc (arg0: qbit[], arg1: qbit)>(qvar: qbit[], aux: qbit) {
+  proj_cnot(qvar, aux);
+  RZ<phase>(aux);
+  proj_cnot(qvar, aux);
+}

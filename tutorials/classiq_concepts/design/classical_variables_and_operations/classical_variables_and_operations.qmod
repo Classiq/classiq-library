@@ -1,0 +1,12 @@
+qfunc apply_condition<index: int>(qubit: qbit) {
+  if ((index % 2) == 0) {
+    X(qubit);
+  }
+}
+
+qfunc main(output x: qbit[]) {
+  allocate<10>(x);
+  repeat (index: x.len) {
+    apply_condition<index>(x[index]);
+  }
+}

@@ -1,0 +1,8 @@
+qfunc qsvt_step<phase_seq: real[], index: int, proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit) {
+  u(qvar);
+  projector_controlled_phase<phase_seq[(2 * index) + 1], proj_cnot_2>(qvar, aux);
+  invert {
+    u(qvar);
+  }
+  projector_controlled_phase<phase_seq[(2 * index) + 2], proj_cnot_1>(qvar, aux);
+}

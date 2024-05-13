@@ -1,0 +1,37 @@
+qfunc moving_one_hamming_dist<pos: int>(x: qbit[]) {
+  X(x[pos]);
+}
+
+qfunc discrete_quantum_walk<time: int, coin_flip_qfunc: qfunc (arg0: qnum), walks_qfuncs: qfunc[] ()>(coin_state: qnum) {
+  power (time) {
+    coin_flip_qfunc(coin_state);
+    repeat (i: walks_qfuncs.len) {
+      control (coin_state == i) {
+        walks_qfuncs[i]();
+      }
+    }
+  }
+}
+
+qfunc main<t: int>(output x: qbit[]) {
+  allocate<4>(x);
+  coin: qbit[];
+  prepare_state<[0.25, 0.25, 0.25, 0.25], 0.0>(coin);
+  discrete_quantum_walk<t, lambda(arg0) {
+    grover_diffuser<lambda(arg0) {
+      inplace_prepare_state<[0.25, 0.25, 0.25, 0.25], 0.0>(arg0);
+    }>(arg0);
+  }, [lambda() {
+    moving_one_hamming_dist<0>(x);
+  }, lambda() {
+    moving_one_hamming_dist<1>(x);
+  }, lambda() {
+    moving_one_hamming_dist<2>(x);
+  }, lambda() {
+    moving_one_hamming_dist<3>(x);
+  }]>(coin);
+}
+
+cscope ```
+save({'run': sample({'t': 4})})
+```
