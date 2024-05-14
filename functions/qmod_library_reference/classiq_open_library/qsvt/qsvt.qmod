@@ -1,0 +1,39 @@
+qfunc projector_cnot(reg: qnum, aux: qbit) {
+  control (reg == 0) {
+    X(aux);
+  }
+}
+
+qfunc u_sqrt(a: qnum, ref: qnum, res: qbit) {
+  hadamard_transform(ref);
+  res ^= a <= ref;
+}
+
+qfunc qsvt_sqrt_polynomial<qsvt_phases: real[]>(state: qnum, ref: qnum, ind: qbit, qsvt_aux: qbit) {
+  full_reg: qbit[];
+  {ind, ref, state} -> full_reg;
+  qsvt<qsvt_phases, lambda(arg0, arg1) {
+    projector_cnot(arg0[0:5], arg1);
+  }, lambda(arg0, arg1) {
+    projector_cnot(arg0[0], arg1);
+  }, lambda(arg0) {
+    u_sqrt(arg0[5:arg0.len], arg0[1:5], arg0[0]);
+  }>(full_reg, qsvt_aux);
+  full_reg -> {ind, ref, state};
+}
+
+qfunc main(output state: qnum, output ref: qnum, output ind: qbit, output qsvt_aux: qbit) {
+  allocate<4>(state);
+  allocate<4>(ref);
+  allocate<1>(ind);
+  allocate<1>(qsvt_aux);
+  hadamard_transform(state);
+  qsvt_sqrt_polynomial<[
+    5.594,
+    (-0.8682),
+    7.8232,
+    1.54,
+    5.415,
+    (-13.2555)
+  ]>(state, ref, ind, qsvt_aux);
+}

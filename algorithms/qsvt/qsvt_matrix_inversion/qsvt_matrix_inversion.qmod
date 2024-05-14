@@ -1,17 +1,17 @@
-qfunc projector_controlled_phase<phase: real, proj_cnot: qfunc (arg0: qbit[3], arg1: qbit)>(qbv_reg: qbit[3], qbv_aux: qbit) {
+qfunc my_projector_controlled_phase<phase: real, proj_cnot: qfunc (arg0: qbit[], arg1: qbit)>(qbv_reg: qbit[], qbv_aux: qbit) {
   proj_cnot(qbv_reg, qbv_aux);
   RZ<phase>(qbv_aux);
   proj_cnot(qbv_reg, qbv_aux);
 }
 
-qfunc qsvt_step<phase_seq: real[], num_qubits: int, index: int, proj_cnot_1: qfunc (arg0: qbit[num_qubits], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[num_qubits], arg1: qbit), u: qfunc (arg0: qbit[num_qubits])>(qbv: qbit[num_qubits + 1]) {
-  qbv_reg: qbit[num_qubits];
+qfunc my_qsvt_step<phase_seq: real[], index: int, proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qbv: qbit[]) {
+  qbv_reg: qbit[];
   qbv_aux: qbit;
   qbv -> {qbv_reg, qbv_aux};
-  projector_controlled_phase<phase_seq[2 * index], proj_cnot_1>(qbv_reg, qbv_aux);
+  my_projector_controlled_phase<phase_seq[2 * index], proj_cnot_1>(qbv_reg, qbv_aux);
   u(qbv_reg);
-  projector_controlled_phase<phase_seq[(2 * index) + 1], proj_cnot_2>(qbv_reg, qbv_aux);
-  if (((2 * index) + 2) == phase_seq.len) {
+  my_projector_controlled_phase<phase_seq[(2 * index) + 1], proj_cnot_2>(qbv_reg, qbv_aux);
+  if (phase_seq.len == ((2 * index) + 2)) {
     IDENTITY(qbv_reg);
   } else {
     invert {
@@ -21,31 +21,31 @@ qfunc qsvt_step<phase_seq: real[], num_qubits: int, index: int, proj_cnot_1: qfu
   {qbv_reg, qbv_aux} -> qbv;
 }
 
-qfunc qsvt<num_qubits: int, phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[num_qubits], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[num_qubits], arg1: qbit), u: qfunc (arg0: qbit[num_qubits])>(qbv_reg: qbit[num_qubits], qbv_aux: qbit) {
+qfunc my_qsvt<phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], qbv_aux: qbit) {
   H(qbv_aux);
   qbv: qbit[];
   {qbv_reg, qbv_aux} -> qbv;
   repeat (index: phase_seq.len / 2) {
-    qsvt_step<phase_seq, num_qubits, index, proj_cnot_1, proj_cnot_2, u>(qbv);
+    my_qsvt_step<phase_seq, index, proj_cnot_1, proj_cnot_2, u>(qbv);
   }
   qbv -> {qbv_reg, qbv_aux};
   H(qbv_aux);
 }
 
-qfunc qsvt_inversion<num_qubits: int, phase_seq: real[], u: qfunc (arg0: qbit[num_qubits])>(qbv_reg: qbit[num_qubits], output qbv_aux: qbit) {
+qfunc my_qsvt_inversion<phase_seq: real[], u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], output qbv_aux: qbit) {
   allocate<1>(qbv_aux);
-  qsvt<num_qubits, phase_seq, lambda(arg0, arg1) {
-    X(arg0[(num_qubits) - 1]);
-    CX(arg0[(num_qubits) - 1], arg1);
-    X(arg0[(num_qubits) - 1]);
+  my_qsvt<phase_seq, lambda(arg0, arg1) {
+    X(arg0[arg0.len - 1]);
+    CX(arg0[arg0.len - 1], arg1);
+    X(arg0[arg0.len - 1]);
   }, lambda(arg0, arg1) {
-    X(arg0[(num_qubits) - 1]);
-    CX(arg0[(num_qubits) - 1], arg1);
-    X(arg0[(num_qubits) - 1]);
+    X(arg0[arg0.len - 1]);
+    CX(arg0[arg0.len - 1], arg1);
+    X(arg0[arg0.len - 1]);
   }, u>(qbv_reg, qbv_aux);
 }
 
-qfunc main(output qbv_state: qbit[2], output qbv_block: qbit, output qbv_aux: qbit) {
+qfunc main(output qbv_state: qbit[], output qbv_block: qbit, output qbv_aux: qbit) {
   qbv_reg: qbit[];
   prepare_amplitudes<[
     0.0,
@@ -55,49 +55,49 @@ qfunc main(output qbv_state: qbit[2], output qbv_block: qbit, output qbv_aux: qb
   ], 0>(qbv_state);
   allocate<1>(qbv_block);
   {qbv_state, qbv_block} -> qbv_reg;
-  qsvt_inversion<3, [
-    2.098749029462422,
-    4.378063130949322,
-    4.65618934541247,
-    1.915655677983328,
-    1.670665754747233,
-    2.49815630434774,
-    5.488152839722767,
-    4.091243526643548,
-    (-1.251115431586672),
-    3.588803809383612,
-    2.783964199395885,
-    7.746319774279469,
-    2.899420239258764,
-    (-0.909666745587832),
-    2.425921233484828,
-    3.623264621185356,
-    8.140076517450122,
-    2.663512896202112,
-    (-1.121647941841156),
-    2.633798480454193,
-    7.414345485988994,
-    1.131160202672302,
-    2.633798488117604,
-    5.161537354859073,
-    2.663512894352896,
-    1.85689118276644,
-    3.623264673505738,
-    2.425921227429656,
-    5.373518550068384,
-    2.899420273087806,
-    1.463134458983303,
-    2.783964230554988,
-    3.58880382903496,
-    5.032069896772624,
-    4.091243528581512,
-    (-0.795032506424254),
-    2.498156269778397,
-    7.953851044282136,
-    1.915655742166561,
-    4.656189377408761,
-    4.378063091889698,
-    (-4.184436319955728)
+  my_qsvt_inversion<[
+    2.098749029388482,
+    4.378063130806854,
+    4.656189345424973,
+    1.915655678027971,
+    1.67066575470027,
+    2.498156304430762,
+    5.488152839669489,
+    4.091243526517143,
+    (-1.251115431591289),
+    3.588803809309495,
+    2.783964199244988,
+    7.746319774378003,
+    2.89942023958655,
+    (-0.909666745415125),
+    2.425921233436824,
+    3.623264620945224,
+    8.140076517508655,
+    2.663512896516528,
+    (-1.121647941858035),
+    2.633798480277707,
+    7.414345486024335,
+    1.131160202820879,
+    2.63379848798362,
+    5.161537354773452,
+    2.663512894390884,
+    1.856891182481254,
+    3.62326467388187,
+    2.425921227530116,
+    5.37351854993015,
+    2.899420272721196,
+    1.463134458470786,
+    2.783964230331378,
+    3.588803827830013,
+    5.0320698960626,
+    4.091243529386839,
+    (-0.795032505129111),
+    2.498156270058826,
+    7.953851043907628,
+    1.915655742106189,
+    4.656189377220687,
+    4.378063091502028,
+    (-4.184436319637947)
   ], lambda(arg0) {
     unitary<[
       [

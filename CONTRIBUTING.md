@@ -1,11 +1,10 @@
-# Contributing to Classiq
+# Contributing to Classiq 
 
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
-
 - Creating a new algorithm, application or function 🚀
 - Submitting your research done with Classiq 👩🏻‍💻
 - Reporting a bug 🐞
-- Discussing the current state of the code
+- Discussing the current state of the code 
 
 ## We Develop with Github
 
@@ -15,9 +14,9 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
 
 Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
 
-1. Create an issue to discuss what you will be submitting. We will reply swiftly with comments and feedback.
+1. Create an issue to discuss what you will be submitting. We will reply swiftly with comments and feedback. 
 2. Fork the repo and create your branch from `main`.
-3. Ensure your code runs with the latest Classiq version.
+3. Ensure your code runs with the latest Classiq version. 
 4. Issue that pull request!
 
 ## Any contributions you make will be under the MIT Software License
