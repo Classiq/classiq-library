@@ -1,4 +1,4 @@
-# Welcome to QClass 2024 Session #2!
+# Welcome to QClass 2024!
 
 **This is our workspace for mastering Git & GitHub skills.**
 
@@ -16,7 +16,7 @@ To keep track of submissions, we kindly ask you to:
 2. Rename the files to include your full name, for example: `Nadav_Ben-Ami_HW1_QClass2024.ipynb`.
 3. Navigate to your local clone of the `classiq-library`.
 4. Go to `community/QClass_2024`.
-5. Place your solutions in the correct folder.
+5. Place your solutions in the correct folder (`Submissions/HW...`).
 6. Use the command line to `add`, `commit`, and `push` those changes to the remote (your fork of the `classiq-library`).
 7. Navigate to your GitHub repository `classiq-library` and create a new Pull Request (PR) to merge the changes from your fork to the original repository (`Classiq/classiq-library`). Make sure that your PR is well described.
 8. After you are done, please let us know by submitting the form here: [Typfeorm](https://fvrn0h72gwo.typeform.com/to/dKvnZuk6)
