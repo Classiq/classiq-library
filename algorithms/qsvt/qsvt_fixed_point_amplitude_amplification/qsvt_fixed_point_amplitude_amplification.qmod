@@ -2,11 +2,11 @@ qfunc arith_equation(a: qnum, b: qnum, c: qnum, res: qbit) {
   res ^= ((a + b) == 3) and ((c - a) == 2);
 }
 
-qfunc qsvt_step<phase_seq: real[], index: int, proj_ctrl_phase_1: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), proj_ctrl_phase_2: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], qbv_aux: qbit) {
+qfunc my_qsvt_step<phase_seq: real[], index: int, proj_ctrl_phase_1: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), proj_ctrl_phase_2: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], qbv_aux: qbit) {
   proj_ctrl_phase_1<phase_seq[2 * index]>(qbv_reg, qbv_aux);
   u(qbv_reg);
   proj_ctrl_phase_2<phase_seq[(2 * index) + 1]>(qbv_reg, qbv_aux);
-  if (((2 * index) + 2) == phase_seq.len) {
+  if (phase_seq.len == ((2 * index) + 2)) {
     IDENTITY(qbv_reg);
   } else {
     invert {
@@ -15,17 +15,17 @@ qfunc qsvt_step<phase_seq: real[], index: int, proj_ctrl_phase_1: qfunc <arg0: r
   }
 }
 
-qfunc qsvt<phase_seq: real[], proj_ctrl_phase_1: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), proj_ctrl_phase_2: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], qbv_aux: qbit) {
+qfunc my_qsvt<phase_seq: real[], proj_ctrl_phase_1: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), proj_ctrl_phase_2: qfunc <arg0: real>(arg1: qbit[], arg2: qbit), u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], qbv_aux: qbit) {
   H(qbv_aux);
   repeat (index: phase_seq.len / 2) {
-    qsvt_step<phase_seq, index, proj_ctrl_phase_1, proj_ctrl_phase_2, u>(qbv_reg, qbv_aux);
+    my_qsvt_step<phase_seq, index, proj_ctrl_phase_1, proj_ctrl_phase_2, u>(qbv_reg, qbv_aux);
   }
   H(qbv_aux);
 }
 
 qfunc qsvt_fpaa<phase_seq: real[], arith_oracle: qfunc (arg0: qbit[], arg1: qbit)>(qbv_reg: qbit[], output qbv_aux: qbit) {
   allocate<1>(qbv_aux);
-  qsvt<phase_seq, lambda<phase>(arg1, arg2) {
+  my_qsvt<phase_seq, lambda<phase>(arg1, arg2) {
     hadamard_transform(arg1);
     apply_to_all<X>(arg1);
     control (arg1) {
@@ -50,32 +50,32 @@ qfunc main(output state: qbit[], output aux: qbit) {
   allocate<6>(state);
   hadamard_transform(state);
   qsvt_fpaa<[
-    2.5183,
-    3.7976,
-    1.7857,
-    1.4305,
-    3.2694,
-    8.3133,
-    2.0117,
-    (-0.9743),
-    4.9852,
-    2.6652,
-    4.2312,
-    2.6323,
-    4.6257,
-    4.6257,
-    2.6323,
-    4.2312,
-    2.6652,
-    (-1.298),
-    5.3089,
-    2.0117,
-    2.0301,
-    3.2694,
-    7.7137,
-    1.7857,
-    3.7976,
-    (-3.7649)
+    2.6976,
+    4.4213,
+    4.0814,
+    3.6155,
+    0.8812,
+    1.8104,
+    3.7579,
+    1.3706,
+    3.7754,
+    4.1934,
+    2.6905,
+    2.756,
+    5.2406,
+    5.2406,
+    2.756,
+    2.6905,
+    4.1934,
+    (-2.5078),
+    7.6538,
+    3.7579,
+    1.8104,
+    0.8812,
+    3.6155,
+    4.0814,
+    4.4213,
+    (-3.5856)
   ], lambda(arg0, arg1) {
     arith_equation(arg0[0:2], arg0[2:3], arg0[3:6], arg1);
   }>(state, aux);
