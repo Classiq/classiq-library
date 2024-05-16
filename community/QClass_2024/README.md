@@ -1,4 +1,4 @@
-# Welcome to QClass 2024 Session #2!
+# Welcome to QClass 2024!
 
 **This is our workspace for mastering Git & GitHub skills.**
 
