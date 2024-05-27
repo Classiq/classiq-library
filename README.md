@@ -115,7 +115,7 @@ def prep_minus(out: Output[QBit]) -> None:
     H(out)
 ```
 
-A part of the Deutsch Jozsa algorithm (see the full algirthm [here](/algorithms/deutsch_josza/deutsch_jozsa.ipynb))
+A part of the Deutsch Jozsa algorithm (see the full algorithm [here](/algorithms/deutsch_josza/deutsch_jozsa.ipynb))
 
 ```python
 @qfunc
@@ -125,7 +125,7 @@ def deutsch_jozsa(predicate: QCallable[QNum, QBit], x: QNum) -> None:
     hadamard_transform(x)
 ```
 
-A part of a QML encoder (see the full algirthm [here](/algorithms/qml/quantum_autoencoder/quantum_autoencoder.ipynb))
+A part of a QML encoder (see the full algorithm [here](/algorithms/qml/quantum_autoencoder/quantum_autoencoder.ipynb))
 
 ```python
 @qfunc
