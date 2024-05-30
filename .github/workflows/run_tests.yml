@@ -42,6 +42,10 @@ jobs:
             echo "LIST_OF_IPYNB_CHANGED=None" >> $GITHUB_ENV
           fi
 
+      - name: Set authentication
+        run: |
+          echo "${{ secrets.CLASSIQ_CREDENTIALS_TOKEN }}" > "${HOME}/.classiq-credentials"
+
       - name: "Run tests"
         run: python -m pytest tests
         env:
