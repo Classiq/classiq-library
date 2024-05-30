@@ -1,6 +1,9 @@
 [tool.pytest.ini_options]
 python_files = "test_*.py"
 
+# treat all warnings as errors
+filterwarnings = "error"
+
 [tool.isort]
 profile = "black"
 combine_as_imports = true
