@@ -1,6 +1,0 @@
-qfunc qft_step(target: qbit[]) {
-  H(target[0]);
-  repeat (index: target.len - 1) {
-    CPHASE<pi / (2 ** (index + 1))>(target[index + 1], target[0]);
-  }
-}

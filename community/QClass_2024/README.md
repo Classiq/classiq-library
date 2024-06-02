@@ -3,15 +3,20 @@
 **This is our workspace for mastering Git & GitHub skills.**
 
 ## What is This Repository For?
+
 We'll use this repository to submit assignments as an initial practice in opening a pull request.
 
 ## Getting Started
+
 If you didn't forked and clone the [classiq-library](https://github.com/Classiq/classiq-library) already, follow this:
+
 1. **Fork** the repo to add it to your GitHub account.
 2. **Clone** your forked repository to your local machine.
 
 ## Submission: Rules & Instructions
+
 To keep track of submissions, we kindly ask you to:
+
 1. Complete the assignment.
 2. Rename the files to include your full name, for example: `Nadav_Ben-Ami_HW1_QClass2024.ipynb`.
 3. Navigate to your local clone of the `classiq-library`.
@@ -24,7 +29,7 @@ To keep track of submissions, we kindly ask you to:
 **Please ensure you follow these steps carefully to properly submit your assignment!**
 
 ## Support
+
 If you need help or have questions, feel free to reach out in our Slack channel!
 
 ## Enjoy your learning journey at QClass 2024!
-
