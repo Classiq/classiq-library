@@ -1,5 +1,3 @@
-Hello @channel! Please read!
-
 :rocket: Final Assignment Alert! :rocket:
 
 Hey everyone! :tada: Get ready to apply your skills and creativity in our final assignment. Here are the main highlights:
