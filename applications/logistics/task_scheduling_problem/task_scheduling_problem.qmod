@@ -1,6 +1,6 @@
 hamiltonian: PauliTerm[] = [
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::I,
@@ -8,10 +8,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::I
     ],
-    coefficient = 53.0
+    coefficient=53.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::I,
@@ -19,10 +19,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::Z,
@@ -30,10 +30,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::Z,
       Pauli::I,
@@ -41,10 +41,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::Z,
       Pauli::I,
       Pauli::I,
@@ -52,10 +52,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::I,
@@ -63,10 +63,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::Z
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::I,
@@ -74,10 +74,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::Z,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::I,
@@ -85,10 +85,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::Z,
       Pauli::Z
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::Z,
@@ -96,10 +96,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::I,
@@ -107,10 +107,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::Z
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::I,
       Pauli::Z,
@@ -118,10 +118,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::Z
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::Z,
       Pauli::Z,
       Pauli::I,
@@ -129,10 +129,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::I,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::I,
       Pauli::Z,
       Pauli::I,
@@ -140,10 +140,10 @@ hamiltonian: PauliTerm[] = [
       Pauli::Z,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   },
   PauliTerm {
-    pauli = [
+    pauli=[
       Pauli::Z,
       Pauli::I,
       Pauli::I,
@@ -151,7 +151,7 @@ hamiltonian: PauliTerm[] = [
       Pauli::Z,
       Pauli::I
     ],
-    coefficient = 10.0
+    coefficient=10.0
   }
 ];
 
@@ -161,7 +161,6 @@ qfunc main<params_list: real[16]>(output target: qbit[6]) {
 }
 
 cscope ```
-
 vqe_result = vqe(
 hamiltonian=hamiltonian,
 maximize=False,
@@ -175,5 +174,4 @@ alpha_cvar=0.3
 )
 
 save({"vqe_result": vqe_result, "hamiltonian": hamiltonian})
-
 ```
