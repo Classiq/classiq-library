@@ -7,7 +7,7 @@ qfunc phase_lad<value: int>(phi_b: qbit[]) {
 qfunc my_qft_step(qbv: qbit[]) {
   H(qbv[0]);
   repeat (index: qbv.len - 1) {
-    CPHASE<pi / (2 ** (index + 1))>(qbv[0], qbv[(index) + 1]);
+    CPHASE<pi / (2 ** (index + 1))>(qbv[0], qbv[index + 1]);
   }
 }
 

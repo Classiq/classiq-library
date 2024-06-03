@@ -1,0 +1,118 @@
+qfunc apply_ry_on_all<params: real[]>(io: qbit[]) {
+  repeat (index: io.len) {
+    RY<params[index]>(io[index]);
+  }
+}
+
+qfunc apply_fixed_3_qubit_system_ansatz<angles: real[]>(system_qubits: qbit[]) {
+  apply_ry_on_all<[
+    angles[0],
+    angles[1],
+    angles[2]
+  ]>(system_qubits);
+  repeat (index: system_qubits.len - 1) {
+    CZ(system_qubits[0], system_qubits[index + 1]);
+  }
+  CZ(system_qubits[1], system_qubits[2]);
+  apply_ry_on_all<[
+    angles[3],
+    angles[4],
+    angles[5]
+  ]>(system_qubits);
+  repeat (index: system_qubits.len - 1) {
+    CZ(system_qubits[system_qubits.len - 1], system_qubits[index]);
+  }
+  CZ(system_qubits[1], system_qubits[0]);
+  apply_ry_on_all<[
+    angles[6],
+    angles[7],
+    angles[8]
+  ]>(system_qubits);
+}
+
+qfunc prepare_c(ancillary_qubits: qbit[]) {
+  inplace_prepare_state<[0.55, 0.225, 0.225, 0.0], 0.0>(ancillary_qubits);
+}
+
+qfunc apply_pauli<pauli_value: int>(qbit: qbit) {
+  switch<pauli_value, [lambda() {
+    IDENTITY(qbit);
+  }, lambda() {
+    X(qbit);
+  }, lambda() {
+    Y(qbit);
+  }, lambda() {
+    Z(qbit);
+  }]>();
+}
+
+qfunc apply_pauli_term<pauli_term: PauliTerm>(x: qbit[]) {
+  repeat (index: x.len) {
+    apply_pauli<pauli_term.pauli[index]>(x[index]);
+  }
+}
+
+qfunc prepare_ca<pauli_terms_list: PauliTerm[]>(system_qubits: qbit[], ancillary_qubits: qnum) {
+  repeat (i: pauli_terms_list.len) {
+    control (ancillary_qubits == i) {
+      apply_pauli_term<pauli_terms_list[i]>(system_qubits);
+    }
+  }
+}
+
+qfunc block_encoding_vqls<ansatz: qfunc (), block_encoding: qfunc (), prepare_b_state: qfunc ()>() {
+  ansatz();
+  block_encoding();
+  invert {
+    prepare_b_state();
+  }
+}
+
+qfunc main<params: real[9]>(output ancillary_qubits: qnum, output system_qubits: qbit[]) {
+  allocate<2>(ancillary_qubits);
+  allocate<3>(system_qubits);
+  block_encoding_vqls<lambda() {
+    apply_fixed_3_qubit_system_ansatz<params>(system_qubits);
+  }, lambda() {
+    within {
+      prepare_c(ancillary_qubits);
+    } apply {
+      prepare_ca<[
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=0.55
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::Z,
+            Pauli::I
+          ],
+          coefficient=0.225
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z
+          ],
+          coefficient=0.225
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=0
+        }
+      ]>(system_qubits, ancillary_qubits);
+    }
+  }, lambda() {
+    apply_to_all<H>(system_qubits);
+  }>();
+}
