@@ -4,8 +4,8 @@ qfunc simon_qfunc_with_bipartite_s<partition_index: int>(x: qbit[], output res: 
     CX(x[i], res[i]);
   }
   repeat (i: partition_index - 1) {
-    CX(x[(((x.len) - (partition_index)) + 1) + (i)], res[(((x.len) - (partition_index)) + 1) + (i)]);
-    CX(x[(x.len) - (partition_index)], res[(((x.len) - (partition_index)) + 1) + (i)]);
+    CX(x[((x.len - partition_index) + 1) + i], res[((x.len - partition_index) + 1) + i]);
+    CX(x[x.len - partition_index], res[((x.len - partition_index) + 1) + i]);
   }
 }
 
