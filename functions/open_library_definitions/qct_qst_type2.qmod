@@ -1,0 +1,47 @@
+qfunc qct_qst_type2(x: qbit[], q: qbit) {
+  extended_state: qbit[];
+  H(q);
+  control (q == 1) {
+    apply_to_all<X>(x);
+  }
+  {x, q} -> extended_state;
+  qft(extended_state);
+  extended_state -> {x, q};
+  control (q == 0) {
+    repeat (k: x.len) {
+      PHASE<((2 * pi) / (4 * (2 ** x.len))) * (2 ** k)>(x[k]);
+    }
+  }
+  control (q == 1) {
+    repeat (k: x.len) {
+      within {
+        X(x[k]);
+      } apply {
+        PHASE<(-((2 * pi) / (4 * (2 ** x.len)))) * (2 ** k)>(x[k]);
+      }
+    }
+  }
+  PHASE<-((2 * pi) / (4 * (2 ** x.len)))>(q);
+  invert {
+    _qct_pi_operator(x, q);
+  }
+  x_num: qnum<x.len, False, 0>;
+  x -> x_num;
+  H(q);
+  S(q);
+  control (x_num == 0) {
+    within {
+      Z(q);
+    } apply {
+      S(q);
+      H(q);
+      S(q);
+    }
+  }
+  x_num -> x;
+  invert {
+    control (q == 1) {
+      modular_increment<1>(x);
+    }
+  }
+}
