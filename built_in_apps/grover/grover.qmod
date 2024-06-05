@@ -1,4 +1,4 @@
-qfunc expr_predicate(a: qnum<2, False, 0>, b: qnum<2, False, 0>, c: qnum<3, False, 0>, res: qbit) {
+qfunc expr_predicate(a: qnum<2, False, 0>, b: qnum<2, False, 0>, c: qnum<3, False, 0>, res: qbit[1]) {
   res ^= ((((a + b) + (c & 6)) % 4) | (4 & c)) == 4;
 }
 
