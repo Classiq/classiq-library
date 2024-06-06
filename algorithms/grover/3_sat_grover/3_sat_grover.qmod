@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 qfunc expr_predicate(x1: qnum<1, False, 0>, x2: qnum<1, False, 0>, x3: qnum<1, False, 0>, res: qbit) {
 =======
 qfunc expr_predicate(x1: qnum<1, False, 0>, x2: qnum<1, False, 0>, x3: qnum<1, False, 0>, res: qbit[1]) {
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+qfunc expr_predicate(x1: qnum<1, False, 0>, x2: qnum<1, False, 0>, x3: qnum<1, False, 0>, res: qbit[1]) {
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   res ^= (x1 or x2 or x3) and ((not x1) or x2 or x3) and ((not x1) or (not x2) or (not x3)) and ((not x1) or (not x2) or x3) and (x1 or x2 or (not x3)) and ((not x1) or x2 or (not x3));
 }
 

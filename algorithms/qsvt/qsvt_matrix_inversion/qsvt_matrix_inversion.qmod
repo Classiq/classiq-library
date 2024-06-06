@@ -7,10 +7,14 @@ qfunc my_projector_controlled_phase<phase: real, proj_cnot: qfunc (arg0: qbit[],
 qfunc my_qsvt_step<phase_seq: real[], index: int, proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qbv: qbit[]) {
   qbv_reg: qbit[];
 <<<<<<< HEAD
+<<<<<<< HEAD
   qbv_aux: qbit;
 =======
   qbv_aux: qbit[1];
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+  qbv_aux: qbit[1];
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   qbv -> {qbv_reg, qbv_aux};
   my_projector_controlled_phase<phase_seq[2 * index], proj_cnot_1>(qbv_reg, qbv_aux);
   u(qbv_reg);
@@ -61,6 +65,7 @@ qfunc main(output qbv_state: qbit[], output qbv_block: qbit, output qbv_aux: qbi
   {qbv_state, qbv_block} -> qbv_reg;
   my_qsvt_inversion<[
 <<<<<<< HEAD
+<<<<<<< HEAD
     2.098749029388482,
     4.378063130806854,
     4.656189345424973,
@@ -104,6 +109,8 @@ qfunc main(output qbv_state: qbit[], output qbv_block: qbit, output qbv_aux: qbi
     4.378063091502028,
     (-4.184436319637947)
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
     2.098749029462422,
     4.378063130949322,
     4.65618934541247,
@@ -146,7 +153,10 @@ qfunc main(output qbv_state: qbit[], output qbv_block: qbit, output qbv_aux: qbi
     4.656189377408761,
     4.378063091889698,
     (-4.184436319955728)
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   ], lambda(arg0) {
     unitary<[
       [

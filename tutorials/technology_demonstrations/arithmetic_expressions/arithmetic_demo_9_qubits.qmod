@@ -1,7 +1,15 @@
 qfunc main(output z: qnum) {
   x: qnum;
   y: qnum;
+<<<<<<< HEAD
   allocate<2>(x);
   allocate<1>(y);
   z = (((2 * x) + y) + max(3 * y, 2)) > 4;
 }
+=======
+  prepare_int<2>(x);
+  prepare_int<1>(y);
+  z = (((2 * x) + y) + max(3 * y, 2)) > 4;
+}
+
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb

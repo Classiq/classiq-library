@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit)>(x: qbit[], q: qbit) {
 =======
 qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit[1])>(x: qbit[], q: qbit[1]) {
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit[1])>(x: qbit[], q: qbit[1]) {
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   repeat (index: x.len) {
     control (x[index]) {
       q1_qfunc<(2 ** index) * slope>(q);

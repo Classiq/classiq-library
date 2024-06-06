@@ -22,16 +22,22 @@ qfunc my_matrix_inversion_flexible<unitary_with_power: qfunc <arg0: int>(arg1: q
 qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
   prepare_amplitudes<[
 <<<<<<< HEAD
+<<<<<<< HEAD
     0.18257418583505536,
     0.3651483716701107,
     0.7302967433402214,
     0.5477225575051661
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
     0.1825741858,
     0.3651483717,
     0.7302967433,
     0.5477225575
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   ], 0.0>(res);
   my_matrix_inversion_flexible<lambda<pw>(arg1) {
     suzuki_trotter1_with_power_logic<[
@@ -41,6 +47,7 @@ qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
       },
       PauliTerm {
         pauli=[Pauli::I, Pauli::Z],
+<<<<<<< HEAD
 <<<<<<< HEAD
         coefficient=-0.05249999999999999
       },
@@ -56,6 +63,8 @@ qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
         pauli=[Pauli::Z, Pauli::Z],
         coefficient=-0.057499999999999996
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
         coefficient=-0.0525
       },
       PauliTerm {
@@ -69,7 +78,10 @@ qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
       PauliTerm {
         pauli=[Pauli::Z, Pauli::Z],
         coefficient=-0.0575
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
       },
       PauliTerm {
         pauli=[Pauli::Z, Pauli::X],
@@ -82,10 +94,14 @@ qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
       PauliTerm {
         pauli=[Pauli::X, Pauli::Z],
 <<<<<<< HEAD
+<<<<<<< HEAD
         coefficient=0.045000000000000005
 =======
         coefficient=0.045
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+        coefficient=0.045
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
       },
       PauliTerm {
         pauli=[Pauli::X, Pauli::X],
@@ -96,9 +112,13 @@ qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
         coefficient=-0.06
       }
 <<<<<<< HEAD
+<<<<<<< HEAD
     ], pw, 4, 1.8, -6.283185307179586>(arg1);
 =======
     ], pw, 4, 1.8, -6.2831853072>(arg1);
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+    ], pw, 4, 1.8, -6.2831853072>(arg1);
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   }, 4>(res, indicator);
 }

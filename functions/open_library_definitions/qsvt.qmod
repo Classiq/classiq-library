@@ -3,10 +3,14 @@ qfunc qsvt<phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), pro
   projector_controlled_phase<phase_seq[0], proj_cnot_1>(qvar, aux);
   repeat (index: floor((phase_seq.len - 1) / 2)) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     qsvt_step<phase_seq, index, proj_cnot_1, proj_cnot_2, u>(qvar, aux);
 =======
     qsvt_step<phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], proj_cnot_1, proj_cnot_2, u>(qvar, aux);
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+    qsvt_step<phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], proj_cnot_1, proj_cnot_2, u>(qvar, aux);
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   }
   if ((phase_seq.len % 2) == 1) {
     IDENTITY(qvar);

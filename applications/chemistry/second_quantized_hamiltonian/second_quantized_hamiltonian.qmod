@@ -1,6 +1,7 @@
 qfunc main<t: real[12]>(output qbv: qbit[]) {
   allocate<fock_hamiltonian_problem_to_hamiltonian(FockHamiltonianProblem {
 <<<<<<< HEAD
+<<<<<<< HEAD
     mapping = FermionMapping::JORDAN_WIGNER,
     z2_symmetries = False,
     terms = [
@@ -15,6 +16,8 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
             op = LadderOperator::MINUS,
             index = 0
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
     mapping=FermionMapping::JORDAN_WIGNER,
     z2_symmetries=False,
     terms=[
@@ -28,11 +31,15 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
           LadderOp {
             op=LadderOperator::MINUS,
             index=0
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
           }
         ]
       },
       LadderTerm {
+<<<<<<< HEAD
 <<<<<<< HEAD
         coefficient = 0.3,
         ops = [
@@ -44,6 +51,8 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
             op = LadderOperator::MINUS,
             index = 1
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
         coefficient=0.3,
         ops=[
           LadderOp {
@@ -53,11 +62,15 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
           LadderOp {
             op=LadderOperator::MINUS,
             index=1
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
           }
         ]
       },
       LadderTerm {
+<<<<<<< HEAD
 <<<<<<< HEAD
         coefficient = 0.4,
         ops = [
@@ -69,6 +82,8 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
             op = LadderOperator::MINUS,
             index = 2
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
         coefficient=0.4,
         ops=[
           LadderOp {
@@ -78,11 +93,15 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
           LadderOp {
             op=LadderOperator::MINUS,
             index=2
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
           }
         ]
       },
       LadderTerm {
+<<<<<<< HEAD
 <<<<<<< HEAD
         coefficient = 0.5,
         ops = [
@@ -94,6 +113,8 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
             op = LadderOperator::MINUS,
             index = 3
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
         coefficient=0.5,
         ops=[
           LadderOp {
@@ -103,11 +124,15 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
           LadderOp {
             op=LadderOperator::MINUS,
             index=3
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
           }
         ]
       },
       LadderTerm {
+<<<<<<< HEAD
 <<<<<<< HEAD
         coefficient = -0.1,
         ops = [
@@ -127,6 +152,8 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
             op = LadderOperator::MINUS,
             index = 0
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
         coefficient=-0.1,
         ops=[
           LadderOp {
@@ -144,11 +171,15 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
           LadderOp {
             op=LadderOperator::MINUS,
             index=0
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
           }
         ]
       },
       LadderTerm {
+<<<<<<< HEAD
 <<<<<<< HEAD
         coefficient = -0.3,
         ops = [
@@ -168,6 +199,8 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
             op = LadderOperator::MINUS,
             index = 3
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
         coefficient=-0.3,
         ops=[
           LadderOp {
@@ -185,16 +218,23 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
           LadderOp {
             op=LadderOperator::MINUS,
             index=3
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
           }
         ]
       }
     ],
 <<<<<<< HEAD
+<<<<<<< HEAD
     num_particles = [1, 1]
 =======
     num_particles=[1, 1]
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+    num_particles=[1, 1]
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   })[0].pauli.len>(qbv);
   full_hea<4, [0, 1, 0], t, [[0, 1], [1, 2], [2, 3]], 3, [lambda<angle>(q) {
     X(q);
@@ -207,9 +247,12 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
 
 cscope ```
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 vqe_result = vqe(
     hamiltonian=fock_hamiltonian_problem_to_hamiltonian(struct_literal(FockHamiltonianProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,terms=[
             struct_literal(LadderTerm,
@@ -269,7 +312,10 @@ alpha_cvar=1.0,
 )
 save({'vqe_result': vqe_result})
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 ```

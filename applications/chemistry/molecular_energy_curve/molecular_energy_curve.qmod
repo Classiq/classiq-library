@@ -1,6 +1,7 @@
 qfunc main(output qbv: qbit[]) {
   allocate<molecule_problem_to_hamiltonian(MoleculeProblem {
 <<<<<<< HEAD
+<<<<<<< HEAD
     mapping = FermionMapping::JORDAN_WIGNER,
     z2_symmetries = True,
     molecule = Molecule {
@@ -84,6 +85,8 @@ qfunc main(output qbv: qbit[]) {
     freeze_core = True,
     remove_orbitals = []
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
     mapping=FermionMapping::JORDAN_WIGNER,
     z2_symmetries=True,
     molecule=Molecule {
@@ -142,15 +145,21 @@ qfunc main(output qbv: qbit[]) {
     },
     freeze_core=True,
     remove_orbitals=[]
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   }, [1, 2]>(qbv);
 }
 
 cscope ```
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 vqe_result = vqe(
     hamiltonian=molecule_problem_to_hamiltonian(struct_literal(MoleculeProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=True,molecule=struct_literal(Molecule,atoms=[struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0.0)),struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=3.5))],spin=1,charge=0),freeze_core=True,remove_orbitals=[])), maximize=False,
 initial_point=[],
@@ -167,7 +176,10 @@ save({'vqe_result': vqe_result})
 molecule_result = molecule_ground_state_solution_post_process(struct_literal(MoleculeProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=True,molecule=struct_literal(Molecule,atoms=[struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0.0)),struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=3.5))],spin=1,charge=0),freeze_core=True,remove_orbitals=[]),vqe_result)
 save({'molecule_result': molecule_result})
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 ```

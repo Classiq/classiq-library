@@ -25,16 +25,22 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
   state: qbit[];
   prepare_amplitudes<[
 <<<<<<< HEAD
+<<<<<<< HEAD
     0.55653745541481,
     0.17653302146188,
     0.629197193488002,
     0.513042926820719
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
     0.513396396241511,
     0.451402223282909,
     0.714366707564118,
     0.149466987209476
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   ], 0.0>(state);
   phase_array: qbit[];
   my_qpe_flexible<lambda<pw>(arg1) {
@@ -68,6 +74,7 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
     } else {
       suzuki_trotter1_with_power_logic<[
         PauliTerm {
+<<<<<<< HEAD
 <<<<<<< HEAD
           pauli = [Pauli::I, Pauli::I],
           coefficient = 0.4
@@ -108,6 +115,8 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
           pauli = [Pauli::Y, Pauli::Y],
           coefficient = 0.09539162
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
           pauli=[Pauli::I, Pauli::I],
           coefficient=0.4
         },
@@ -146,7 +155,10 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
         PauliTerm {
           pauli=[Pauli::Y, Pauli::Y],
           coefficient=0.09539162
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
         }
       ], pw, 2, 1.8, -6.283185307179586>(arg1);
     }

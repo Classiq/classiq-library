@@ -1,6 +1,7 @@
 # Welcome to QClass 2024!
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 **This is our workspace for mastering Git & GitHub skills.**
 
 ## What is This Repository For?
@@ -9,6 +10,8 @@ We'll use this repository to submit assignments as an initial practice in openin
 ## Getting Started
 If you didn't forked and clone the [classiq-library](https://github.com/Classiq/classiq-library) already, follow this:
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 **This repository serves as our central hub for all course activities, including mastering Git & GitHub skills, submitting assignments, and accessing course materials.**
 
 ## What is This Repository For?
@@ -17,11 +20,15 @@ If you didn't forked and clone the [classiq-library](https://github.com/Classiq/
 
 ## Getting Started
 If you haven't already, please ensure you fork and clone the [classiq-library](https://github.com/Classiq/classiq-library):
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 1. **Fork** the repo to add it to your GitHub account.
 2. **Clone** your forked repository to your local machine.
 
 ## Submission: Rules & Instructions
+<<<<<<< HEAD
 <<<<<<< HEAD
 To keep track of submissions, we kindly ask you to:
 1. Complete the assignment.
@@ -41,6 +48,8 @@ If you need help or have questions, feel free to reach out in our Slack channel!
 ## Enjoy your learning journey at QClass 2024!
 
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 To ensure efficient tracking and management of submissions, please adhere to the following:
 1. Complete the assignment.
 2. Rename the files to include your full name, e.g., `Nadav_Ben-Ami_HW1_QClass2024.ipynb`.
@@ -60,5 +69,9 @@ Upon fulfilling the course requirements, complete the following [Survey](https:/
 ## Support
 For assistance or inquiries, please reach out on our Slack channel.
 
+<<<<<<< HEAD
 ## Enjoy your learning journey at QClass 2024!
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+## Enjoy your learning journey at QClass 2024!
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb

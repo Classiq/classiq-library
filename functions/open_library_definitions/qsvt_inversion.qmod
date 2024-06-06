@@ -1,11 +1,17 @@
 qfunc qsvt_inversion<phase_seq: real[], block_encoding_cnot: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit) {
 <<<<<<< HEAD
+<<<<<<< HEAD
   qsvt<phase_seq, block_encoding_cnot, block_encoding_cnot, u>(qvar, aux);
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   qsvt<phase_seq, block_encoding_cnot, block_encoding_cnot, lambda(arg0) {
     invert {
       u(arg0);
     }
   }>(qvar, aux);
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 }

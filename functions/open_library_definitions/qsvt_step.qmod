@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 qfunc qsvt_step<phase_seq: real[], index: int, proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit) {
   u(qvar);
   projector_controlled_phase<phase_seq[(2 * index) + 1], proj_cnot_2>(qvar, aux);
@@ -7,6 +8,8 @@ qfunc qsvt_step<phase_seq: real[], index: int, proj_cnot_1: qfunc (arg0: qbit[],
   }
   projector_controlled_phase<phase_seq[(2 * index) + 2], proj_cnot_1>(qvar, aux);
 =======
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 qfunc qsvt_step<phase1: real, phase2: real, proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit) {
   u(qvar);
   projector_controlled_phase<phase1, proj_cnot_2>(qvar, aux);
@@ -14,5 +17,8 @@ qfunc qsvt_step<phase1: real, phase2: real, proj_cnot_1: qfunc (arg0: qbit[], ar
     u(qvar);
   }
   projector_controlled_phase<phase2, proj_cnot_1>(qvar, aux);
+<<<<<<< HEAD
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
 }

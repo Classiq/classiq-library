@@ -1,8 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 qfunc expr_predicate(a: qnum<2, False, 0>, b: qnum<2, False, 0>, c: qnum<3, False, 0>, res: qbit) {
 =======
 qfunc expr_predicate(a: qnum<2, False, 0>, b: qnum<2, False, 0>, c: qnum<3, False, 0>, res: qbit[1]) {
 >>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
+=======
+qfunc expr_predicate(a: qnum<2, False, 0>, b: qnum<2, False, 0>, c: qnum<3, False, 0>, res: qbit[1]) {
+>>>>>>> f7386d5a02b35677da04846cd26d5ba60930f8cb
   res ^= ((((a + b) + (c & 6)) % 4) | (4 & c)) == 4;
 }
 
