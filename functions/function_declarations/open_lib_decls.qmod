@@ -1,9 +1,16 @@
 // Open library functions
+<<<<<<< HEAD
 qfunc qft_step(target: qbit[]);
 qfunc qft(target: qbit[]);
 qfunc qpe_flexible<unitary_with_power: qfunc <arg0: int>()>(phase: qnum);
 qfunc qpe<unitary: qfunc ()>(phase: qnum);
 qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit)>(x: qbit[], q: qbit);
+=======
+qfunc qft(target: qbit[]);
+qfunc qpe_flexible<unitary_with_power: qfunc <arg0: int>()>(phase: qnum);
+qfunc qpe<unitary: qfunc ()>(phase: qnum);
+qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit[1])>(x: qbit[], q: qbit[1]);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 qfunc linear_pauli_rotations<bases: Pauli[], slopes: real[], offsets: real[]>(x: qbit[], q: qbit[]);
 qfunc amplitude_estimation<oracle: qfunc (arg0: qbit[]), space_transform: qfunc (arg0: qbit[])>(phase: qnum, packed_vars: qbit[]);
 qfunc phase_oracle<predicate: qfunc (arg0: qbit[], arg1: qbit)>(target: qbit[]);
@@ -12,7 +19,11 @@ qfunc grover_diffuser<space_transform: qfunc (arg0: qbit[])>(packed_vars: qbit[]
 qfunc grover_operator<oracle: qfunc (arg0: qbit[]), space_transform: qfunc (arg0: qbit[])>(packed_vars: qbit[]);
 qfunc grover_search<reps: int, oracle: qfunc (arg0: qbit[])>(packed_vars: qbit[]);
 qfunc hadamard_transform(target: qbit[]);
+<<<<<<< HEAD
 qfunc apply_to_all<gate_operand: qfunc (target: qbit)>(target: qbit[]);
+=======
+qfunc apply_to_all<gate_operand: qfunc (target: qbit[1])>(target: qbit[]);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 qfunc qft_no_swap(qbv: qbit[]);
 qfunc _check_msb<ref: int>(x: qbit[], aux: qbit);
 qfunc _ctrl_x<ref: int>(ctrl: qnum, aux: qbit);
@@ -22,7 +33,11 @@ qfunc c_modular_multiply<n: int, a: int>(b: qbit[], x: qbit[], ctrl: qbit, aux: 
 qfunc multiswap(x: qbit[], y: qbit[]);
 qfunc inplace_c_modular_multiply<n: int, a: int>(x: qbit[], ctrl: qbit, aux: qbit);
 qfunc modular_exp<n: int, a: int>(x: qbit[], power: qbit[]);
+<<<<<<< HEAD
 qfunc qsvt_step<phase_seq: real[], index: int, proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit);
+=======
+qfunc qsvt_step<phase1: real, phase2: real, proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 qfunc qsvt<phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit);
 qfunc projector_controlled_phase<phase: real, proj_cnot: qfunc (arg0: qbit[], arg1: qbit)>(qvar: qbit[], aux: qbit);
 qfunc qsvt_inversion<phase_seq: real[], block_encoding_cnot: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit);
@@ -32,7 +47,11 @@ qfunc qaoa_cost_layer<g: real, hamiltonian: PauliTerm[]>(target: qbit[]);
 qfunc qaoa_layer<g: real, b: real, hamiltonian: PauliTerm[]>(target: qbit[]);
 qfunc qaoa_init(target: qbit[]);
 qfunc qaoa_penalty<num_qubits: int, params_list: real[], hamiltonian: PauliTerm[]>(target: qbit[num_qubits]);
+<<<<<<< HEAD
 qfunc full_hea<num_qubits: int, is_parametrized: int[], angle_params: real[], connectivity_map: int[][], reps: int, operands_1qubit: qfunc[] <angle: real>(q: qbit), operands_2qubit: qfunc[] <angle: real>(q1: qbit, q2: qbit)>(x: qbit[num_qubits]);
+=======
+qfunc full_hea<num_qubits: int, is_parametrized: int[], angle_params: real[], connectivity_map: int[][], reps: int, operands_1qubit: qfunc[] <angle: real>(q: qbit[1]), operands_2qubit: qfunc[] <angle: real>(q1: qbit[1], q2: qbit[1])>(x: qbit[num_qubits]);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 qfunc swap_test(state1: qbit[], state2: qbit[], output test: qbit);
 qfunc prepare_ghz_state<size: int>(output q: qbit[]);
 qfunc prepare_exponential_state<rate: int>(q: qbit[]);
@@ -40,3 +59,13 @@ qfunc prepare_bell_state<state_num: int>(output q: qbit[2]);
 qfunc inplace_prepare_int<value: int>(target: qbit[]);
 qfunc prepare_int<value: int>(output out: qnum);
 qfunc switch<selector: int, cases: qfunc[] ()>();
+<<<<<<< HEAD
+=======
+qfunc _qct_d_operator(x: qnum, q: qbit);
+qfunc _qct_pi_operator(x: qbit[], q: qbit);
+qfunc qct_qst_type1(x: qbit[]);
+qfunc qct_qst_type2(x: qbit[], q: qbit);
+qfunc qct_type2(x: qbit[]);
+qfunc qst_type2(x: qbit[]);
+qfunc modular_increment<a: int>(x: qbit[]);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb

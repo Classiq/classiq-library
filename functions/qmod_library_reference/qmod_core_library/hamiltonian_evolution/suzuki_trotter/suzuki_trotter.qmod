@@ -1,21 +1,40 @@
+<<<<<<< HEAD
 qfunc main(output qba: qbit[]) {
   allocate<3>(qba);
   suzuki_trotter<[
     PauliTerm {
       pauli = [
+=======
+qfunc main<a: real, x: real>(output qba: qbit[]) {
+  allocate<3>(qba);
+  suzuki_trotter<[
+    PauliTerm {
+      pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
         Pauli::X,
         Pauli::X,
         Pauli::Z
       ],
+<<<<<<< HEAD
       coefficient = a
     },
     PauliTerm {
       pauli = [
+=======
+      coefficient=a
+    },
+    PauliTerm {
+      pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
         Pauli::Y,
         Pauli::X,
         Pauli::Z
       ],
+<<<<<<< HEAD
       coefficient = 0.5
+=======
+      coefficient=0.5
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
     }
   ], x, 1, 1>(qba);
 }

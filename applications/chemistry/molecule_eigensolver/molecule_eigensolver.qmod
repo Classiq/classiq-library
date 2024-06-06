@@ -1,5 +1,6 @@
 qfunc main<t: real[12]>(output qbv: qbit[]) {
   allocate<molecule_problem_to_hamiltonian(MoleculeProblem {
+<<<<<<< HEAD
     mapping = FermionMapping::JORDAN_WIGNER,
     z2_symmetries = False,
     molecule = Molecule {
@@ -54,6 +55,46 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
     },
     freeze_core = True,
     remove_orbitals = []
+=======
+    mapping=FermionMapping::JORDAN_WIGNER,
+    z2_symmetries=False,
+    molecule=Molecule {
+      atoms=[
+        ChemistryAtom {
+          element=Element::H,
+          position=Position {x=0.0, y=0.0, z=0.0}
+        },
+        ChemistryAtom {
+          element=Element::H,
+          position=Position {x=0.0, y=0.0, z=0.735}
+        }
+      ],
+      spin=1,
+      charge=0
+    },
+    freeze_core=True,
+    remove_orbitals=[]
+  })[0].pauli.len>(qbv);
+  molecule_hartree_fock<MoleculeProblem {
+    mapping=FermionMapping::JORDAN_WIGNER,
+    z2_symmetries=False,
+    molecule=Molecule {
+      atoms=[
+        ChemistryAtom {
+          element=Element::H,
+          position=Position {x=0.0, y=0.0, z=0.0}
+        },
+        ChemistryAtom {
+          element=Element::H,
+          position=Position {x=0.0, y=0.0, z=0.735}
+        }
+      ],
+      spin=1,
+      charge=0
+    },
+    freeze_core=True,
+    remove_orbitals=[]
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
   }>(qbv);
   full_hea<4, [0, 1, 0], t, [[0, 1], [1, 2], [2, 3]], 3, [lambda<angle>(q) {
     X(q);
@@ -65,7 +106,10 @@ qfunc main<t: real[12]>(output qbv: qbit[]) {
 }
 
 cscope ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 vqe_result = vqe(
     hamiltonian=molecule_problem_to_hamiltonian(struct_literal(MoleculeProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,molecule=struct_literal(Molecule,atoms=[struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0.0)),struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0.735))],spin=1,charge=0),freeze_core=True,remove_orbitals=[])), maximize=False,
 initial_point=[],
@@ -81,5 +125,8 @@ save({'vqe_result': vqe_result})
 
 molecule_result = molecule_ground_state_solution_post_process(struct_literal(MoleculeProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,molecule=struct_literal(Molecule,atoms=[struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0.0)),struct_literal(ChemistryAtom,element=Element.H,position=struct_literal(Position,x=0.0,y=0.0,z=0.735))],spin=1,charge=0),freeze_core=True,remove_orbitals=[]),vqe_result)
 save({'molecule_result': molecule_result})
+<<<<<<< HEAD
 
+=======
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 ```

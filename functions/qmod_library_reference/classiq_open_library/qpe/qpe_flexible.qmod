@@ -5,6 +5,7 @@ qfunc main(output state: qbit[], output phase: qnum) {
   qpe_flexible<lambda<power>() {
     suzuki_trotter<[
       PauliTerm {
+<<<<<<< HEAD
         pauli = [Pauli::I, Pauli::Z],
         coefficient = -0.125
       },
@@ -15,6 +16,18 @@ qfunc main(output state: qbit[], output phase: qnum) {
       PauliTerm {
         pauli = [Pauli::I, Pauli::I],
         coefficient = 0.375
+=======
+        pauli=[Pauli::I, Pauli::Z],
+        coefficient=-0.125
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::I],
+        coefficient=-0.25
+      },
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::I],
+        coefficient=0.375
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
       }
     ], ((-2) * pi) * power, 1, 1>(state);
   }>(phase);

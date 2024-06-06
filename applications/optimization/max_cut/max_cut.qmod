@@ -1,73 +1,123 @@
 hamiltonian: PauliTerm[] = [
   PauliTerm {
+<<<<<<< HEAD
     pauli = [
+=======
+    pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
       Pauli::I,
       Pauli::I,
       Pauli::I,
       Pauli::I,
       Pauli::I
     ],
+<<<<<<< HEAD
     coefficient = -3.0
   },
   PauliTerm {
     pauli = [
+=======
+    coefficient=-3.0
+  },
+  PauliTerm {
+    pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
       Pauli::I,
       Pauli::I,
       Pauli::I,
       Pauli::Z,
       Pauli::Z
     ],
+<<<<<<< HEAD
     coefficient = 0.5
   },
   PauliTerm {
     pauli = [
+=======
+    coefficient=0.5
+  },
+  PauliTerm {
+    pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
       Pauli::I,
       Pauli::I,
       Pauli::Z,
       Pauli::I,
       Pauli::Z
     ],
+<<<<<<< HEAD
     coefficient = 0.5
   },
   PauliTerm {
     pauli = [
+=======
+    coefficient=0.5
+  },
+  PauliTerm {
+    pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
       Pauli::I,
       Pauli::I,
       Pauli::Z,
       Pauli::Z,
       Pauli::I
     ],
+<<<<<<< HEAD
     coefficient = 0.5
   },
   PauliTerm {
     pauli = [
+=======
+    coefficient=0.5
+  },
+  PauliTerm {
+    pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
       Pauli::I,
       Pauli::Z,
       Pauli::I,
       Pauli::Z,
       Pauli::I
     ],
+<<<<<<< HEAD
     coefficient = 0.5
   },
   PauliTerm {
     pauli = [
+=======
+    coefficient=0.5
+  },
+  PauliTerm {
+    pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
       Pauli::Z,
       Pauli::I,
       Pauli::Z,
       Pauli::I,
       Pauli::I
     ],
+<<<<<<< HEAD
     coefficient = 0.5
   },
   PauliTerm {
     pauli = [
+=======
+    coefficient=0.5
+  },
+  PauliTerm {
+    pauli=[
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
       Pauli::Z,
       Pauli::Z,
       Pauli::I,
       Pauli::I,
       Pauli::I
     ],
+<<<<<<< HEAD
     coefficient = 0.5
+=======
+    coefficient=0.5
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
   }
 ];
 
@@ -77,7 +127,10 @@ qfunc main<params_list: real[8]>(output target: qbit[5]) {
 }
 
 cscope ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 vqe_result = vqe(
 hamiltonian=hamiltonian,
 maximize=True,
@@ -91,5 +144,8 @@ alpha_cvar=0.7
 )
 
 save({"vqe_result": vqe_result, "hamiltonian": hamiltonian})
+<<<<<<< HEAD
 
+=======
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 ```

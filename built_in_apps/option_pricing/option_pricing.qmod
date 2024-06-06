@@ -1,5 +1,6 @@
 qfunc qmci<space_transform: qfunc (arg0: qbit[], arg1: qbit)>(phase: qnum, packed_vars: qbit[]) {
   amplitude_estimation<lambda(arg0) {
+<<<<<<< HEAD
     Z(arg0[(arg0.len) - 1]);
   }, lambda(arg0) {
     space_transform(arg0[0:(arg0.len) - 1], arg0[(arg0.len) - 1]);
@@ -7,11 +8,21 @@ qfunc qmci<space_transform: qfunc (arg0: qbit[], arg1: qbit)>(phase: qnum, packe
 }
 
 qfunc main(output phase_port: qbit) {
+=======
+    Z(arg0[arg0.len - 1]);
+  }, lambda(arg0) {
+    space_transform(arg0[0:arg0.len - 1], arg0[arg0.len - 1]);
+  }>(phase, packed_vars);
+}
+
+qfunc main(output phase_port: qbit[1]) {
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
   unitary_port: qbit[];
   allocate<6>(unitary_port);
   allocate_num<1, False, 1>(phase_port);
   qmci<lambda(arg0, arg1) {
     log_normal_finance<LogNormalModel {
+<<<<<<< HEAD
       num_qubits = 5,
       mu = 0.7,
       sigma = 0.13
@@ -22,12 +33,27 @@ qfunc main(output phase_port: qbit) {
       polynomial_degree = 0,
       use_chebyshev_polynomial_approximation = False,
       tail_probability = 0.0
+=======
+      num_qubits=5,
+      mu=0.7,
+      sigma=0.13
+    }, FinanceFunction {
+      f=FinanceFunctionType::EUROPEAN_CALL_OPTION,
+      threshold=2.0,
+      larger=True,
+      polynomial_degree=0,
+      use_chebyshev_polynomial_approximation=False,
+      tail_probability=0.0
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
     }>(arg0, arg1);
   }>(phase_port, unitary_port);
 }
 
 cscope ```
+<<<<<<< HEAD
 
+=======
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 def execute_amplitude_estimation(phase_port_size):
     result = sample()
     estimation = qae_with_qpe_result_post_processing(
@@ -41,5 +67,8 @@ def execute_amplitude_estimation(phase_port_size):
 estimation = execute_amplitude_estimation(1)
 result = log_normal_finance_post_process(struct_literal(LogNormalModel, num_qubits=5, mu=0.7, sigma=0.13), struct_literal(FinanceFunction, f=FinanceFunctionType.EUROPEAN_CALL_OPTION, threshold=2.0, larger=True, polynomial_degree=0, use_chebyshev_polynomial_approximation=False, tail_probability=0.0), estimation)
 save({'result': result})
+<<<<<<< HEAD
 
+=======
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 ```

@@ -2,7 +2,11 @@ qfunc qft(target: qbit[]) {
   repeat (index: target.len / 2) {
     SWAP(target[index], target[(target.len - 1) - index]);
   }
+<<<<<<< HEAD
   repeat (index: target.len) {
     qft_step(target[index:target.len]);
   }
+=======
+  qft_no_swap(target);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 }

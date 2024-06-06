@@ -1,5 +1,13 @@
 qfunc qft_no_swap(qbv: qbit[]) {
+<<<<<<< HEAD
   repeat (index: qbv.len) {
     qft_step(qbv[index:qbv.len]);
+=======
+  repeat (i: qbv.len) {
+    H(qbv[i]);
+    repeat (j: (qbv.len - i) - 1) {
+      CPHASE<pi / (2 ** (j + 1))>(qbv[(i + j) + 1], qbv[i]);
+    }
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
   }
 }

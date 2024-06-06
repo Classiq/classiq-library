@@ -51,9 +51,15 @@ qfunc main<k: int>(output ind_reg: qbit) {
   full_reg: qbit[];
   allocate<5>(full_reg);
   my_iqae_algorithm<k, lambda(arg0) {
+<<<<<<< HEAD
     Z(arg0[(arg0.len) - 1]);
   }, lambda(arg0) {
     iqae_state_preparation(arg0[0:2], arg0[2:(arg0.len) - 1], arg0[(arg0.len) - 1]);
+=======
+    Z(arg0[arg0.len - 1]);
+  }, lambda(arg0) {
+    iqae_state_preparation(arg0[0:2], arg0[2:arg0.len - 1], arg0[arg0.len - 1]);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
   }>(full_reg);
   state_reg: qbit[4];
   full_reg -> {state_reg, ind_reg};

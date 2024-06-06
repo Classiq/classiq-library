@@ -50,6 +50,7 @@ qfunc main(output state: qbit[], output aux: qbit) {
   allocate<6>(state);
   hadamard_transform(state);
   qsvt_fpaa<[
+<<<<<<< HEAD
     2.6976,
     4.4213,
     4.0814,
@@ -76,6 +77,34 @@ qfunc main(output state: qbit[], output aux: qbit) {
     4.0814,
     4.4213,
     (-3.5856)
+=======
+    3.7966,
+    4.059,
+    4.3526,
+    1.9162,
+    2.8594,
+    (-1.0825),
+    3.6073,
+    3.1312,
+    6.962,
+    2.5015,
+    2.4699,
+    1.6874,
+    4.1289,
+    4.1289,
+    1.6874,
+    2.4699,
+    2.5015,
+    6.962,
+    3.1312,
+    3.6073,
+    (-1.0825),
+    2.8594,
+    8.1994,
+    (-1.9306),
+    4.059,
+    (-2.4866)
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
   ], lambda(arg0, arg1) {
     arith_equation(arg0[0:2], arg0[2:3], arg0[3:6], arg1);
   }>(state, aux);

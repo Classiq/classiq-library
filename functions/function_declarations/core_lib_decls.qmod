@@ -5,6 +5,7 @@ qfunc molecule_hartree_fock<molecule_problem: MoleculeProblem>(qbv: qbit[molecul
 qfunc fock_hamiltonian_ucc<fock_hamiltonian_problem: FockHamiltonianProblem, excitations: int[]>(qbv: qbit[fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli.len]);
 qfunc fock_hamiltonian_hva<fock_hamiltonian_problem: FockHamiltonianProblem, reps: int>(qbv: qbit[fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli.len]);
 qfunc fock_hamiltonian_hartree_fock<fock_hamiltonian_problem: FockHamiltonianProblem>(qbv: qbit[fock_hamiltonian_problem_to_hamiltonian(fock_hamiltonian_problem)[0].pauli.len]);
+<<<<<<< HEAD
 qfunc log_normal_finance<finance_model: LogNormalModel, finance_function: FinanceFunction>(func_port: qbit[finance_model.num_qubits], obj_port: qbit);
 qfunc gaussian_finance<finance_model: GaussianModel, finance_function: FinanceFunction>(func_port: qbit[((finance_model.num_qubits + finance_model.rhos.len) + floor(log(sum(finance_model.loss), 2))) + 1], obj_port: qbit);
 qfunc pauli_feature_map<feature_map: QSVMFeatureMapPauli>(qbv: qbit[feature_map.feature_dimension]);
@@ -35,6 +36,38 @@ qfunc CRY<theta: real>(control: qbit, target: qbit);
 qfunc CRZ<theta: real>(control: qbit, target: qbit);
 qfunc CPHASE<theta: real>(control: qbit, target: qbit);
 qfunc SWAP(qbit0: qbit, qbit1: qbit);
+=======
+qfunc log_normal_finance<finance_model: LogNormalModel, finance_function: FinanceFunction>(func_port: qbit[finance_model.num_qubits], obj_port: qbit[1]);
+qfunc gaussian_finance<finance_model: GaussianModel, finance_function: FinanceFunction>(func_port: qbit[((finance_model.num_qubits + finance_model.rhos.len) + floor(log(sum(finance_model.loss), 2))) + 1], obj_port: qbit[1]);
+qfunc pauli_feature_map<feature_map: QSVMFeatureMapPauli>(qbv: qbit[feature_map.feature_dimension]);
+qfunc bloch_sphere_feature_map<feature_dimension: int>(qbv: qbit[ceiling(feature_dimension / 2)]);
+qfunc H(target: qbit[1]);
+qfunc X(target: qbit[1]);
+qfunc Y(target: qbit[1]);
+qfunc Z(target: qbit[1]);
+qfunc I(target: qbit[1]);
+qfunc S(target: qbit[1]);
+qfunc T(target: qbit[1]);
+qfunc SDG(target: qbit[1]);
+qfunc TDG(target: qbit[1]);
+qfunc PHASE<theta: real>(target: qbit[1]);
+qfunc RX<theta: real>(target: qbit[1]);
+qfunc RY<theta: real>(target: qbit[1]);
+qfunc RZ<theta: real>(target: qbit[1]);
+qfunc R<theta: real, phi: real>(target: qbit[1]);
+qfunc RXX<theta: real>(target: qbit[2]);
+qfunc RYY<theta: real>(target: qbit[2]);
+qfunc RZZ<theta: real>(target: qbit[2]);
+qfunc CH(control: qbit[1], target: qbit[1]);
+qfunc CX(control: qbit[1], target: qbit[1]);
+qfunc CY(control: qbit[1], target: qbit[1]);
+qfunc CZ(control: qbit[1], target: qbit[1]);
+qfunc CRX<theta: real>(control: qbit[1], target: qbit[1]);
+qfunc CRY<theta: real>(control: qbit[1], target: qbit[1]);
+qfunc CRZ<theta: real>(control: qbit[1], target: qbit[1]);
+qfunc CPHASE<theta: real>(control: qbit[1], target: qbit[1]);
+qfunc SWAP(qbit0: qbit[1], qbit1: qbit[1]);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 qfunc IDENTITY(target: qbit[]);
 qfunc prepare_state<probabilities: real[], bound: real>(output out: qbit[log(probabilities.len, 2)]);
 qfunc prepare_amplitudes<amplitudes: real[], bound: real>(output out: qbit[log(amplitudes.len, 2)]);
@@ -42,8 +75,13 @@ qfunc unitary<elements: real[][]>(target: qbit[log(elements[0].len, 2)]);
 qfunc add(left: qbit[], right: qbit[], output result: qbit[Max(left.len, right.len) + 1]);
 qfunc modular_add(left: qbit[], right: qbit[]);
 qfunc integer_xor(left: qbit[], right: qbit[]);
+<<<<<<< HEAD
 qfunc U<theta: real, phi: real, lam: real, gam: real>(target: qbit);
 qfunc CCX(control: qbit[2], target: qbit);
+=======
+qfunc U<theta: real, phi: real, lam: real, gam: real>(target: qbit[1]);
+qfunc CCX(control: qbit[2], target: qbit[1]);
+>>>>>>> 991980ef0472d4a1f0e4f3caa0a1c1046ab9fbeb
 qfunc allocate<num_qubits: int>(output out: qbit[num_qubits]);
 qfunc free(input in: qbit[]);
 qfunc randomized_benchmarking<num_of_cliffords: int>(target: qbit[]);
