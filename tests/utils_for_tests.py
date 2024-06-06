@@ -17,7 +17,7 @@ def iterate_notebooks() -> Iterable[str]:
     return notebooks_to_test
 
 
-def _get_all_notebooks(directory=ROOT_DIRECTORY) -> Iterable[str]:
+def _get_all_notebooks(directory: Path = ROOT_DIRECTORY) -> Iterable[str]:
     for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(".ipynb"):
