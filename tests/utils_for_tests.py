@@ -2,7 +2,7 @@ import os
 from collections.abc import Iterable
 from pathlib import Path
 
-ROOT_DIRECTORY = Path(__file__).parent
+ROOT_DIRECTORY = Path(__file__).parents[1]
 
 
 def iterate_notebooks() -> Iterable[str]:
