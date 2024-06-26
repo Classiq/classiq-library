@@ -1,0 +1,59 @@
+qfunc qmci_oracle(ind: qbit) {
+  Z(ind);
+}
+
+qfunc affine_max(x1: qnum, x2: qnum, output res: qnum) {
+  res = max(x1 * 1.0, ((x1 * 0.5) + (x2 * 0.5)) + (-1.5));
+}
+
+qfunc brute_force_payoff(max_reg: qnum, ind_reg: qbit) {
+  max_reg_fixed: qnum<max_reg.size, False, max_reg.size>;
+  max_reg -> max_reg_fixed;
+  ind_reg *= sqrt(max(193.97 * exp(((0.4341 * (2 ** (max_reg.size - max_reg.fraction_digits))) * max_reg_fixed) + (-0.7408)), 190)) / sqrt(max(193.97 * exp(((0.4341 * (2 ** (max_reg.size - max_reg.fraction_digits))) * (1 - (1 / (2 ** max_reg.size)))) + (-0.7408)), 190));
+  max_reg_fixed -> max_reg;
+}
+
+qfunc rainbow_brute_force(x1: qnum, x2: qnum, ind_reg: qbit) {
+  inplace_prepare_state<[
+    0.0656,
+    0.4344,
+    0.4344,
+    0.0656
+  ], 0>(x1);
+  inplace_prepare_state<[
+    0.0656,
+    0.4344,
+    0.4344,
+    0.0656
+  ], 0>(x2);
+  max_out: qnum;
+  within {
+    affine_max(x1, x2, max_out);
+  } apply {
+    brute_force_payoff(max_out, ind_reg);
+  }
+}
+
+qfunc grover_algorithm<k: int, oracle_operand: qfunc (arg0: qbit[]), sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
+  sp_operand(x);
+  power (k) {
+    grover_operator<oracle_operand, sp_operand>(x);
+  }
+}
+
+qfunc main<k: int>(output ind_reg: qbit) {
+  full_reg: qbit[];
+  allocate<5>(full_reg);
+  grover_algorithm<k, lambda(arg0) {
+    qmci_oracle(arg0[arg0.len - 1]);
+  }, lambda(arg0) {
+    rainbow_brute_force(arg0[0:2], arg0[2:4], arg0[arg0.len - 1]);
+  }>(full_reg);
+  state_reg: qbit[];
+  full_reg -> {state_reg, ind_reg};
+}
+
+cscope ```
+iqae_res = iqae(epsilon=0.01, alpha=0.05)
+save({'iqae_res': iqae_res})
+```
