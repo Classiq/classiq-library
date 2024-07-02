@@ -58,7 +58,7 @@ qfunc ccmod_add<N: int, a: int>(phi_b: qbit[], c1: qbit, c2: qbit, aux: qbit) {
   ctrl -> {c1, c2};
 }
 
-qfunc main(output b: qnum, output ctrl: qbit[], output aux: qbit) {
+qfunc main(output b: qnum, output ctrl: qbit[2], output aux: qbit) {
   allocate<5>(b);
   allocate<2>(ctrl);
   allocate<1>(aux);

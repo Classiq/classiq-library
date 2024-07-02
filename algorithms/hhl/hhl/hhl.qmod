@@ -26,7 +26,7 @@ qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
     0.7302967433,
     0.5477225575
   ], 0.0>(res);
-  my_matrix_inversion_flexible<lambda<pw>(arg1) {
+  my_matrix_inversion_flexible<lambda<pw>(target) {
     suzuki_trotter1_with_power_logic<[
       PauliTerm {
         pauli=[Pauli::I, Pauli::I],
@@ -68,6 +68,6 @@ qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
         pauli=[Pauli::Y, Pauli::Y],
         coefficient=-0.06
       }
-    ], pw, 4, 1.8, -6.2831853072>(arg1);
+    ], pw, 4, 1.8, -6.2831853072>(target);
   }, 4>(res, indicator);
 }

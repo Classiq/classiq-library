@@ -44,10 +44,10 @@ qfunc grover_algorithm<k: int, oracle_operand: qfunc (arg0: qbit[]), sp_operand:
 qfunc main<k: int>(output ind_reg: qbit) {
   full_reg: qbit[];
   allocate<5>(full_reg);
-  grover_algorithm<k, lambda(arg0) {
-    qmci_oracle(arg0[arg0.len - 1]);
-  }, lambda(arg0) {
-    rainbow_brute_force(arg0[0:2], arg0[2:4], arg0[arg0.len - 1]);
+  grover_algorithm<k, lambda(x) {
+    qmci_oracle(x[x.len - 1]);
+  }, lambda(x) {
+    rainbow_brute_force(x[0:2], x[2:4], x[x.len - 1]);
   }>(full_reg);
   state_reg: qbit[];
   full_reg -> {state_reg, ind_reg};
