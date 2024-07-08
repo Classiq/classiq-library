@@ -24,13 +24,13 @@ qfunc my_qpe_flexible<unitary_with_power: qfunc <arg0: int>(arg1: qbit[]), preci
 qfunc main(output phase_result: qnum<8, False, 8>) {
   state: qbit[];
   prepare_amplitudes<[
-    0.55653745541481,
-    0.17653302146188,
-    0.629197193488002,
-    0.513042926820719
+    0.30132518685935,
+    0.675974655003596,
+    0.286332054507695,
+    0.608502548982623
   ], 0.0>(state);
   phase_array: qbit[];
-  my_qpe_flexible<lambda<pw>(arg1) {
+  my_qpe_flexible<lambda<pw>(target) {
     if (True) {
       unitary_with_power_logic<pw, [
         [
@@ -57,50 +57,50 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
           ((-0.026023894036146) + 0.012295427374176j),
           ((-0.895413431349899) - 0.401691392328609j)
         ]
-      ]>(arg1);
+      ]>(target);
     } else {
       suzuki_trotter1_with_power_logic<[
         PauliTerm {
-          pauli = [Pauli::I, Pauli::I],
-          coefficient = 0.4
+          pauli=[Pauli::I, Pauli::I],
+          coefficient=0.4
         },
         PauliTerm {
-          pauli = [Pauli::I, Pauli::Z],
-          coefficient = 0.01504032
+          pauli=[Pauli::I, Pauli::Z],
+          coefficient=0.01504032
         },
         PauliTerm {
-          pauli = [Pauli::I, Pauli::X],
-          coefficient = 0.10676978
+          pauli=[Pauli::I, Pauli::X],
+          coefficient=0.10676978
         },
         PauliTerm {
-          pauli = [Pauli::Z, Pauli::I],
-          coefficient = 0.016634415
+          pauli=[Pauli::Z, Pauli::I],
+          coefficient=0.016634415
         },
         PauliTerm {
-          pauli = [Pauli::Z, Pauli::Z],
-          coefficient = -0.042759185
+          pauli=[Pauli::Z, Pauli::Z],
+          coefficient=-0.042759185
         },
         PauliTerm {
-          pauli = [Pauli::Z, Pauli::X],
-          coefficient = 0.12638833
+          pauli=[Pauli::Z, Pauli::X],
+          coefficient=0.12638833
         },
         PauliTerm {
-          pauli = [Pauli::X, Pauli::I],
-          coefficient = 0.042057265
+          pauli=[Pauli::X, Pauli::I],
+          coefficient=0.042057265
         },
         PauliTerm {
-          pauli = [Pauli::X, Pauli::Z],
-          coefficient = 0.172936455
+          pauli=[Pauli::X, Pauli::Z],
+          coefficient=0.172936455
         },
         PauliTerm {
-          pauli = [Pauli::X, Pauli::X],
-          coefficient = 0.15658719
+          pauli=[Pauli::X, Pauli::X],
+          coefficient=0.15658719
         },
         PauliTerm {
-          pauli = [Pauli::Y, Pauli::Y],
-          coefficient = 0.09539162
+          pauli=[Pauli::Y, Pauli::Y],
+          coefficient=0.09539162
         }
-      ], pw, 2, 1.8, -6.283185307179586>(arg1);
+      ], pw, 2, 1.8, -6.283185307179586>(target);
     }
   }, 8>(state, phase_array);
   phase_array -> phase_result;

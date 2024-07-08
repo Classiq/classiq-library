@@ -1,10 +1,10 @@
 qfunc grover_search<reps: int, oracle: qfunc (arg0: qbit[])>(packed_vars: qbit[]) {
   hadamard_transform(packed_vars);
   power (reps) {
-    grover_operator<lambda(arg0) {
-      oracle(arg0);
-    }, lambda(arg0) {
-      hadamard_transform(arg0);
+    grover_operator<lambda(qba) {
+      oracle(qba);
+    }, lambda(qba) {
+      hadamard_transform(qba);
     }>(packed_vars);
   }
 }

@@ -53,9 +53,9 @@ qfunc hidden_shift_no_dual<oracle: qfunc (arg0: qbit[], arg1: qbit), oracle_shif
 qfunc main(output target: qbit[], output ind: qbit) {
   allocate<16>(target);
   allocate<1>(ind);
-  hidden_shift_no_dual<lambda(arg0, arg1) {
-    f_qfunc(arg0, arg1);
-  }, lambda(arg0, arg1) {
-    g_qfunc(arg0, arg1);
+  hidden_shift_no_dual<lambda(vars, result) {
+    f_qfunc(vars, result);
+  }, lambda(vars, result) {
+    g_qfunc(vars, result);
   }>(target, ind);
 }

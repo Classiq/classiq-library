@@ -1,45 +1,41 @@
 qfunc qmci<space_transform: qfunc (arg0: qbit[], arg1: qbit)>(phase: qnum, packed_vars: qbit[]) {
-  amplitude_estimation<lambda(arg0) {
-    Z(arg0[(arg0.len) - 1]);
-  }, lambda(arg0) {
-    space_transform(arg0[0:(arg0.len) - 1], arg0[(arg0.len) - 1]);
+  amplitude_estimation<lambda(reg) {
+    Z(reg[reg.len - 1]);
+  }, lambda(reg) {
+    space_transform(reg[0:reg.len - 1], reg[reg.len - 1]);
   }>(phase, packed_vars);
 }
 
-qfunc main(output phase_port: qbit) {
+qfunc main(output phase_port: qbit[1]) {
   unitary_port: qbit[];
   allocate<6>(unitary_port);
   allocate_num<1, False, 1>(phase_port);
   qmci<lambda(arg0, arg1) {
     log_normal_finance<LogNormalModel {
-      num_qubits = 5,
-      mu = 0.7,
-      sigma = 0.13
+      num_qubits=5,
+      mu=0.7,
+      sigma=0.13
     }, FinanceFunction {
-      f = FinanceFunctionType::EUROPEAN_CALL_OPTION,
-      threshold = 2.0,
-      larger = True,
-      polynomial_degree = 0,
-      use_chebyshev_polynomial_approximation = False,
-      tail_probability = 0.0
+      f=FinanceFunctionType::EUROPEAN_CALL_OPTION,
+      threshold=2.0,
+      larger=True,
+      polynomial_degree=0,
+      use_chebyshev_polynomial_approximation=False,
+      tail_probability=0.0
     }>(arg0, arg1);
   }>(phase_port, unitary_port);
 }
 
 cscope ```
-
-def execute_amplitude_estimation(phase_port_size):
-    result = sample()
-    estimation = qae_with_qpe_result_post_processing(
-        estimation_register_size=phase_port_size,
-        estimation_method=1,
-        result=result
-    )
-    save({"result": result, "estimation": estimation})
-    return estimation
-
-estimation = execute_amplitude_estimation(1)
-result = log_normal_finance_post_process(struct_literal(LogNormalModel, num_qubits=5, mu=0.7, sigma=0.13), struct_literal(FinanceFunction, f=FinanceFunctionType.EUROPEAN_CALL_OPTION, threshold=2.0, larger=True, polynomial_degree=0, use_chebyshev_polynomial_approximation=False, tail_probability=0.0), estimation)
-save({'result': result})
-
+phase_port_size = 1
+counts = sample()
+save({"counts": counts})
+probability_estimation = qae_with_qpe_result_post_processing(
+    estimation_register_size=phase_port_size,
+    estimation_method=1,
+    result=counts
+)
+save({"probability_estimation": probability_estimation})
+payoff_estimation = log_normal_finance_post_process(struct_literal(LogNormalModel, num_qubits=5, mu=0.7, sigma=0.13), struct_literal(FinanceFunction, f=FinanceFunctionType.EUROPEAN_CALL_OPTION, threshold=2.0, larger=True, polynomial_degree=0, use_chebyshev_polynomial_approximation=False, tail_probability=0.0), probability_estimation)
+save({"payoff_estimation": payoff_estimation})
 ```

@@ -1,6 +1,6 @@
 qfunc create_initial_state(reg: qbit[]) {
-  apply_to_all<lambda(target) {
-    H(target);
+  apply_to_all<lambda(qb) {
+    H(qb);
   }>(reg);
 }
 
