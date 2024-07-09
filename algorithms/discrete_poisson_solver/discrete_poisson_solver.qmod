@@ -1,0 +1,280 @@
+qfunc qsct_2d(xy_variable: qnum[2]) {
+  qst_type2(xy_variable[0]);
+  qct_type2(xy_variable[1]);
+}
+
+qfunc powered_hamiltonian_evolution<hamiltonian: PauliTerm[], scaling: real, p: int>(qba: qbit[]) {
+  suzuki_trotter<hamiltonian, p * ((-6.28318530718) * scaling), 1, 1>(qba);
+}
+
+qfunc inverse_amplitude_load<prefactor: real>(phase: qnum, ind: qbit) {
+  ind *= prefactor / phase;
+}
+
+qfunc matrix_inversion_HHL<prefactor: real, my_unitary: qfunc <arg0: int>(arg1: qbit[])>(state: qbit[], phase: qnum, output indicator: qbit) {
+  allocate<1>(indicator);
+  within {
+    qpe_flexible<lambda<power>() {
+      my_unitary<power>(state);
+    }>(phase);
+  } apply {
+    inverse_amplitude_load<prefactor>(phase, indicator);
+  }
+}
+
+qfunc main(output x_variable: qnum<3, False, 0>, output y_variable: qnum<3, False, 0>, output phase: qnum, output indicator: qbit) {
+  xy_variable: qnum<3, False, 0>[2];
+  prepare_amplitudes<[
+    0.000929993206,
+    0.006286469531,
+    0.012502019419,
+    0.01640293531,
+    0.01640293531,
+    0.012502019419,
+    0.006286469531,
+    0.000929993206,
+    0.006286469531,
+    0.042483535101,
+    0.084462252894,
+    0.110795378713,
+    0.110795378713,
+    0.084462252894,
+    0.042483535101,
+    0.006286469531,
+    0.012502019419,
+    0.084462252894,
+    0.167861987331,
+    0.220148535874,
+    0.220148535874,
+    0.167861987331,
+    0.084462252894,
+    0.012502019419,
+    0.01640293531,
+    0.110795378713,
+    0.220148535874,
+    0.288681749865,
+    0.288681749865,
+    0.220148535874,
+    0.110795378713,
+    0.01640293531,
+    0.01640293531,
+    0.110795378713,
+    0.220148535874,
+    0.288681749865,
+    0.288681749865,
+    0.220148535874,
+    0.110795378713,
+    0.01640293531,
+    0.012502019419,
+    0.084462252894,
+    0.167861987331,
+    0.220148535874,
+    0.220148535874,
+    0.167861987331,
+    0.084462252894,
+    0.012502019419,
+    0.006286469531,
+    0.042483535101,
+    0.084462252894,
+    0.110795378713,
+    0.110795378713,
+    0.084462252894,
+    0.042483535101,
+    0.006286469531,
+    0.000929993206,
+    0.006286469531,
+    0.012502019419,
+    0.01640293531,
+    0.01640293531,
+    0.012502019419,
+    0.006286469531,
+    0.000929993206
+  ], 0.0>(xy_variable);
+  allocate<6>(phase);
+  within {
+    qsct_2d(xy_variable);
+  } apply {
+    matrix_inversion_HHL<0.015625, lambda<p>(target) {
+      powered_hamiltonian_evolution<[
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=2.25
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z
+          ],
+          coefficient=-0.25
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z,
+            Pauli::I
+          ],
+          coefficient=-0.520598050073
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z,
+            Pauli::Z
+          ],
+          coefficient=-0.020598050073
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=-1.256834873031
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z,
+            Pauli::I,
+            Pauli::Z
+          ],
+          coefficient=-0.049728091845
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z,
+            Pauli::Z,
+            Pauli::I
+          ],
+          coefficient=-0.103553390593
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z,
+            Pauli::Z,
+            Pauli::Z
+          ],
+          coefficient=0.103553390593
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=1.75
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::I,
+            Pauli::Z,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=-0.25
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::Z,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=-0.520598050073
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::I,
+            Pauli::Z,
+            Pauli::Z,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=0.020598050073
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::Z,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=-1.256834873031
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::Z,
+            Pauli::I,
+            Pauli::Z,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=0.049728091845
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::Z,
+            Pauli::Z,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=0.103553390593
+        },
+        PauliTerm {
+          pauli=[
+            Pauli::Z,
+            Pauli::Z,
+            Pauli::Z,
+            Pauli::I,
+            Pauli::I,
+            Pauli::I
+          ],
+          coefficient=0.103553390593
+        }
+      ], 0.101321183642, p>(target);
+    }>(xy_variable, phase, indicator);
+  }
+  xy_variable -> {x_variable, y_variable};
+}
+
