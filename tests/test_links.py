@@ -32,13 +32,21 @@ def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
             yield cell_index, url
 
 
-def _test_single_url(url: str) -> bool:
+def _test_single_url(url: str, retry: int = 3) -> bool:
+    if retry == 0:
+        return False
+
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
     }
 
     try:
         response = httpx.head(url, headers=headers, follow_redirects=True)
+
+        if response.status_code == 403:
+            # Some flaky error with "doi.org" links
+            return _test_single_url(url, retry - 1)
+
         return response.is_success
     except httpx.HTTPError:
         return False
