@@ -12,12 +12,12 @@ qfunc u_sqrt(a: qnum, ref: qnum, res: qbit) {
 qfunc qsvt_sqrt_polynomial<qsvt_phases: real[]>(state: qnum, ref: qnum, ind: qbit, qsvt_aux: qbit) {
   full_reg: qbit[];
   {ind, ref, state} -> full_reg;
-  qsvt<qsvt_phases, lambda(arg0, arg1) {
-    projector_cnot(arg0[0:5], arg1);
-  }, lambda(arg0, arg1) {
-    projector_cnot(arg0[0], arg1);
-  }, lambda(arg0) {
-    u_sqrt(arg0[5:arg0.len], arg0[1:5], arg0[0]);
+  qsvt<qsvt_phases, lambda(reg_, aux_) {
+    projector_cnot(reg_[0:5], aux_);
+  }, lambda(reg_, aux_) {
+    projector_cnot(reg_[0], aux_);
+  }, lambda(reg_) {
+    u_sqrt(reg_[5:reg_.len], reg_[1:5], reg_[0]);
   }>(full_reg, qsvt_aux);
   full_reg -> {ind, ref, state};
 }

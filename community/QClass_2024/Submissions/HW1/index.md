@@ -1,7 +1,9 @@
 # Submitting HW1
 
 ## Submission: Rules & Instructions
+
 To keep track of submissions, we kindly ask you to:
+
 1. Complete `HW1_QClass2024.ipynb`.
 2. Rename the files to include your full name, for example: `Nadav_Ben-Ami_HW1_QClass2024.ipynb`.
 3. Navigate to your local clone of the `classiq-library`.
@@ -14,7 +16,7 @@ To keep track of submissions, we kindly ask you to:
 **Please ensure you follow these steps carefully to properly submit your assignment!**
 
 ## Support
+
 If you need help or have questions, feel free to reach out in our Slack channel!
 
 ## Enjoy your learning journey at QClass 2024!
-

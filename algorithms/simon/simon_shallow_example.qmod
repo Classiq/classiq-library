@@ -18,7 +18,7 @@ qfunc simon_qfunc<f_qfunc: qfunc (arg0: qnum, output arg1: qnum)>(x: qnum) {
 
 qfunc main(output x: qnum) {
   allocate<6>(x);
-  simon_qfunc<lambda(arg0, arg1) {
-    simon_qfunc_with_bipartite_s<4>(arg0, arg1);
+  simon_qfunc<lambda(x, res) {
+    simon_qfunc_with_bipartite_s<4>(x, res);
   }>(x);
 }

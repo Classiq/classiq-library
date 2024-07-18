@@ -25,24 +25,24 @@ qfunc my_qsvt<phase_seq: real[], proj_ctrl_phase_1: qfunc <arg0: real>(arg1: qbi
 
 qfunc qsvt_fpaa<phase_seq: real[], arith_oracle: qfunc (arg0: qbit[], arg1: qbit)>(qbv_reg: qbit[], output qbv_aux: qbit) {
   allocate<1>(qbv_aux);
-  my_qsvt<phase_seq, lambda<phase>(arg1, arg2) {
-    hadamard_transform(arg1);
-    apply_to_all<X>(arg1);
-    control (arg1) {
-      X(arg2);
+  my_qsvt<phase_seq, lambda<phase>(state, aux) {
+    hadamard_transform(state);
+    apply_to_all<X>(state);
+    control (state) {
+      X(aux);
     }
-    RZ<phase>(arg2);
-    control (arg1) {
-      X(arg2);
+    RZ<phase>(aux);
+    control (state) {
+      X(aux);
     }
-    apply_to_all<X>(arg1);
-    hadamard_transform(arg1);
-  }, lambda<phase>(arg1, arg2) {
-    arith_oracle(arg1, arg2);
-    RZ<phase>(arg2);
-    arith_oracle(arg1, arg2);
-  }, lambda(arg0) {
-    IDENTITY(arg0);
+    apply_to_all<X>(state);
+    hadamard_transform(state);
+  }, lambda<phase>(state, aux) {
+    arith_oracle(state, aux);
+    RZ<phase>(aux);
+    arith_oracle(state, aux);
+  }, lambda(state) {
+    IDENTITY(state);
   }>(qbv_reg, qbv_aux);
 }
 
@@ -50,33 +50,33 @@ qfunc main(output state: qbit[], output aux: qbit) {
   allocate<6>(state);
   hadamard_transform(state);
   qsvt_fpaa<[
-    3.7966,
-    4.059,
-    4.3526,
-    1.9162,
-    2.8594,
-    (-1.0825),
-    3.6073,
-    3.1312,
-    6.962,
-    2.5015,
-    2.4699,
-    1.6874,
-    4.1289,
-    4.1289,
-    1.6874,
-    2.4699,
-    2.5015,
-    6.962,
-    3.1312,
-    3.6073,
-    (-1.0825),
-    2.8594,
-    8.1994,
-    (-1.9306),
-    4.059,
-    (-2.4866)
-  ], lambda(arg0, arg1) {
-    arith_equation(arg0[0:2], arg0[2:3], arg0[3:6], arg1);
+    4.6247,
+    3.3506,
+    3.2361,
+    2.6425,
+    2.7655,
+    4.6477,
+    3.1328,
+    1.3116,
+    3.1851,
+    4.7221,
+    2.8952,
+    3.466,
+    1.3118,
+    1.3118,
+    3.466,
+    2.8952,
+    4.7221,
+    3.1851,
+    1.3116,
+    3.1328,
+    4.6477,
+    2.7655,
+    2.6425,
+    3.2361,
+    3.3506,
+    (-1.6585)
+  ], lambda(state_reg, aux_reg) {
+    arith_equation(state_reg[0:2], state_reg[2:3], state_reg[3:6], aux_reg);
   }>(state, aux);
 }
