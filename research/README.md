@@ -115,4 +115,21 @@ in the table or to add new ones.
             #amplitude_estimation
         </td>
     </tr>
+    <tr>
+        <td>
+            <a href="https://arxiv.org/pdf/2205.04844" target="_blank">Solving workflow scheduling problems with QUBO modeling</a>
+        </td>
+        <td style="min-width: 200px;">
+          <a href="../applications/logistics/task_scheduling_problem/task_scheduling_problem.ipynb">Integration Method</a>
+        </td>
+        <td>
+            Workflow scheduling with QAOA
+        </td>
+        <td>
+            #optimization<br>
+            #QAOA<br>
+            #logistics
+        </td>
+    </tr>
+    
 </table>
