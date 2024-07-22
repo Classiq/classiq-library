@@ -120,7 +120,7 @@ in the table or to add new ones.
             <a href="https://arxiv.org/pdf/2205.04844" target="_blank">Solving workflow scheduling problems with QUBO modeling</a>
         </td>
         <td style="min-width: 200px;">
-          <a href="../applications/logistics/task_scheduling_problem/task_scheduling_problem.ipynb">Integration Method</a>
+          <a href="../applications/logistics/task_scheduling_problem/task_scheduling_problem.ipynb">Workflow Scheduing</a>
         </td>
         <td>
             Workflow scheduling with QAOA
@@ -129,6 +129,36 @@ in the table or to add new ones.
             #optimization<br>
             #QAOA<br>
             #logistics
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="https://www.nature.com/articles/s41534-021-00368-4" target="_blank">Resource-efficient quantum algorithm for protein folding</a>
+        </td>
+        <td style="min-width: 200px;">
+          <a href="../applications/chemistry/protein_folding/protein_folding.ipynb">Protein Folding</a>
+        </td>
+        <td>
+            Protein Folding, implemented with QAOA
+        </td>
+        <td>
+            #optimization<br>
+            #QAOA<br>
+            #chemistry
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="https://arxiv.org/abs/quant-ph/0111038" target="_blank">Discrete Cosine Transforms on Quantum Computers</a>
+        </td>
+        <td style="min-width: 200px;">
+          <a href="../functions/qmod_library_reference/classiq_open_library/qct_qst/qct_qst.ipynb">Quantum Discrete Cosine Transform</a>
+        </td>
+        <td>
+            Quantum Discrete Cosine Transform Function
+        </td>
+        <td>
+            #functions
         </td>
     </tr>
     
