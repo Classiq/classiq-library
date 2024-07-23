@@ -161,5 +161,21 @@ in the table or to add new ones.
             #functions
         </td>
     </tr>
+    <tr>
+        <td>
+            <a href="https://arxiv.org/pdf/2208.01203" target="_blank">Unsupervised quantum machine learning for fraud detection</a>
+        </td>
+        <td style="min-width: 200px;">
+          <a href="../applications/finance/credit_card_fraud/credit_card_fraud.ipynb">Credit Card Fraud Detection</a>
+        </td>
+        <td>
+            Credit card fraud detection with Quantum Stave Vector Machine (QSVM)
+        </td>
+        <td>
+            #applications<be>
+            #finance<be>
+            #qml
+        </td>
+    </tr>
     
 </table>
