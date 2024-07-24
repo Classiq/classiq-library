@@ -52,13 +52,13 @@ qfunc hidden_shift<oracle: qfunc (arg0: qbit[]), oracle_shifted: qfunc (arg0: qb
 
 qfunc main(output s: qbit[]) {
   allocate<16>(s);
-  hidden_shift<lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      f_dual_qfunc(arg0, arg1);
-    }>(arg0);
-  }, lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      g_qfunc(arg0, arg1);
-    }>(arg0);
+  hidden_shift<lambda(y) {
+    phase_oracle<lambda(vars, result) {
+      f_dual_qfunc(vars, result);
+    }>(y);
+  }, lambda(y) {
+    phase_oracle<lambda(vars, result) {
+      g_qfunc(vars, result);
+    }>(y);
   }>(s);
 }

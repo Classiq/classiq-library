@@ -19,15 +19,15 @@ qfunc my_oracle<predicate: qfunc (arg0: qnum, arg1: qbit)>(target: qnum) {
 
 qfunc deutsch_jozsa<predicate: qfunc (arg0: qnum, arg1: qbit)>(x: qnum) {
   hadamard_transform(x);
-  my_oracle<lambda(arg0, arg1) {
-    predicate(arg0, arg1);
+  my_oracle<lambda(x, y) {
+    predicate(x, y);
   }>(x);
   hadamard_transform(x);
 }
 
 qfunc main(output x: qnum) {
   allocate<4>(x);
-  deutsch_jozsa<lambda(arg0, arg1) {
-    simple_predicate(arg0, arg1);
+  deutsch_jozsa<lambda(x, y) {
+    simple_predicate(x, y);
   }>(x);
 }
