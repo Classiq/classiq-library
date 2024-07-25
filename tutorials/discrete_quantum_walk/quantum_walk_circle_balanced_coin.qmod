@@ -25,8 +25,8 @@ qfunc main<t: int>(output x: qnum) {
   allocate<1>(coin);
   H(coin);
   S(coin);
-  discrete_quantum_walk<t, lambda(arg0) {
-    H(arg0);
+  discrete_quantum_walk<t, lambda(coin) {
+    H(coin);
   }, [lambda() {
     quantum_step_clockwise(x);
   }, lambda() {

@@ -17,10 +17,10 @@ qfunc main<t: int>(output x: qbit[]) {
   allocate<4>(x);
   coin: qbit[];
   prepare_state<[0.25, 0.25, 0.25, 0.25], 0.0>(coin);
-  discrete_quantum_walk<t, lambda(arg0) {
-    grover_diffuser<lambda(arg0) {
-      inplace_prepare_state<[0.25, 0.25, 0.25, 0.25], 0.0>(arg0);
-    }>(arg0);
+  discrete_quantum_walk<t, lambda(coin) {
+    grover_diffuser<lambda(coin) {
+      inplace_prepare_state<[0.25, 0.25, 0.25, 0.25], 0.0>(coin);
+    }>(coin);
   }, [lambda() {
     moving_one_hamming_dist<0>(x);
   }, lambda() {

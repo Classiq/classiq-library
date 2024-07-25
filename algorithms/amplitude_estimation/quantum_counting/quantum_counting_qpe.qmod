@@ -47,10 +47,10 @@ qfunc main(output phase_reg: qnum) {
   allocate_num<5, False, 5>(phase_reg);
   hadamard_transform(state_reg);
   qpe<lambda() {
-    my_grover_operator<lambda(arg0) {
-      arith_oracle(arg0[0:2], arg0[2:arg0.len]);
-    }, lambda(arg0) {
-      hadamard_transform(arg0);
+    my_grover_operator<lambda(x) {
+      arith_oracle(x[0:2], x[2:x.len]);
+    }, lambda(x) {
+      hadamard_transform(x);
     }>(state_reg);
   }>(phase_reg);
 }
