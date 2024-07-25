@@ -11,7 +11,7 @@ qfunc simon_qfunc<f_qfunc: qfunc (arg0: qnum, output arg1: qnum)>(x: qnum) {
 
 qfunc main(output x: qnum) {
   allocate<5>(x);
-  simon_qfunc<lambda(arg0, arg1) {
-    simon_qfunc_simple<6>(arg0, arg1);
+  simon_qfunc<lambda(x, res) {
+    simon_qfunc_simple<6>(x, res);
   }>(x);
 }

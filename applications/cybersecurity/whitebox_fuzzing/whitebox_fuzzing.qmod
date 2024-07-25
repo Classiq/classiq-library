@@ -37,8 +37,8 @@ qfunc my_diffuser<sp_operand: qfunc (arg0: qnum, arg1: qnum)>(x: qnum, y: qnum) 
       sp_operand(x, y);
     }
   } apply {
-    my_oracle<lambda(arg0) {
-      zero_predicate(x, y, arg0);
+    my_oracle<lambda(q) {
+      zero_predicate(x, y, q);
     }>();
   }
 }
@@ -54,12 +54,12 @@ qfunc main(output x: qnum, output y: qnum) {
   my_sp(x, y);
   power (4) {
     my_grover_operator<lambda() {
-      my_oracle<lambda(arg0) {
-        my_predicate(x, y, arg0);
+      my_oracle<lambda(q) {
+        my_predicate(x, y, q);
       }>();
     }, lambda() {
-      my_diffuser<lambda(arg0, arg1) {
-        my_sp(arg0, arg1);
+      my_diffuser<lambda(x, y) {
+        my_sp(x, y);
       }>(x, y);
     }>();
   }

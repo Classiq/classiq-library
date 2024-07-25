@@ -7,7 +7,7 @@ qfunc phase_lad<value: int>(phi_b: qbit[]) {
 qfunc my_qft_step(qbv: qbit[]) {
   H(qbv[0]);
   repeat (index: qbv.len - 1) {
-    CPHASE<pi / (2 ** (index + 1))>(qbv[0], qbv[(index) + 1]);
+    CPHASE<pi / (2 ** (index + 1))>(qbv[0], qbv[index + 1]);
   }
 }
 
@@ -93,7 +93,7 @@ qfunc mod_exp_func<N: int, a: int>(x: qbit[], m: qbit[], aux: qbit) {
   }
 }
 
-qfunc main(output x: qbit[], output power: qbit[], output aux: qbit) {
+qfunc main(output x: qbit[], output power: qbit[6], output aux: qbit) {
   allocate<3>(x);
   allocate<6>(power);
   allocate<1>(aux);
