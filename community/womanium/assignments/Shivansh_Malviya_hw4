@@ -1,0 +1,116 @@
+1. Class Example
+Explanation
+The algorithm involves creating a superposition of vertices, applying a diffusion operator (W operator) to spread the amplitude across neighboring vertices, and then applying a coin flip operator (S operator) to determine if the walker moves to a neighbor.
+
+prepare_minus: Prepares the minus state for the auxiliary qubit to be used during phase-kickback
+
+diffuzer_oracle: Implements the oracle for the diffuser.
+
+zero_diffuzer: Creates an auxiliary qubit, prepares it in the minus state, and applies the diffuzer oracle.
+
+C_iteration: Calculates the probability distribution for moving to neighboring vertices. As described in the class, it can't be coded on Qmod. Also, applies a controlled operation to update the adjacent vertices based on the calculated probabilities.
+
+from classiq import *
+import numpy as np
+
+chain_len = 16    # This is the variable for the length of 1-D chain. Instead of 16, it could be anything
+closed = False    # if the chain is closed
+@qfunc
+def prepare_minus(x: QBit):
+    X(x)
+    H(x)
+
+
+@qfunc
+def diffuzer_oracle(aux: Output[QNum],x:QNum):
+    aux ^= (x!=0)
+
+
+@qfunc
+def zero_diffuzer(x: QNum):    # Phase-kickback
+    aux = QNum('aux')
+    allocate(1, aux)
+    within_apply(compute = lambda: prepare_minus(aux),
+              action = lambda: diffuzer_oracle)
+
+
+def C_iteration(i:int, vertices: QNum, adjacent_vertices:QNum):
+    prob = [0 for _ in range(chain_len)]
+
+    if closed :
+        prob[(i+1) % chain_len] = 0.5
+        prob[(i-1) % chain_len] = 0.5
+
+    else : 
+        if i == 0 :
+            prob[1] = 1.0
+            
+        elif i == chain_len - 1 :
+            prob[chain_len - 2] = 1.0
+
+        else :
+            prob[i+1] = 0.5
+            prob[i-1] = 0.5
+    
+    print(f'State={i}, prob vec = {prob}')
+    
+    control(ctrl = vertices == i,
+            operand = lambda: within_apply(
+                compute = lambda: inplace_prepare_state(probabilities = prob, bound = 0.01, target = adjacent_vertices),
+                action = lambda: zero_diffuzer(adjacent_vertices)))
+
+
+@qfunc 
+def C_operator(vertices:QNum, adjacent_vertices: QNum):
+    for i in range(chain_len):
+        C_iteration(i, vertices, adjacent_vertices)
+
+
+@qfunc
+def edge_oracle(res:Output[QBit], vertices: QNum, adjacent_vertices: QNum):
+    if closed :
+        index = chain_len - 1
+        res |= (((vertices - adjacent_vertices) == index) | ((vertices - adjacent_vertices) == -index))
+    else :
+        res |= (((vertices - adjacent_vertices) == 1) | ((vertices - adjacent_vertices) == -1))
+
+        
+
+@qfunc 
+def bitwise_swap(x: QArray[QBit], y:QArray[QBit]):
+    repeat(count = x.len, iteration = lambda i: SWAP(x[i],y[i]))
+  
+
+@qfunc 
+def S_operator(vertices:QNum, adjacent_vertices: QNum):
+    res = QNum('res')
+    edge_oracle(res, vertices, adjacent_vertices)
+    control(ctrl = res == 1,
+        operand = lambda: bitwise_swap(vertices,adjacent_vertices))
+
+@qfunc 
+def main(vertices:Output[QNum], adjacent_vertices:Output[QNum]):
+
+    min_qubits = np.ceil(np.log2(chain_len))
+    allocate(min_qubits, vertices)
+    hadamard_transform(vertices)
+    allocate(min_qubits, adjacent_vertices)
+    
+    C_operator(vertices, adjacent_vertices)
+    S_operator(vertices,adjacent_vertices)
+
+qmod = create_model(main)
+constraints = Constraints(optimization_parameter="depth", max_width=25)
+
+# define models with different preferences
+qmod = set_constraints(qmod, constraints)
+
+qprog = synthesize(qmod)
+show(qprog)
+
+results = execute(qprog).result()
+counts = results.value.parsed_counts()
+counts 
+
+# Challenges :
+As is shown in the notebook itself, I'm limited by the number of qubits available to use
