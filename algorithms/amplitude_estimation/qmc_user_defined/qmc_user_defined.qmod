@@ -1,5 +1,5 @@
 qfunc load_probabilities(state: qbit[]) {
-  inplace_prepare_state<[
+  inplace_prepare_state([
     0.0,
     0.0357142857,
     0.0714285714,
@@ -8,11 +8,11 @@ qfunc load_probabilities(state: qbit[]) {
     0.1785714286,
     0.2142857143,
     0.25
-  ], 0>(state);
+  ], 0, state);
 }
 
 qfunc amplitude_loading(io: qbit[], ind: qbit) {
-  linear_pauli_rotations<[2], [0.5], [0.4]>(io, ind);
+  linear_pauli_rotations([2], [0.5], [0.4], io, ind);
 }
 
 qfunc state_loading(io: qbit[], ind: qbit) {
@@ -51,21 +51,21 @@ qfunc my_grover_operator(state: qbit[]) {
   } apply {
     zero_oracle(io, ind);
   }
-  U<0, 0, 0, 3.1415926536>(ind);
+  U(0, 0, 0, 3.1415926536, ind);
   {ind, io} -> state;
 }
 
 qfunc main(output phase: qnum) {
   io: qbit[];
   ind: qbit;
-  allocate<3>(io);
-  allocate<1>(ind);
+  allocate(3, io);
+  allocate(1, ind);
   state_loading(io, ind);
   state: qbit[];
   {ind, io} -> state;
-  allocate_num<3, False, 3>(phase);
-  qpe<lambda() {
+  allocate_num(3, False, 3, phase);
+  qpe(lambda() {
     my_grover_operator(state);
-  }>(phase);
+  }, phase);
   state -> {ind, io};
 }

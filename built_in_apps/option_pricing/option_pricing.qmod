@@ -1,17 +1,17 @@
-qfunc qmci<space_transform: qfunc (arg0: qbit[], arg1: qbit)>(phase: qnum, packed_vars: qbit[]) {
-  amplitude_estimation<lambda(reg) {
+qfunc qmci(space_transform: qfunc (qbit[], qbit), phase: qnum, packed_vars: qbit[]) {
+  amplitude_estimation(lambda(reg) {
     Z(reg[reg.len - 1]);
   }, lambda(reg) {
     space_transform(reg[0:reg.len - 1], reg[reg.len - 1]);
-  }>(phase, packed_vars);
+  }, phase, packed_vars);
 }
 
 qfunc main(output phase_port: qbit[1]) {
   unitary_port: qbit[];
-  allocate<6>(unitary_port);
-  allocate_num<1, False, 1>(phase_port);
-  qmci<lambda(arg0, arg1) {
-    log_normal_finance<LogNormalModel {
+  allocate(6, unitary_port);
+  allocate_num(1, False, 1, phase_port);
+  qmci(lambda(state, ind) {
+    log_normal_finance(LogNormalModel {
       num_qubits=5,
       mu=0.7,
       sigma=0.13
@@ -22,8 +22,8 @@ qfunc main(output phase_port: qbit[1]) {
       polynomial_degree=0,
       use_chebyshev_polynomial_approximation=False,
       tail_probability=0.0
-    }>(arg0, arg1);
-  }>(phase_port, unitary_port);
+    }, state, ind);
+  }, phase_port, unitary_port);
 }
 
 cscope ```

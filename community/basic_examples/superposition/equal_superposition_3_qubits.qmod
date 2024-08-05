@@ -1,8 +1,8 @@
 qfunc my_hadamard_transform(reg_a: qbit[]) {
-  apply_to_all<H>(reg_a);
+  apply_to_all(H, reg_a);
 }
 
 qfunc main(output register_a: qbit[]) {
-  allocate<3>(register_a);
+  allocate(3, register_a);
   my_hadamard_transform(register_a);
 }

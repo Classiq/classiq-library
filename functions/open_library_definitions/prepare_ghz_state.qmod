@@ -1,5 +1,5 @@
-qfunc prepare_ghz_state<size: int>(output q: qbit[]) {
-  allocate<size>(q);
+qfunc prepare_ghz_state(size: int, output q: qbit[]) {
+  allocate(size, q);
   H(q[0]);
   repeat (step: floor(log(size - 1, 2)) + 1) {
     repeat (control_index: 2 ** step) {

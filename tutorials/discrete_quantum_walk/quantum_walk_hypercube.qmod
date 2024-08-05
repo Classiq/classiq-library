@@ -1,8 +1,8 @@
-qfunc moving_one_hamming_dist<pos: int>(x: qbit[]) {
+qfunc moving_one_hamming_dist(pos: int, x: qbit[]) {
   X(x[pos]);
 }
 
-qfunc discrete_quantum_walk<time: int, coin_flip_qfunc: qfunc (arg0: qnum), walks_qfuncs: qfunc[] ()>(coin_state: qnum) {
+qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfuncs: qfunc[] (), coin_state: qnum) {
   power (time) {
     coin_flip_qfunc(coin_state);
     repeat (i: walks_qfuncs.len) {
@@ -13,23 +13,23 @@ qfunc discrete_quantum_walk<time: int, coin_flip_qfunc: qfunc (arg0: qnum), walk
   }
 }
 
-qfunc main<t: int>(output x: qbit[]) {
-  allocate<4>(x);
+qfunc main(t: int, output x: qbit[]) {
+  allocate(4, x);
   coin: qbit[];
-  prepare_state<[0.25, 0.25, 0.25, 0.25], 0.0>(coin);
-  discrete_quantum_walk<t, lambda(coin) {
-    grover_diffuser<lambda(coin) {
-      inplace_prepare_state<[0.25, 0.25, 0.25, 0.25], 0.0>(coin);
-    }>(coin);
+  prepare_state([0.25, 0.25, 0.25, 0.25], 0.0, coin);
+  discrete_quantum_walk(t, lambda(coin) {
+    grover_diffuser(lambda(coin) {
+      inplace_prepare_state([0.25, 0.25, 0.25, 0.25], 0.0, coin);
+    }, coin);
   }, [lambda() {
-    moving_one_hamming_dist<0>(x);
+    moving_one_hamming_dist(0, x);
   }, lambda() {
-    moving_one_hamming_dist<1>(x);
+    moving_one_hamming_dist(1, x);
   }, lambda() {
-    moving_one_hamming_dist<2>(x);
+    moving_one_hamming_dist(2, x);
   }, lambda() {
-    moving_one_hamming_dist<3>(x);
-  }]>(coin);
+    moving_one_hamming_dist(3, x);
+  }], coin);
 }
 
 cscope ```

@@ -1,4 +1,4 @@
-qfunc inplace_prepare_int<value: int>(target: qbit[]) {
+qfunc inplace_prepare_int(value: int, target: qbit[]) {
   repeat (index: target.len) {
     if ((floor(value / (2 ** index)) % 2) == 1) {
       X(target[index]);
