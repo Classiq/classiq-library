@@ -1,7 +1,7 @@
-qfunc grover_operator<oracle: qfunc (arg0: qbit[]), space_transform: qfunc (arg0: qbit[])>(packed_vars: qbit[]) {
+qfunc grover_operator(oracle: qfunc (qbit[]), space_transform: qfunc (qbit[]), packed_vars: qbit[]) {
   oracle(packed_vars);
-  grover_diffuser<lambda(qba) {
+  grover_diffuser(lambda(qba) {
     space_transform(qba);
-  }>(packed_vars);
-  U<0, 0, 0, pi>(packed_vars[0]);
+  }, packed_vars);
+  U(0, 0, 0, pi, packed_vars[0]);
 }

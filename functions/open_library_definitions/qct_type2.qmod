@@ -1,7 +1,7 @@
 qfunc qct_type2(x: qbit[]) {
   q: qbit;
   within {
-    allocate<1>(q);
+    allocate(1, q);
   } apply {
     qct_qst_type2(x, q);
   }

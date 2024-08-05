@@ -1,6 +1,6 @@
-qfunc apply_pauli_term<pauli_string: PauliTerm>(x: qbit[]) {
+qfunc apply_pauli_term(pauli_string: PauliTerm, x: qbit[]) {
   repeat (index: x.len) {
-    switch<pauli_string.pauli[index], [lambda() {
+    switch(pauli_string.pauli[index], [lambda() {
       IDENTITY(x[(pauli_string.pauli.len - index) - 1]);
     }, lambda() {
       X(x[(pauli_string.pauli.len - index) - 1]);
@@ -8,24 +8,24 @@ qfunc apply_pauli_term<pauli_string: PauliTerm>(x: qbit[]) {
       Y(x[(pauli_string.pauli.len - index) - 1]);
     }, lambda() {
       Z(x[(pauli_string.pauli.len - index) - 1]);
-    }]>();
+    }]);
   }
 }
 
-qfunc lcu_paulis<pauli_terms_list: PauliTerm[], probs: real[]>(block: qnum, data: qbit[]) {
+qfunc lcu_paulis(pauli_terms_list: PauliTerm[], probs: real[], block: qnum, data: qbit[]) {
   within {
-    inplace_prepare_state<probs, 0.0>(block);
+    inplace_prepare_state(probs, 0.0, block);
   } apply {
     repeat (i: pauli_terms_list.len) {
       control (block == i) {
-        apply_pauli_term<pauli_terms_list[i]>(data);
+        apply_pauli_term(pauli_terms_list[i], data);
       }
     }
   }
 }
 
 qfunc my_walk_operator(block: qbit[], data: qbit[]) {
-  lcu_paulis<[
+  lcu_paulis([
     PauliTerm {
       pauli=[Pauli::I, Pauli::I],
       coefficient=0.4
@@ -47,18 +47,18 @@ qfunc my_walk_operator(block: qbit[], data: qbit[]) {
     0.133333333333,
     0.066666666667,
     0.266666666667
-  ]>(block, data);
+  ], block, data);
   reflect_about_zero(block);
-  RY<2 * pi>(block[0]);
+  RY(2 * pi, block[0]);
 }
 
-qfunc lcu_cheb<coef: real[], generalized_signs: int[], walk_operator: qfunc (arg0: qnum, arg1: qbit[])>(walk_block: qnum, walk_data: qbit[], cheb_block: qnum) {
+qfunc lcu_cheb(coef: real[], generalized_signs: int[], walk_operator: qfunc (qnum, qbit[]), walk_block: qnum, walk_data: qbit[], cheb_block: qnum) {
   within {
-    inplace_prepare_state<coef, 0.0>(cheb_block);
+    inplace_prepare_state(coef, 0.0, cheb_block);
   } apply {
     repeat (k: generalized_signs.len) {
       control (cheb_block == k) {
-        U<0, 0, 0, (pi / 2) * generalized_signs[k]>(walk_data[0]);
+        U(0, 0, 0, (pi / 2) * generalized_signs[k], walk_data[0]);
         power (k) {
           walk_operator(walk_block, walk_data);
         }
@@ -68,15 +68,15 @@ qfunc lcu_cheb<coef: real[], generalized_signs: int[], walk_operator: qfunc (arg
 }
 
 qfunc main(output ham_block: qnum, output data: qnum, output exp_block: qnum) {
-  allocate<4>(exp_block);
-  allocate<2>(ham_block);
-  prepare_amplitudes<[
-    0.365154368146,
-    0.904440742132,
-    0.214848894355,
-    0.049891722653
-  ], 0.0>(data);
-  lcu_cheb<[
+  allocate(4, exp_block);
+  allocate(2, ham_block);
+  prepare_amplitudes([
+    0.210013606062,
+    0.401192530688,
+    0.156326932589,
+    0.877781709047
+  ], 0.0, data);
+  lcu_cheb([
     0.066463021055,
     0.067500417785,
     0.1149259307,
@@ -107,5 +107,5 @@ qfunc main(output ham_block: qnum, output data: qnum, output exp_block: qnum) {
     2.0
   ], lambda(x, y) {
     my_walk_operator(x, y);
-  }>(ham_block, data, exp_block);
+  }, ham_block, data, exp_block);
 }

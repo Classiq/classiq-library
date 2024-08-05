@@ -95,13 +95,13 @@ def main(res: Output[QBit]):
     X(res)
 ```
 
-The 1st line states that the function will be a quantum one. [Further documentation](https://docs.classiq.io/latest/reference-manual/platform/qmod/language-reference/functions/).
+The 1st line states that the function will be a quantum one. [Further documentation](https://docs.classiq.io/latest/reference-manual/qmod/language-reference/functions/).
 
-The 2nd line defines the type of the output. [Further examples on types](https://docs.classiq.io/latest/reference-manual/platform/qmod/language-reference/classical-types/)
+The 2nd line defines the type of the output. [Further examples on types](https://docs.classiq.io/latest/reference-manual/qmod/language-reference/classical-types/)
 
-The 3rd line allocates several qubits (in this example, only 1) in this quantum variable. [Further details on allocate](https://docs.classiq.io/latest/reference-manual/platform/qmod/language-reference/quantum-variables/)
+The 3rd line allocates several qubits (in this example, only 1) in this quantum variable. [Further details on allocate](https://docs.classiq.io/latest/reference-manual/qmod/language-reference/quantum-variables/)
 
-The 4th line applies an `X` operator on the quantum variable. [Further details on quantum operators](https://docs.classiq.io/latest/reference-manual/platform/qmod/language-reference/operators/)
+The 4th line applies an `X` operator on the quantum variable. [Further details on quantum operators](https://docs.classiq.io/latest/reference-manual/qmod/language-reference/operators/)
 
 ### More Examples
 
@@ -170,7 +170,7 @@ flowchart
 
     SDKInput[<a href='https://docs.classiq.io/latest/reference-manual/python-sdk/'>Classiq python SDK</a>]
 
-    Model[<a href='https://docs.classiq.io/latest/reference-manual/platform/qmod/'>Quantum Model</a>]
+    Model[<a href='https://docs.classiq.io/latest/reference-manual/qmod/'>Quantum Model</a>]
 
     Synthesis[<a href='https://docs.classiq.io/latest/classiq_101/classiq_concepts/optimize/'>Synthesis Engine</a>]
 

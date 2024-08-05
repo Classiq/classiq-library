@@ -23,7 +23,7 @@ def test_links() -> None:
 
 def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
     with open(filename) as f:
-        notebook_data = nbformat.read(f, nbformat.NO_CONVERT)  # type: ignore[no-untyped-call]
+        notebook_data = nbformat.read(f, nbformat.NO_CONVERT)
 
     markdown_cells = [c for c in notebook_data["cells"] if c["cell_type"] == "markdown"]
     for cell_index, cell in enumerate(markdown_cells):

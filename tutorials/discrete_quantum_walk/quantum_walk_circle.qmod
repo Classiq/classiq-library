@@ -7,14 +7,14 @@ qfunc quantum_step_clockwise(x: qbit[]) {
     qft(x);
   } apply {
     repeat (i: x.len) {
-      PHASE<((2 * pi) * (2 ** i)) / (2 ** x.len)>(x[i]);
+      PHASE(((2 * pi) * (2 ** i)) / (2 ** x.len), x[i]);
     }
   }
 }
 
-qfunc discrete_quantum_walk_circle<time: int>(x: qbit[]) {
+qfunc discrete_quantum_walk_circle(time: int, x: qbit[]) {
   coin: qnum;
-  allocate<1>(coin);
+  allocate(1, coin);
   power (time) {
     quantum_coin_flip(coin);
     control (coin == 0) {
@@ -28,9 +28,9 @@ qfunc discrete_quantum_walk_circle<time: int>(x: qbit[]) {
   }
 }
 
-qfunc main<t: int>(output x: qnum) {
-  allocate_num<floor(log(128, 2)), True, 0>(x);
-  discrete_quantum_walk_circle<t>(x);
+qfunc main(t: int, output x: qnum) {
+  allocate_num(floor(log(128, 2)), True, 0, x);
+  discrete_quantum_walk_circle(t, x);
 }
 
 cscope ```

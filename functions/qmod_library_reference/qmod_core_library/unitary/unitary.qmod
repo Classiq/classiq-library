@@ -1,9 +1,9 @@
 qfunc main(output x: qbit[]) {
-  allocate<2>(x);
-  unitary<[
+  allocate(2, x);
+  unitary([
     [1, 0, 0, 0],
     [0, 1, 0, 0],
     [0, 0, ((-0) - 1j), 0],
     [0, 0, 0, 1j]
-  ]>(x);
+  ], x);
 }

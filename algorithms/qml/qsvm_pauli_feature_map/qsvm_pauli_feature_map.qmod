@@ -1,6 +1,6 @@
 qfunc main(output qbv: qbit[]) {
-  allocate<2>(qbv);
-  pauli_feature_map<QSVMFeatureMapPauli {
+  allocate(2, qbv);
+  pauli_feature_map(QSVMFeatureMapPauli {
     paulis=[
       [Pauli::Z],
       [Pauli::Z, Pauli::Z]
@@ -9,7 +9,7 @@ qfunc main(output qbv: qbit[]) {
     alpha=2,
     reps=2,
     feature_dimension=2
-  }>(qbv);
+  }, qbv);
 }
 
 cscope ```

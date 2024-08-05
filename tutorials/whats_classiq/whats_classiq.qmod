@@ -1,5 +1,5 @@
 qfunc prepare_minus(output out: qbit) {
-  allocate<1>(out);
+  allocate(1, out);
   X(out);
   H(out);
 }
@@ -18,7 +18,7 @@ qfunc apply_oracle(x: qnum) {
 }
 
 qfunc main(output x: qnum) {
-  allocate<4>(x);
+  allocate(4, x);
   hadamard_transform(x);
   apply_oracle(x);
   hadamard_transform(x);
