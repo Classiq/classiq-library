@@ -1,7 +1,7 @@
 qfunc main(output z: qnum) {
   x: qnum;
   y: qnum;
-  prepare_int<2>(x);
-  prepare_int<1>(y);
+  prepare_int(2, x);
+  prepare_int(1, y);
   z = (((2 * x) + y) + max(3 * y, 2)) > 4;
 }

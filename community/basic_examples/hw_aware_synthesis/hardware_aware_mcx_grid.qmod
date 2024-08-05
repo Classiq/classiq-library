@@ -5,7 +5,7 @@ qfunc my_mcx(ctrl: qbit[], target: qbit) {
 }
 
 qfunc main(output ctrl: qbit[], output target: qbit) {
-  allocate<12>(ctrl);
-  allocate<1>(target);
+  allocate(12, ctrl);
+  allocate(1, target);
   my_mcx(ctrl, target);
 }

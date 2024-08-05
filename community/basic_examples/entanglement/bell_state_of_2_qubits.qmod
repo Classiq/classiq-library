@@ -4,6 +4,6 @@ qfunc my_bell_state(reg: qbit[]) {
 }
 
 qfunc main(output registers: qbit[]) {
-  allocate<2>(registers);
+  allocate(2, registers);
   my_bell_state(registers);
 }

@@ -9,31 +9,31 @@ qfunc u_sqrt(a: qnum, ref: qnum, res: qbit) {
   res ^= a <= ref;
 }
 
-qfunc qsvt_sqrt_polynomial<qsvt_phases: real[]>(state: qnum, ref: qnum, ind: qbit, qsvt_aux: qbit) {
+qfunc qsvt_sqrt_polynomial(qsvt_phases: real[], state: qnum, ref: qnum, ind: qbit, qsvt_aux: qbit) {
   full_reg: qbit[];
   {ind, ref, state} -> full_reg;
-  qsvt<qsvt_phases, lambda(reg_, aux_) {
+  qsvt(qsvt_phases, lambda(reg_, aux_) {
     projector_cnot(reg_[0:5], aux_);
   }, lambda(reg_, aux_) {
     projector_cnot(reg_[0], aux_);
   }, lambda(reg_) {
     u_sqrt(reg_[5:reg_.len], reg_[1:5], reg_[0]);
-  }>(full_reg, qsvt_aux);
+  }, full_reg, qsvt_aux);
   full_reg -> {ind, ref, state};
 }
 
 qfunc main(output state: qnum, output ref: qnum, output ind: qbit, output qsvt_aux: qbit) {
-  allocate<4>(state);
-  allocate<4>(ref);
-  allocate<1>(ind);
-  allocate<1>(qsvt_aux);
+  allocate(4, state);
+  allocate(4, ref);
+  allocate(1, ind);
+  allocate(1, qsvt_aux);
   hadamard_transform(state);
-  qsvt_sqrt_polynomial<[
+  qsvt_sqrt_polynomial([
     5.594,
     (-0.8682),
     7.8232,
     1.54,
     5.415,
     (-13.2555)
-  ]>(state, ref, ind, qsvt_aux);
+  ], state, ref, ind, qsvt_aux);
 }

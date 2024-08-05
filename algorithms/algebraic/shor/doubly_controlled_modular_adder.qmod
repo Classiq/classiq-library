@@ -1,13 +1,13 @@
-qfunc phase_lad<value: int>(phi_b: qbit[]) {
+qfunc phase_lad(value: int, phi_b: qbit[]) {
   repeat (index: phi_b.len) {
-    PHASE<qft_const_adder_phase(index, value, phi_b.len)>(phi_b[index]);
+    PHASE(qft_const_adder_phase(index, value, phi_b.len), phi_b[index]);
   }
 }
 
 qfunc my_qft_step(qbv: qbit[]) {
   H(qbv[0]);
   repeat (index: qbv.len - 1) {
-    CPHASE<pi / (2 ** (index + 1))>(qbv[0], qbv[index + 1]);
+    CPHASE(pi / (2 ** (index + 1)), qbv[0], qbv[index + 1]);
   }
 }
 
@@ -17,57 +17,57 @@ qfunc qft_ns(qbv: qbit[]) {
   }
 }
 
-qfunc ctrl_x<ref: int>(ctrl: qnum, aux: qbit) {
+qfunc ctrl_x(ref: int, ctrl: qnum, aux: qbit) {
   control (ctrl == ref) {
     X(aux);
   }
 }
 
-qfunc check_msb<ref: int>(x: qbit[], aux: qbit) {
+qfunc check_msb(ref: int, x: qbit[], aux: qbit) {
   within {
     invert {
       qft_ns(x);
     }
   } apply {
-    ctrl_x<ref>(x[0], aux);
+    ctrl_x(ref, x[0], aux);
   }
 }
 
-qfunc ccmod_add<N: int, a: int>(phi_b: qbit[], c1: qbit, c2: qbit, aux: qbit) {
+qfunc ccmod_add(N: int, a: int, phi_b: qbit[], c1: qbit, c2: qbit, aux: qbit) {
   ctrl: qbit[];
   {c1, c2} -> ctrl;
   control (ctrl) {
-    phase_lad<a>(phi_b);
+    phase_lad(a, phi_b);
   }
   invert {
-    phase_lad<N>(phi_b);
+    phase_lad(N, phi_b);
   }
-  check_msb<1>(phi_b, aux);
+  check_msb(1, phi_b, aux);
   control (aux) {
-    phase_lad<N>(phi_b);
+    phase_lad(N, phi_b);
   }
   within {
     invert {
       control (ctrl) {
-        phase_lad<a>(phi_b);
+        phase_lad(a, phi_b);
       }
     }
   } apply {
-    check_msb<0>(phi_b, aux);
+    check_msb(0, phi_b, aux);
   }
   ctrl -> {c1, c2};
 }
 
 qfunc main(output b: qnum, output ctrl: qbit[2], output aux: qbit) {
-  allocate<5>(b);
-  allocate<2>(ctrl);
-  allocate<1>(aux);
-  inplace_prepare_int<8>(b);
+  allocate(5, b);
+  allocate(2, ctrl);
+  allocate(1, aux);
+  inplace_prepare_int(8, b);
   X(ctrl[0]);
   X(ctrl[1]);
   within {
     qft(b);
   } apply {
-    ccmod_add<15, 9>(b, ctrl[0], ctrl[1], aux);
+    ccmod_add(15, 9, b, ctrl[0], ctrl[1], aux);
   }
 }

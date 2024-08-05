@@ -1,5 +1,5 @@
 qfunc main(output a: qnum, output res: qnum) {
-  allocate<2>(a);
+  allocate(2, a);
   hadamard_transform(a);
   res = 3.5 * a;
 }

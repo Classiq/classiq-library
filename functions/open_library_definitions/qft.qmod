@@ -1,6 +1,0 @@
-qfunc qft(target: qbit[]) {
-  repeat (index: target.len / 2) {
-    SWAP(target[index], target[(target.len - 1) - index]);
-  }
-  qft_no_swap(target);
-}

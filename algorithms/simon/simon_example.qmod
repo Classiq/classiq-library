@@ -1,8 +1,8 @@
-qfunc simon_qfunc_simple<s: int>(x: qnum, output res: qnum) {
+qfunc simon_qfunc_simple(s: int, x: qnum, output res: qnum) {
   res = min(x, x ^ s);
 }
 
-qfunc simon_qfunc<f_qfunc: qfunc (arg0: qnum, output arg1: qnum)>(x: qnum) {
+qfunc simon_qfunc(f_qfunc: qfunc (qnum, output qnum), x: qnum) {
   res: qnum;
   hadamard_transform(x);
   f_qfunc(x, res);
@@ -10,8 +10,8 @@ qfunc simon_qfunc<f_qfunc: qfunc (arg0: qnum, output arg1: qnum)>(x: qnum) {
 }
 
 qfunc main(output x: qnum) {
-  allocate<5>(x);
-  simon_qfunc<lambda(x, res) {
-    simon_qfunc_simple<6>(x, res);
-  }>(x);
+  allocate(5, x);
+  simon_qfunc(lambda(x, res) {
+    simon_qfunc_simple(6, x, res);
+  }, x);
 }
