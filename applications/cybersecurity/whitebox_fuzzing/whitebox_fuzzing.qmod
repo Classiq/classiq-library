@@ -8,12 +8,12 @@ qfunc my_predicate(x: qnum, y: qnum, res: qbit) {
 }
 
 qfunc prep_minus(output out: qbit) {
-  allocate<1>(out);
+  allocate(1, out);
   X(out);
   H(out);
 }
 
-qfunc my_oracle<predicate: qfunc (arg0: qbit)>() {
+qfunc my_oracle(predicate: qfunc (qbit)) {
   aux: qbit;
   within {
     prep_minus(aux);
@@ -31,36 +31,36 @@ qfunc zero_predicate(x: qnum, y: qnum, res: qbit) {
   joined -> {x, y};
 }
 
-qfunc my_diffuser<sp_operand: qfunc (arg0: qnum, arg1: qnum)>(x: qnum, y: qnum) {
+qfunc my_diffuser(sp_operand: qfunc (qnum, qnum), x: qnum, y: qnum) {
   within {
     invert {
       sp_operand(x, y);
     }
   } apply {
-    my_oracle<lambda(q) {
+    my_oracle(lambda(q) {
       zero_predicate(x, y, q);
-    }>();
+    });
   }
 }
 
-qfunc my_grover_operator<oracle_operand: qfunc (), diffuser_operand: qfunc ()>() {
+qfunc my_grover_operator(oracle_operand: qfunc (), diffuser_operand: qfunc ()) {
   oracle_operand();
   diffuser_operand();
 }
 
 qfunc main(output x: qnum, output y: qnum) {
-  allocate_num<6, False, 0>(x);
-  allocate_num<6, False, 0>(y);
+  allocate_num(6, False, 0, x);
+  allocate_num(6, False, 0, y);
   my_sp(x, y);
   power (4) {
-    my_grover_operator<lambda() {
-      my_oracle<lambda(q) {
+    my_grover_operator(lambda() {
+      my_oracle(lambda(q) {
         my_predicate(x, y, q);
-      }>();
+      });
     }, lambda() {
-      my_diffuser<lambda(x, y) {
+      my_diffuser(lambda(x, y) {
         my_sp(x, y);
-      }>(x, y);
-    }>();
+      }, x, y);
+    });
   }
 }

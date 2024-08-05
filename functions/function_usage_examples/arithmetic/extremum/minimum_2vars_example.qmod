@@ -1,6 +1,6 @@
 qfunc main(output a: qnum, output b: qnum, output res: qnum) {
-  prepare_int<4>(a);
-  allocate<3>(b);
+  prepare_int(4, a);
+  allocate(3, b);
   hadamard_transform(b);
   res = min(a, b);
 }

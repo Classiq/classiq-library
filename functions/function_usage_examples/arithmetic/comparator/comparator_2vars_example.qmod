@@ -1,5 +1,5 @@
 qfunc main(output a: qnum, output b: qnum, output res: qnum) {
-  allocate_num<5, True, 0>(a);
-  allocate_num<3, False, 0>(b);
+  allocate_num(5, True, 0, a);
+  allocate_num(3, False, 0, b);
   res = a == b;
 }

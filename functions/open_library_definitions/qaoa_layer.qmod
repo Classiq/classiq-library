@@ -1,4 +1,4 @@
-qfunc qaoa_layer<g: real, b: real, hamiltonian: PauliTerm[]>(target: qbit[]) {
-  qaoa_cost_layer<g, hamiltonian>(target);
-  qaoa_mixer_layer<b>(target);
+qfunc qaoa_layer(g: real, b: real, hamiltonian: PauliTerm[], target: qbit[]) {
+  qaoa_cost_layer(g, hamiltonian, target);
+  qaoa_mixer_layer(b, target);
 }

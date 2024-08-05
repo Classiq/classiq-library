@@ -1,5 +1,5 @@
 qfunc prepare_minus(output target: qbit) {
-  allocate<1>(target);
+  allocate(1, target);
   X(target);
   H(target);
 }
@@ -18,7 +18,7 @@ qfunc oracle_phase_kickback(x: qnum) {
 }
 
 qfunc main(output x: qnum) {
-  allocate<4>(x);
+  allocate(4, x);
   hadamard_transform(x);
   oracle_phase_kickback(x);
 }

@@ -1,38 +1,25 @@
-qfunc unitary_with_power_logic<pw: int, matrix: real[][]>(target: qbit[]) {
+qfunc unitary_with_power_logic(pw: int, matrix: real[][], target: qbit[]) {
   power (pw) {
-    unitary<matrix>(target);
+    unitary(matrix, target);
   }
 }
 
-qfunc suzuki_trotter1_with_power_logic<hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real>(target: qbit[]) {
-  suzuki_trotter<hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2))>(target);
-}
-
-qfunc my_qpe_flexible<unitary_with_power: qfunc <arg0: int>(arg1: qbit[]), precision: int>(state: qbit[], output phase: qbit[precision]) {
-  allocate<precision>(phase);
-  apply_to_all<H>(phase);
-  repeat (index: precision) {
-    control (phase[index]) {
-      unitary_with_power<2 ** index>(state);
-    }
-  }
-  invert {
-    qft(phase);
-  }
+qfunc suzuki_trotter1_with_power_logic(hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real, target: qbit[]) {
+  suzuki_trotter(hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2)), target);
 }
 
 qfunc main(output phase_result: qnum<8, False, 8>) {
   state: qbit[];
-  prepare_amplitudes<[
-    0.30132518685935,
-    0.675974655003596,
-    0.286332054507695,
-    0.608502548982623
-  ], 0.0>(state);
-  phase_array: qbit[];
-  my_qpe_flexible<lambda<pw>(target) {
+  prepare_amplitudes([
+    0.667440796614848,
+    0.024885482173617,
+    0.368323359032267,
+    0.646715856448805
+  ], 0.0, state);
+  allocate_num(8, False, 8, phase_result);
+  qpe_flexible(lambda(pw) {
     if (True) {
-      unitary_with_power_logic<pw, [
+      unitary_with_power_logic(pw, [
         [
           ((-0.800994193328528) - 0.432184369481798j),
           (0.18481604491471 - 0.230641913600945j),
@@ -57,9 +44,9 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
           ((-0.026023894036146) + 0.012295427374176j),
           ((-0.895413431349899) - 0.401691392328609j)
         ]
-      ]>(target);
+      ], state);
     } else {
-      suzuki_trotter1_with_power_logic<[
+      suzuki_trotter1_with_power_logic([
         PauliTerm {
           pauli=[Pauli::I, Pauli::I],
           coefficient=0.4
@@ -69,16 +56,16 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
           coefficient=0.01504032
         },
         PauliTerm {
-          pauli=[Pauli::I, Pauli::X],
-          coefficient=0.10676978
-        },
-        PauliTerm {
           pauli=[Pauli::Z, Pauli::I],
           coefficient=0.016634415
         },
         PauliTerm {
           pauli=[Pauli::Z, Pauli::Z],
           coefficient=-0.042759185
+        },
+        PauliTerm {
+          pauli=[Pauli::I, Pauli::X],
+          coefficient=0.10676978
         },
         PauliTerm {
           pauli=[Pauli::Z, Pauli::X],
@@ -100,8 +87,7 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
           pauli=[Pauli::Y, Pauli::Y],
           coefficient=0.09539162
         }
-      ], pw, 2, 1.8, -6.283185307179586>(target);
+      ], pw, 2, 1.8, -6.283185307179586, state);
     }
-  }, 8>(state, phase_array);
-  phase_array -> phase_result;
+  }, phase_result);
 }

@@ -1,6 +1,6 @@
 qfunc main(output qbv: qbit[]) {
-  allocate<ceiling(2 / 2)>(qbv);
-  bloch_sphere_feature_map<2>(qbv);
+  allocate(ceiling(2 / 2), qbv);
+  bloch_sphere_feature_map(2, qbv);
 }
 
 cscope ```

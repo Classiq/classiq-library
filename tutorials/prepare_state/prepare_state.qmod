@@ -1,5 +1,5 @@
 qfunc main(output io: qbit[]) {
-  prepare_state<[
+  prepare_state([
     0,
     0.002,
     0.004,
@@ -32,5 +32,5 @@ qfunc main(output io: qbit[]) {
     0.0585,
     0.0605,
     0.0625
-  ], 0.01>(io);
+  ], 0.01, io);
 }

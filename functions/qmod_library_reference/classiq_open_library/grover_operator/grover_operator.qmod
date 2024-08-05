@@ -4,16 +4,16 @@ qfunc my_predicate(x: qnum, y: qnum, res: qbit) {
 
 qfunc main(output x: qnum<2, False, 0>, output y: qnum<2, False, 0>) {
   packed_vars: qbit[];
-  allocate<4>(packed_vars);
+  allocate(4, packed_vars);
   hadamard_transform(packed_vars);
   power (2) {
-    grover_operator<lambda(vars) {
-      phase_oracle<lambda(_vars, _res) {
+    grover_operator(lambda(vars) {
+      phase_oracle(lambda(_vars, _res) {
         my_predicate(_vars[0:2], _vars[2:_vars.len], _res);
-      }>(vars);
+      }, vars);
     }, lambda(vars) {
       hadamard_transform(vars);
-    }>(packed_vars);
+    }, packed_vars);
   }
   packed_vars -> {x, y};
 }

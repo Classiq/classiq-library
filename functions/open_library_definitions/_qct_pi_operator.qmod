@@ -1,8 +1,8 @@
 qfunc _qct_pi_operator(x: qbit[], q: qbit) {
   control (q == 1) {
-    apply_to_all<X>(x);
+    apply_to_all(X, x);
   }
   control (q == 1) {
-    modular_increment<1>(x);
+    modular_increment(1, x);
   }
 }

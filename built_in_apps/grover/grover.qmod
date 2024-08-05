@@ -1,14 +1,16 @@
-qfunc expr_predicate(a: qnum<2, False, 0>, b: qnum<2, False, 0>, c: qnum<3, False, 0>, res: qbit[1]) {
-  res ^= ((((a + b) + (c & 6)) % 4) | (4 & c)) == 4;
+qstruct PredicateVars {
+  a: qnum<2, False, 0>;
+  b: qnum<2, False, 0>;
+  c: qnum<3, False, 0>;
 }
 
-qfunc main(output a: qnum<2, False, 0>, output b: qnum<2, False, 0>, output c: qnum<3, False, 0>) {
-  packed_vars: qbit[];
-  allocate<7>(packed_vars);
-  grover_search<1, lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      expr_predicate(arg0[0:2], arg0[2:4], arg0[4:7], arg1);
-    }>(arg0);
-  }>(packed_vars);
-  packed_vars -> {a, b, c};
+qfunc quantum_predicate(vars: PredicateVars, res: qbit) {
+  res ^= ((((vars.a + vars.b) + (vars.c & 6)) % 4) | (4 & vars.c)) == 4;
+}
+
+qfunc main(output vars: PredicateVars) {
+  allocate(7, vars);
+  grover_search(1, lambda(vars) {
+    phase_oracle(quantum_predicate, vars);
+  }, vars);
 }
