@@ -10,14 +10,14 @@ qfunc asset_geq_strike_price(x: qnum, output res: qbit) {
   res = x > 1.5;
 }
 
-qfunc exponential_amplitude_loading<exp_rate: real>(x: qbit[], aux: qbit[], res: qbit) {
-  apply_to_all<X>(x);
+qfunc exponential_amplitude_loading(exp_rate: real, x: qbit[], aux: qbit[], res: qbit) {
+  apply_to_all(X, x);
   repeat (index: x.len) {
     control (x[index]) {
-      RY<2 * acos(1 / sqrt(exp(exp_rate * (2 ** index))))>(aux[index]);
+      RY(2 * acos(1 / sqrt(exp(exp_rate * (2 ** index)))), aux[index]);
     }
   }
-  apply_to_all<X>(x);
+  apply_to_all(X, x);
   aux_num: qnum<aux.len, False, 0>;
   aux -> aux_num;
   control (aux_num == 0) {
@@ -28,10 +28,10 @@ qfunc exponential_amplitude_loading<exp_rate: real>(x: qbit[], aux: qbit[], res:
 
 qfunc direct_load_amplitudes(geq_reg: qnum, max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
   control (geq_reg == 1) {
-    exponential_amplitude_loading<(1 / (2 ** max_reg.fraction_digits)) * 0.4341>(max_reg, aux_reg, ind_reg);
+    exponential_amplitude_loading((1 / (2 ** max_reg.fraction_digits)) * 0.4341, max_reg, aux_reg, ind_reg);
   }
   control (geq_reg == 0) {
-    RY<2 * asin(13.784 / sqrt(max(193.97 * exp(((0.4341 * (2 ** (max_reg.size - max_reg.fraction_digits))) * (1 - (1 / (2 ** max_reg.size)))) + (-0.7408)), 190)))>(ind_reg);
+    RY(2 * asin(13.784 / sqrt(max(193.97 * exp(((0.4341 * (2 ** (max_reg.size - max_reg.fraction_digits))) * (1 - (1 / (2 ** max_reg.size)))) + (-0.7408)), 190))), ind_reg);
   }
 }
 
@@ -45,18 +45,18 @@ qfunc direct_payoff(max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
 }
 
 qfunc rainbow_direct(x1: qnum, x2: qnum, aux_reg: qnum, ind_reg: qbit) {
-  inplace_prepare_state<[
+  inplace_prepare_state([
     0.0656,
     0.4344,
     0.4344,
     0.0656
-  ], 0>(x1);
-  inplace_prepare_state<[
+  ], 0, x1);
+  inplace_prepare_state([
     0.0656,
     0.4344,
     0.4344,
     0.0656
-  ], 0>(x2);
+  ], 0, x2);
   max_out: qnum;
   within {
     affine_max(x1, x2, max_out);
@@ -65,21 +65,21 @@ qfunc rainbow_direct(x1: qnum, x2: qnum, aux_reg: qnum, ind_reg: qbit) {
   }
 }
 
-qfunc grover_algorithm<k: int, oracle_operand: qfunc (arg0: qbit[]), sp_operand: qfunc (arg0: qbit[])>(x: qbit[]) {
+qfunc grover_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
   sp_operand(x);
   power (k) {
-    grover_operator<oracle_operand, sp_operand>(x);
+    grover_operator(oracle_operand, sp_operand, x);
   }
 }
 
-qfunc main<k: int>(output ind_reg: qbit) {
+qfunc main(k: int, output ind_reg: qbit) {
   full_reg: qbit[];
-  allocate<10>(full_reg);
-  grover_algorithm<k, lambda(x) {
+  allocate(10, full_reg);
+  grover_algorithm(k, lambda(x) {
     qmci_oracle(x[x.len - 1]);
   }, lambda(x) {
     rainbow_direct(x[0:2], x[2:4], x[4:9], x[x.len - 1]);
-  }>(full_reg);
+  }, full_reg);
   state_reg: qbit[];
   full_reg -> {state_reg, ind_reg};
 }

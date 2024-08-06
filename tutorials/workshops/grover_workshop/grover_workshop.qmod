@@ -1,7 +1,7 @@
 qfunc create_initial_state(reg: qbit[]) {
-  apply_to_all<lambda(qb) {
+  apply_to_all(lambda(qb) {
     H(qb);
-  }>(reg);
+  }, reg);
 }
 
 qfunc create_initial_states(a: qnum, b: qnum, c: qnum) {
@@ -21,7 +21,7 @@ qfunc oracle_black_box(res: qnum, a: qnum, b: qnum, c: qnum) {
 
 qfunc oracle_function(a: qnum, b: qnum, c: qnum) {
   aux: qbit;
-  allocate<1>(aux);
+  allocate(1, aux);
   prepare_minus_state(aux);
   oracle_black_box(aux, a, b, c);
   invert {
@@ -37,7 +37,7 @@ qfunc not_equal_zero(aux: qbit, x: qnum) {
 
 qfunc zero_diffuser(x: qnum) {
   aux: qbit;
-  allocate<1>(aux);
+  allocate(1, aux);
   prepare_minus_state(aux);
   not_equal_zero(aux, x);
   invert {
@@ -63,9 +63,9 @@ qfunc my_grover_operator(a: qnum, b: qnum, c: qnum) {
 }
 
 qfunc main(output a: qnum, output b: qnum, output c: qnum) {
-  allocate<2>(a);
-  allocate<2>(b);
-  allocate<3>(c);
+  allocate(2, a);
+  allocate(2, b);
+  allocate(3, c);
   create_initial_states(a, b, c);
   my_grover_operator(a, b, c);
 }

@@ -1,6 +1,6 @@
 qfunc main(output qba: qbit[]) {
-  allocate<2>(qba);
-  qdrift<[
+  allocate(2, qba);
+  qdrift([
     PauliTerm {
       pauli=[Pauli::X, Pauli::Y],
       coefficient=1.0
@@ -9,5 +9,5 @@ qfunc main(output qba: qbit[]) {
       pauli=[Pauli::Z, Pauli::I],
       coefficient=0.5
     }
-  ], 2.0, 5>(qba);
+  ], 2.0, 5, qba);
 }

@@ -1,24 +1,28 @@
-qfunc cc_modular_add<n: int, a: int>(phi_b: qbit[], c1: qbit, c2: qbit, aux: qbit) {
+qfunc cc_modular_add(n: int, a: int, phi_b: qbit[], c1: qbit, c2: qbit) {
   ctrl: qbit[];
-  {c1, c2} -> ctrl;
-  control (ctrl) {
-    qft_space_add_const<a>(phi_b);
-  }
-  invert {
-    qft_space_add_const<n>(phi_b);
-  }
-  _check_msb<1>(phi_b, aux);
-  control (aux) {
-    qft_space_add_const<n>(phi_b);
-  }
+  aux: qbit;
   within {
-    invert {
-      control (ctrl) {
-        qft_space_add_const<a>(phi_b);
-      }
-    }
+    allocate(1, aux);
+    {c1, c2} -> ctrl;
   } apply {
-    _check_msb<0>(phi_b, aux);
+    control (ctrl) {
+      qft_space_add_const(a, phi_b);
+    }
+    invert {
+      qft_space_add_const(n, phi_b);
+    }
+    _check_msb(1, phi_b, aux);
+    control (aux) {
+      qft_space_add_const(n, phi_b);
+    }
+    within {
+      invert {
+        control (ctrl) {
+          qft_space_add_const(a, phi_b);
+        }
+      }
+    } apply {
+      _check_msb(0, phi_b, aux);
+    }
   }
-  ctrl -> {c1, c2};
 }

@@ -1,5 +1,5 @@
 qfunc main(output x: qbit[], output ind: qbit[]) {
-  allocate<6>(x);
-  allocate<3>(ind);
-  linear_pauli_rotations<[2, 2, 2], [2.1, 1, 7.0], [0.1, 0.3, 0.33]>(x, ind);
+  allocate(6, x);
+  allocate(3, ind);
+  linear_pauli_rotations([2, 2, 2], [2.1, 1, 7.0], [0.1, 0.3, 0.33], x, ind);
 }

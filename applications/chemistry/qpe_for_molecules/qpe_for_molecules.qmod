@@ -1,8 +1,8 @@
-qfunc my_flexible_qpe<unitary_with_power: qfunc <arg0: int>()>(phase: qbit[]) {
-  apply_to_all<H>(phase);
+qfunc my_flexible_qpe(unitary_with_power: qfunc (int), phase: qbit[]) {
+  apply_to_all(H, phase);
   repeat (index: phase.len) {
     control (phase[index]) {
-      unitary_with_power<2 ** index>();
+      unitary_with_power(2 ** index);
     }
   }
   invert {
@@ -11,9 +11,9 @@ qfunc my_flexible_qpe<unitary_with_power: qfunc <arg0: int>()>(phase: qbit[]) {
 }
 
 qfunc main(output reg: qbit[], output phase: qnum) {
-  allocate_num<6, False, 6>(phase);
-  allocate<1>(reg);
-  molecule_hartree_fock<MoleculeProblem {
+  allocate_num(6, False, 6, phase);
+  allocate(1, reg);
+  molecule_hartree_fock(MoleculeProblem {
     mapping=FermionMapping::JORDAN_WIGNER,
     z2_symmetries=True,
     molecule=Molecule {
@@ -32,9 +32,9 @@ qfunc main(output reg: qbit[], output phase: qnum) {
     },
     freeze_core=True,
     remove_orbitals=[]
-  }>(reg);
-  my_flexible_qpe<lambda<power>() {
-    exponentiation_with_depth_constraint<[
+  }, reg);
+  my_flexible_qpe(lambda(power) {
+    exponentiation_with_depth_constraint([
       PauliTerm {
         pauli=[Pauli::I],
         coefficient=0.2383
@@ -47,6 +47,6 @@ qfunc main(output reg: qbit[], output phase: qnum) {
         pauli=[Pauli::X],
         coefficient=0.0441
       }
-    ], (-6.2832) * power, 2200 * (1.4142 ** log(power, 2))>(reg);
-  }>(phase);
+    ], (-6.2832) * power, 2200 * (1.4142 ** log(power, 2)), reg);
+  }, phase);
 }

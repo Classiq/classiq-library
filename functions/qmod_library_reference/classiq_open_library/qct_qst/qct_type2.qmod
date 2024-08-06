@@ -1,5 +1,5 @@
-qfunc main(output x: qbit[]) {
-  prepare_amplitudes<[
+qfunc main(output x: qnum) {
+  prepare_amplitudes([
     0.112068721799421,
     0.107745452355844,
     0.326427301057128,
@@ -8,6 +8,6 @@ qfunc main(output x: qbit[]) {
     0.521638625386058,
     0.444890198893713,
     0.375231379859592
-  ], 0.0>(x);
+  ], 0.0, x);
   qct_type2(x);
 }

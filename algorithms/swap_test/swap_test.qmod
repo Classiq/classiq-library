@@ -1,7 +1,7 @@
 qfunc main(output test: qbit) {
   state1: qbit[];
   state2: qbit[];
-  prepare_amplitudes<[
+  prepare_amplitudes([
     0.341820472306662,
     (-0.237261667325083),
     0.233936034675983,
@@ -10,8 +10,8 @@ qfunc main(output test: qbit) {
     (-0.413883519835207),
     (-0.396060798200712),
     0.461159549986877
-  ], 0.0>(state1);
-  prepare_amplitudes<[
+  ], 0.0, state1);
+  prepare_amplitudes([
     (-0.464354866499289),
     0.368670230538333,
     0.219675023759545,
@@ -20,6 +20,6 @@ qfunc main(output test: qbit) {
     (-0.358452134839606),
     0.505807381305853,
     (-0.021570025938839)
-  ], 0.0>(state2);
+  ], 0.0, state2);
   swap_test(state1, state2, test);
 }

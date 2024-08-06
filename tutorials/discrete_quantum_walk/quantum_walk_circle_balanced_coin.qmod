@@ -3,12 +3,12 @@ qfunc quantum_step_clockwise(x: qbit[]) {
     qft(x);
   } apply {
     repeat (i: x.len) {
-      PHASE<((2 * pi) * (2 ** i)) / (2 ** x.len)>(x[i]);
+      PHASE(((2 * pi) * (2 ** i)) / (2 ** x.len), x[i]);
     }
   }
 }
 
-qfunc discrete_quantum_walk<time: int, coin_flip_qfunc: qfunc (arg0: qnum), walks_qfuncs: qfunc[] ()>(coin_state: qnum) {
+qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfuncs: qfunc[] (), coin_state: qnum) {
   power (time) {
     coin_flip_qfunc(coin_state);
     repeat (i: walks_qfuncs.len) {
@@ -19,13 +19,13 @@ qfunc discrete_quantum_walk<time: int, coin_flip_qfunc: qfunc (arg0: qnum), walk
   }
 }
 
-qfunc main<t: int>(output x: qnum) {
+qfunc main(t: int, output x: qnum) {
   coin: qbit;
-  allocate_num<floor(log(128, 2)), True, 0>(x);
-  allocate<1>(coin);
+  allocate_num(floor(log(128, 2)), True, 0, x);
+  allocate(1, coin);
   H(coin);
   S(coin);
-  discrete_quantum_walk<t, lambda(coin) {
+  discrete_quantum_walk(t, lambda(coin) {
     H(coin);
   }, [lambda() {
     quantum_step_clockwise(x);
@@ -33,7 +33,7 @@ qfunc main<t: int>(output x: qnum) {
     invert {
       quantum_step_clockwise(x);
     }
-  }]>(coin);
+  }], coin);
 }
 
 cscope ```

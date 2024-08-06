@@ -1,6 +1,6 @@
-qfunc modular_exponentiation<exponent: int>(target: qbit[4]) {
+qfunc modular_exponentiation(exponent: int, target: qbit[4]) {
   power (2 ** exponent) {
-    unitary<[
+    unitary([
       [
         0.0,
         0.0,
@@ -289,18 +289,18 @@ qfunc modular_exponentiation<exponent: int>(target: qbit[4]) {
         0.0,
         0.0
       ]
-    ]>(target);
+    ], target);
   }
 }
 
 qfunc period_finding(output qv_counting: qbit[8], output qv_auxilliary: qbit[4]) {
-  allocate<8>(qv_counting);
+  allocate(8, qv_counting);
   hadamard_transform(qv_counting);
-  allocate<4>(qv_auxilliary);
+  allocate(4, qv_auxilliary);
   X(qv_auxilliary[0]);
   repeat (index: 4) {
     control (qv_counting[index]) {
-      modular_exponentiation<index>(qv_auxilliary);
+      modular_exponentiation(index, qv_auxilliary);
     }
   }
   invert {
