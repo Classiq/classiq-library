@@ -1,0 +1,83 @@
+qfunc suzuki_trotter1_with_power_logic<hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real>(target: qbit[]) {
+  suzuki_trotter<hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2))>(target);
+}
+
+qfunc load_b<amplitudes: real[], bound: real>(output res: qbit[]) {
+  prepare_amplitudes<amplitudes, bound>(res);
+}
+
+qfunc simple_eig_inv(phase: qnum, output indicator: qbit) {
+  allocate<1>(indicator);
+  indicator *= (1 / (2 ** phase.size)) / phase;
+}
+
+qfunc hhl<rhs_vector: real[], bound: real, precision: int, hamiltonian_evolution_with_power: qfunc <arg0: int>(arg1: qbit[])>(output res: qbit[], output indicator: qbit) {
+  phase: qnum;
+  allocate_num<precision, False, precision>(phase);
+  load_b<[
+    0.1825741858,
+    0.3651483717,
+    0.7302967433,
+    0.5477225575
+  ], bound>(res);
+  within {
+    qpe_flexible<lambda<k>() {
+      hamiltonian_evolution_with_power<k>(res);
+    }>(phase);
+  } apply {
+    simple_eig_inv(phase, indicator);
+  }
+}
+
+qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
+  hhl<[
+    0.1825741858,
+    0.3651483717,
+    0.7302967433,
+    0.5477225575
+  ], 0.0, 4, lambda<pw>(target) {
+    suzuki_trotter1_with_power_logic<[
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::I],
+        coefficient=0.4075
+      },
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::Z],
+        coefficient=-0.0525
+      },
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::X],
+        coefficient=-0.03
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::I],
+        coefficient=-0.0175
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::Z],
+        coefficient=-0.0575
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::X],
+        coefficient=0.02
+      },
+      PauliTerm {
+        pauli=[Pauli::X, Pauli::I],
+        coefficient=-0.025
+      },
+      PauliTerm {
+        pauli=[Pauli::X, Pauli::Z],
+        coefficient=0.045
+      },
+      PauliTerm {
+        pauli=[Pauli::X, Pauli::X],
+        coefficient=-0.16
+      },
+      PauliTerm {
+        pauli=[Pauli::Y, Pauli::Y],
+        coefficient=-0.06
+      }
+    ], pw, 4, 1.8, -6.2831853072>(target);
+  }>(res, indicator);
+}
+
