@@ -1,0 +1,73 @@
+qfunc suzuki_trotter1_with_power_logic(hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real, target: qbit[]) {
+  suzuki_trotter(hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2)), target);
+}
+
+qfunc simple_eig_inv(phase: qnum, output indicator: qbit) {
+  allocate(1, indicator);
+  indicator *= (1 / (2 ** phase.size)) / phase;
+}
+
+qfunc my_matrix_inversion_flexible(unitary_with_power: qfunc (int, qbit[]), precision: int, state: qbit[], output indicator: qbit) {
+  phase: qnum;
+  allocate_num(precision, False, precision, phase);
+  within {
+    qpe_flexible(lambda(k) {
+      unitary_with_power(k, state);
+    }, phase);
+  } apply {
+    simple_eig_inv(phase, indicator);
+  }
+}
+
+qfunc main(output res: qnum, output indicator: qbit) {
+  prepare_amplitudes([
+    0.1825741858,
+    0.3651483717,
+    0.7302967433,
+    0.5477225575
+  ], 0.0, res);
+  my_matrix_inversion_flexible(lambda(pw, target) {
+    suzuki_trotter1_with_power_logic([
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::I],
+        coefficient=0.4075
+      },
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::Z],
+        coefficient=-0.0525
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::I],
+        coefficient=-0.0175
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::Z],
+        coefficient=-0.0575
+      },
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::X],
+        coefficient=-0.03
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::X],
+        coefficient=0.02
+      },
+      PauliTerm {
+        pauli=[Pauli::X, Pauli::I],
+        coefficient=-0.025
+      },
+      PauliTerm {
+        pauli=[Pauli::X, Pauli::Z],
+        coefficient=0.045
+      },
+      PauliTerm {
+        pauli=[Pauli::X, Pauli::X],
+        coefficient=-0.16
+      },
+      PauliTerm {
+        pauli=[Pauli::Y, Pauli::Y],
+        coefficient=-0.06
+      }
+    ], pw, 4, 1.8, -6.2831853072, target);
+  }, 4, res, indicator);
+}

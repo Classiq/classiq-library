@@ -9,7 +9,7 @@ qfunc quantum_predicate(vars: PredicateVars, res: qbit) {
 }
 
 qfunc main(output vars: PredicateVars) {
-  allocate(7, vars);
+  allocate(vars.size, vars);
   grover_search(1, lambda(vars) {
     phase_oracle(quantum_predicate, vars);
   }, vars);
