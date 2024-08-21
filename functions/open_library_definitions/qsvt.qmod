@@ -1,14 +1,14 @@
-qfunc qsvt<phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qvar: qbit[], aux: qbit) {
+qfunc qsvt(phase_seq: real[], proj_cnot_1: qfunc (qbit[], qbit), proj_cnot_2: qfunc (qbit[], qbit), u: qfunc (qbit[]), qvar: qbit[], aux: qbit) {
   H(aux);
-  projector_controlled_phase<phase_seq[0], proj_cnot_1>(qvar, aux);
+  projector_controlled_phase(phase_seq[0], proj_cnot_1, qvar, aux);
   repeat (index: floor((phase_seq.len - 1) / 2)) {
-    qsvt_step<phase_seq, index, proj_cnot_1, proj_cnot_2, u>(qvar, aux);
+    qsvt_step(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], proj_cnot_1, proj_cnot_2, u, qvar, aux);
   }
   if ((phase_seq.len % 2) == 1) {
     IDENTITY(qvar);
   } else {
     u(qvar);
-    projector_controlled_phase<phase_seq[phase_seq.len - 1], proj_cnot_2>(qvar, aux);
+    projector_controlled_phase(phase_seq[phase_seq.len - 1], proj_cnot_2, qvar, aux);
   }
   H(aux);
 }

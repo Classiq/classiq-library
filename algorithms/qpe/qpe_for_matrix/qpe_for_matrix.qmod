@@ -1,38 +1,25 @@
-qfunc unitary_with_power_logic<pw: int, matrix: real[][]>(target: qbit[]) {
+qfunc unitary_with_power_logic(pw: int, matrix: real[][], target: qbit[]) {
   power (pw) {
-    unitary<matrix>(target);
+    unitary(matrix, target);
   }
 }
 
-qfunc suzuki_trotter1_with_power_logic<hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real>(target: qbit[]) {
-  suzuki_trotter<hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2))>(target);
-}
-
-qfunc my_qpe_flexible<unitary_with_power: qfunc <arg0: int>(arg1: qbit[]), precision: int>(state: qbit[], output phase: qbit[precision]) {
-  allocate<precision>(phase);
-  apply_to_all<H>(phase);
-  repeat (index: precision) {
-    control (phase[index]) {
-      unitary_with_power<2 ** index>(state);
-    }
-  }
-  invert {
-    qft(phase);
-  }
+qfunc suzuki_trotter1_with_power_logic(hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real, target: qbit[]) {
+  suzuki_trotter(hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2)), target);
 }
 
 qfunc main(output phase_result: qnum<8, False, 8>) {
   state: qbit[];
-  prepare_amplitudes<[
-    0.55653745541481,
-    0.17653302146188,
-    0.629197193488002,
-    0.513042926820719
-  ], 0.0>(state);
-  phase_array: qbit[];
-  my_qpe_flexible<lambda<pw>(arg1) {
+  prepare_amplitudes([
+    0.667440796614848,
+    0.024885482173617,
+    0.368323359032267,
+    0.646715856448805
+  ], 0.0, state);
+  allocate_num(8, False, 8, phase_result);
+  qpe_flexible(lambda(pw) {
     if (True) {
-      unitary_with_power_logic<pw, [
+      unitary_with_power_logic(pw, [
         [
           ((-0.800994193328528) - 0.432184369481798j),
           (0.18481604491471 - 0.230641913600945j),
@@ -57,51 +44,50 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
           ((-0.026023894036146) + 0.012295427374176j),
           ((-0.895413431349899) - 0.401691392328609j)
         ]
-      ]>(arg1);
+      ], state);
     } else {
-      suzuki_trotter1_with_power_logic<[
+      suzuki_trotter1_with_power_logic([
         PauliTerm {
-          pauli = [Pauli::I, Pauli::I],
-          coefficient = 0.4
+          pauli=[Pauli::I, Pauli::I],
+          coefficient=0.4
         },
         PauliTerm {
-          pauli = [Pauli::I, Pauli::Z],
-          coefficient = 0.01504032
+          pauli=[Pauli::I, Pauli::Z],
+          coefficient=0.01504032
         },
         PauliTerm {
-          pauli = [Pauli::I, Pauli::X],
-          coefficient = 0.10676978
+          pauli=[Pauli::Z, Pauli::I],
+          coefficient=0.016634415
         },
         PauliTerm {
-          pauli = [Pauli::Z, Pauli::I],
-          coefficient = 0.016634415
+          pauli=[Pauli::Z, Pauli::Z],
+          coefficient=-0.042759185
         },
         PauliTerm {
-          pauli = [Pauli::Z, Pauli::Z],
-          coefficient = -0.042759185
+          pauli=[Pauli::I, Pauli::X],
+          coefficient=0.10676978
         },
         PauliTerm {
-          pauli = [Pauli::Z, Pauli::X],
-          coefficient = 0.12638833
+          pauli=[Pauli::Z, Pauli::X],
+          coefficient=0.12638833
         },
         PauliTerm {
-          pauli = [Pauli::X, Pauli::I],
-          coefficient = 0.042057265
+          pauli=[Pauli::X, Pauli::I],
+          coefficient=0.042057265
         },
         PauliTerm {
-          pauli = [Pauli::X, Pauli::Z],
-          coefficient = 0.172936455
+          pauli=[Pauli::X, Pauli::Z],
+          coefficient=0.172936455
         },
         PauliTerm {
-          pauli = [Pauli::X, Pauli::X],
-          coefficient = 0.15658719
+          pauli=[Pauli::X, Pauli::X],
+          coefficient=0.15658719
         },
         PauliTerm {
-          pauli = [Pauli::Y, Pauli::Y],
-          coefficient = 0.09539162
+          pauli=[Pauli::Y, Pauli::Y],
+          coefficient=0.09539162
         }
-      ], pw, 2, 1.8, -6.283185307179586>(arg1);
+      ], pw, 2, 1.8, -6.283185307179586, state);
     }
-  }, 8>(state, phase_array);
-  phase_array -> phase_result;
+  }, phase_result);
 }

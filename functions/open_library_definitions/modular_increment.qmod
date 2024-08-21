@@ -1,0 +1,9 @@
+qfunc modular_increment(a: int, x: qbit[]) {
+  within {
+    qft(x);
+  } apply {
+    repeat (i: x.len) {
+      PHASE((((a * 2) * pi) * (2 ** i)) / (2 ** x.len), x[i]);
+    }
+  }
+}

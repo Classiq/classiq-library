@@ -1,48 +1,20 @@
 qfunc f_dual_qfunc(vars: qbit[16], res: qbit) {
-  x1: qbit;
-  x2: qbit;
-  x3: qbit;
-  x4: qbit;
-  x5: qbit;
-  x6: qbit;
-  x7: qbit;
-  x8: qbit;
-  x9: qbit;
-  x10: qbit;
-  x11: qbit;
-  x12: qbit;
-  x13: qbit;
-  x14: qbit;
-  x15: qbit;
-  x16: qbit;
-  vars -> {x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16};
-  res ^= (((((((((x6 & x9) ^ (x3 & x10)) ^ (x8 & x11)) ^ (x1 & x12)) ^ (x7 & x13)) ^ (x4 & x14)) ^ (x2 & x15)) ^ (x5 & x16)) ^ (((((((x6 & x3) & x8) & x1) & x7) & x4) & x2) & x5)) == 1;
-  {x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16} -> vars;
+  x: qbit[8];
+  y: qbit[8];
+  vars -> {x, y};
+  res ^= ((((((((x[5] & y[0]) ^ (x[2] & y[1])) ^ (x[7] & y[2])) ^ (x[0] & y[3])) ^ (x[6] & y[4])) ^ (x[3] & y[5])) ^ (x[1] & y[6])) ^ (x[4] & y[7])) ^ (((((((x[5] & x[2]) & x[7]) & x[0]) & x[6]) & x[3]) & x[1]) & x[4]);
+  {x, y} -> vars;
 }
 
 qfunc g_qfunc(vars: qbit[16], res: qbit) {
-  x1: qbit;
-  x2: qbit;
-  x3: qbit;
-  x4: qbit;
-  x5: qbit;
-  x6: qbit;
-  x7: qbit;
-  x8: qbit;
-  x9: qbit;
-  x10: qbit;
-  x11: qbit;
-  x12: qbit;
-  x13: qbit;
-  x14: qbit;
-  x15: qbit;
-  x16: qbit;
-  vars -> {x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16};
-  res ^= (((((((((x1 & x12) ^ ((x2 ^ 1) & x15)) ^ (x3 & (x10 ^ 1))) ^ ((x4 ^ 1) & x14)) ^ (x5 & x16)) ^ (x6 & x9)) ^ (x7 & x13)) ^ (x8 & x11)) ^ (((((((x9 & (x10 ^ 1)) & x11) & x12) & x13) & x14) & x15) & x16)) == 1;
-  {x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16} -> vars;
+  x: qbit[8];
+  y: qbit[8];
+  vars -> {x, y};
+  res ^= ((((((((x[0] & y[3]) ^ ((x[1] ^ 1) & y[6])) ^ (x[2] & (y[1] ^ 1))) ^ ((x[3] ^ 1) & y[5])) ^ (x[4] & y[7])) ^ (x[5] & y[0])) ^ (x[6] & y[4])) ^ (x[7] & y[2])) ^ (((((((y[0] & (y[1] ^ 1)) & y[2]) & y[3]) & y[4]) & y[5]) & y[6]) & y[7]);
+  {x, y} -> vars;
 }
 
-qfunc hidden_shift<oracle: qfunc (arg0: qbit[]), oracle_shifted: qfunc (arg0: qbit[])>(target: qbit[]) {
+qfunc hidden_shift(oracle: qfunc (qbit[]), oracle_shifted: qfunc (qbit[]), target: qbit[]) {
   hadamard_transform(target);
   oracle_shifted(target);
   hadamard_transform(target);
@@ -51,14 +23,10 @@ qfunc hidden_shift<oracle: qfunc (arg0: qbit[]), oracle_shifted: qfunc (arg0: qb
 }
 
 qfunc main(output s: qbit[]) {
-  allocate<16>(s);
-  hidden_shift<lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      f_dual_qfunc(arg0, arg1);
-    }>(arg0);
-  }, lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      g_qfunc(arg0, arg1);
-    }>(arg0);
-  }>(s);
+  allocate(16, s);
+  hidden_shift(lambda(y) {
+    phase_oracle(f_dual_qfunc, y);
+  }, lambda(y) {
+    phase_oracle(g_qfunc, y);
+  }, s);
 }

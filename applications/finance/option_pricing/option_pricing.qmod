@@ -1,45 +1,84 @@
-qfunc qmci<space_transform: qfunc (arg0: qbit[], arg1: qbit)>(phase: qnum, packed_vars: qbit[]) {
-  amplitude_estimation<lambda(arg0) {
-    Z(arg0[(arg0.len) - 1]);
-  }, lambda(arg0) {
-    space_transform(arg0[0:(arg0.len) - 1], arg0[(arg0.len) - 1]);
-  }>(phase, packed_vars);
+qfunc load_distribution(asset: qnum) {
+  inplace_prepare_state([
+    0.0001,
+    0.0003,
+    0.0008,
+    0.0019,
+    0.004,
+    0.0074,
+    0.0126,
+    0.0198,
+    0.0288,
+    0.0392,
+    0.0501,
+    0.0605,
+    0.0692,
+    0.0755,
+    0.0787,
+    0.0788,
+    0.0759,
+    0.0705,
+    0.0634,
+    0.0553,
+    0.0469,
+    0.0387,
+    0.0312,
+    0.0246,
+    0.0189,
+    0.0143,
+    0.0106,
+    0.0077,
+    0.0055,
+    0.0039,
+    0.0027,
+    0.0019
+  ], 0, asset);
 }
 
-qfunc main(output phase_port: qbit[2]) {
-  unitary_port: qbit[];
-  allocate<6>(unitary_port);
-  allocate_num<2, False, 2>(phase_port);
-  qmci<lambda(arg0, arg1) {
-    log_normal_finance<LogNormalModel {
-      num_qubits = 5,
-      mu = 0.7,
-      sigma = 0.13
-    }, FinanceFunction {
-      f = FinanceFunctionType::EUROPEAN_CALL_OPTION,
-      threshold = 1.9,
-      larger = True,
-      polynomial_degree = 0,
-      use_chebyshev_polynomial_approximation = False,
-      tail_probability = 0.0
-    }>(arg0, arg1);
-  }>(phase_port, unitary_port);
+qfunc is_in_the_money(asset: qnum, output res: qbit) {
+  res = asset >= ceiling(12.9503);
+}
+
+qfunc payoff_linear(asset: qnum, ind: qbit) {
+  ind *= sqrt(abs((((asset * 0.0513) + 1.2355) - 1.9) / 0.9262));
+}
+
+qfunc payoff(asset: qnum, ind: qbit) {
+  res: qbit;
+  within {
+    is_in_the_money(asset, res);
+  } apply {
+    control (res) {
+      payoff_linear(asset, ind);
+    }
+  }
+}
+
+qfunc european_call_state_preparation(asset: qnum, ind: qbit) {
+  load_distribution(asset);
+  payoff(asset, ind);
+}
+
+qfunc iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
+  sp_operand(x);
+  power (k) {
+    grover_operator(oracle_operand, sp_operand, x);
+  }
+}
+
+qfunc main(k: int, output ind_reg: qbit) {
+  full_reg: qbit[];
+  state_reg: qbit[];
+  allocate(6, full_reg);
+  iqae_algorithm(k, lambda(x) {
+    Z(x[x.len - 1]);
+  }, lambda(x) {
+    european_call_state_preparation(x[0:5], x[x.len - 1]);
+  }, full_reg);
+  full_reg -> {state_reg, ind_reg};
 }
 
 cscope ```
-
-def execute_amplitude_estimation(phase_port_size):
-    result = sample()
-    estimation = qae_with_qpe_result_post_processing(
-        estimation_register_size=phase_port_size,
-        estimation_method=1,
-        result=result
-    )
-    save({"result": result, "estimation": estimation})
-    return estimation
-
-estimation = execute_amplitude_estimation(2)
-result = log_normal_finance_post_process(struct_literal(LogNormalModel, num_qubits=5, mu=0.7, sigma=0.13), struct_literal(FinanceFunction, f=FinanceFunctionType.EUROPEAN_CALL_OPTION, threshold=1.9, larger=True, polynomial_degree=0, use_chebyshev_polynomial_approximation=False, tail_probability=0.0), estimation)
-save({'result': result})
-
+iqae_res = iqae(epsilon=0.05, alpha=0.01)
+save({'iqae_res': iqae_res})
 ```

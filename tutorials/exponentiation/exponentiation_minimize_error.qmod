@@ -1,9 +1,9 @@
 qfunc main() {
   state: qbit[];
-  allocate<8>(state);
-  exponentiation_with_depth_constraint<[
+  allocate(8, state);
+  exponentiation_with_depth_constraint([
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::Z,
@@ -13,10 +13,10 @@ qfunc main() {
         Pauli::I,
         Pauli::I
       ],
-      coefficient = 0.1
+      coefficient=0.1
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::X,
@@ -26,10 +26,10 @@ qfunc main() {
         Pauli::I,
         Pauli::I
       ],
-      coefficient = 0.2
+      coefficient=0.2
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::I,
@@ -39,10 +39,10 @@ qfunc main() {
         Pauli::Y,
         Pauli::X
       ],
-      coefficient = 0.3
+      coefficient=0.3
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::X,
         Pauli::Z,
         Pauli::I,
@@ -52,10 +52,10 @@ qfunc main() {
         Pauli::I,
         Pauli::X
       ],
-      coefficient = 0.4
+      coefficient=0.4
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::I,
@@ -65,10 +65,10 @@ qfunc main() {
         Pauli::X,
         Pauli::I
       ],
-      coefficient = 0.5
+      coefficient=0.5
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::I,
@@ -78,10 +78,10 @@ qfunc main() {
         Pauli::Z,
         Pauli::Y
       ],
-      coefficient = 0.6
+      coefficient=0.6
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::I,
@@ -91,10 +91,10 @@ qfunc main() {
         Pauli::X,
         Pauli::Y
       ],
-      coefficient = 0.7
+      coefficient=0.7
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::Y,
@@ -104,10 +104,10 @@ qfunc main() {
         Pauli::I,
         Pauli::I
       ],
-      coefficient = 0.8
+      coefficient=0.8
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::I,
@@ -117,10 +117,10 @@ qfunc main() {
         Pauli::X,
         Pauli::Z
       ],
-      coefficient = 0.9
+      coefficient=0.9
     },
     PauliTerm {
-      pauli = [
+      pauli=[
         Pauli::I,
         Pauli::I,
         Pauli::Y,
@@ -130,7 +130,7 @@ qfunc main() {
         Pauli::I,
         Pauli::I
       ],
-      coefficient = 1.0
+      coefficient=1.0
     }
-  ], 0.05, 400>(state);
+  ], 0.05, 400, state);
 }

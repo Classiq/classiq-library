@@ -1,5 +1,5 @@
 qfunc swap_test(state1: qbit[], state2: qbit[], output test: qbit) {
-  allocate<1>(test);
+  allocate(1, test);
   H(test);
   control (test) {
     repeat (i: state1.len) {

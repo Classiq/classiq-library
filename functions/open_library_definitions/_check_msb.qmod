@@ -1,9 +1,9 @@
-qfunc _check_msb<ref: int>(x: qbit[], aux: qbit) {
+qfunc _check_msb(ref: int, x: qbit[], aux: qbit) {
   within {
     invert {
       qft_no_swap(x);
     }
   } apply {
-    _ctrl_x<ref>(x[0], aux);
+    _ctrl_x(ref, x[0], aux);
   }
 }

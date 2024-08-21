@@ -1,0 +1,9 @@
+qfunc prepare_uniform_trimmed_state(m: int, q: qbit[]) {
+  hadamard_transform(q);
+  if (m < (2 ** q.len)) {
+    RY(((-2) * (asin(sqrt(min((2 ** (q.len - 1)) / m, 1))) + (pi / 4))) + pi, q[q.len - 1]);
+  }
+  repeat (i: max(q.len - 1, 0)) {
+    _prepare_uniform_trimmed_state_step((q.len - i) - 2, floor(m / (2 ** ((q.len - i) - 1))), m % (2 ** ((q.len - i) - 1)), q[(q.len - i) - 1:q.len], q[(q.len - i) - 2]);
+  }
+}

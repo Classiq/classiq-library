@@ -1,14 +1,10 @@
-qfunc expr_predicate(x1: qnum<1, False, 0>, x2: qnum<1, False, 0>, x3: qnum<1, False, 0>, res: qbit) {
-  res ^= (x1 or x2 or x3) and ((not x1) or x2 or x3) and ((not x1) or (not x2) or (not x3)) and ((not x1) or (not x2) or x3) and (x1 or x2 or (not x3)) and ((not x1) or x2 or (not x3));
+qfunc sat_oracle(x: qbit[], res: qbit) {
+  res ^= ((((((x[0] | x[1]) | x[2]) & (((x[0] ^ 1) | x[1]) | x[2])) & (((x[0] ^ 1) | (x[1] ^ 1)) | (x[2] ^ 1))) & (((x[0] ^ 1) | (x[1] ^ 1)) | x[2])) & ((x[0] | x[1]) | (x[2] ^ 1))) & (((x[0] ^ 1) | x[1]) | (x[2] ^ 1));
 }
 
-qfunc main(output x1: qnum<1, False, 0>, output x2: qnum<1, False, 0>, output x3: qnum<1, False, 0>) {
-  packed_vars: qbit[];
-  allocate<3>(packed_vars);
-  grover_search<1, lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      expr_predicate(arg0[0:1], arg0[1:2], arg0[2:3], arg1);
-    }>(arg0);
-  }>(packed_vars);
-  packed_vars -> {x1, x2, x3};
+qfunc main(output x: qbit[3]) {
+  allocate(3, x);
+  grover_search(1, lambda(vars) {
+    phase_oracle(sat_oracle, vars);
+  }, x);
 }

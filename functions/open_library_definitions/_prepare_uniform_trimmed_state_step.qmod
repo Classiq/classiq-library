@@ -1,0 +1,7 @@
+qfunc _prepare_uniform_trimmed_state_step(size_lsb: int, ctrl_val: int, lsbs_val: int, ctrl_var: qnum, rotation_var: qbit) {
+  if (lsbs_val != 0) {
+    control (ctrl_var == ctrl_val) {
+      RY(((-2) * (asin(sqrt(min((2 ** size_lsb) / lsbs_val, 1))) + (pi / 4))) + pi, rotation_var);
+    }
+  }
+}

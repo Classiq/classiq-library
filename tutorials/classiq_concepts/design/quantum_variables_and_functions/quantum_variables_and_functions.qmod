@@ -4,7 +4,7 @@ qfunc flip_msb(reg: qbit[]) {
 
 qfunc main(output indicator: qbit) {
   x: qnum;
-  allocate<4>(x);
+  allocate(4, x);
   flip_msb(x);
   indicator = x == 8;
 }

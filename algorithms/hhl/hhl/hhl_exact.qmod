@@ -1,0 +1,69 @@
+qfunc unitary_with_power_logic<pw: int, matrix: real[][]>(target: qbit[]) {
+  power (pw) {
+    unitary<matrix>(target);
+  }
+}
+
+qfunc load_b<amplitudes: real[], bound: real>(output res: qbit[]) {
+  prepare_amplitudes<amplitudes, bound>(res);
+}
+
+qfunc simple_eig_inv(phase: qnum, output indicator: qbit) {
+  allocate<1>(indicator);
+  indicator *= (1 / (2 ** phase.size)) / phase;
+}
+
+qfunc hhl<rhs_vector: real[], bound: real, precision: int, hamiltonian_evolution_with_power: qfunc <arg0: int>(arg1: qbit[])>(output res: qbit[], output indicator: qbit) {
+  phase: qnum;
+  allocate_num<precision, False, precision>(phase);
+  load_b<[
+    0.1825741858,
+    0.3651483717,
+    0.7302967433,
+    0.5477225575
+  ], bound>(res);
+  within {
+    qpe_flexible<lambda<k>() {
+      hamiltonian_evolution_with_power<k>(res);
+    }>(phase);
+  } apply {
+    simple_eig_inv(phase, indicator);
+  }
+}
+
+qfunc main(output res: qbit[floor(log(4, 2))], output indicator: qbit) {
+  hhl<[
+    0.1825741858,
+    0.3651483717,
+    0.7302967433,
+    0.5477225575
+  ], 0, 4, lambda<arg0>(arg1) {
+    unitary_with_power_logic<arg0, [
+      [
+        ((-0.0940624095) + 0.8149069223j),
+        ((-0.018800717) - 0.161428798j),
+        (0.0352187195 - 0.0297635346j),
+        (0.4376924593 + 0.3270555491j)
+      ],
+      [
+        ((-0.018800717) - 0.161428798j),
+        ((-0.1219131721) + 0.1320013813j),
+        (0.2311764446 + 0.8872069971j),
+        (0.295840691 + 0.1148893873j)
+      ],
+      [
+        (0.0352187195 - 0.0297635346j),
+        (0.2311764446 + 0.8872069971j),
+        ((-0.153472483) - 0.1727528247j),
+        (0.2397182575 + 0.2154826792j)
+      ],
+      [
+        (0.4376924593 + 0.3270555491j),
+        (0.295840691 + 0.1148893873j),
+        (0.2397182575 + 0.2154826792j),
+        ((-0.656382795) + 0.2569098899j)
+      ]
+    ]>(arg1);
+  }>(res, indicator);
+}
+

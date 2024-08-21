@@ -1,14 +1,12 @@
-qfunc expr_predicate(x0: qnum<1, False, 0>, x1: qnum<1, False, 0>, x2: qnum<1, False, 0>, x3: qnum<1, False, 0>, x4: qnum<1, False, 0>, res: qbit) {
-  res ^= ((((((((((((2 * x0) * x1) + ((2 * x0) * x2)) - (2 * x0)) + ((2 * x1) * x2)) + ((2 * x1) * x3)) - (3 * x1)) + ((2 * x2) * x4)) - (3 * x2)) + ((2 * x3) * x4)) - (2 * x3)) - (2 * x4)) <= (-4);
+qfunc cut_oracle(cut_size: int, nodes: qbit[], res: qbit) {
+  res ^= (-(((((((((((((-2) * nodes[0]) * nodes[1]) - ((2 * nodes[0]) * nodes[2])) + (2 * nodes[0])) - ((2 * nodes[1]) * nodes[2])) - ((2 * nodes[1]) * nodes[3])) + (3 * nodes[1])) - ((2 * nodes[2]) * nodes[4])) + (3 * nodes[2])) - ((2 * nodes[3]) * nodes[4])) + (2 * nodes[3])) + (2 * nodes[4]))) <= (-cut_size);
 }
 
-qfunc main(output x0: qnum<1, False, 0>, output x1: qnum<1, False, 0>, output x2: qnum<1, False, 0>, output x3: qnum<1, False, 0>, output x4: qnum<1, False, 0>) {
-  packed_vars: qbit[];
-  allocate<5>(packed_vars);
-  grover_search<3, lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      expr_predicate(arg0[0:1], arg0[1:2], arg0[2:3], arg0[3:4], arg0[4:5], arg1);
-    }>(arg0);
-  }>(packed_vars);
-  packed_vars -> {x0, x1, x2, x3, x4};
+qfunc main(output nodes: qbit[5]) {
+  allocate(5, nodes);
+  grover_search(3, lambda(vars) {
+    phase_oracle(lambda(vars, res) {
+      cut_oracle(4, vars, res);
+    }, vars);
+  }, nodes);
 }
