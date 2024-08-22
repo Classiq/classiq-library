@@ -1,9 +1,10 @@
-qfunc identify_block(num_data_qubits: int, qvar: qbit[], qubit: qbit) {
-  block_qubits: qnum<qvar.len - num_data_qubits, False, 0>;
-  data: qbit[num_data_qubits];
-  qvar -> {block_qubits, data};
-  qubit ^= block_qubits == 0;
-  {block_qubits, data} -> qvar;
+qstruct BlockEncodedState {
+  block: qnum<2, False, 0>;
+  data: qnum<2, False, 0>;
+}
+
+qfunc identify_block(state: BlockEncodedState, qubit: qbit) {
+  qubit ^= state.block == 0;
 }
 
 qfunc apply_pauli_term(pauli_string: PauliTerm, x: qbit[]) {
@@ -32,89 +33,84 @@ qfunc lcu_paulis(pauli_terms_list: PauliTerm[], probs: real[], block: qnum, data
   }
 }
 
-qfunc my_qsvt(phases: real[], qsvt_aux: qbit, block_ham: qbit[], data: qbit[]) {
-  combined_vars: qbit[];
-  {block_ham, data} -> combined_vars;
-  qsvt(phases, lambda(qvar, qubit) {
-    identify_block(data.len, qvar, qubit);
-  }, lambda(qvar, qubit) {
-    identify_block(data.len, qvar, qubit);
-  }, lambda(x) {
-    lcu_paulis([
-      PauliTerm {
-        pauli=[Pauli::I, Pauli::I],
-        coefficient=0.4
-      },
-      PauliTerm {
-        pauli=[Pauli::I, Pauli::Z],
-        coefficient=0.1
-      },
-      PauliTerm {
-        pauli=[Pauli::X, Pauli::X],
-        coefficient=0.05
-      },
-      PauliTerm {
-        pauli=[Pauli::Z, Pauli::Z],
-        coefficient=0.2
-      }
-    ], [
-      0.533333333333,
-      0.133333333333,
-      0.066666666667,
-      0.266666666667
-    ], x[0:block_ham.len], x[block_ham.len:x.len]);
-  }, combined_vars, qsvt_aux);
-  combined_vars -> {block_ham, data};
+qfunc block_encode_hamiltonian(state: BlockEncodedState) {
+  lcu_paulis([
+    PauliTerm {
+      pauli=[Pauli::I, Pauli::I],
+      coefficient=0.4
+    },
+    PauliTerm {
+      pauli=[Pauli::I, Pauli::Z],
+      coefficient=0.1
+    },
+    PauliTerm {
+      pauli=[Pauli::X, Pauli::X],
+      coefficient=0.05
+    },
+    PauliTerm {
+      pauli=[Pauli::Z, Pauli::Z],
+      coefficient=0.2
+    }
+  ], [
+    0.533333333333,
+    0.133333333333,
+    0.066666666667,
+    0.266666666667
+  ], state.block, state.data);
 }
 
-qfunc main(output qsvt_aux: qbit, output block_ham: qnum, output data: qnum, output block_exp: qbit) {
+qfunc my_qsvt(phases: real[], qsvt_aux: qbit, state: BlockEncodedState) {
+  qsvt(phases, identify_block, identify_block, block_encode_hamiltonian, state, qsvt_aux);
+}
+
+qfunc main(output qsvt_aux: qbit, output block_exp: qbit, output state: BlockEncodedState) {
   allocate(1, qsvt_aux);
   allocate(1, block_exp);
-  allocate(2, block_ham);
-  prepare_amplitudes([
-    0.210013606062,
-    0.401192530688,
-    0.156326932589,
-    0.877781709047
-  ], 0.0, data);
+  allocate(state.size, state);
+  inplace_prepare_amplitudes([
+    0.219017168306,
+    0.794720495321,
+    0.276765386913,
+    0.493813461653
+  ], 0.0, state.data);
   within {
     H(block_exp);
   } apply {
     control (block_exp == 0) {
       my_qsvt([
-        1.719637344108,
-        2.52588728871,
-        3.800733709887,
-        2.313318036864,
-        2.224618278572,
-        3.363594945309,
-        6.152896032692,
-        3.363594945397,
-        2.224618278529,
-        2.313318036823,
-        3.800733709886,
-        2.525887288722,
-        (-39.121067152566)
-      ], qsvt_aux, block_ham, data);
+        3.410911103343,
+        2.612260563483,
+        2.272729626091,
+        4.73613813696,
+        2.361516373429,
+        3.298356950177,
+        6.249108246753,
+        3.298356950188,
+        2.361516373428,
+        (-1.547047170217),
+        8.55591493328,
+        2.612260563482,
+        (-37.429793393329)
+      ], qsvt_aux, state);
     }
     control (block_exp == 1) {
       U(0, 0, 0, pi / 2, qsvt_aux);
       my_qsvt([
-        4.50835942415,
-        3.972681130945,
-        0.795730516482,
-        2.779709110191,
-        4.252739646774,
-        3.928512270665,
-        0.670917055422,
-        6.9541023626,
-        (-2.354673036517),
-        4.252739646776,
-        2.779709110195,
-        7.078915823661,
-        (-2.310504176238),
-        (-39.473937726108)
-      ], qsvt_aux, block_ham, data);
+        1.624980886906,
+        2.939347810591,
+        4.533568111605,
+        2.735661892347,
+        4.801425200666,
+        3.552958819911,
+        0.720706433761,
+        7.003891739691,
+        (-2.730226488811),
+        4.801425200555,
+        2.735661892504,
+        4.533568111712,
+        2.939347810816,
+        (-42.357316263304)
+      ], qsvt_aux, state);
     }
   }
 }

@@ -1,15 +1,26 @@
 DOMAIN_SIZE_QCONST: int = 4;
 
+qstruct OracleVars {
+  a: qnum<2, False, 0>;
+  b: qnum<2, False, 0>;
+}
+
+qstruct IQAEVars {
+  state: OracleVars;
+  ind: qbit;
+}
+
+qfunc iqae_oracle(vars: IQAEVars) {
+  Z(vars.ind);
+}
+
 qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
   res ^= (a + b) <= 2;
 }
 
-qfunc iqae_state_preparation(a: qnum, b: qnum, res: qbit) {
-  reg: qbit[];
-  {a, b, res} -> reg;
-  hadamard_transform(reg[0:4]);
-  reg -> {a, b, res};
-  arith_equation(a, b, res);
+qfunc iqae_state_preparation(vars: IQAEVars) {
+  hadamard_transform(vars.state);
+  arith_equation(vars.state.a, vars.state.b, vars.ind);
 }
 
 qfunc reflection_about_zero(x: qbit[]) {
@@ -40,7 +51,7 @@ qfunc my_grover_operator(oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit
   U(0, 0, 0, 3.1416, x[0]);
 }
 
-qfunc my_iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
+qfunc my_iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: IQAEVars) {
   sp_operand(x);
   power (k) {
     my_grover_operator(oracle_operand, sp_operand, x);
@@ -48,14 +59,10 @@ qfunc my_iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfun
 }
 
 qfunc main(k: int, output ind_reg: qbit) {
-  full_reg: qbit[];
-  allocate(5, full_reg);
-  my_iqae_algorithm(k, lambda(x) {
-    Z(x[x.len - 1]);
-  }, lambda(x) {
-    iqae_state_preparation(x[0:2], x[2:x.len - 1], x[x.len - 1]);
-  }, full_reg);
-  state_reg: qbit[4];
+  full_reg: IQAEVars;
+  allocate(full_reg.size, full_reg);
+  my_iqae_algorithm(k, iqae_oracle, iqae_state_preparation, full_reg);
+  state_reg: OracleVars;
   full_reg -> {state_reg, ind_reg};
 }
 

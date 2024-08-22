@@ -1,3 +1,7 @@
+EPSILON: real = 0.05;
+
+ALPHA: real = 0.1;
+
 qfunc qmci_oracle(ind: qbit) {
   Z(ind);
 }
@@ -54,6 +58,6 @@ qfunc main(k: int, output ind_reg: qbit) {
 }
 
 cscope ```
-iqae_res = iqae(epsilon=0.01, alpha=0.05)
+iqae_res = iqae(epsilon=EPSILON, alpha=ALPHA)
 save({'iqae_res': iqae_res})
 ```

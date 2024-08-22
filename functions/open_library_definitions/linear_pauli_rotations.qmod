@@ -1,6 +1,6 @@
 qfunc linear_pauli_rotations(bases: Pauli[], slopes: real[], offsets: real[], x: qbit[], q: qbit[]) {
   repeat (index: q.len) {
-    single_pauli(slopes[index], offsets[index], lambda(theta, target) {
+    _single_pauli(slopes[index], offsets[index], lambda(theta, target) {
       switch(bases[index], [lambda() {
         IDENTITY(target);
       }, lambda() {

@@ -1,9 +1,11 @@
-qfunc modular_increment(a: int, x: qbit[]) {
+qfunc modular_increment(a: int, x: qnum) {
+  array_cast: qbit[];
   within {
-    qft(x);
+    x -> array_cast;
+    qft(array_cast);
   } apply {
-    repeat (i: x.len) {
-      PHASE((((a * 2) * pi) * (2 ** i)) / (2 ** x.len), x[i]);
+    repeat (i: x.size) {
+      PHASE((((a * 2) * pi) * (2 ** i)) / (2 ** x.size), array_cast[i]);
     }
   }
 }

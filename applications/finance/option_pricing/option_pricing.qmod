@@ -1,3 +1,12 @@
+qstruct OptionPricingState {
+  asset: qnum<5, False, 0>;
+  ind: qbit;
+}
+
+qfunc iqae_oracle(state: OptionPricingState) {
+  Z(state.ind);
+}
+
 qfunc load_distribution(asset: qnum) {
   inplace_prepare_state([
     0.0001,
@@ -35,28 +44,19 @@ qfunc load_distribution(asset: qnum) {
   ], 0, asset);
 }
 
-qfunc is_in_the_money(asset: qnum, output res: qbit) {
-  res = asset >= ceiling(12.9503);
-}
-
 qfunc payoff_linear(asset: qnum, ind: qbit) {
   ind *= sqrt(abs((((asset * 0.0513) + 1.2355) - 1.9) / 0.9262));
 }
 
 qfunc payoff(asset: qnum, ind: qbit) {
-  res: qbit;
-  within {
-    is_in_the_money(asset, res);
-  } apply {
-    control (res) {
-      payoff_linear(asset, ind);
-    }
+  control (asset >= ceiling(12.9503)) {
+    payoff_linear(asset, ind);
   }
 }
 
-qfunc european_call_state_preparation(asset: qnum, ind: qbit) {
-  load_distribution(asset);
-  payoff(asset, ind);
+qfunc european_call_state_preparation(state: OptionPricingState) {
+  load_distribution(state.asset);
+  payoff(state.asset, state.ind);
 }
 
 qfunc iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
@@ -66,16 +66,12 @@ qfunc iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (
   }
 }
 
-qfunc main(k: int, output ind_reg: qbit) {
-  full_reg: qbit[];
-  state_reg: qbit[];
-  allocate(6, full_reg);
-  iqae_algorithm(k, lambda(x) {
-    Z(x[x.len - 1]);
-  }, lambda(x) {
-    european_call_state_preparation(x[0:5], x[x.len - 1]);
-  }, full_reg);
-  full_reg -> {state_reg, ind_reg};
+qfunc main(k: int, output ind: qbit) {
+  state: OptionPricingState;
+  asset: qbit[];
+  allocate(state.size, state);
+  iqae_algorithm(k, iqae_oracle, european_call_state_preparation, state);
+  state -> {asset, ind};
 }
 
 cscope ```

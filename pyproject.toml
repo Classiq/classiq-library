@@ -2,7 +2,10 @@
 python_files = "test_*.py"
 
 # treat all warnings as errors
-filterwarnings = "error"
+filterwarnings = [
+  "error",
+  """ignore: invalid escape sequence:DeprecationWarning""",
+]
 
 [tool.isort]
 profile = "black"
@@ -10,10 +13,10 @@ combine_as_imports = true
 
 known_classiq = "classiq"
 sections = [
-    "FUTURE",
-    "STDLIB",
-    "THIRDPARTY",
-    "FIRSTPARTY",
-    "CLASSIQ",
-    "LOCALFOLDER",
+  "FUTURE",
+  "STDLIB",
+  "THIRDPARTY",
+  "FIRSTPARTY",
+  "CLASSIQ",
+  "LOCALFOLDER",
 ]
