@@ -1,20 +1,23 @@
 name: "Test notebooks"
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+      branches:
+        - dev
 
 jobs:
   tests:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: "Install dependencies"
-        run: |
-          python -m pip install -U -r requirements.txt
-          python -m pip install -U -r requirements_tests.txt
 
       - name: Get changed files - all
         id: changed-files-all
@@ -26,15 +29,24 @@ jobs:
           files: |
             **.ipynb
 
+      - uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
       - name: Set environment variables
         run: |
+          set -ex
+          echo "CLASSIQ_TEXT_ONLY=true" >> $GITHUB_ENV
+
           if [ "${{ github.event_name }}" == 'pull_request' ]; then
             echo "SHOULD_TEST_ALL_FILES=false" >> $GITHUB_ENV
             echo "HAS_ANY_FILE_CHANGED=${{ steps.changed-files-all.outputs.any_changed }}" >> $GITHUB_ENV
             echo "LIST_OF_FILE_CHANGED=${{ steps.changed-files-all.outputs.all_changed_files }}" >> $GITHUB_ENV
             echo "HAS_ANY_IPYNB_CHANGED=${{ steps.changed-files-ipynb.outputs.any_changed }}" >> $GITHUB_ENV
             echo "LIST_OF_IPYNB_CHANGED=${{ steps.changed-files-ipynb.outputs.all_changed_files }}" >> $GITHUB_ENV
-          elif [ "${{ github.event_name }}" == 'workflow_dispatch' ]; then
+          elif [[ "${{ github.event_name }}" == 'workflow_dispatch' || "${{ github.head_ref || github.ref_name }}" == "dev" ]]; then
             echo "SHOULD_TEST_ALL_FILES=true" >> $GITHUB_ENV
             echo "HAS_ANY_FILE_CHANGED=None" >> $GITHUB_ENV
             echo "LIST_OF_FILE_CHANGED=None" >> $GITHUB_ENV
@@ -42,10 +54,22 @@ jobs:
             echo "LIST_OF_IPYNB_CHANGED=None" >> $GITHUB_ENV
           fi
 
+          if [ "${{ github.head_ref || github.ref_name }}" == "dev" ]; then
+            echo "CLASSIQ_IDE=https://nightly.platform.classiq.io" >> $GITHUB_ENV
+            echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
+            echo "IS_DEV=true" >> $GITHUB_ENV
+          fi
+
       - name: Set authentication
-        run: echo "${{ secrets.CLASSIQ_CREDENTIALS_B64 }}" | base64 --decode > "${HOME}/.classiq-credentials"
+        run: .github/scripts/get_m2m_token.sh
+        env:
+          PROD_M2M_SECRET_ARN: "${{ secrets.PROD_M2M_SECRET_ARN }}"
+          NIGHTLY_M2M_SECRET_ARN: "${{ secrets.NIGHTLY_M2M_SECRET_ARN }}"
+
+      - name: "Install dependencies"
+        run: .github/scripts/install_deps.sh
 
       - name: "Run tests"
-        run: python -m pytest tests
+        run: python -m pytest --log-cli-level=INFO tests/test_notebooks.py
         env:
           JUPYTER_PLATFORM_DIRS: "1"
