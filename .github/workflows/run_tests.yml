@@ -1,4 +1,4 @@
-name: "Test notebooks old"
+name: "Test notebooks"
 
 on:
   pull_request:
@@ -66,14 +66,10 @@ jobs:
           PROD_M2M_SECRET_ARN: "${{ secrets.PROD_M2M_SECRET_ARN }}"
           NIGHTLY_M2M_SECRET_ARN: "${{ secrets.NIGHTLY_M2M_SECRET_ARN }}"
 
-      - name: Install dependencies
-        run: |
-          set -e
-          # Pre is needed for Dev pre releases
-          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
-          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
+      - name: "Install dependencies"
+        run: .github/scripts/install_deps.sh
 
       - name: "Run tests"
-        run: python -m pytest --log-cli-level=INFO tests
+        run: python -m pytest --log-cli-level=INFO tests/test_notebooks.py
         env:
           JUPYTER_PLATFORM_DIRS: "1"
