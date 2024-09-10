@@ -104,8 +104,8 @@ in the table or to add new ones.
             <a href="https://arxiv.org/abs/2402.05574" target="_blank">Quantum Amplitude Loading for Rainbow Options Pricing</a>
         </td>
         <td style="min-width: 200px;">
-          <a href="../research/rainbow_options_direct_method/rainbow_options_direct_method.ipynb">Direct Method</a><br>
-          <a href="../research/rainbow_options_integration_method/rainbow_options_integration_method.ipynb">Integration Method</a>
+          <a href="../research/rainbow_options/rainbow_options_direct_method.ipynb">Direct Method</a><br>
+          <a href="../research/rainbow_options/rainbow_options_integration_method.ipynb">Integration Method</a>
         </td>
         <td>
             Implementation of the quantum monte-carlo integration method for the use case of rainbow option pricing
