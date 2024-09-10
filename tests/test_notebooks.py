@@ -7,7 +7,11 @@ TIMEOUT: int = 60 * 3  # 3 minutes
 
 
 def test_notebooks() -> None:
+    current_dir = os.getcwd()
     for notebook_path in iterate_notebooks():
         os.chdir(os.path.dirname(notebook_path))
+
         with testbook(os.path.basename(notebook_path), execute=True, timeout=TIMEOUT):
             pass  # we simply wish it to run without errors
+
+        os.chdir(current_dir)

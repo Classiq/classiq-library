@@ -6,8 +6,8 @@ qfunc discrete_log_oracle(g_generator: int, x_element: int, N_modulus: int, x1: 
 }
 
 qfunc discrete_log(g: int, x: int, N: int, order: int, output x1: qnum, output x2: qnum, output func_res: qnum) {
-  allocate_num(ceiling(log(order, 2)), False, ceiling(log(order, 2)), x1);
-  allocate_num(ceiling(log(order, 2)), False, ceiling(log(order, 2)), x2);
+  allocate_num(ceiling(log(order, 2)) + 1, False, ceiling(log(order, 2)) + 1, x1);
+  allocate_num(ceiling(log(order, 2)) + 1, False, ceiling(log(order, 2)) + 1, x2);
   prepare_uniform_trimmed_state(12, x1);
   prepare_uniform_trimmed_state(12, x2);
   discrete_log_oracle(g, x, N, x1, x2, func_res);

@@ -2,8 +2,14 @@ EPSILON: real = 0.05;
 
 ALPHA: real = 0.1;
 
-qfunc qmci_oracle(ind: qbit) {
-  Z(ind);
+qstruct EstimationVars {
+  x1: qnum<2, False, 0>;
+  x2: qnum<2, False, 0>;
+  ind: qbit;
+}
+
+qfunc qmci_oracle(qvars: EstimationVars) {
+  Z(qvars.ind);
 }
 
 qfunc affine_max(x1: qnum, x2: qnum, output res: qnum) {
@@ -17,24 +23,24 @@ qfunc brute_force_payoff(max_reg: qnum, ind_reg: qbit) {
   max_reg_fixed -> max_reg;
 }
 
-qfunc rainbow_brute_force(x1: qnum, x2: qnum, ind_reg: qbit) {
+qfunc rainbow_brute_force(qvars: EstimationVars) {
   inplace_prepare_state([
     0.0656,
     0.4344,
     0.4344,
     0.0656
-  ], 0, x1);
+  ], 0, qvars.x1);
   inplace_prepare_state([
     0.0656,
     0.4344,
     0.4344,
     0.0656
-  ], 0, x2);
+  ], 0, qvars.x2);
   max_out: qnum;
   within {
-    affine_max(x1, x2, max_out);
+    affine_max(qvars.x1, qvars.x2, max_out);
   } apply {
-    brute_force_payoff(max_out, ind_reg);
+    brute_force_payoff(max_out, qvars.ind);
   }
 }
 
@@ -45,16 +51,12 @@ qfunc grover_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc
   }
 }
 
-qfunc main(k: int, output ind_reg: qbit) {
-  full_reg: qbit[];
-  allocate(5, full_reg);
-  grover_algorithm(k, lambda(x) {
-    qmci_oracle(x[x.len - 1]);
-  }, lambda(x) {
-    rainbow_brute_force(x[0:2], x[2:4], x[x.len - 1]);
-  }, full_reg);
+qfunc main(k: int, output ind: qbit) {
+  qvars: EstimationVars;
+  allocate(qvars.size, qvars);
+  grover_algorithm(k, qmci_oracle, rainbow_brute_force, qvars);
   state_reg: qbit[];
-  full_reg -> {state_reg, ind_reg};
+  qvars -> {state_reg, ind};
 }
 
 cscope ```

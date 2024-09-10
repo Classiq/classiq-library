@@ -2,8 +2,15 @@ EPSILON: real = 0.05;
 
 ALPHA: real = 0.1;
 
-qfunc qmci_oracle(ind: qbit) {
-  Z(ind);
+qstruct EstimationVars {
+  x1: qnum<2, False, 0>;
+  x2: qnum<2, False, 0>;
+  integrator: qnum<5, False, 2>;
+  ind: qbit;
+}
+
+qfunc qmci_oracle(qvars: EstimationVars) {
+  Z(qvars.ind);
 }
 
 qfunc affine_max(x1: qnum, x2: qnum, output res: qnum) {
@@ -16,10 +23,7 @@ qfunc asset_geq_strike_price(x: qnum, output res: qbit) {
 
 qfunc integrator(x: qnum, ref: qnum, res: qbit) {
   prepare_exponential_state(-((1 / (2 ** x.fraction_digits)) * 0.4341), ref);
-  x_uint: qnum<x.size, False, 0>;
-  x -> x_uint;
-  res ^= x_uint >= ref;
-  x_uint -> x;
+  res ^= x >= ref;
 }
 
 qfunc integration_load_amplitudes(geq_reg: qnum, max_reg: qnum, integrator_reg: qnum, ind_reg: qbit) {
@@ -40,24 +44,24 @@ qfunc integration_payoff(max_reg: qnum, integrator_reg: qnum, ind_reg: qbit) {
   }
 }
 
-qfunc rainbow_integration(x1: qnum, x2: qnum, integrator_reg: qnum, ind_reg: qbit) {
+qfunc rainbow_integration(qvars: EstimationVars) {
   inplace_prepare_state([
     0.0656,
     0.4344,
     0.4344,
     0.0656
-  ], 0, x1);
+  ], 0, qvars.x1);
   inplace_prepare_state([
     0.0656,
     0.4344,
     0.4344,
     0.0656
-  ], 0, x2);
+  ], 0, qvars.x2);
   max_out: qnum;
   within {
-    affine_max(x1, x2, max_out);
+    affine_max(qvars.x1, qvars.x2, max_out);
   } apply {
-    integration_payoff(max_out, integrator_reg, ind_reg);
+    integration_payoff(max_out, qvars.integrator, qvars.ind);
   }
 }
 
@@ -68,16 +72,12 @@ qfunc grover_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc
   }
 }
 
-qfunc main(k: int, output ind_reg: qbit) {
-  full_reg: qbit[];
-  allocate(10, full_reg);
-  grover_algorithm(k, lambda(x) {
-    qmci_oracle(x[x.len - 1]);
-  }, lambda(x) {
-    rainbow_integration(x[0:2], x[2:4], x[4:9], x[x.len - 1]);
-  }, full_reg);
-  state_reg: qbit[];
-  full_reg -> {state_reg, ind_reg};
+qfunc main(k: int, output ind: qbit) {
+  qvars: EstimationVars;
+  allocate(qvars.size, qvars);
+  grover_algorithm(k, qmci_oracle, rainbow_integration, qvars);
+  state: qbit[];
+  qvars -> {state, ind};
 }
 
 cscope ```
