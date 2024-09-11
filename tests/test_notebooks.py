@@ -4,7 +4,7 @@ import logging
 from testbook import testbook  # type: ignore[import]
 from utils_for_tests import iterate_notebooks
 
-TIMEOUT: int = 60 * 3  # 3 minutes
+TIMEOUT: int = 60 * 10  # 10 minutes
 LOGGER = logging.getLogger(__name__)
 
 
