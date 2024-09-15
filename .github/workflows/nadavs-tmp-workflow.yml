@@ -1,0 +1,51 @@
+# .github/workflows/nadavs-tmp-workflow.yml
+name: Test Notebooks- Temp
+
+on:
+  # Trigger the workflow on push to the specific branch
+  push:
+    branches:
+      - Nadav/CAD-22790/refactor_run_tests
+
+  # Trigger the workflow on pull requests targeting the specific branch
+  pull_request:
+    branches:
+      - Nadav/CAD-22790/refactor_run_tests
+
+  # Add a manual trigger option for running the workflow
+  workflow_dispatch:
+
+jobs:
+  test:
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      PROD_M2M_SECRET_ARN: ${{ secrets.PROD_M2M_SECRET_ARN }}  # Passing secrets
+      NIGHTLY_M2M_SECRET_ARN: ${{ secrets.NIGHTLY_M2M_SECRET_ARN }}  # Passing secrets
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Configure AWS Credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ env.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
+      - name: Run notebook tests
+        uses: ./.github/actions/run-tests  # Calls your composite action
+        with:
+          env: dev  # Example environment
+          notebooks: algorithms/deutsch_jozsa/deutsch_jozsa.ipynb,algorithms/bernstein_vazirani/bernstein_vazirani.ipynb,algorithms/grover/3_sat_grover/3_sat_grover.ipynb  # List of notebooks to be tested
+
+          prod_m2m_secret_arn:  ${{ env.PROD_M2M_SECRET_ARN }}
+          nightly_m2m_secret_arn: ${{ env.NIGHTLY_M2M_SECRET_ARN }}
+          aws_role: ${{ env.AWS_ROLE }}
+
