@@ -1,16 +1,16 @@
-# .github/workflows/nadavs-tmp-workflow.yml
-name: Test Notebooks- Temp
+# .github/workflows/test-CI.yml
+name: Test Library CI
 
 on:
   # Trigger the workflow on push to the specific branch
   push:
     branches:
-      - Nadav/CAD-22790/refactor_run_tests
+      - Nadav/CAD-22801/create_CI-library_workflow
 
   # Trigger the workflow on pull requests targeting the specific branch
   pull_request:
     branches:
-      - Nadav/CAD-22790/refactor_run_tests
+      - Nadav/CAD-22801/create_CI-library_workflow
 
   # Add a manual trigger option for running the workflow
   workflow_dispatch:
