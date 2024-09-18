@@ -38,10 +38,18 @@ jobs:
       # Decide environment based on the branch
       - name: Set environment based on branch
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Use the target branch of the PR
+            target_branch="${{ github.event.pull_request.base.ref }}"
+          else
+            # Use the branch of the push event
+            target_branch="${{ github.ref_name }}"
+          fi
+
+          if [[ "$target_branch" == "dev" ]]; then
             echo "env=nightly" >> $GITHUB_ENV
             echo "Running on nightly environment."
-          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          elif [[ "$target_branch" == "main" ]]; then
             echo "env=prod" >> $GITHUB_ENV
             echo "Running on prod environment."
           else
