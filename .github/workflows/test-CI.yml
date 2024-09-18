@@ -35,18 +35,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Decide environment based on the branch
-      - name: Set environment based on branch
+      # Decide environment based on the target branch (for both push and PR events)
+      - name: Set environment based on target branch
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-            echo "env=nightly" >> $GITHUB_ENV
-            echo "Running on nightly environment."
-          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Use the target branch of the pull request
+            target_branch="${{ github.event.pull_request.base.ref }}"
+          else
+            # Use the branch of the push event
+            target_branch="${{ github.ref_name }}"
+          fi
+
+          # Determine the environment based on the target branch
+          if [[ "$target_branch" == "dev" ]]; then
+            echo "env=dev" >> $GITHUB_ENV
+            echo "Running on dev environment."
+          elif [[ "$target_branch" == "main" ]]; then
             echo "env=prod" >> $GITHUB_ENV
             echo "Running on prod environment."
           else
             echo "env=dev" >> $GITHUB_ENV  # Default to dev for other branches
-            echo "Running on dev environment."
+            echo "Running on dev environment (also known as nightly)."
           fi
         shell: bash
 
@@ -67,6 +76,7 @@ jobs:
           else
             echo "No notebooks changed."
           fi
+
       # Configure AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
