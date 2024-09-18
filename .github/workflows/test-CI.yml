@@ -4,11 +4,15 @@ on:
   # Trigger the workflow on push to the specific branch
   push:
     branches:
+      - dev
+      - main
       - Nadav/CAD-22801/create_CI-library_workflow
 
   # Trigger the workflow on pull requests targeting the specific branch
   pull_request:
     branches:
+      - dev
+      - main
       - Nadav/CAD-22801/create_CI-library_workflow
 
   # Add a manual trigger option for running the workflow
@@ -31,6 +35,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Decide environment based on the branch
+      - name: Set environment based on branch
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "env=nightly" >> $GITHUB_ENV
+            echo "Running on nightly environment."
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "env=prod" >> $GITHUB_ENV
+            echo "Running on prod environment."
+          else
+            echo "env=dev" >> $GITHUB_ENV  # Default to dev for other branches
+            echo "Running on dev environment."
+          fi
+        shell: bash
+
       # Step to detect changed .ipynb files
       - name: Get changed notebook files
         id: changed-files
@@ -48,7 +67,6 @@ jobs:
           else
             echo "No notebooks changed."
           fi
-
       # Configure AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
@@ -62,7 +80,7 @@ jobs:
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: ./.github/actions/run-tests  # Calls your composite action
         with:
-          env: dev  # Example environment
+          env: ${{ env.env }}  # Uses the env set by branch logic
           notebooks: ${{ env.NOTEBOOKS_TO_RUN }}  # Pass the comma-separated list of notebooks
           prod_m2m_secret_arn: ${{ env.PROD_M2M_SECRET_ARN }}
           nightly_m2m_secret_arn: ${{ env.NIGHTLY_M2M_SECRET_ARN }}
