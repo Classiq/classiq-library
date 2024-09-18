@@ -67,18 +67,21 @@ jobs:
           else
             echo "No notebooks changed."
           fi
+
+      # Install dependencies and run tests only if notebooks have changed
+      - name: Install dependencies
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: .github/scripts/install_deps.sh
+        shell: bash
+
       # Configure AWS Credentials
       - name: Configure AWS Credentials
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           role-to-assume: ${{ env.AWS_ROLE }}
           aws-region: us-east-1
           mask-aws-account-id: true
-
-      # Install Dependencies
-      - name: Install dependencies
-        run: .github/scripts/install_deps.sh
-        shell: bash
 
       # Run notebook tests if any changed notebooks are detected
       - name: Run notebook tests
