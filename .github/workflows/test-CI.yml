@@ -1,14 +1,14 @@
 name: Test Library CI
 
 on:
-  # Trigger the workflow on push to the specific branch
+  # Trigger the workflow on push to the specific branches
   push:
     branches:
       - dev
       - main
       - Nadav/CAD-22801/create_CI-library_workflow
 
-  # Trigger the workflow on pull requests targeting the specific branch
+  # Trigger the workflow on pull requests targeting the specific branches
   pull_request:
     branches:
       - dev
@@ -35,17 +35,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Decide environment based on the branch
-      - name: Set environment based on branch
+      # Decide environment based on the target branch for both push and pull_request events
+      - name: Set environment based on target branch
         run: |
+          # For pull requests, use the target branch (base.ref)
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # Use the target branch of the PR
             target_branch="${{ github.event.pull_request.base.ref }}"
           else
-            # Use the branch of the push event
+            # For pushes, the ref represents the target branch directly
             target_branch="${{ github.ref_name }}"
           fi
 
+          # Determine environment based on the target branch
           if [[ "$target_branch" == "dev" ]]; then
             echo "env=nightly" >> $GITHUB_ENV
             echo "Running on nightly environment."
@@ -66,7 +67,7 @@ jobs:
           files: |
             **/*.ipynb
 
-      # Create a comma-separated list of notebooks
+      # Create a comma-separated list of notebooks if any files have changed
       - name: Create comma-separated list of notebooks
         run: |
           if [ -n "${{ steps.changed-files.outputs.all_changed_files }}" ]; then
@@ -82,7 +83,7 @@ jobs:
         run: .github/scripts/install_deps.sh
         shell: bash
 
-      # Configure AWS Credentials
+      # Configure AWS Credentials only if notebooks have changed
       - name: Configure AWS Credentials
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: aws-actions/configure-aws-credentials@v4.0.2
