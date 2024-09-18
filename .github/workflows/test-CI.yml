@@ -75,6 +75,11 @@ jobs:
           aws-region: us-east-1
           mask-aws-account-id: true
 
+      # Install Dependencies
+      - name: Install dependencies
+        run: .github/scripts/install_deps.sh
+        shell: bash
+
       # Run notebook tests if any changed notebooks are detected
       - name: Run notebook tests
         if: steps.changed-files.outputs.any_changed == 'true'
