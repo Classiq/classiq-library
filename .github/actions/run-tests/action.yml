@@ -67,17 +67,20 @@ runs:
       shell: bash
 
     - name: Run Notebooks
-      run: |
-        IFS=',' read -ra notebooks <<< "${{ inputs.notebooks }}"
-    
-        for notebook in "${notebooks[@]}"; do
-          echo "Running notebook: $notebook"
-          notebook_dir=$(dirname "$notebook")
-          notebook_name=$(basename "$notebook")
-          output_path="${notebook_dir}/${notebook_name}"
-          echo "Output path: $output_path"
-          python -m nbconvert --to notebook --execute "$notebook" --output-dir "$notebook_dir"
-        done
+#      run: |
+#        IFS=',' read -ra notebooks <<< "${{ inputs.notebooks }}"
+#
+#        for notebook in "${notebooks[@]}"; do
+#          echo "Running notebook: $notebook"
+#          notebook_dir=$(dirname "$notebook")
+#          notebook_name=$(basename "$notebook")
+#          output_path="${notebook_dir}/${notebook_name}"
+#          echo "Output path: $output_path"
+#          python -m nbconvert --to notebook --execute "$notebook" --output-dir "$notebook_dir"
+#        done
+
+      run: python -m pytest --log-cli-level=INFO tests
+#
       env:
         JUPYTER_PLATFORM_DIRS: "1"
       shell: bash
