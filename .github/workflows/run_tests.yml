@@ -1,10 +1,10 @@
-name: "Test notebooks"
+name: "Test notebooks old"
 
 on:
   pull_request:
   push:
-      branches:
-        - dev
+    branches:
+      - dev
 
 jobs:
   tests:
@@ -66,8 +66,12 @@ jobs:
           PROD_M2M_SECRET_ARN: "${{ secrets.PROD_M2M_SECRET_ARN }}"
           NIGHTLY_M2M_SECRET_ARN: "${{ secrets.NIGHTLY_M2M_SECRET_ARN }}"
 
-      - name: "Install dependencies"
-        run: .github/scripts/install_deps.sh
+      - name: Install dependencies
+        run: |
+          set -e
+          # Pre is needed for Dev pre releases
+          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
+          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
       - name: "Run tests"
         run: python -m pytest --log-cli-level=INFO tests
