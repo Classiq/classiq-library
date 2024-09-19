@@ -6,14 +6,14 @@ on:
     branches:
       - dev
       - main
-      - Nadav/CAD-22801/create_CI-library_workflow
+      - Nadav/CAD-22801/create_CI-library_workflow # Will be eliminated
 
   # Trigger the workflow on pull requests targeting the specific branch
   pull_request:
     branches:
       - dev
       - main
-      - Nadav/CAD-22801/create_CI-library_workflow
+      - Nadav/CAD-22801/create_CI-library_workflow # Will be eliminated
 
   # Add a manual trigger option for running the workflow
   workflow_dispatch:
@@ -42,7 +42,7 @@ jobs:
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
-      # A bunch of if-else. Will move to an action
+      # A bunch of if-else. Might move to an action
       # Decide environment based on the target branch (for both push and PR events)
       - name: Set environment based on target branch
         run: |
@@ -56,16 +56,7 @@ jobs:
             target_branch="${{ github.ref_name }}"
           fi
 
-          # Determine the environment based on the target branch
-          if [[ "$target_branch" == "dev" ]]; then
-            echo "env=dev" >> $GITHUB_ENV
-          elif [[ "$target_branch" == "main" ]]; then
-            echo "env=prod" >> $GITHUB_ENV
-          else
-            echo "env=dev" >> $GITHUB_ENV  # Default to dev for other branches
-          fi
-
-          if [[ "$env" == "prod" ]]; then
+          if [[ "$target_branch" == "main" ]]; then
             echo "Running on prod environment."
 
             echo "M2M_SECRET_ARN=${{ secrets.PROD_M2M_SECRET_ARN }}" >> $GITHUB_ENV
@@ -73,7 +64,7 @@ jobs:
             echo "CLASSIQ_IDE=https://platform.classiq.io" >> $GITHUB_ENV
             echo "CLASSIQ_HOST=https://api.classiq.io" >> $GITHUB_ENV
             echo "IS_DEV=false" >> $GITHUB_ENV
-          elif [[ "$env" == "dev" ]]; then
+          else
             echo "Running on dev environment."
 
             echo "M2M_SECRET_ARN=${{ secrets.NIGHTLY_M2M_SECRET_ARN }}" >> $GITHUB_ENV
@@ -81,9 +72,6 @@ jobs:
             echo "CLASSIQ_IDE=https://nightly.platform.classiq.io" >> $GITHUB_ENV
             echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
             echo "IS_DEV=true" >> $GITHUB_ENV
-          else
-            echo "no dev and no prod"
-            exit 1
           fi
         shell: bash
 
