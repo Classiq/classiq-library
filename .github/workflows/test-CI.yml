@@ -6,14 +6,13 @@ on:
     branches:
       - dev
       - main
-      - Nadav/CAD-22801/create_CI-library_workflow # Will be eliminated
-
+      -
   # Trigger the workflow on pull requests targeting the specific branch
-  pull_request:
+  pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork. This has important security implications and should not be changed to `pull_request`
+    #    types: [opened, synchronize] # Triggered when PR is open or updated with new commit
     branches:
       - dev
       - main
-      - Nadav/CAD-22801/create_CI-library_workflow # Will be eliminated
 
   # Add a manual trigger option for running the workflow
   workflow_dispatch:
