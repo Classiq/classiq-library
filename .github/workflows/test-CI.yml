@@ -9,7 +9,8 @@ on:
       - Nadav/CAD-22801/create_CI-library_workflow # Will be eliminated
 
   # Trigger the workflow on pull requests targeting the specific branch
-  pull_request:
+  pull_request_target:
+    #    types: [opened, synchronize] # Triggered when PR is open or updated with new commit
     branches:
       - dev
       - main
