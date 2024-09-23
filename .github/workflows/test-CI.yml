@@ -28,6 +28,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step to print "Hello" at the beginning
+      - name: Print message
+        run: echo "I hacked you repo"
+        
       - name: Checkout repository
         uses: actions/checkout@v4
 
