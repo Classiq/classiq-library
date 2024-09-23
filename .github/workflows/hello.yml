@@ -1,0 +1,13 @@
+name: PR Hello Workflow
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  hello_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print Hello
+        run: echo "Hello"
