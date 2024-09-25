@@ -9,10 +9,10 @@ def iterate_notebooks() -> Iterable[str]:
     if os.environ.get("SHOULD_TEST_ALL_FILES", "") == "true":
         notebooks_to_test = _get_all_notebooks()
     else:
-        #if os.environ.get("HAS_ANY_IPYNB_CHANGED", "") == "true":
+        if os.environ.get("HAS_ANY_IPYNB_CHANGED", "") == "true":
             notebooks_to_test = os.environ.get("LIST_OF_IPYNB_CHANGED", "").split()
-        #else:
-        #    notebooks_to_test = []
+        else:
+            notebooks_to_test = []
 
     return notebooks_to_test
 

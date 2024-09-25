@@ -68,7 +68,7 @@ qfunc block_encoding_vqls(ansatz: qfunc (), block_encoding: qfunc (), prepare_b_
   }
 }
 
-qfunc main(params: real[9], output ancillary_qubits: qnum, output system_qubits: qbit[]) {
+qfunc main(params: real[9], output ancillary_qubits: qnum, output system_qubits: qnum) {
   allocate(2, ancillary_qubits);
   allocate(3, system_qubits);
   block_encoding_vqls(lambda() {
