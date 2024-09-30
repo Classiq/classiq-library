@@ -84,6 +84,12 @@ jobs:
         with:
           files: |
             **/*.ipynb
+
+      - name: Print changed notebook files
+        run: |
+          echo "Changed notebook files:"
+          echo "${{ steps.changed-files.outputs.all_changed_files }}"
+
       - name: Set changed notebook into environment variables
         run: |
           set -ex
