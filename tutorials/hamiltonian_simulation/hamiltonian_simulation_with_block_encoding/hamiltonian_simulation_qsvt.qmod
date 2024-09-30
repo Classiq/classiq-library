@@ -1,0 +1,116 @@
+qstruct BlockEncodedState {
+  block: qnum<2, False, 0>;
+  data: qnum<2, False, 0>;
+}
+
+qfunc identify_block(state: BlockEncodedState, qubit: qbit) {
+  qubit ^= state.block == 0;
+}
+
+qfunc apply_pauli_term(pauli_string: PauliTerm, x: qbit[]) {
+  repeat (index: x.len) {
+    switch(pauli_string.pauli[index], [lambda() {
+      IDENTITY(x[(pauli_string.pauli.len - index) - 1]);
+    }, lambda() {
+      X(x[(pauli_string.pauli.len - index) - 1]);
+    }, lambda() {
+      Y(x[(pauli_string.pauli.len - index) - 1]);
+    }, lambda() {
+      Z(x[(pauli_string.pauli.len - index) - 1]);
+    }]);
+  }
+}
+
+qfunc lcu_paulis(pauli_terms_list: PauliTerm[], probs: real[], block: qnum, data: qbit[]) {
+  within {
+    inplace_prepare_state(probs, 0.0, block);
+  } apply {
+    repeat (i: pauli_terms_list.len) {
+      control (block == i) {
+        apply_pauli_term(pauli_terms_list[i], data);
+      }
+    }
+  }
+}
+
+qfunc block_encode_hamiltonian(state: BlockEncodedState) {
+  lcu_paulis([
+    PauliTerm {
+      pauli=[Pauli::I, Pauli::I],
+      coefficient=0.4
+    },
+    PauliTerm {
+      pauli=[Pauli::I, Pauli::Z],
+      coefficient=0.1
+    },
+    PauliTerm {
+      pauli=[Pauli::X, Pauli::X],
+      coefficient=0.05
+    },
+    PauliTerm {
+      pauli=[Pauli::Z, Pauli::Z],
+      coefficient=0.2
+    }
+  ], [
+    0.533333333333,
+    0.133333333333,
+    0.066666666667,
+    0.266666666667
+  ], state.block, state.data);
+}
+
+qfunc my_qsvt(phases: real[], qsvt_aux: qbit, state: BlockEncodedState) {
+  qsvt(phases, identify_block, identify_block, block_encode_hamiltonian, state, qsvt_aux);
+}
+
+qfunc main(output qsvt_aux: qbit, output block_exp: qbit, output state: BlockEncodedState) {
+  allocate(1, qsvt_aux);
+  allocate(1, block_exp);
+  allocate(state.size, state);
+  inplace_prepare_amplitudes([
+    0.219017168306,
+    0.794720495321,
+    0.276765386913,
+    0.493813461653
+  ], 0.0, state.data);
+  within {
+    H(block_exp);
+  } apply {
+    control (block_exp == 0) {
+      my_qsvt([
+        3.410911103343,
+        2.612260563483,
+        2.272729626091,
+        4.73613813696,
+        2.361516373429,
+        3.298356950177,
+        6.249108246753,
+        3.298356950188,
+        2.361516373428,
+        (-1.547047170217),
+        8.55591493328,
+        2.612260563482,
+        (-37.429793393329)
+      ], qsvt_aux, state);
+    }
+    control (block_exp == 1) {
+      U(0, 0, 0, pi / 2, qsvt_aux);
+      my_qsvt([
+        1.624980886906,
+        2.939347810591,
+        4.533568111605,
+        2.735661892347,
+        4.801425200666,
+        3.552958819911,
+        0.720706433761,
+        7.003891739691,
+        (-2.730226488811),
+        4.801425200555,
+        2.735661892504,
+        4.533568111712,
+        2.939347810816,
+        (-42.357316263304)
+      ], qsvt_aux, state);
+    }
+  }
+}

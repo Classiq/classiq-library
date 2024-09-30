@@ -1,40 +1,36 @@
-qfunc my_projector_controlled_phase<phase: real, proj_cnot: qfunc (arg0: qbit[], arg1: qbit)>(qbv_reg: qbit[], qbv_aux: qbit) {
-  proj_cnot(qbv_reg, qbv_aux);
-  RZ<phase>(qbv_aux);
-  proj_cnot(qbv_reg, qbv_aux);
+qfunc my_projector_controlled_phase(phase: real, proj_cnot: qfunc (qbit[], qbit), state: qbit[], aux: qbit) {
+  proj_cnot(state, aux);
+  RZ(phase, aux);
+  proj_cnot(state, aux);
 }
 
-qfunc my_qsvt_step<phase_seq: real[], index: int, proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qbv: qbit[]) {
-  qbv_reg: qbit[];
-  qbv_aux: qbit[1];
-  qbv -> {qbv_reg, qbv_aux};
-  my_projector_controlled_phase<phase_seq[2 * index], proj_cnot_1>(qbv_reg, qbv_aux);
-  u(qbv_reg);
-  my_projector_controlled_phase<phase_seq[(2 * index) + 1], proj_cnot_2>(qbv_reg, qbv_aux);
-  if (phase_seq.len == ((2 * index) + 2)) {
-    IDENTITY(qbv_reg);
+qfunc my_qsvt_step(phase1: real, phase2: real, proj_cnot_1: qfunc (qbit[], qbit), proj_cnot_2: qfunc (qbit[], qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
+  u(state);
+  my_projector_controlled_phase(phase1, proj_cnot_2, state, aux);
+  invert {
+    u(state);
+  }
+  my_projector_controlled_phase(phase2, proj_cnot_1, state, aux);
+}
+
+qfunc my_qsvt(phase_seq: real[], proj_cnot_1: qfunc (qbit[], qbit), proj_cnot_2: qfunc (qbit[], qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
+  H(aux);
+  my_projector_controlled_phase(phase_seq[0], proj_cnot_1, state, aux);
+  repeat (index: floor((phase_seq.len - 1) / 2)) {
+    my_qsvt_step(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], proj_cnot_1, proj_cnot_2, u, state, aux);
+  }
+  if ((phase_seq.len % 2) == 1) {
+    IDENTITY(state);
   } else {
-    invert {
-      u(qbv_reg);
-    }
+    u(state);
+    my_projector_controlled_phase(phase_seq[phase_seq.len - 1], proj_cnot_2, state, aux);
   }
-  {qbv_reg, qbv_aux} -> qbv;
+  H(aux);
 }
 
-qfunc my_qsvt<phase_seq: real[], proj_cnot_1: qfunc (arg0: qbit[], arg1: qbit), proj_cnot_2: qfunc (arg0: qbit[], arg1: qbit), u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], qbv_aux: qbit) {
-  H(qbv_aux);
-  qbv: qbit[];
-  {qbv_reg, qbv_aux} -> qbv;
-  repeat (index: phase_seq.len / 2) {
-    my_qsvt_step<phase_seq, index, proj_cnot_1, proj_cnot_2, u>(qbv);
-  }
-  qbv -> {qbv_reg, qbv_aux};
-  H(qbv_aux);
-}
-
-qfunc my_qsvt_inversion<phase_seq: real[], u: qfunc (arg0: qbit[])>(qbv_reg: qbit[], output qbv_aux: qbit) {
-  allocate<1>(qbv_aux);
-  my_qsvt<phase_seq, lambda(arg0, arg1) {
+qfunc my_qsvt_inversion(phase_seq: real[], u: qfunc (qbit[]), state: qbit[], output aux: qbit) {
+  allocate(1, aux);
+  my_qsvt(phase_seq, lambda(arg0, arg1) {
     X(arg0[arg0.len - 1]);
     CX(arg0[arg0.len - 1], arg1);
     X(arg0[arg0.len - 1]);
@@ -42,20 +38,20 @@ qfunc my_qsvt_inversion<phase_seq: real[], u: qfunc (arg0: qbit[])>(qbv_reg: qbi
     X(arg0[arg0.len - 1]);
     CX(arg0[arg0.len - 1], arg1);
     X(arg0[arg0.len - 1]);
-  }, u>(qbv_reg, qbv_aux);
+  }, u, state, aux);
 }
 
-qfunc main(output qbv_state: qbit[], output qbv_block: qbit, output qbv_aux: qbit) {
-  qbv_reg: qbit[];
-  prepare_amplitudes<[
+qfunc main(output state: qnum, output block: qbit, output aux: qbit) {
+  full_state: qbit[];
+  prepare_amplitudes([
     0.0,
     0.267261241912424,
     0.534522483824849,
     0.801783725737273
-  ], 0>(qbv_state);
-  allocate<1>(qbv_block);
-  {qbv_state, qbv_block} -> qbv_reg;
-  my_qsvt_inversion<[
+  ], 0, state);
+  allocate(1, block);
+  {state, block} -> full_state;
+  my_qsvt_inversion([
     2.098749029462422,
     4.378063130949322,
     4.65618934541247,
@@ -97,9 +93,9 @@ qfunc main(output qbv_state: qbit[], output qbv_block: qbit, output qbv_aux: qbi
     1.915655742166561,
     4.656189377408761,
     4.378063091889698,
-    (-4.184436319955728)
+    (-129.84814246354745)
   ], lambda(arg0) {
-    unitary<[
+    unitary([
       [
         (-0.05338002108921),
         (-0.333041206855177),
@@ -180,7 +176,7 @@ qfunc main(output qbv_state: qbit[], output qbv_block: qbit, output qbv_aux: qbi
         (-0.113629749251151),
         0.331793873649537
       ]
-    ]>(arg0);
-  }>(qbv_reg, qbv_aux);
-  qbv_reg -> {qbv_state, qbv_block};
+    ], arg0);
+  }, full_state, aux);
+  full_state -> {state, block};
 }

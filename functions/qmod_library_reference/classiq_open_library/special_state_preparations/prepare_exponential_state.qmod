@@ -1,4 +1,4 @@
 qfunc main(output x: qbit[]) {
-  allocate<5>(x);
-  prepare_exponential_state<0.1>(x);
+  allocate(5, x);
+  prepare_exponential_state(0.1, x);
 }

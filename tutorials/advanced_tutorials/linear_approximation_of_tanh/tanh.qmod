@@ -1,0 +1,31 @@
+qfunc inplace_compute_linear(A: real, B: real, x: qnum, y: qnum) {
+  y ^= A*x + B;
+}
+
+qfunc map_label(num_segs: int, v: qbit[], output label: qbit[]) {
+  allocate_num(num_segs, false, 0, label);
+  repeat (i: num_segs) {  // duplicate MSBs of v
+    CX(v[v.len-num_segs+i], label[i]);
+  }
+}
+
+qfunc compute_piecewise_linear(As: real[], Bs: real[], x: qnum, y: qnum) {
+  label: qnum;
+  map_label(log(As.len,2), x, label);
+
+  repeat (i: As.len) {
+    control (label==i) {
+      inplace_compute_linear(As[i], Bs[i], x, y);
+    }
+  }
+}
+
+qfunc main(output x: qnum, output y: qnum) {
+  allocate_num(4, false, 4, x);
+  hadamard_transform(x);
+  allocate_num(4, false, 4, y);
+  compute_piecewise_linear( // tanh coefficients for 4 subdomains
+    [1.0, 0.9375, 0.8125, 0.625  ],
+    [0.0, 0.03125, 0.0625, 0.21875],
+  x, y);
+}

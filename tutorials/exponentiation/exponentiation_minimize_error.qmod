@@ -1,7 +1,7 @@
 qfunc main() {
   state: qbit[];
-  allocate<8>(state);
-  exponentiation_with_depth_constraint<[
+  allocate(8, state);
+  exponentiation_with_depth_constraint([
     PauliTerm {
       pauli=[
         Pauli::I,
@@ -132,5 +132,5 @@ qfunc main() {
       ],
       coefficient=1.0
     }
-  ], 0.05, 400>(state);
+  ], 0.05, 400, state);
 }

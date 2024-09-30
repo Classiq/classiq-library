@@ -1,9 +1,0 @@
-qfunc main(output psi: qbit[], output phi: qbit[]) {
-  allocate<5>(psi);
-  allocate<5>(phi);
-  apply_to_all<H>(psi);
-  apply_to_all<X>(phi);
-  repeat (i: psi.len) {
-    SWAP(phi[i], psi[i]);
-  }
-}

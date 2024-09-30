@@ -1,12 +1,12 @@
 qfunc apply_control(x: qnum, y: qnum) {
   control (x == 15) {
-    inplace_prepare_int<17>(y);
+    inplace_prepare_int(17, y);
   }
 }
 
 qfunc main(output x: qnum, output y: qnum) {
-  allocate<4>(x);
-  allocate<5>(y);
+  allocate(4, x);
+  allocate(5, y);
   hadamard_transform(x);
   apply_control(x, y);
 }

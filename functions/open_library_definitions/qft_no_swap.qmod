@@ -2,7 +2,7 @@ qfunc qft_no_swap(qbv: qbit[]) {
   repeat (i: qbv.len) {
     H(qbv[i]);
     repeat (j: (qbv.len - i) - 1) {
-      CPHASE<pi / (2 ** (j + 1))>(qbv[(i + j) + 1], qbv[i]);
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
     }
   }
 }

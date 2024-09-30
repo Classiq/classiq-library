@@ -1,0 +1,23 @@
+qfunc lcu_controllers(controller: qnum, psi: qnum) {
+  control (controller == 0) {
+    apply_to_all(IDENTITY, psi);
+  }
+  control (controller == 1) {
+    qft(psi);
+  }
+  control (controller == 2) {
+    invert {
+      qft(psi);
+    }
+  }
+}
+
+qfunc main(output controller: qnum, output psi: qnum) {
+  allocate(2, psi);
+  allocate(2, controller);
+  within {
+    inplace_prepare_state([0.5, 0.25, 0.25, 0], 0.01, controller);
+  } apply {
+    lcu_controllers(controller, psi);
+  }
+}

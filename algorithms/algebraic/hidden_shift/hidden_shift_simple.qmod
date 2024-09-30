@@ -1,24 +1,12 @@
 qfunc arith_func(vars: qbit[4], res: qbit) {
-  a: qbit;
-  b: qbit;
-  c: qbit;
-  d: qbit;
-  vars -> {a, b, c, d};
-  res ^= ((a & b) ^ (c & d)) == 1;
-  {a, b, c, d} -> vars;
+  res ^= (vars[0] & vars[1]) ^ (vars[2] & vars[3]);
 }
 
 qfunc arith_func_shifted(vars: qbit[4], res: qbit) {
-  a: qbit;
-  b: qbit;
-  c: qbit;
-  d: qbit;
-  vars -> {a, b, c, d};
-  res ^= (((a ^ 1) & b) ^ (c & d)) == 1;
-  {a, b, c, d} -> vars;
+  res ^= ((vars[0] ^ 1) & vars[1]) ^ (vars[2] & vars[3]);
 }
 
-qfunc hidden_shift<oracle: qfunc (arg0: qbit[]), oracle_shifted: qfunc (arg0: qbit[])>(target: qbit[]) {
+qfunc hidden_shift(oracle: qfunc (qbit[]), oracle_shifted: qfunc (qbit[]), target: qbit[]) {
   hadamard_transform(target);
   oracle_shifted(target);
   hadamard_transform(target);
@@ -27,14 +15,10 @@ qfunc hidden_shift<oracle: qfunc (arg0: qbit[]), oracle_shifted: qfunc (arg0: qb
 }
 
 qfunc main(output s: qbit[]) {
-  allocate<4>(s);
-  hidden_shift<lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      arith_func(arg0, arg1);
-    }>(arg0);
-  }, lambda(arg0) {
-    phase_oracle<lambda(arg0, arg1) {
-      arith_func_shifted(arg0, arg1);
-    }>(arg0);
-  }>(s);
+  allocate(4, s);
+  hidden_shift(lambda(y) {
+    phase_oracle(arith_func, y);
+  }, lambda(y) {
+    phase_oracle(arith_func_shifted, y);
+  }, s);
 }

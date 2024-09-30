@@ -1,4 +1,4 @@
-qfunc prepare_int<value: int>(output out: qnum) {
-  allocate<floor(log(value, 2)) + 1>(out);
-  inplace_prepare_int<value>(out);
+qfunc prepare_int(value: int, output out: qnum<floor(log(value, 2)) + 1, False, 0>) {
+  allocate(floor(log(value, 2)) + 1, out);
+  inplace_prepare_int(value, out);
 }

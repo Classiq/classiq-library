@@ -1,8 +1,0 @@
-qfunc single_pauli<slope: real, offset: real, q1_qfunc: qfunc <theta: real>(target: qbit[1])>(x: qbit[], q: qbit[1]) {
-  repeat (index: x.len) {
-    control (x[index]) {
-      q1_qfunc<(2 ** index) * slope>(q);
-    }
-  }
-  q1_qfunc<offset>(q);
-}

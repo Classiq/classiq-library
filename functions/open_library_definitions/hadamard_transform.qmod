@@ -1,5 +1,3 @@
 qfunc hadamard_transform(target: qbit[]) {
-  apply_to_all<lambda(target) {
-    H(target);
-  }>(target);
+  apply_to_all(H, target);
 }
