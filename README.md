@@ -53,7 +53,7 @@ The `.ipynb` files are intended to be viewed inside [JupyterLab](https://jupyter
 
 The simplest quantum circuit has 1 qubit, and has a single `X` gate.
 
-Using Classiq's SDK, it would like like so:
+Using Classiq's SDK, it would look like so:
 
 ```python
 from classiq import *
@@ -258,7 +258,7 @@ print(result[0].value.parsed_counts)
 
 The examples found in this repository can be accessed via [Classiq's platform](https://platform.classiq.io/), in the [`model`](https://platform.classiq.io/dsl-synthesis) tab, under the same folder structure.
 
-Additionally, one may write his own model in the model editor (highlighted in green) or upload his own model (highlighted in red)
+Additionally, one may write their own model in the model editor (highlighted in green) or upload his own model (highlighted in red)
 
 ![writing_models.png](README_resources/writing_models.png)
 
