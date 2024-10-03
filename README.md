@@ -53,7 +53,7 @@ The `.ipynb` files are intended to be viewed inside [JupyterLab](https://jupyter
 
 The simplest quantum circuit has 1 qubit, and has a single `X` gate.
 
-Using Classiq's SDK, it would like like so:
+Using Classiq's SDK, it would look like so:
 
 ```python
 from classiq import *
