@@ -80,7 +80,7 @@ jobs:
       # The following 2 steps can also be grouped into one action
       # Step to detect changed .ipynb files
       - name: Get changed notebook files
-        id: changed-files
+        id: changed-files-ipynb
         uses: tj-actions/changed-files@v44
         with:
           files: |
@@ -89,7 +89,7 @@ jobs:
       - name: Print changed notebook files
         run: |
           echo "Changed notebook files:"
-          echo "${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
 
       - name: Set changed notebook into environment variables
         run: |
