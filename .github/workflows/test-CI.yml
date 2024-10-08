@@ -6,14 +6,15 @@ on:
     branches:
       - dev
       - main
-      - CAD-22795-restore-changes # Temp
+      - CAD-22795-restore-changes
 
   # Trigger the workflow on pull requests targeting the specific branch
-  pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
+  pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork. This has important security implications and should not be changed to `pull_request`
+    #    types: [opened, synchronize] # Triggered when PR is open or updated with new commit
     branches:
       - dev
       - main
-      - CAD-22795-restore-changes # Temp
+      - CAD-22795-restore-changes
 
   # Add a manual trigger option for running the workflow
   workflow_dispatch:
@@ -30,66 +31,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Check out the branch from the pull request, whether it's from a fork or not
-      - name: Checkout the pull request's branch
-        run: |
-          set -ex
-          # debug
-          echo "==== before"
-          git status
-          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
-            if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
-              echo "PR from a fork detected. Checking out the fork's branch."
-              git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
-              git fetch fork ${{ github.event.pull_request.head.ref }}
-              git checkout -B ci-testing-branch FETCH_HEAD
-            else
-              echo "PR from the same repository detected. Checking out the branch."
-              git fetch origin ${{ github.event.pull_request.head.ref }}
-              git checkout ${{ github.event.pull_request.head.ref }}
-            fi
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            # we believe that `actions/checkout` will checkout to the branch that you chose in the `dispatch` tab
-            # so we do nothing
-            echo "we're in the right branch. no need to checkout (dispatch)"
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            # we believe that `actions/checkout` will checkout to the branch that we push into (i.e. either `dev` or `main`)
-            echo "we're in the right branch. no need to checkout (push)"
-          else
-            echo "we're not in push/pull/dispatch. error."
-            exit 1
-          fi
-          # debug
-          echo "==== after"
-          git status
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          set -e
+          # Pre is needed for Dev pre releases
+          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
+          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
       # A bunch of if-else. Might move to an action
       # Decide environment based on the target branch (for both push and PR events)
       - name: Set environment based on target branch
         run: |
           set -ex
-          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             # Use the target branch of the pull request
-            echo "were in pull_request_target"
-            target_branch="${{ github.event.pull_request.base.ref }}" # Probably should be updated to produce the target branch and not the branch
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "were in push"
-            target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
+            target_branch="${{ github.event.pull_request.base.ref }}"
           else
             # Use the branch of the push event
             # todo: verify that dispatch works
-            echo "On dsipatch - WIP"
             target_branch="${{ github.ref_name }}"
-            echo $target_branch
-            echo $target_branch
-            echo $target_branch
-            echo $target_branch
-            echo $target_branch
           fi
 
           if [[ "$target_branch" == "main" ]]; then
@@ -110,48 +75,27 @@ jobs:
             echo "IS_DEV=true" >> $GITHUB_ENV
           fi
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
 
       # The following 2 steps can also be grouped into one action
       # Step to detect changed .ipynb files
       - name: Get changed notebook files
-        id: changed-files-ipynb
+        id: changed-files
         uses: tj-actions/changed-files@v44
         with:
           files: |
             **/*.ipynb
-
-      - name: Print changed notebook files
-        run: |
-          echo "Changed notebook files: ${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
-
       - name: Set changed notebook into environment variables
         run: |
           set -ex
-          if [ "${{ github.event_name }}" == 'pull_request_target' ]; then
+          if [ "${{ github.event_name }}" == 'pull_request' ]; then
             echo "SHOULD_TEST_ALL_FILES=false" >> $GITHUB_ENV
           elif [[ "${{ github.event_name }}" == 'workflow_dispatch' || "${{ github.head_ref || github.ref_name }}" == "dev" ]]; then
             echo "SHOULD_TEST_ALL_FILES=true" >> $GITHUB_ENV
           fi
 
-      - name: Install dependencies
-        run: |
-          set -e
-          # Pre is needed for Dev pre releases
-          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
-          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
-
-      - name: Correct directory after manual checkout # Debug step to confirm path
-
-        run: |
-          git status
-          pwd
-          ls -la .github/actions/  # Debug step to confirm path
-
       # Run notebook tests if any changed notebooks are detected
       - name: Run notebook tests
-        if: steps.changed-files-ipynb.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: ./.github/actions/run-tests # Calls your composite action
         with:
           # diff files - set to python inside pytest
