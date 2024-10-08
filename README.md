@@ -115,7 +115,7 @@ def prep_minus(out: Output[QBit]) -> None:
     H(out)
 ```
 
-A part of the Deutsch Jozsa algorithm (see the full algorithm [here](/algorithms/deutsch_josza/deutsch_jozsa.ipynb))
+A part of the Deutsch Jozsa algorithm (see the full algorithm [here](/algorithms/deutsch_jozsa/deutsch_jozsa.ipynb))
 
 ```python
 @qfunc
