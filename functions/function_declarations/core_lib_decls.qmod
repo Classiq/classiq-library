@@ -42,6 +42,8 @@ qfunc unitary(elements: real[][], target: qbit[log(elements[0].len, 2)]);
 qfunc add(left: qbit[], right: qbit[], output result: qbit[Max(left.len, right.len) + 1]);
 qfunc modular_add(left: qbit[], right: qbit[]);
 qfunc integer_xor(left: qbit[], right: qbit[]);
+qfunc modular_add_constant(left: real, right: qnum);
+qfunc real_xor_constant(left: real, right: qnum);
 qfunc U(theta: real, phi: real, lam: real, gam: real, target: qbit);
 qfunc CCX(control: qbit[2], target: qbit);
 qfunc allocate(num_qubits: int, output out: qbit[num_qubits]);
