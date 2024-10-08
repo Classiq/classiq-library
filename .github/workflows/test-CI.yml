@@ -9,7 +9,7 @@ on:
       - CAD-22795-restore-changes
 
   # Trigger the workflow on pull requests targeting the specific branch
-  pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork. This has important security implications and should not be changed to `pull_request`
+  pull_request: #_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork. This has important security implications and should not be changed to `pull_request`
     #    types: [opened, synchronize] # Triggered when PR is open or updated with new commit
     branches:
       - dev
@@ -35,13 +35,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          set -e
-          # Pre is needed for Dev pre releases
-          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
-          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
       # A bunch of if-else. Might move to an action
       # Decide environment based on the target branch (for both push and PR events)
@@ -79,7 +72,7 @@ jobs:
       # The following 2 steps can also be grouped into one action
       # Step to detect changed .ipynb files
       - name: Get changed notebook files
-        id: changed-files
+        id: changed-files-ipynb
         uses: tj-actions/changed-files@v44
         with:
           files: |
@@ -93,9 +86,16 @@ jobs:
             echo "SHOULD_TEST_ALL_FILES=true" >> $GITHUB_ENV
           fi
 
+      - name: Install dependencies
+        run: |
+          set -e
+          # Pre is needed for Dev pre releases
+          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
+          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
+
       # Run notebook tests if any changed notebooks are detected
       - name: Run notebook tests
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files-ipynb.outputs.any_changed == 'true'
         uses: ./.github/actions/run-tests # Calls your composite action
         with:
           # diff files - set to python inside pytest
