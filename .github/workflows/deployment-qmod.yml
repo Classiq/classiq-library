@@ -64,7 +64,7 @@ jobs:
     env:
       QMOD_DIR: .
     name: Deploy QMOD app
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     environment: ${{ needs.get-config.outputs.environment }}
     permissions:
       id-token: write
