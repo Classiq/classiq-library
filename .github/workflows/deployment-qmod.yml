@@ -6,8 +6,8 @@ on:
     - cron: "0 17 * * *"
   workflow_dispatch:
     inputs:
-      build-mode:
-        description: "Build mode"
+      deploy-mode:
+        description: "Deploy mode"
         type: choice
         required: true
         default: staging
@@ -25,9 +25,9 @@ jobs:
       branch: ${{ steps.get-config.outputs.branch }}
     steps:
       - id: get-config
-        name: "Get Configuration from build-mode"
+        name: "Get Configuration from deploy-mode"
         env:
-          INPUTS_BUILD_MODE: ${{ inputs.build-mode }}
+          INPUTS_BUILD_MODE: ${{ inputs.deploy-mode }}
         run: |
           set -ex
 
