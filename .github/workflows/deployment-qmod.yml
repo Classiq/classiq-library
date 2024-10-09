@@ -77,10 +77,6 @@ jobs:
         with:
           lfs: "false"
 
-      - name: Join QMOD Metadata
-        run: |
-          python3 .github/scripts/join_qmod_metadata.py "$QMOD_DIR" "$QMOD_DIR"/qmod_metadata.json
-
       - uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
@@ -93,6 +89,10 @@ jobs:
           lfs: "false"
           path: qmod
           ref: ${{ needs.get-config.outputs.branch }}
+
+      - name: Join QMOD Metadata
+        run: |
+          python3 .github/scripts/join_qmod_metadata.py "$QMOD_DIR" "$QMOD_DIR"/qmod_metadata.json
 
       - name: "Upload Qmod"
         env:
