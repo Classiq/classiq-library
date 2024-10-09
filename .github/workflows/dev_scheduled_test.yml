@@ -1,0 +1,58 @@
+name: Nightly Notebook Tests
+
+on:
+  # Schedule the workflow to run every day at 19:00 UTC
+  schedule:
+    - cron: "00 19 * * *"
+
+  # Add a manual trigger option for running the workflow
+  workflow_dispatch:
+
+jobs:
+  nightly-test:
+    permissions:
+      id-token: write
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          set -e
+          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
+          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
+
+      # Set environment variables for the dev environment
+      - name: Set environment for nightly dev run
+        run: |
+          set -ex
+          echo "Running on dev environment."
+          echo "M2M_SECRET_ARN=${{ secrets.NIGHTLY_M2M_SECRET_ARN }}" >> $GITHUB_ENV
+          echo "CLASSIQ_IDE=https://nightly.platform.classiq.io" >> $GITHUB_ENV
+          echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
+          echo "IS_DEV=true" >> $GITHUB_ENV
+        shell: bash
+
+      # Run notebook tests for all files
+      - name: Run all notebook tests
+        uses: ./.github/actions/run-tests
+        with:
+          # Run tests on all notebooks
+          should_test_all_files: true
+          list_of_ipynb_changed: "**/*.ipynb" # You can pass all notebooks directly
+          # aws environment
+          m2m_secret_arn: ${{ env.M2M_SECRET_ARN }}
+          aws_role: ${{ secrets.AWS_ROLE }}
+          is_dev: ${{ env.IS_DEV }}
+          # environment
+          classiq_ide: ${{ env.CLASSIQ_IDE }}
+          classiq_host: ${{ env.CLASSIQ_HOST }}
