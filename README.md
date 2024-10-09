@@ -5,11 +5,9 @@
     <img src="README_resources/classiq-logo.svg" width="300" height="150">
 </div>
 
-# Classiq
+# Classiq: Quantum Programming Made Simple
 
-Your entry-point for creating & running quantum programs.
-
-This repository holds a wide collection of quantum functions, algorithms, applications and tutorials built with Classiq.
+Classiq provides a **powerful platform** for creating, running, and optimizing quantum programs. This repository hosts a **wide collection** of quantum functions, algorithms, applications, and tutorials, built using the Classiq SDK. Whether you're a researcher, developer, or student, Classiq helps you **simplify complex quantum workflows** and seamlessly transform your quantum logic into optimized circuits. With a user-friendly interface, you can model, simulate, and deploy quantum programs on various quantum hardware platforms.
 
 <hr> <br>
 
