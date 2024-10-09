@@ -9,7 +9,7 @@ on:
       - CAD-22795-restore-changes # Temp
 
   # Trigger the workflow on pull requests targeting the specific branch
-  pull_request: #_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork. This has important security implications and should not be changed to `pull_request`
+  pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork. This has important security implications and should not be changed to `pull_request`
     #    types: [opened, synchronize] # Triggered when PR is open or updated with new commit
     branches:
       - dev
@@ -30,6 +30,20 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # Check out the branch from the pull request, whether it's from a fork or not
+      - name: Checkout the pull request's branch
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            echo "PR from a fork detected. Checking out the fork's branch."
+            git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
+            git fetch fork ${{ github.event.pull_request.head.ref }}
+            git checkout -B ci-testing-branch FETCH_HEAD
+          else
+            echo "PR from the same repository detected. Checking out the branch."
+            git fetch origin ${{ github.event.pull_request.head.ref }}
+            git checkout ${{ github.event.pull_request.head.ref }}
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
