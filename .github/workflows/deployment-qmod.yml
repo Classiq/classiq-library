@@ -1,0 +1,96 @@
+name: "Deployment - qmod"
+
+on:
+  schedule:
+    # Once a day at 5:00 PM UTC, equivalent to 7:00 PM Israel time
+    - cron: "0 17 * * *"
+  workflow_dispatch:
+    inputs:
+      build-mode:
+        description: "Build mode"
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+          - release_candidate
+          - production
+
+jobs:
+  get-config:
+    runs-on: ubuntu-24.04
+    outputs:
+      environment: ${{ steps.get-config.outputs.environment }}
+      qmod-bucket: ${{ steps.get-config.outputs.qmod-bucket }}
+      branch: ${{ steps.get-config.outputs.branch }}
+    steps:
+      - id: get-config
+        name: "Get Configuration from build-mode"
+        env:
+          INPUTS_BUILD_MODE: ${{ inputs.build-mode }}
+        run: |
+          set -ex
+
+          case "$INPUTS_BUILD_MODE" in
+            production)
+              ENVIRONMENT=prod
+              QMOD_BUCKET="qmod-library-prod"
+              BRANCH="main"
+              ;;
+            release_candidate)
+              ENVIRONMENT=prod
+              QMOD_BUCKET="qmod-library-pre-release"
+              BRANCH="main"
+              ;;
+            staging)
+              ENVIRONMENT=staging
+              QMOD_BUCKET="qmod-library-nightly"
+              BRANCH="dev"
+              ;;
+            *)
+              echo unknown
+              exit 1
+              ;;
+          esac
+
+          {
+            echo "environment=${ENVIRONMENT}"
+            echo "qmod-bucket=${QMOD_BUCKET}"
+            echo "branch=${BRANCH}"
+          } >>"$GITHUB_OUTPUT"
+
+  main:
+    needs: get-config
+    env:
+      QMOD_DIR: .
+    name: Deploy QMOD app
+    runs-on: ubuntu-22.04
+    environment: ${{ needs.get-config.outputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: "false"
+          ref: ${{ needs.get-config.outputs.branch }}
+
+      - name: Join QMOD Metadata
+        run: |
+          python3 .github/scripts/join_qmod_metadata.py "$QMOD_DIR" "$QMOD_DIR"/qmod_metadata.json
+
+      - uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: "us-east-1"
+          mask-aws-account-id: true
+
+      - name: "Upload Qmod"
+        env:
+          QMOD_BUCKET: ${{ needs.get-config.outputs.qmod-bucket }}
+        run: |
+          set -e
+          aws s3 sync "$QMOD_DIR" "s3://${QMOD_BUCKET}/latest" \
+          --delete --exclude "*" --include "qmod_metadata.json" --include "*.qmod" --include "*.synthesis_options.json"
