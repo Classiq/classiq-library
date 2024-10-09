@@ -6,7 +6,7 @@ on:
     branches:
       - dev
       - main
-      - CAD-22795-restore-changes
+      - CAD-22795-restore-changes # Temp
 
   # Trigger the workflow on pull requests targeting the specific branch
   pull_request: #_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork. This has important security implications and should not be changed to `pull_request`
@@ -14,7 +14,7 @@ on:
     branches:
       - dev
       - main
-      - CAD-22795-restore-changes
+      - CAD-22795-restore-changes # Temp
 
   # Add a manual trigger option for running the workflow
   workflow_dispatch:
@@ -77,6 +77,11 @@ jobs:
         with:
           files: |
             **/*.ipynb
+
+      - name: Print changed notebook files
+        run: |
+          echo "Changed notebook files: ${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
+
       - name: Set changed notebook into environment variables
         run: |
           set -ex
