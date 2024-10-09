@@ -62,7 +62,7 @@ jobs:
   main:
     needs: get-config
     env:
-      QMOD_DIR: .
+      QMOD_DIR: qmod
     name: Deploy QMOD app
     runs-on: ubuntu-24.04
     environment: ${{ needs.get-config.outputs.environment }}
@@ -71,11 +71,11 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout
+      # We Checkout twice, once from main to get the latest actions, and second from dev to get QMODs
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
           lfs: "false"
-          ref: ${{ needs.get-config.outputs.branch }}
 
       - name: Join QMOD Metadata
         run: |
@@ -86,6 +86,13 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: "us-east-1"
           mask-aws-account-id: true
+
+      - name: Checkout qmod
+        uses: actions/checkout@v4
+        with:
+          lfs: "false"
+          path: qmod
+          ref: ${{ needs.get-config.outputs.branch }}
 
       - name: "Upload Qmod"
         env:
