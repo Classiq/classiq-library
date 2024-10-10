@@ -83,7 +83,13 @@ jobs:
           else
             # Use the branch of the push event
             # todo: verify that dispatch works
+            echo "On dsipatch - WIP"
             target_branch="${{ github.ref_name }}"
+            echo $target_branch
+            echo $target_branch
+            echo $target_branch
+            echo $target_branch
+            echo $target_branch
           fi
 
           if [[ "$target_branch" == "main" ]]; then
