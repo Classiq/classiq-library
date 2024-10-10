@@ -302,14 +302,14 @@ qfunc main(output res: qnum){
 
 </center>
 
-3. Press Run:
+4. Press Run:
 <center>
 
 ![Execution_Screenshot_3_plus_5.png](README_resources/Execution_Screenshot_3_plus_5.png)
 
 </center>
 
-4. View Results:
+5. View Results:
 <center>
 
 ![Jobs_Screenshot_3_plus_5.png](README_resources/Jobs_Screenshot_3_plus_5.png)
