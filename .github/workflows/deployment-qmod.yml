@@ -111,10 +111,11 @@ jobs:
             const pulls = await github.rest.pulls.list({
               owner: owner,
               repo: repo,
-              head: context.ref,
+              head: 'dev',
               base: 'main',
               state: 'open',
             });
+            console.log(pulls)
 
             if (pulls.data.length < 1) {
               await github.rest.pulls.create({
