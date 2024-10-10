@@ -77,6 +77,15 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             # Use the target branch of the pull request
             target_branch="${{ github.event.pull_request.base.ref }}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            echo 1
+            echo "${{ github.event.push.ref }}"
+            echo 2
+            echo "${{ github.event.push.base_ref }}"
+            echo 3
+            echo "${{ github.event.push.before }}"
+            echo 4
+            echo "${{ github.event.push.after }}"
           else
             # Use the branch of the push event
             # todo: verify that dispatch works
