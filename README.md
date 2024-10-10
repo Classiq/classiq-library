@@ -1,17 +1,17 @@
-[![Version](https://badge.fury.io/py/classiq.svg)](https://badge.fury.io/py/classiq)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/classiq)
-
 <div align="center">
     <img src="README_resources/classiq-logo.svg" width="300" height="150">
 </div>
 
 # Classiq
 
-Your entry-point for creating & running quantum programs.
+Your entry point for creating & running quantum programs.
 
-This repository holds a wide collection of quantum functions, algorithms, applications and tutorials built with Classiq.
+This repository holds a wide collection of quantum functions, algorithms, applications, and tutorials built with Classiq.
 
-<hr> <br>
+<hr> <be>
+
+[![Version](https://badge.fury.io/py/classiq.svg)](https://badge.fury.io/py/classiq)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/classiq)
 
 <p align="center">
    &emsp;
@@ -51,7 +51,7 @@ The `.ipynb` files are intended to be viewed inside [JupyterLab](https://jupyter
 
 # Create Quantum Programs with Classiq
 
-The simplest quantum circuit has 1 qubit, and has a single `X` gate.
+The simplest quantum circuit has 1 qubit and has a single `X` gate.
 
 Using Classiq's SDK, it would like like so:
 
@@ -82,7 +82,7 @@ Let's unravel the code above:
 1. `def main` : We define the logic of our quantum program. We'll expand on this point soon below.
 2. `create_model` : We convert the logic we defined into a Model.
 3. `synthesize` : We synthesize the Model into a Quantum Program. From a logical definition of quantum operations, into a series of quantum gates.
-4. `execute` : Executing the quantum program. Can be executed on a physical quantum computer, or on simulations.
+4. `execute` : Executing the quantum program. Can be executed on a physical quantum computer, or simulations.
 
 ## 1) Defining the Logic of Quantum Programs
 
@@ -149,7 +149,7 @@ The former is a quantum language used for defining quantum programs, while the l
 The model can be saved via `write_qmod(model, "file_name")`, which will save 2 files: `file_name.qmod` and `file_name.synthesis_options.json`.
 You may encounter these files in this repository.
 
-## 3) Synthesis : Models to Quantum Program
+## 3) Synthesis: Models to Quantum Program
 
 This is where the magic happens.
 Taking a model, which is a set of logical operations, and synthesizing it into physical qubits and the gates entangling them, is not an easy task.
@@ -158,7 +158,7 @@ Classiq's synthesis engine is able to optimize this process, whether by requirin
 
 ## 4) Execution
 
-Classiq provides an easy-to-use way to execute quantum programs, and provides various insights of the execution results.
+Classiq provides an easy-to-use way to execute quantum programs and provides various insights into the execution results.
 
 ## Diagrams
 
@@ -203,7 +203,7 @@ flowchart
 
 With Classiq, you can build anything. Classiq provides a powerful modeling language to describe any quantum program, which can then be synthesized and executed on any hardware or simulator. Explore our [Documentation](https://docs.classiq.io/latest/) to learn everything.
 
-## SDK : Classiq's Python Interface
+## SDK: Classiq's Python Interface
 
 ### Example: 3+5 with Classiq
 
@@ -254,7 +254,7 @@ result = execute(quantum_program).result()
 print(result[0].value.parsed_counts)
 ```
 
-## IDE : Classiq's Platform
+## IDE: Classiq's Platform
 
 The examples found in this repository can be accessed via [Classiq's platform](https://platform.classiq.io/), in the [`model`](https://platform.classiq.io/dsl-synthesis) tab, under the same folder structure.
 
@@ -264,7 +264,7 @@ Additionally, one may write his own model in the model editor (highlighted in gr
 
 ### Example: 3+5 with Classiq
 
-1. Create a model (paste in the [`model`](https://platform.classiq.io/dsl-synthesis) tab)
+<h4> 1. Create a model (paste in the [`model`](https://platform.classiq.io/dsl-synthesis) tab) </h4>
 
 ```
 qfunc get_3(output x: qnum){
@@ -288,28 +288,28 @@ qfunc main(output res: qnum){
 }
 ```
 
-2. Press Synthesize:
+<h4> 2. Press Synthesize: </h4>
 <center>
 
 ![Model_Screenshot_3_plus_5.png](README_resources/Model_Screenshot_3_plus_5.png)
 
 </center>
 
-3. Press Execute:
+<h4> 3. Press Execute: </h4>
 <center>
 
 ![Program_Screenshot_3_plus_5.png](README_resources/Program_Screenshot_3_plus_5.png)
 
 </center>
 
-3. Press Run:
+<h4> 3. Press Run: </h4>
 <center>
 
 ![Execution_Screenshot_3_plus_5.png](README_resources/Execution_Screenshot_3_plus_5.png)
 
 </center>
 
-4. View Results:
+<h4> 4. View Results: </h4>
 <center>
 
 ![Jobs_Screenshot_3_plus_5.png](README_resources/Jobs_Screenshot_3_plus_5.png)
