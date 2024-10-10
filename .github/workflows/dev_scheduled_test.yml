@@ -25,6 +25,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Debug
+        run: git status
+
       - name: Install dependencies
         run: |
           set -e
