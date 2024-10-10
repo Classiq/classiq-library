@@ -105,7 +105,7 @@ jobs:
     needs: main
     name: Create PR for next deployment
     runs-on: ubuntu-24.04
-    if: inputs.deploy-mode == 'release_candidate'
+    if: inputs.deploy-mode == 'production'
     permissions:
       id-token: write
       contents: write
