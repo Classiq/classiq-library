@@ -77,6 +77,9 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             # Use the target branch of the pull request
             target_branch="${{ github.event.pull_request.base.ref }}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "were in push"
+            target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
           else
             # Use the branch of the push event
             # todo: verify that dispatch works
@@ -101,6 +104,8 @@ jobs:
             echo "IS_DEV=true" >> $GITHUB_ENV
           fi
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       # The following 2 steps can also be grouped into one action
       # Step to detect changed .ipynb files
