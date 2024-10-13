@@ -9,8 +9,7 @@ on:
       - CAD-22795-restore-changes # Temp
 
   # Trigger the workflow on pull requests targeting the specific branch
-  pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork. This has important security implications and should not be changed to `pull_request`
-    #    types: [opened, synchronize] # Triggered when PR is open or updated with new commit
+  pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
       - dev
       - main
@@ -38,7 +37,7 @@ jobs:
           # debug
           echo "==== before"
           git status
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
               echo "PR from a fork detected. Checking out the fork's branch."
               git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
@@ -49,15 +48,15 @@ jobs:
               git fetch origin ${{ github.event.pull_request.head.ref }}
               git checkout ${{ github.event.pull_request.head.ref }}
             fi
-          elif [[ "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
-            # we belive that `actions/checkout` will checkout to the branch that you chose in the `dispatch` tab
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # we believe that `actions/checkout` will checkout to the branch that you chose in the `dispatch` tab
             # so we do nothing
             echo "we're in the right branch. no need to checkout (dispatch)"
-          elif [[ "${{ github.event_name }}" == 'push' ]]; then
-            # we belive that `actions/checkout` will checkout to the branch that we push into (i.e. either `dev` or `main`)
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            # we believe that `actions/checkout` will checkout to the branch that we push into (i.e. either `dev` or `main`)
             echo "we're in the right branch. no need to checkout (push)"
           else
-            echo "we're not it push/pull/dispatch. error."
+            echo "we're not in push/pull/dispatch. error."
             exit 1
           fi
           # debug
@@ -74,7 +73,7 @@ jobs:
       - name: Set environment based on target branch
         run: |
           set -ex
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             # Use the target branch of the pull request
             target_branch="${{ github.event.pull_request.base.ref }}"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
@@ -129,7 +128,7 @@ jobs:
       - name: Set changed notebook into environment variables
         run: |
           set -ex
-          if [ "${{ github.event_name }}" == 'pull_request' ]; then
+          if [ "${{ github.event_name }}" == 'pull_request_target' ]; then
             echo "SHOULD_TEST_ALL_FILES=false" >> $GITHUB_ENV
           elif [[ "${{ github.event_name }}" == 'workflow_dispatch' || "${{ github.head_ref || github.ref_name }}" == "dev" ]]; then
             echo "SHOULD_TEST_ALL_FILES=true" >> $GITHUB_ENV
