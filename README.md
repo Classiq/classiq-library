@@ -5,9 +5,11 @@
     <img src="README_resources/classiq-logo.svg" width="300" height="150">
 </div>
 
-# Classiq: Quantum Programming Made Simple
+# Classiq: High-Level Quantum Modeling Language
 
-Classiq provides a **powerful platform** for creating, running, and optimizing quantum programs. This repository hosts a **wide collection** of quantum functions, algorithms, applications, and tutorials, built using the Classiq SDK. Whether you're a researcher, developer, or student, Classiq helps you **simplify complex quantum workflows** and seamlessly transform your quantum logic into optimized circuits. With a user-friendly interface, you can model, simulate, and deploy quantum programs on various quantum hardware platforms.
+Classiq provides a powerful platform for designing, optimizing, analyzing, and executing quantum programs. This repository hosts a comprehensive collection of quantum functions, algorithms, applications, and tutorials built using the Classiq SDK and our native Qmod language.
+
+Whether you're a researcher, developer, or student, Classiq helps you simplify complex quantum workflows and seamlessly transform quantum logic into optimized circuits by leveraging our high-level functional design approach. A user-friendly interface allows you to model, simulate, visualize, and execute quantum programs across various quantum hardware platforms.
 
 <hr> <br>
 
