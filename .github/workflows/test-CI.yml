@@ -75,7 +75,7 @@ jobs:
           set -ex
           if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             # Use the target branch of the pull request
-            target_branch="${{ github.event.pull_request.base.ref }}"
+            target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             echo "were in push"
             target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
@@ -141,9 +141,9 @@ jobs:
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
-      - name: Correct directory after manual checkout
+      - name: Correct directory after manual checkout # Debug step to confirm path
+
         run: |
-          cd /home/runner/work/classiq-library/classiq-library  # Ensure we are in the right directory
           git status
           pwd
           ls -la .github/actions/  # Debug step to confirm path
