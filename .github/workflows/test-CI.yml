@@ -75,7 +75,8 @@ jobs:
           set -ex
           if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             # Use the target branch of the pull request
-            target_branch="${{ github.event.pull_request.base.ref }}"
+            echo "were in pull_request_target"
+            target_branch="${{ github.event.pull_request.base.ref }}" # Probably should be updated to produce the target branch and not the branch
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             echo "were in push"
             target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
@@ -140,6 +141,13 @@ jobs:
           # Pre is needed for Dev pre releases
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
+
+      - name: Correct directory after manual checkout # Debug step to confirm path
+
+        run: |
+          git status
+          pwd
+          ls -la .github/actions/  # Debug step to confirm path
 
       # Run notebook tests if any changed notebooks are detected
       - name: Run notebook tests
