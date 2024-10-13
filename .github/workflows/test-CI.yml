@@ -141,6 +141,13 @@ jobs:
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
+      - name: Correct directory after manual checkout
+        run: |
+          cd /home/runner/work/classiq-library/classiq-library  # Ensure we are in the right directory
+          git status
+          pwd
+          ls -la .github/actions/  # Debug step to confirm path
+
       # Run notebook tests if any changed notebooks are detected
       - name: Run notebook tests
         if: steps.changed-files-ipynb.outputs.any_changed == 'true'
