@@ -1,9 +1,6 @@
 name: "Deployment - qmod"
 
 on:
-  schedule:
-    # Once a day at 5:00 PM UTC, equivalent to 7:00 PM Israel time
-    - cron: "0 17 * * *"
   workflow_dispatch:
     inputs:
       deploy-mode:
