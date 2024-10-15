@@ -7,9 +7,9 @@
 
 # Classiq: High-Level Quantum Modeling Language
 
-Classiq provides a powerful platform for designing, optimizing, analyzing, and executing quantum programs. This repository hosts a comprehensive collection of quantum functions, algorithms, applications, and tutorials built using the Classiq SDK and our native Qmod language.
+Classiq provides a powerful platform for **designing, optimizing, analyzing, and executing** quantum programs. This repository hosts a comprehensive collection of quantum functions, algorithms, applications, and tutorials built using the Classiq SDK and our native Qmod language.
 
-Whether you're a researcher, developer, or student, Classiq helps you simplify complex quantum workflows and seamlessly transform quantum logic into optimized circuits by leveraging our high-level functional design approach. A user-friendly interface allows you to model, simulate, visualize, and execute quantum programs across various quantum hardware platforms.
+Whether you're a researcher, developer, or student, Classiq helps you simplify complex quantum workflows and seamlessly transform quantum logic into optimized circuits by leveraging our **high-level functional design** approach. A user-friendly interface allows you to model, simulate, visualize, and execute quantum programs across various quantum hardware platforms.
 
 <hr> <br>
 
@@ -32,7 +32,7 @@ Whether you're a researcher, developer, or student, Classiq helps you simplify c
 Working with Classiq's latest GUI requires no installations!
 Just head over to [Classiq's platform](https://platform.classiq.io/) and follow the examples below over there :)
 
-If you'd rather work programmatically, using Python, Classiq also provides an SDK, which can be installed as follows:
+If you'd rather work programmatically using Python, Classiq also provides an SDK, which can be installed as follows:
 
 ```bash
 pip install classiq
@@ -51,9 +51,9 @@ The `.ipynb` files are intended to be viewed inside [JupyterLab](https://jupyter
 
 # Create Quantum Programs with Classiq
 
-The simplest quantum circuit has 1 qubit, and has a single `X` gate.
+The simplest quantum circuit has 1 qubit and has a single `X` gate.
 
-Using Classiq's SDK, it would look like so:
+Using Classiq's SDK, it would look like this:
 
 ```python
 from classiq import *
