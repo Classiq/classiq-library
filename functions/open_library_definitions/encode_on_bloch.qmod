@@ -1,0 +1,9 @@
+qfunc encode_on_bloch(data: real[], output qba: qbit[]) {
+  allocate(ceiling(data.len / 2), qba);
+  repeat (index: ceiling(data.len / 2)) {
+    RX(pi * data[2 * index], qba[index]);
+  }
+  repeat (index: floor(data.len / 2)) {
+    RZ(pi * data[(2 * index) + 1], qba[index]);
+  }
+}

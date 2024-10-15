@@ -49,3 +49,5 @@ qfunc _prepare_uniform_trimmed_state_step(size_lsb: int, ctrl_val: int, lsbs_val
 qfunc _qct_d_operator(x: qnum, q: qbit);
 qfunc _qct_pi_operator(x: qbit[], q: qbit);
 qfunc _check_msb(ref: int, x: qbit[], aux: qbit);
+qfunc encode_in_angle(data: real[], output qba: qbit[]);
+qfunc encode_on_bloch(data: real[], output qba: qbit[]);

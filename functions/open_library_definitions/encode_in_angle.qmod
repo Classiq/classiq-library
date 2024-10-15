@@ -1,0 +1,6 @@
+qfunc encode_in_angle(data: real[], output qba: qbit[]) {
+  allocate(data.len, qba);
+  repeat (index: data.len) {
+    RY(pi * data[index], qba[index]);
+  }
+}
