@@ -3,13 +3,13 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 
 def _get_qmod_path_for_metadata(metadata_path: Path) -> Path:
     # Each metadata file has the same name as the qmod file, but with a .json extension,
     # so we replace the extension with qmod
-    qmod_path = metadata_path.parent / (Path(metadata_path.stem).stem + ".qmod")
+    qmod_path = metadata_path.with_suffix('.qmod')
     if not qmod_path.exists():
         raise RuntimeError(
             f"Could not find qmod file for metadata file {metadata_path} at {qmod_path}"
@@ -25,12 +25,19 @@ def _is_json(data: str) -> bool:
     if m.group(0) != "{":
         return False
     # Still verify that this is a valid json
-    _ = json.loads(data)
+    try:
+        _ = json.loads(data)
+    except json.JSONDecodeError:
+        raise RuntimeError("Invalid JSON format")
     return True
 
 
 def _get_qmod_type(qmod_path: Path) -> str:
-    data = qmod_path.read_text()
+    try:
+        data = qmod_path.read_text()
+    except Exception as e:
+        raise RuntimeError(f"Failed to read qmod file at {qmod_path}") from e
+
     if _is_json(data):
         return "json"
     else:
@@ -44,8 +51,12 @@ def join_metadata_files(directory: Path, exclude_file: Path) -> List[dict]:
             continue
         if metadata_path.suffixes == [".synthesis_options", ".json"]:
             continue
-        with metadata_path.open() as fobj:
-            single_metadata = json.load(fobj)
+        try:
+            with metadata_path.open() as fobj:
+                single_metadata = json.load(fobj)
+        except json.JSONDecodeError:
+            raise RuntimeError(f"Invalid JSON in metadata file {metadata_path}")
+
         qmod_path = _get_qmod_path_for_metadata(metadata_path)
         single_metadata["path"] = str(qmod_path.relative_to(directory))
         if single_metadata.get("qmod_dialect") is None:
@@ -60,12 +71,15 @@ def join_metadata_files(directory: Path, exclude_file: Path) -> List[dict]:
     return metadata
 
 
-def generate_unified_metadata_file(qmod_directory: str, metadata_filename: str) -> None:
+def generate_unified_metadata_file(qmod_directory: Union[str, Path], metadata_filename: Union[str, Path]) -> None:
     metadata = join_metadata_files(
         directory=Path(qmod_directory), exclude_file=Path(metadata_filename)
     )
-    with open(metadata_filename, "w") as f:
-        json.dump(metadata, f, indent=2)  # indent is for readability
+    try:
+        with open(metadata_filename, "w") as f:
+            json.dump(metadata, f, indent=2)  # indent is for readability
+    except Exception as e:
+        raise RuntimeError(f"Failed to write to metadata file {metadata_filename}") from e
 
 
 if __name__ == "__main__":
