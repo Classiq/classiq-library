@@ -6,6 +6,10 @@ on:
       - main
     types:
       - closed
+  pull_request_target:
+    branches:
+      - dev
+      - CAD-23261
 jobs:
   deploy:
     if: github.event.pull_request.merged == true
