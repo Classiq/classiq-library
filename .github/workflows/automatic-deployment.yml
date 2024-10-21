@@ -1,0 +1,19 @@
+name: "Automatic Deployment"
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+  pull_request_target:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/deployment-qmod.yml
+    with:
+      deploy-mode: production
+    secrets: inherit

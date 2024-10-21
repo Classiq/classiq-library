@@ -44,10 +44,10 @@ qfunc oblivious_amplitude_amplification(reps: int, block_encoding: qfunc (qnum, 
 qfunc main(output data: qnum, output block: qnum) {
   allocate(2, block);
   prepare_amplitudes([
-    0.4709,
-    0.8134,
-    0.0001,
-    0.3414
+    0.4709243714124557,
+    0.8134303596981152,
+    0.0001291583857834318,
+    0.3414107052353368
   ], 0, data);
   oblivious_amplitude_amplification(1, lambda(_block, _data) {
     block_encode([

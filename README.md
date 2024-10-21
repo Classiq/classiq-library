@@ -55,6 +55,7 @@ The simplest quantum circuit has 1 qubit and has a single `X` gate.
 
 Using Classiq's SDK, it would look like this:
 
+
 ```python
 from classiq import *
 
@@ -115,7 +116,7 @@ def prep_minus(out: Output[QBit]) -> None:
     H(out)
 ```
 
-A part of the Deutsch Jozsa algorithm (see the full algorithm [here](/algorithms/deutsch_jozsa/deutsch_jozsa.ipynb))
+A part of the Deutsch Jozsa algorithm (see the full algorithm [here](/algorithms/deutsch_josza/deutsch_jozsa.ipynb))
 
 ```python
 @qfunc
@@ -258,7 +259,7 @@ print(result[0].value.parsed_counts)
 
 The examples found in this repository can be accessed via [Classiq's platform](https://platform.classiq.io/), in the [`model`](https://platform.classiq.io/dsl-synthesis) tab, under the same folder structure.
 
-Additionally, one may write their own model in the model editor (highlighted in green) or upload his own model (highlighted in red)
+Additionally, one may write his own model in the model editor (highlighted in green) or upload his own model (highlighted in red)
 
 ![writing_models.png](README_resources/writing_models.png)
 
@@ -302,14 +303,14 @@ qfunc main(output res: qnum){
 
 </center>
 
-4. Press Run:
+3. Press Run:
 <center>
 
 ![Execution_Screenshot_3_plus_5.png](README_resources/Execution_Screenshot_3_plus_5.png)
 
 </center>
 
-5. View Results:
+4. View Results:
 <center>
 
 ![Jobs_Screenshot_3_plus_5.png](README_resources/Jobs_Screenshot_3_plus_5.png)

@@ -56,7 +56,7 @@ in the table or to add new ones.
     <tr>
         <td><a href="https://arxiv.org/abs/2303.13012" target="_blank">Exponential quantum speedup in simulating coupled classical oscillators</a></td>
         <td>
-          <a href="../algorithms/glued_trees/glued_trees.ipynb">Glued Trees Implementation</a>
+          <a href="../research/glued_trees/glued_trees.ipynb">Glued Trees Implementation</a>
         </td>
         <td>Exponential speedup in solving system of coupled harmonic oscilators</td>
         <td>#quantum_speedup</td>
