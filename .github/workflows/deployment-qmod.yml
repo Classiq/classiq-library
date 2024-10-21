@@ -111,7 +111,7 @@ jobs:
     needs: main
     name: Create PR for next deployment
     runs-on: ubuntu-24.04
-    if: inputs.deploy-mode == 'production'
+    if: inputs.deploy-mode == 'staging'
     permissions:
       id-token: write
       contents: write

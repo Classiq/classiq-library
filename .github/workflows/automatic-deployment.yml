@@ -3,16 +3,17 @@ name: "Automatic Deployment"
 on:
   pull_request:
     branches:
-      - main
+      - main-test
     types:
       - closed
   pull_request_target:
     branches:
       - dev
       - CAD-23261
+
 jobs:
   deploy:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/deployment-qmod.yml
     with:
       deploy-mode: staging
