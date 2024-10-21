@@ -12,6 +12,12 @@ on:
           - staging
           - release_candidate
           - production
+  workflow_call:
+    inputs:
+      deploy-mode:
+        description: "Deploy mode"
+        type: string
+        required: true
 
 jobs:
   get-config:
