@@ -49,7 +49,7 @@ body:
       label: "👀 Have you spent some time to check if this feature request has been raised before?"
       options:
         - label: "I checked and didn't find similar issue"
-          required: true
+          required: false
 
   - type: dropdown
     id: willing-to-submit-pr
@@ -61,12 +61,3 @@ body:
         - "No"
     validations:
       required: true
-
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: 🧑‍⚖️ Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/Classiq/classiq-library/blob/main/CODE_OF_CONDUCT.md)
-      options:
-          - label: I agree to follow this project's Code of Conduct
-            required: true
