@@ -38,15 +38,18 @@ jobs:
           echo "Repository Name: ${{ github.repository }}"
 
       # Check out the branch from the pull request, whether it's from a fork or not
-      - name: Checkout the pull request's branch
+      - name: Checkout the target branch # logic step
         run: |
           set -ex
           # debug
           echo "==== before"
           git status
           if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
+            echo "We're in pull_request_target"
+            target_branch="${{ github.event.pull_request.base.ref }}" # from old config
             if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
               echo "PR from a fork detected. Checking out the fork's branch."
+              # Checking out the fork's branch while still being in Classiq/classiq-library repo
               git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
               git fetch fork ${{ github.event.pull_request.head.ref }}
               git checkout -B ci-testing-branch FETCH_HEAD
@@ -58,9 +61,12 @@ jobs:
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             # `actions/checkout` will checkout to the branch that you chose in the `dispatch` tab - so we do nothing
             echo "we're in the right branch. no need to checkout (dispatch)"
+            target_branch="${{ github.ref_name }}" # from old config
+            echo $target_branch # from old config
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             # we believe that `actions/checkout` will checkout to the branch that we push into (i.e. either `dev` or `main`)
             echo "we're in the right branch. no need to checkout (push)"
+            target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)" # from old config
           else
             echo "we're not in push/pull/dispatch. error."
             exit 1
@@ -80,19 +86,6 @@ jobs:
       - name: Set environment based on target branch
         run: |
           set -ex
-          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
-            # Use the target branch of the pull request
-            echo "We're in pull_request_target"
-            target_branch="${{ github.event.pull_request.base.ref }}"
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "We're in push"
-            target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
-          else
-            # Use the branch of the push event
-            target_branch="${{ github.ref_name }}"
-            echo $target_branch
-          fi
-
           if [[ "$target_branch" == "main" ]]; then
             echo "Running on prod environment."
 
@@ -127,7 +120,7 @@ jobs:
         run: |
           echo "Changed notebook files: ${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
 
-      - name: Set changed notebook into environment variables
+      - name: Set changed notebook into environment variables # Could be integrated in logic step
         run: |
           set -ex
           if [ "${{ github.event_name }}" == 'pull_request_target' ]; then
