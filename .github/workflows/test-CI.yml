@@ -1,21 +1,24 @@
 name: Test Library CI
 
+# This workflow always run in the context of Classiq/classiq-library (base repo) but might use a branch from a fork to test its contribution
+# PRs from users (should be from a fork) need to target `main` branch which runs against `prod` environment
+# PRs from classiq team (might be from the base repo) need to target `dev` branch and runs against `dev` environment (nightly)
+
 on:
   # Trigger the workflow on push to the specific branch
   push:
     branches:
       - dev
       - main
-      - CAD-22795-restore-changes # Temp
+      - CAD-22795-restore-changes # Remove when merging to main
 
   # Trigger the workflow on pull requests targeting the specific branch
   pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
-    branches:
+    branches: # It gives access to the secrets as it run in the base repo Classiq/classiq-library so PRs from forks could be tested without exposing it to the user
       - dev
       - main
-      - CAD-22795-restore-changes # Temp
+      - CAD-22795-restore-changes # Remove when merging to main
 
-  # Add a manual trigger option for running the workflow
   workflow_dispatch:
 
 jobs:
@@ -29,6 +32,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Print repository name
+        run: |
+          echo "Repository Name: ${{ github.repository }}"
 
       # Check out the branch from the pull request, whether it's from a fork or not
       - name: Checkout the pull request's branch
@@ -49,8 +56,7 @@ jobs:
               git checkout ${{ github.event.pull_request.head.ref }}
             fi
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            # we believe that `actions/checkout` will checkout to the branch that you chose in the `dispatch` tab
-            # so we do nothing
+            # `actions/checkout` will checkout to the branch that you chose in the `dispatch` tab - so we do nothing
             echo "we're in the right branch. no need to checkout (dispatch)"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             # we believe that `actions/checkout` will checkout to the branch that we push into (i.e. either `dev` or `main`)
@@ -62,6 +68,7 @@ jobs:
           # debug
           echo "==== after"
           git status
+          echo "Repository Name: ${{ github.repository }}" # Debug - intresting when PR is from a fork
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -75,20 +82,14 @@ jobs:
           set -ex
           if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             # Use the target branch of the pull request
-            echo "were in pull_request_target"
-            target_branch="${{ github.event.pull_request.base.ref }}" # Probably should be updated to produce the target branch and not the branch
+            echo "We're in pull_request_target"
+            target_branch="${{ github.event.pull_request.base.ref }}"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "were in push"
+            echo "We're in push"
             target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
           else
             # Use the branch of the push event
-            # todo: verify that dispatch works
-            echo "On dsipatch - WIP"
             target_branch="${{ github.ref_name }}"
-            echo $target_branch
-            echo $target_branch
-            echo $target_branch
-            echo $target_branch
             echo $target_branch
           fi
 
@@ -131,8 +132,10 @@ jobs:
           set -ex
           if [ "${{ github.event_name }}" == 'pull_request_target' ]; then
             echo "SHOULD_TEST_ALL_FILES=false" >> $GITHUB_ENV
-          elif [[ "${{ github.event_name }}" == 'workflow_dispatch' || "${{ github.head_ref || github.ref_name }}" == "dev" ]]; then
+            echo "list_of_ipynb_changed=${{ steps.changed-files-ipynb.outputs.all_changed_files }}" >> $GITHUB_ENV
+          elif [ "${{ github.event_name }}" == 'workflow_dispatch' ]; then
             echo "SHOULD_TEST_ALL_FILES=true" >> $GITHUB_ENV
+            echo "list_of_ipynb_changed=**/*.ipynb" >> $GITHUB_ENV
           fi
 
       - name: Install dependencies
@@ -142,16 +145,9 @@ jobs:
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
-      - name: Correct directory after manual checkout # Debug step to confirm path
-
-        run: |
-          git status
-          pwd
-          ls -la .github/actions/  # Debug step to confirm path
-
       # Run notebook tests if any changed notebooks are detected
       - name: Run notebook tests
-        if: steps.changed-files-ipynb.outputs.any_changed == 'true'
+        if: steps.changed-files-ipynb.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
         uses: ./.github/actions/run-tests # Calls your composite action
         with:
           # diff files - set to python inside pytest
