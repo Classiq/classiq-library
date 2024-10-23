@@ -1,8 +1,8 @@
 name: Test Library CI
 
 # This workflow always run in the context of Classiq/classiq-library (base repo) but might use a branch from a fork to test its contribution
-# PRs from users (should be from a fork) need to target `main` branch which runs against `prod` environment
-# PRs from classiq team (might be from the base repo) need to target `dev` branch and runs against `dev` environment (nightly)
+# PRs from users (should be from a fork) need to targePrint repository namet `main` branch which runs against `prod` environment
+# PRs from maintainers team (might be from the base repo) need to target `dev` branch and runs against `dev` environment (nightly)
 
 on:
   # Trigger the workflow on push to the specific branch
@@ -10,14 +10,12 @@ on:
     branches:
       - dev
       - main
-      - CAD-22795-restore-changes # Remove when merging to main
 
   # Trigger the workflow on pull requests targeting the specific branch
   pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
-    branches: # It gives access to the secrets as it run in the base repo Classiq/classiq-library so PRs from forks could be tested without exposing it to the user
+    branches:
       - dev
       - main
-      - CAD-22795-restore-changes # Remove when merging to main
 
   workflow_dispatch:
 
@@ -51,7 +49,7 @@ jobs:
               echo "PR from a fork detected. Checking out the fork's branch."
               git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
               git fetch fork ${{ github.event.pull_request.head.ref }}
-              git checkout -B ci-testing-branch FETCH_HEAD
+              git checkout -B ci-testing-branch FETCH_HEAD # Tested code is comming from this branch (contributer's)
             else
               echo "PR from the same repository detected. Checking out the branch."
               git fetch origin ${{ github.event.pull_request.head.ref }}
@@ -124,7 +122,7 @@ jobs:
       - name: Install dependencies
         run: |
           set -e
-          # Pre is needed for Dev pre releases
+          # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
