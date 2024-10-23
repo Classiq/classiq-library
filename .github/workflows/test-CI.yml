@@ -33,20 +33,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Check out the branch from the pull request, whether it's from a fork or not
-      - name: Checkout the target branch # logic step
+      - name: Checkout the target branch
         run: |
           set -ex
-          # debug
-          echo "==== before"
+
+          # Debugging: initial git status
+          echo "==== Git status before checkout ===="
           git status
+
+          # Handle different GitHub Actions events
           if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
-            echo "We're in pull_request_target"
+            echo "Handling pull_request_target event"
             echo "SHOULD_TEST_ALL_FILES=false" >> $GITHUB_ENV
             target_branch="${{ github.event.pull_request.base.ref }}"
+
             if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
               echo "PR from a fork detected. Checking out the fork's branch."
-              # Checking out the fork's branch while still being in Classiq/classiq-library repo
               git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
               git fetch fork ${{ github.event.pull_request.head.ref }}
               git checkout -B ci-testing-branch FETCH_HEAD
@@ -55,23 +57,24 @@ jobs:
               git fetch origin ${{ github.event.pull_request.head.ref }}
               git checkout ${{ github.event.pull_request.head.ref }}
             fi
+
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            # `actions/checkout` will checkout to the branch that you chose in the `dispatch` tab - so we do nothing
-            echo "we're in the right branch. no need to checkout (dispatch)"
-            target_branch="${{ github.ref_name }}" # from old config
-            echo $target_branch
+            echo "Handling workflow_dispatch event: No checkout needed"
+            target_branch="${{ github.ref_name }}"
             echo "SHOULD_TEST_ALL_FILES=true" >> $GITHUB_ENV
             echo "list_of_ipynb_changed=**/*.ipynb" >> $GITHUB_ENV
+
           elif [[ "${{ github.event_name }}" == "push" ]]; then
-            # we believe that `actions/checkout` will checkout to the branch that we push into (i.e. either `dev` or `main`)
-            echo "we're in the right branch. no need to checkout (push)"
+            echo "Handling push event: No checkout needed"
             target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
+
           else
-            echo "we're not in push/pull/dispatch. error."
+            echo "Unsupported event type: ${github.event_name}. Exiting."
             exit 1
           fi
-          # debug
-          echo "==== after"
+
+          # Debugging: final git status
+          echo "==== Git status after checkout ===="
           git status
 
       - name: Set up Python
