@@ -12,7 +12,7 @@ def _get_qmod_path_for_metadata(metadata_path: Path) -> Path:
     qmod_path = metadata_path.parent / (Path(metadata_path.stem).stem + ".qmod")
     if not qmod_path.exists():
         raise RuntimeError(
-            f"Could not find qmod file for metadata file {metadata_path} at {qmod_path}"
+            f"Could not find the corresponding qmod file for metadata file: {metadata_path}. Expected at: {qmod_path}"
         )
     return qmod_path
 
@@ -30,7 +30,8 @@ def _is_json(data: str) -> bool:
 
 
 def _get_qmod_type(qmod_path: Path) -> str:
-    data = qmod_path.read_text()
+    with qmod_path.open() as f:
+        data = f.read()
     if _is_json(data):
         return "json"
     else:
