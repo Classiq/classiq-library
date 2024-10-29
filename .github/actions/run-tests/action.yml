@@ -30,7 +30,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Failt
+    - name: Fail
+      shell: bash
       run: |
         echo "test"
         exit 1
