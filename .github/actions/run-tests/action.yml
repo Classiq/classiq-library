@@ -30,6 +30,10 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Failt
+      run: |
+        echo "test"
+        exit 1
     - uses: aws-actions/configure-aws-credentials@v4.0.2
       with:
         role-to-assume: ${{ inputs.aws_role }}
