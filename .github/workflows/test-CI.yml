@@ -28,6 +28,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Fail immediately
+        run: |
+          echo "test"
+          exit 1
+          
       - name: Checkout repository
         uses: actions/checkout@v4
 
