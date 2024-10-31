@@ -1,5 +1,7 @@
+[![License](https://img.shields.io/github/license/Classiq/classiq-library)](https://opensource.org/license/mit)
 [![Version](https://badge.fury.io/py/classiq.svg)](https://badge.fury.io/py/classiq)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/classiq)
+[![Downloads](https://img.shields.io/pypi/dm/classiq.svg)](https://pypi.org/project/classiq/)
 
 <div align="center">
     <img src="README_resources/classiq-logo.svg" width="300" height="150">
