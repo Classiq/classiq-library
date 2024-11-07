@@ -126,18 +126,29 @@ jobs:
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
-      # Run notebook tests if any changed notebooks are detected
-      - name: Run notebook tests
-        if: steps.changed-files-ipynb.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
-        uses: ./.github/actions/run-tests # Calls your composite action
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          # diff files - set to python inside pytest
-          should_test_all_files: ${{ env.SHOULD_TEST_ALL_FILES }}
-          list_of_ipynb_changed: ${{ steps.changed-files-ipynb.outputs.all_changed_files }}
-          # aws environment
-          m2m_secret_arn: ${{ env.M2M_SECRET_ARN }}
-          aws_role: ${{ secrets.AWS_ROLE }}
-          is_dev: ${{ env.IS_DEV }}
-          # environment
-          classiq_ide: ${{ env.CLASSIQ_IDE }}
-          classiq_host: ${{ env.CLASSIQ_HOST }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
+      # Set authentication with M2M token
+      - name: Set authentication
+        run: .github/scripts/get_m2m_token.sh
+        shell: bash
+        env:
+          IS_DEV: "${{ env.IS_DEV }}"
+          M2M_SECRET_ARN: "${{ env.M2M_SECRET_ARN }}"
+
+      # Run Notebook Tests
+      - name: Run Notebooks
+        run: python -m pytest --log-cli-level=INFO tests
+        env:
+          JUPYTER_PLATFORM_DIRS: "1"
+          SHOULD_TEST_ALL_FILES: "true" # Assuming this is always set to 'true' in the workflow
+          LIST_OF_IPYNB_CHANGED: "**/*.ipynb" # Set to match all notebook files
+          CLASSIQ_IDE: "${{ env.CLASSIQ_IDE }}"
+          CLASSIQ_HOST: "${{ env.CLASSIQ_HOST }}"
+        shell: bash
