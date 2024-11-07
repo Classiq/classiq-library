@@ -1,4 +1,4 @@
-name: Nightly Notebook Tests
+name: Test CI Dev
 
 on:
   # Schedule the workflow to run every day at 19:00 UTC
@@ -45,17 +45,27 @@ jobs:
           echo "IS_DEV=true" >> $GITHUB_ENV
         shell: bash
 
-      # Run notebook tests for all files
-      - name: Run all notebook tests
-        uses: ./.github/actions/run-tests
+        # Run notebook tests for all files
+      - uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          # Run tests on all notebooks
-          should_test_all_files: true
-          list_of_ipynb_changed: "**/*.ipynb" # You can pass all notebooks directly
-          # aws environment
-          m2m_secret_arn: ${{ env.M2M_SECRET_ARN }}
-          aws_role: ${{ secrets.AWS_ROLE }}
-          is_dev: ${{ env.IS_DEV }}
-          # environment
-          classiq_ide: ${{ env.CLASSIQ_IDE }}
-          classiq_host: ${{ env.CLASSIQ_HOST }}
+          role-to-assume: ${{ inputs.aws_role }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
+      - name: Set authentication
+        run: .github/scripts/get_m2m_token.sh
+        shell: bash
+        env:
+          IS_DEV: "${{ inputs.is_dev }}"
+          M2M_SECRET_ARN: "${{ inputs.m2m_secret_arn }}"
+
+      - name: Run Notebooks
+        run: python -m pytest --log-cli-level=INFO tests
+        env:
+          JUPYTER_PLATFORM_DIRS: "1"
+          SHOULD_TEST_ALL_FILES: "${{ inputs.should_test_all_files }}"
+          LIST_OF_IPYNB_CHANGED: "${{ inputs.list_of_ipynb_changed }}"
+          CLASSIQ_IDE: "${{ inputs.classiq_ide}}"
+          CLASSIQ_HOST: "${{ inputs.classiq_host }}"
+
+        shell: bash
