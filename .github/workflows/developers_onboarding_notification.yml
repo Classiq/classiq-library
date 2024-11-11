@@ -50,7 +50,7 @@ jobs:
             try {
               const prCount = parseInt(process.env.PR_COUNT);
               const author = process.env.AUTHOR;
-              const mention = 'amir-naveh'; 
+              const mention = 'amir-naveh';
               const prNumber = context.payload.pull_request.number;
               const repo = process.env.REPO;
 
@@ -98,7 +98,7 @@ jobs:
               }
 
               const message = getMessage(prCount);
-              
+
               await github.rest.issues.createComment({
                 owner: process.env.OWNER,
                 repo: process.env.REPO,
