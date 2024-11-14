@@ -19,3 +19,18 @@ def _get_all_notebooks(directory: Path = ROOT_DIRECTORY) -> Iterable[str]:
         for file in files:
             if file.endswith(".ipynb"):
                 yield os.path.join(root, file)
+
+
+def should_test_notebook(notebook_path: str) -> bool:
+    return notebook_path in list(iterate_notebooks())
+
+
+def resolve_notebook_path(notebook_name: str) -> str:
+    notebook_name_lower = notebook_name.lower()
+    if not notebook_name_lower.endswith(".ipynb"):
+        notebook_name_lower += ".ipynb"
+
+    for root, _, files in os.walk(ROOT_DIRECTORY):
+        for file in files:
+            if file.lower() == notebook_name_lower:
+                return os.path.join(root, file)
