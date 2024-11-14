@@ -8,7 +8,8 @@ from utils_for_tests import iterate_notebooks
 # the regex below is taken from this stackoverflow:
 #   https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
 #   I only removed the brackets in the regex
-URL_REGEX = r"https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9()@:%_\+.~#?&//=]*"
+# Update 2024/11/14 : removed `()` from the last `[...]`, since the regex was confused with the syntax `(... [...](...) )`
+URL_REGEX = r"https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9@:%_\+.~#?&//=]*"
 # urls come in `[title](url)`
 URL_IN_MARKDOWN_REGEX = re.compile(r"(?<=\]\()%s(?=\s*\))" % URL_REGEX)
 
