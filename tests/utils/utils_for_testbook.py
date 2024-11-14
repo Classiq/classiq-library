@@ -1,14 +1,13 @@
 import base64
 import json
 import os
-import pytest
 import pickle
 import re
 from typing import Any, Callable
 
 from testbook import testbook  # type: ignore[import]
 from testbook.client import TestbookNotebookClient  # type: ignore[import]
-from tests.utils.utils_for_tests import resolve_notebook_path, should_test_notebook
+from tests.utils.utils_for_tests import resolve_notebook_path
 
 from classiq.interface.generator.quantum_program import QuantumProgram
 
@@ -18,9 +17,6 @@ def execute_testbook_with_timeout(
 ) -> Callable:
     def inner_decorator(func: Callable) -> Any:
         notebook_path = resolve_notebook_path(notebook_name)
-
-        if not should_test_notebook(notebook_path):
-            pytest.skip("Skipped")
 
         for decorator in [
             testbook(notebook_path, execute=True, timeout=timeout_seconds),

@@ -1,8 +1,9 @@
 import os
+from functools import lru_cache
 from collections.abc import Iterable
 from pathlib import Path
 
-ROOT_DIRECTORY = Path(__file__).parents[1]
+ROOT_DIRECTORY = Path(__file__).parents[2]
 
 
 def iterate_notebooks() -> Iterable[str]:
@@ -14,17 +15,22 @@ def iterate_notebooks() -> Iterable[str]:
     return notebooks_to_test
 
 
+@lru_cache
 def _get_all_notebooks(directory: Path = ROOT_DIRECTORY) -> Iterable[str]:
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.endswith(".ipynb"):
-                yield os.path.join(root, file)
+    return [
+        file
+        for root, _, files in os.walk(directory)
+        for file in files
+        if file.endswith(".ipynb")
+    ]
 
 
-def should_test_notebook(notebook_path: str) -> bool:
+def should_skip_notebook(notebook_name: str) -> bool:
+    notebook_path = resolve_notebook_path(notebook_name)
     return notebook_path in list(iterate_notebooks())
 
 
+@lru_cache
 def resolve_notebook_path(notebook_name: str) -> str:
     notebook_name_lower = notebook_name.lower()
     if not notebook_name_lower.endswith(".ipynb"):
@@ -34,3 +40,4 @@ def resolve_notebook_path(notebook_name: str) -> str:
         for file in files:
             if file.lower() == notebook_name_lower:
                 return os.path.join(root, file)
+    raise LookupError(f"Notebook not found: {notebook_name}")
