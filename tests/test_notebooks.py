@@ -2,7 +2,7 @@ import os
 import logging
 
 from testbook import testbook  # type: ignore[import]
-from utils_for_tests import iterate_notebooks
+from tests.utils.utils_for_tests import iterate_notebooks
 
 TIMEOUT: int = 60 * 10  # 10 minutes
 LOGGER = logging.getLogger(__name__)

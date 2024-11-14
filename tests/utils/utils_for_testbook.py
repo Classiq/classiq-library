@@ -8,7 +8,7 @@ from typing import Any, Callable
 
 from testbook import testbook  # type: ignore[import]
 from testbook.client import TestbookNotebookClient  # type: ignore[import]
-from utils_for_tests import resolve_notebook_path, should_test_notebook
+from tests.utils.utils_for_tests import resolve_notebook_path, should_test_notebook
 
 from classiq.interface.generator.quantum_program import QuantumProgram
 

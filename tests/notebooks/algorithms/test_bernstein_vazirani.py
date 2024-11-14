@@ -1,4 +1,4 @@
-from tests.utils_for_testbook import (
+from tests.utils.utils_for_testbook import (
     assert_unchanged_size,
     assert_valid_model,
     execute_testbook_with_timeout,

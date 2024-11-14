@@ -3,7 +3,7 @@ from collections.abc import Iterable
 
 import httpx
 import nbformat
-from utils_for_tests import iterate_notebooks
+from tests.utils.utils_for_tests import iterate_notebooks
 
 # the regex below is taken from this stackoverflow:
 #   https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
