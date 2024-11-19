@@ -1,6 +1,6 @@
-qfunc qpe_flexible(unitary_with_power: qfunc (int), phase: qnum) {
+qfunc qpe_flexible(unitary_with_power: qfunc (int), phase_var: qnum) {
   phase_array: qbit[];
-  phase -> phase_array;
+  phase_var -> phase_array;
   apply_to_all(H, phase_array);
   repeat (index: phase_array.len) {
     control (phase_array[index]) {
@@ -10,5 +10,5 @@ qfunc qpe_flexible(unitary_with_power: qfunc (int), phase: qnum) {
   invert {
     qft(phase_array);
   }
-  phase_array -> phase;
+  phase_array -> phase_var;
 }

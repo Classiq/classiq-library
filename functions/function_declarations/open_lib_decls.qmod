@@ -36,7 +36,7 @@ qfunc prepare_ghz_state(size: int, output q: qbit[]);
 qfunc prepare_exponential_state(rate: int, q: qbit[]);
 qfunc prepare_bell_state(state_num: int, output q: qbit[2]);
 qfunc inplace_prepare_int(value: int, target: qbit[]);
-qfunc prepare_int(value: int, output out: qnum<floor(log(value, 2)) + 1, False, 0>);
+qfunc prepare_int(value: int, output out: qnum<floor(log(value, 2)) + 1>);
 qfunc switch(selector: int, cases: qfunc[] ());
 qfunc qct_qst_type1(x: qbit[]);
 qfunc qct_qst_type2(x: qbit[], q: qbit);
