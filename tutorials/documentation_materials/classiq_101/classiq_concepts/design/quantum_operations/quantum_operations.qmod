@@ -1,6 +1,6 @@
 qfunc apply_control(x: qnum, y: qnum) {
   control (x == 15) {
-    inplace_prepare_int(17, y);
+    y ^= 17;
   }
 }
 
