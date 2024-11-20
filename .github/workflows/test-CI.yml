@@ -32,6 +32,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout the target branch
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -ex
 
