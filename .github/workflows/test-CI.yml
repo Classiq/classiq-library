@@ -32,8 +32,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout the target branch
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -ex
 
@@ -66,7 +64,7 @@ jobs:
 
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             echo "Handling push event: No checkout needed"
-            target_branch="$(gh pr view --json baseRefName,headRefName --jq .baseRefName)"
+            target_branch="${{ github.ref_name }}"
 
           else
             echo "Unsupported event type: ${github.event_name}. Exiting."
