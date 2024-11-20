@@ -32,6 +32,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout the target branch
+        id: checkout
         run: |
           set -ex
 
@@ -70,6 +71,8 @@ jobs:
             echo "Unsupported event type: ${github.event_name}. Exiting."
             exit 1
           fi
+          
+          echo "target_branch=$target_branch" >> $GITHUB_OUTPUT
 
           # Debugging: final git status
           echo "==== Git status after checkout ===="
@@ -84,6 +87,7 @@ jobs:
       # Decide environment based on the target branch (for both push and PR events)
       - name: Set environment based on target branch
         run: |
+          target_branch=${{ steps.checkout.outputs.target_branch }}
           set -ex
           if [[ "$target_branch" == "main" ]]; then
             echo "Running on prod environment."
