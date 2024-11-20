@@ -151,7 +151,7 @@ jobs:
         run: python -m pytest --log-cli-level=INFO tests
         env:
           JUPYTER_PLATFORM_DIRS: "1"
-          SHOULD_TEST_ALL_FILES: "true" # Assuming this is always set to 'true' in the workflow
+          SHOULD_TEST_ALL_FILES: "${{ env.SHOULD_TEST_ALL_FILES }}"
           LIST_OF_IPYNB_CHANGED: "**/*.ipynb" # Set to match all notebook files
           CLASSIQ_IDE: "${{ env.CLASSIQ_IDE }}"
           CLASSIQ_HOST: "${{ env.CLASSIQ_HOST }}"
