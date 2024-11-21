@@ -5,19 +5,23 @@ name: Test Library CI
 # PRs from maintainers team (might be from the base repo) need to target `dev` branch and runs against `dev` environment (nightly)
 
 on:
-  # Trigger the workflow on push to the specific branch
-  push:
+  push: # Trigger the workflow on push to the specific branch
     branches:
       - dev
       - main
-
-  # Trigger the workflow on pull requests targeting the specific branch
-  pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
+      - cache_ci_pip
+  pull_request_target: # Trigger the workflow on pull requests targeting the specific branch
+    # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
       - dev
       - main
+      - cache_ci_pip
 
   workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   test:
@@ -28,6 +32,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      #
+      # Setup Repository
+      #
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -78,11 +85,40 @@ jobs:
           echo "==== Git status after checkout ===="
           git status
 
+      #
+      # Setup Python
+      #
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      - name: Get latest classiq version
+        id: classiq-version
+        run: |
+          echo "LATEST_CLASSIQ_VERSION=$(pip index versions classiq 2>/dev/null | grep classiq | cut -d '(' -f2 | cut -d ')' -f1)" >> $GITHUB_OUTPUT
+
+      # The caching we do follows from
+      #   https://stackoverflow.com/questions/59127258/how-can-i-use-pip-cache-in-github-actions
+      - uses: actions/cache@v2
+        id: cache-pip
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements*.txt') }}-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
+          restore-keys: |
+            ${{ runner.os }}-venv-
+
+      - name: Install dependencies
+        if: steps.cache-pip.outputs.cache-hit != 'true'
+        run: |
+          set -e
+          # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
+          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
+          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
+
+      #
+      # Setup Environment
+      #
       # A bunch of if-else. Might move to an action
       # Decide environment based on the target branch (for both push and PR events)
       - name: Set environment based on target branch
@@ -106,29 +142,8 @@ jobs:
             echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
             echo "IS_DEV=true" >> $GITHUB_ENV
           fi
-        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-
-      # The following 2 steps can also be grouped into one action
-      # Step to detect changed .ipynb files
-      - name: Get changed notebook files
-        id: changed-files-ipynb
-        uses: tj-actions/changed-files@v44
-        with:
-          files: |
-            **/*.ipynb
-
-      - name: Print changed notebook files
-        run: |
-          echo "Changed notebook files: ${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
-
-      - name: Install dependencies
-        run: |
-          set -e
-          # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
-          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
-          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
       # Configure AWS credentials
       - name: Configure AWS Credentials
@@ -141,18 +156,29 @@ jobs:
       # Set authentication with M2M token
       - name: Set authentication
         run: .github/scripts/get_m2m_token.sh
-        shell: bash
         env:
           IS_DEV: "${{ env.IS_DEV }}"
           M2M_SECRET_ARN: "${{ env.M2M_SECRET_ARN }}"
+
+      #
+      # Propagate CI information to python tests
+      #
+      - name: Get changed notebook files
+        id: changed-files-ipynb
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            **/*.ipynb
 
       # Run Notebook Tests
       - name: Run Notebooks
         run: python -m pytest --log-cli-level=INFO tests
         env:
+          # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
+          # Passing which notebooks changed
           SHOULD_TEST_ALL_FILES: "${{ env.SHOULD_TEST_ALL_FILES }}"
           LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
+          # Passing environment information
           CLASSIQ_IDE: "${{ env.CLASSIQ_IDE }}"
           CLASSIQ_HOST: "${{ env.CLASSIQ_HOST }}"
-        shell: bash
