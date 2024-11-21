@@ -10,12 +10,14 @@ on:
     branches:
       - dev
       - main
+      - cache_ci_pip_2
 
   # Trigger the workflow on pull requests targeting the specific branch
   pull_request_target: # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
       - dev
       - main
+      - cache_ci_pip_2
 
   workflow_dispatch:
 
@@ -71,7 +73,7 @@ jobs:
             echo "Unsupported event type: ${github.event_name}. Exiting."
             exit 1
           fi
-          
+
           echo "target_branch=$target_branch" >> $GITHUB_OUTPUT
 
           # Debugging: final git status
@@ -82,6 +84,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements_tests.txt
+
+      - name: Install dependencies
+        run: |
+          set -e
+          # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
+          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
+          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
       # A bunch of if-else. Might move to an action
       # Decide environment based on the target branch (for both push and PR events)
@@ -119,17 +132,6 @@ jobs:
           files: |
             **/*.ipynb
 
-      - name: Print changed notebook files
-        run: |
-          echo "Changed notebook files: ${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
-
-      - name: Install dependencies
-        run: |
-          set -e
-          # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
-          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
-          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
-
       # Configure AWS credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
@@ -152,7 +154,7 @@ jobs:
         env:
           JUPYTER_PLATFORM_DIRS: "1"
           SHOULD_TEST_ALL_FILES: "${{ env.SHOULD_TEST_ALL_FILES }}"
-          LIST_OF_IPYNB_CHANGED: "**/*.ipynb" # Set to match all notebook files
+          LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
           CLASSIQ_IDE: "${{ env.CLASSIQ_IDE }}"
           CLASSIQ_HOST: "${{ env.CLASSIQ_HOST }}"
         shell: bash
