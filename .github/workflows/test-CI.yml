@@ -21,6 +21,10 @@ on:
 
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   test:
     permissions:
@@ -119,7 +123,6 @@ jobs:
             echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
             echo "IS_DEV=true" >> $GITHUB_ENV
           fi
-        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
 
@@ -143,7 +146,6 @@ jobs:
       # Set authentication with M2M token
       - name: Set authentication
         run: .github/scripts/get_m2m_token.sh
-        shell: bash
         env:
           IS_DEV: "${{ env.IS_DEV }}"
           M2M_SECRET_ARN: "${{ env.M2M_SECRET_ARN }}"
@@ -157,4 +159,3 @@ jobs:
           LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
           CLASSIQ_IDE: "${{ env.CLASSIQ_IDE }}"
           CLASSIQ_HOST: "${{ env.CLASSIQ_HOST }}"
-        shell: bash
