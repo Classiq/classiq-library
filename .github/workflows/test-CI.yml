@@ -9,13 +9,11 @@ on:
     branches:
       - dev
       - main
-      - cache_ci_pip
   pull_request_target: # Trigger the workflow on pull requests targeting the specific branch
     # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
       - dev
       - main
-      - cache_ci_pip
 
   workflow_dispatch:
 
@@ -112,6 +110,7 @@ jobs:
         if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
           set -e
+          python -m pip install -U pip
           # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
@@ -119,7 +118,7 @@ jobs:
       #
       # Setup Environment
       #
-      # A bunch of if-else. Might move to an action
+      # A bunch of if-else.
       # Decide environment based on the target branch (for both push and PR events)
       - name: Set environment based on target branch
         run: |
