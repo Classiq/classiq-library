@@ -29,22 +29,22 @@ qfunc binary_to_one_hot_expanded___0(input binary: qnum<2, False, 0>, output one
   inplace_binary_to_one_hot_expanded___0(one_hot);
 }
 
-qfunc iteration_expanded___0(qvar: qbit[4]) {
-  CX(qvar[3], qvar[2]);
+qfunc iteration_lambda___0_0_expanded___0(qvar___3_captured__inplace_one_hot_to_unary__5: qbit, qvar___2_captured__inplace_one_hot_to_unary__5: qbit) {
+  CX(qvar___3_captured__inplace_one_hot_to_unary__5, qvar___2_captured__inplace_one_hot_to_unary__5);
 }
 
-qfunc iteration_expanded___1(qvar: qbit[4]) {
-  CX(qvar[2], qvar[1]);
+qfunc iteration_lambda___0_0_expanded___1(qvar___2_captured__inplace_one_hot_to_unary__5: qbit, qvar___1_captured__inplace_one_hot_to_unary__5: qbit) {
+  CX(qvar___2_captured__inplace_one_hot_to_unary__5, qvar___1_captured__inplace_one_hot_to_unary__5);
 }
 
-qfunc iteration_expanded___2(qvar: qbit[4]) {
-  CX(qvar[1], qvar[0]);
+qfunc iteration_lambda___0_0_expanded___2(qvar___1_captured__inplace_one_hot_to_unary__5: qbit, qvar___0_captured__inplace_one_hot_to_unary__5: qbit) {
+  CX(qvar___1_captured__inplace_one_hot_to_unary__5, qvar___0_captured__inplace_one_hot_to_unary__5);
 }
 
 qfunc inplace_one_hot_to_unary_expanded___0(qvar: qbit[4]) {
-  iteration_expanded___0(qvar);
-  iteration_expanded___1(qvar);
-  iteration_expanded___2(qvar);
+  iteration_lambda___0_0_expanded___0(qvar[3], qvar[2]);
+  iteration_lambda___0_0_expanded___1(qvar[2], qvar[1]);
+  iteration_lambda___0_0_expanded___2(qvar[1], qvar[0]);
   X(qvar[0]);
 }
 
@@ -81,7 +81,7 @@ qfunc _dicke_split_cycle_shift_expanded___0(qvar: qbit[6]) {
       qvar -> {qvar___0_0, qvar___1_0, qvar___2_0, qvar___3_0, qvar___4_0, qvar___5_0};
     } apply {
       control (qvar___0_0) {
-        RY(2.3005, qvar___1_0);
+        RY(2.30052398, qvar___1_0);
       }
     }
   }
@@ -102,7 +102,7 @@ qfunc _dicke_split_cycle_shift_expanded___0(qvar: qbit[6]) {
         result__temp___0 = qvar___0_1 & qvar___1_1;
       } apply {
         control (result__temp___0) {
-          RY(1.9106, qvar___2_1);
+          RY(1.91063324, qvar___2_1);
         }
       }
     }
@@ -122,7 +122,7 @@ qfunc _dicke_split_cycle_shift_expanded___1(qvar: qbit[5]) {
       qvar -> {qvar___0_2, qvar___1_2, qvar___2_2, qvar___3_2, qvar___4_2};
     } apply {
       control (qvar___0_2) {
-        RY(2.2143, qvar___1_2);
+        RY(2.21429744, qvar___1_2);
       }
     }
   }
@@ -142,7 +142,7 @@ qfunc _dicke_split_cycle_shift_expanded___1(qvar: qbit[5]) {
         result__temp___1 = qvar___0_3 & qvar___1_3;
       } apply {
         control (result__temp___1) {
-          RY(1.7722, qvar___2_3);
+          RY(1.77215425, qvar___2_3);
         }
       }
     }
@@ -161,7 +161,7 @@ qfunc _dicke_split_cycle_shift_expanded___2(qvar: qbit[4]) {
       qvar -> {qvar___0_4, qvar___1_4, qvar___2_4, qvar___3_4};
     } apply {
       control (qvar___0_4) {
-        RY(2.0944, qvar___1_4);
+        RY(2.0943951, qvar___1_4);
       }
     }
   }
@@ -180,7 +180,7 @@ qfunc _dicke_split_cycle_shift_expanded___2(qvar: qbit[4]) {
         result__temp___2 = qvar___0_5 & qvar___1_5;
       } apply {
         control (result__temp___2) {
-          RY(1.5708, qvar___2_5);
+          RY(1.57079633, qvar___2_5);
         }
       }
     }
@@ -198,7 +198,7 @@ qfunc _dicke_split_cycle_shift_expanded___3(qvar: qbit[3]) {
       qvar -> {qvar___0_6, qvar___1_6, qvar___2_6};
     } apply {
       control (qvar___0_6) {
-        RY(1.9106, qvar___1_6);
+        RY(1.91063324, qvar___1_6);
       }
     }
   }
@@ -216,7 +216,7 @@ qfunc _dicke_split_cycle_shift_expanded___3(qvar: qbit[3]) {
         result__temp___3 = qvar___0_7 & qvar___1_7;
       } apply {
         control (result__temp___3) {
-          RY(1.231, qvar___2_7);
+          RY(1.23095942, qvar___2_7);
         }
       }
     }
@@ -233,7 +233,7 @@ qfunc _dicke_split_cycle_shift_expanded___4(qvar: qbit[2]) {
       qvar -> {qvar___0_8, qvar___1_8};
     } apply {
       control (qvar___0_8) {
-        RY(1.5708, qvar___1_8);
+        RY(1.57079633, qvar___1_8);
       }
     }
   }
@@ -267,37 +267,37 @@ qfunc prepare_dick_state_unary_input_expanded___5(qvar: qbit[6]) {
   prepare_dick_state_unary_input_expanded___4(qvar[1:6]);
 }
 
-qfunc iteration_expanded___3(y: qbit[6]) {
-  Z(y[0]);
+qfunc iteration_lambda___0_0_expanded___3(y___0_captured__vector_product_phase__3: qbit) {
+  Z(y___0_captured__vector_product_phase__3);
 }
 
-qfunc iteration_expanded___4(y: qbit[6]) {
-  Z(y[1]);
+qfunc iteration_lambda___0_0_expanded___4(y___1_captured__vector_product_phase__3: qbit) {
+  Z(y___1_captured__vector_product_phase__3);
 }
 
-qfunc iteration_expanded___5(y: qbit[6]) {
-  Z(y[2]);
+qfunc iteration_lambda___0_0_expanded___5(y___2_captured__vector_product_phase__3: qbit) {
+  Z(y___2_captured__vector_product_phase__3);
 }
 
-qfunc iteration_expanded___6(y: qbit[6]) {
-  Z(y[3]);
+qfunc iteration_lambda___0_0_expanded___6(y___3_captured__vector_product_phase__3: qbit) {
+  Z(y___3_captured__vector_product_phase__3);
 }
 
-qfunc iteration_expanded___7(y: qbit[6]) {
-  Z(y[4]);
+qfunc iteration_lambda___0_0_expanded___7(y___4_captured__vector_product_phase__3: qbit) {
+  Z(y___4_captured__vector_product_phase__3);
 }
 
-qfunc iteration_expanded___8(y: qbit[6]) {
-  Z(y[5]);
+qfunc iteration_lambda___0_0_expanded___8(y___5_captured__vector_product_phase__3: qbit) {
+  Z(y___5_captured__vector_product_phase__3);
 }
 
 qfunc vector_product_phase_expanded___0(y: qbit[6]) {
-  iteration_expanded___3(y);
-  iteration_expanded___4(y);
-  iteration_expanded___5(y);
-  iteration_expanded___6(y);
-  iteration_expanded___7(y);
-  iteration_expanded___8(y);
+  iteration_lambda___0_0_expanded___3(y[0]);
+  iteration_lambda___0_0_expanded___4(y[1]);
+  iteration_lambda___0_0_expanded___5(y[2]);
+  iteration_lambda___0_0_expanded___6(y[3]);
+  iteration_lambda___0_0_expanded___7(y[4]);
+  iteration_lambda___0_0_expanded___8(y[5]);
 }
 
 qfunc matrix_vector_product_expanded___0(y: qbit[6], output out: qbit[6]) {
@@ -572,7 +572,12 @@ qfunc syndrome_decode_lookuptable_expanded___0(syndrome: qnum<6, False, 0>, erro
 
 qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) {
   k_num_errors: qnum<2, False, 0>;
-  prepare_amplitudes([0.0, 0.7071, 0.7071, 0.0], 0, k_num_errors);
+  prepare_amplitudes([
+    0.0,
+    0.70710678,
+    0.70710678,
+    0.0
+  ], 0, k_num_errors);
   k_unary: qbit[3];
   binary_to_unary_expanded___0(k_num_errors, k_unary);
   pad_zeros_expanded___0(k_unary, y);
