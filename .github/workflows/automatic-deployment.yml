@@ -1,23 +1,21 @@
 name: "Automatic Deployment"
 
 on:
-  pull_request:
+  push:
     branches:
       - main
       - dev
-    types:
-      - closed
 
 jobs:
   deploy-prod:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    if: github.ref_name == 'main'
     uses: ./.github/workflows/deployment-qmod.yml
     with:
       deploy-mode: production
     secrets: inherit
 
   deploy-dev:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
+    if: github.ref_name == 'dev'
     uses: ./.github/workflows/deployment-qmod.yml
     with:
       deploy-mode: staging
