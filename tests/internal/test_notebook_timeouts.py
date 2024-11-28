@@ -6,7 +6,7 @@ import yaml
 
 Seconds = float
 
-ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
+ROOT = Path(__file__).parents[2]
 TIMEOUTS_FILE = "timeouts.yaml"
 TIMEOUTS_PATH = ROOT / "tests" / "resources" / TIMEOUTS_FILE
 
