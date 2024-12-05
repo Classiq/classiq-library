@@ -2,17 +2,14 @@ name: "Test Library CI (main)"
 
 # This workflow always run in the context of Classiq/classiq-library (base repo) but might use a branch from a fork to test its contribution
 # PRs from users (should be from a fork) need to targePrint repository namet `main` branch which runs against `prod` environment
-# PRs from maintainers team (might be from the base repo) need to target `dev` branch and runs against `dev` environment (nightly)
 
 on:
   push: # Trigger the workflow on push to the specific branch
     branches:
-      - dev
       - main
   pull_request_target: # Trigger the workflow on pull requests targeting the specific branch
     # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
-      - dev
       - main
 
   workflow_dispatch:
@@ -91,7 +88,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Get latest classiq version
+      - name: Get latest classiq version for cache key
         id: classiq-version
         run: |
           echo "LATEST_CLASSIQ_VERSION=$(pip index versions classiq 2>/dev/null | grep classiq | cut -d '(' -f2 | cut -d ')' -f1)" >> $GITHUB_OUTPUT
@@ -111,39 +108,12 @@ jobs:
         run: |
           set -e
           python -m pip install -U pip
-          # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
-          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
-          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
+          python -m pip install -U -r requirements.txt
+          python -m pip install -U -r requirements_tests.txt
 
       #
       # Setup Environment
       #
-      # A bunch of if-else.
-      # Decide environment based on the target branch (for both push and PR events)
-      - name: Set environment based on target branch
-        run: |
-          target_branch=${{ steps.checkout.outputs.target_branch }}
-          set -ex
-          if [[ "$target_branch" == "main" ]]; then
-            echo "Running on prod environment."
-
-            echo "M2M_SECRET_ARN=${{ secrets.PROD_M2M_SECRET_ARN }}" >> $GITHUB_ENV
-
-            echo "CLASSIQ_IDE=https://platform.classiq.io" >> $GITHUB_ENV
-            echo "CLASSIQ_HOST=https://api.classiq.io" >> $GITHUB_ENV
-            echo "IS_DEV=false" >> $GITHUB_ENV
-          else
-            echo "Running on dev environment."
-
-            echo "M2M_SECRET_ARN=${{ secrets.NIGHTLY_M2M_SECRET_ARN }}" >> $GITHUB_ENV
-
-            echo "CLASSIQ_IDE=https://nightly.platform.classiq.io" >> $GITHUB_ENV
-            echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
-            echo "IS_DEV=true" >> $GITHUB_ENV
-          fi
-        env:
-          GH_TOKEN: ${{ github.token }}
-
       # Configure AWS credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
@@ -156,8 +126,8 @@ jobs:
       - name: Set authentication
         run: .github/scripts/get_m2m_token.sh
         env:
-          IS_DEV: "${{ env.IS_DEV }}"
-          M2M_SECRET_ARN: "${{ env.M2M_SECRET_ARN }}"
+          IS_DEV: "false"
+          M2M_SECRET_ARN: "${{ secrets.PROD_M2M_SECRET_ARN }}"
 
       #
       # Propagate CI information to python tests
@@ -179,5 +149,5 @@ jobs:
           SHOULD_TEST_ALL_FILES: "${{ env.SHOULD_TEST_ALL_FILES }}"
           LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
           # Passing environment information
-          CLASSIQ_IDE: "${{ env.CLASSIQ_IDE }}"
-          CLASSIQ_HOST: "${{ env.CLASSIQ_HOST }}"
+          CLASSIQ_IDE: "https://platform.classiq.io"
+          CLASSIQ_HOST: "https://api.classiq.io"
