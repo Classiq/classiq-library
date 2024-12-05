@@ -6,10 +6,10 @@ qfunc qmci(space_transform: qfunc (qbit[], qbit), phase: qnum, packed_vars: qbit
   }, phase, packed_vars);
 }
 
-qfunc main(output phase_port: qbit[1]) {
+qfunc main(output phase_port: qnum<1, False, 1>) {
   unitary_port: qbit[];
   allocate(6, unitary_port);
-  allocate_num(1, False, 1, phase_port);
+  allocate(1, phase_port);
   qmci(lambda(state, ind) {
     log_normal_finance(LogNormalModel {
       num_qubits=5,
