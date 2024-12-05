@@ -1,15 +1,28 @@
-name: "Test CI Dev"
+name: "Test Library CI (dev)"
+
+# This workflow always run in the context of Classiq/classiq-library (base repo) but might use a branch from a fork to test its contribution
+# PRs from users (should be from a fork) need to targePrint repository namet `main` branch which runs against `prod` environment
+# PRs from maintainers team (might be from the base repo) need to target `dev` branch and runs against `dev` environment (nightly)
 
 on:
-  # Schedule the workflow to run every day at 19:00 UTC
-  schedule:
-    - cron: "00 19 * * *"
+  push: # Trigger the workflow on push to the specific branch
+    branches:
+      - dev
+      - main
+  pull_request_target: # Trigger the workflow on pull requests targeting the specific branch
+    # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
+    branches:
+      - dev
+      - main
 
-  # Add a manual trigger option for running the workflow
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
-  nightly-test:
+  test:
     permissions:
       id-token: write
       contents: read
@@ -17,33 +30,119 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      #
+      # Setup Repository
+      #
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout the target branch
+        id: checkout
+        run: |
+          set -ex
+
+          # Debugging: initial git status
+          echo "==== Git status before checkout ===="
+          git status
+
+          # Handle different GitHub Actions events
+          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
+            echo "Handling pull_request_target event"
+            echo "SHOULD_TEST_ALL_FILES=false" >> $GITHUB_ENV
+            target_branch="${{ github.event.pull_request.base.ref }}"
+
+            if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+              echo "PR from a fork detected. Checking out the fork's branch."
+              git remote add fork https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git
+              git fetch fork ${{ github.event.pull_request.head.ref }}
+              git checkout -B ci-testing-branch FETCH_HEAD # Tested code is comming from this branch (contributer's)
+            else
+              echo "PR from the same repository detected. Checking out the branch."
+              git fetch origin ${{ github.event.pull_request.head.ref }}
+              git checkout ${{ github.event.pull_request.head.ref }}
+            fi
+
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Handling workflow_dispatch event: No checkout needed"
+            target_branch="${{ github.ref_name }}"
+            echo "SHOULD_TEST_ALL_FILES=true" >> $GITHUB_ENV
+            echo "list_of_ipynb_changed=**/*.ipynb" >> $GITHUB_ENV
+
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "Handling push event: No checkout needed"
+            target_branch="${{ github.ref_name }}"
+
+          else
+            echo "Unsupported event type: ${github.event_name}. Exiting."
+            exit 1
+          fi
+
+          echo "target_branch=$target_branch" >> $GITHUB_OUTPUT
+
+          # Debugging: final git status
+          echo "==== Git status after checkout ===="
+          git status
+
+      #
+      # Setup Python
+      #
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Debug
-        run: git status
+      - name: Get latest classiq version
+        id: classiq-version
+        run: |
+          echo "LATEST_CLASSIQ_VERSION=$(pip index versions classiq 2>/dev/null | grep classiq | cut -d '(' -f2 | cut -d ')' -f1)" >> $GITHUB_OUTPUT
+
+      # The caching we do follows from
+      #   https://stackoverflow.com/questions/59127258/how-can-i-use-pip-cache-in-github-actions
+      - uses: actions/cache@v2
+        id: cache-pip
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements*.txt') }}-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
+          restore-keys: |
+            ${{ runner.os }}-venv-
 
       - name: Install dependencies
+        if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
           set -e
+          python -m pip install -U pip
+          # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
 
-      # Set environment variables for the dev environment
-      - name: Set environment for nightly dev run
+      #
+      # Setup Environment
+      #
+      # A bunch of if-else.
+      # Decide environment based on the target branch (for both push and PR events)
+      - name: Set environment based on target branch
         run: |
+          target_branch=${{ steps.checkout.outputs.target_branch }}
           set -ex
-          echo "Running on dev environment."
-          echo "M2M_SECRET_ARN=${{ secrets.NIGHTLY_M2M_SECRET_ARN }}" >> $GITHUB_ENV
-          echo "CLASSIQ_IDE=https://nightly.platform.classiq.io" >> $GITHUB_ENV
-          echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
-          echo "IS_DEV=true" >> $GITHUB_ENV
-        shell: bash
+          if [[ "$target_branch" == "main" ]]; then
+            echo "Running on prod environment."
+
+            echo "M2M_SECRET_ARN=${{ secrets.PROD_M2M_SECRET_ARN }}" >> $GITHUB_ENV
+
+            echo "CLASSIQ_IDE=https://platform.classiq.io" >> $GITHUB_ENV
+            echo "CLASSIQ_HOST=https://api.classiq.io" >> $GITHUB_ENV
+            echo "IS_DEV=false" >> $GITHUB_ENV
+          else
+            echo "Running on dev environment."
+
+            echo "M2M_SECRET_ARN=${{ secrets.NIGHTLY_M2M_SECRET_ARN }}" >> $GITHUB_ENV
+
+            echo "CLASSIQ_IDE=https://nightly.platform.classiq.io" >> $GITHUB_ENV
+            echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
+            echo "IS_DEV=true" >> $GITHUB_ENV
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       # Configure AWS credentials
       - name: Configure AWS Credentials
@@ -56,18 +155,29 @@ jobs:
       # Set authentication with M2M token
       - name: Set authentication
         run: .github/scripts/get_m2m_token.sh
-        shell: bash
         env:
           IS_DEV: "${{ env.IS_DEV }}"
           M2M_SECRET_ARN: "${{ env.M2M_SECRET_ARN }}"
+
+      #
+      # Propagate CI information to python tests
+      #
+      - name: Get changed notebook files
+        id: changed-files-ipynb
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            **/*.ipynb
 
       # Run Notebook Tests
       - name: Run Notebooks
         run: python -m pytest --log-cli-level=INFO tests
         env:
+          # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
-          SHOULD_TEST_ALL_FILES: "true" # Assuming this is always set to 'true' in the workflow
-          LIST_OF_IPYNB_CHANGED: "**/*.ipynb" # Set to match all notebook files
+          # Passing which notebooks changed
+          SHOULD_TEST_ALL_FILES: "${{ env.SHOULD_TEST_ALL_FILES }}"
+          LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
+          # Passing environment information
           CLASSIQ_IDE: "${{ env.CLASSIQ_IDE }}"
           CLASSIQ_HOST: "${{ env.CLASSIQ_HOST }}"
-        shell: bash
