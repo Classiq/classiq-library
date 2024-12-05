@@ -85,21 +85,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Get latest classiq version
-        id: classiq-version
-        run: |
-          echo "LATEST_CLASSIQ_VERSION=$(pip index versions classiq 2>/dev/null | grep classiq | cut -d '(' -f2 | cut -d ')' -f1)" >> $GITHUB_OUTPUT
-
-      # The caching we do follows from
-      #   https://stackoverflow.com/questions/59127258/how-can-i-use-pip-cache-in-github-actions
-      - uses: actions/cache@v2
-        id: cache-pip
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements*.txt') }}-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
-          restore-keys: |
-            ${{ runner.os }}-venv-
-
       - name: Install dependencies
         if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
