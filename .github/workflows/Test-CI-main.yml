@@ -46,7 +46,6 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             echo "Handling pull_request_target event"
             echo "SHOULD_TEST_ALL_FILES=false" >> $GITHUB_ENV
-            target_branch="${{ github.event.pull_request.base.ref }}"
 
             if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
               echo "PR from a fork detected. Checking out the fork's branch."
@@ -61,20 +60,16 @@ jobs:
 
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "Handling workflow_dispatch event: No checkout needed"
-            target_branch="${{ github.ref_name }}"
             echo "SHOULD_TEST_ALL_FILES=true" >> $GITHUB_ENV
             echo "list_of_ipynb_changed=**/*.ipynb" >> $GITHUB_ENV
 
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             echo "Handling push event: No checkout needed"
-            target_branch="${{ github.ref_name }}"
 
           else
             echo "Unsupported event type: ${github.event_name}. Exiting."
             exit 1
           fi
-
-          echo "target_branch=$target_branch" >> $GITHUB_OUTPUT
 
           # Debugging: final git status
           echo "==== Git status after checkout ===="
