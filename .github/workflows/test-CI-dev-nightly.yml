@@ -1,4 +1,4 @@
-name: Test CI Dev
+name: Test CI Dev daily
 
 on:
   # Schedule the workflow to run every day at 19:00 UTC
@@ -7,6 +7,10 @@ on:
 
   # Add a manual trigger option for running the workflow
   workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   nightly-test:
@@ -31,19 +35,9 @@ jobs:
       - name: Install dependencies
         run: |
           set -e
+          python -m pip install -U pip
           python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
           python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
-
-      # Set environment variables for the dev environment
-      - name: Set environment for nightly dev run
-        run: |
-          set -ex
-          echo "Running on dev environment."
-          echo "M2M_SECRET_ARN=${{ secrets.NIGHTLY_M2M_SECRET_ARN }}" >> $GITHUB_ENV
-          echo "CLASSIQ_IDE=https://nightly.platform.classiq.io" >> $GITHUB_ENV
-          echo "CLASSIQ_HOST=https://staging.api.classiq.io" >> $GITHUB_ENV
-          echo "IS_DEV=true" >> $GITHUB_ENV
-        shell: bash
 
       # Configure AWS credentials
       - name: Configure AWS Credentials
@@ -56,18 +50,18 @@ jobs:
       # Set authentication with M2M token
       - name: Set authentication
         run: .github/scripts/get_m2m_token.sh
-        shell: bash
         env:
-          IS_DEV: "${{ env.IS_DEV }}"
-          M2M_SECRET_ARN: "${{ env.M2M_SECRET_ARN }}"
+          IS_DEV: "true"
+          M2M_SECRET_ARN: "${{ secrets.NIGHTLY_M2M_SECRET_ARN }}"
 
       # Run Notebook Tests
       - name: Run Notebooks
         run: python -m pytest --log-cli-level=INFO tests
         env:
+          # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
-          SHOULD_TEST_ALL_FILES: "true" # Assuming this is always set to 'true' in the workflow
-          LIST_OF_IPYNB_CHANGED: "**/*.ipynb" # Set to match all notebook files
-          CLASSIQ_IDE: "${{ env.CLASSIQ_IDE }}"
-          CLASSIQ_HOST: "${{ env.CLASSIQ_HOST }}"
-        shell: bash
+          # Passing which notebooks changed
+          SHOULD_TEST_ALL_FILES: "true"
+          # Passing environment information
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://staging.api.classiq.io"
