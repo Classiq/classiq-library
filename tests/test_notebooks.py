@@ -1,5 +1,6 @@
 import os
 import logging
+from contextlib import contextmanager
 
 from testbook import testbook  # type: ignore[import]
 from utils_for_tests import iterate_notebooks
@@ -9,12 +10,20 @@ LOGGER = logging.getLogger(__name__)
 
 
 def test_notebooks() -> None:
-    current_dir = os.getcwd()
     for notebook_path in iterate_notebooks():
         LOGGER.info(f"Exeucting notebook {notebook_path}")
-        os.chdir(os.path.dirname(notebook_path))
+        with cwd(os.path.dirname(notebook_path)):
+            with testbook(
+                os.path.basename(notebook_path), execute=True, timeout=TIMEOUT
+            ):
+                pass  # we simply wish it to run without errors
 
-        with testbook(os.path.basename(notebook_path), execute=True, timeout=TIMEOUT):
-            pass  # we simply wish it to run without errors
 
-        os.chdir(current_dir)
+@contextmanager
+def cwd(path):
+    oldpwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(oldpwd)
