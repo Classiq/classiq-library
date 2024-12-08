@@ -7,16 +7,8 @@ qfunc inplace_binary_to_one_hot_expanded___0(one_hot: qbit[4]) {
   {temp_2, temp_0, temp_3, temp_1} -> one_hot;
   X(one_hot[0]);
   CX(one_hot[1], one_hot[0]);
-  one_hot___0_0: qbit;
-  one_hot___1_0: qbit;
-  one_hot___2_0: qbit;
-  one_hot___3_0: qbit;
-  within {
-    one_hot -> {one_hot___0_0, one_hot___1_0, one_hot___2_0, one_hot___3_0};
-  } apply {
-    control (one_hot___3_0) {
-      SWAP(one_hot___0_0, one_hot___2_0);
-    }
+  control (one_hot[3]) {
+    SWAP(one_hot[0], one_hot[2]);
   }
   CX(one_hot[2], one_hot[3]);
   CX(one_hot[3], one_hot[1]);
@@ -71,40 +63,15 @@ qfunc _dicke_split_cycle_shift_expanded___0(qvar: qbit[6]) {
   within {
     CX(qvar[1], qvar[0]);
   } apply {
-    qvar___0_0: qbit;
-    qvar___1_0: qbit;
-    qvar___2_0: qbit;
-    qvar___3_0: qbit;
-    qvar___4_0: qbit;
-    qvar___5_0: qbit;
-    within {
-      qvar -> {qvar___0_0, qvar___1_0, qvar___2_0, qvar___3_0, qvar___4_0, qvar___5_0};
-    } apply {
-      control (qvar___0_0) {
-        RY(2.300523983021863, qvar___1_0);
-      }
+    control (qvar[0]) {
+      RY(2.300523983021863, qvar[1]);
     }
   }
   within {
     CX(qvar[2], qvar[0]);
   } apply {
-    qvar___0_1: qbit;
-    qvar___1_1: qbit;
-    qvar___2_1: qbit;
-    qvar___3_1: qbit;
-    qvar___4_1: qbit;
-    qvar___5_1: qbit;
-    within {
-      qvar -> {qvar___0_1, qvar___1_1, qvar___2_1, qvar___3_1, qvar___4_1, qvar___5_1};
-    } apply {
-      result__temp___0: qbit;
-      within {
-        result__temp___0 = qvar___0_1 & qvar___1_1;
-      } apply {
-        control (result__temp___0) {
-          RY(1.9106332362490186, qvar___2_1);
-        }
-      }
+    control (qvar[0] & qvar[1]) {
+      RY(1.9106332362490186, qvar[2]);
     }
   }
 }
@@ -113,38 +80,15 @@ qfunc _dicke_split_cycle_shift_expanded___1(qvar: qbit[5]) {
   within {
     CX(qvar[1], qvar[0]);
   } apply {
-    qvar___0_2: qbit;
-    qvar___1_2: qbit;
-    qvar___2_2: qbit;
-    qvar___3_2: qbit;
-    qvar___4_2: qbit;
-    within {
-      qvar -> {qvar___0_2, qvar___1_2, qvar___2_2, qvar___3_2, qvar___4_2};
-    } apply {
-      control (qvar___0_2) {
-        RY(2.214297435588181, qvar___1_2);
-      }
+    control (qvar[0]) {
+      RY(2.214297435588181, qvar[1]);
     }
   }
   within {
     CX(qvar[2], qvar[0]);
   } apply {
-    qvar___0_3: qbit;
-    qvar___1_3: qbit;
-    qvar___2_3: qbit;
-    qvar___3_3: qbit;
-    qvar___4_3: qbit;
-    within {
-      qvar -> {qvar___0_3, qvar___1_3, qvar___2_3, qvar___3_3, qvar___4_3};
-    } apply {
-      result__temp___1: qbit;
-      within {
-        result__temp___1 = qvar___0_3 & qvar___1_3;
-      } apply {
-        control (result__temp___1) {
-          RY(1.7721542475852274, qvar___2_3);
-        }
-      }
+    control (qvar[0] & qvar[1]) {
+      RY(1.7721542475852274, qvar[2]);
     }
   }
 }
@@ -153,36 +97,15 @@ qfunc _dicke_split_cycle_shift_expanded___2(qvar: qbit[4]) {
   within {
     CX(qvar[1], qvar[0]);
   } apply {
-    qvar___0_4: qbit;
-    qvar___1_4: qbit;
-    qvar___2_4: qbit;
-    qvar___3_4: qbit;
-    within {
-      qvar -> {qvar___0_4, qvar___1_4, qvar___2_4, qvar___3_4};
-    } apply {
-      control (qvar___0_4) {
-        RY(2.0943951023931957, qvar___1_4);
-      }
+    control (qvar[0]) {
+      RY(2.0943951023931957, qvar[1]);
     }
   }
   within {
     CX(qvar[2], qvar[0]);
   } apply {
-    qvar___0_5: qbit;
-    qvar___1_5: qbit;
-    qvar___2_5: qbit;
-    qvar___3_5: qbit;
-    within {
-      qvar -> {qvar___0_5, qvar___1_5, qvar___2_5, qvar___3_5};
-    } apply {
-      result__temp___2: qbit;
-      within {
-        result__temp___2 = qvar___0_5 & qvar___1_5;
-      } apply {
-        control (result__temp___2) {
-          RY(1.5707963267948968, qvar___2_5);
-        }
-      }
+    control (qvar[0] & qvar[1]) {
+      RY(1.5707963267948968, qvar[2]);
     }
   }
 }
@@ -191,34 +114,15 @@ qfunc _dicke_split_cycle_shift_expanded___3(qvar: qbit[3]) {
   within {
     CX(qvar[1], qvar[0]);
   } apply {
-    qvar___0_6: qbit;
-    qvar___1_6: qbit;
-    qvar___2_6: qbit;
-    within {
-      qvar -> {qvar___0_6, qvar___1_6, qvar___2_6};
-    } apply {
-      control (qvar___0_6) {
-        RY(1.9106332362490186, qvar___1_6);
-      }
+    control (qvar[0]) {
+      RY(1.9106332362490186, qvar[1]);
     }
   }
   within {
     CX(qvar[2], qvar[0]);
   } apply {
-    qvar___0_7: qbit;
-    qvar___1_7: qbit;
-    qvar___2_7: qbit;
-    within {
-      qvar -> {qvar___0_7, qvar___1_7, qvar___2_7};
-    } apply {
-      result__temp___3: qbit;
-      within {
-        result__temp___3 = qvar___0_7 & qvar___1_7;
-      } apply {
-        control (result__temp___3) {
-          RY(1.2309594173407747, qvar___2_7);
-        }
-      }
+    control (qvar[0] & qvar[1]) {
+      RY(1.2309594173407747, qvar[2]);
     }
   }
 }
@@ -227,14 +131,8 @@ qfunc _dicke_split_cycle_shift_expanded___4(qvar: qbit[2]) {
   within {
     CX(qvar[1], qvar[0]);
   } apply {
-    qvar___0_8: qbit;
-    qvar___1_8: qbit;
-    within {
-      qvar -> {qvar___0_8, qvar___1_8};
-    } apply {
-      control (qvar___0_8) {
-        RY(1.5707963267948968, qvar___1_8);
-      }
+    control (qvar[0]) {
+      RY(1.5707963267948968, qvar[1]);
     }
   }
 }
@@ -302,272 +200,118 @@ qfunc vector_product_phase_expanded___0(y: qbit[6]) {
 
 qfunc matrix_vector_product_expanded___0(y: qbit[6], output out: qbit[6]) {
   allocate(6, out);
-  y___0_0: qbit;
-  y___1_0: qbit;
-  y___2_0: qbit;
-  y___3_0: qbit;
-  y___4_0: qbit;
-  y___5_0: qbit;
-  within {
-    y -> {y___0_0, y___1_0, y___2_0, y___3_0, y___4_0, y___5_0};
-  } apply {
-    out[0] ^= ((((y___0_0 ^ y___1_0) ^ 0) ^ 0) ^ 0) ^ 0;
-  }
-  y___0_1: qbit;
-  y___1_1: qbit;
-  y___2_1: qbit;
-  y___3_1: qbit;
-  y___4_1: qbit;
-  y___5_1: qbit;
-  within {
-    y -> {y___0_1, y___1_1, y___2_1, y___3_1, y___4_1, y___5_1};
-  } apply {
-    out[1] ^= ((((y___0_1 ^ 0) ^ y___2_1) ^ 0) ^ 0) ^ 0;
-  }
-  y___0_2: qbit;
-  y___1_2: qbit;
-  y___2_2: qbit;
-  y___3_2: qbit;
-  y___4_2: qbit;
-  y___5_2: qbit;
-  within {
-    y -> {y___0_2, y___1_2, y___2_2, y___3_2, y___4_2, y___5_2};
-  } apply {
-    out[2] ^= (((0 ^ y___2_2) ^ y___3_2) ^ 0) ^ 0;
-  }
-  y___0_3: qbit;
-  y___1_3: qbit;
-  y___2_3: qbit;
-  y___3_3: qbit;
-  y___4_3: qbit;
-  y___5_3: qbit;
-  within {
-    y -> {y___0_3, y___1_3, y___2_3, y___3_3, y___4_3, y___5_3};
-  } apply {
-    out[3] ^= ((0 ^ y___3_3) ^ y___4_3) ^ 0;
-  }
-  y___0_4: qbit;
-  y___1_4: qbit;
-  y___2_4: qbit;
-  y___3_4: qbit;
-  y___4_4: qbit;
-  y___5_4: qbit;
-  within {
-    y -> {y___0_4, y___1_4, y___2_4, y___3_4, y___4_4, y___5_4};
-  } apply {
-    out[4] ^= ((((0 ^ y___1_4) ^ 0) ^ 0) ^ 0) ^ y___5_4;
-  }
-  y___0_5: qbit;
-  y___1_5: qbit;
-  y___2_5: qbit;
-  y___3_5: qbit;
-  y___4_5: qbit;
-  y___5_5: qbit;
-  within {
-    y -> {y___0_5, y___1_5, y___2_5, y___3_5, y___4_5, y___5_5};
-  } apply {
-    out[5] ^= (0 ^ y___4_5) ^ y___5_5;
-  }
+  out[0] ^= ((((y[0] ^ y[1]) ^ 0) ^ 0) ^ 0) ^ 0;
+  out[1] ^= ((((y[0] ^ 0) ^ y[2]) ^ 0) ^ 0) ^ 0;
+  out[2] ^= (((0 ^ y[2]) ^ y[3]) ^ 0) ^ 0;
+  out[3] ^= ((0 ^ y[3]) ^ y[4]) ^ 0;
+  out[4] ^= ((((0 ^ y[1]) ^ 0) ^ 0) ^ 0) ^ y[5];
+  out[5] ^= (0 ^ y[4]) ^ y[5];
 }
 
 qfunc syndrome_decode_lookuptable_expanded___0(syndrome: qnum<6, False, 0>, error: qnum<6, False, 0>) {
-  syndrome___array_cast_0: qbit[6];
-  within {
-    real_xor_constant(63, syndrome);
-    syndrome -> syndrome___array_cast_0;
-  } apply {
-    control (syndrome___array_cast_0) {
-    }
+  control (syndrome == 0) {
+    error ^= 0;
   }
-  syndrome___array_cast_1: qbit[6];
-  within {
-    real_xor_constant(60, syndrome);
-    syndrome -> syndrome___array_cast_1;
-  } apply {
-    control (syndrome___array_cast_1) {
-      real_xor_constant(1, error);
-    }
+  control (syndrome == 3) {
+    error ^= 1;
   }
-  syndrome___array_cast_2: qbit[6];
-  within {
-    real_xor_constant(46, syndrome);
-    syndrome -> syndrome___array_cast_2;
-  } apply {
-    control (syndrome___array_cast_2) {
-      real_xor_constant(2, error);
-    }
+  control (syndrome == 17) {
+    error ^= 2;
   }
-  syndrome___array_cast_3: qbit[6];
-  within {
-    real_xor_constant(57, syndrome);
-    syndrome -> syndrome___array_cast_3;
-  } apply {
-    control (syndrome___array_cast_3) {
-      real_xor_constant(4, error);
-    }
+  control (syndrome == 6) {
+    error ^= 4;
   }
-  syndrome___array_cast_4: qbit[6];
-  within {
-    real_xor_constant(51, syndrome);
-    syndrome -> syndrome___array_cast_4;
-  } apply {
-    control (syndrome___array_cast_4) {
-      real_xor_constant(8, error);
-    }
+  control (syndrome == 12) {
+    error ^= 8;
   }
-  syndrome___array_cast_5: qbit[6];
-  within {
-    real_xor_constant(23, syndrome);
-    syndrome -> syndrome___array_cast_5;
-  } apply {
-    control (syndrome___array_cast_5) {
-      real_xor_constant(16, error);
-    }
+  control (syndrome == 40) {
+    error ^= 16;
   }
-  syndrome___array_cast_6: qbit[6];
-  within {
-    real_xor_constant(15, syndrome);
-    syndrome -> syndrome___array_cast_6;
-  } apply {
-    control (syndrome___array_cast_6) {
-      real_xor_constant(32, error);
-    }
+  control (syndrome == 48) {
+    error ^= 32;
   }
-  syndrome___array_cast_7: qbit[6];
-  within {
-    real_xor_constant(45, syndrome);
-    syndrome -> syndrome___array_cast_7;
-  } apply {
-    control (syndrome___array_cast_7) {
-      real_xor_constant(3, error);
-    }
+  control (syndrome == 18) {
+    error ^= 3;
   }
-  syndrome___array_cast_8: qbit[6];
-  within {
-    real_xor_constant(58, syndrome);
-    syndrome -> syndrome___array_cast_8;
-  } apply {
-    control (syndrome___array_cast_8) {
-      real_xor_constant(5, error);
-    }
+  control (syndrome == 5) {
+    error ^= 5;
   }
-  syndrome___array_cast_9: qbit[6];
-  within {
-    real_xor_constant(48, syndrome);
-    syndrome -> syndrome___array_cast_9;
-  } apply {
-    control (syndrome___array_cast_9) {
-      real_xor_constant(9, error);
-    }
+  control (syndrome == 15) {
+    error ^= 9;
   }
-  syndrome___array_cast_10: qbit[6];
-  within {
-    real_xor_constant(20, syndrome);
-    syndrome -> syndrome___array_cast_10;
-  } apply {
-    control (syndrome___array_cast_10) {
-      real_xor_constant(17, error);
-    }
+  control (syndrome == 43) {
+    error ^= 17;
   }
-  syndrome___array_cast_11: qbit[6];
-  within {
-    real_xor_constant(12, syndrome);
-    syndrome -> syndrome___array_cast_11;
-  } apply {
-    control (syndrome___array_cast_11) {
-      real_xor_constant(33, error);
-    }
+  control (syndrome == 51) {
+    error ^= 33;
   }
-  syndrome___array_cast_12: qbit[6];
-  within {
-    real_xor_constant(40, syndrome);
-    syndrome -> syndrome___array_cast_12;
-  } apply {
-    control (syndrome___array_cast_12) {
-      real_xor_constant(6, error);
-    }
+  control (syndrome == 23) {
+    error ^= 6;
   }
-  syndrome___array_cast_13: qbit[6];
-  within {
-    real_xor_constant(34, syndrome);
-    syndrome -> syndrome___array_cast_13;
-  } apply {
-    control (syndrome___array_cast_13) {
-      real_xor_constant(10, error);
-    }
+  control (syndrome == 29) {
+    error ^= 10;
   }
-  syndrome___array_cast_14: qbit[6];
-  within {
-    real_xor_constant(6, syndrome);
-    syndrome -> syndrome___array_cast_14;
-  } apply {
-    control (syndrome___array_cast_14) {
-      real_xor_constant(18, error);
-    }
+  control (syndrome == 57) {
+    error ^= 18;
   }
-  syndrome___array_cast_15: qbit[6];
-  within {
-    real_xor_constant(30, syndrome);
-    syndrome -> syndrome___array_cast_15;
-  } apply {
-    control (syndrome___array_cast_15) {
-      real_xor_constant(34, error);
-    }
+  control (syndrome == 33) {
+    error ^= 34;
   }
-  syndrome___array_cast_16: qbit[6];
-  within {
-    real_xor_constant(53, syndrome);
-    syndrome -> syndrome___array_cast_16;
-  } apply {
-    control (syndrome___array_cast_16) {
-      real_xor_constant(12, error);
-    }
+  control (syndrome == 10) {
+    error ^= 12;
   }
-  syndrome___array_cast_17: qbit[6];
-  within {
-    real_xor_constant(17, syndrome);
-    syndrome -> syndrome___array_cast_17;
-  } apply {
-    control (syndrome___array_cast_17) {
-      real_xor_constant(20, error);
-    }
+  control (syndrome == 46) {
+    error ^= 20;
   }
-  syndrome___array_cast_18: qbit[6];
-  within {
-    real_xor_constant(9, syndrome);
-    syndrome -> syndrome___array_cast_18;
-  } apply {
-    control (syndrome___array_cast_18) {
-      real_xor_constant(36, error);
-    }
+  control (syndrome == 54) {
+    error ^= 36;
   }
-  syndrome___array_cast_19: qbit[6];
-  within {
-    real_xor_constant(27, syndrome);
-    syndrome -> syndrome___array_cast_19;
-  } apply {
-    control (syndrome___array_cast_19) {
-      real_xor_constant(24, error);
-    }
+  control (syndrome == 36) {
+    error ^= 24;
   }
-  syndrome___array_cast_20: qbit[6];
-  within {
-    real_xor_constant(3, syndrome);
-    syndrome -> syndrome___array_cast_20;
-  } apply {
-    control (syndrome___array_cast_20) {
-      real_xor_constant(40, error);
-    }
+  control (syndrome == 60) {
+    error ^= 40;
   }
-  syndrome___array_cast_21: qbit[6];
-  within {
-    real_xor_constant(39, syndrome);
-    syndrome -> syndrome___array_cast_21;
-  } apply {
-    control (syndrome___array_cast_21) {
-      real_xor_constant(48, error);
-    }
+  control (syndrome == 24) {
+    error ^= 48;
   }
+}
+
+qfunc iteration_lambda___0_0_expanded___9(target___0_captured__apply_to_all__4: qbit) {
+  H(target___0_captured__apply_to_all__4);
+}
+
+qfunc iteration_lambda___0_0_expanded___10(target___1_captured__apply_to_all__4: qbit) {
+  H(target___1_captured__apply_to_all__4);
+}
+
+qfunc iteration_lambda___0_0_expanded___11(target___2_captured__apply_to_all__4: qbit) {
+  H(target___2_captured__apply_to_all__4);
+}
+
+qfunc iteration_lambda___0_0_expanded___12(target___3_captured__apply_to_all__4: qbit) {
+  H(target___3_captured__apply_to_all__4);
+}
+
+qfunc iteration_lambda___0_0_expanded___13(target___4_captured__apply_to_all__4: qbit) {
+  H(target___4_captured__apply_to_all__4);
+}
+
+qfunc iteration_lambda___0_0_expanded___14(target___5_captured__apply_to_all__4: qbit) {
+  H(target___5_captured__apply_to_all__4);
+}
+
+qfunc apply_to_all_expanded___0(target: qbit[6]) {
+  iteration_lambda___0_0_expanded___9(target[0]);
+  iteration_lambda___0_0_expanded___10(target[1]);
+  iteration_lambda___0_0_expanded___11(target[2]);
+  iteration_lambda___0_0_expanded___12(target[3]);
+  iteration_lambda___0_0_expanded___13(target[4]);
+  iteration_lambda___0_0_expanded___14(target[5]);
+}
+
+qfunc hadamard_transform_expanded___0(target: qbit[6]) {
+  apply_to_all_expanded___0(target);
 }
 
 qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) {
@@ -585,7 +329,7 @@ qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) 
   vector_product_phase_expanded___0(y);
   matrix_vector_product_expanded___0(y, solution);
   syndrome_decode_lookuptable_expanded___0(solution, y);
-  hadamard_transform(solution);
+  hadamard_transform_expanded___0(solution);
 }
 
 qfunc main(output y: qbit[6], output solution: qbit[6]) {
