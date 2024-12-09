@@ -1,0 +1,5 @@
+qfunc main(output x: qbit, t: real, w: real) {
+  allocate(1, x);
+  RX(t, x);
+  RZ(w, x);
+}
