@@ -1,155 +1,21 @@
-hamiltonian: PauliTerm[] = [
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z
-    ],
-    coefficient=-20.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::I
-    ],
-    coefficient=-20.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=-20.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=-20.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=-20.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=-20.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::Z
-    ],
-    coefficient=-10.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z
-    ],
-    coefficient=-10.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::Z,
-      Pauli::I
-    ],
-    coefficient=-10.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=-10.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::Z,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=-10.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::Z,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=-10.0
-  }
-];
-
-qfunc main(params_list: real[10], output target: qbit[6]) {
-  allocate(target.len, target);
-  qaoa_penalty(target.len, params_list, hamiltonian, target);
+qstruct QAOAVars {
+  z_0: qbit;
+  z_1: qbit;
+  z_2: qbit;
+  z_3: qbit;
+  z_4: qbit;
+  z_5: qbit;
 }
 
-cscope ```
-vqe_result = vqe(
-hamiltonian=hamiltonian,
-maximize=False,
-initial_point=[0.0, 0.027272727272727275, 0.006818181818181819, 0.020454545454545454, 0.013636363636363637, 0.013636363636363637, 0.020454545454545454, 0.006818181818181819, 0.027272727272727275, 0.0],
-optimizer=Optimizer.COBYLA,
-max_iteration=100,
-tolerance=0.0,
-step_size=0.0,
-skip_compute_variance=False,
-alpha_cvar=0.7
-)
 
-save({"vqe_result": vqe_result, "hamiltonian": hamiltonian})
-```
+
+qfunc main(params: real[10], output v: QAOAVars) {
+  allocate(v.size, v);
+  hadamard_transform(v);
+  repeat (i: 5) {
+    phase (-(((((((((((((40.0 * v.z_0) + (40.0 * v.z_1)) + (40.0 * v.z_2)) + (40.0 * v.z_3)) + (40.0 * v.z_4)) + (40.0 * v.z_5)) + ((10 - (20 * v.z_0)) * ((2 * v.z_1) - 1))) + ((10 - (20 * v.z_0)) * ((2 * v.z_5) - 1))) + ((10 - (20 * v.z_1)) * ((2 * v.z_2) - 1))) + ((10 - (20 * v.z_2)) * ((2 * v.z_3) - 1))) + ((10 - (20 * v.z_3)) * ((2 * v.z_4) - 1))) + ((10 - (20 * v.z_4)) * ((2 * v.z_5) - 1))) - 120.0), params[i]);
+    apply_to_all(lambda(q) {
+      RX(params[5 + i], q);
+    }, v);
+  }
+}
