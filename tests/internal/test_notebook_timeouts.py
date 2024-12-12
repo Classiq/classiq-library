@@ -39,7 +39,7 @@ def test_notebook_timeouts(timeouts: dict[str, float]) -> None:
         relative_path = file_path.relative_to(ROOT)
         if _can_skip(relative_path):
             continue
-        if str(relative_path) not in timeouts:
+        if relative_path.name not in timeouts:
             missing_notebooks.append(file_path)
 
     assert (
@@ -50,8 +50,7 @@ def test_notebook_timeouts(timeouts: dict[str, float]) -> None:
 def test_unused_timeouts(timeouts: dict[str, float]) -> None:
     unused_timeouts: list[str] = []
     for notebook in timeouts:
-        full_notebook_path = ROOT / notebook
-        if not full_notebook_path.exists():
+        if not list(ROOT.rglob(notebook)):
             unused_timeouts.append(notebook)
 
     assert (
