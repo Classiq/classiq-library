@@ -12,7 +12,9 @@ def test_unique_notebook_name():
 
 def test_unique_qmod_name():
     all_qmods = ROOT.rglob("*.qmod")
-    assert not duplicate_base_names(all_qmods)
+    # exclude `functions/`
+    qmods = [path for path in all_qmods if "functions" not in path.parts]
+    assert not duplicate_base_names(qmods)
 
 
 def duplicate_base_names(files: Iterable[Path]) -> bool:
