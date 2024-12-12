@@ -2,7 +2,6 @@ from collections import Counter
 from pathlib import Path
 from typing import Iterable
 
-
 ROOT = Path(__file__).parents[2]
 
 
