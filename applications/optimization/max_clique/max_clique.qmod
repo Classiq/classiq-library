@@ -1,22 +1,16 @@
 qstruct QAOAVars {
-  x_0: qbit;
-  x_1: qbit;
-  x_2: qbit;
-  x_3: qbit;
-  x_4: qbit;
-  x_5: qbit;
-  x_6: qbit;
+  x: qbit[7];
 }
 
 
 
-qfunc main(params: real[40], output v: QAOAVars) {
+qfunc main(params: real[6], output v: QAOAVars) {
   allocate(v.size, v);
   hadamard_transform(v);
-  repeat (i: 20) {
-    phase (-((((((((-v.x_0) - v.x_1) - v.x_2) - v.x_3) - v.x_4) - v.x_5) - v.x_6) + (2 * ((((((((2 * v.x_0) * v.x_5) + (v.x_1 * v.x_4)) + (v.x_2 * (v.x_4 + v.x_6))) + (v.x_3 * v.x_6)) + (v.x_4 * ((v.x_1 + v.x_2) + v.x_6))) + (v.x_6 * ((v.x_2 + v.x_3) + v.x_4))) ** 2))), params[i]);
+  repeat (i: 3) {
+    phase (-((((((((-v.x[0]) - v.x[1]) - v.x[2]) - v.x[3]) - v.x[4]) - v.x[5]) - v.x[6]) + (2 * ((((((((2 * v.x[0]) * v.x[5]) + (v.x[1] * v.x[4])) + (v.x[2] * (v.x[4] + v.x[6]))) + (v.x[3] * v.x[6])) + (v.x[4] * ((v.x[1] + v.x[2]) + v.x[6]))) + (v.x[6] * ((v.x[2] + v.x[3]) + v.x[4]))) ** 2))), params[i]);
     apply_to_all(lambda(q) {
-      RX(params[20 + i], q);
+      RX(params[3 + i], q);
     }, v);
   }
 }
