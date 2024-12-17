@@ -1,3 +1,11 @@
+qfunc block_encoding_vqls(ansatz: qfunc (), block_encoding: qfunc (), prepare_b_state: qfunc ()) {
+  ansatz();
+  block_encoding();
+  invert {
+    prepare_b_state();
+  }
+}
+
 qfunc apply_ry_on_all(params: real[], io: qbit[]) {
   repeat (index: io.len) {
     RY(params[index], io[index]);
@@ -57,14 +65,6 @@ qfunc prepare_ca(pauli_terms_list: PauliTerm[], system_qubits: qbit[], ancillary
     control (ancillary_qubits == i) {
       apply_pauli_term(pauli_terms_list[i], system_qubits);
     }
-  }
-}
-
-qfunc block_encoding_vqls(ansatz: qfunc (), block_encoding: qfunc (), prepare_b_state: qfunc ()) {
-  ansatz();
-  block_encoding();
-  invert {
-    prepare_b_state();
   }
 }
 
