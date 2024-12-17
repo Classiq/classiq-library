@@ -1,9 +1,3 @@
-qfunc unitary_with_power_logic(pw: int, matrix: real[][], target: qbit[]) {
-  power (pw) {
-    unitary(matrix, target);
-  }
-}
-
 qfunc load_b(amplitudes: real[], output state: qbit[], bound: real) {
   prepare_amplitudes(amplitudes, bound, state);
 }
@@ -27,6 +21,12 @@ qfunc hhl(rhs_vector: real[], bound: real, precision: int, hamiltonian_evolution
     }, phase);
   } apply {
     simple_eig_inv(phase, indicator);
+  }
+}
+
+qfunc unitary_with_power_logic(pw: int, matrix: real[][], target: qbit[]) {
+  power (pw) {
+    unitary(matrix, target);
   }
 }
 

@@ -21,22 +21,22 @@ qfunc binary_to_one_hot_expanded___0(input binary: qnum<2, False, 0>, output one
   inplace_binary_to_one_hot_expanded___0(one_hot);
 }
 
-qfunc iteration_lambda___0_0_expanded___0(qvar___3_captured__inplace_one_hot_to_unary__5: qbit, qvar___2_captured__inplace_one_hot_to_unary__5: qbit) {
-  CX(qvar___3_captured__inplace_one_hot_to_unary__5, qvar___2_captured__inplace_one_hot_to_unary__5);
+qfunc iteration_0_lambda___0_0_expanded___0(qvar___3_captured__inplace_one_hot_to_unary__4: qbit, qvar___2_captured__inplace_one_hot_to_unary__4: qbit) {
+  CX(qvar___3_captured__inplace_one_hot_to_unary__4, qvar___2_captured__inplace_one_hot_to_unary__4);
 }
 
-qfunc iteration_lambda___0_0_expanded___1(qvar___2_captured__inplace_one_hot_to_unary__5: qbit, qvar___1_captured__inplace_one_hot_to_unary__5: qbit) {
-  CX(qvar___2_captured__inplace_one_hot_to_unary__5, qvar___1_captured__inplace_one_hot_to_unary__5);
+qfunc iteration_0_lambda___0_0_expanded___1(qvar___2_captured__inplace_one_hot_to_unary__4: qbit, qvar___1_captured__inplace_one_hot_to_unary__4: qbit) {
+  CX(qvar___2_captured__inplace_one_hot_to_unary__4, qvar___1_captured__inplace_one_hot_to_unary__4);
 }
 
-qfunc iteration_lambda___0_0_expanded___2(qvar___1_captured__inplace_one_hot_to_unary__5: qbit, qvar___0_captured__inplace_one_hot_to_unary__5: qbit) {
-  CX(qvar___1_captured__inplace_one_hot_to_unary__5, qvar___0_captured__inplace_one_hot_to_unary__5);
+qfunc iteration_0_lambda___0_0_expanded___2(qvar___1_captured__inplace_one_hot_to_unary__4: qbit, qvar___0_captured__inplace_one_hot_to_unary__4: qbit) {
+  CX(qvar___1_captured__inplace_one_hot_to_unary__4, qvar___0_captured__inplace_one_hot_to_unary__4);
 }
 
 qfunc inplace_one_hot_to_unary_expanded___0(qvar: qbit[4]) {
-  iteration_lambda___0_0_expanded___0(qvar[3], qvar[2]);
-  iteration_lambda___0_0_expanded___1(qvar[2], qvar[1]);
-  iteration_lambda___0_0_expanded___2(qvar[1], qvar[0]);
+  iteration_0_lambda___0_0_expanded___0(qvar[3], qvar[2]);
+  iteration_0_lambda___0_0_expanded___1(qvar[2], qvar[1]);
+  iteration_0_lambda___0_0_expanded___2(qvar[1], qvar[0]);
   X(qvar[0]);
 }
 
@@ -165,37 +165,37 @@ qfunc prepare_dick_state_unary_input_expanded___5(qvar: qbit[6]) {
   prepare_dick_state_unary_input_expanded___4(qvar[1:6]);
 }
 
-qfunc iteration_lambda___0_0_expanded___3(y___0_captured__vector_product_phase__3: qbit) {
-  Z(y___0_captured__vector_product_phase__3);
+qfunc iteration_1_lambda___0_0_expanded___0(y___0_captured__vector_product_phase__2: qbit) {
+  Z(y___0_captured__vector_product_phase__2);
 }
 
-qfunc iteration_lambda___0_0_expanded___4(y___1_captured__vector_product_phase__3: qbit) {
-  Z(y___1_captured__vector_product_phase__3);
+qfunc iteration_1_lambda___0_0_expanded___1(y___1_captured__vector_product_phase__2: qbit) {
+  Z(y___1_captured__vector_product_phase__2);
 }
 
-qfunc iteration_lambda___0_0_expanded___5(y___2_captured__vector_product_phase__3: qbit) {
-  Z(y___2_captured__vector_product_phase__3);
+qfunc iteration_1_lambda___0_0_expanded___2(y___2_captured__vector_product_phase__2: qbit) {
+  Z(y___2_captured__vector_product_phase__2);
 }
 
-qfunc iteration_lambda___0_0_expanded___6(y___3_captured__vector_product_phase__3: qbit) {
-  Z(y___3_captured__vector_product_phase__3);
+qfunc iteration_1_lambda___0_0_expanded___3(y___3_captured__vector_product_phase__2: qbit) {
+  Z(y___3_captured__vector_product_phase__2);
 }
 
-qfunc iteration_lambda___0_0_expanded___7(y___4_captured__vector_product_phase__3: qbit) {
-  Z(y___4_captured__vector_product_phase__3);
+qfunc iteration_1_lambda___0_0_expanded___4(y___4_captured__vector_product_phase__2: qbit) {
+  Z(y___4_captured__vector_product_phase__2);
 }
 
-qfunc iteration_lambda___0_0_expanded___8(y___5_captured__vector_product_phase__3: qbit) {
-  Z(y___5_captured__vector_product_phase__3);
+qfunc iteration_1_lambda___0_0_expanded___5(y___5_captured__vector_product_phase__2: qbit) {
+  Z(y___5_captured__vector_product_phase__2);
 }
 
 qfunc vector_product_phase_expanded___0(y: qbit[6]) {
-  iteration_lambda___0_0_expanded___3(y[0]);
-  iteration_lambda___0_0_expanded___4(y[1]);
-  iteration_lambda___0_0_expanded___5(y[2]);
-  iteration_lambda___0_0_expanded___6(y[3]);
-  iteration_lambda___0_0_expanded___7(y[4]);
-  iteration_lambda___0_0_expanded___8(y[5]);
+  iteration_1_lambda___0_0_expanded___0(y[0]);
+  iteration_1_lambda___0_0_expanded___1(y[1]);
+  iteration_1_lambda___0_0_expanded___2(y[2]);
+  iteration_1_lambda___0_0_expanded___3(y[3]);
+  iteration_1_lambda___0_0_expanded___4(y[4]);
+  iteration_1_lambda___0_0_expanded___5(y[5]);
 }
 
 qfunc matrix_vector_product_expanded___0(y: qbit[6], output out: qbit[6]) {
@@ -277,37 +277,37 @@ qfunc syndrome_decode_lookuptable_expanded___0(syndrome: qnum<6, False, 0>, erro
   }
 }
 
-qfunc iteration_lambda___0_0_expanded___9(target___0_captured__apply_to_all__4: qbit) {
-  H(target___0_captured__apply_to_all__4);
+qfunc iteration_2_lambda___0_0_expanded___0(target___0_captured__apply_to_all__3: qbit) {
+  H(target___0_captured__apply_to_all__3);
 }
 
-qfunc iteration_lambda___0_0_expanded___10(target___1_captured__apply_to_all__4: qbit) {
-  H(target___1_captured__apply_to_all__4);
+qfunc iteration_2_lambda___0_0_expanded___1(target___1_captured__apply_to_all__3: qbit) {
+  H(target___1_captured__apply_to_all__3);
 }
 
-qfunc iteration_lambda___0_0_expanded___11(target___2_captured__apply_to_all__4: qbit) {
-  H(target___2_captured__apply_to_all__4);
+qfunc iteration_2_lambda___0_0_expanded___2(target___2_captured__apply_to_all__3: qbit) {
+  H(target___2_captured__apply_to_all__3);
 }
 
-qfunc iteration_lambda___0_0_expanded___12(target___3_captured__apply_to_all__4: qbit) {
-  H(target___3_captured__apply_to_all__4);
+qfunc iteration_2_lambda___0_0_expanded___3(target___3_captured__apply_to_all__3: qbit) {
+  H(target___3_captured__apply_to_all__3);
 }
 
-qfunc iteration_lambda___0_0_expanded___13(target___4_captured__apply_to_all__4: qbit) {
-  H(target___4_captured__apply_to_all__4);
+qfunc iteration_2_lambda___0_0_expanded___4(target___4_captured__apply_to_all__3: qbit) {
+  H(target___4_captured__apply_to_all__3);
 }
 
-qfunc iteration_lambda___0_0_expanded___14(target___5_captured__apply_to_all__4: qbit) {
-  H(target___5_captured__apply_to_all__4);
+qfunc iteration_2_lambda___0_0_expanded___5(target___5_captured__apply_to_all__3: qbit) {
+  H(target___5_captured__apply_to_all__3);
 }
 
 qfunc apply_to_all_expanded___0(target: qbit[6]) {
-  iteration_lambda___0_0_expanded___9(target[0]);
-  iteration_lambda___0_0_expanded___10(target[1]);
-  iteration_lambda___0_0_expanded___11(target[2]);
-  iteration_lambda___0_0_expanded___12(target[3]);
-  iteration_lambda___0_0_expanded___13(target[4]);
-  iteration_lambda___0_0_expanded___14(target[5]);
+  iteration_2_lambda___0_0_expanded___0(target[0]);
+  iteration_2_lambda___0_0_expanded___1(target[1]);
+  iteration_2_lambda___0_0_expanded___2(target[2]);
+  iteration_2_lambda___0_0_expanded___3(target[3]);
+  iteration_2_lambda___0_0_expanded___4(target[4]);
+  iteration_2_lambda___0_0_expanded___5(target[5]);
 }
 
 qfunc hadamard_transform_expanded___0(target: qbit[6]) {
