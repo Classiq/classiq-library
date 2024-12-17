@@ -2,8 +2,6 @@ qstruct QAOAVars {
   z: qbit[6];
 }
 
-
-
 qfunc main(params: real[10], output v: QAOAVars) {
   allocate(v.size, v);
   hadamard_transform(v);

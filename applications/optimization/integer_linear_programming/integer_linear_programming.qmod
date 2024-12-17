@@ -4,8 +4,6 @@ qstruct QAOAVars {
   monotone_rule_2_slack_var_0: qbit;
 }
 
-
-
 qfunc main(params: real[6], output v: QAOAVars) {
   allocate(v.size, v);
   hadamard_transform(v);
