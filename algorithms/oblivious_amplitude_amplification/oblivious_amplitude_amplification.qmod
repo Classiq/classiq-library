@@ -1,3 +1,20 @@
+qfunc check_block(b: qnum, res: qbit) {
+  res ^= b == 0;
+}
+
+qfunc oblivious_amplitude_amplification(reps: int, block_encoding: qfunc (qnum, qbit[]), block: qnum, data: qbit[]) {
+  block_encoding(data, block);
+  repeat (index: reps) {
+    grover_operator(lambda(b) {
+      phase_oracle(lambda(x, res) {
+        check_block(x, res);
+      }, b);
+    }, lambda(b) {
+      block_encoding(data, b);
+    }, block);
+  }
+}
+
 qfunc apply_pauli_term(pauli_string: Pauli[], x: qbit[]) {
   repeat (index: x.len) {
     switch(pauli_string[index], [lambda() {
@@ -21,23 +38,6 @@ qfunc block_encode(pauli_list: Pauli[][], data: qbit[], block: qnum) {
         apply_pauli_term(pauli_list[i], data);
       }
     }
-  }
-}
-
-qfunc check_block(b: qnum, res: qbit) {
-  res ^= b == 0;
-}
-
-qfunc oblivious_amplitude_amplification(reps: int, block_encoding: qfunc (qnum, qbit[]), block: qnum, data: qbit[]) {
-  block_encoding(data, block);
-  repeat (index: reps) {
-    grover_operator(lambda(b) {
-      phase_oracle(lambda(x, res) {
-        check_block(x, res);
-      }, b);
-    }, lambda(b) {
-      block_encoding(data, b);
-    }, block);
   }
 }
 
