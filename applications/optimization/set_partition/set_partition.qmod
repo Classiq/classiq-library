@@ -2,13 +2,11 @@ qstruct QAOAVars {
   x: qbit[10];
 }
 
-
-
 qfunc main(params: real[6], output v: QAOAVars) {
   allocate(v.size, v);
   hadamard_transform(v);
   repeat (i: 3) {
-    phase (-((((((((((((16 * v.x[0]) + (16 * v.x[1])) + (16 * v.x[2])) + (10 * v.x[3])) + (10 * v.x[4])) + (12 * v.x[5])) + (10 * v.x[6])) + (12 * v.x[7])) + (16 * v.x[8])) + (22 * v.x[9])) - 70) ** 2), params[i]);
+    phase (-((((((((((((4 * v.x[0]) + (16 * v.x[1])) + (14 * v.x[2])) + (18 * v.x[3])) + (16 * v.x[4])) + (16 * v.x[5])) + (12 * v.x[6])) + (4 * v.x[7])) + (10 * v.x[8])) + (20 * v.x[9])) - 65) ** 2), params[i]);
     apply_to_all(lambda(q) {
       RX(params[3 + i], q);
     }, v);
