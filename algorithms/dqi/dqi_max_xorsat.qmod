@@ -21,27 +21,15 @@ qfunc binary_to_one_hot_expanded___0(input binary: qnum<2, False, 0>, output one
   inplace_binary_to_one_hot_expanded___0(one_hot);
 }
 
-qfunc iteration_0_lambda___0_0_expanded___0(qvar___3_captured__inplace_one_hot_to_unary__4: qbit, qvar___2_captured__inplace_one_hot_to_unary__4: qbit) {
-  CX(qvar___3_captured__inplace_one_hot_to_unary__4, qvar___2_captured__inplace_one_hot_to_unary__4);
-}
-
-qfunc iteration_0_lambda___0_0_expanded___1(qvar___2_captured__inplace_one_hot_to_unary__4: qbit, qvar___1_captured__inplace_one_hot_to_unary__4: qbit) {
-  CX(qvar___2_captured__inplace_one_hot_to_unary__4, qvar___1_captured__inplace_one_hot_to_unary__4);
-}
-
-qfunc iteration_0_lambda___0_0_expanded___2(qvar___1_captured__inplace_one_hot_to_unary__4: qbit, qvar___0_captured__inplace_one_hot_to_unary__4: qbit) {
-  CX(qvar___1_captured__inplace_one_hot_to_unary__4, qvar___0_captured__inplace_one_hot_to_unary__4);
-}
-
-qfunc inplace_one_hot_to_unary_expanded___0(qvar: qbit[4]) {
-  iteration_0_lambda___0_0_expanded___0(qvar[3], qvar[2]);
-  iteration_0_lambda___0_0_expanded___1(qvar[2], qvar[1]);
-  iteration_0_lambda___0_0_expanded___2(qvar[1], qvar[0]);
+qfunc inplace_one_hot_to_unary(qvar: qbit[]) {
+  repeat (i: qvar.len - 1) {
+    CX(qvar[(qvar.len - i) - 1], qvar[(qvar.len - i) - 2]);
+  }
   X(qvar[0]);
 }
 
 qfunc one_hot_to_unary_expanded___0(input one_hot: qbit[4], output unary: qbit[3]) {
-  inplace_one_hot_to_unary_expanded___0(one_hot);
+  inplace_one_hot_to_unary(one_hot);
   lsb: qbit;
   one_hot -> {lsb, unary};
   free(lsb);
@@ -165,37 +153,12 @@ qfunc prepare_dick_state_unary_input_expanded___5(qvar: qbit[6]) {
   prepare_dick_state_unary_input_expanded___4(qvar[1:6]);
 }
 
-qfunc iteration_1_lambda___0_0_expanded___0(y___0_captured__vector_product_phase__2: qbit) {
-  Z(y___0_captured__vector_product_phase__2);
-}
-
-qfunc iteration_1_lambda___0_0_expanded___1(y___1_captured__vector_product_phase__2: qbit) {
-  Z(y___1_captured__vector_product_phase__2);
-}
-
-qfunc iteration_1_lambda___0_0_expanded___2(y___2_captured__vector_product_phase__2: qbit) {
-  Z(y___2_captured__vector_product_phase__2);
-}
-
-qfunc iteration_1_lambda___0_0_expanded___3(y___3_captured__vector_product_phase__2: qbit) {
-  Z(y___3_captured__vector_product_phase__2);
-}
-
-qfunc iteration_1_lambda___0_0_expanded___4(y___4_captured__vector_product_phase__2: qbit) {
-  Z(y___4_captured__vector_product_phase__2);
-}
-
-qfunc iteration_1_lambda___0_0_expanded___5(y___5_captured__vector_product_phase__2: qbit) {
-  Z(y___5_captured__vector_product_phase__2);
-}
-
-qfunc vector_product_phase_expanded___0(y: qbit[6]) {
-  iteration_1_lambda___0_0_expanded___0(y[0]);
-  iteration_1_lambda___0_0_expanded___1(y[1]);
-  iteration_1_lambda___0_0_expanded___2(y[2]);
-  iteration_1_lambda___0_0_expanded___3(y[3]);
-  iteration_1_lambda___0_0_expanded___4(y[4]);
-  iteration_1_lambda___0_0_expanded___5(y[5]);
+qfunc vector_product_phase(v: int[], y: qbit[]) {
+  repeat (i: y.len) {
+    if (v[i] > 0) {
+      Z(y[i]);
+    }
+  }
 }
 
 qfunc matrix_vector_product_expanded___0(y: qbit[6], output out: qbit[6]) {
@@ -208,7 +171,7 @@ qfunc matrix_vector_product_expanded___0(y: qbit[6], output out: qbit[6]) {
   out[5] ^= (0 ^ y[4]) ^ y[5];
 }
 
-qfunc syndrome_decode_lookuptable_expanded___0(syndrome: qnum<6, False, 0>, error: qnum<6, False, 0>) {
+qfunc syndrome_decode_lookuptable(syndrome: qnum, error: qnum) {
   control (syndrome == 0) {
     error ^= 0;
   }
@@ -277,43 +240,6 @@ qfunc syndrome_decode_lookuptable_expanded___0(syndrome: qnum<6, False, 0>, erro
   }
 }
 
-qfunc iteration_2_lambda___0_0_expanded___0(target___0_captured__apply_to_all__3: qbit) {
-  H(target___0_captured__apply_to_all__3);
-}
-
-qfunc iteration_2_lambda___0_0_expanded___1(target___1_captured__apply_to_all__3: qbit) {
-  H(target___1_captured__apply_to_all__3);
-}
-
-qfunc iteration_2_lambda___0_0_expanded___2(target___2_captured__apply_to_all__3: qbit) {
-  H(target___2_captured__apply_to_all__3);
-}
-
-qfunc iteration_2_lambda___0_0_expanded___3(target___3_captured__apply_to_all__3: qbit) {
-  H(target___3_captured__apply_to_all__3);
-}
-
-qfunc iteration_2_lambda___0_0_expanded___4(target___4_captured__apply_to_all__3: qbit) {
-  H(target___4_captured__apply_to_all__3);
-}
-
-qfunc iteration_2_lambda___0_0_expanded___5(target___5_captured__apply_to_all__3: qbit) {
-  H(target___5_captured__apply_to_all__3);
-}
-
-qfunc apply_to_all_expanded___0(target: qbit[6]) {
-  iteration_2_lambda___0_0_expanded___0(target[0]);
-  iteration_2_lambda___0_0_expanded___1(target[1]);
-  iteration_2_lambda___0_0_expanded___2(target[2]);
-  iteration_2_lambda___0_0_expanded___3(target[3]);
-  iteration_2_lambda___0_0_expanded___4(target[4]);
-  iteration_2_lambda___0_0_expanded___5(target[5]);
-}
-
-qfunc hadamard_transform_expanded___0(target: qbit[6]) {
-  apply_to_all_expanded___0(target);
-}
-
 qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) {
   k_num_errors: qnum<2, False, 0>;
   prepare_amplitudes([
@@ -326,10 +252,10 @@ qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) 
   binary_to_unary_expanded___0(k_num_errors, k_unary);
   pad_zeros_expanded___0(k_unary, y);
   prepare_dick_state_unary_input_expanded___5(y);
-  vector_product_phase_expanded___0(y);
+  vector_product_phase([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], y);
   matrix_vector_product_expanded___0(y, solution);
-  syndrome_decode_lookuptable_expanded___0(solution, y);
-  hadamard_transform_expanded___0(solution);
+  syndrome_decode_lookuptable(solution, y);
+  hadamard_transform(solution);
 }
 
 qfunc main(output y: qbit[6], output solution: qbit[6]) {
