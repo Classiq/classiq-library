@@ -3,8 +3,9 @@ qfunc my_sp(x: qnum, y: qnum) {
   hadamard_transform(y);
 }
 
-qfunc my_predicate(x: qnum, y: qnum, res: qbit) {
-  res ^= ((x + y) < 9) and (((x * y) % 4) == 1);
+qfunc my_grover_operator(oracle_operand: qfunc (), diffuser_operand: qfunc ()) {
+  oracle_operand();
+  diffuser_operand();
 }
 
 qfunc prep_minus(output out: qbit) {
@@ -20,6 +21,10 @@ qfunc my_oracle(predicate: qfunc (qbit)) {
   } apply {
     predicate(aux);
   }
+}
+
+qfunc my_predicate(x: qnum, y: qnum, res: qbit) {
+  res ^= ((x + y) < 9) and (((x * y) % 4) == 1);
 }
 
 qfunc zero_predicate(x: qnum, y: qnum, res: qbit) {
@@ -41,11 +46,6 @@ qfunc my_diffuser(sp_operand: qfunc (qnum, qnum), x: qnum, y: qnum) {
       zero_predicate(x, y, q);
     });
   }
-}
-
-qfunc my_grover_operator(oracle_operand: qfunc (), diffuser_operand: qfunc ()) {
-  oracle_operand();
-  diffuser_operand();
 }
 
 qfunc main(output x: qnum, output y: qnum) {

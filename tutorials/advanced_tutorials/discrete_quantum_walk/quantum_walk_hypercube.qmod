@@ -1,7 +1,3 @@
-qfunc moving_one_hamming_dist(pos: int, x: qbit[]) {
-  X(x[pos]);
-}
-
 qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfuncs: qfunc[] (), coin_state: qnum) {
   power (time) {
     coin_flip_qfunc(coin_state);
@@ -11,6 +7,10 @@ qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfun
       }
     }
   }
+}
+
+qfunc moving_one_hamming_dist(pos: int, x: qbit[]) {
+  X(x[pos]);
 }
 
 qfunc main(t: int, output x: qbit[]) {
