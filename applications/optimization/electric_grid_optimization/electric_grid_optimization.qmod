@@ -1,31 +1,15 @@
 qstruct QAOAVars {
-  x_0,0: qbit;
-  x_0,1: qbit;
-  x_0,2: qbit;
-  x_0,3: qbit;
-  x_1,0: qbit;
-  x_1,1: qbit;
-  x_1,2: qbit;
-  x_1,3: qbit;
-  x_2,0: qbit;
-  x_2,1: qbit;
-  x_2,2: qbit;
-  x_2,3: qbit;
-  source_supply_rule_0_slack_var_0: qbit;
-  source_supply_rule_0_slack_var_1: qbit;
-  source_supply_rule_1_slack_var_0: qbit;
-  source_supply_rule_1_slack_var_1: qbit;
-  source_supply_rule_2_slack_var_0: qbit;
-  source_supply_rule_2_slack_var_1: qbit;
+  x: qbit[4][3];
+  source_supply_rule_0_slack_var: qbit[2];
+  source_supply_rule_1_slack_var: qbit[2];
+  source_supply_rule_2_slack_var: qbit[2];
 }
-
-
 
 qfunc main(params: real[12], output v: QAOAVars) {
   allocate(v.size, v);
   hadamard_transform(v);
   repeat (i: 6) {
-    phase (-(((((((((((((((((((0.5 * v.x_0,0) + v.x_0,1) + v.x_0,2) + (2.1 * v.x_0,3)) + v.x_1,0) + (0.6 * v.x_1,1)) + (1.4 * v.x_1,2)) + v.x_1,3) + v.x_2,0) + (1.4 * v.x_2,1)) + (0.4 * v.x_2,2)) + (2.3 * v.x_2,3)) + (16 * ((((v.x_0,0 + v.x_1,0) + v.x_2,0) - 1) ** 2))) + (16 * ((((v.x_0,1 + v.x_1,1) + v.x_2,1) - 1) ** 2))) + (16 * ((((v.x_0,2 + v.x_1,2) + v.x_2,2) - 1) ** 2))) + (16 * ((((v.x_0,3 + v.x_1,3) + v.x_2,3) - 1) ** 2))) + (64.0 * ((((((((0.5 * v.source_supply_rule_0_slack_var_0) + (0.5 * v.source_supply_rule_0_slack_var_1)) + (0.5 * v.x_0,0)) + (0.5 * v.x_0,1)) + (0.5 * v.x_0,2)) + (0.5 * v.x_0,3)) - 1) ** 2))) + (64.0 * ((((((((0.5 * v.source_supply_rule_1_slack_var_0) + (0.5 * v.source_supply_rule_1_slack_var_1)) + (0.5 * v.x_1,0)) + (0.5 * v.x_1,1)) + (0.5 * v.x_1,2)) + (0.5 * v.x_1,3)) - 1) ** 2))) + (64.0 * ((((((((0.5 * v.source_supply_rule_2_slack_var_0) + (0.5 * v.source_supply_rule_2_slack_var_1)) + (0.5 * v.x_2,0)) + (0.5 * v.x_2,1)) + (0.5 * v.x_2,2)) + (0.5 * v.x_2,3)) - 1) ** 2))), params[i]);
+    phase (-(((((((((((((((((((0.5 * v.x[0][0]) + v.x[0][1]) + v.x[0][2]) + (2.1 * v.x[0][3])) + v.x[1][0]) + (0.6 * v.x[1][1])) + (1.4 * v.x[1][2])) + v.x[1][3]) + v.x[2][0]) + (1.4 * v.x[2][1])) + (0.4 * v.x[2][2])) + (2.3 * v.x[2][3])) + (16 * ((((v.x[0][0] + v.x[1][0]) + v.x[2][0]) - 1) ** 2))) + (16 * ((((v.x[0][1] + v.x[1][1]) + v.x[2][1]) - 1) ** 2))) + (16 * ((((v.x[0][2] + v.x[1][2]) + v.x[2][2]) - 1) ** 2))) + (16 * ((((v.x[0][3] + v.x[1][3]) + v.x[2][3]) - 1) ** 2))) + (64.0 * ((((((((0.5 * v.source_supply_rule_0_slack_var[0]) + (0.5 * v.source_supply_rule_0_slack_var[1])) + (0.5 * v.x[0][0])) + (0.5 * v.x[0][1])) + (0.5 * v.x[0][2])) + (0.5 * v.x[0][3])) - 1) ** 2))) + (64.0 * ((((((((0.5 * v.source_supply_rule_1_slack_var[0]) + (0.5 * v.source_supply_rule_1_slack_var[1])) + (0.5 * v.x[1][0])) + (0.5 * v.x[1][1])) + (0.5 * v.x[1][2])) + (0.5 * v.x[1][3])) - 1) ** 2))) + (64.0 * ((((((((0.5 * v.source_supply_rule_2_slack_var[0]) + (0.5 * v.source_supply_rule_2_slack_var[1])) + (0.5 * v.x[2][0])) + (0.5 * v.x[2][1])) + (0.5 * v.x[2][2])) + (0.5 * v.x[2][3])) - 1) ** 2))), params[i]);
     apply_to_all(lambda(q) {
       RX(params[6 + i], q);
     }, v);
