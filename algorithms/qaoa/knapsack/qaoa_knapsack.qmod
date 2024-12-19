@@ -1,0 +1,32 @@
+qstruct KnapsackVars {
+  a: qnum<3>;
+  b: qnum<2>;
+}
+
+
+
+qfunc eval_constraint(v: KnapsackVars, output aux: qbit) {
+  aux = ((v.a * 2) + (v.b * 3)) <= 12;
+}
+
+qfunc apply_cost(gamma: real, v: KnapsackVars) {
+  aux: qbit;
+  within {
+    eval_constraint(v, aux);
+  } apply {
+    control (aux) {
+      phase (-((v.a * 3) + (v.b * 5)), gamma);
+    }
+  }
+}
+
+qfunc main(params: real[6], output v: KnapsackVars) {
+  allocate(v.size, v);
+  hadamard_transform(v);
+  repeat (i: 3) {
+    apply_cost(params[2 * i], v);
+    apply_to_all(lambda(q) {
+      RX(params[(2 * i) + 1], q);
+    }, v);
+  }
+}
