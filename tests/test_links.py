@@ -12,6 +12,9 @@ from utils_for_tests import iterate_notebooks
 URL_REGEX = r"https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9@:%_\+.~#?&//=]*"
 # urls come in `[title](url)`
 URL_IN_MARKDOWN_REGEX = re.compile(r"(?<=\]\()%s(?=\s*\))" % URL_REGEX)
+SKIPPED_URLS = [
+    "https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.69.607",  # From date: 19.12.24, notebook: hamiltonian_simulation_guide.ipynb
+]
 
 
 def test_links() -> None:
@@ -34,6 +37,8 @@ def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
 
 
 def _test_single_url(url: str, retry: int = 3) -> bool:
+    if url in SKIPPED_URLS:
+        return True
     if retry == 0:
         return False
 

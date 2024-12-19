@@ -3,7 +3,7 @@ qfunc cut_oracle(cut_size: int, nodes: qbit[], res: qbit) {
 }
 
 qfunc main(output nodes: qbit[5]) {
-  allocate(5, nodes);
+  allocate(nodes.len, nodes);
   grover_search(3, lambda(vars) {
     phase_oracle(lambda(vars, res) {
       cut_oracle(4, vars, res);

@@ -1,13 +1,3 @@
-qfunc quantum_step_clockwise(x: qbit[]) {
-  within {
-    qft(x);
-  } apply {
-    repeat (i: x.len) {
-      PHASE(((2 * pi) * (2 ** i)) / (2 ** x.len), x[i]);
-    }
-  }
-}
-
 qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfuncs: qfunc[] (), coin_state: qnum) {
   power (time) {
     coin_flip_qfunc(coin_state);
@@ -15,6 +5,16 @@ qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfun
       control (coin_state == i) {
         walks_qfuncs[i]();
       }
+    }
+  }
+}
+
+qfunc quantum_step_clockwise(x: qbit[]) {
+  within {
+    qft(x);
+  } apply {
+    repeat (i: x.len) {
+      PHASE(((2 * pi) * (2 ** i)) / (2 ** x.len), x[i]);
     }
   }
 }
