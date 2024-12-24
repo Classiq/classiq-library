@@ -3,10 +3,6 @@ qfunc qsct_2d(xy_variable: qnum[2]) {
   qct_type2(xy_variable[1]);
 }
 
-qfunc powered_hamiltonian_evolution(hamiltonian: PauliTerm[], scaling: real, p: int, qba: qbit[]) {
-  suzuki_trotter(hamiltonian, p * ((-6.28318530718) * scaling), 1, 1, qba);
-}
-
 qfunc inverse_amplitude_load(prefactor: real, phase: qnum, ind: qbit) {
   ind *= prefactor / phase;
 }
@@ -20,6 +16,10 @@ qfunc matrix_inversion_HHL(prefactor: real, my_unitary: qfunc (int, qbit[]), sta
   } apply {
     inverse_amplitude_load(prefactor, phase, indicator);
   }
+}
+
+qfunc powered_hamiltonian_evolution(hamiltonian: PauliTerm[], scaling: real, p: int, qba: qbit[]) {
+  suzuki_trotter(hamiltonian, p * ((-6.28318530718) * scaling), 1, 1, qba);
 }
 
 qfunc main(output x_variable: qnum<3, False, 0>, output y_variable: qnum<3, False, 0>, output phase: qnum, output indicator: qbit) {

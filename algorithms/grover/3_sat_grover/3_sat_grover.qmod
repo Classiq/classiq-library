@@ -3,7 +3,7 @@ qfunc sat_oracle(x: qbit[], res: qbit) {
 }
 
 qfunc main(output x: qbit[3]) {
-  allocate(3, x);
+  allocate(x.len, x);
   grover_search(1, lambda(vars) {
     phase_oracle(sat_oracle, vars);
   }, x);
