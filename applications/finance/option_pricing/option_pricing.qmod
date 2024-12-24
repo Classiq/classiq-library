@@ -56,8 +56,13 @@ qfunc payoff_linear(asset: qnum, ind: qbit) {
 }
 
 qfunc payoff(asset: qnum, ind: qbit) {
-  control (asset >= ceiling(12.9502500662)) {
-    payoff_linear(asset, ind);
+  aux: qbit;
+  within {
+    aux = asset >= ceiling(12.9502500662);
+  } apply {
+    control (aux) {
+      payoff_linear(asset, ind);
+    }
   }
 }
 
