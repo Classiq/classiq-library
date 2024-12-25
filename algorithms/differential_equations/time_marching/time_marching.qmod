@@ -1,0 +1,106 @@
+qstruct TimeDependentBE {
+  index: qnum<2>;
+  time: qnum<2>;
+  block: qbit;
+}
+
+qstruct MagnusBE {
+  time_dependent: TimeDependentBE;
+  qsvt_exp_aux: qbit;
+  qsvt_exp_lcu: qbit;
+}
+
+qstruct LongSliceBE {
+  magnus: MagnusBE;
+  qsvt_amplification_aux: qbit;
+}
+
+qstruct FullBE {
+  time_slice: LongSliceBE;
+  counter: qnum<3.0>;
+}
+
+qfunc magnus_projector(qbe: MagnusBE, is_in_block: qbit) {
+  is_in_block ^= ((qbe.time_dependent.block == 0) and (qbe.time_dependent.time == 0)) and ((qbe.qsvt_exp_aux == 0) and (qbe.qsvt_exp_lcu == 0));
+}
+
+qfunc time_dependent_projector(qbe: TimeDependentBE, is_in_block: qbit) {
+  is_in_block ^= (qbe.block == 0) and (qbe.time == 0);
+}
+
+qfunc block_encode_time_dependent_A(a: real, b: real, qbe: TimeDependentBE) {
+  linear_pauli_rotations([Pauli::Y], [
+    (((b - a) * 2) / (2 ** qbe.time.size))
+  ], [(2 * a)], qbe.time, qbe.block);
+  linear_pauli_rotations([Pauli::Y], [2], [0], qbe.index, qbe.block);
+}
+
+qfunc short_time_summation(a: real, b: real, qbe: TimeDependentBE) {
+  within {
+    hadamard_transform(qbe.time);
+  } apply {
+    block_encode_time_dependent_A(a, b, qbe);
+  }
+}
+
+qfunc short_time_magnus(a: real, b: real, qbe_st: MagnusBE) {
+  within {
+    H(qbe_st.qsvt_exp_lcu);
+  } apply {
+    qsvt_lcu([
+      4.7085,
+      3.0195,
+      0.0547,
+      4.7904,
+      0.0547,
+      3.0195,
+      (-17.2827)
+    ], [
+      4.5651,
+      0.2495,
+      6.6887,
+      (-0.1862),
+      6.097,
+      0.4056,
+      0.2495,
+      (-20.5676)
+    ], time_dependent_projector, time_dependent_projector, lambda(x) {
+      short_time_summation(a, b, x);
+    }, qbe_st.time_dependent, qbe_st.qsvt_exp_aux, qbe_st.qsvt_exp_lcu);
+  }
+}
+
+qfunc long_slice_evolution(a: real, b: real, qbe: LongSliceBE) {
+  qsvt([
+    4.1801,
+    2.3715,
+    4.6112,
+    4.5273,
+    (-1.7559),
+    4.6112,
+    8.6546,
+    (-20.9526)
+  ], magnus_projector, magnus_projector, lambda(x) {
+    short_time_magnus(a, b, x);
+  }, qbe.magnus, qbe.qsvt_amplification_aux);
+}
+
+qfunc long_time_integrator_step(a: real, b: real, qbe_full: FullBE) {
+  long_slice_evolution(a, b, qbe_full.time_slice);
+  control ((((qbe_full.time_slice.magnus.time_dependent.block == 0) and (qbe_full.time_slice.magnus.time_dependent.time == 0)) and ((qbe_full.time_slice.magnus.qsvt_exp_aux == 0) and (qbe_full.time_slice.magnus.qsvt_exp_lcu == 0))) and (qbe_full.time_slice.qsvt_amplification_aux == 0)) {
+    qbe_full.counter += -1;
+  }
+}
+
+qfunc long_time_integrator(T: real, num_slices: int, qbe_full: FullBE) {
+  inplace_prepare_int(num_slices, qbe_full.counter);
+  repeat (i: num_slices) {
+    long_time_integrator_step((i * T) / num_slices, ((i + 1) * T) / num_slices, qbe_full);
+  }
+}
+
+qfunc main(output qbe: FullBE) {
+  allocate(qbe.size, qbe);
+  hadamard_transform(qbe.time_slice.magnus.time_dependent.index);
+  long_time_integrator(2, 4, qbe);
+}
