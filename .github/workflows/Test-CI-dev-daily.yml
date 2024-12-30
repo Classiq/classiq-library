@@ -32,12 +32,37 @@ jobs:
       - name: Debug
         run: git status
 
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
       - name: Install dependencies
         run: |
           set -e
-          python -m pip install -U pip
-          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
-          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
+          python -m pip install -U pip \
+              --extra-index-url https://pypi.org/simple
+          # Install "classiq" separately
+          export CODEARTIFACT_AUTH_TOKEN="$( \
+              aws codeartifact get-authorization-token \
+              --domain ${{ secrets.CODEARTIFACT_DOMAIN }} \
+              --domain-owner ${{ secrets.CODEARTIFACT_OWNER }} \
+              --region ${{ secrets.CODEARTIFACT_REGION }} \
+              --query authorizationToken \
+              --output text \
+          )"
+          python -m pip install -U --pre \
+              --extra-index-url "https://aws:$CODEARTIFACT_AUTH_TOKEN@${{ secrets.CODEARTIFACT_DOMAIN }}-${{ secrets.CODEARTIFACT_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/pypi/${{ secrets.PYPI_NIGHTLY_NAME }}/simple/" \
+              --extra-index-url https://pypi.org/simple \
+              classiq
+          # Install everything from the requirements, other than "classiq".
+          python -m pip install -U $(grep -ivE "classiq" requirements.txt) \
+              --extra-index-url https://pypi.org/simple
+          python -m pip install -U -r requirements_tests.txt \
+              --extra-index-url https://pypi.org/simple
 
       - name: Install couenne solver
         env:
@@ -50,14 +75,6 @@ jobs:
           echo "$LOCAL_BIN" >>"$GITHUB_PATH"
           gzip -dc "$COUENNE_FILE" >"${LOCAL_BIN}/couenne"
           chmod ugo+x "${LOCAL_BIN}/couenne"
-
-      # Configure AWS credentials
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: us-east-1
-          mask-aws-account-id: true
 
       # Set authentication with M2M token
       - name: Set authentication
