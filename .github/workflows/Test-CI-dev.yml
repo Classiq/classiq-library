@@ -81,15 +81,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        if: steps.cache-pip.outputs.cache-hit != 'true'
-        run: |
-          set -e
-          python -m pip install -U pip
-          # The `--pre` allows the installation of pre-release versions of packages (needed for Dev)
-          python -m pip install --extra-index-url https://pypi.org/simple --pre -U -r requirements.txt
-          python -m pip install --extra-index-url https://pypi.org/simple -U -r requirements_tests.txt
-
       #
       # Setup Environment
       #
@@ -100,6 +91,30 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: us-east-1
           mask-aws-account-id: true
+
+      - name: Install dependencies
+        run: |
+          set -e
+          python -m pip install -U pip \
+              --extra-index-url https://pypi.org/simple
+          # Install "classiq" separately
+          export CODEARTIFACT_AUTH_TOKEN="$( \
+              aws codeartifact get-authorization-token \
+              --domain ${{ secrets.CODEARTIFACT_DOMAIN }} \
+              --domain-owner ${{ secrets.CODEARTIFACT_OWNER }} \
+              --region ${{ secrets.CODEARTIFACT_REGION }} \
+              --query authorizationToken \
+              --output text \
+          )"
+          python -m pip install -U --pre \
+              --extra-index-url "https://aws:$CODEARTIFACT_AUTH_TOKEN@${{ secrets.CODEARTIFACT_DOMAIN }}-${{ secrets.CODEARTIFACT_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/pypi/${{ secrets.PYPI_NIGHTLY_NAME }}/simple/" \
+              --extra-index-url https://pypi.org/simple \
+              classiq
+          # Install everything from the requirements, other than "classiq".
+          python -m pip install -U $(grep -ivE "classiq" requirements.txt) \
+              --extra-index-url https://pypi.org/simple
+          python -m pip install -U -r requirements_tests.txt \
+              --extra-index-url https://pypi.org/simple
 
       # Set authentication with M2M token
       - name: Set authentication
