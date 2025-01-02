@@ -1,7 +1,7 @@
 qfunc main(output state: qbit[], output phase: qnum) {
   allocate(2, state);
   allocate_num(2, False, 2, phase);
-  inplace_prepare_int(3, state);
+  state ^= 3;
   qpe(lambda() {
     CRZ(pi, state[0], state[1]);
   }, phase);

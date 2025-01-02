@@ -1,6 +1,6 @@
 qfunc discrete_log_oracle(g_generator: int, x_element: int, N_modulus: int, x1: qbit[], x2: qbit[], output func_res: qbit[]) {
   allocate(ceiling(log(N_modulus, 2)), func_res);
-  inplace_prepare_int(1, func_res);
+  func_res ^= 1;
   modular_exp(N_modulus, x_element, func_res, x1);
   modular_exp(N_modulus, g_generator, func_res, x2);
 }
