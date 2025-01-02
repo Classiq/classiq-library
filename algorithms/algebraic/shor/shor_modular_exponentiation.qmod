@@ -98,7 +98,7 @@ qfunc main(output x: qbit[], output power: qbit[6], output aux: qbit) {
   allocate(6, power);
   allocate(1, aux);
   hadamard_transform(power);
-  inplace_prepare_int(1, x);
+  x ^= 1;
   mod_exp_func(6, 5, x, power, aux);
   invert {
     qft(power);
