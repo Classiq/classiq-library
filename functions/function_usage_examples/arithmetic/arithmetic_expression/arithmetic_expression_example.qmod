@@ -1,6 +1,6 @@
 qfunc main(output a: qnum, output b: qnum, output c: qnum, output res: qnum) {
-  prepare_int(2, a);
-  prepare_int(1, b);
-  prepare_int(5, c);
+  a = 2;
+  b = 1;
+  c = 5;
   res = ((((((a + b) + c) & 15) % 8) ^ (3 & a)) ^ 10) == 4;
 }
