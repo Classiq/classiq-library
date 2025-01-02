@@ -93,7 +93,7 @@ qfunc long_time_integrator_step(a: real, b: real, qbe_full: FullBE) {
 }
 
 qfunc long_time_integrator(T: real, num_slices: int, qbe_full: FullBE) {
-  inplace_prepare_int(num_slices, qbe_full.counter);
+  qbe_full.counter ^= num_slices;
   repeat (i: num_slices) {
     long_time_integrator_step((i * T) / num_slices, ((i + 1) * T) / num_slices, qbe_full);
   }
