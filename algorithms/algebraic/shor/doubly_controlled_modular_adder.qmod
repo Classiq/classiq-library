@@ -33,41 +33,44 @@ qfunc check_msb(ref: int, x: qbit[], aux: qbit) {
   }
 }
 
-qfunc ccmod_add(N: int, a: int, phi_b: qbit[], c1: qbit, c2: qbit, aux: qbit) {
+qfunc ccmod_add(N: int, a: int, phi_b: qbit[], c1: qbit, c2: qbit) {
   ctrl: qbit[];
-  {c1, c2} -> ctrl;
-  control (ctrl) {
-    phase_lad(a, phi_b);
-  }
-  invert {
-    phase_lad(N, phi_b);
-  }
-  check_msb(1, phi_b, aux);
-  control (aux) {
-    phase_lad(N, phi_b);
-  }
+  aux: qbit;
   within {
-    invert {
-      control (ctrl) {
-        phase_lad(a, phi_b);
-      }
-    }
+    allocate(1, aux);
+    {c1, c2} -> ctrl;
   } apply {
-    check_msb(0, phi_b, aux);
+    control (ctrl) {
+      phase_lad(a, phi_b);
+    }
+    invert {
+      phase_lad(N, phi_b);
+    }
+    check_msb(1, phi_b, aux);
+    control (aux) {
+      phase_lad(N, phi_b);
+    }
+    within {
+      invert {
+        control (ctrl) {
+          phase_lad(a, phi_b);
+        }
+      }
+    } apply {
+      check_msb(0, phi_b, aux);
+    }
   }
-  ctrl -> {c1, c2};
 }
 
-qfunc main(output b: qnum, output ctrl: qbit[2], output aux: qbit) {
+qfunc main(output b: qnum, output ctrl: qbit[2]) {
   allocate(5, b);
   allocate(2, ctrl);
-  allocate(1, aux);
   b ^= 8;
   X(ctrl[0]);
   X(ctrl[1]);
   within {
     qft(b);
   } apply {
-    ccmod_add(15, 9, b, ctrl[0], ctrl[1], aux);
+    ccmod_add(15, 9, b, ctrl[0], ctrl[1]);
   }
 }
