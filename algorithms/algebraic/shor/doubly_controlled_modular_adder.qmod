@@ -62,7 +62,7 @@ qfunc main(output b: qnum, output ctrl: qbit[2], output aux: qbit) {
   allocate(5, b);
   allocate(2, ctrl);
   allocate(1, aux);
-  inplace_prepare_int(8, b);
+  b ^= 8;
   X(ctrl[0]);
   X(ctrl[1]);
   within {
