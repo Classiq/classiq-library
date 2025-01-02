@@ -1,12 +1,12 @@
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
     validate_quantum_model,
-    test_notebook,
+    wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
 
 
-@test_notebook(
+@wrap_testbook(
     "hidden_shift",
     timeout_seconds=272,  # we may lower this value
 )

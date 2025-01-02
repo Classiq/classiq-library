@@ -1,12 +1,12 @@
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
     validate_quantum_model,
-    test_notebook,
+    wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
 
 
-@test_notebook("bernstein_vazirani", timeout_seconds=20)
+@wrap_testbook("bernstein_vazirani", timeout_seconds=20)
 def test_bernstein_vazirani(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))

@@ -9,7 +9,7 @@ from tests.utils_for_tests import resolve_notebook_path, should_skip_notebook
 from classiq.interface.generator.quantum_program import QuantumProgram
 
 
-def test_notebook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
+def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
     def inner_decorator(func: Callable) -> Any:
         notebook_path = resolve_notebook_path(notebook_name)
 
