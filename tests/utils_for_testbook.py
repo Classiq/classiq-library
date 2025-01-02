@@ -42,6 +42,12 @@ def _build_cd_decorator(file_path: str) -> Callable:
 
 
 def _build_skip_decorator(notebook_name: str) -> Callable:
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.error(
+        f"{notebook_name=} ; should skip: {should_skip_notebook(notebook_name)}"
+    )
     return pytest.mark.skipif(
         should_skip_notebook(notebook_name),
         reason="Didn't change",
