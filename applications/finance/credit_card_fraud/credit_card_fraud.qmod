@@ -1,4 +1,4 @@
-qfunc my_pauli_kernel_expanded___0(qba: qbit[3]) {
+qfunc pauli_kernel_expanded___0(qba: qbit[3]) {
   power (2) {
     hadamard_transform(qba);
     suzuki_trotter([
@@ -30,7 +30,7 @@ qfunc my_pauli_kernel_expanded___0(qba: qbit[3]) {
   }
 }
 
-qfunc my_pauli_kernel_expanded___1(qba: qbit[3]) {
+qfunc pauli_kernel_expanded___1(qba: qbit[3]) {
   power (2) {
     hadamard_transform(qba);
     suzuki_trotter([
@@ -64,8 +64,8 @@ qfunc my_pauli_kernel_expanded___1(qba: qbit[3]) {
 
 qfunc main(output qba: qnum<3, False, 0>) {
   allocate(3, qba);
-  my_pauli_kernel_expanded___0(qba);
+  pauli_kernel_expanded___0(qba);
   invert {
-    my_pauli_kernel_expanded___1(qba);
+    pauli_kernel_expanded___1(qba);
   }
 }

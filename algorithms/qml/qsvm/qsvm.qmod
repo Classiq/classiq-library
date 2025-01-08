@@ -1,4 +1,4 @@
-qfunc my_bloch_feature_map(data: real[], qba: qbit[]) {
+qfunc bloch_feature_map(data: real[], qba: qbit[]) {
   repeat (i: ceiling(data.len / 2)) {
     RX(data[2 * i] / 2, qba[i]);
   }
@@ -9,8 +9,8 @@ qfunc my_bloch_feature_map(data: real[], qba: qbit[]) {
 
 qfunc main(data1: real[2], data2: real[2], output qba: qnum) {
   allocate(ceiling(data1.len / 2), qba);
-  my_bloch_feature_map(data1, qba);
+  bloch_feature_map(data1, qba);
   invert {
-    my_bloch_feature_map(data2, qba);
+    bloch_feature_map(data2, qba);
   }
 }
