@@ -45,12 +45,14 @@ def _build_skip_decorator(notebook_path: str) -> Callable:
     import logging
     from tests.utils_for_tests import iterate_notebooks
 
+    notebook_name = os.path.basename(notebook_path)
+
     logger = logging.getLogger(__name__)
     logger.error(
-        f"{notebook_path=} ; should skip: {should_skip_notebook(notebook_path)} ; notebooks: {iterate_notebooks()}"
+        f"{notebook_path=} ; should skip: {should_skip_notebook(notebook_name)} ; notebooks: {iterate_notebooks()}"
     )
     return pytest.mark.skipif(
-        should_skip_notebook(notebook_path),
+        should_skip_notebook(notebook_name),
         reason="Didn't change",
     )
 
