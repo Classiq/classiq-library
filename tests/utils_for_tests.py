@@ -15,6 +15,11 @@ def iterate_notebooks() -> list[str]:
 
 
 @lru_cache
+def iterate_notebook_names() -> list[str]:
+    return list(map(os.path.basename, iterate_notebooks()))
+
+
+@lru_cache
 def _get_all_notebooks(
     directory: Path = ROOT_DIRECTORY, suffix: str = ".ipynb"
 ) -> list[str]:
@@ -27,8 +32,7 @@ def _get_all_notebooks(
 
 
 def should_run_notebook(notebook_name: str) -> bool:
-    notebook_path = resolve_notebook_path(notebook_name)
-    return notebook_path in iterate_notebooks()
+    return notebook_name in iterate_notebook_names()
 
 
 def should_skip_notebook(notebook_name: str) -> bool:
