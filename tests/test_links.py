@@ -13,6 +13,7 @@ URL_REGEX = r"https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-
 # urls come in `[title](url)`
 URL_IN_MARKDOWN_REGEX = re.compile(r"(?<=\]\()%s(?=\s*\))" % URL_REGEX)
 SKIPPED_URLS = [
+    "https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud",  # From date: 09.01.25, notebook: credit_card_fraud.ipynb
     "https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.69.607",  # From date: 19.12.24, notebook: hamiltonian_simulation_guide.ipynb
     "https://doi.org/10.1137/S0036144598336745",  # From date: 5.1.25, notebook: algorithms/differential_equations/discrete_poisson_solver/discrete_poisson_solver.ipynb
 ]
