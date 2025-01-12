@@ -106,17 +106,18 @@ jobs:
           python -m pip install -U -r requirements.txt
           python -m pip install -U -r requirements_tests.txt
 
-#      - name: Install couenne solver
-#        env:
-#          COUENNE_FILE: tests/resources/couenne.gz
-#          LOCAL_BIN: ${{ runner.temp }}/.local/bin
-#        run: |
-#          set -eux
-#          git lfs pull -I "$COUENNE_FILE"
-#          mkdir -p "$LOCAL_BIN"
-#          echo "$LOCAL_BIN" >>"$GITHUB_PATH"
-#          gzip -dc "$COUENNE_FILE" >"${LOCAL_BIN}/couenne"
-#          chmod ugo+x "${LOCAL_BIN}/couenne"
+      - name: Install couenne solver
+        env:
+          COUENNE_SOURCE: "s3://public-library-resources/couenne.gz"
+          COUENNE_FILE: ${{ runner.temp }}/couenne.gz
+          LOCAL_BIN: ${{ runner.temp }}/.local/bin
+        run: |
+          set -eux
+          aws s3 cp "$COUENNE_SOURCE "$COUENNE_FILE"
+          mkdir -p "$LOCAL_BIN"
+          echo "$LOCAL_BIN" >>"$GITHUB_PATH"
+          gzip -dc "$COUENNE_FILE" >"${LOCAL_BIN}/couenne"
+          chmod ugo+x "${LOCAL_BIN}/couenne"
 
       #
       # Setup Environment
