@@ -98,6 +98,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-venv-
 
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
       - name: Install dependencies
         if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
@@ -122,14 +130,6 @@ jobs:
       #
       # Setup Environment
       #
-      # Configure AWS credentials
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: us-east-1
-          mask-aws-account-id: true
-
       # Set authentication with M2M token
       - name: Set authentication
         run: .github/scripts/get_m2m_token.sh
