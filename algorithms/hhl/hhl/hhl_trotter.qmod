@@ -1,7 +1,3 @@
-qfunc suzuki_trotter1_with_power_logic(hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real, target: qbit[]) {
-  suzuki_trotter(hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2)), target);
-}
-
 qfunc load_b(amplitudes: real[], output state: qbit[], bound: real) {
   prepare_amplitudes(amplitudes, bound, state);
 }
@@ -26,6 +22,10 @@ qfunc hhl(rhs_vector: real[], bound: real, precision: int, hamiltonian_evolution
   } apply {
     simple_eig_inv(phase, indicator);
   }
+}
+
+qfunc suzuki_trotter1_with_power_logic(hamiltonian: PauliTerm[], pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real, target: qbit[]) {
+  suzuki_trotter(hamiltonian, evolution_coefficient * pw, 1, r0 * ceiling(reps_scaling_factor ** log(pw, 2)), target);
 }
 
 qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {

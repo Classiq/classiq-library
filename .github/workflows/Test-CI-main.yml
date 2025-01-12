@@ -98,6 +98,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-venv-
 
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
       - name: Install dependencies
         if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
@@ -108,11 +116,12 @@ jobs:
 
       - name: Install couenne solver
         env:
-          COUENNE_FILE: tests/resources/couenne.gz
+          COUENNE_SOURCE: "s3://public-library-resources/couenne.gz"
+          COUENNE_FILE: ${{ runner.temp }}/couenne.gz
           LOCAL_BIN: ${{ runner.temp }}/.local/bin
         run: |
           set -eux
-          git lfs pull -I "$COUENNE_FILE"
+          aws s3 cp "$COUENNE_SOURCE" "$COUENNE_FILE"
           mkdir -p "$LOCAL_BIN"
           echo "$LOCAL_BIN" >>"$GITHUB_PATH"
           gzip -dc "$COUENNE_FILE" >"${LOCAL_BIN}/couenne"
@@ -121,14 +130,6 @@ jobs:
       #
       # Setup Environment
       #
-      # Configure AWS credentials
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: us-east-1
-          mask-aws-account-id: true
-
       # Set authentication with M2M token
       - name: Set authentication
         run: .github/scripts/get_m2m_token.sh

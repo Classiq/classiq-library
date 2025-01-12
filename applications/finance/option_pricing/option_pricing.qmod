@@ -3,6 +3,13 @@ qstruct OptionPricingState {
   ind: qbit;
 }
 
+qfunc iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
+  sp_operand(x);
+  power (k) {
+    grover_operator(oracle_operand, sp_operand, x);
+  }
+}
+
 qfunc iqae_oracle(state: OptionPricingState) {
   Z(state.ind);
 }
@@ -49,21 +56,19 @@ qfunc payoff_linear(asset: qnum, ind: qbit) {
 }
 
 qfunc payoff(asset: qnum, ind: qbit) {
-  control (asset >= ceiling(12.9502500662)) {
-    payoff_linear(asset, ind);
+  aux: qbit;
+  within {
+    aux = asset >= ceiling(12.9502500662);
+  } apply {
+    control (aux) {
+      payoff_linear(asset, ind);
+    }
   }
 }
 
 qfunc european_call_state_preparation(state: OptionPricingState) {
   load_distribution(state.asset);
   payoff(state.asset, state.ind);
-}
-
-qfunc iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
-  sp_operand(x);
-  power (k) {
-    grover_operator(oracle_operand, sp_operand, x);
-  }
 }
 
 qfunc main(k: int, output ind: qbit) {
