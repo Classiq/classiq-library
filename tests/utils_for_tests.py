@@ -24,7 +24,7 @@ def _get_all_notebooks(
     directory: Path = ROOT_DIRECTORY, suffix: str = ".ipynb"
 ) -> list[str]:
     return [
-        file
+        f"{root}/{file}"
         for root, _, files in os.walk(directory)
         for file in files
         if file.endswith(suffix)
