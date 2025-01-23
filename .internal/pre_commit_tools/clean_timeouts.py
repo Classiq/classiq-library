@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
+import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
 
 import yaml
 
-PROJECT_ROOT = Path(__file__).parents[2]
+PROJECT_ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
 TIMEOUTS_FILE = PROJECT_ROOT / "tests" / "resources" / "timeouts.yaml"
 
 
