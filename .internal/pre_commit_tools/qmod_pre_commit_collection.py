@@ -2,6 +2,7 @@
 # ruff: noqa: F841,E713
 
 import os
+import subprocess
 import sys
 from collections import Counter
 from collections.abc import Iterable
@@ -9,7 +10,7 @@ from pathlib import Path
 
 import yaml
 
-PROJECT_ROOT = Path(__file__).parents[2]
+PROJECT_ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
 TIMEOUTS_FILE = PROJECT_ROOT / "tests" / "resources" / "timeouts.yaml"
 
 Seconds = float
