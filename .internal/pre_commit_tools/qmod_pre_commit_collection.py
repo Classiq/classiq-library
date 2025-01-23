@@ -76,8 +76,8 @@ def _add_file_to_timeouts(file_name: str) -> None:
         yaml.dump(timeouts, f, sort_keys=True)
 
 
-def validate_unique_names():
-    all_files = PROJECT_ROOT.rglob("*.qmod")
+def validate_unique_names() -> bool:
+    all_files: Iterable[Path] = PROJECT_ROOT.rglob("*.qmod")
     # exclude `functions/`
     all_files = [path for path in all_files if "functions" not in path.parts]
     base_names = [file.name for file in all_files]

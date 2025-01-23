@@ -72,7 +72,7 @@ def _add_file_to_timeouts(file_name: str) -> None:
         yaml.dump(timeouts, f, sort_keys=True)
 
 
-def validate_unique_names():
+def validate_unique_names() -> bool:
     all_files = PROJECT_ROOT.rglob("*.ipynb")
     base_names = [file.name for file in all_files]
 
