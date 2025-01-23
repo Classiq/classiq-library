@@ -10,7 +10,7 @@ from testbook.client import TestbookNotebookClient
     "hidden_shift",
     timeout_seconds=272,  # we may lower this value
 )
-def test_hidden_shift(tb: TestbookNotebookClient) -> None:
+def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod_simple"))
     validate_quantum_model(tb.ref("qmod_complex"))
@@ -31,5 +31,6 @@ def test_hidden_shift(tb: TestbookNotebookClient) -> None:
         expected_width=20,  # actual width: 20
         expected_depth=1700,  # actual depth: 1685
     )
+
     # test notebook content
     pass  # TODO
