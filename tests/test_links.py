@@ -17,6 +17,8 @@ SKIPPED_URLS = [
     "https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.69.607",  # From date: 19.12.24, notebook: hamiltonian_simulation_guide.ipynb
     "https://doi.org/10.1137/S0036144598336745",  # From date: 5.1.25, notebook: algorithms/differential_equations/discrete_poisson_solver/discrete_poisson_solver.ipynb
     "https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.033246",  # From 15/1. notebook algorithms/differential_equations/advection/advection.ipynb (QInnovision 2025 challenge)
+    "https://short.classiq.io/join-slack", # from date 21/1/25. notebook: tutorials/documentation_materials/classiq_101/whats_classiq/whats_classiq.ipynb
+    "https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.2.040203",
 ]
 
 
