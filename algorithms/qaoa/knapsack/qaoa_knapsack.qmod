@@ -3,16 +3,10 @@ qstruct KnapsackVars {
   b: qnum<2>;
 }
 
-
-
-qfunc eval_constraint(v: KnapsackVars, output aux: qbit) {
-  aux = ((v.a * 2) + (v.b * 3)) <= 12;
-}
-
 qfunc apply_cost(gamma: real, v: KnapsackVars) {
   aux: qbit;
   within {
-    eval_constraint(v, aux);
+    aux = ((v.a * 2) + (v.b * 3)) <= 12;
   } apply {
     control (aux) {
       phase (-((v.a * 3) + (v.b * 5)), gamma);
