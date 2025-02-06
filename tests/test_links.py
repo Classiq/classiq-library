@@ -3,6 +3,7 @@ from collections.abc import Iterable
 
 import httpx
 import nbformat
+import pytest
 from utils_for_tests import iterate_notebooks
 
 # the regex below is taken from this stackoverflow:
@@ -12,22 +13,14 @@ from utils_for_tests import iterate_notebooks
 URL_REGEX = r"https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9@:%_\+.~#?&//=]*"
 # urls come in `[title](url)`
 URL_IN_MARKDOWN_REGEX = re.compile(r"(?<=\]\()%s(?=\s*\))" % URL_REGEX)
-SKIPPED_URLS = [
-    "https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud",  # From date: 09.01.25, notebook: credit_card_fraud.ipynb
-    "https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.69.607",  # From date: 19.12.24, notebook: hamiltonian_simulation_guide.ipynb
-    "https://doi.org/10.1137/S0036144598336745",  # From date: 5.1.25, notebook: algorithms/differential_equations/discrete_poisson_solver/discrete_poisson_solver.ipynb
-    "https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.033246",  # From 15/1. notebook algorithms/differential_equations/advection/advection.ipynb (QInnovision 2025 challenge)
-    "https://short.classiq.io/join-slack", # from date 21/1/25. notebook: tutorials/documentation_materials/classiq_101/whats_classiq/whats_classiq.ipynb
-    "https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.2.040203",
-]
 
 
-def test_links() -> None:
-    for notebook_path in iterate_notebooks():
-        for cell_index, url in iterate_links_from_notebook(notebook_path):
-            assert _test_single_url(
-                url
-            ), f'Broken link found! in file "{notebook_path}", cell number {cell_index} (counting only markdown cells), broken url: "{url}"'
+@pytest.mark.parametrize("notebook_path", iterate_notebooks())
+def test_links(notebook_path: str) -> None:
+    for cell_index, url in iterate_links_from_notebook(notebook_path):
+        assert _test_single_url(
+            url
+        ), f'Broken link found! in file "{notebook_path}", cell number {cell_index} (counting only markdown cells), broken url: "{url}"'
 
 
 def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
@@ -41,9 +34,9 @@ def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
             yield cell_index, url
 
 
-def _test_single_url(url: str, retry: int = 3) -> bool:
-    if url in SKIPPED_URLS:
-        return True
+def _test_single_url(
+    url: str, retry: int = 3, use_head: bool = True, follow_redirects: bool = True
+) -> bool:
     if retry == 0:
         return False
 
@@ -52,11 +45,34 @@ def _test_single_url(url: str, retry: int = 3) -> bool:
     }
 
     try:
-        response = httpx.head(url, headers=headers, follow_redirects=True)
+        if use_head:
+            response = httpx.head(url, headers=headers, follow_redirects=True)
+        else:
+            response = httpx.get(url, headers=headers, follow_redirects=True)
 
+        # we don't check cloudflare links
+        if (not response.is_success) and response.headers.get(
+            "server", ""
+        ).lower() == "cloudflare":
+            return True
+
+        # Method not allowed
+        if response.status_code == 405:
+            return _test_single_url(
+                url, retry, use_head=False, follow_redirects=follow_redirects
+            )
+        # give another retry with GET
+        if (not response.is_success) and use_head:
+            return _test_single_url(
+                url, retry - 1, use_head=False, follow_redirects=follow_redirects
+            )
+        if (not response.is_success) and follow_redirects:
+            return _test_single_url(
+                url, retry - 1, use_head=use_head, follow_redirects=False
+            )
+        # Some flaky error with "doi.org" links
         if response.status_code == 403:
-            # Some flaky error with "doi.org" links
-            return _test_single_url(url, retry - 1)
+            return _test_single_url(url, retry - 1, use_head=use_head)
 
         return response.is_success
     except httpx.HTTPError:
