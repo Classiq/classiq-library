@@ -107,7 +107,6 @@ jobs:
           mask-aws-account-id: true
 
       - name: Install dependencies
-        if: steps.cache-pip.outputs.cache-hit != 'true'
         run: |
           set -e
           python -m pip install -U pip
