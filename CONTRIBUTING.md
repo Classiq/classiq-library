@@ -55,8 +55,12 @@ We use GitHub issues to track public bugs. You can report a bug by [opening a ne
 
 ### **How to Write a Good Bug Report**  
 
-- Include **detailed** information about the issue.  
-- Provide **background context** and **sample code** if possible.  
+- Include **detailed** information about the issue
+    - Provide a minimal **code example** that causes the error
+    - Include the error message you get when running the code
+- Provide **background context** if possible
+    - Include the Classiq version you are using (you can obtain it by running `import classiq; print(classiq.__version__)`)
+    - If you think it's necessary, add information about the OS you are using
 
 ## Need Help?  
 
