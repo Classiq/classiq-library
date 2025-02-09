@@ -46,8 +46,8 @@ As part of the CI process, you **must** add a timeout value for your notebook in
 - The timeout value should be **sufficient but not exaggerated**.  
 - If your CI tests fail, check the error messages carefully.  
 - **Common CI failures** are usually due to:  
-  - Missing or insufficient timeout values.  
-  - Non-trivial dependencies in the new notebook.  
+  - Missing or insufficient timeout values - You will have to add or increase the timeout value of the specific notebook in `tests/resources/timeouts.yaml`.
+  - Non-trivial dependencies in the new notebook — If this issue occurs, please contact us to discuss it further.
 
 ## Reporting Bugs  
 
