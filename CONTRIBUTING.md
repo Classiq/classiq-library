@@ -62,7 +62,7 @@ We use GitHub issues to track public bugs. You can report a bug by [opening a ne
 
 We are always available to assist you!  
 - Reach out through **[GitHub Discussions](https://github.com/Classiq/classiq-library/discussions)**.  
-- Connect with us within the *[Classiq Slack Community](https://short.classiq.io/join-slack). 
+- Connect with us within the **[Classiq Slack Community](https://short.classiq.io/join-slack)**. 
 
 ## License  
 
