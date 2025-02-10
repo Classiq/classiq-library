@@ -40,8 +40,7 @@ We follow [GitHub Flow](https://guides.github.com/introduction/flow/index.html),
 
 ## Continuous Integration (CI) Requirements  
 
-As part of the CI process, you **must** add a timeout value for your notebook in the file:  
-📂 `tests/resources/timeouts.yaml`  
+As part of the CI process, you **must** add a timeout value for your notebook in the file: `tests/resources/timeouts.yaml`  
 
 - The timeout value should be **sufficient but not exaggerated**.  
 - If your CI tests fail, check the error messages carefully.  
