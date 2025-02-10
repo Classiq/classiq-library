@@ -1,4 +1,8 @@
-qfunc lcu_controllers(controller: qnum, psi: qnum) {
+qfunc prepare(controller: qnum) {
+  inplace_prepare_state([0.5, 0.25, 0.25, 0], 0.01, controller);
+}
+
+qfunc select(controller: qnum, psi: qnum) {
   control (controller == 0) {
     apply_to_all(IDENTITY, psi);
   }
@@ -16,8 +20,8 @@ qfunc main(output controller: qnum, output psi: qnum) {
   allocate(2, psi);
   allocate(2, controller);
   within {
-    inplace_prepare_state([0.5, 0.25, 0.25, 0], 0.01, controller);
+    prepare(controller);
   } apply {
-    lcu_controllers(controller, psi);
+    select(controller, psi);
   }
 }
