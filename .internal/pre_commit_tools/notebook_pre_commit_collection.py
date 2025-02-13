@@ -13,24 +13,23 @@ import yaml
 PROJECT_ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
 TIMEOUTS_FILE = PROJECT_ROOT / "tests" / "resources" / "timeouts.yaml"
 
-Seconds = float
-DEFAULT_TIMEOUT: Seconds = 20
+DEFAULT_TIMEOUT_SECONDS: float = 20
 
-IS_FILE_VALID = bool
+IS_FILE_VALID = IS_FILE_INVALID = bool
 
 
 def main(full_file_paths: Iterable[str]) -> bool:
     return validate_unique_names() and all(map(validate_notebook, full_file_paths))
 
 
-def validate_notebook(file_path: str, automatically_add_timeout: bool = True) -> bool:
+def validate_notebook(
+    file_path: str, automatically_add_timeout: bool = True
+) -> IS_FILE_VALID:
     file_name = os.path.basename(file_path)
-    with open(file_path) as f:
-        file_content = f.read()
 
     errors = []
 
-    if not _forbid_dash_in_file_name(file_name):
+    if _does_contain_dash_in_file_name(file_name):
         errors.append(
             "Dash (-) is not allowed in file named. please use underscore (_)"
         )
@@ -43,16 +42,14 @@ def validate_notebook(file_path: str, automatically_add_timeout: bool = True) ->
             errors.append("File is missing timeout in the timeouts.yaml file.")
 
     if errors:
-        print(f"file `{file_path}` has error:")
-    for error in errors:
-        print(f'\t"{error}"')
+        spacing = "\n\t"  # f-string cannot include backslash
+        print(f"file `{file_path}` has error:{spacing}{spacing.join(errors)}")
 
-    is_ok = not errors
-    return is_ok
+    return not errors
 
 
-def _forbid_dash_in_file_name(file_name: str) -> IS_FILE_VALID:
-    return not ("-" in file_name)
+def _does_contain_dash_in_file_name(file_name: str) -> IS_FILE_INVALID:
+    return "-" in file_name
 
 
 def _is_file_in_timeouts(file_name: str) -> IS_FILE_VALID:
@@ -66,7 +63,7 @@ def _add_file_to_timeouts(file_name: str) -> None:
     with TIMEOUTS_FILE.open("r") as f:
         timeouts = yaml.safe_load(f)
 
-    timeouts[file_name] = DEFAULT_TIMEOUT
+    timeouts[file_name] = DEFAULT_TIMEOUT_SECONDS
 
     with TIMEOUTS_FILE.open("w") as f:
         yaml.dump(timeouts, f, sort_keys=True)
