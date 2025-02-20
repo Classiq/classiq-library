@@ -4,7 +4,6 @@ on:
   pull_request_target:
     branches:
       - main
-      - dev
     types:
       - closed
 
@@ -14,11 +13,4 @@ jobs:
     uses: ./.github/workflows/Utils-deployment-qmod.yml
     with:
       deploy-mode: production
-    secrets: inherit
-
-  deploy-dev:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
-    uses: ./.github/workflows/Utils-deployment-qmod.yml
-    with:
-      deploy-mode: staging
     secrets: inherit
