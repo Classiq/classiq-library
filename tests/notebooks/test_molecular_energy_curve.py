@@ -23,6 +23,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test notebook content
     for duration in tb.ref("durations"):
-        assert duration < 20
+        assert duration < 40  # locally it is no longer than 15 seconds
 
     assert all(np.isclose(tb.ref("exact_energy"), tb.ref("VQE_energy"), atol=0.01))
