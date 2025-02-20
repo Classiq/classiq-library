@@ -4,7 +4,7 @@ from collections.abc import Iterable
 import httpx
 import nbformat
 import pytest
-from utils_for_tests import iterate_notebooks
+from utils_for_tests import iterate_notebook_names, resolve_notebook_path
 
 # the regex below is taken from this stackoverflow:
 #   https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
@@ -15,7 +15,7 @@ URL_REGEX = r"https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-
 URL_IN_MARKDOWN_REGEX = re.compile(r"(?<=\]\()%s(?=\s*\))" % URL_REGEX)
 
 
-@pytest.mark.parametrize("notebook_path", iterate_notebooks())
+@pytest.mark.parametrize("notebook_path", iterate_notebook_names())
 def test_links(notebook_path: str) -> None:
     for cell_index, url in iterate_links_from_notebook(notebook_path):
         assert _test_single_url(
@@ -24,7 +24,7 @@ def test_links(notebook_path: str) -> None:
 
 
 def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
-    with open(filename) as f:
+    with open(resolve_notebook_path(filename)) as f:
         notebook_data = nbformat.read(f, nbformat.NO_CONVERT)
 
     markdown_cells = [c for c in notebook_data["cells"] if c["cell_type"] == "markdown"]
