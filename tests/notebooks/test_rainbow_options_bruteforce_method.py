@@ -5,8 +5,6 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
-import numpy as np
-
 
 @wrap_testbook(
     "rainbow_options_bruteforce_method",
