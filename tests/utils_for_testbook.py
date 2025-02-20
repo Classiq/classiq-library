@@ -66,6 +66,7 @@ def validate_quantum_program_size(
         assert (
             actual_width <= expected_width
         ), f"The width of the circuit changed! (for the worse!). From {expected_width} to {actual_width}"
+    assert actual_width > 0, "Got a 0-width circuit."
 
     assert qp.transpiled_circuit is not None  # for mypy
     actual_depth = qp.transpiled_circuit.depth
@@ -73,3 +74,4 @@ def validate_quantum_program_size(
         assert (
             actual_depth <= expected_depth
         ), f"The depth of the circuit changed! (for the worse!). From {expected_depth} to {actual_depth}"
+    assert actual_depth > 0, "Got a 0-depth circuit."
