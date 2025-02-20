@@ -8,6 +8,13 @@ qstruct EstimationVars {
   ind: qbit;
 }
 
+qfunc grover_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
+  sp_operand(x);
+  power (k) {
+    grover_operator(oracle_operand, sp_operand, x);
+  }
+}
+
 qfunc qmci_oracle(qvars: EstimationVars) {
   Z(qvars.ind);
 }
@@ -41,13 +48,6 @@ qfunc rainbow_brute_force(qvars: EstimationVars) {
     affine_max(qvars.x1, qvars.x2, max_out);
   } apply {
     brute_force_payoff(max_out, qvars.ind);
-  }
-}
-
-qfunc grover_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
-  sp_operand(x);
-  power (k) {
-    grover_operator(oracle_operand, sp_operand, x);
   }
 }
 
