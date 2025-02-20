@@ -4,7 +4,11 @@ from typing import Any, Callable
 import pytest
 
 from testbook import testbook
-from tests.utils_for_tests import resolve_notebook_path, should_skip_notebook
+from tests.utils_for_tests import (
+    resolve_notebook_path,
+    should_skip_notebook,
+    ROOT_DIRECTORY,
+)
 
 from classiq.interface.generator.quantum_program import QuantumProgram
 
@@ -30,6 +34,7 @@ def _build_cd_decorator(file_path: str) -> Callable:
     def cd_decorator(func: Callable) -> Any:
         def inner(*args: Any, **kwargs: Any) -> Any:
             previous_dir = os.getcwd()
+            os.chdir(ROOT_DIRECTORY)
             os.chdir(os.path.dirname(file_path))
 
             func(*args, **kwargs)
