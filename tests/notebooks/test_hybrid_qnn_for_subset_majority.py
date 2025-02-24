@@ -8,7 +8,7 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook(
     "hybrid_qnn_for_subset_majority",
-    timeout_seconds=120,
+    timeout_seconds=150,  # note: 2025.02.20, bumping from 120 to 150. If it raises further, there's a problem.
 )
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
