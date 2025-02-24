@@ -9,7 +9,10 @@ def iterate_notebooks() -> list[str]:
     if os.environ.get("SHOULD_TEST_ALL_FILES", "") == "true":
         notebooks_to_test = _get_all_notebooks()
     else:
-        notebooks_to_test = os.environ.get("LIST_OF_IPYNB_CHANGED", "").split()
+        notebooks_to_test = [
+            os.path.relpath(os.path.join(ROOT_DIRECTORY, path), os.getcwd())
+            for path in os.environ.get("LIST_OF_IPYNB_CHANGED", "").split()
+        ]
 
     return notebooks_to_test
 
