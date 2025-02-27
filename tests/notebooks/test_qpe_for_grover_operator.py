@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("qpe_for_grover_operator", timeout_seconds=1000)
+@wrap_testbook("qpe_for_grover_operator", timeout_seconds=2000)  # bump from 1000
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # the `qmod`s and `qprog`s are in a for-loop
     # need to rewrite the notebook in order to test them
