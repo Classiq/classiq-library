@@ -1,4 +1,6 @@
 import json
+import base64
+import pickle
 import os
 from typing import Any, Callable
 import pytest
@@ -12,9 +14,15 @@ from tests.utils_for_tests import (
 
 from classiq.interface.generator.quantum_program import QuantumProgram
 
+from testbook.client import TestbookNotebookClient
+
+_PATCHED = False
+
 
 def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
     def inner_decorator(func: Callable) -> Any:
+        _patch_testbook()
+
         notebook_path = resolve_notebook_path(notebook_name)
 
         for decorator in [
@@ -52,6 +60,30 @@ def _build_skip_decorator(notebook_path: str) -> Callable:
         should_skip_notebook(notebook_name),
         reason="Didn't change",
     )
+
+
+def _patch_testbook() -> None:
+    global _PATCHED
+
+    if _PATCHED:
+        return
+
+    def ref_numpy(self, obj_name: str) -> Any:
+        """
+        s = base64.b64encode( pickle.dumps(obj) ).decode()
+        result = pickle.loads(base64.b64decode(s))
+        result == obj
+        """
+
+        string = self.ref(
+            f"__import__('base64').b64encode(__import__('pickle').dumps({obj_name})).decode()"
+        )
+        result = pickle.loads(base64.b64decode(string))
+        return result
+
+    TestbookNotebookClient.ref_numpy = ref_numpy
+
+    _PATCHED = True
 
 
 def validate_quantum_model(model: str) -> None:
