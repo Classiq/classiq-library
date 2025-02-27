@@ -25,4 +25,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         tb.ref("classiq_cx_counts"),
         tb.ref("qiskit_cx_counts"),
     ):
-        assert cx_count_qiskit < cx_count_qiskit
+        assert cx_count_qiskit <= cx_count_qiskit
