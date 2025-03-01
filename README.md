@@ -7,7 +7,7 @@
     <img src="README_resources/classiq-logo.svg" width="300" height="150">
 </div>
 
-# Classiq: High-Level Quantum Modeling Language (HQML)
+# Classiq: High-Level Quantum Modeling Language
 
 ### Asif Mohammed Saad did this modification
 
