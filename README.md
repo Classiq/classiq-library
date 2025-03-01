@@ -7,7 +7,7 @@
     <img src="README_resources/classiq-logo.svg" width="300" height="150">
 </div>
 
-# Classiq: High-Level Quantum Modeling Language (HQML)
+# Classiq: High-Level Quantum Modeling Language
 
 Classiq provides a powerful platform for **designing, optimizing, analyzing, and executing** quantum programs. This repository hosts a comprehensive collection of quantum functions, algorithms, applications, and tutorials built using the Classiq SDK and our native Qmod language.
 
