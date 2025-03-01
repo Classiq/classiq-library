@@ -9,7 +9,8 @@
 
 # Classiq: High-Level Quantum Modeling Language
 
-### Asif Mohammed Saad did this modification
+### Modification done by Asif Mohammed Saad for testing purpose
+
 
 Classiq provides a powerful platform for **designing, optimizing, analyzing, and executing** quantum programs. This repository hosts a comprehensive collection of quantum functions, algorithms, applications, and tutorials built using the Classiq SDK and our native Qmod language.
 
