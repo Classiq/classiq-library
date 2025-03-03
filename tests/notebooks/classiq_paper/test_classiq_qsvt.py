@@ -6,16 +6,16 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("bernstein_vazirani", timeout_seconds=20)
+@wrap_testbook("classiq_qsvt", timeout_seconds=300)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref("qprog"),
-        expected_width=6,
-        expected_depth=5,
+        expected_width=30,  # actual width: 18
+        expected_depth=1400,  # actual depth: 701
     )
 
     # test notebook content
-    assert int(tb.ref("secret_integer_q")) == tb.ref("SECRET_INT")
+    pass  # TODO
