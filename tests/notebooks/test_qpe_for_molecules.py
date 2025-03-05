@@ -13,15 +13,18 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
         tb.ref("qprog"),
-        expected_width=10,  # actual width: 7
-        expected_depth=85000,  # actual depth: 74356
+        expected_width=16,  # actual width: 13
+        expected_depth=50000,  # actual depth: 22412
     )
 
     # test notebook content
-    solution = tb.ref("solution")
-    energy_resolution = tb.ref("energy_resolution")
+    solution_max_prob = tb.ref("measured_phase")
+    solution_first_peak = tb.ref("estimated_energy")
+    resolution = tb.ref("post_process_phase(2**(-QPE_SIZE), normalization)")
 
-    exact_result = tb.ref("np.real(min( np.linalg.eig(operator.to_matrix())[0] ))")
+    exact_result = tb.ref(
+        "np.real(min( np.linalg.eig( hamiltonian_to_matrix(mol_hamiltonian))[0] ))"
+    )
 
-    for sol in solution:
-        assert sol - energy_resolution <= exact_result <= sol + energy_resolution
+    for sol in [solution_max_prob, solution_first_peak]:
+        assert sol - resolution <= exact_result <= sol + resolution
