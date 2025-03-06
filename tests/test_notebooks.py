@@ -3,7 +3,7 @@ import logging
 from contextlib import contextmanager
 
 from testbook import testbook  # type: ignore[import]
-from utils_for_tests import iterate_notebooks
+from utils_for_tests import iterate_notebooks, ROOT_DIRECTORY
 
 TIMEOUT: int = 60 * 10  # 10 minutes
 LOGGER = logging.getLogger(__name__)
@@ -22,6 +22,7 @@ def test_notebooks() -> None:
 @contextmanager
 def cwd(path):
     oldpwd = os.getcwd()
+    os.chdir(ROOT_DIRECTORY)
     os.chdir(path)
     try:
         yield
