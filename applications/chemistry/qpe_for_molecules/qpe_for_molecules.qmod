@@ -542,7 +542,7 @@ qfunc powered_st2_for_LiH(p: int, state: qbit[]) {
   ], ((-2) * pi) * p, 2, ceiling(0.05 * (p ** 1.5)), state);
 }
 
-qfunc main(output state: qbit[], output phase: qnum<7, False, 7>) {
+qfunc main(output state: qbit[], output phase: qnum<7, SIGNED, 7>) {
   allocate(6, state);
   molecule_hartree_fock(MoleculeProblem {
     mapping=FermionMapping::JORDAN_WIGNER,
