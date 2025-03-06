@@ -5,13 +5,8 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
-import numpy as np
 
-
-@wrap_testbook(
-    "vqls_with_lcu",
-    timeout_seconds=1200,
-)
+@wrap_testbook("vqls_with_lcu", timeout_seconds=1200)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for a hybrid classical quantum neural network.
