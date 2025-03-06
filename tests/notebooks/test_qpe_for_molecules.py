@@ -18,9 +18,9 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    solution_max_prob = tb.ref("measured_phase")
-    solution_first_peak = tb.ref("estimated_energy")
-    resolution = tb.ref("post_process_phase(2**(-QPE_SIZE), normalization)")
+    solution_max_prob = tb.ref("max_prob_energy")
+    solution_first_peak = tb.ref("measured_energy")
+    resolution = tb.ref("2**(-QPE_SIZE)* normalization")
 
     exact_result = tb.ref(
         "np.real(min( np.linalg.eig( hamiltonian_to_matrix(mol_hamiltonian))[0] ))"
