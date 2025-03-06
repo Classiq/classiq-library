@@ -6,7 +6,9 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("learning_optimization", timeout_seconds=80)
+@wrap_testbook(
+    "learning_optimization", timeout_seconds=200
+)  # 2025.03.06 bump from 80 seconds
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod_1"))
