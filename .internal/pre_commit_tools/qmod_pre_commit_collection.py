@@ -15,16 +15,12 @@ TIMEOUTS_FILE = PROJECT_ROOT / "tests" / "resources" / "timeouts.yaml"
 
 DEFAULT_TIMEOUT_SECONDS: float = 10
 
-IS_FILE_VALID = IS_FILE_INVALID = bool
-
 
 def main(full_file_paths: Iterable[str]) -> bool:
-    return validate_unique_names() and all(map(validate_qmod, full_file_paths))
+    return validate_unique_names() and all(map(is_valid_qmod, full_file_paths))
 
 
-def validate_qmod(
-    file_path: str, automatically_add_timeout: bool = True
-) -> IS_FILE_VALID:
+def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> bool:
     file_name = os.path.basename(file_path)
 
     errors = []
@@ -43,16 +39,16 @@ def validate_qmod(
 
     if errors:
         spacing = "\n\t"  # f-string cannot include backslash
-        print(f"file `{file_path}` has error:{spacing}{spacing.join(errors)}")
+        print(f"File `{file_path}` has error(s):{spacing}{spacing.join(errors)}")
 
     return not errors
 
 
-def _does_contain_dash_in_file_name(file_name: str) -> IS_FILE_INVALID:
+def _does_contain_dash_in_file_name(file_name: str) -> bool:
     return "-" in file_name
 
 
-def _is_file_in_timeouts(file_name: str) -> IS_FILE_VALID:
+def _is_file_in_timeouts(file_name: str) -> bool:
     with TIMEOUTS_FILE.open("r") as f:
         timeouts = yaml.safe_load(f)
 
@@ -78,7 +74,7 @@ def validate_unique_names() -> bool:
     duplicate_names = [name for name, count in Counter(base_names).items() if count > 1]
 
     if duplicate_names:
-        print(f"qmods with duplicate names found: {duplicate_names}")
+        print(f"Qmods with duplicate names found: {duplicate_names}")
 
     is_ok = not duplicate_names
     return is_ok
