@@ -25,7 +25,7 @@ def test_timeouts_missing_files():
 #
 @pytest.mark.parametrize("notebook_path", map(str, PROJECT_ROOT.rglob("*.ipynb")))
 def test_notebooks(notebook_path: str):
-    assert notebook_pre_commit_collection.validate_notebook(
+    assert notebook_pre_commit_collection.is_valid_notebook(
         notebook_path, automatically_add_timeout=False
     )
 
@@ -44,7 +44,7 @@ def test_notebooks(qmod_path: str):
     if "functions/open_library_definitions" in qmod_path:
         return  # skipped
 
-    assert qmod_pre_commit_collection.validate_qmod(
+    assert qmod_pre_commit_collection.is_valid_qmod(
         qmod_path, automatically_add_timeout=False
     )
 
