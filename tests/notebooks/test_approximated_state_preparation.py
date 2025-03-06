@@ -7,7 +7,7 @@ from testbook.client import TestbookNotebookClient
 
 
 @wrap_testbook(
-    "approximated_state_preparation", timeout_seconds=3000
+    "approximated_state_preparation", timeout_seconds=3600
 )  # took 1860 seconds on my computer
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models

@@ -5,6 +5,8 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
+import itertools
+
 
 @wrap_testbook("discrete_quantum_walk_circle", timeout_seconds=800)
 def test_notebook(tb: TestbookNotebookClient) -> None:
