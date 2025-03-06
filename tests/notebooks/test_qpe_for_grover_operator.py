@@ -8,8 +8,40 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("qpe_for_grover_operator", timeout_seconds=2000)  # bump from 1000
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # the `qmod`s and `qprog`s are in a for-loop
-    # need to rewrite the notebook in order to test them
+    # test models
+    for qmod in itertools.chain(
+        tb.ref("qmods"),
+        tb.ref("qmods_width"),
+        tb.ref("qmods_cx"),
+    ):
+        validate_quantum_model(qmod)
+
+    # test quantum programs
+    """
+    classiq depths: [866, 2596, 6056, 12976, 26816]
+    classiq cx_counts: [513, 1544, 3600, 7713, 15929]
+    classiq widths: [6, 7, 8, 9, 10]
+    """
+    for qprog in tb.ref("qprogs_width"):
+        validate_quantum_program_size(
+            qprog,
+            expected_width=None,
+            expected_depth=None,
+        )
+    """
+    classiq depths: [426, 1272, 2926, 6196, 13015]
+    classiq cx_counts: [241, 722, 1664, 3523, 7384]
+    classiq widths: [15, 18, 21, 24, 27]
+    """
+    for qprog, expected_max_width in zip(
+        tb.ref("qprogs_cx"),
+        tb.ref("qmod_cx_max_width"),
+    ):
+        validate_quantum_program_size(
+            qprog,
+            expected_width=expected_max_width,
+            expected_depth=None,
+        )
 
     # test notebook content
     for depth_classiq_optimize_depth, depth_classiq_optimize_width, depth_qiskit in zip(
