@@ -5,6 +5,8 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
+import numpy as np
+
 
 @wrap_testbook("hamiltonian_simulation_with_block_encoding", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
