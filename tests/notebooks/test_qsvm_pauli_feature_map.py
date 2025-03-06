@@ -5,13 +5,8 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
-import numpy as np
 
-
-@wrap_testbook(
-    "qsvm_pauli_feature_map",
-    timeout_seconds=68,
-)
+@wrap_testbook("qsvm_pauli_feature_map", timeout_seconds=68)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for a hybrid classical quantum neural network.

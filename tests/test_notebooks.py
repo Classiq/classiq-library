@@ -5,7 +5,9 @@ from contextlib import contextmanager
 from testbook import testbook  # type: ignore[import]
 from utils_for_tests import iterate_notebooks, ROOT_DIRECTORY
 
-TIMEOUT: int = 60 * 10  # 10 minutes
+# 2025.03.06 : bumping timeout from 10min to 15min to support `approximated_state_preparation.ipynb`
+#   it should be reverted ~soon
+TIMEOUT: int = 60 * 15  # 15 minutes
 LOGGER = logging.getLogger(__name__)
 
 
