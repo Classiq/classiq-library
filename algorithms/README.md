@@ -1,6 +1,6 @@
 # Quantum Algorithms Implementations
 
-This page gathers paper implementations for both canonical and recent works, that
+This page gathers implementations for both canonical and recent works, that
 include concrete quantum algorithms. Researchers are invited to add their work
 to the table. We also encourage the community to add implementations to papers listed
 in the table or to add new ones.
