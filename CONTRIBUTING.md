@@ -9,6 +9,8 @@ We love your input! We want to make contributing to this project as easy and tra
 
 We are **always available to help**—feel free to reach out via [GitHub Discussions](https://github.com/Classiq/classiq-library/discussions) or within the [Classiq Slack Community](https://short.classiq.io/join-slack).
 
+Please note that we accept high-quality implementations to our repository and will be glad to accept a contribution that meets our standards.
+
 ## We Develop with GitHub  
 
 We use GitHub to host code, track issues and feature requests, and accept pull requests.  
