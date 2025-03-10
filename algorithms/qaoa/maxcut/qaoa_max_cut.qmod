@@ -1,0 +1,22 @@
+qfunc mixer_layer(beta: real, qba: qbit[]) {
+  apply_to_all(lambda(q) {
+    RX(beta, q);
+  }, qba);
+}
+
+qfunc qaoa_ansatz(cost_layer: qfunc (real, qbit[]), num_layers: int, gammas: real[], betas: real[], qba: qbit[]) {
+  hadamard_transform(qba);
+  repeat (i: num_layers) {
+    cost_layer(gammas[i], qba);
+    mixer_layer(betas[i], qba);
+  }
+}
+
+qfunc maxcut_cost_layer(gamma: real, v: qbit[]) {
+  phase (-((-((((((0 + ((v[0] * (1 - v[1])) + (v[1] * (1 - v[0])))) + ((v[0] * (1 - v[2])) + (v[2] * (1 - v[0])))) + ((v[1] * (1 - v[2])) + (v[2] * (1 - v[1])))) + ((v[1] * (1 - v[3])) + (v[3] * (1 - v[1])))) + ((v[2] * (1 - v[4])) + (v[4] * (1 - v[2])))) + ((v[3] * (1 - v[4])) + (v[4] * (1 - v[3]))))) / 6), gamma);
+}
+
+qfunc main(params: real[8], output v: qbit[5]) {
+  allocate(v.size, v);
+  qaoa_ansatz(maxcut_cost_layer, 4, params[0:4], params[4:8], v);
+}
