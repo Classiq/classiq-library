@@ -6,10 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook(
-    "qgan_bars_and_strips",
-    timeout_seconds=360,
-)
+@wrap_testbook("qgan_bars_and_strips", timeout_seconds=360)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for a hybrid classical quantum neural network.

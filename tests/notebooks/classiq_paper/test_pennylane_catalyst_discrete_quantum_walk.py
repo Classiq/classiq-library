@@ -6,8 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("quantum_volume", timeout_seconds=516)
+@wrap_testbook("pennylane_catalyst_discrete_quantum_walk", timeout_seconds=300)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # need to rewrite the notebook
-    # everything is inside functions, it's hard to test it
-    pass
+    # the notebook is empty, there's nothing to test
+    pass  # TODO

@@ -6,21 +6,22 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("3_sat_grover", timeout_seconds=36)
+@wrap_testbook("arithmetic_expressions", timeout_seconds=40)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
-    validate_quantum_model(tb.ref("qmod_large"))
+    validate_quantum_model(tb.ref("qmod_1"))
+    validate_quantum_model(tb.ref("qmod_2"))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog"),
-        expected_width=10,  # actual width: 10
-        expected_depth=450,  # actual depth: 429
+        tb.ref("qprog_1"),
+        expected_width=tb.ref("NUM_QUBITS_1"),
+        expected_depth=380,  # actual depth: 321
     )
     validate_quantum_program_size(
-        tb.ref("qprog_large"),
-        expected_width=20,  # actual width: 19
-        expected_depth=2500,  # actual depth: 2375
+        tb.ref("qprog_2"),
+        expected_width=tb.ref("NUM_QUBITS_2"),
+        expected_depth=270,  # actual depth: 228
     )
 
     # test notebook content

@@ -8,10 +8,7 @@ from testbook.client import TestbookNotebookClient
 import numpy as np
 
 
-@wrap_testbook(
-    "qsvt_matrix_inversion",
-    timeout_seconds=180,
-)
+@wrap_testbook("qsvt_matrix_inversion", timeout_seconds=180)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for a hybrid classical quantum neural network.

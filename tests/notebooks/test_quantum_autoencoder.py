@@ -6,10 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook(
-    "quantum_autoencoder",
-    timeout_seconds=120,
-)
+@wrap_testbook("quantum_autoencoder", timeout_seconds=120)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for a hybrid classical quantum neural network.
