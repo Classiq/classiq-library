@@ -5,6 +5,8 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
+import itertools
+
 
 @wrap_testbook(
     "qpe_for_grover_operator", timeout_seconds=3600
