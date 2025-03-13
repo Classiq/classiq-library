@@ -12,10 +12,7 @@ LOGGER = logging.getLogger(__name__)
 def test_notebooks() -> None:
     for notebook_path in iterate_notebooks():
         # a patch, which should be removed soon:
-        if (
-            str(notebook_path)
-            == "tutorials/technology_demonstrations/approximated_state_preparation/approximated_state_preparation.ipynb"
-        ):
+        if os.path.basename(notebook_path) == "approximated_state_preparation.ipynb":
             LOGGER.info(f"Skipping notebook {notebook_path}")
             continue
 
