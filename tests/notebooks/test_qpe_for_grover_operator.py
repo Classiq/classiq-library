@@ -39,7 +39,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     for qprog, expected_max_width in zip(
         tb.ref("qprogs_cx"),
-        tb.ref("qmod_cx_max_width"),
+        tb.ref("qmods_cx_max_width"),
     ):
         validate_quantum_program_size(
             qprog,
