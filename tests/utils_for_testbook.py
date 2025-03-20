@@ -18,6 +18,8 @@ from testbook.client import TestbookNotebookClient
 
 _PATCHED = False
 
+TESTED_NOTEBOOKS: list[str] = []
+
 
 def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
     def inner_decorator(func: Callable) -> Any:
@@ -26,6 +28,7 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
         notebook_path = resolve_notebook_path(notebook_name)
 
         for decorator in [
+            _build_mark_as_tested(notebook_name),
             testbook(notebook_path, execute=True, timeout=timeout_seconds),
             _build_cd_decorator(notebook_path),
             _build_skip_decorator(notebook_path),
@@ -60,6 +63,19 @@ def _build_skip_decorator(notebook_path: str) -> Callable:
         should_skip_notebook(notebook_name),
         reason="Didn't change",
     )
+
+
+def _build_mark_as_tested(notebook_name: str) -> Callable:
+    def mark_as_tested_decorator(func: Callable) -> Any:
+        def inner(*args: Any, **kwargs: Any) -> Any:
+            try:
+                func(*args, **kwargs)
+            finally:
+                TESTED_NOTEBOOKS.append(notebook_name)
+
+        return inner
+
+    return mark_as_tested_decorator
 
 
 def _patch_testbook() -> None:
