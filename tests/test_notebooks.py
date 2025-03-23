@@ -16,7 +16,6 @@ def test_notebooks() -> None:
             "approximated_state_preparation.ipynb",
             "qpe_for_grover_operator.ipynb",
             "logical_qubits_by_alice_and_bob.ipynb",
-            "testing_skip.ipynb",
         ]:
             LOGGER.info(f"Skipping notebook {notebook_path}")
             continue
