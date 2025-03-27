@@ -11,10 +11,10 @@ qfunc suzuki_trotter1_with_power_logic(hamiltonian: PauliTerm[], pw: int, r0: in
 qfunc main(output phase_result: qnum<8, False, 8>) {
   state: qbit[];
   prepare_amplitudes([
-    0.667440796614848,
-    0.024885482173617,
-    0.368323359032267,
-    0.646715856448805
+    0.642611096645452,
+    0.203616720482687,
+    0.736833832279323,
+    0.0516441014693
   ], 0.0, state);
   allocate_num(8, False, 8, phase_result);
   qpe_flexible(lambda(pw) {
@@ -40,7 +40,7 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
         ],
         [
           (0.010207121446984 - 0.087597188034849j),
-          ((-0.073057977274841) + 0.151444613535273j),
+          ((-0.07305797727484) + 0.151444613535273j),
           ((-0.026023894036146) + 0.012295427374176j),
           ((-0.895413431349899) - 0.401691392328609j)
         ]

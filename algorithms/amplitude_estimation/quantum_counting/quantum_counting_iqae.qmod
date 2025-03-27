@@ -10,19 +10,6 @@ qstruct IQAEVars {
   ind: qbit;
 }
 
-qfunc iqae_oracle(vars: IQAEVars) {
-  Z(vars.ind);
-}
-
-qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
-  res ^= (a + b) <= 2;
-}
-
-qfunc iqae_state_preparation(vars: IQAEVars) {
-  hadamard_transform(vars.state);
-  arith_equation(vars.state.a, vars.state.b, vars.ind);
-}
-
 qfunc reflection_about_zero(x: qbit[]) {
   lsb: qbit;
   msbs: qbit[x.len - 1];
@@ -56,6 +43,19 @@ qfunc my_iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfun
   power (k) {
     my_grover_operator(oracle_operand, sp_operand, x);
   }
+}
+
+qfunc iqae_oracle(vars: IQAEVars) {
+  Z(vars.ind);
+}
+
+qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
+  res ^= (a + b) <= 2;
+}
+
+qfunc iqae_state_preparation(vars: IQAEVars) {
+  hadamard_transform(vars.state);
+  arith_equation(vars.state.a, vars.state.b, vars.ind);
 }
 
 qfunc main(k: int, output ind_reg: qbit) {
