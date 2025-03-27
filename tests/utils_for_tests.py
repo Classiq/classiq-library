@@ -7,7 +7,7 @@ ROOT_DIRECTORY = Path(__file__).parents[1]
 
 def iterate_notebooks() -> list[str]:
     if os.environ.get("SHOULD_TEST_ALL_FILES", "") == "true":
-        notebooks_to_test = _get_all_notebooks()
+        notebooks_to_test = get_all_notebooks()
     else:
         notebooks_to_test = os.environ.get("LIST_OF_IPYNB_CHANGED", "").split()
 
@@ -19,8 +19,10 @@ def iterate_notebook_names() -> list[str]:
     return list(map(os.path.basename, iterate_notebooks()))
 
 
+# do not use `get_all_notebooks` unless you're sure it's the right one.
+# 95% of the tests would use `iterate_notebooks`
 @lru_cache
-def _get_all_notebooks(
+def get_all_notebooks(
     directory: Path = ROOT_DIRECTORY, suffix: str = ".ipynb"
 ) -> list[str]:
     return [
