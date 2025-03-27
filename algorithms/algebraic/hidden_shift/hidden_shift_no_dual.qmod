@@ -1,3 +1,11 @@
+qfunc hidden_shift_no_dual(oracle: qfunc (qbit[], qbit), oracle_shifted: qfunc (qbit[], qbit), target: qbit[], ind: qbit) {
+  hadamard_transform(target);
+  oracle(target, ind);
+  Z(ind);
+  oracle_shifted(target, ind);
+  hadamard_transform(target);
+}
+
 qfunc f_qfunc(vars: qbit[16], res: qbit) {
   x: qbit[8];
   y: qbit[8];
@@ -12,14 +20,6 @@ qfunc g_qfunc(vars: qbit[16], res: qbit) {
   vars -> {x, y};
   res ^= ((((((((x[0] & y[3]) ^ ((x[1] ^ 1) & y[6])) ^ (x[2] & (y[1] ^ 1))) ^ ((x[3] ^ 1) & y[5])) ^ (x[4] & y[7])) ^ (x[5] & y[0])) ^ (x[6] & y[4])) ^ (x[7] & y[2])) ^ (((((((y[0] & (y[1] ^ 1)) & y[2]) & y[3]) & y[4]) & y[5]) & y[6]) & y[7]);
   {x, y} -> vars;
-}
-
-qfunc hidden_shift_no_dual(oracle: qfunc (qbit[], qbit), oracle_shifted: qfunc (qbit[], qbit), target: qbit[], ind: qbit) {
-  hadamard_transform(target);
-  oracle(target, ind);
-  Z(ind);
-  oracle_shifted(target, ind);
-  hadamard_transform(target);
 }
 
 qfunc main(output target: qbit[], output ind: qbit) {
