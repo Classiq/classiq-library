@@ -1,7 +1,3 @@
-qfunc complex_predicate(x: qnum, res: qbit) {
-  res ^= max(x ^ 4, x & 3) >= 4;
-}
-
 qfunc prep_minus(output out: qbit) {
   allocate(1, out);
   X(out);
@@ -23,6 +19,10 @@ qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
     predicate(x, y);
   }, x);
   hadamard_transform(x);
+}
+
+qfunc complex_predicate(x: qnum, res: qbit) {
+  res ^= max(x ^ 4, x & 3) >= 4;
 }
 
 qfunc main(output x: qnum) {

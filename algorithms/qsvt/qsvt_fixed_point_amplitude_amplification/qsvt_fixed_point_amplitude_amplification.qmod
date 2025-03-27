@@ -4,10 +4,6 @@ qstruct OracleVars {
   c: qnum<3, False, 0>;
 }
 
-qfunc arith_equation(state: OracleVars, res: qbit) {
-  res ^= ((state.a + state.b) == 3) and ((state.c - state.a) == 2);
-}
-
 qfunc my_qsvt_step(phase1: real, phase2: real, proj_ctrl_phase_1: qfunc (real, qbit[], qbit), proj_ctrl_phase_2: qfunc (real, qbit[], qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
   u(state);
   proj_ctrl_phase_2(phase1, state, aux);
@@ -55,35 +51,39 @@ qfunc qsvt_fpaa(phase_seq: real[], arith_oracle: qfunc (qbit[], qbit), state: qb
   }, state, aux);
 }
 
+qfunc arith_equation(state: OracleVars, res: qbit) {
+  res ^= ((state.a + state.b) == 3) and ((state.c - state.a) == 2);
+}
+
 qfunc main(output state: OracleVars, output aux: qbit) {
   allocate(state.size, state);
   hadamard_transform(state);
   qsvt_fpaa([
-    4.4887,
-    3.349,
-    3.2901,
-    3.0355,
-    3.7585,
-    3.3036,
-    1.5241,
-    4.555,
-    3.722,
-    1.8864,
-    3.4246,
-    4.2507,
-    0.7036,
-    0.7036,
-    4.2507,
-    3.4246,
-    1.8864,
-    3.722,
-    4.555,
-    1.5241,
-    3.3036,
-    3.7585,
-    3.0355,
-    3.2901,
-    3.349,
-    (-77.1927)
+    3.9712,
+    1.6315,
+    1.2479,
+    8.7026,
+    (-2.7098),
+    4.1489,
+    3.9036,
+    4.3047,
+    3.3333,
+    4.1012,
+    2.3609,
+    4.5852,
+    0.8085,
+    0.8085,
+    4.5852,
+    2.3609,
+    4.1012,
+    3.3333,
+    4.3047,
+    3.9036,
+    4.1489,
+    3.5734,
+    2.4194,
+    1.2479,
+    1.6315,
+    (-77.7103)
   ], arith_equation, state, aux);
 }

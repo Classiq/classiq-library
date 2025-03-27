@@ -1,7 +1,3 @@
-qfunc simple_predicate(x: qnum, res: qbit) {
-  res ^= x > 7;
-}
-
 qfunc prep_minus(output out: qbit) {
   allocate(1, out);
   X(out);
@@ -23,6 +19,10 @@ qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
     predicate(x, y);
   }, x);
   hadamard_transform(x);
+}
+
+qfunc simple_predicate(x: qnum, res: qbit) {
+  res ^= x > 7;
 }
 
 qfunc main(output x: qnum) {
