@@ -45,7 +45,7 @@ def distance(p1: CArray[CBool], p2:CArray[CBool]):
 def increment(l: CArray[CBool]) -> CArray[CBool]:
     next = l.copy()
     #flip True (1) to False (0) until we hit a False(0); then flip and break.
-    for i in range (len(next)-1, -1, -1):
+    for i in range (len(next)):
         if not next[i]:
             next[i] = True
             break
@@ -53,12 +53,12 @@ def increment(l: CArray[CBool]) -> CArray[CBool]:
             next[i] = False
     return next
 
-#Translate integer n into a length-m bitstring.
+#Translate integer n into a length-m little-endian bitstring.
 def to_node(n: int, m: int) -> list[bool]:
-    return  [((n >> (m-i-1)) % 2 == 1) for i in range(m)]
+    return  [((n >> i) % 2 == 1) for i in range(m)]
 
 def to_num(node: list[bool]):
-    return sum(node[i] << len(node)-i-1 for i in range(len(node)))
+    return sum(node[i] << i for i in range(len(node)))
 
 #reverse the bits in n, flipping its endian-ness.
 def reverse_endian(n: int, m: int):
@@ -71,6 +71,7 @@ def reverse_endian(n: int, m: int):
 
 #step to the next node in the tree, where xs are inputs and qs are ancillas.
 #Precondition 1 < |bs| = |xs| = |qs| + 1.
+#Childs' version is big-endian: we want little-endian...
 @qfunc(generative=True)
 def stepRight(n:CArray[CBool], xs:QArray, qs:QArray) -> None:
     assert xs.len == qs.len + 1
@@ -81,36 +82,25 @@ def stepRight(n:CArray[CBool], xs:QArray, qs:QArray) -> None:
                 return
             #1 -> triangle step
             case 1:
-                #q0 = qs[-1]
-                #q1 = qs[-2]
-                CX(qs[qs.len-2],qs[qs.len-1])
+                CX(qs[1], qs[0])
                 return
             #2 -> diamond step
             case 2:
-                #q0 = qs[-1]
-                #q1 = qs[-2]
-                #q2 = qs[-3]
-                #x0 = xs[-1]
-                control(ctrl=qs[qs.len-2], stmt_block=lambda: X(qs[qs.len-1]))
-                tof_CT(True, False, qs[qs.len-3], xs[xs.len-1], qs[qs.len-1])
-                control(ctrl=qs[qs.len-3], stmt_block=lambda: X(qs[qs.len-2]))
+                CX(qs[1], qs[0])
+                tof_CT(True, False, qs[2], xs[0], qs[0])
+                CX(qs[2], qs[1])
                 return
             #else recurse
             case _:
-                #note: "init" means [:-1]
-                #x0 = xs[-1]
+                #note: "init" means [:-1]; but we're reversing, so...
                 x0 = QBit()
-                #xss = xs[:-1]
                 xss = QArray("xss", QBit, xs.size-1)
-                bind(xs,[xss,x0])
-                #q0 = qs[-1]
+                bind(xs,[x0,xss])
                 q0 = QBit()
-                #q1 = qs[-2]
                 q1 = QBit()
-                #qss = qs[:-1]
                 qsss = QArray("qsss", QBit, qs.size-2)
-                bind(qs,[qsss,q1,q0])
-                m = n[:n.len-1]
+                bind(qs,[q0,q1,qsss])
+                m = n[1:]
             
                 H(q0)
                 TDG(q1)
@@ -123,9 +113,9 @@ def stepRight(n:CArray[CBool], xs:QArray, qs:QArray) -> None:
 
                 SDG(q0)
                 qss = QArray("qss", QBit, qs.size-1)
-                bind([qsss,q1],qss)
+                bind([q1,qsss],qss)
                 stepRight_aux(m,xss,qss)
-                bind(qss,[qsss,q1])
+                bind(qss,[q1,qsss])
 
                 T(q1)
                 CX(x0,q1)
@@ -136,8 +126,8 @@ def stepRight(n:CArray[CBool], xs:QArray, qs:QArray) -> None:
                 TDG(q1)
                 H(q0)
 
-                bind([qsss,q1,q0], qs)
-                bind([xss,x0],xs)
+                bind([q0,q1,qsss], qs)
+                bind([x0,xss],xs)
         return
 
     x0 = QBit()
@@ -145,10 +135,10 @@ def stepRight(n:CArray[CBool], xs:QArray, qs:QArray) -> None:
     qs_aux = QArray("qs_aux", QBit, qs.size+1)
     within_apply(
         lambda : [
-            bind(xs, [x0, xss]),
-            bind([x0, qs], qs_aux)
+            bind(xs, [xss, x0]),
+            bind([qs, x0], qs_aux)
         ],
-        #tail xs, (head xs : qs)
+        #tail xs, (head xs : qs) but reversed
         lambda : stepRight_aux(n, xss, qs_aux)
     )
     return
@@ -162,14 +152,15 @@ def walkDown(bs: CArray[CBool], xs: QArray, qs: QArray) -> None:
         if(len(bs)==0):
             return
         elif(len(bs)==1):
-            tof_CT(bs[0], True, xs[0], qs[0], qs[1])
+            tof_CT(bs[bs.len-1], True, xs[xs.len-1], qs[qs.len-1], qs[qs.len-2])
+            #walkDown_aux(bs[0:bs.len-1], xs[0:xs.len-1], qs[0:qs.len-1])
         else:
-            tof_CT(bs[0], True, xs[0], qs[0], qs[1])
-            walkDown_aux(bs[1:], xs[1:xs.len], qs[1:qs.len])
+            tof_CT(bs[bs.len-1], True, xs[xs.len-1], qs[qs.len-1], qs[qs.len-2])
+            walkDown_aux(bs[0:bs.len-1], xs[0:xs.len-1], qs[0:qs.len-1])
         return
 
-    tof_CT(bs[0], bs[1], xs[0], xs[1], qs[0])
-    walkDown_aux(bs[2:], xs[2:xs.len], qs)
+    tof_CT(bs[bs.len-1], bs[bs.len-2], xs[xs.len-1], xs[xs.len-2], qs[qs.len-1])
+    walkDown_aux(bs[0:bs.len-2], xs[0:xs.len-2], qs)
 
 
 
@@ -186,17 +177,17 @@ def walkUp(bs: CArray[CBool], xs: QArray, qs: QArray) -> None:
 def controlled_selectV(ops: QCallableList[QBit, QArray[QBit]], q: QBit, xs: QArray, target: QArray) -> None:
     m = ops.len
     n = xs.size
-    start = [True] + to_node(0,n)
-    end = [True] + to_node((m-1),n)
+    start = to_node(0,n) + [True]
+    end =  to_node((m-1),n) + [True]
 
     #Operand lists don't support slicing?!
     @qfunc(generative=True)
     def applyAndStep(ops: QCallableList[QBit, QArray[QBit]], opsindex: CInt, start: CArray[CBool], end: CArray[CBool], xs: QArray, qs: QArray, target: QArray)  -> None:
         if (start == end):
-            ops[opsindex](qs[qs.len-1], target)
+            ops[opsindex](qs[0], target)
             return
         else:
-            ops[opsindex](qs[qs.len-1], target)
+            ops[opsindex](qs[0], target)
             stepRight(start, xs, qs)
             #applyAndStep(ops[1:ops.len], increment(start), end, xs, qs, target)
             applyAndStep(ops, opsindex+1, increment(start), end, xs, qs, target)
@@ -208,7 +199,7 @@ def controlled_selectV(ops: QCallableList[QBit, QArray[QBit]], q: QBit, xs: QArr
     xsp = QArray("xs'", QBit, n + 1)
     qs = QArray("qs", QBit, n)
     within_apply(
-        lambda: bind([q,xs], xsp),
+        lambda: bind([xs,q], xsp),
         #with_ancilla_list n $ \qs-> do...
         #creates n ancillas in 0 and uses as qs in the function following.
         lambda: within_apply(
