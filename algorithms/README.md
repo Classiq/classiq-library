@@ -40,7 +40,7 @@ in the table or to add new ones.
     <tr>
         <td><a href="https://arxiv.org/abs/1411.4028" target="_blank">A Quantum Approximate Optimization Algorithm</a></td>
         <td>
-          <a href="../applications/optimization/max_cut/max_cut.ipynb">Max Cut Problem</a>
+          <a href="../algorithms/qaoa/maxcut/qaoa_maxcut.ipynb">Max Cut Problem</a>
         </td>
         <td>QAOA for combinatorial optimization problems</td>
         <td>#qaoa #optimization</td>
