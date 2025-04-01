@@ -4,8 +4,8 @@
 
 This folder provides working implementations of the state preparation algorithm proposed in the paper, with a particular focus on Gaussian state preparation.
 Each notebook varies parameters resolution and exp_rate. For example:
-- `resolution=6`, `exp_rate=1`: [stateprep_gaussian_n6_rate1.ipynb](./stateprep_gaussian_n6_rate1.ipynb)
-- `resolution=7`, `exp_rate=2`: [stateprep_gaussian_n7_rate2.ipynb](./stateprep_gaussian_n7_rate2.ipynb)
+- `resolution=6`, `exp_rate=1`: [stateprep_gaussian_n6_rate1.ipynb](./stateprep_guassian_n6_rate1.ipynb)
+- `resolution=7`, `exp_rate=2`: [stateprep_gaussian_n7_rate2.ipynb](./stateprep_guassian_n7_rate2.ipynb)
 
 
 Additional files:
