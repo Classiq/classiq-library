@@ -9,7 +9,7 @@ We appreciate your input! Contributing to this project should be easy, clear, an
 
 We are always available to help — feel free to reach out via [GitHub Discussions](https://github.com/Classiq/classiq-library/discussions) or the [Classiq Slack Community](https://short.classiq.io/join-slack).
 
-We welcome high-quality contributions that follow our standards and help grow the Classiq ecosystem.
+We welcome high-quality contributions that follow our standards and can serve the quantum ecosystem.
 
 ---
 
@@ -34,13 +34,13 @@ We use [GitHub Flow](https://guides.github.com/introduction/flow/index.html), an
 
 ### Submission Guidelines
 
-1. **Start with an Issue**
+1. **Start with an Issue** -
    Open an issue to discuss your proposed change. This helps align efforts, avoid duplication, and ensure your contribution fits the project's goals.
 
-2. **Fork and Branch**
+2. **Fork and Branch** -
    Fork the repository and create a new branch from `main`.
 
-3. **Rebase Only (No Merge Commits)**
+3. **Rebase Only (No Merge Commits)** -
    We maintain a clean, linear commit history via rebase-only.
 
    - If your branch includes merge commits, please rebase it or create a fresh branch.
@@ -58,13 +58,13 @@ We use [GitHub Flow](https://guides.github.com/introduction/flow/index.html), an
 
 To keep the library organized and functional, please follow these standards:
 
-- **Place Files Correctly**
+- **Place Files Correctly** -
   Add new content to the appropriate folder: `algorithms/`, `applications/`, or `tutorials/`.
 
-- **Use `.ipynb` Format**
+- **Use `.ipynb` Format** -
   All contributions should be in Jupyter Notebook format unless agreed otherwise with a maintainer.
 
-- **Include Required Support Files**
+- **Include Required Support Files** -
   Each notebook must be accompanied by:
   - `file_name.qmod`
   - `file_name.synthesis_options.json`
@@ -104,7 +104,7 @@ To pass CI, you must add a timeout for your notebook in:
 
 ---
 
-## Before You Submit Checklist
+## Before-You-Submit Checklist
 
 - [ ] Your notebook runs successfully with the latest Classiq version
 - [ ] Required files are included: `.qmod`, `.synthesis_options.json`, `.metadata.json`
