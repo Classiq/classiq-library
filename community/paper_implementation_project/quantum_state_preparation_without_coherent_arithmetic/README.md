@@ -17,7 +17,7 @@ Additional files:
 ### Difference from paper
 
 In our implementation, we observed that the formula for the target amplitude—used prior to applying `exact_amplitude_amplification`—did not produce the expected results.
-To address this, we performed a numerical analysis using Newton’s method and found that **multiplying the amplitude from the paper by a factor of 1.5** led to improved agreement with the intended state.
+To address this, we performed a numerical analysis using Newton’s method and found that **multiplying the amplitude from the paper by a factor of 1.45** led to improved agreement with the intended state.
 
 The notebook `materials/finding_exact_amplitue.ipynb` documents this investigation and provides supporting numerical evidence.
 This difference may be due to implementation-specific details or implicit assumptions in the paper that differ from our setting.
