@@ -4,20 +4,19 @@ on:
   pull_request_target:
     branches:
       - main
-      - dev
     types:
       - closed
 
 jobs:
   deploy-prod:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/Utils-deployment-qmod.yml
     with:
       deploy-mode: production
     secrets: inherit
 
-  deploy-dev:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev'
+  deploy-staging:
+    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/Utils-deployment-qmod.yml
     with:
       deploy-mode: staging

@@ -6,6 +6,7 @@ import yaml
 
 ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
 PATHS_FOR_DOCS = ROOT / ".internal" / "paths_for_docs.yaml"
+DOCS_DIRECTORIES = ROOT / ".internal" / "docs_directories.txt"
 
 """
 This test checks if all paths in the files_to_copy_for_docs.yaml file exist.
@@ -26,3 +27,8 @@ def test_paths_to_copy_for_docs():
             missing_paths.append(path)
 
     assert not missing_paths, f"The following paths do not exist: {missing_paths}"
+
+
+def test_docs_directories():
+    dir_list = DOCS_DIRECTORIES.read_text().splitlines()
+    assert all((ROOT / path).exists() for path in dir_list), f"Make sure all directories in {DOCS_DIRECTORIES} actually exist"

@@ -1,0 +1,97 @@
+name: "Test CI (daily)"
+
+on:
+  # Schedule the workflow to run every day at 19:00 UTC
+  schedule:
+    - cron: "00 19 * * *"
+
+  # Add a manual trigger option for running the workflow
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  nightly-test:
+    permissions:
+      id-token: write
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Debug
+        run: git status
+
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
+      - name: Install dependencies
+        run: |
+          set -e
+          python -m pip install -U pip \
+              --extra-index-url https://pypi.org/simple
+          # Install "classiq" separately
+          export CODEARTIFACT_AUTH_TOKEN="$( \
+              aws codeartifact get-authorization-token \
+              --domain ${{ secrets.CODEARTIFACT_DOMAIN }} \
+              --domain-owner ${{ secrets.CODEARTIFACT_OWNER }} \
+              --region ${{ secrets.CODEARTIFACT_REGION }} \
+              --query authorizationToken \
+              --output text \
+          )"
+          python -m pip install -U --pre \
+              --extra-index-url "https://aws:$CODEARTIFACT_AUTH_TOKEN@${{ secrets.CODEARTIFACT_DOMAIN }}-${{ secrets.CODEARTIFACT_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/pypi/${{ secrets.PYPI_NIGHTLY_NAME }}/simple/" \
+              --extra-index-url https://pypi.org/simple \
+              classiq
+          # Install everything from the requirements, other than "classiq".
+          python -m pip install -U $(grep -ivE "classiq" requirements.txt) \
+              --extra-index-url https://pypi.org/simple
+          python -m pip install -U -r requirements_tests.txt \
+              --extra-index-url https://pypi.org/simple
+
+      - name: Install couenne solver
+        env:
+          COUENNE_SOURCE: "s3://public-library-resources/couenne.gz"
+          COUENNE_FILE: ${{ runner.temp }}/couenne.gz
+          LOCAL_BIN: ${{ runner.temp }}/.local/bin
+        run: |
+          set -eux
+          aws s3 cp "$COUENNE_SOURCE" "$COUENNE_FILE"
+          mkdir -p "$LOCAL_BIN"
+          echo "$LOCAL_BIN" >>"$GITHUB_PATH"
+          gzip -dc "$COUENNE_FILE" >"${LOCAL_BIN}/couenne"
+          chmod ugo+x "${LOCAL_BIN}/couenne"
+
+      # Set authentication with M2M token
+      - name: Set authentication
+        run: .github/scripts/get_m2m_token.sh
+        env:
+          IS_DEV: "true"
+          M2M_SECRET_ARN: "${{ secrets.NIGHTLY_M2M_SECRET_ARN }}"
+
+      # Run Notebook Tests
+      - name: Run Notebooks
+        run: python -m pytest --log-cli-level=INFO --durations=0 tests
+        env:
+          # to disable a warning in Jupyter notebooks
+          JUPYTER_PLATFORM_DIRS: "1"
+          # Passing which notebooks changed
+          SHOULD_TEST_ALL_FILES: "true"
+          # Passing environment information
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://staging.api.classiq.io"

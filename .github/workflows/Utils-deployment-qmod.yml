@@ -48,7 +48,7 @@ jobs:
             staging)
               ENVIRONMENT=staging
               QMOD_BUCKET="qmod-library-nightly"
-              BRANCH="dev"
+              BRANCH="main"
               ;;
             *)
               echo unknown
@@ -106,30 +106,3 @@ jobs:
           set -e
           aws s3 sync "$QMOD_DIR" "s3://${QMOD_BUCKET}/latest" \
           --delete --exclude "*" --include "qmod_metadata.json" --include "*.qmod" --include "*.synthesis_options.json"
-
-  create_pr_for_next_deployment:
-    needs: main
-    name: Create PR for next deployment
-    runs-on: ubuntu-24.04
-    if: inputs.deploy-mode == 'production'
-    permissions:
-      id-token: write
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: "false"
-          ref: dev
-
-      - name: Update release log
-        run: |
-          date --iso-8601=minutes >> .github/release_log.txt
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          title: "[CI] Merge dev into main"
-          branch: dev
-          base: main

@@ -24,3 +24,30 @@ repos:
     rev: 1.8.4
     hooks:
       - id: nbqa-isort
+
+  - repo: local
+    hooks:
+      - id: notebook-pre-commit
+        name: Notebook pre commit collection
+        description: Ensure notebooks conventions
+        entry: .internal/pre_commit_tools/notebook_pre_commit_collection.py
+        language: python
+        files: ^\S+\.ipynb$
+        additional_dependencies:
+          - "pyyaml==6.0"
+      - id: qmod-pre-commit
+        name: Qmod pre commit collection
+        description: Ensure qmods conventions
+        entry: .internal/pre_commit_tools/qmod_pre_commit_collection.py
+        language: python
+        files: ^\S+\.qmod$
+        additional_dependencies:
+          - "pyyaml==6.0"
+      - id: clean-demo-timeouts
+        name: Clean demo timeouts
+        description: Remove unexisting entries and verify unique keys
+        entry: .internal/pre_commit_tools/clean_timeouts.py
+        language: python
+        files: ^\S+\.(qmod|ipynb|yaml)$
+        additional_dependencies:
+          - "pyyaml==6.0"

@@ -141,14 +141,14 @@ jobs:
       #
       - name: Get changed notebook files
         id: changed-files-ipynb
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46.0.1
         with:
           files: |
             **/*.ipynb
 
       # Run Notebook Tests
       - name: Run Notebooks
-        run: python -m pytest --log-cli-level=INFO tests
+        run: python -m pytest --log-cli-level=INFO --durations=0 tests
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
