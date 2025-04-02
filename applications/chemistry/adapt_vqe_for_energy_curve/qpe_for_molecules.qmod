@@ -542,7 +542,7 @@ qfunc powered_st2_for_LiH(p: int, state: qbit[]) {
   ], ((-2) * pi) * p, 2, ceiling(0.05 * (p ** 1.5)), state);
 }
 
-qfunc main(output state: qbit[], output phase: qnum<7, SIGNED, 7>) {
+qfunc main(output state: qbit[], output phase: qnum<5, SIGNED, 5>) {
   allocate(6, state);
   molecule_hartree_fock(MoleculeProblem {
     mapping=FermionMapping::JORDAN_WIGNER,
@@ -564,7 +564,7 @@ qfunc main(output state: qbit[], output phase: qnum<7, SIGNED, 7>) {
     freeze_core=True,
     remove_orbitals=[]
   }, state);
-  allocate(7, phase);
+  allocate(5, phase);
   qpe_flexible(lambda(p) {
     powered_st2_for_LiH(p, state);
   }, phase);
