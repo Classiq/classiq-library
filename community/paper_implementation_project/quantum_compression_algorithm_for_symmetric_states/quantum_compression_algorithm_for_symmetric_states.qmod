@@ -1,0 +1,392 @@
+qfunc apply_matrix_expanded___0(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q0, q1, q2} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0.5774, 0, 0, 0.8165, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [
+      0,
+      0,
+      0.8165,
+      0,
+      0,
+      (-0.5774),
+      0,
+      0
+    ],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q0, q1, q2};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_Uab_expanded___0(q: qbit[5]) {
+  apply_matrix_expanded___0(q);
+}
+
+qfunc apply_matrix_expanded___1(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q0, q1, q2} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0.8165, 0, 0, 0.5774, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [
+      0,
+      (-0.5774),
+      0,
+      0,
+      0.8165,
+      0,
+      0,
+      0
+    ],
+    [0, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q0, q1, q2};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_Uf_expanded___0(q: qbit[5]) {
+  apply_matrix_expanded___1(q);
+}
+
+qfunc apply_matrix_expanded___2(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q0, q1, q3} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0.7071, 0, 0, 0.7071, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [
+      0,
+      0,
+      0.7071,
+      0,
+      0,
+      (-0.7071),
+      0,
+      0
+    ],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q0, q1, q3};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_matrix_expanded___3(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q1, q2, q3} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0.5, 0, 0, 0.866, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0.866, 0, 0, (-0.5), 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q1, q2, q3};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_Uab_expanded___1(q: qbit[5]) {
+  apply_matrix_expanded___2(q);
+  apply_matrix_expanded___3(q);
+}
+
+qfunc apply_matrix_expanded___4(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q0, q2, q3} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0.866, 0, 0, 0.5, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, (-0.5), 0, 0, 0.866, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q0, q2, q3};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_Uf_expanded___1(q: qbit[5]) {
+  apply_matrix_expanded___4(q);
+}
+
+qfunc apply_matrix_expanded___5(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q0, q1, q4} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0.7746, 0, 0, 0.6325, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [
+      0,
+      0,
+      0.6325,
+      0,
+      0,
+      (-0.7746),
+      0,
+      0
+    ],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q0, q1, q4};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_matrix_expanded___6(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q1, q2, q4} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0.6325, 0, 0, 0.7746, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [
+      0,
+      0,
+      0.7746,
+      0,
+      0,
+      (-0.6325),
+      0,
+      0
+    ],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q1, q2, q4};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_matrix_expanded___7(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q2, q3, q4} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0.4472, 0, 0, 0.8944, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [
+      0,
+      0,
+      0.8944,
+      0,
+      0,
+      (-0.4472),
+      0,
+      0
+    ],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q2, q3, q4};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_Uab_expanded___2(q: qbit[5]) {
+  apply_matrix_expanded___5(q);
+  apply_matrix_expanded___6(q);
+  apply_matrix_expanded___7(q);
+}
+
+qfunc apply_matrix_expanded___8(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q0, q3, q4} -> temp_array;
+  unitary([
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0.8944, 0, 0, 0.4472, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [
+      0,
+      (-0.4472),
+      0,
+      0,
+      0.8944,
+      0,
+      0,
+      0
+    ],
+    [0, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+  ], temp_array);
+  temp_array -> {q0, q3, q4};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_Uf_expanded___2(q: qbit[5]) {
+  apply_matrix_expanded___8(q);
+}
+
+qfunc apply_MultiCNOT_expanded___0(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q0, q1, q2} -> temp_array;
+  control (temp_array[0:2]) {
+    X(temp_array[2]);
+  }
+  temp_array -> {q0, q1, q2};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_MultiCNOT_expanded___1(q: qbit[5]) {
+  temp_array: qbit[2];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q2, q3} -> temp_array;
+  control (temp_array[0:1]) {
+    X(temp_array[1]);
+  }
+  temp_array -> {q2, q3};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc apply_MultiCNOT_expanded___2(q: qbit[5]) {
+  temp_array: qbit[3];
+  q0: qbit;
+  q1: qbit;
+  q2: qbit;
+  q3: qbit;
+  q4: qbit;
+  q -> {q0, q1, q2, q3, q4};
+  {q0, q2, q4} -> temp_array;
+  control (temp_array[0:2]) {
+    X(temp_array[2]);
+  }
+  temp_array -> {q0, q2, q4};
+  {q0, q1, q2, q3, q4} -> q;
+}
+
+qfunc symmetric_compression_algorithm_expanded___0(q_array: qbit[5]) {
+  control (q_array[1]) {
+    X(q_array[0]);
+  }
+  control (q_array[0]) {
+    H(q_array[1]);
+  }
+  apply_Uab_expanded___0(q_array);
+  apply_Uf_expanded___0(q_array);
+  control (q_array[2]) {
+    X(q_array[1]);
+  }
+  apply_Uab_expanded___1(q_array);
+  apply_Uf_expanded___1(q_array);
+  control (q_array[3]) {
+    X(q_array[2]);
+  }
+  apply_Uab_expanded___2(q_array);
+  apply_Uf_expanded___2(q_array);
+  control (q_array[4]) {
+    X(q_array[3]);
+  }
+  control (q_array[2]) {
+    X(q_array[1]);
+  }
+  control (q_array[2]) {
+    X(q_array[0]);
+  }
+  apply_MultiCNOT_expanded___0(q_array);
+  control (q_array[3]) {
+    X(q_array[2]);
+  }
+  apply_MultiCNOT_expanded___1(q_array);
+  control (q_array[4]) {
+    X(q_array[2]);
+  }
+  control (q_array[4]) {
+    X(q_array[0]);
+  }
+  apply_MultiCNOT_expanded___2(q_array);
+}
+
+qfunc main(output x: qbit[5]) {
+  allocate(5, x);
+  hadamard_transform(x);
+  symmetric_compression_algorithm_expanded___0(x);
+}
