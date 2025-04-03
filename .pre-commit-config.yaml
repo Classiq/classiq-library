@@ -51,3 +51,10 @@ repos:
         files: ^\S+\.(qmod|ipynb|yaml)$
         additional_dependencies:
           - "pyyaml==6.0"
+
+      - id: auto-add-tests
+        name: Auto add test
+        description: Automatically adding a test to new notebooks
+        entry: .internal/pre_commit_tools/auto_add_tests.py
+        language: python
+        files: ^\S+\.ipynb$
