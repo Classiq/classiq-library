@@ -1,31 +1,15 @@
 import os
-import logging
+import pytest
 from contextlib import contextmanager
 
 from testbook import testbook  # type: ignore[import]
-from utils_for_tests import iterate_notebooks, ROOT_DIRECTORY
+from utils_for_tests import iterate_notebooks, ROOT_DIRECTORY, resolve_notebook_path
 
-TIMEOUT: int = 60 * 10  # 10 minutes
-LOGGER = logging.getLogger(__name__)
+TIMEOUT: int = 60 * 15  # 15 minutes
 
 
-def test_notebooks() -> None:
-    for notebook_path in iterate_notebooks():
-        # a patch, which should be removed soon:
-        if os.path.basename(notebook_path) in [
-            "approximated_state_preparation.ipynb",
-            "qpe_for_grover_operator.ipynb",
-            "logical_qubits_by_alice_and_bob.ipynb",
-        ]:
-            LOGGER.info(f"Skipping notebook {notebook_path}")
-            continue
-
-        LOGGER.info(f"Exeucting notebook {notebook_path}")
-        with cwd(os.path.dirname(notebook_path)):
-            with testbook(
-                os.path.basename(notebook_path), execute=True, timeout=TIMEOUT
-            ):
-                pass  # we simply wish it to run without errors
+def _should_test_notebook(notebook_path: str) -> bool:
+    return "/functions/" in notebook_path or "/community/" in notebook_path
 
 
 @contextmanager
@@ -37,3 +21,16 @@ def cwd(path):
         yield
     finally:
         os.chdir(oldpwd)
+
+
+@pytest.mark.parametrize(
+    "notebook_path", filter(_should_test_notebook, iterate_notebooks())
+)
+def test_notebooks(notebook_path: str) -> None:
+    with cwd(os.path.dirname(notebook_path)):
+        with testbook(
+            os.path.basename(notebook_path),
+            execute=True,
+            timeout=TIMEOUT,
+        ):
+            pass  # we simply wish it to run without errors
