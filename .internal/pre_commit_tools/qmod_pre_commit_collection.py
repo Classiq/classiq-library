@@ -68,7 +68,11 @@ def _add_file_to_timeouts(file_name: str) -> None:
 def validate_unique_names() -> bool:
     all_files: Iterable[Path] = PROJECT_ROOT.rglob("*.qmod")
     # exclude `functions/`
-    all_files = [path for path in all_files if "functions" not in path.parts]
+    all_files = [
+        path
+        for path in all_files
+        if ("functions" not in path.parts) and (".ipynb_checkpoints" not in path.parts)
+    ]
     base_names = [file.name for file in all_files]
 
     duplicate_names = [name for name, count in Counter(base_names).items() if count > 1]

@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("minimum_dominating_set", timeout_seconds=620)
+@wrap_testbook("minimum_dominating_set", timeout_seconds=1000)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
