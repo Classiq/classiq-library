@@ -65,13 +65,6 @@ To keep the library organized and functional, please follow these standards:
 - **Use `.ipynb` Format:**
   All contributions should be in Jupyter Notebook format unless agreed otherwise with a maintainer.
 
-- **Include Required Support Files:**
-  Each notebook must be accompanied by:
-
-  - `file_name.qmod`
-  - `file_name.synthesis_options.json`
-  - `file_name.metadata.json`
-
 - **If your contribution is based on a paper:**
 
   - The folder and notebook name should match the paper title (use lowercase and underscores if needed).
@@ -79,6 +72,13 @@ To keep the library organized and functional, please follow these standards:
 
 - **Include Images Within the Notebook:**
   Use Jupyter's built-in drag-and-drop feature to embed images directly into the notebook. Do not add images as separate files.
+
+- **Include Required Support Files:**
+  Each notebook must be accompanied by:
+
+  - `file_name.qmod`
+  - `file_name.synthesis_options.json`
+  - `file_name.metadata.json`
 
 ### How to Generate These Files:
 
