@@ -1,0 +1,62 @@
+qfunc main(output readout: qbit) {
+  state: qbit[];
+  allocate(1, state);
+  allocate(1, readout);
+  molecule_hartree_fock(MoleculeProblem {
+    mapping=FermionMapping::JORDAN_WIGNER,
+    z2_symmetries=True,
+    molecule=Molecule {
+      atoms=[
+        ChemistryAtom {
+          element=Element::H,
+          position=Position {x=0.0, y=0.0, z=0.0}
+        },
+        ChemistryAtom {
+          element=Element::H,
+          position=Position {x=0.0, y=0.0, z=0.9988}
+        }
+      ],
+      spin=1,
+      charge=0
+    },
+    freeze_core=True,
+    remove_orbitals=[]
+  }, state);
+  H(readout);
+  X(readout);
+  control (readout) {
+    suzuki_trotter([
+      PauliTerm {
+        pauli=[Pauli::I],
+        coefficient=-1.0603
+      },
+      PauliTerm {
+        pauli=[Pauli::Z],
+        coefficient=-0.536
+      },
+      PauliTerm {
+        pauli=[Pauli::X],
+        coefficient=0.1967
+      }
+    ], 50.0, 2, 100, state);
+  }
+  X(readout);
+  control (readout) {
+    suzuki_trotter([
+      PauliTerm {
+        pauli=[Pauli::I],
+        coefficient=-1.0602
+      },
+      PauliTerm {
+        pauli=[Pauli::Z],
+        coefficient=-0.5341
+      },
+      PauliTerm {
+        pauli=[Pauli::X],
+        coefficient=0.1969
+      }
+    ], 50.0, 2, 100, state);
+  }
+  PHASE(0.1, readout);
+  H(readout);
+}
