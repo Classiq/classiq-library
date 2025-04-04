@@ -38,7 +38,7 @@ qfunc main(output readout: qbit) {
         pauli=[Pauli::X],
         coefficient=0.1967
       }
-    ], 18.6729, 2, 38, state);
+    ], 1.0, 2, 2, state);
   }
   X(readout);
   control (readout) {
@@ -55,8 +55,8 @@ qfunc main(output readout: qbit) {
         pauli=[Pauli::X],
         coefficient=0.1969
       }
-    ], 18.6729, 2, 38, state);
+    ], 1.0, 2, 2, state);
   }
-  PHASE(-1.7677, readout);
+  PHASE(0.1, readout);
   H(readout);
 }
