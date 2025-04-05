@@ -1,0 +1,18 @@
+qfunc main(output qba: qbit[]) {
+  result: qbit[];
+  allocate(8, result);
+  X(result[0]);
+  X(result[2]);
+  X(result[3]);
+  X(result[5]);
+  H(result[1]);
+  H(result[2]);
+  H(result[4]);
+  H(result[7]);
+  H(result[0]);
+  H(result[1]);
+  H(result[4]);
+  H(result[6]);
+  H(result[7]);
+  allocate(8, qba);
+}
