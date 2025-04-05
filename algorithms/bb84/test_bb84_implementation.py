@@ -1,51 +1,45 @@
 from classiq import *
 
 @qfunc
-def main() -> None:
+def main(qba: Output[QArray[QBit]]) -> None:
     """
-    Quantum circuit matching the specific gate pattern
+    Implements the quantum part of BB84 protocol with 8 qubits.
     """
+
     q = QArray[QBit]()
     allocate(8, q)
-    
+
     X(q[0])
-    H(q[0])
-    H(q[0])
-    
-    X(q[1])
-    H(q[1])
-    H(q[1])
-
     X(q[2])
-    H(q[2])
-    H(q[2])
-
     X(q[3])
-    H(q[3])
-
-    X(q[4])
-    H(q[4])
-
     X(q[5])
-
+    H(q[1])
+    H(q[2])
+    H(q[4])
+    H(q[7])
+    H(q[0])
+    H(q[1])
+    H(q[4])
     H(q[6])
+    H(q[7])
     
-    X(q[7])
-    H(q[7])
-    H(q[7])
+    allocate(8, qba)
+    for i in range(8):
+        qba[i] = q[i]
+        
 
 def test_quantum_circuit():
     """
-    Basic test for the quantum circuit
+    Test the BB84 quantum circuit implementation from the notebook
     """
 
-    # Define and create the model
+    # Create the quantum model using the updated main function
     qmod = create_model(main)
     if qmod is None:
         print("Test Failed: Model creation failed")
         return
 
-    # Synthesize the circuit
+    # Synthesize the quantum program
     qprog = synthesize(qmod)
     if qprog is None:
         print("Test Failed: Synthesis failed")
@@ -57,13 +51,13 @@ def test_quantum_circuit():
         print("Test Failed: Execution failed")
         return
 
-    # Get and print results
+    # Fetch and print parsed results
     results = job.get_sample_result().parsed_counts
-    if results is None:
+    if not results:
         print("Test Failed: No results returned")
         return
 
-    print("Test Passed: Quantum circuit executed successfully")
+    print("Test Passed: BB84 quantum circuit executed successfully")
     print("Results:", results)
 
 if __name__ == "__main__":
