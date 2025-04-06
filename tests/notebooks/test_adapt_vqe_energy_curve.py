@@ -28,3 +28,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     assert all(
         np.isclose(tb.ref("exact_energy"), tb.ref("aVQE_energy"), atol=0.02)
     )  # should be atol=0.01
+    pass
