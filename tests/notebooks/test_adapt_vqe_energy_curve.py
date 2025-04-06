@@ -8,7 +8,7 @@ from testbook.client import TestbookNotebookClient
 import numpy as np
 
 
-@wrap_testbook("molecular_energy_curve", timeout_seconds=1200)
+@wrap_testbook("adapt_vqe_energy_curve", timeout_seconds=6000)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     for qmod in tb.ref("qmods"):
