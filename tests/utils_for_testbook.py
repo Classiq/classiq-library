@@ -60,11 +60,11 @@ def validate_quantum_model(model: str) -> None:
 
 
 def validate_quantum_program_size(
-    quantum_program: str,
+    quantum_program: str | QuantumProgram,
     expected_width: int | None = None,
     expected_depth: int | None = None,
 ) -> None:
-    qp = QuantumProgram.model_validate_json(quantum_program)
+    qp = QuantumProgram.from_qprog(quantum_program)
 
     actual_width = qp.data.width
     if expected_width is not None:
