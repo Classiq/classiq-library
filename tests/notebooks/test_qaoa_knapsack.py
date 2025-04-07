@@ -6,10 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook(
-    "qaoa_knapsack",
-    timeout_seconds=300,
-)
+@wrap_testbook("qaoa_knapsack", timeout_seconds=300)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))

@@ -6,10 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook(
-    "qpe_for_matrix",
-    timeout_seconds=748,
-)
+@wrap_testbook("qpe_for_matrix", timeout_seconds=748)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for a hybrid classical quantum neural network.
