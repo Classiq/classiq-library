@@ -92,7 +92,7 @@ def validate_quantum_model(model: str) -> None:
 
 
 def validate_quantum_program_size(
-    quantum_program: str,
+    quantum_program: str | QuantumProgram,
     expected_width: int | None = None,
     expected_depth: int | None = None,
     compare_to: str | None = None,
@@ -108,17 +108,15 @@ def validate_quantum_program_size(
 
         return validate_quantum_program_size(quantum_program, other_width, other_depth)
 
-    qp = QuantumProgram.model_validate_json(quantum_program)
-
-    actual_width = qp.data.width
+    actual_width = quantum_program.data.width
     if expected_width is not None:
         assert (
             actual_width <= expected_width
         ), f"The width of the circuit changed! (for the worse!). From {expected_width} to {actual_width}"
     assert allow_zero_size or actual_width > 0, "Got a 0-width circuit."
 
-    assert qp.transpiled_circuit is not None  # for mypy
-    actual_depth = qp.transpiled_circuit.depth
+    assert quantum_program.transpiled_circuit is not None  # for mypy
+    actual_depth = quantum_program.transpiled_circuit.depth
     if expected_depth is not None:
         assert (
             actual_depth <= expected_depth
