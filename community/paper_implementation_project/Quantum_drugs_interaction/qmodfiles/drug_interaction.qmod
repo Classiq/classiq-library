@@ -1,0 +1,641 @@
+{
+  "version": "1.0",
+  "problem": {
+    "type": "drug_interaction_prediction",
+    "drug_mapping": {
+      "Phenytoin": 0,
+      "Rifampicin": 1,
+      "Fosphenytoin": 2,
+      "Carbamazepine": 3,
+      "Primidone": 4,
+      "Phenobarbital": 5,
+      "Pentobarbital": 6,
+      "Ranolazine": 7,
+      "Thioridazine": 8,
+      "Clozapine": 9,
+      "Imipramine": 10,
+      "Clomipramine": 11,
+      "Isradipine": 12,
+      "Bortezomib": 13,
+      "Diltiazem": 14,
+      "Verapamil": 15,
+      "Vemurafenib": 16,
+      "Azelastine": 17,
+      "Lopinavir": 18,
+      "Amiodarone": 19,
+      "Ziprasidone": 20,
+      "Dihydroergotamine": 21,
+      "Cyclosporine": 22,
+      "Ticlopidine": 23,
+      "Nefazodone": 24,
+      "Venlafaxine": 25,
+      "Fluvoxamine": 26,
+      "Mifepristone": 27,
+      "Ketoconazole": 28,
+      "Stiripentol": 29
+    },
+    "interaction_stats": {
+      "total": 442,
+      "increase": 269,
+      "decrease": 172,
+      "top_drugs": {
+        "Drug 1": {
+          "Pentobarbital": 27,
+          "Fosphenytoin": 26,
+          "Rifampicin": 26,
+          "Primidone": 26,
+          "Phenobarbital": 26,
+          "Azelastine": 25,
+          "Phenytoin": 23,
+          "Thioridazine": 23,
+          "Clozapine": 21,
+          "Carbamazepine": 21
+        },
+        "Drug 2": {
+          "Mifepristone": 28,
+          "Stiripentol": 28,
+          "Lopinavir": 26,
+          "Ketoconazole": 26,
+          "Nefazodone": 25,
+          "Ticlopidine": 22,
+          "Fluvoxamine": 22,
+          "Amiodarone": 21,
+          "Vemurafenib": 20,
+          "Bortezomib": 19
+        }
+      }
+    },
+    "text_analysis": {
+      "word_counts": {
+        "min": 8,
+        "max": 26,
+        "mean": 12.309954751131222,
+        "std": 1.9900752609972212
+      },
+      "common_terms": [
+        [
+          "the",
+          443
+        ],
+        [
+          "of",
+          443
+        ],
+        [
+          "can",
+          406
+        ],
+        [
+          "be",
+          406
+        ],
+        [
+          "when",
+          406
+        ],
+        [
+          "with",
+          406
+        ],
+        [
+          "combined",
+          405
+        ],
+        [
+          "increased",
+          235
+        ],
+        [
+          "metabolism",
+          216
+        ],
+        [
+          "is",
+          190
+        ],
+        [
+          "serum",
+          170
+        ],
+        [
+          "concentration",
+          170
+        ],
+        [
+          "decreased",
+          170
+        ],
+        [
+          "it",
+          169
+        ],
+        [
+          "may",
+          36
+        ]
+      ]
+    },
+    "samples": [
+      {
+        "drug1": 0,
+        "drug2": 758,
+        "label": 1
+      },
+      {
+        "drug1": 34,
+        "drug2": 758,
+        "label": 1
+      },
+      {
+        "drug1": 68,
+        "drug2": 758,
+        "label": 0
+      },
+      {
+        "drug1": 103,
+        "drug2": 758,
+        "label": 0
+      },
+      {
+        "drug1": 137,
+        "drug2": 758,
+        "label": 1
+      },
+      {
+        "drug1": 172,
+        "drug2": 758,
+        "label": 1
+      },
+      {
+        "drug1": 206,
+        "drug2": 758,
+        "label": 1
+      },
+      {
+        "drug1": 241,
+        "drug2": 758,
+        "label": 1
+      },
+      {
+        "drug1": 275,
+        "drug2": 758,
+        "label": 1
+      },
+      {
+        "drug1": 310,
+        "drug2": 758,
+        "label": 0
+      },
+      {
+        "drug1": 344,
+        "drug2": 758,
+        "label": 0
+      },
+      {
+        "drug1": 379,
+        "drug2": 758,
+        "label": 0
+      },
+      {
+        "drug1": 413,
+        "drug2": 758,
+        "label": 0
+      },
+      {
+        "drug1": 0,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 34,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 68,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 103,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 137,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 172,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 206,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 448,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 482,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 517,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 551,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 586,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 620,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 241,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 655,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 689,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 724,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 275,
+        "drug2": 965,
+        "label": 1
+      },
+      {
+        "drug1": 758,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 310,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 344,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 379,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 413,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 793,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 827,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 862,
+        "drug2": 965,
+        "label": 0
+      },
+      {
+        "drug1": 0,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 34,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 68,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 103,
+        "drug2": 862,
+        "label": 0
+      },
+      {
+        "drug1": 137,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 172,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 206,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 517,
+        "drug2": 862,
+        "label": 0
+      },
+      {
+        "drug1": 586,
+        "drug2": 862,
+        "label": 0
+      },
+      {
+        "drug1": 241,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 689,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 275,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 758,
+        "drug2": 862,
+        "label": 0
+      },
+      {
+        "drug1": 310,
+        "drug2": 862,
+        "label": 1
+      },
+      {
+        "drug1": 0,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 34,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 68,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 103,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 137,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 172,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 206,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 448,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 482,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 517,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 551,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 586,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 241,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 689,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 724,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 275,
+        "drug2": 793,
+        "label": 1
+      },
+      {
+        "drug1": 758,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 310,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 344,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 379,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 413,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 862,
+        "drug2": 793,
+        "label": 0
+      },
+      {
+        "drug1": 0,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 34,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 68,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 103,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 137,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 172,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 206,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 551,
+        "drug2": 413,
+        "label": 0
+      },
+      {
+        "drug1": 586,
+        "drug2": 413,
+        "label": 0
+      },
+      {
+        "drug1": 241,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 689,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 724,
+        "drug2": 413,
+        "label": 0
+      },
+      {
+        "drug1": 275,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 310,
+        "drug2": 413,
+        "label": 1
+      },
+      {
+        "drug1": 344,
+        "drug2": 413,
+        "label": 0
+      },
+      {
+        "drug1": 379,
+        "drug2": 413,
+        "label": 0
+      },
+      {
+        "drug1": 862,
+        "drug2": 413,
+        "label": 0
+      },
+      {
+        "drug1": 0,
+        "drug2": 448,
+        "label": 0
+      },
+      {
+        "drug1": 34,
+        "drug2": 448,
+        "label": 0
+      },
+      {
+        "drug1": 68,
+        "drug2": 448,
+        "label": 0
+      },
+      {
+        "drug1": 103,
+        "drug2": 448,
+        "label": 0
+      },
+      {
+        "drug1": 137,
+        "drug2": 448,
+        "label": 0
+      },
+      {
+        "drug1": 172,
+        "drug2": 448,
+        "label": 0
+      },
+      {
+        "drug1": 206,
+        "drug2": 448,
+        "label": 0
+      },
+      {
+        "drug1": 482,
+        "drug2": 448,
+        "label": 0
+      }
+    ]
+  }
+}
