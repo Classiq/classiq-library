@@ -1,5 +1,11 @@
 from classiq import *
 
+from tests.utils_for_testbook import (
+    validate_quantum_model,        
+    wrap_testbook,
+)
+from testbook.client import TestbookNotebookClient
+
 @qfunc
 def main(qba: Output[QArray[QBit]]) -> None:
     """
@@ -26,13 +32,16 @@ def main(qba: Output[QArray[QBit]]) -> None:
     allocate(8, qba)
     for i in range(8):
         qba[i] = q[i]
-        
 
-def test_quantum_circuit():
+@wrap_testbook(
+    "circuit for implementing bb84 quantum key distribution protocol",
+    timeout_seconds=100,  
+)
+def test_notebook(tb: TestbookNotebookClient) -> None:
     """
-    Test the BB84 quantum circuit implementation from the notebook
+    A notebook for a hybrid classical quantum neural network.
+    The test verifies that the pre-trained model is indeed well trained.
     """
-
     # Create the quantum model using the updated main function
     qmod = create_model(main)
     if qmod is None:
@@ -59,6 +68,33 @@ def test_quantum_circuit():
 
     print("Test Passed: BB84 quantum circuit executed successfully")
     print("Results:", results)
+    # test models
+    validate_quantum_model(tb.ref("qmod"))
+    # Create the quantum model using the updated main function
+    qmod = create_model(main)
+    if qmod is None:
+        print("Test Failed: Model creation failed")
+        return
 
-if __name__ == "__main__":
-    test_quantum_circuit()
+    # Synthesize the quantum program
+    qprog = synthesize(qmod)
+    if qprog is None:
+        print("Test Failed: Synthesis failed")
+        return
+
+    # Execute the quantum program
+    job = execute(qprog)
+    if job is None:
+        print("Test Failed: Execution failed")
+        return
+
+    # Fetch and print parsed results
+    results = job.get_sample_result().parsed_counts
+    if not results:
+        print("Test Failed: No results returned")
+        return
+
+    print("Test Passed: BB84 quantum circuit executed successfully")
+    print("Results:", results)
+    pass
+
