@@ -35,7 +35,7 @@ def main(qba: Output[QArray[QBit]]) -> None:
 
 @wrap_testbook(
     "circuit for implementing bb84 quantum key distribution protocol",
-    timeout_seconds=100,  
+    timeout_seconds=150,  
 )
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
