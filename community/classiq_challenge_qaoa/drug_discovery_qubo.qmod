@@ -3,38 +3,27 @@
     "name": "vqe",
     "params": {
       "hamiltonian": [
-        { "pauli": ["I", "I", "I", "I"], "coefficient": -0.082 },
-        { "pauli": ["I", "Z", "I", "I"], "coefficient": -0.0035 },
-        { "pauli": ["I", "I", "Z", "I"], "coefficient": -0.0018 },
-        { "pauli": ["I", "I", "Z", "I"], "coefficient": -0.0051 }
+        {
+          "pauli": ["Z", "Z"],
+          "coefficient": -1.05
+        },
+        {
+          "pauli": ["X", "X"],
+          "coefficient": 0.5
+        }
       ],
       "maximize": false,
-      "initial_point": [0.0, 0.0, 0.0, 0.0],
       "optimizer": "COBYLA",
-      "max_iteration": 50,
-      "tolerance": 0.0,
-      "step_size": 0.0,
+      "initial_point": [0.0, 0.0],
+      "max_iteration": 100,
+      "tolerance": 1e-6,
+      "step_size": 0.1,
       "skip_compute_variance": false,
-      "alpha_cvar": 0.7
+      "alpha_cvar": 0.9
     }
   },
-  "constraints": {
-    "max_gate_count": {},
-    "optimization_parameter": "no_opt"
-  },
   "preferences": {
-    "machine_precision": 8,
-    "custom_hardware_settings": {
-      "basis_gates": ["x", "y", "z", "h", "cx"],
-      "is_symmetric_connectivity": true
-    },
-    "debug_mode": true,
-    "synthesize_all_separately": false,
-    "optimization_level": 3,
     "output_format": ["qasm"],
-    "pretty_qasm": true,
-    "transpilation_option": "auto optimize",
-    "timeout_seconds": 300,
-    "random_seed": 12345678
+    "timeout_seconds": 60
   }
 }
