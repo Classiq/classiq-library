@@ -46,7 +46,7 @@ def test_notebooks_unique_names():
 
     # assert qmod_pre_commit_collection.is_valid_qmod(
     #     qmod_path, automatically_add_timeout=False
-    )
+    # )
 
 
 def test_notebooks_unique_names():
