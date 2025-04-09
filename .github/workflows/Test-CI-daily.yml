@@ -64,6 +64,7 @@ jobs:
           python -m pip install -U -r requirements_tests.txt \
               --extra-index-url https://pypi.org/simple
           python -m pip install qiskit  # 👈 Added line to install Qiskit
+          python -m pip install imbalanced-learn
 
       - name: Install couenne solver
         env:
