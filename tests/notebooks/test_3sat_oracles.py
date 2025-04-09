@@ -9,15 +9,10 @@ from testbook.client import TestbookNotebookClient
 @wrap_testbook("3sat_oracles", timeout_seconds=1800)
 def test_notebook(tb: TestbookNotebookClient) -> None:
 
-    num_models = len(tb.ref("qmods"))
-
-    for i in range(num_models):
-        # test models
-        validate_quantum_model(tb.ref("qmods")[i])
+    for qmod in tb.ref("qmods"):
+        validate_quantum_model(qmod)
         # TODO test quantum programs with transpilation is "none"
 
     # test notebook content
-    for i in range(num_models):
-        assert (
-            tb.ref("cl_times")[i] < 30
-        )  # actual time is less than 15 sec for all models
+    for cl_time in tb.ref("cl_times"):
+        assert cl_time < 30  # actual time is less than 15 sec for all models
