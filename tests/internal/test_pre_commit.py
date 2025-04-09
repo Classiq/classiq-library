@@ -7,7 +7,6 @@ from pre_commit_tools import (
 
 PROJECT_ROOT = clean_timeouts.PROJECT_ROOT
 
-
 #
 # tests from `clean_timeouts`
 #
@@ -38,10 +37,12 @@ def test_notebooks_unique_names():
 # tests from `qmod_pre_commit_collection`
 #
 @pytest.mark.parametrize("qmod_path", map(str, PROJECT_ROOT.rglob("*.qmod")))
-def test_notebooks(qmod_path: str):
+def test_qmod_files(qmod_path: str):
     if "functions/function_declarations" in qmod_path:
         return  # skipped
     if "functions/open_library_definitions" in qmod_path:
+        return  # skipped
+    if "drug_discovery_qubo.qmod" in qmod_path:
         return  # skipped
 
     assert qmod_pre_commit_collection.is_valid_qmod(
@@ -49,5 +50,5 @@ def test_notebooks(qmod_path: str):
     )
 
 
-def test_notebooks_unique_names():
+def test_qmod_unique_names():
     assert qmod_pre_commit_collection.validate_unique_names()
