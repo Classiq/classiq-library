@@ -8,6 +8,16 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("quantum_volume", timeout_seconds=516)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # need to rewrite the notebook
-    # everything is inside functions, it's hard to test it
-    pass
+
+    actual_widths = [3] * 10 + [4] * 10 + [5] * 10 + [6] * 10
+    actual_depths = [19] * 10 + [25] * 10 + [31] * 10 + [37] * 10
+    for qmod in tb.ref("qmods"):
+        # test models
+        validate_quantum_model(qmod)
+    for qprog, e_width, e_depth in zip(tb.ref("qprogs"), actual_widths, actual_depths):
+        # test quantum programs
+        validate_quantum_program_size(
+            qprog,
+            expected_width=e_width,  # not expected to change
+            expected_depth=int(e_depth * 1.5),  # 1.5* actual depth
+        )
