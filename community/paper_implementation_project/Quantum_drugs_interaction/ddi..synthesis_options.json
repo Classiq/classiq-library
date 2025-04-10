@@ -1,0 +1,23 @@
+{
+    "version": "1.0",
+    "target": {
+      "hardware": "simulator",
+      "language": "qiskit"
+    },
+    "circuit_parameters": {
+      "max_qubits": 12,
+      "ansatz": {
+        "type": "layered",
+        "layers": 3,
+        "entanglement": "full"
+      },
+      "measurement": {
+        "observable": "z"
+      }
+    },
+    "optimization": {
+      "method": "COBYLA",
+      "shots": 1024
+    }
+  }
+  

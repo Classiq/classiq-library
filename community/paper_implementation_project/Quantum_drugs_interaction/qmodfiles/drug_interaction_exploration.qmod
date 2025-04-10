@@ -1,0 +1,28 @@
+{
+  "name": "drug_interaction_exploration",
+  "variables": {
+    "x": {
+      "type": "binary",
+      "size": 10
+    }
+  },
+  "objective": {
+    "type": "maximize",
+    "expression": "x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9]"
+  },
+  "constraints": [
+    {
+      "name": "max_selected",
+      "expression": "x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] <= 3"
+    }
+  ],
+  "output": {
+    "format": "vector",
+    "variables": ["x"]
+  },
+  "metadata": {
+    "description": "Binary optimization for exploring drug interactions",
+    "author": "Sasiprabha R M, Vishruthi M",
+    "created": "2025-04-10"
+  }
+}
