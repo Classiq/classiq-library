@@ -27,15 +27,27 @@ def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> boo
 
     if _does_contain_dash_in_file_name(file_name):
         errors.append(
-            "Dash (-) is not allowed in file named. please use underscore (_)"
+            "File naming format error:\n"
+            "    Dash (-) is not allowed in file named. please use underscore (_)\n"
+            f"    for example, you may change '{file_path}' to '{file_path.replace('-', '_')}'."
         )
 
     if not _is_file_in_timeouts(file_name):
         if automatically_add_timeout:
             _add_file_to_timeouts(file_name)
-            errors.append("Automatically adding timeout.")
+            errors.append(
+                "A new notebook was detected.\n"
+                f"    Automatically adding a timeout entry {{{file_name} : {DEFAULT_TIMEOUT_SECONDS}}}.\n"
+                f"    Please make sure to add the changes done to '{TIMEOUTS_FILE}'"
+            )
         else:
-            errors.append("File is missing timeout in the timeouts.yaml file.")
+            errors.append(
+                "A new notebook was detected.\n"
+                "    However, a coresponding entry in the timeouts file is missing.\n"
+                f"    Please add an entry. You may add '{{{file_name} : {DEFAULT_TIMEOUT_SECONDS}}}'\n"
+                f"        to {TIMEOUTS_FILE}\n"
+                "    Alternatively, you may install pre-commit. It will automatically add a timeout entry in the next time you run 'git commit'."
+            )
 
     if errors:
         spacing = "\n\t"  # f-string cannot include backslash
@@ -78,7 +90,11 @@ def validate_unique_names() -> bool:
     duplicate_names = [name for name, count in Counter(base_names).items() if count > 1]
 
     if duplicate_names:
-        print(f"Qmods with duplicate names found: {duplicate_names}")
+        print(
+            "File naming error:\n"
+            "    There is a requirement that each qmod file will have a unique names. No two files with the same name, even if the files sit in different directories.\n"
+            f"    However, the following qmods were found with duplicate names: {duplicate_names}"
+        )
 
     is_ok = not duplicate_names
     return is_ok
