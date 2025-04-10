@@ -1,133 +1,16 @@
-hamiltonian: PauliTerm[] = [
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=5.0
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::I
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::Z,
-      Pauli::I
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::Z,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z,
-      Pauli::Z
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I,
-      Pauli::Z
-    ],
-    coefficient=0.5
-  },
-  PauliTerm {
-    pauli=[
-      Pauli::Z,
-      Pauli::Z,
-      Pauli::I,
-      Pauli::I,
-      Pauli::I
-    ],
-    coefficient=0.5
-  }
-];
-
-qfunc main(params_list: real[6], output target: qbit[5]) {
-  allocate(target.len, target);
-  qaoa_penalty(target.len, params_list, hamiltonian, target);
+design {
+    let features = ["drug_A", "drug_B", "interaction_score"];
+    let thresholds = [0.1, 0.3, 0.7];
+    let weights = [0.4, 0.3, 0.3]; // example weights
 }
 
-cscope ```
-vqe_result = vqe(
-hamiltonian=hamiltonian,
-maximize=False,
-initial_point=[0.0, 1.0, 0.5, 0.5, 1.0, 0.0],
-optimizer=Optimizer.COBYLA,
-max_iteration=100,
-tolerance=0.0,
-step_size=0.0,
-skip_compute_variance=False,
-alpha_cvar=0.7
-)
+solve {
+    // Dummy solve block to make it valid
+    minimize const 1;
+}
 
-save({"vqe_result": vqe_result, "hamiltonian": hamiltonian})
-```
+analyze {
+    print(features);
+    print(thresholds);
+    print(weights);
+}
