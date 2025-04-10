@@ -80,6 +80,16 @@ To keep the library organized and functional, please follow these standards:
   - `file_name.synthesis_options.json`
   - `file_name.metadata.json`
 
+- **Use `pre-commit`**
+  New content must follow the standars which are enforced by `pre-commit`.
+  Such standards, for example, automatically format the code, or add templates for testing notebooks.
+  In order to install `pre-commit`, you may run
+  ```bash
+  pip install pre-commit
+  pre-commit install
+  ```
+  Alternatively, you may visit [the `pre-commit` documentation](https://pre-commit.com/) for more details.
+
 ### How to Generate These Files:
 
 - Use the [`write_qmod`](https://docs.classiq.io/latest/sdk-reference/modeling/?h=write_qmod#classiq.write_qmod.write_qmod) function:
