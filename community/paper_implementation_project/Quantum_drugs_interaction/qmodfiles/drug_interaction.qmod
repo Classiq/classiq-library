@@ -1,18 +1,32 @@
-design {
-    let drugs = ["Aspirin", "Ibuprofen", "Paracetamol"];
-    let interactions = [
-        ("Aspirin", "Ibuprofen", "Increased bleeding risk"),
-        ("Aspirin", "Paracetamol", "Minor interaction"),
-        ("Ibuprofen", "Paracetamol", "Kidney stress")
-    ];
-}
-
-solve {
-    // Dummy solve block to pass validation (required)
-    minimize const 1;
-}
-
-analyze {
-    print(drugs);
-    print(interactions);
+{
+  "problem": {
+    "qubits": {
+      "q1": {
+        "type": "BasicQubit",
+        "count": 4
+      },
+      "q2": {
+        "type": "BasicQubit",
+        "count": 2
+      }
+    },
+    "operators": {
+      "sum_op": {
+        "type": "WeightedSum",
+        "weights": [1, 2, 3, 4],
+        "qubit": "q1"
+      },
+      "pauli_op": {
+        "type": "BasicPauliZ",
+        "qubit": "q2"
+      }
+    },
+    "objective": {
+      "type": "Minimize",
+      "operator": "sum_op"
+    },
+    "resources": {
+      "shots": 1024
+    }
+  }
 }

@@ -1,16 +1,24 @@
-design {
-    let features = ["drug_A", "drug_B", "interaction_score"];
-    let thresholds = [0.1, 0.3, 0.7];
-    let weights = [0.4, 0.3, 0.3]; // example weights
-}
-
-solve {
-    // Dummy solve block to make it valid
-    minimize const 1;
-}
-
-analyze {
-    print(features);
-    print(thresholds);
-    print(weights);
+{
+  "qna_config": {
+    "type": "simple"
+  },
+  "rag_config": {
+    "prompt_template": "default",
+    "prompt_config": {
+      "prompt_name": "rag_default"
+    }
+  },
+  "rag_module": {
+    "model": "GPT-4",
+    "mode": "api",
+    "temperature": 0.7
+  },
+  "retriever": {
+    "type": "default",
+    "chunk_size": 512
+  },
+  "text_splitter": {
+    "type": "default",
+    "chunk_size": 512
+  }
 }
