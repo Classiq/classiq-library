@@ -8,12 +8,12 @@
   "constraints": [
     {
       "name": "interaction_limit",
-      "expression": "sum(x) <= 3"
+      "expression": "sum(x[i] for i in range(10)) <= 3"
     }
   ],
   "objective": {
     "type": "maximize",
-    "expression": "sum(x)"
+    "expression": "sum(x[i] for i in range(10))"
   },
   "metadata": {
     "description": "Quantum model for drug-drug interaction prediction using binary optimization"
