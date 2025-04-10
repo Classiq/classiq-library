@@ -1,21 +1,22 @@
 {
+  "name": "drug_interaction_exploration",
   "variables": {
     "x": {
       "type": "binary",
       "size": 10
     }
   },
+  "objective": {
+    "type": "maximize",
+    "expression": "x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9]"
+  },
   "constraints": [
     {
       "name": "interaction_limit",
-      "expression": "sum(x[i] for i in range(10)) <= 3"
+      "expression": "x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] <= 3"
     }
   ],
-  "objective": {
-    "type": "maximize",
-    "expression": "sum(x[i] for i in range(10))"
-  },
   "metadata": {
-    "description": "Quantum model for drug-drug interaction prediction using binary optimization"
+    "description": "Valid QMOD for drug-drug interaction binary optimization"
   }
 }
