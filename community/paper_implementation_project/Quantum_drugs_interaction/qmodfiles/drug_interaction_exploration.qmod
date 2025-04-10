@@ -1,24 +1,21 @@
 {
-  "qna_config": {
-    "type": "simple"
-  },
-  "rag_config": {
-    "prompt_template": "default",
-    "prompt_config": {
-      "prompt_name": "rag_default"
+  "variables": {
+    "x": {
+      "type": "binary",
+      "size": 10
     }
   },
-  "rag_module": {
-    "model": "GPT-4",
-    "mode": "api",
-    "temperature": 0.7
+  "constraints": [
+    {
+      "name": "interaction_limit",
+      "expression": "sum(x) <= 3"
+    }
+  ],
+  "objective": {
+    "type": "maximize",
+    "expression": "sum(x)"
   },
-  "retriever": {
-    "type": "default",
-    "chunk_size": 512
-  },
-  "text_splitter": {
-    "type": "default",
-    "chunk_size": 512
+  "metadata": {
+    "description": "Quantum model for drug-drug interaction prediction using binary optimization"
   }
 }
