@@ -34,9 +34,9 @@ def test_notebooks_unique_names():
     assert notebook_pre_commit_collection.validate_unique_names()
 
 
-
-tests from qmod_pre_commit_collection
-
+#
+# tests from qmod_pre_commit_collection
+#
 @pytest.mark.parametrize("qmod_path", map(str, PROJECT_ROOT.rglob("*.qmod")))
 def test_notebooks(qmod_path: str):
     if "functions/function_declarations" in qmod_path:
