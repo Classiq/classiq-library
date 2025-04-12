@@ -8,12 +8,12 @@
   },
   "objective": {
     "type": "maximize",
-    "expression": "x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9]"
+    "expression": "sum(x)"
   },
   "constraints": [
     {
       "name": "max_selected",
-      "expression": "x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] <= 3"
+      "expression": "sum(x) <= 3"
     }
   ],
   "output": {
