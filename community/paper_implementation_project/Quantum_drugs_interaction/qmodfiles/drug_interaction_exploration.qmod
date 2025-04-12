@@ -1,67 +1,48 @@
-qmod {
-  input_ports: {
-    drug1_rot: float,
-    drug2_rot: float,
-    params: array<float>
-  },
+qfunc drug_interaction_circuit(
+    drug1_rot: CReal,
+    drug2_rot: CReal,
+    params: CArray[8, CReal],
+    result: Output[QBit]
+) {
+    q: QBit[];
+    allocate(4, q);
+    allocate(1, result);
 
-  output_ports: {
-    result: float
-  },
+    // Feature encoding
+    RX(drug1_rot * PI, q[0]);
+    RX(drug2_rot * PI, q[1]);
 
-  quantum_circuit: {
-    qubits: 5,
+    // Layer 1
+    CX(q[0], q[1]);
+    CX(q[1], q[2]);
+    CX(q[2], q[3]);
+    RY(params[0], q[0]);
+    RY(params[1], q[1]);
+    RY(params[2], q[2]);
+    RY(params[3], q[3]);
+    CZ(q[0], q[1]);
+    CZ(q[2], q[3]);
 
-    layers: [
-      {
-        name: "feature_encoding",
-        gates: [
-          { type: "RX", target: 0, parameter: "drug1_rot * pi" },
-          { type: "RX", target: 1, parameter: "drug2_rot * pi" }
-        ]
-      },
-      {
-        name: "variational_layer_1",
-        gates: [
-          { type: "CNOT", control: 0, target: 1 },
-          { type: "CNOT", control: 1, target: 2 },
-          { type: "CNOT", control: 2, target: 3 },
+    // Layer 2
+    CX(q[0], q[1]);
+    CX(q[1], q[2]);
+    CX(q[2], q[3]);
+    RY(params[4], q[0]);
+    RY(params[5], q[1]);
+    RY(params[6], q[2]);
+    RY(params[7], q[3]);
+    CZ(q[0], q[1]);
+    CZ(q[2], q[3]);
 
-          { type: "RY", target: 0, parameter: "params[0]" },
-          { type: "RY", target: 1, parameter: "params[1]" },
-          { type: "RY", target: 2, parameter: "params[2]" },
-          { type: "RY", target: 3, parameter: "params[3]" },
+    // Measurement
+    CX(q[3], result);
+}
 
-          { type: "CZ", control: 0, target: 1 },
-          { type: "CZ", control: 2, target: 3 }
-        ]
-      },
-      {
-        name: "variational_layer_2",
-        gates: [
-          { type: "CNOT", control: 0, target: 1 },
-          { type: "CNOT", control: 1, target: 2 },
-          { type: "CNOT", control: 2, target: 3 },
-
-          { type: "RY", target: 0, parameter: "params[4]" },
-          { type: "RY", target: 1, parameter: "params[5]" },
-          { type: "RY", target: 2, parameter: "params[6]" },
-          { type: "RY", target: 3, parameter: "params[7]" },
-
-          { type: "CZ", control: 0, target: 1 },
-          { type: "CZ", control: 2, target: 3 }
-        ]
-      },
-      {
-        name: "measurement_layer",
-        gates: [
-          { type: "CNOT", control: 3, target: 4 }
-        ]
-      }
-    ],
-
-    measurements: [
-      { target: 4, key: "result" }
-    ]
-  }
+qfunc main(
+    drug1_rot: CReal,
+    drug2_rot: CReal,
+    params: CArray[8, CReal],
+    result: Output[QBit]
+) {
+    drug_interaction_circuit(drug1_rot, drug2_rot, params, result);
 }
