@@ -1,28 +1,67 @@
-{
-  "name": "drug_interaction_exploration",
-  "variables": {
-    "x": {
-      "type": "binary",
-      "size": 10
-    }
+qmod {
+  input_ports: {
+    drug1_rot: float,
+    drug2_rot: float,
+    params: array<float>
   },
-  "objective": {
-    "type": "maximize",
-    "expression": "sum(x)"
+
+  output_ports: {
+    result: float
   },
-  "constraints": [
-    {
-      "name": "max_selected",
-      "expression": "sum(x) <= 3"
-    }
-  ],
-  "output": {
-    "format": "vector",
-    "variables": ["x"]
-  },
-  "metadata": {
-    "description": "Binary optimization for exploring drug interactions",
-    "author": "Sasiprabha R M, Vishruthi M",
-    "created": "2025-04-10"
+
+  quantum_circuit: {
+    qubits: 5,
+
+    layers: [
+      {
+        name: "feature_encoding",
+        gates: [
+          { type: "RX", target: 0, parameter: "drug1_rot * pi" },
+          { type: "RX", target: 1, parameter: "drug2_rot * pi" }
+        ]
+      },
+      {
+        name: "variational_layer_1",
+        gates: [
+          { type: "CNOT", control: 0, target: 1 },
+          { type: "CNOT", control: 1, target: 2 },
+          { type: "CNOT", control: 2, target: 3 },
+
+          { type: "RY", target: 0, parameter: "params[0]" },
+          { type: "RY", target: 1, parameter: "params[1]" },
+          { type: "RY", target: 2, parameter: "params[2]" },
+          { type: "RY", target: 3, parameter: "params[3]" },
+
+          { type: "CZ", control: 0, target: 1 },
+          { type: "CZ", control: 2, target: 3 }
+        ]
+      },
+      {
+        name: "variational_layer_2",
+        gates: [
+          { type: "CNOT", control: 0, target: 1 },
+          { type: "CNOT", control: 1, target: 2 },
+          { type: "CNOT", control: 2, target: 3 },
+
+          { type: "RY", target: 0, parameter: "params[4]" },
+          { type: "RY", target: 1, parameter: "params[5]" },
+          { type: "RY", target: 2, parameter: "params[6]" },
+          { type: "RY", target: 3, parameter: "params[7]" },
+
+          { type: "CZ", control: 0, target: 1 },
+          { type: "CZ", control: 2, target: 3 }
+        ]
+      },
+      {
+        name: "measurement_layer",
+        gates: [
+          { type: "CNOT", control: 3, target: 4 }
+        ]
+      }
+    ],
+
+    measurements: [
+      { target: 4, key: "result" }
+    ]
   }
 }
