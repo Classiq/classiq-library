@@ -46,13 +46,13 @@ def remove_missing_files() -> bool:
         print(
             "There exists some entries in timeouts which are long gone. removing them."
         )
-        with PRODUCT_DEMOS_INTERNAL_TIMEOUTS_FILE.open("r") as f:
+        with TIMEOUTS_FILE.open("r") as f:
             timeouts = yaml.safe_load(f)
 
         for file in missing_files:
             del timeouts[file]
 
-        with open(PRODUCT_DEMOS_INTERNAL_TIMEOUTS_FILE, "w") as f:
+        with open(TIMEOUTS_FILE, "w") as f:
             yaml.dump(timeouts, f, sort_keys=True)
 
     is_ok = not missing_files
