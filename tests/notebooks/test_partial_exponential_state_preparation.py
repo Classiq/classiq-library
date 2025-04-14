@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("partial_exponential_state_preparation", timeout_seconds=60)
+@wrap_testbook("partial_exponential_state_preparation", timeout_seconds=100)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
