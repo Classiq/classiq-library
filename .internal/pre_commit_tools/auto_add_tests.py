@@ -7,6 +7,8 @@ import subprocess
 
 PROJECT_ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
 
+DEFAULT_TIMEOUTS_SECONDS = 60
+
 
 def main() -> bool:
     if len(sys.argv) == 1:
@@ -73,7 +75,7 @@ def create_test_content(notebook_file_path: Path) -> str:
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("{notebook_file_path.stem}", timeout_seconds=20)
+@wrap_testbook("{notebook_file_path.stem}", timeout_seconds={DEFAULT_TIMEOUTS_SECONDS})
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
