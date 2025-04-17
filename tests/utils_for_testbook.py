@@ -1,4 +1,5 @@
 import json
+import itertools
 import base64
 import pickle
 import os
@@ -26,6 +27,7 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
         notebook_path = resolve_notebook_path(notebook_name)
 
         for decorator in [
+            _build_patch_testbook_client_decorator(notebook_name),
             testbook(notebook_path, execute=True, timeout=timeout_seconds),
             _build_cd_decorator(notebook_path),
             _build_skip_decorator(notebook_path),
@@ -34,6 +36,20 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
         return func
 
     return inner_decorator
+
+
+def _build_patch_testbook_client_decorator(notebook_name: str) -> Callable:
+    def patch_testbook_client_decorator(func: Callable) -> Any:
+        def inner(*args: Any, **kwargs: Any) -> Any:
+            for arg in itertools.chain(args, kwargs.values()):
+                if isinstance(arg, TestbookNotebookClient):
+                    arg._notebook_name = notebook_name
+
+            return func(*args, *kwargs)
+
+        return inner
+
+    return patch_testbook_client_decorator
 
 
 # The purpose of the `cd_decorator` is to execute the test in the same folder as the `ipynb` file
@@ -82,6 +98,16 @@ def _patch_testbook() -> None:
         return result
 
     TestbookNotebookClient.ref_numpy = ref_numpy
+
+    original_repr = TestbookNotebookClient.__repr__
+
+    def new_repr(self) -> str:
+        if hasattr(self, "_notebook_name"):
+            return f"<{self.__class__.__name__} of notebook '{self._notebook_name}'>"
+        else:
+            return original_repr(self)
+
+    TestbookNotebookClient.__repr__ = new_repr
 
     _PATCHED = True
 
