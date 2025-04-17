@@ -20,6 +20,29 @@ from testbook.client import TestbookNotebookClient
 _PATCHED = False
 
 
+"""
+Decorator explanation, from bottom to top
+
+1 - skip decorator
+this has to be the first, since the pytest decision of whether to skip this test has to be the first to run
+
+2 - cd decorator
+this has to come before testbook, since it changes the working directory in which testbook will run the notebook
+
+3 - testbook
+that's the main decorator
+
+4 - patch client
+this one aims to set `tb.__repr__`
+but since `__repr__` is always called from the class's __dict__, rather than the instance's
+than we have to use `_path_testbook` (which exists for `ref_numpy`. So it's handy that it's already here)
+and add a property - `self._notebook_name`
+adding this property must come after the testbook decorator
+since before the decorator, the function takes 0 arguments
+and after the decorator, it takes 1 - `tb`.
+"""
+
+
 def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
     def inner_decorator(func: Callable) -> Any:
         _patch_testbook()
@@ -61,9 +84,10 @@ def _build_cd_decorator(file_path: str) -> Callable:
             os.chdir(ROOT_DIRECTORY)
             os.chdir(os.path.dirname(file_path))
 
-            func(*args, **kwargs)
+            result = func(*args, **kwargs)
 
             os.chdir(previous_dir)
+            return result
 
         return inner
 
