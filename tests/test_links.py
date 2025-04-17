@@ -1,10 +1,17 @@
 import re
 from collections.abc import Iterable
 
+from functools import lru_cache
 import httpx
 import nbformat
 import pytest
-from utils_for_tests import iterate_notebook_names, resolve_notebook_path
+from utils_for_tests import (
+    iterate_notebook_names,
+    resolve_notebook_path,
+    ROOT_DIRECTORY,
+)
+
+URL_ALLOW_LIST_FILE = ROOT_DIRECTORY / ".internal" / "url_allow_list.txt"
 
 # the regex below is taken from this stackoverflow:
 #   https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
@@ -34,9 +41,22 @@ def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
             yield cell_index, url
 
 
+@lru_cache
+def get_url_allow_list() -> list[str]:
+    if URL_ALLOW_LIST_FILE.is_file():
+        with open(URL_ALLOW_LIST_FILE) as f:
+            data = f.read()
+        return data.splitlines()
+    else:
+        return []
+
+
 def _test_single_url(
     url: str, retry: int = 3, use_head: bool = True, follow_redirects: bool = True
 ) -> bool:
+    if url in get_url_allow_list():
+        return True
+
     if retry == 0:
         return False
 
