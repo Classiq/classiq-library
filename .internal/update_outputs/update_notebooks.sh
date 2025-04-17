@@ -26,19 +26,19 @@ python -m pip install -U -r requirements.txt -r requirements_tests.txt
 echo
 echo
 echo "======= Updating notebooks ======="
-# disable popping browser for `show(qprog)`
-export BROWSER=echo
+
+current_folder="$(realpath "$(dirname "$0")")"
+
 
 # note: there's a max of 3 running jobs per user, so we limit the threads to 3
 # # test all bernstein-vazirani notebooks
-# find . -type f -name "*bernstein*.ipynb" | xargs -P2 -I{} jupyter nbconvert --to notebook --execute --inplace {}
+find . -type f -name "*bernstein*.ipynb" | xargs -P2 -I{} "$current_folder/update_single_notebook.sh" {}
 # test all algorithms
-# find algorithms/ -type f -name "*.ipynb" | xargs -P3 -I{} jupyter nbconvert --to notebook --execute --inplace {}
-find algorithms/ -type f -name "*.ipynb" | xargs -P3 -I{} sh -c 'cd "$(dirname {})" && jupyter nbconvert --to notebook --execute --inplace "$(basename {})"'
+# find algorithms/ -type f -name "*.ipynb" | xargs -P3 -I{} "$current_folder/update_single_notebook.sh" {}
 # # test 3 notebooks
-# find . -type f -name "*.ipynb" | head -n 3 | xargs -P3 -I{} jupyter nbconvert --to notebook --execute --inplace {}
+# find . -type f -name "*.ipynb" | head -n 3 | xargs -P3 -I{} "$current_folder/update_single_notebook.sh" {}
 # # test all notebooks
-# find algorithms applications tutorials -type f -name "*.ipynb" | xargs -P3 -I{} jupyter nbconvert --to notebook --execute --inplace {}
+# find algorithms applications tutorials -type f -name "*.ipynb" | xargs -P3 -I{} "$current_folder/update_single_notebook.sh" {}
 
 #
 # 3) Commit the changes + open PR
