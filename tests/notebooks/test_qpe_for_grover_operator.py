@@ -26,25 +26,30 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     classiq cx_counts: [513, 1544, 3600, 7713, 15929]
     classiq widths: [6, 7, 8, 9, 10]
     """
-    for qprog in tb.ref("qprogs_width"):
+    for qprog, e_width, e_depth in zip(
+        tb.ref("qprogs_width"),
+        tb.ref("classiq_widths_ae_opt_width"),
+        tb.ref("classiq_depths_ae_opt_width"),
+    ):
         validate_quantum_program_size(
             qprog,
-            expected_width=None,
-            expected_depth=None,
+            expected_width=int(e_width * 1.5),
+            expected_depth=int(e_depth * 1.5),
         )
     """
     classiq depths: [426, 1272, 2926, 6196, 13015]
     classiq cx_counts: [241, 722, 1664, 3523, 7384]
     classiq widths: [15, 18, 21, 24, 27]
     """
-    for qprog, expected_max_width in zip(
+    for qprog, expected_max_width, e_depth in zip(
         tb.ref("qprogs_cx"),
         tb.ref("qmods_cx_max_width"),
+        tb.ref("classiq_depths_ae_opt_depth_max_width"),
     ):
         validate_quantum_program_size(
             qprog,
             expected_width=expected_max_width,
-            expected_depth=None,
+            expected_depth=int(e_depth * 1.5),
         )
 
     # test notebook content

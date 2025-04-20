@@ -22,7 +22,11 @@ def validate_unique_keys() -> bool:
     keys = [line.split(":")[0].strip() for line in data.splitlines()]
     duplicate_keys = [key for key, count in Counter(keys).items() if count > 1]
     if duplicate_keys:
-        print(f"duplicate keys found in the timeouts file ({duplicate_keys})")
+        print(
+            "While looking at the `timeouts.yaml` file, a duplicate key was found.\n"
+            f"    Please open '{str(TIMEOUTS_FILE)}' and remove one of the duplicate keys.\n"
+            f"    The duplicate keys are: ({duplicate_keys})"
+        )
 
     return not duplicate_keys
 
@@ -44,15 +48,17 @@ def remove_missing_files() -> bool:
     missing_files = find_missing_files()
     if missing_files:
         print(
-            "There exists some entries in timeouts which are long gone. removing them."
+            "While looking at the `timeouts.yaml` file, some old keys were found.\n"
+            "    These keys point to notebooks/qmods which are long gone.\n"
+            "    We'll automatically remove them. Make sure to `git add` these new changes."
         )
-        with PRODUCT_DEMOS_INTERNAL_TIMEOUTS_FILE.open("r") as f:
+        with TIMEOUTS_FILE.open("r") as f:
             timeouts = yaml.safe_load(f)
 
         for file in missing_files:
             del timeouts[file]
 
-        with open(PRODUCT_DEMOS_INTERNAL_TIMEOUTS_FILE, "w") as f:
+        with open(TIMEOUTS_FILE, "w") as f:
             yaml.dump(timeouts, f, sort_keys=True)
 
     is_ok = not missing_files

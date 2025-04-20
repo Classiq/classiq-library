@@ -18,7 +18,7 @@ We welcome high-quality contributions that follow our standards and can serve th
 - [How to Contribute & Workflow](#how-to-contribute--workflow)
 - [Contribution Standards](#contribution-standards)
 - [CI Requirements](#ci-requirements)
-- [Before You Submit Checklist](#before-you-submit-checklist)
+- [Before-You-Submit Checklist](#before-you-submit-checklist)
 - [Reporting Bugs](#reporting-bugs)
 - [Need Help?](#need-help)
 - [License](#license)
@@ -32,25 +32,26 @@ We follow a standard GitHub-based workflow with issues, branches, and pull reque
 
 We use [GitHub Flow](https://guides.github.com/introduction/flow/index.html), and all code changes must go through pull requests.
 
-### Submission Guidelines
+### Submission Guidelines:
 
-1. **Start with an Issue** -
+1. **Start with an Issue:**
    Open an issue to discuss your proposed change. This helps align efforts, avoid duplication, and ensure your contribution fits the project's goals.
 
-2. **Fork and Branch** -
+2. **Fork and Branch:**
    Fork the repository and create a new branch from `main`.
 
-3. **Rebase Only (No Merge Commits)** -
+3. **Rebase Only (No Merge Commits):**
    We maintain a clean, linear commit history via rebase-only.
 
    - If your branch includes merge commits, please rebase it or create a fresh branch.
    - See: [Git Rebase Guide](https://git-scm.com/book/en/v2/Git-Branching-Rebasing)
 
-4. **Use the Latest Classiq Version**
+4. **Use the Latest Classiq Version:**
    Ensure your code is compatible with the current SDK version.
 
-5. **Open a Pull Request**
+5. **Open a Pull Request:**
    Submit your PR and tag the maintainers for feedback.
+   - Make sure the PR is **linked to its related issue**. See: [Linking a PR to an Issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue)
 
 ---
 
@@ -58,19 +59,38 @@ We use [GitHub Flow](https://guides.github.com/introduction/flow/index.html), an
 
 To keep the library organized and functional, please follow these standards:
 
-- **Place Files Correctly** -
+- **Place Files Correctly:**
   Add new content to the appropriate folder: `algorithms/`, `applications/`, or `tutorials/`.
 
-- **Use `.ipynb` Format** -
+- **Use `.ipynb` Format:**
   All contributions should be in Jupyter Notebook format unless agreed otherwise with a maintainer.
 
-- **Include Required Support Files** -
+- **If your contribution is based on a paper:**
+
+  - The folder and notebook name should match the paper title (use lowercase and underscores if needed).
+  - Include a link to the paper’s [arXiv](https://arxiv.org/) or publication URL **at the top of the notebook**.
+
+- **Include Images Within the Notebook:**
+  Use Jupyter's built-in drag-and-drop feature to embed images directly into the notebook. Do not add images as separate files.
+
+- **Include Required Support Files:**
   Each notebook must be accompanied by:
+
   - `file_name.qmod`
   - `file_name.synthesis_options.json`
   - `file_name.metadata.json`
 
-### How to Generate These Files
+- **Use `pre-commit`**
+  New content must follow the standars which are enforced by `pre-commit`.
+  Such standards, for example, automatically format the code, or add templates for testing notebooks.
+  In order to install `pre-commit`, you may run
+  ```bash
+  pip install pre-commit
+  pre-commit install
+  ```
+  Alternatively, you may visit [the `pre-commit` documentation](https://pre-commit.com/) for more details.
+
+### How to Generate These Files:
 
 - Use the [`write_qmod`](https://docs.classiq.io/latest/sdk-reference/modeling/?h=write_qmod#classiq.write_qmod.write_qmod) function:
 
@@ -106,11 +126,25 @@ To pass CI, you must add a timeout for your notebook in:
 
 ## Before-You-Submit Checklist
 
-- [ ] Your notebook runs successfully with the latest Classiq version
-- [ ] Required files are included: `.qmod`, `.synthesis_options.json`, `.metadata.json`
-- [ ] Timeout is added in `tests/resources/timeouts.yaml`
-- [ ] Your branch is rebased (no merge commits)
-- [ ] File names are clear, descriptive, and match the notebook content
+- [ ] Please make sure that the notebook runs successfully with the latest Classiq version.
+
+- [ ] Please make sure that you placed the files in an appropriate folder
+
+  - [ ] And that the file names are clear, descriptive, and match the notebook content.
+    - [ ] Note that we require the file names of `.ipynb` and `.qmod` to be unique across this repository.
+  - [ ] Plus, please make sure that all required files are included: `.qmod`, `.synthesis_options.json`, `.metadata.json`
+  - [ ] And that images are embedded inside the notebook, not added as external files
+
+- [ ] If applicable, please include link to the paper on which the notebook is based, in the notebook itself.
+
+- [ ] Please use `rebase` on your branch (no merge commits)
+- [ ] Please link this PR to the relevant issue
+
+- [ ] Please make sure to run `pre-commit` when commiting changes
+  - [ ] If you're using `git` in the terminal, make sure to install `pre-commit` via running `pip install pre-commit` followed by `pre-commit install`
+    - [ ] More info at [the `pre-commit` documentation](https://pre-commit.com/)
+  - [ ] Note that Classiq runs automatic code linting. Meaning that one of the tests verifies the output of `pre-commit`.
+  - [ ] Also note that `pre-commit` may minorly alter some files. Make sure to `git add` the changes done by `pre-commit`
 
 ---
 
@@ -118,7 +152,7 @@ To pass CI, you must add a timeout for your notebook in:
 
 We use GitHub Issues to track bugs. [Open a new issue](https://github.com/Classiq/classiq-library/issues/new) and include the following:
 
-### How to Write a Helpful Bug Report
+### How to Write a Helpful Bug Report:
 
 - **What were you trying to do?**
   Briefly explain your goal or expected behavior.
@@ -163,3 +197,4 @@ By contributing, you agree that your work will be licensed under the [MIT Licens
 - [How to Contribute to an Open Source Project on GitHub](https://opensource.guide/how-to-contribute/)
 - [Using Pull Requests](https://help.github.com/articles/about-pull-requests/)
 - [GitHub Flow](https://guides.github.com/introduction/flow/)
+- [Linking Pull Requests to Issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue)
