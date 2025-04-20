@@ -25,10 +25,8 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     for duration in tb.ref("DURATIONS"):
         assert duration < 500  # locally it is no longer than 200 seconds
 
-    assert all(
-        np.isclose(
-            tb.ref("calculated_energy_gradient"),
-            tb.ref("total_energy_gaps")[10],
-            atol=0.01,
-        )
+    assert np.isclose(
+        tb.ref("calculated_energy_gradient"),
+        tb.ref("total_energy_gaps")[10],
+        atol=0.01,
     )  # should be atol=0.01
