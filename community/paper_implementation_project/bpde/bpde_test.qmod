@@ -1,4 +1,4 @@
-qfunc main(output readout: qbit) {
+qfunc main(output readout: qbit, delta_e: real) {
   state: qbit[];
   allocate(1, state);
   allocate(1, readout);
@@ -23,24 +23,6 @@ qfunc main(output readout: qbit) {
     remove_orbitals=[]
   }, state);
   H(readout);
-  X(readout);
-  control (readout) {
-    suzuki_trotter([
-      PauliTerm {
-        pauli=[Pauli::I],
-        coefficient=-1.0603
-      },
-      PauliTerm {
-        pauli=[Pauli::Z],
-        coefficient=-0.536
-      },
-      PauliTerm {
-        pauli=[Pauli::X],
-        coefficient=0.1967
-      }
-    ], 1.0, 2, 2, state);
-  }
-  X(readout);
   control (readout) {
     suzuki_trotter([
       PauliTerm {
@@ -56,7 +38,22 @@ qfunc main(output readout: qbit) {
         coefficient=0.1969
       }
     ], 1.0, 2, 2, state);
+  } else {
+    suzuki_trotter([
+      PauliTerm {
+        pauli=[Pauli::I],
+        coefficient=-1.0603
+      },
+      PauliTerm {
+        pauli=[Pauli::Z],
+        coefficient=-0.536
+      },
+      PauliTerm {
+        pauli=[Pauli::X],
+        coefficient=0.1967
+      }
+    ], 1.0, 2, 2, state);
   }
-  PHASE(0.1, readout);
+  PHASE(delta_e * 1.0, readout);
   H(readout);
 }
