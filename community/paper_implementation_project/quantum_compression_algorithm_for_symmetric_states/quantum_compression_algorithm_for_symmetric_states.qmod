@@ -1,9 +1,3 @@
-qfunc hadamard_transform_expanded___0(target: qbit[5]) {
-  repeat (index: 5) {
-    H(target[index]);
-  }
-}
-
 qfunc apply_matrix_expanded___0(q1: qbit, q2: qbit, q3: qbit) {
   temp: qbit[3];
   within {
@@ -407,6 +401,6 @@ qfunc symmetric_compression_algorithm_expanded___0(q_array: qbit[5]) {
 
 qfunc main(output x: qbit[5]) {
   allocate(5, x);
-  hadamard_transform_expanded___0(x);
+  hadamard_transform(x);
   symmetric_compression_algorithm_expanded___0(x);
 }
