@@ -1,0 +1,118 @@
+qfunc check_block(a: qnum, res: qbit) {
+  res ^= a == 0;
+}
+
+qfunc projector_cnot(reg: qnum, aux: qbit) {
+  control (reg == 0) {
+    X(aux);
+  }
+}
+
+qfunc u_sin(x: qbit[], a: qnum) {
+  repeat (i: 8) {
+    CRY(2 ** (((-8) + i) + 1), x[i], a);
+  }
+  X(a);
+}
+
+qfunc u_f(x: qnum, a1: qnum, a2_qsvt: qbit, a3_qsvt: qbit) {
+  full_reg: qbit[];
+  {a1, x} -> full_reg;
+  within {
+    H(a3_qsvt);
+  } apply {
+    qsvt_lcu([
+      4.7123,
+      3.1416,
+      3.1414,
+      3.1423,
+      3.1413,
+      3.1351,
+      3.164,
+      3.1257,
+      3.0607,
+      3.3762,
+      2.9726,
+      2.8151,
+      3.9225,
+      2.7022,
+      2.7022,
+      3.9225,
+      2.8151,
+      2.9726,
+      3.3762,
+      3.0607,
+      3.1257,
+      3.164,
+      3.1351,
+      3.1413,
+      3.1423,
+      3.1414,
+      3.1416,
+      (-83.2523),
+      0.0
+    ], [
+      4.7123,
+      3.1416,
+      3.1415,
+      3.1416,
+      3.1428,
+      3.137,
+      3.1445,
+      3.1681,
+      3.0581,
+      3.203,
+      3.329,
+      2.6441,
+      3.4704,
+      3.5741,
+      2.2316,
+      3.5741,
+      3.4704,
+      2.6441,
+      3.329,
+      3.203,
+      3.0581,
+      3.1681,
+      3.1445,
+      3.137,
+      3.1428,
+      3.1416,
+      3.1415,
+      3.1416,
+      (-86.3939)
+    ], lambda(reg, aux) {
+      projector_cnot(reg[0], aux);
+    }, lambda(reg, aux) {
+      projector_cnot(reg[0], aux);
+    }, lambda(reg) {
+      u_sin(reg[1:reg.len], reg[0]);
+    }, full_reg, a2_qsvt, a3_qsvt);
+  }
+  H(a3_qsvt);
+  full_reg -> {a1, x};
+}
+
+qfunc state_prep(reg: qbit[]) {
+  hadamard_transform(reg[0:8]);
+  u_f(reg[0:8], reg[8], reg[9], reg[10]);
+}
+
+qfunc u_amp(x: qnum, a1: qnum, a2: qbit, a3: qbit) {
+  full_reg: qbit[];
+  {x, a1, a2, a3} -> full_reg;
+  exact_amplitude_amplification(0.4058, lambda(_reg) {
+    phase_oracle(check_block, _reg[8:11]);
+  }, lambda(_reg) {
+    state_prep(_reg);
+  }, full_reg);
+  full_reg -> {x, a1, a2, a3};
+}
+
+qfunc main(output x: qnum, output a1: qnum, output a2_qsvt: qbit, output a3_qsvt_parity: qbit) {
+  allocate(8, x);
+  allocate(1, a1);
+  allocate(1, a2_qsvt);
+  allocate(1, a3_qsvt_parity);
+  u_amp(x, a1, a2_qsvt, a3_qsvt_parity);
+}
