@@ -8,7 +8,7 @@ from tests.utils_for_testbook import (
 )
 
 
-@wrap_testbook("bpde", timeout_seconds=1200)
+@wrap_testbook("bpde", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     for qmod in tb.ref("QMODS"):
@@ -23,7 +23,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test notebook content
     for duration in tb.ref("DURATIONS"):
-        assert duration < 500  # locally it is no longer than 200 seconds
+        assert duration < 300  # locally it is no longer than 200 seconds
 
     assert np.isclose(
         tb.ref("calculated_energy_gradient"),
