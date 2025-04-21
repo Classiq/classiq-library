@@ -1,12 +1,6 @@
-qfunc hadamard_transform_expanded___0(target: qbit[3]) {
-  repeat (index: 3) {
-    H(target[index]);
-  }
-}
-
 qfunc pauli_kernel_expanded___0(data: real[3], qba: qbit[3]) {
   power (2) {
-    hadamard_transform_expanded___0(qba);
+    hadamard_transform(qba);
     suzuki_trotter([
       PauliTerm {
         pauli=[3, 0, 0],
