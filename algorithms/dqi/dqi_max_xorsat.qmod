@@ -21,15 +21,15 @@ qfunc binary_to_one_hot_expanded___0(input binary: qnum<2, False, 0>, output one
   inplace_binary_to_one_hot_expanded___0(one_hot);
 }
 
-qfunc inplace_one_hot_to_unary(qvar: qbit[]) {
-  repeat (i: qvar.len - 1) {
-    CX(qvar[(qvar.len - i) - 1], qvar[(qvar.len - i) - 2]);
+qfunc inplace_one_hot_to_unary_expanded___0(qvar: qbit[4]) {
+  repeat (i: 3) {
+    CX(qvar[3 - i], qvar[2 - i]);
   }
   X(qvar[0]);
 }
 
 qfunc one_hot_to_unary_expanded___0(input one_hot: qbit[4], output unary: qbit[3]) {
-  inplace_one_hot_to_unary(one_hot);
+  inplace_one_hot_to_unary_expanded___0(one_hot);
   lsb: qbit;
   one_hot -> {lsb, unary};
   free(lsb);
@@ -153,9 +153,9 @@ qfunc prepare_dick_state_unary_input_expanded___5(qvar: qbit[6]) {
   prepare_dick_state_unary_input_expanded___4(qvar[1:6]);
 }
 
-qfunc vector_product_phase(v: int[], y: qbit[]) {
-  repeat (i: y.len) {
-    if (v[i] > 0) {
+qfunc vector_product_phase_expanded___0(y: qbit[6]) {
+  repeat (i: 6) {
+    if ([1.0, 1.0, 1.0, 1.0, 1.0, 1.0][i] > 0) {
       Z(y[i]);
     }
   }
@@ -171,7 +171,7 @@ qfunc matrix_vector_product_expanded___0(y: qbit[6], output out: qbit[6]) {
   out[5] ^= (0 ^ y[4]) ^ y[5];
 }
 
-qfunc syndrome_decode_lookuptable(syndrome: qnum, error: qnum) {
+qfunc syndrome_decode_lookuptable_expanded___0(syndrome: qnum<6, False, 0>, error: qnum<6, False, 0>) {
   control (syndrome == 0) {
     error ^= 0;
   }
@@ -240,6 +240,12 @@ qfunc syndrome_decode_lookuptable(syndrome: qnum, error: qnum) {
   }
 }
 
+qfunc hadamard_transform_expanded___0(target: qbit[6]) {
+  repeat (index: 6) {
+    H(target[index]);
+  }
+}
+
 qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) {
   k_num_errors: qnum<2, False, 0>;
   prepare_amplitudes([
@@ -252,10 +258,10 @@ qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) 
   binary_to_unary_expanded___0(k_num_errors, k_unary);
   pad_zeros_expanded___0(k_unary, y);
   prepare_dick_state_unary_input_expanded___5(y);
-  vector_product_phase([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], y);
+  vector_product_phase_expanded___0(y);
   matrix_vector_product_expanded___0(y, solution);
-  syndrome_decode_lookuptable(solution, y);
-  hadamard_transform(solution);
+  syndrome_decode_lookuptable_expanded___0(solution, y);
+  hadamard_transform_expanded___0(solution);
 }
 
 qfunc main(output y: qbit[6], output solution: qbit[6]) {
