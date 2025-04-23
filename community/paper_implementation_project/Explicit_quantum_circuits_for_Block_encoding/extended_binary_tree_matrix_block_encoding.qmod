@@ -1,0 +1,87 @@
+qfunc O_A_extendedBT(l_array: qbit[], j: qnum, data: qnum, ancilla: qbit) {
+  j_array: qbit[];
+  within {
+    j -> j_array;
+  } apply {
+    control (l_array[2] == 0) {
+      RY(2.5322, data);
+    }
+    control (l_array[2] == 1) {
+      control (j_array[2] == 0) {
+        RY(2.8909, data);
+      }
+    }
+    control (l_array[2] == 1) {
+      control (j_array[2] == 1) {
+        RY(2.7898, data);
+      }
+    }
+  }
+  control (l_array[2] == 1) {
+    control (j == 0) {
+      RY(0.2007, data);
+    }
+  }
+}
+
+qfunc M2(j: qbit[], anc_M: qbit) {
+  SWAP(j[j.len - 1], anc_M);
+  repeat (i: j.len - 1) {
+    SWAP(j[(j.len - 1) - i], j[(j.len - 2) - i]);
+  }
+}
+
+qfunc L_shift(jarr: qnum) {
+  jarr += 1;
+}
+
+qfunc R_shift(jarr: qnum) {
+}
+
+qfunc O_C_extendedBT(l: qnum, j: qnum, ancilla: qbit) {
+  l_array: qbit[];
+  within {
+    l -> l_array;
+  } apply {
+    control (l_array[2] == 0) {
+      control (l_array[1] == 0) {
+        M2(j, ancilla);
+      }
+    }
+  }
+  control (l == 1) {
+    L_shift(j);
+  }
+  control (l == 3) {
+    R_shift(j);
+  }
+  within {
+    l -> l_array;
+  } apply {
+    control (l_array[2] == 0) {
+      control (l_array[1] == 1) {
+        invert {
+          M2(j, ancilla);
+        }
+      }
+    }
+  }
+}
+
+qfunc BE_extendedBT(l: qnum, j: qnum, data: qnum, ancilla: qbit) {
+  O_A_extendedBT(l, j, data, ancilla);
+  O_C_extendedBT(l, j, ancilla);
+}
+
+qfunc main(output j: qnum, output l: qnum, output data: qnum, output anc_M: qbit) {
+  allocate(1, anc_M);
+  allocate(1, data);
+  allocate(3, l);
+  allocate(3, j);
+  apply_to_all(H, j);
+  within {
+    apply_to_all(H, l);
+  } apply {
+    BE_extendedBT(l, j, data, anc_M);
+  }
+}
