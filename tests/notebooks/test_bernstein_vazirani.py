@@ -11,6 +11,9 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
+    a = tb.ref("qprog")
+    assert type(a) is None, f"{type(a)=} ,,, {tb.ref('type(qprog)')=}"
+
     validate_quantum_program_size(
         tb.ref("qprog"),
         expected_width=6,
