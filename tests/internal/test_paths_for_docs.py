@@ -31,4 +31,6 @@ def test_paths_to_copy_for_docs():
 
 def test_docs_directories():
     dir_list = DOCS_DIRECTORIES.read_text().splitlines()
-    assert all((ROOT / path).exists() for path in dir_list), f"Make sure all directories in {DOCS_DIRECTORIES} actually exist"
+    assert all(
+        (ROOT / path).exists() for path in dir_list
+    ), f"Make sure all directories in {DOCS_DIRECTORIES} actually exist"
