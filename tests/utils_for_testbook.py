@@ -142,23 +142,21 @@ def validate_quantum_model(model: str) -> None:
 
 
 def validate_quantum_program_size(
-    quantum_program: str,
+    qp: QuantumProgram,
     expected_width: int | None = None,
     expected_depth: int | None = None,
-    compare_to: str | None = None,
+    compare_to: QuantumProgram | None = None,
     allow_zero_size: bool = False,
 ) -> None:
     if compare_to is not None:
-        other_qp = QuantumProgram.model_validate_json(quantum_program)
+        other_qp = compare_to
 
         other_width = other_qp.data.width
 
         assert other_qp.transpiled_circuit is not None  # for mypy
         other_depth = other_qp.transpiled_circuit.depth
 
-        return validate_quantum_program_size(quantum_program, other_width, other_depth)
-
-    qp = QuantumProgram.model_validate_json(quantum_program)
+        return validate_quantum_program_size(qp, other_width, other_depth)
 
     actual_width = qp.data.width
     if expected_width is not None:
