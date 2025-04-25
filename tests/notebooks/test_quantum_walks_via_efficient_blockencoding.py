@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("BE_Sparse_Classiq.ipynb", timeout_seconds=1000)
+@wrap_testbook("quantum_walks_via_efficient_blockencoding.ipynb", timeout_seconds=720)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod_ebt"))

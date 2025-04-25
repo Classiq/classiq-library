@@ -78,9 +78,9 @@ qfunc main(output j: qnum, output l: qnum, output data: qnum, output anc_M: qbit
   allocate(1, data);
   allocate(3, l);
   allocate(3, j);
-  apply_to_all(H, j);
+  hadamard_transform(j);
   within {
-    apply_to_all(H, l);
+    hadamard_transform(l);
   } apply {
     BE_extendedBT(l, j, data, anc_M);
   }
