@@ -46,6 +46,6 @@ qfunc BE_stochastic(block: qnum, state: qnum) {
 qfunc main(output block: qnum, output state: qnum) {
   allocate(3, block);
   allocate(3, state);
-  apply_to_all(H, state);
+  hadamard_transform(state);
   BE_stochastic(block, state);
 }
