@@ -1,0 +1,171 @@
+qfunc main(t: real[12], output qbv: qbit[]) {
+  allocate(fock_hamiltonian_problem_to_hamiltonian(FockHamiltonianProblem {
+    mapping=FermionMapping::JORDAN_WIGNER,
+    z2_symmetries=False,
+    terms=[
+      LadderTerm {
+        coefficient=0.2,
+        ops=[
+          LadderOp {
+            op=LadderOperator::PLUS,
+            index=0
+          },
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=0
+          }
+        ]
+      },
+      LadderTerm {
+        coefficient=0.3,
+        ops=[
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=1
+          },
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=1
+          }
+        ]
+      },
+      LadderTerm {
+        coefficient=0.4,
+        ops=[
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=2
+          },
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=2
+          }
+        ]
+      },
+      LadderTerm {
+        coefficient=0.5,
+        ops=[
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=3
+          },
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=3
+          }
+        ]
+      },
+      LadderTerm {
+        coefficient=-0.1,
+        ops=[
+          LadderOp {
+            op=LadderOperator::PLUS,
+            index=0
+          },
+          LadderOp {
+            op=LadderOperator::PLUS,
+            index=1
+          },
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=1
+          },
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=0
+          }
+        ]
+      },
+      LadderTerm {
+        coefficient=-0.3,
+        ops=[
+          LadderOp {
+            op=LadderOperator::PLUS,
+            index=2
+          },
+          LadderOp {
+            op=LadderOperator::PLUS,
+            index=3
+          },
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=2
+          },
+          LadderOp {
+            op=LadderOperator::MINUS,
+            index=3
+          }
+        ]
+      }
+    ],
+    num_particles=[1, 1]
+  })[0].pauli.len, qbv);
+  full_hea(4, [0, 1, 0], t, [[0, 1], [1, 2], [2, 3]], 3, [lambda(angle, q) {
+    X(q);
+  }, lambda(angle, q) {
+    RY(angle, q);
+  }], [lambda(angle, q1, q2) {
+    CX(q1, q2);
+  }], qbv);
+}
+
+cscope ```
+vqe_result = vqe(
+    hamiltonian=fock_hamiltonian_problem_to_hamiltonian(struct_literal(FockHamiltonianProblem,mapping=FermionMapping.JORDAN_WIGNER,z2_symmetries=False,terms=[
+            struct_literal(LadderTerm,
+                coefficient=0.2,
+                ops=[
+                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=0),
+					struct_literal(LadderOp, op=LadderOperator.MINUS, index=0)
+                ]
+            ),		
+            struct_literal(LadderTerm,
+                coefficient=0.3,
+                ops=[
+                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=1),
+					struct_literal(LadderOp, op=LadderOperator.MINUS, index=1)
+                ]
+            ),		
+            struct_literal(LadderTerm,
+                coefficient=0.4,
+                ops=[
+                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=2),
+					struct_literal(LadderOp, op=LadderOperator.MINUS, index=2)
+                ]
+            ),		
+            struct_literal(LadderTerm,
+                coefficient=0.5,
+                ops=[
+                    struct_literal(LadderOp, op=LadderOperator.MINUS, index=3),
+					struct_literal(LadderOp, op=LadderOperator.MINUS, index=3)
+                ]
+            ),		
+            struct_literal(LadderTerm,
+                coefficient=-0.1,
+                ops=[
+                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=0),
+					struct_literal(LadderOp, op=LadderOperator.PLUS, index=1),
+					struct_literal(LadderOp, op=LadderOperator.MINUS, index=1),
+					struct_literal(LadderOp, op=LadderOperator.MINUS, index=0)
+                ]
+            ),		
+            struct_literal(LadderTerm,
+                coefficient=-0.3,
+                ops=[
+                    struct_literal(LadderOp, op=LadderOperator.PLUS, index=2),
+					struct_literal(LadderOp, op=LadderOperator.PLUS, index=3),
+					struct_literal(LadderOp, op=LadderOperator.MINUS, index=2),
+					struct_literal(LadderOp, op=LadderOperator.MINUS, index=3)
+                ]
+            )],num_particles=[1, 1])), maximize=False,
+initial_point=[],
+optimizer=Optimizer.COBYLA,
+max_iteration=100,
+tolerance=0,
+step_size=0,
+skip_compute_variance=False,
+alpha_cvar=1.0,
+
+)
+save({'vqe_result': vqe_result})
+```
