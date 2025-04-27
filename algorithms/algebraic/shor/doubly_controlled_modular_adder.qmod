@@ -1,6 +1,26 @@
-qfunc phase_lad(value: int, phi_b: qbit[]) {
-  repeat (index: phi_b.len) {
-    PHASE(qft_const_adder_phase(index, value, phi_b.len), phi_b[index]);
+qfunc phase_lad_expanded___0(phi_b: qbit[5]) {
+  PHASE(1.7671, phi_b[0]);
+  PHASE(3.5343, phi_b[1]);
+  PHASE(0.7854, phi_b[2]);
+  PHASE(1.5708, phi_b[3]);
+  PHASE(3.1416, phi_b[4]);
+}
+
+qfunc phase_lad_expanded___1(phi_b: qbit[5]) {
+  PHASE(2.9452, phi_b[0]);
+  PHASE(5.8905, phi_b[1]);
+  PHASE(5.4978, phi_b[2]);
+  PHASE(4.7124, phi_b[3]);
+  PHASE(3.1416, phi_b[4]);
+}
+
+qfunc check_msb(ref: int, x: qbit[], aux: qbit) {
+  within {
+    invert {
+      qft_ns(x);
+    }
+  } apply {
+    ctrl_x(ref, x[0], aux);
   }
 }
 
@@ -23,37 +43,27 @@ qfunc ctrl_x(ref: int, ctrl: qnum, aux: qbit) {
   }
 }
 
-qfunc check_msb(ref: int, x: qbit[], aux: qbit) {
-  within {
-    invert {
-      qft_ns(x);
-    }
-  } apply {
-    ctrl_x(ref, x[0], aux);
-  }
-}
-
-qfunc ccmod_add(N: int, a: int, phi_b: qbit[], c1: qbit, c2: qbit) {
-  ctrl: qbit[];
+qfunc ccmod_add_expanded___0(phi_b: qbit[5], c1: qbit, c2: qbit) {
+  ctrl: qbit[2];
   aux: qbit;
   within {
     allocate(1, aux);
     {c1, c2} -> ctrl;
   } apply {
     control (ctrl) {
-      phase_lad(a, phi_b);
+      phase_lad_expanded___0(phi_b);
     }
     invert {
-      phase_lad(N, phi_b);
+      phase_lad_expanded___1(phi_b);
     }
     check_msb(1, phi_b, aux);
     control (aux) {
-      phase_lad(N, phi_b);
+      phase_lad_expanded___1(phi_b);
     }
     within {
       invert {
         control (ctrl) {
-          phase_lad(a, phi_b);
+          phase_lad_expanded___0(phi_b);
         }
       }
     } apply {
@@ -62,7 +72,7 @@ qfunc ccmod_add(N: int, a: int, phi_b: qbit[], c1: qbit, c2: qbit) {
   }
 }
 
-qfunc main(output b: qnum, output ctrl: qbit[2]) {
+qfunc main(output b: qnum<5, False, 0>, output ctrl: qbit[2]) {
   allocate(5, b);
   allocate(2, ctrl);
   b ^= 8;
@@ -71,6 +81,6 @@ qfunc main(output b: qnum, output ctrl: qbit[2]) {
   within {
     qft(b);
   } apply {
-    ccmod_add(15, 9, b, ctrl[0], ctrl[1]);
+    ccmod_add_expanded___0(b, ctrl[0], ctrl[1]);
   }
 }
