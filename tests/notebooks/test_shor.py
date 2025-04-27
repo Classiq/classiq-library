@@ -24,10 +24,9 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    counts_results = tb.ref("result_2")
-    d = {
-        item.state["pow"]: item.shots
-        for item in counts_results.parsed_counts_of_outputs("pow")
-    }
+    parsed_counts = tb.ref(
+        "[res.dict() for res in result_2.parsed_counts_of_outputs('pow')]"
+    )
+    d = {item["state"]["pow"]: item["shots"] for item in parsed_counts}
     for val in [0, 171, 341, 512, 683, 853]:
         assert val in d and d[val] > 120, "Unexpected shor execution results"
