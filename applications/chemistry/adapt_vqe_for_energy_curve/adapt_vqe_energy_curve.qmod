@@ -1,7 +1,7 @@
-qfunc main(output qbv: qbit[]) {
+qfunc main(t: real[4], output qbv: qbit[]) {
   allocate(molecule_problem_to_hamiltonian(MoleculeProblem {
-    mapping=FermionMapping::BRAVYI_KITAEV,
-    z2_symmetries=True,
+    mapping=FermionMapping::JORDAN_WIGNER,
+    z2_symmetries=False,
     molecule=Molecule {
       atoms=[
         ChemistryAtom {
@@ -16,12 +16,12 @@ qfunc main(output qbv: qbit[]) {
       spin=1,
       charge=0
     },
-    freeze_core=True,
+    freeze_core=False,
     remove_orbitals=[]
   })[0].pauli.len, qbv);
   molecule_hartree_fock(MoleculeProblem {
-    mapping=FermionMapping::BRAVYI_KITAEV,
-    z2_symmetries=True,
+    mapping=FermionMapping::JORDAN_WIGNER,
+    z2_symmetries=False,
     molecule=Molecule {
       atoms=[
         ChemistryAtom {
@@ -36,37 +36,31 @@ qfunc main(output qbv: qbit[]) {
       spin=1,
       charge=0
     },
-    freeze_core=True,
+    freeze_core=False,
     remove_orbitals=[]
   }, qbv);
-  molecule_ucc(MoleculeProblem {
-    mapping=FermionMapping::BRAVYI_KITAEV,
-    z2_symmetries=True,
-    molecule=Molecule {
-      atoms=[
-        ChemistryAtom {
-          element=Element::H,
-          position=Position {x=0.0, y=0.0, z=0.0}
-        },
-        ChemistryAtom {
-          element=Element::H,
-          position=Position {x=0.0, y=0.0, z=3.5}
-        }
-      ],
-      spin=1,
-      charge=0
-    },
-    freeze_core=True,
-    remove_orbitals=[]
-  }, [1, 2], qbv);
+  full_hea(4, [0, 1, 0], t, [
+    [0, 1],
+    [0, 2],
+    [0, 3],
+    [1, 2],
+    [1, 3],
+    [2, 3]
+  ], 1, [lambda(angle, q) {
+    X(q);
+  }, lambda(angle, q) {
+    RY(angle, q);
+  }], [lambda(angle, q1, q2) {
+    CX(q1, q2);
+  }], qbv);
 }
 
 cscope ```
 vqe_result = vqe(
-    hamiltonian=molecule_problem_to_hamiltonian(struct_literal(MoleculeProblem, mapping=FermionMapping.BRAVYI_KITAEV, z2_symmetries=True, molecule=struct_literal(Molecule, atoms=[struct_literal(ChemistryAtom, element=Element.H, position=struct_literal(Position, x=0.0, y=0.0, z=0.0)), struct_literal(ChemistryAtom, element=Element.H, position=struct_literal(Position, x=0.0, y=0.0, z=3.5))], spin=1, charge=0), freeze_core=True, remove_orbitals=[])), maximize=False,
+    hamiltonian=molecule_problem_to_hamiltonian(struct_literal(MoleculeProblem, mapping=FermionMapping.JORDAN_WIGNER, z2_symmetries=False, molecule=struct_literal(Molecule, atoms=[struct_literal(ChemistryAtom, element=Element.H, position=struct_literal(Position, x=0.0, y=0.0, z=0.0)), struct_literal(ChemistryAtom, element=Element.H, position=struct_literal(Position, x=0.0, y=0.0, z=3.5))], spin=1, charge=0), freeze_core=False, remove_orbitals=[])), maximize=False,
 initial_point=[],
 optimizer=Optimizer.COBYLA,
-max_iteration=50,
+max_iteration=10,
 tolerance=0,
 step_size=0,
 skip_compute_variance=False,
@@ -75,6 +69,6 @@ alpha_cvar=1.0,
 )
 save({'vqe_result': vqe_result})
 
-molecule_result = molecule_ground_state_solution_post_process(struct_literal(MoleculeProblem, mapping=FermionMapping.BRAVYI_KITAEV, z2_symmetries=True, molecule=struct_literal(Molecule, atoms=[struct_literal(ChemistryAtom, element=Element.H, position=struct_literal(Position, x=0.0, y=0.0, z=0.0)), struct_literal(ChemistryAtom, element=Element.H, position=struct_literal(Position, x=0.0, y=0.0, z=3.5))], spin=1, charge=0), freeze_core=True, remove_orbitals=[]),vqe_result)
+molecule_result = molecule_ground_state_solution_post_process(struct_literal(MoleculeProblem, mapping=FermionMapping.JORDAN_WIGNER, z2_symmetries=False, molecule=struct_literal(Molecule, atoms=[struct_literal(ChemistryAtom, element=Element.H, position=struct_literal(Position, x=0.0, y=0.0, z=0.0)), struct_literal(ChemistryAtom, element=Element.H, position=struct_literal(Position, x=0.0, y=0.0, z=3.5))], spin=1, charge=0), freeze_core=False, remove_orbitals=[]),vqe_result)
 save({'molecule_result': molecule_result})
 ```
