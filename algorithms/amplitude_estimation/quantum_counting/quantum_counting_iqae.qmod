@@ -1,38 +1,26 @@
 DOMAIN_SIZE_QCONST: int = 4;
 
-qstruct OracleVars {
-  a: qnum<2, False, 0>;
-  b: qnum<2, False, 0>;
-}
-
 qstruct IQAEVars {
   state: OracleVars;
   ind: qbit;
 }
 
-qfunc iqae_oracle(vars: IQAEVars) {
-  Z(vars.ind);
-}
-
-qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
-  res ^= (a + b) <= 2;
-}
-
-qfunc iqae_state_preparation(vars: IQAEVars) {
-  hadamard_transform(vars.state);
-  arith_equation(vars.state.a, vars.state.b, vars.ind);
+qstruct OracleVars {
+  a: qnum<2, False, 0>;
+  b: qnum<2, False, 0>;
 }
 
 qfunc reflection_about_zero(x: qbit[]) {
   lsb: qbit;
-  msbs: qbit[x.len - 1];
-  apply_to_all(X, x);
-  x -> {msbs, lsb};
-  control (msbs) {
-    Z(lsb);
+  msbs: qbit[];
+  within {
+    apply_to_all(X, x);
+    x -> {lsb, msbs};
+  } apply {
+    control (msbs) {
+      Z(lsb);
+    }
   }
-  {msbs, lsb} -> x;
-  apply_to_all(X, x);
 }
 
 qfunc my_diffuser(sp_operand: qfunc (qbit[]), x: qbit[]) {
@@ -56,6 +44,19 @@ qfunc my_iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfun
   power (k) {
     my_grover_operator(oracle_operand, sp_operand, x);
   }
+}
+
+qfunc iqae_oracle(vars: IQAEVars) {
+  Z(vars.ind);
+}
+
+qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
+  res ^= (a + b) <= 2;
+}
+
+qfunc iqae_state_preparation(vars: IQAEVars) {
+  hadamard_transform(vars.state);
+  arith_equation(vars.state.a, vars.state.b, vars.ind);
 }
 
 qfunc main(k: int, output ind_reg: qbit) {

@@ -3,31 +3,17 @@ qstruct OracleVars {
   b: qnum<2, False, 0>;
 }
 
-qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
-  res ^= (a + b) <= 2;
-}
-
-qfunc arith_oracle(state: OracleVars) {
-  aux: qbit;
-  within {
-    allocate(1, aux);
-    X(aux);
-    H(aux);
-  } apply {
-    arith_equation(state.a, state.b, aux);
-  }
-}
-
 qfunc reflection_about_zero(x: qbit[]) {
   lsb: qbit;
-  msbs: qbit[x.len - 1];
-  apply_to_all(X, x);
-  x -> {msbs, lsb};
-  control (msbs) {
-    Z(lsb);
+  msbs: qbit[];
+  within {
+    apply_to_all(X, x);
+    x -> {lsb, msbs};
+  } apply {
+    control (msbs) {
+      Z(lsb);
+    }
   }
-  {msbs, lsb} -> x;
-  apply_to_all(X, x);
 }
 
 qfunc my_diffuser(sp_operand: qfunc (qbit[]), x: qbit[]) {
@@ -44,6 +30,21 @@ qfunc my_grover_operator(oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit
   oracle_operand(x);
   my_diffuser(sp_operand, x);
   U(0, 0, 0, 3.1416, x[0]);
+}
+
+qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
+  res ^= (a + b) <= 2;
+}
+
+qfunc arith_oracle(state: OracleVars) {
+  aux: qbit;
+  within {
+    allocate(1, aux);
+    X(aux);
+    H(aux);
+  } apply {
+    arith_equation(state.a, state.b, aux);
+  }
 }
 
 qfunc main(output phase_reg: qnum) {
