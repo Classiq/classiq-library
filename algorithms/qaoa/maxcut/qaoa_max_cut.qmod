@@ -4,9 +4,8 @@ qfunc mixer_layer(beta: real, qba: qbit[]) {
   }, qba);
 }
 
-qfunc qaoa_ansatz(cost_layer: qfunc (real, qbit[]), num_layers: int, gammas: real[], betas: real[], qba: qbit[]) {
-  hadamard_transform(qba);
-  repeat (i: num_layers) {
+qfunc qaoa_ansatz(cost_layer: qfunc (real, qbit[]), gammas: real[], betas: real[], qba: qbit[]) {
+  repeat (i: betas.len) {
     cost_layer(gammas[i], qba);
     mixer_layer(betas[i], qba);
   }
@@ -17,6 +16,7 @@ qfunc maxcut_cost_layer(gamma: real, v: qbit[]) {
 }
 
 qfunc main(params: real[8], output v: qbit[5]) {
-  allocate(v.size, v);
-  qaoa_ansatz(maxcut_cost_layer, 4, params[0:4], params[4:8], v);
+  allocate(v);
+  hadamard_transform(v);
+  qaoa_ansatz(maxcut_cost_layer, params[0:4], params[4:8], v);
 }
