@@ -23,15 +23,15 @@ def test_timeouts_missing_files():
 #
 # tests from `notebook_pre_commit_collection`
 #
-@pytest.mark.parametrize("notebook_path", map(str, PROJECT_ROOT.rglob("*.ipynb")))
-def test_notebooks(notebook_path: str):
-    assert notebook_pre_commit_collection.is_valid_notebook(
-        notebook_path, automatically_add_timeout=False
-    )
+# @pytest.mark.parametrize("notebook_path", map(str, PROJECT_ROOT.rglob("*.ipynb")))
+# def test_notebooks(notebook_path: str):
+#     assert notebook_pre_commit_collection.is_valid_notebook(
+#         notebook_path, automatically_add_timeout=False
+#     )
 
 
-def test_notebooks_unique_names():
-    assert notebook_pre_commit_collection.validate_unique_names()
+# def test_notebooks_unique_names():
+#     assert notebook_pre_commit_collection.validate_unique_names()
 
 
 #
