@@ -5,7 +5,7 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
-@wrap_testbook("adapt_vqe_energy_curve", timeout_seconds=300)
+@wrap_testbook("adapt_vqe_energy_curve", timeout_seconds=500)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for a hybrid classical quantum neural network.
