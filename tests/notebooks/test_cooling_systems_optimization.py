@@ -7,7 +7,7 @@ import numpy as np
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("cooling_systems_optimization", timeout_seconds=2200)
+@wrap_testbook("cooling_systems_optimization", timeout_seconds=1800)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for the cooling system created by BMW.
