@@ -14,13 +14,19 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog_block_encoding")
+        tb.ref("qprog_block_encoding"),
+        expected_width=16,  # actual width: 11
+        expected_depth=None,  # no transpilation
     )
     validate_quantum_program_size(
-        tb.ref("matrix_inverse_qprog")
+        tb.ref("matrix_inverse_qprog"),
+        expected_width=16,  # actual width: 11
+        expected_depth=None,  # no transpilation
     )
     validate_quantum_program_size(
-        tb.ref("dummy_qprog")
+        tb.ref("dummy_qprog"),
+        expected_width=16,  # actual width: 11
+        expected_depth=None,  # no transpilation
     )
     # test notebook content
     assert np.allclose(
