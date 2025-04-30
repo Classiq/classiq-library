@@ -16,7 +16,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     #    validate_quantum_model(qmod)
     #test quantum programs
     for duration in tb.ref("durations"):
-    assert duration < 400  # locally it is no longer than 15 seconds
+        assert duration < 400  # locally it is no longer than 15 seconds
     assert all(
         np.isclose(tb.ref("exact_energy"), tb.ref("VQE_energy"), atol=0.02)
     )  # should be atol=0.01
