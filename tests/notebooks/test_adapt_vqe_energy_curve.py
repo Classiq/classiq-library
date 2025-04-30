@@ -13,6 +13,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     test models
     test quantum programs
-    )
+
     # test notebook content
     pass  # TODO
