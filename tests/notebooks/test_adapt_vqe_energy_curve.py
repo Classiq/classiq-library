@@ -4,6 +4,7 @@ from tests.utils_for_testbook import (
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
+import numpy as np
 
 @wrap_testbook("adapt_vqe_energy_curve", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
