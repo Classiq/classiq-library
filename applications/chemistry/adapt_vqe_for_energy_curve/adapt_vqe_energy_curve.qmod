@@ -1,4 +1,4 @@
-qfunc main(t: real[30], output qbv: qbit[]) {
+qfunc main(t: real[4], output qbv: qbit[]) {
   allocate(molecule_problem_to_hamiltonian(MoleculeProblem {
     mapping=FermionMapping::JORDAN_WIGNER,
     z2_symmetries=False,
@@ -39,7 +39,7 @@ qfunc main(t: real[30], output qbv: qbit[]) {
     freeze_core=False,
     remove_orbitals=[]
   }, qbv);
-  full_hea(4, [1, 1, 1, 1, 1, 1], t, [
+  full_hea(4, [1], t, [
     [0, 1],
     [0, 2],
     [0, 3],
@@ -48,17 +48,7 @@ qfunc main(t: real[30], output qbv: qbit[]) {
     [2, 3]
   ], 1, [lambda(angle, q) {
     RX(angle, q);
-  }, lambda(angle, q) {
-    RX(angle, q);
-  }, lambda(angle, q) {
-    RX(angle, q);
-  }], [lambda(angle, q1, q2) {
-    CRX(angle, q1, q2);
-  }, lambda(angle, q1, q2) {
-    CRX(angle, q1, q2);
-  }, lambda(angle, q1, q2) {
-    CRX(angle, q1, q2);
-  }], qbv);
+  }], [], qbv);
 }
 
 cscope ```
