@@ -11,8 +11,10 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     A notebook for a hybrid classical quantum neural network.
     The test verifies that the pre-trained model is indeed well trained.
     """
-    test models
-    test quantum programs
+    #test models
+    for qmod in tb.ref("qmods"):
+        validate_quantum_model(qmod)
+    #test quantum programs
 
     # test notebook content
     pass  # TODO
