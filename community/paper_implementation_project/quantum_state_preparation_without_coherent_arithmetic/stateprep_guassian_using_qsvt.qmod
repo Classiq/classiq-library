@@ -10,8 +10,8 @@ qfunc projector_cnot(reg: qnum, aux: qbit) {
 }
 
 qfunc u_sin(x: qbit[], a: qbit) {
-  repeat (i: 8) {
-    CRY(2 ** (((-8) + i) + 1), x[i], a);
+  repeat (i: x.len) {
+    CRY(2 ** (((-x.len) + i) + 1), x[i], a);
   }
   X(a);
 }
