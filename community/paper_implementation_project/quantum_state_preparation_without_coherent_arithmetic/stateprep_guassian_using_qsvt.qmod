@@ -98,13 +98,13 @@ qfunc state_prep(reg: MyQStruct) {
   u_f(reg.x, reg.a1, reg.a2, reg.a3);
 }
 
-qfunc u_amp(x: qnum, a1: qnum, a2: qbit, a3: qbit) {
+qfunc u_amp(x: qnum, a1: qbit, a2: qbit, a3: qbit) {
   reg: qbit[];
   within {
     {x, a1, a2, a3} -> reg;
   } apply {
     exact_amplitude_amplification(0.4058, lambda(_reg) {
-      reflect_about_zero(_reg[8:11]);
+      reflect_about_zero(_reg[x.size:x.size + 3]);
     }, lambda(_reg) {
       state_prep(_reg);
     }, reg);
