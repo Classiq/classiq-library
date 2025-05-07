@@ -20,6 +20,11 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_width=7,  # actual width: 5
         expected_depth=130,  # actual depth: 97
     )
+    validate_quantum_program_size(
+        tb.ref("qprog_with_execution_preferences"),
+        expected_width=7,  # actual width: 5
+        expected_depth=130,  # actual depth: 97
+    )
 
     # test notebook content
     pass  # Todo
