@@ -1,0 +1,21 @@
+{
+  "algorithm": {
+    "name": "vqe",
+    "params": {
+      "hamiltonian": [
+        { "pauli": ["I", "I", "I", "I", "I", "I", "I", "I", "I", "I", "I", "I", "I", "I", "I"], "coefficient": -0.082 },
+        { "pauli": ["I", "I", "I", "I", "I", "Z", "I", "I", "I", "I", "I", "I", "I", "I", "I"], "coefficient": -0.0035 },
+        { "pauli": ["I", "I", "Z", "I", "I", "I", "I", "I", "I", "I", "I", "I", "I", "I", "I"], "coefficient": -0.0018 },
+        { "pauli": ["I", "I", "I", "I", "I", "I", "I", "I", "I", "I", "Z", "I", "I", "I", "I"], "coefficient": -0.0051 }
+      ],
+      "maximize": false,
+      "initial_point": [0.0, 0.0, 0.0, 0.0],
+      "optimizer": "COBYLA",
+      "max_iteration": 50,
+      "tolerance": 0.0,
+      "step_size": 0.0,
+      "skip_compute_variance": false,
+      "alpha_cvar": 0.7
+    }
+  }
+}
