@@ -7,10 +7,12 @@ on:
   push: # Trigger the workflow on push to the specific branch
     branches:
       - main
+      - split_ci_to_quick_and_slow
   pull_request_target: # Trigger the workflow on pull requests targeting the specific branch
     # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
       - main
+      - split_ci_to_quick_and_slow
 
   workflow_dispatch:
 
