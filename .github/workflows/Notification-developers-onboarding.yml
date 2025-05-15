@@ -34,7 +34,8 @@ jobs:
               const repo = process.env.REPO;
               const owner = process.env.OWNER;
               const { data } = await github.rest.search.issuesAndPullRequests({
-                q: `repo:${owner}/${repo} type:pr state:closed author:${author}`
+                q: `repo:${owner}/${repo} type:pr state:closed author:${author}`,
+                per_page: 1000
               });
               const prCount = data.items.filter(pr => pr.pull_request.merged_at).length;
               core.exportVariable('PR_COUNT', prCount);
