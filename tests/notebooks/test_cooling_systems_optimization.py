@@ -30,11 +30,15 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
     # test notebook content
     assert np.allclose(
-        tb.ref_numpy("qsvt_solution"), tb.ref_numpy("classical_solution"), atol=1e-1, rtol=1e-1
+        tb.ref_numpy("qsvt_solution"),
+        tb.ref_numpy("classical_solution"),
+        atol=1e-1,
+        rtol=1e-1,
     ), "QSVT solution is not close to the classical solution"
     assert np.allclose(
         np.real(tb.ref_numpy("block_encoded_matrix")),
-        np.real(tb.ref_numpy("classical_matrix")), atol=1e-2
+        np.real(tb.ref_numpy("classical_matrix")),
+        atol=1e-2,
     ), "Block encoding matrix is not close to the classical matrix"
 
     pass  # TODO
