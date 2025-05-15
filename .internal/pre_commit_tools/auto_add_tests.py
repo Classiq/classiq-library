@@ -19,7 +19,9 @@ def main() -> bool:
 
     result = True
     for notebook_file_path in _get_all_notebooks():
-        if not does_test_exist(notebook_file_path):
+        if not does_test_exist(notebook_file_path) and should_notebook_be_tested(
+            notebook_file_path
+        ):
             result = False
             auto_create_test(notebook_file_path)
     return result
@@ -47,6 +49,13 @@ def _get_all_notebooks() -> Iterable[Path]:
 def does_test_exist(notebook_file_path: Path) -> bool:
     expected_test_name = f"test_{notebook_file_path.stem}.py"
     return bool(list(PROJECT_ROOT.rglob(expected_test_name)))
+
+
+def should_notebook_be_tested(notebook_file_path: Path) -> bool:
+    return not (
+        "functions" in notebook_file_path.parts
+        or "community" in notebook_file_path.parts
+    )
 
 
 def auto_create_test(notebook_file_path: Path) -> None:

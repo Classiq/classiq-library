@@ -9,7 +9,7 @@ TIMEOUT: int = 60 * 15  # 15 minutes
 
 
 def _should_test_notebook(notebook_path: str) -> bool:
-    return "/functions/" in notebook_path or "/community/" in notebook_path
+    return not ("/functions/" in notebook_path or "/community/" in notebook_path)
 
 
 @contextmanager
