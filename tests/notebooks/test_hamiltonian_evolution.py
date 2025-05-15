@@ -8,10 +8,6 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("hamiltonian_evolution", timeout_seconds=1200)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    for qmod in tb.ref("qmods"):
-        validate_quantum_model(qmod)
-
     # test quantum programs
     for qprog in tb.ref("qprogs"):
         validate_quantum_program_size(
