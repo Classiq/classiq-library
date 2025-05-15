@@ -35,6 +35,7 @@ repos:
         files: ^\S+\.ipynb$
         additional_dependencies:
           - "pyyaml==6.0"
+        require_serial: true
       - id: qmod-pre-commit
         name: Qmod pre commit collection
         description: Ensure qmods conventions
@@ -43,6 +44,7 @@ repos:
         files: ^\S+\.qmod$
         additional_dependencies:
           - "pyyaml==6.0"
+        require_serial: true
       - id: clean-demo-timeouts
         name: Clean demo timeouts
         description: Remove unexisting entries and verify unique keys
@@ -51,9 +53,11 @@ repos:
         files: ^\S+\.(qmod|ipynb|yaml)$
         additional_dependencies:
           - "pyyaml==6.0"
+        require_serial: true
       - id: auto-add-tests
         name: Auto add test
         description: Automatically adding a test to new notebooks
         entry: .internal/pre_commit_tools/auto_add_tests.py
         language: python
         files: ^\S+\.ipynb$
+        require_serial: true
