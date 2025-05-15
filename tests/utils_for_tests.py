@@ -20,7 +20,7 @@ def iterate_notebook_names() -> list[str]:
 
 
 # do not use `get_all_notebooks` unless you're sure it's the right one.
-# 95% of the tests would use `iterate_notebooks`
+# 95% of the tests would use `iterate_notebooks_names`
 @lru_cache
 def get_all_notebooks(
     directory: Path = ROOT_DIRECTORY, suffix: str = ".ipynb"
