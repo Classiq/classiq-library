@@ -1,7 +1,11 @@
-qstruct TimeDependentBE {
-  index: qnum<2>;
-  time: qnum<2>;
-  block: qbit;
+qstruct FullBE {
+  time_slice: LongSliceBE;
+  counter: qnum<3.0>;
+}
+
+qstruct LongSliceBE {
+  magnus: MagnusBE;
+  qsvt_amplification_aux: qbit;
 }
 
 qstruct MagnusBE {
@@ -10,14 +14,10 @@ qstruct MagnusBE {
   qsvt_exp_lcu: qbit;
 }
 
-qstruct LongSliceBE {
-  magnus: MagnusBE;
-  qsvt_amplification_aux: qbit;
-}
-
-qstruct FullBE {
-  time_slice: LongSliceBE;
-  counter: qnum<3.0>;
+qstruct TimeDependentBE {
+  index: qnum<2>;
+  time: qnum<2>;
+  block: qbit;
 }
 
 qfunc magnus_projector(qbe: MagnusBE, is_in_block: qbit) {
@@ -48,22 +48,22 @@ qfunc short_time_magnus(a: real, b: real, qbe_st: MagnusBE) {
     H(qbe_st.qsvt_exp_lcu);
   } apply {
     qsvt_lcu([
-      4.7085,
-      3.0195,
-      0.0547,
-      4.7904,
-      0.0547,
-      3.0195,
-      (-17.2827)
+      4.7123,
+      3.1413,
+      3.0909,
+      1.7374,
+      3.0909,
+      3.1413,
+      (-17.2788)
     ], [
-      4.5651,
-      0.2495,
-      6.6887,
-      (-0.1862),
-      6.097,
-      0.4056,
-      0.2495,
-      (-20.5676)
+      4.7123,
+      3.1416,
+      3.1383,
+      2.8234,
+      2.8234,
+      3.1383,
+      3.1416,
+      (-20.4204)
     ], time_dependent_projector, time_dependent_projector, lambda(x) {
       short_time_summation(a, b, x);
     }, qbe_st.time_dependent, qbe_st.qsvt_exp_aux, qbe_st.qsvt_exp_lcu);
@@ -72,14 +72,14 @@ qfunc short_time_magnus(a: real, b: real, qbe_st: MagnusBE) {
 
 qfunc long_slice_evolution(a: real, b: real, qbe: LongSliceBE) {
   qsvt([
-    4.1801,
-    2.3715,
-    4.6112,
-    4.5273,
-    (-1.7559),
-    4.6112,
-    8.6546,
-    (-20.9526)
+    4.4226,
+    3.0652,
+    4.6791,
+    3.5232,
+    (-2.7599),
+    4.6791,
+    9.3483,
+    (-20.7101)
   ], magnus_projector, magnus_projector, lambda(x) {
     short_time_magnus(a, b, x);
   }, qbe.magnus, qbe.qsvt_amplification_aux);
