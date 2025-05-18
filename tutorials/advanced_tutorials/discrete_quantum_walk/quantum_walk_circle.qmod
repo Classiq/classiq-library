@@ -29,7 +29,7 @@ qfunc discrete_quantum_walk_circle(time: int, x: qbit[]) {
 }
 
 qfunc main(t: int, output x: qnum) {
-  allocate_num(floor(log(128, 2)), True, 0, x);
+  allocate(floor(log(128, 2)), True, 0, x);
   discrete_quantum_walk_circle(t, x);
 }
 
