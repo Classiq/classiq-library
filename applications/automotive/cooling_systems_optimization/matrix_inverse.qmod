@@ -1,0 +1,200 @@
+qstruct QsvtState {
+  qsvt_aux: qbit;
+  qsvt_real_aux: qbit;
+  state: BlockEncodedState;
+}
+
+qstruct BlockEncodedState {
+  block: Block;
+  data: qbit[2];
+}
+
+qstruct Block {
+  lcu_aux: qnum<3, False, 0>;
+  flag: qbit;
+  aux: qbit;
+}
+
+qfunc identify_block(state: BlockEncodedState, block_zero_qbit: qbit) {
+  block_qubits: qnum<state.block.size, False, 0>;
+  data: qbit[state.data.size];
+  state -> {block_qubits, data};
+  block_zero_qbit ^= block_qubits == 0;
+  {block_qubits, data} -> state;
+}
+
+qfunc qsvt_solve_system(b_amps: real[], block_encoding: qfunc (qbit[]), phases: real[], qsvt_state: QsvtState) {
+  inplace_prepare_amplitudes(b_amps, 0, qsvt_state.state.data);
+  hadamard_transform(qsvt_state.qsvt_real_aux);
+  control (qsvt_state.qsvt_real_aux == 0) {
+    qsvt_inversion(phases, lambda(qvar, block_zero_qbit) {
+      identify_block(qvar, block_zero_qbit);
+    }, lambda(qvar) {
+      block_encoding(qvar);
+    }, qsvt_state.state, qsvt_state.qsvt_aux);
+  } else {
+    invert {
+      qsvt_inversion(phases, lambda(qvar, block_zero_qbit) {
+        identify_block(qvar, block_zero_qbit);
+      }, lambda(qvar) {
+        block_encoding(qvar);
+      }, qsvt_state.state, qsvt_state.qsvt_aux);
+    }
+  }
+  hadamard_transform(qsvt_state.qsvt_real_aux);
+}
+
+qfunc permute_block(i: int, j: int, data: qbit[]) {
+  repeat (k: data.len) {
+    if (((i >> k) & 1) == 1) {
+      X(data[k]);
+    } else {
+      IDENTITY(data[k]);
+    }
+  }
+  repeat (k: data.len) {
+    if ((k != log((j ^ i) & ((~(j ^ i)) + 1), 2)) and ((((j ^ i) >> k) & 1) == 1)) {
+      CX(data[log((j ^ i) & ((~(j ^ i)) + 1), 2)], data[k]);
+    } else {
+      IDENTITY(data);
+    }
+  }
+  if (log((j ^ i) & ((~(j ^ i)) + 1), 2) != 0) {
+    SWAP(data[0], data[log((j ^ i) & ((~(j ^ i)) + 1), 2)]);
+  } else {
+    IDENTITY(data);
+  }
+}
+
+qfunc block_encode_2x2(aux: qnum, data: qbit[]) {
+  within {
+    H(aux);
+  } apply {
+    control (aux == 1) {
+      X(data);
+      U(0, 0, 0, 3.1416, data);
+    }
+  }
+}
+
+qfunc block_encode_2X2_first_qubit(flag: qbit, aux: qbit, data: qbit[]) {
+  lsb: qbit;
+  msb: qnum<data.len - 1, False, 0>;
+  data -> {lsb, msb};
+  flag ^= msb > 0;
+  block_encode_2x2(aux, lsb);
+  {lsb, msb} -> data;
+}
+
+qfunc block_encode_2X2_arbitrary(i: int, j: int, flag: qbit, aux: qbit, data: qbit[]) {
+  within {
+    permute_block(i, j, data);
+  } apply {
+    block_encode_2X2_first_qubit(flag, aux, data);
+  }
+}
+
+qfunc combine_blocks_coeffs(pair_list: int[][], amplitudes: real[], lcu_aux: qnum, flag: qbit, aux: qbit, data: qbit[]) {
+  within {
+    inplace_prepare_amplitudes(amplitudes, 0, lcu_aux);
+  } apply {
+    repeat (index: pair_list.len) {
+      control (lcu_aux == index) {
+        block_encode_2X2_arbitrary(pair_list[index][0], pair_list[index][1], flag, aux, data);
+      }
+    }
+  }
+}
+
+qfunc block_encoding_demo(pair_list: int[][], amplitudes: real[], state: BlockEncodedState) {
+  combine_blocks_coeffs(pair_list, amplitudes, state.block.lcu_aux, state.block.flag, state.block.aux, state.data);
+}
+
+qfunc main(output qsvt_state: QsvtState) {
+  allocate(qsvt_state);
+  qsvt_solve_system([
+    0.4079,
+    0.8158,
+    (-0.0408),
+    (-0.4079)
+  ], lambda(q_var) {
+    block_encoding_demo([
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [1, 2],
+      [1, 3],
+      [2, 3]
+    ], [
+      0.3722,
+      0.3397,
+      0.3397,
+      0.3145,
+      0.3145,
+      0.2942,
+      0.5884,
+      0.0
+    ], q_var);
+  }, [
+    4.7123,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1415,
+    3.1418,
+    3.1409,
+    3.1434,
+    3.1374,
+    3.1507,
+    3.1231,
+    3.177,
+    3.078,
+    3.2488,
+    2.9719,
+    3.393,
+    2.7956,
+    3.5781,
+    2.6451,
+    2.6451,
+    3.5781,
+    2.7956,
+    3.393,
+    2.9719,
+    3.2488,
+    3.078,
+    3.177,
+    3.1231,
+    3.1507,
+    3.1374,
+    3.1434,
+    3.1409,
+    3.1418,
+    3.1415,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    3.1416,
+    (-183.7832)
+  ], qsvt_state);
+}
