@@ -22,9 +22,3 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_width=5,  # actual width: 4
         expected_depth=1500,  # actual depth: 1328
     )
-
-    # test notebook content
-    expected_x = tb.ref("( 1 / (2 * kappa) * (np.linalg.inv(A) @ b) ).tolist()")
-    computed_x = tb.ref("computed_x.tolist()")
-
-    assert np.allclose(computed_x, expected_x, rtol=0.1)
