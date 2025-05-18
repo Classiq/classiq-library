@@ -16,7 +16,7 @@ qfunc main(output phase_result: qnum<8, False, 8>) {
     0.368323359032267,
     0.646715856448805
   ], 0.0, state);
-  allocate_num(8, False, 8, phase_result);
+  allocate(8, False, 8, phase_result);
   qpe_flexible(lambda(pw) {
     if (True) {
       unitary_with_power_logic(pw, [

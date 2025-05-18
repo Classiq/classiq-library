@@ -49,8 +49,8 @@ qfunc my_diffuser(sp_operand: qfunc (qnum, qnum), x: qnum, y: qnum) {
 }
 
 qfunc main(output x: qnum, output y: qnum) {
-  allocate_num(6, False, 0, x);
-  allocate_num(6, False, 0, y);
+  allocate(6, False, 0, x);
+  allocate(6, False, 0, y);
   my_sp(x, y);
   power (4) {
     my_grover_operator(lambda() {
