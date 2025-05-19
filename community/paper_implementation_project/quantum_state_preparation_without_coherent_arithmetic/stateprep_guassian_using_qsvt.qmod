@@ -16,11 +16,9 @@ qfunc u_sin(x: qbit[], a: qbit) {
   X(a);
 }
 
-qfunc u_f(x: qnum, a1: qbit, a2_qsvt: qbit, a3_qsvt: qbit) {
-  full_reg: qbit[];
+qfunc u_f(reg: MyQStruct) {
   within {
-    {a1, x} -> full_reg;
-    H(a3_qsvt);
+    H(reg.a3);
   } apply {
     qsvt_lcu([
       4.7123,
@@ -82,39 +80,39 @@ qfunc u_f(x: qnum, a1: qbit, a2_qsvt: qbit, a3_qsvt: qbit) {
       3.1415,
       3.1416,
       (-86.3939)
-    ], lambda(reg, aux) {
-      projector_cnot(reg[0], aux);
-    }, lambda(reg, aux) {
-      projector_cnot(reg[0], aux);
-    }, lambda(reg) {
-      u_sin(reg[1:reg.len], reg[0]);
-    }, full_reg, a2_qsvt, a3_qsvt);
+    ], lambda(_reg, aux) {
+      projector_cnot(_reg[0], aux);
+    }, lambda(_reg, aux) {
+      projector_cnot(_reg[0], aux);
+    }, lambda(_reg) {
+      u_sin(_reg[1:_reg.len], _reg[0]);
+    }, {reg.a1, reg.x}, reg.a2, reg.a3);
   }
-  H(a3_qsvt);
+  H(reg.a3);
 }
 
 qfunc state_prep(reg: MyQStruct) {
   hadamard_transform(reg.x);
-  u_f(reg.x, reg.a1, reg.a2, reg.a3);
+  u_f(reg);
 }
 
-qfunc u_amp(x: qnum, a1: qbit, a2: qbit, a3: qbit) {
-  reg: qbit[];
+qfunc u_amp(reg: MyQStruct) {
+  exact_amplitude_amplification(0.3958, lambda(r) {
+    reflect_about_zero(r[reg.x.size:r.len]);
+  }, lambda(_reg) {
+    state_prep(_reg);
+  }, {reg.x, reg.a1, reg.a2, reg.a3});
+}
+
+qfunc main(output x: qnum, output a1: qbit, output a2: qbit, output a3: qbit) {
+  allocate(8, x);
+  allocate(1, a1);
+  allocate(1, a2);
+  allocate(1, a3);
+  reg: MyQStruct;
   within {
     {x, a1, a2, a3} -> reg;
   } apply {
-    exact_amplitude_amplification(0.4058, lambda(_reg) {
-      reflect_about_zero(_reg[x.size:x.size + 3]);
-    }, lambda(_reg) {
-      state_prep(_reg);
-    }, reg);
+    u_amp(reg);
   }
-}
-
-qfunc main(output x: qnum, output a1: qbit, output a2_qsvt: qbit, output a3_qsvt_parity: qbit) {
-  allocate(8, x);
-  allocate(1, a1);
-  allocate(1, a2_qsvt);
-  allocate(1, a3_qsvt_parity);
-  u_amp(x, a1, a2_qsvt, a3_qsvt_parity);
 }
