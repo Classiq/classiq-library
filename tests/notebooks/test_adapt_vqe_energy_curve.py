@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("test_adapt_vqe_energy_curve", timeout_seconds=1500)
+@wrap_testbook("adapt_vqe_energy_curve", timeout_seconds=1500)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
