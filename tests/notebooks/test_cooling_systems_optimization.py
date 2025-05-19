@@ -12,6 +12,8 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for the cooling system created by BMW.
     """
+    # test models
+    validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref("qprog_block_encoding"),
