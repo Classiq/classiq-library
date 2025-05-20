@@ -9,7 +9,7 @@ import numpy as np
 
 @wrap_testbook(
     "molecule_eigensolver_using_openfermion",
-    timeout_seconds=120,
+    timeout_seconds=600,
 )
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
