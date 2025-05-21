@@ -11,8 +11,7 @@ import numpy as np
 @wrap_testbook("execution_tutorial_part2", timeout_seconds=60)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
-    validate_quantum_model(tb.ref("execution_tutorial_part2"))
-    validate_quantum_model(tb.ref("execution_tutorial_part2_bell"))
+    # no qmods are created (synthesized directly from main)
     # test quantum programs
     validate_quantum_program_size(
         tb.ref("qprog"),
