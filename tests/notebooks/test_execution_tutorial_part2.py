@@ -23,8 +23,3 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_width=2,
         expected_depth=3,
     )
-
-    # test notebook content
-    first_estimate = tb.ref("first_estimate")
-    tolerance = 0.1  # This value can be reduced if we increase the number of shots on the execution preferences.
-    np.isclose(first_estimate, 0.20, atol=tolerance)
