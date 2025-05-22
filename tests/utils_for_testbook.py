@@ -108,7 +108,7 @@ def _patch_testbook() -> None:
     if _PATCHED:
         return
 
-    def ref_numpy(self, obj_name: str) -> Any:
+    def ref_pickle(self, obj_name: str) -> Any:
         """
         s = base64.b64encode( pickle.dumps(obj) ).decode()
         result = pickle.loads(base64.b64decode(s))
@@ -121,7 +121,8 @@ def _patch_testbook() -> None:
         result = pickle.loads(base64.b64decode(string))
         return result
 
-    TestbookNotebookClient.ref_numpy = ref_numpy
+    TestbookNotebookClient.ref_numpy = ref_pickle
+    TestbookNotebookClient.ref_pydantic = ref_pickle
 
     original_repr = TestbookNotebookClient.__repr__
 
