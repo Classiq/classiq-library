@@ -1,4 +1,5 @@
 import re
+import time
 from collections.abc import Iterable
 
 from functools import lru_cache
@@ -20,6 +21,8 @@ URL_ALLOW_LIST_FILE = ROOT_DIRECTORY / ".internal" / "url_allow_list.txt"
 URL_REGEX = r"https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b[-a-zA-Z0-9@:%_\+.~#?&//=]*"
 # urls come in `[title](url)`
 URL_IN_MARKDOWN_REGEX = re.compile(r"(?<=\]\()%s(?=\s*\))" % URL_REGEX)
+
+NUM_RETRIES = 5
 
 
 @pytest.mark.parametrize("notebook_path", iterate_notebook_names())
@@ -52,13 +55,19 @@ def get_url_allow_list() -> list[str]:
 
 
 def _test_single_url(
-    url: str, retry: int = 3, use_head: bool = True, follow_redirects: bool = True
+    url: str,
+    retry: int = NUM_RETRIES,
+    use_head: bool = True,
+    follow_redirects: bool = True,
 ) -> bool:
     if url in get_url_allow_list():
         return True
 
     if retry == 0:
         return False
+
+    if retry < NUM_RETRIES:
+        time.sleep(0.08)
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
@@ -81,6 +90,17 @@ def _test_single_url(
             return _test_single_url(
                 url, retry, use_head=False, follow_redirects=follow_redirects
             )
+        # Too Many Requests
+        if response.status_code == 429:
+            # not sure what the rate limit we have, but it may be "X per hour" or "X per minute"
+            # so let's add half-a-minute
+            time.sleep(31)
+            return _test_single_url(
+                url,
+                retry=retry - 1,
+                use_head=use_head,
+                follow_redirects=follow_redirects,
+            )
         # give another retry with GET
         if (not response.is_success) and use_head:
             return _test_single_url(
@@ -96,4 +116,6 @@ def _test_single_url(
 
         return response.is_success
     except httpx.HTTPError:
-        return False
+        return _test_single_url(
+            url, retry=retry - 1, use_head=use_head, follow_redirects=follow_redirects
+        )
