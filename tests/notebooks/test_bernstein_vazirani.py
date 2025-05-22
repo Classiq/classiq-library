@@ -15,7 +15,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         tb.ref("qprog"),
         expected_width=6,
         expected_depth=5,
-    )
+    ) 
 
     # test notebook content
     assert int(tb.ref("secret_integer_q")) == tb.ref("SECRET_INT")
