@@ -152,13 +152,12 @@ def validate_quantum_program_size(
     return
 
     if compare_to is not None:
-
-        other_width = compare_to.data.width
-
         assert compare_to.transpiled_circuit is not None  # for mypy
-        other_depth = compare_to.transpiled_circuit.depth
-
-        return validate_quantum_program_size(compare_to, other_width, other_depth)
+        return validate_quantum_program_size(
+            quantum_program,
+            expected_width=compare_to.data.width,
+            expected_depth=compare_to.transpiled_circuit.depth,
+        )
 
     actual_width = quantum_program.data.width
     if expected_width is not None:
