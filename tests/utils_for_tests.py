@@ -1,4 +1,5 @@
 import os
+import re
 from functools import lru_cache
 from pathlib import Path
 
@@ -9,9 +10,38 @@ def iterate_notebooks() -> list[str]:
     if os.environ.get("SHOULD_TEST_ALL_FILES", "") == "true":
         notebooks_to_test = get_all_notebooks()
     else:
-        notebooks_to_test = os.environ.get("LIST_OF_IPYNB_CHANGED", "").split()
+        notebooks_to_test = get_changed_notebooks()
 
     return notebooks_to_test
+
+
+def get_changed_notebooks() -> list[str]:
+    changed_notebooks = os.environ.get("LIST_OF_IPYNB_CHANGED", "").split()
+
+    changed_tests = os.environ.get("LIST_OF_IPYNB_TESTS_CHANGED", "").split()
+    changed_notebooks_from_tests = list(
+        filter(
+            bool,
+            map(
+                get_notebook_of_test,
+                changed_tests,
+            ),
+        )
+    )
+
+    return list(set(changed_notebooks + changed_notebooks_from_tests))
+
+
+def get_notebook_of_test(test_path: str) -> str | None:
+    with open(ROOT_DIRECTORY / test_path) as f:
+        test_data = f.read()
+
+    find_results = re.findall('@wrap_testbook\\([\n\\s]*"(\\S*?)"', test_data)
+    if len(find_results) == 1:
+        return resolve_notebook_path(find_results[0])
+    else:
+        print(f"Failed extracting notebook name from test file")
+        return None
 
 
 @lru_cache
