@@ -1,0 +1,7 @@
+qfunc main(output x: qbit, output y: qbit, angle: real) {
+  allocate(x);
+  allocate(y);
+  X(x);
+  RY(angle, x);
+  CX(x, y);
+}
