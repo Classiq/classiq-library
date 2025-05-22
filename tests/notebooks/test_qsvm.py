@@ -16,7 +16,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_model(tb.ref("QSVM_BLOCH_SHPERE_qmod"))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog"),
+        tb.ref_pydantic("qprog"),
         expected_width=1,  # actual width: 1
         expected_depth=10,  # actual depth: 4
     )
