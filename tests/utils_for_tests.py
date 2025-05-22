@@ -33,6 +33,10 @@ def get_changed_notebooks() -> list[str]:
 
 
 def get_notebook_of_test(test_path: str) -> str | None:
+    if os.path.basename(test_path) == "test__community_and_functions.py":
+        # this is a special test. It tests a whole folder of notebooks, rather than a single one
+        return None
+
     with open(ROOT_DIRECTORY / test_path) as f:
         test_data = f.read()
 
