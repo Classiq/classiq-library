@@ -7,10 +7,12 @@ on:
   push: # Trigger the workflow on push to the specific branch
     branches:
       - main
+      - run_notebooks_tests_based_on_changed_tests
   pull_request_target: # Trigger the workflow on pull requests targeting the specific branch
     # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
       - main
+      - run_notebooks_tests_based_on_changed_tests
 
   workflow_dispatch:
 
