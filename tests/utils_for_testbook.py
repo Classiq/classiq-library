@@ -108,7 +108,7 @@ def _patch_testbook() -> None:
     if _PATCHED:
         return
 
-    def ref_numpy(self, obj_name: str) -> Any:
+    def ref_pickle(self, obj_name: str) -> Any:
         """
         s = base64.b64encode( pickle.dumps(obj) ).decode()
         result = pickle.loads(base64.b64decode(s))
@@ -121,7 +121,8 @@ def _patch_testbook() -> None:
         result = pickle.loads(base64.b64decode(string))
         return result
 
-    TestbookNotebookClient.ref_numpy = ref_numpy
+    TestbookNotebookClient.ref_numpy = ref_pickle
+    TestbookNotebookClient.ref_pydantic = ref_pickle
 
     original_repr = TestbookNotebookClient.__repr__
 
@@ -151,13 +152,12 @@ def validate_quantum_program_size(
     return
 
     if compare_to is not None:
-
-        other_width = compare_to.data.width
-
         assert compare_to.transpiled_circuit is not None  # for mypy
-        other_depth = compare_to.transpiled_circuit.depth
-
-        return validate_quantum_program_size(compare_to, other_width, other_depth)
+        return validate_quantum_program_size(
+            quantum_program,
+            expected_width=compare_to.data.width,
+            expected_depth=compare_to.transpiled_circuit.depth,
+        )
 
     actual_width = quantum_program.data.width
     if expected_width is not None:

@@ -17,17 +17,17 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_model(tb.ref("qmod_no_dual"))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog_simple"),
+        tb.ref_pydantic("qprog_simple"),
         expected_width=7,  # actual width: 7
         expected_depth=50,  # actual depth: 47
     )
     validate_quantum_program_size(
-        tb.ref("qprog_complex"),
+        tb.ref_pydantic("qprog_complex"),
         expected_width=20,  # actual width: 20
         expected_depth=1700,  # actual depth: 1656
     )
     validate_quantum_program_size(
-        tb.ref("qprog_no_dual"),
+        tb.ref_pydantic("qprog_no_dual"),
         expected_width=20,  # actual width: 20
         expected_depth=1700,  # actual depth: 1685
     )

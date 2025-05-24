@@ -15,7 +15,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     actual_widths = [3 + precision for precision in tb.ref("precisions")]
     for qprog, e_width, e_depth in zip(
-        tb.ref("qprogs"), actual_widths, tb.ref("classiq_depths")
+        tb.ref_pydantic("qprogs"), actual_widths, tb.ref("classiq_depths")
     ):
         # test quantum programs
         validate_quantum_program_size(

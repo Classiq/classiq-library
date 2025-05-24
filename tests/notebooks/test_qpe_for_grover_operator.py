@@ -27,7 +27,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     classiq widths: [6, 7, 8, 9, 10]
     """
     for qprog, e_width, e_depth in zip(
-        tb.ref("qprogs_width"),
+        tb.ref_pydantic("qprogs_width"),
         tb.ref("classiq_widths_ae_opt_width"),
         tb.ref("classiq_depths_ae_opt_width"),
     ):
@@ -42,7 +42,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     classiq widths: [15, 18, 21, 24, 27]
     """
     for qprog, expected_max_width, e_depth in zip(
-        tb.ref("qprogs_cx"),
+        tb.ref_pydantic("qprogs_cx"),
         tb.ref("qmods_cx_max_width"),
         tb.ref("classiq_depths_ae_opt_depth_max_width"),
     ):

@@ -25,7 +25,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     classiq widths: [6, 7, 8, 9, 10, 11, 13]
     """
     for qprog, num_qubits in zip(
-        tb.ref_numpy("qprogs_width"),
+        tb.ref_pydantic("qprogs_width"),
         range(tb.ref("NUM_QUBITS_MIN"), tb.ref("NUM_QUBITS_MAX")),
     ):
         validate_quantum_program_size(
@@ -38,7 +38,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     classiq cx_counts: [120, 152, 200, 260, 352, 436, 552]
     classiq widths: [8, 9, 11, 12, 14, 15, 17]
     """
-    for qprog in tb.ref_numpy("qprogs_cx"):
+    for qprog in tb.ref_pydantic("qprogs_cx"):
         validate_quantum_program_size(
             qprog,
             expected_width=2

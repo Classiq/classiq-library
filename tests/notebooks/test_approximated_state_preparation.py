@@ -17,7 +17,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     # classiq depths: [9874, 8721, 8259, 7908, 7677, 7447, 6986, 6755, 6525, 6295]
     # cx-counts depths: [6548, 5748, 5428, 5196, 5036, 4876, 4556, 4396, 4236, 4076]
-    qprogs = tb.ref("qprogs")
+    qprogs = tb.ref_pydantic("qprogs")
     depths = tb.ref("depths")
     validate_quantum_program_size(
         qprogs[0],

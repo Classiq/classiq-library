@@ -16,17 +16,17 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog_block_encoding"),
+        tb.ref_pydantic("qprog_block_encoding"),
         expected_width=16,  # actual width: 11
         expected_depth=None,  # no transpilation
     )
     validate_quantum_program_size(
-        tb.ref("matrix_inverse_qprog"),
+        tb.ref_pydantic("matrix_inverse_qprog"),
         expected_width=16,  # actual width: 11
         expected_depth=None,  # no transpilation
     )
     validate_quantum_program_size(
-        tb.ref("dummy_qprog"),
+        tb.ref_pydantic("dummy_qprog"),
         expected_width=16,  # actual width: 11
         expected_depth=None,  # no transpilation
     )

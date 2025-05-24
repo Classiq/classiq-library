@@ -37,7 +37,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     for qmod in tb.ref("qmods"):
         validate_quantum_model(qmod)
-    for qprog, expected_width in zip(tb.ref("qprogs"), expected_widths):
+    for qprog, expected_width in zip(tb.ref_pydantic("qprogs"), expected_widths):
         validate_quantum_program_size(
             qprog,
             expected_width=expected_width + 5,  # actual width + 5

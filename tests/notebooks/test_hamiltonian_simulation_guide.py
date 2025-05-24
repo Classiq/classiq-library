@@ -18,45 +18,45 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_model(tb.ref("qmod_qdrift"))
     validate_quantum_model(tb.ref("qmod_magnetization_trotter"))
     validate_quantum_model(tb.ref("qmod_magnetization_qdrift"))
-    # for qmod in tb.ref("qmods_magnetization_exponentiation"):
-    #     validate_quantum_model(qmod)
+    for qmod in tb.ref("qmods_magnetization_exponentiation"):
+        validate_quantum_model(qmod)
 
-    # # test quantum programs
-    # validate_quantum_program_size(
-    #     tb.ref("qprog_trotter"),
-    #     expected_width=2,  # actual width: 2
-    #     expected_depth=50,  # actual depth: 40
-    # )
-    # validate_quantum_program_size(
-    #     tb.ref("qprog_exponentiation"),
-    #     expected_width=2,  # actual width: 2
-    #     expected_depth=30,  # actual depth: 20
-    # )
-    # validate_quantum_program_size(
-    #     tb.ref("qprog_qdrift"),
-    #     expected_width=2,  # actual width: 2
-    #     expected_depth=150,  # actual depth: 114
-    # )
-    # validate_quantum_program_size(
-    #     tb.ref("qprog_magnetization_trotter"),
-    #     expected_width=2,  # actual width: 2
-    #     expected_depth=250,  # actual depth: 180
-    # )
-    # validate_quantum_program_size(
-    #     tb.ref("qprog_magnetization_qdrift"),
-    #     expected_width=2,  # actual width: 2
-    #     expected_depth=600,  # actual depth: 480
-    # )
+    # test quantum programs
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog_trotter"),
+        expected_width=2,  # actual width: 2
+        expected_depth=50,  # actual depth: 40
+    )
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog_exponentiation"),
+        expected_width=2,  # actual width: 2
+        expected_depth=30,  # actual depth: 20
+    )
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog_qdrift"),
+        expected_width=2,  # actual width: 2
+        expected_depth=150,  # actual depth: 114
+    )
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog_magnetization_trotter"),
+        expected_width=2,  # actual width: 2
+        expected_depth=250,  # actual depth: 180
+    )
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog_magnetization_qdrift"),
+        expected_width=2,  # actual width: 2
+        expected_depth=600,  # actual depth: 480
+    )
     # widths:
     #   [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
     # depths:
     #   [0,11,11,11,11,11,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
-    # for qprog in tb.ref("qprogs_magnetization_exponentiation")[1:]:
-    #     validate_quantum_program_size(
-    #         qprog,
-    #         expected_width=2,  # actual width: 2
-    #         expected_depth=20,  # actual depth: 20
-    #     )
+    for qprog in tb.ref_pydantic("qprogs_magnetization_exponentiation")[1:]:
+        validate_quantum_program_size(
+            qprog,
+            expected_width=2,  # actual width: 2
+            expected_depth=20,  # actual depth: 20
+        )
 
     # test notebook content
     time_list = tb.ref("time_list")

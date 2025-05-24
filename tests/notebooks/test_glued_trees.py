@@ -11,11 +11,14 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     actual_widths = [10] * 13 + [20] * 13
     actual_depths = [1265] * 13 + [1321] * 13
 
+    # test models
     for qmod in tb.ref("qmods"):
-        # test models
         validate_quantum_model(qmod)
-    for qprog, e_width, e_depth in zip(tb.ref("qprogs"), actual_widths, actual_depths):
-        # test quantum programs
+
+    # test quantum programs
+    for qprog, e_width, e_depth in zip(
+        tb.ref_pydantic("qprogs"), actual_widths, actual_depths
+    ):
         validate_quantum_program_size(
             qprog,
             expected_width=int(e_width * 1.5),  # 1.5* actual width
