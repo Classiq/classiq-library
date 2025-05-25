@@ -18,61 +18,16 @@ from classiq import (
 )
 from classiq.qmod import SIGNED
 from classiq.qmod.symbolic import log, ceiling
-from modular_add_constant_modulus import modolu_adder, modulo_subtract, modolu_double
+from modular_arithmetic import (
+    modular_in_place_add,
+    modular_in_place_subtract,
+    modular_in_place_add_constant,
+    modular_in_place_subtract_constant,
+    modular_in_place_double,
+    modular_out_of_place_multiply,
+    modular_in_place_negate,
+)
 from kaliski import mock_kaliski_inverse
-
-
-@qfunc
-def modular_inplace_add_constant(x: QNum, constant: int, modulus: int) -> None:
-    """
-    Computes (x + constant) mod modulus in-place on x.
-    Uses a single carry qubit to check if we need to subtract modulus.
-
-    Args:
-        x (QNum): The quantum register to add to.
-        constant (int): The classical integer constant to add.
-        modulus (int): The integer modulus.
-    """
-    # Allocate a single carry qubit
-    carry = QBit("carry")
-    allocate(1, carry)
-
-    # Create and allocate temporary register to hold x + carry
-    temp = QNum("temp", x.size + 1, SIGNED, 0)
-
-    # Bind x and carry into temp for addition
-    within_apply(
-        lambda: bind([x, carry], temp),
-        lambda: (
-            # Add constant to temp
-            inplace_add(constant, temp),
-            # Add -modulus to temp to check for overflow
-            inplace_add(-modulus, temp),
-        ),
-    )
-
-    # If carry is set, we need to add modulus back
-    control(carry, lambda: inplace_add(modulus, x))
-    control(x >= constant, lambda: X(carry))
-
-    # Free the temporary registers
-    free(carry)
-
-
-@qfunc
-def modular_inplace_subtract_constant(x: QNum, constant: int, modulus: int) -> None:
-    """
-    Computes (x - constant) mod modulus in-place on x.
-    Uses modular_inplace_add_constant with negated constant.
-
-    Args:
-        x (QNum): The quantum register to subtract from.
-        constant (int): The classical integer constant to subtract.
-        modulus (int): The integer modulus.
-    """
-    # Compute -constant mod modulus and use add_constant
-    neg_const = (-constant) % modulus
-    modular_inplace_add_constant(x, neg_const, modulus)
 
 
 @qfunc
@@ -98,23 +53,27 @@ def ec_point_add(
     Gx = G[0]  # x-coordinate of classical point
     Gy = G[1]  # y-coordinate of classical point
 
-    # STEP 1: Compute terms for lambda (y - Gy) and (x - Gx) mod p
+    # STEP 1: Compute terms for lambda (y - Gy) and (x - Gx) mod p (using modular_in_place_subtract_constant)
     # The results are stored back in y and x respectively.
-    modular_inplace_subtract_constant(y, Gy, p)  # y becomes (y - Gy) mod p
-    modular_inplace_subtract_constant(x, Gx, p)  # x becomes (x - Gx) mod p
+    modular_in_place_subtract_constant(y, Gy, p)  # y becomes (y - Gy) mod p
+    modular_in_place_subtract_constant(x, Gx, p)  # x becomes (x - Gx) mod p
 
-    # STEP 2: Compute modular inverse of (x - Gx) mod p
+    # STEP 2: Compute modular inverse of (x - Gx) mod p (using modular_out_of_place_multiply)
     mock_kaliski_inverse(x)
+    temp = QNum("temp", x.size, SIGNED, 0)
+    allocate(x.size, temp)
+    modular_out_of_place_multiply(p, x, y, temp)
+    # x = temp
 
-    # TODO: Implement the rest of point addition using modular arithmetic operations
+    # TODO: Implement the rest of point addition using modular arithmetic operations (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate)
     # This will require:
-    # 1. Computing modular inverse of (x - Gx) mod p (which is now stored in x)
-    # 2. Computing λ = (y - Gy) * (x - Gx)^(-1) mod p
-    # 3. Computing new x-coordinate: λ^2 - x_original - Gx mod p (Need original x value!)
-    # 4. Computing new y-coordinate: λ(x_original - x3) - y_original mod p (Need original x and y values!)
-    # 5. Storing results back in x and y
+    # 1. Computing modular inverse of (x - Gx) mod p (which is now stored in x) (using modular_out_of_place_multiply)
+    # 2. Computing λ = (y - Gy) * (x - Gx)^(-1) mod p (using modular_out_of_place_multiply)
+    # 3. Computing new x-coordinate: λ^2 - x_original - Gx mod p (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate) (Need original x value!)
+    # 4. Computing new y-coordinate: λ(x_original - x3) - y_original mod p (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate) (Need original x and y values!)
+    # 5. Storing results back in x and y (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate)
 
-    # Note: We need to preserve the original x and y values for later steps.
+    # Note: We need to preserve the original x and y values for later steps (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate).
     # The current implementation overwrites them in STEP 1.
     # We might need temporary registers or a different approach for STEP 1.
 
@@ -129,10 +88,10 @@ def ec_point_double(
     p: int,  # prime modulus
 ) -> None:
     """
-    Performs elliptic curve point doubling: 2P = R where P=(x,y)
+    Performs elliptic curve point doubling (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate): 2P = R where P=(x,y)
     For curve: y^2 = x^3 + ax + b (mod p)
 
-    The doubling is performed using the following formulas:
+    The doubling is performed using the following formulas (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate):
     λ = (3x^2 + a)/(2y) mod p
     x3 = λ^2 - 2x mod p
     y3 = λ(x - x3) - y mod p
@@ -142,7 +101,7 @@ def ec_point_double(
         a: Curve parameter
         p: Prime modulus
     """
-    # TODO: Implement point doubling using modular arithmetic operations
+    # TODO: Implement point doubling using modular arithmetic operations (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate)
     pass
 
 

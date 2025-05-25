@@ -16,11 +16,13 @@ from classiq import (
     show,
     inplace_add,
 )
-from modular_add_constant_modulus import (
-    modolu_adder,
-    modulo_subtract,
+from modular_arithmetic import (
+    modular_in_place_add,
+    modular_in_place_subtract,
     shift_right,
-    modolu_double,
+    modular_in_place_double,
+    modular_out_of_place_multiply,
+    modular_in_place_negate,
 )
 
 
@@ -128,11 +130,11 @@ def kaliski_quantum(v: QNum, p: int, m: QArray[QBit]) -> QNum:
         # qrisp.mcx([f, b], add, ctrl_state="10") equivalent
         control(f == 1, lambda: control(b == 0, lambda: X(to_add)))
 
-        # Control on add to perform modular addition of r to s
-        control(to_add == 1, lambda: modolu_adder(r, s, p))
-        control(to_add == 1, lambda: modulo_subtract(r, s, p))
+        # Control on add to perform modular addition of r to s (using modular_in_place_add and modular_in_place_subtract)
+        control(to_add == 1, lambda: modular_in_place_add(r, s, p))
+        control(to_add == 1, lambda: modular_in_place_subtract(r, s, p))
 
-        # STEP 5
+        # STEP 5 (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate)
         control(f, lambda: control(b == 0, lambda: X(to_add)))
         CX(m[i], b)
         CX(a, b)
@@ -140,7 +142,7 @@ def kaliski_quantum(v: QNum, p: int, m: QArray[QBit]) -> QNum:
             within=lambda: bind(v, v_array),
             apply=lambda: control(f, lambda: shift_right(v_array)),
         )
-        modolu_double(r, p)
+        modular_in_place_double(r, p)
         control(a == 1, lambda: (swap_qnum(u, v), swap_qnum(r, s)))
 
         within_apply(
