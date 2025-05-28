@@ -32,7 +32,7 @@ def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> boo
             f"    for example, you may change '{file_path}' to '{file_path.replace('-', '_')}'."
         )
 
-    if not _is_file_in_timeouts(file_name):
+    if not _is_file_in_timeouts(file_name) and should_notebook_be_tested(file_path):
         if automatically_add_timeout:
             _add_file_to_timeouts(file_name)
             errors.append(
@@ -54,6 +54,10 @@ def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> boo
         print(f"File `{file_path}` has error(s):{spacing}{spacing.join(errors)}")
 
     return not errors
+
+
+def should_notebook_be_tested(file_path: str) -> bool:
+    return not ("functions/" in file_path or "community/" in file_path)
 
 
 def _does_contain_dash_in_file_name(file_name: str) -> bool:

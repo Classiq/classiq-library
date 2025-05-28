@@ -3,7 +3,11 @@ import pytest
 from contextlib import contextmanager
 
 from testbook import testbook  # type: ignore[import]
-from utils_for_tests import iterate_notebooks, ROOT_DIRECTORY, resolve_notebook_path
+from tests.utils_for_tests import (
+    iterate_notebooks,
+    ROOT_DIRECTORY,
+    resolve_notebook_path,
+)
 
 TIMEOUT: int = 60 * 15  # 15 minutes
 
