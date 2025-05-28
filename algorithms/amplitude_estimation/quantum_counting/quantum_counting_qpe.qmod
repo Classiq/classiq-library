@@ -50,7 +50,7 @@ qfunc arith_oracle(state: OracleVars) {
 qfunc main(output phase_reg: qnum) {
   state_reg: OracleVars;
   allocate(state_reg.size, state_reg);
-  allocate_num(5, False, 5, phase_reg);
+  allocate(5, False, 5, phase_reg);
   hadamard_transform(state_reg);
   qpe(lambda() {
     my_grover_operator(arith_oracle, lambda(x) {

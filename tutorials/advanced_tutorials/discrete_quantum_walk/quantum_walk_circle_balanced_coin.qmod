@@ -21,7 +21,7 @@ qfunc quantum_step_clockwise(x: qbit[]) {
 
 qfunc main(t: int, output x: qnum) {
   coin: qbit;
-  allocate_num(floor(log(128, 2)), True, 0, x);
+  allocate(floor(log(128, 2)), True, 0, x);
   allocate(1, coin);
   H(coin);
   S(coin);

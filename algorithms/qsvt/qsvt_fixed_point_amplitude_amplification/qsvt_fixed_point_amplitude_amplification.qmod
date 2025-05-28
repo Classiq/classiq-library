@@ -4,10 +4,6 @@ qstruct OracleVars {
   c: qnum<3, False, 0>;
 }
 
-qfunc arith_equation(state: OracleVars, res: qbit) {
-  res ^= ((state.a + state.b) == 3) and ((state.c - state.a) == 2);
-}
-
 qfunc my_qsvt_step(phase1: real, phase2: real, proj_ctrl_phase_1: qfunc (real, qbit[], qbit), proj_ctrl_phase_2: qfunc (real, qbit[], qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
   u(state);
   proj_ctrl_phase_2(phase1, state, aux);
@@ -32,58 +28,67 @@ qfunc my_qsvt(phase_seq: real[], proj_ctrl_phase_1: qfunc (real, qbit[], qbit), 
   H(aux);
 }
 
+qfunc initial_state_rot(phase: real, state: qnum, aux: qbit) {
+  within {
+    hadamard_transform(state);
+    aux ^= state == 0;
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qfunc target_state_rot(phase: real, arith_oracle: qfunc (qbit[], qbit), state: qbit[], aux: qbit) {
+  within {
+    arith_oracle(state, aux);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
 qfunc qsvt_fpaa(phase_seq: real[], arith_oracle: qfunc (qbit[], qbit), state: qbit[], output aux: qbit) {
   allocate(1, aux);
   my_qsvt(phase_seq, lambda(phase, state, aux) {
-    hadamard_transform(state);
-    apply_to_all(X, state);
-    control (state) {
-      X(aux);
-    }
-    RZ(phase, aux);
-    control (state) {
-      X(aux);
-    }
-    apply_to_all(X, state);
-    hadamard_transform(state);
+    initial_state_rot(phase, state, aux);
   }, lambda(phase, state, aux) {
-    arith_oracle(state, aux);
-    RZ(phase, aux);
-    arith_oracle(state, aux);
+    target_state_rot(phase, arith_oracle, state, aux);
   }, lambda(state) {
     IDENTITY(state);
   }, state, aux);
+}
+
+qfunc arith_equation(state: OracleVars, res: qbit) {
+  res ^= ((state.a + state.b) == 3) and ((state.c - state.a) == 2);
 }
 
 qfunc main(output state: OracleVars, output aux: qbit) {
   allocate(state.size, state);
   hadamard_transform(state);
   qsvt_fpaa([
-    4.4887,
-    3.349,
-    3.2901,
-    3.0355,
-    3.7585,
-    3.3036,
-    1.5241,
-    4.555,
-    3.722,
-    1.8864,
-    3.4246,
-    4.2507,
-    0.7036,
-    0.7036,
-    4.2507,
-    3.4246,
-    1.8864,
-    3.722,
-    4.555,
-    1.5241,
-    3.3036,
-    3.7585,
-    3.0355,
-    3.2901,
-    3.349,
-    (-77.1927)
+    4.6918,
+    3.1678,
+    3.1078,
+    3.1853,
+    3.0848,
+    3.2155,
+    3.045,
+    3.2686,
+    2.9717,
+    3.3761,
+    2.7966,
+    3.7267,
+    1.654,
+    1.654,
+    3.7267,
+    2.7966,
+    3.3761,
+    2.9717,
+    3.2686,
+    3.045,
+    3.2155,
+    3.0848,
+    3.1853,
+    3.1078,
+    3.1678,
+    (-76.9896)
   ], arith_equation, state, aux);
 }

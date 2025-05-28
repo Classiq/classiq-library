@@ -8,7 +8,7 @@ qfunc simple_eig_inv(phase: qnum, output indicator: qbit) {
 }
 
 qfunc hhl(rhs_vector: real[], bound: real, precision: int, hamiltonian_evolution_with_power: qfunc (int, qbit[]), output state: qbit[], output phase: qnum, output indicator: qbit) {
-  allocate_num(precision, False, precision, phase);
+  allocate(precision, False, precision, phase);
   load_b([
     0.1825741858,
     0.3651483717,

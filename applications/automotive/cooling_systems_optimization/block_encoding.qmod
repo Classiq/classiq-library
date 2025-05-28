@@ -1,0 +1,91 @@
+qfunc prepare_ref(num_qubits: int, output data: qnum, output data_ref: qnum) {
+  allocate(num_qubits, data);
+  hadamard_transform(data);
+  data_ref = data;
+}
+
+qfunc permute_block(i: int, j: int, data: qbit[]) {
+  repeat (k: data.len) {
+    if (((i >> k) & 1) == 1) {
+      X(data[k]);
+    } else {
+      IDENTITY(data[k]);
+    }
+  }
+  repeat (k: data.len) {
+    if ((k != log((j ^ i) & ((~(j ^ i)) + 1), 2)) and ((((j ^ i) >> k) & 1) == 1)) {
+      CX(data[log((j ^ i) & ((~(j ^ i)) + 1), 2)], data[k]);
+    } else {
+      IDENTITY(data);
+    }
+  }
+  if (log((j ^ i) & ((~(j ^ i)) + 1), 2) != 0) {
+    SWAP(data[0], data[log((j ^ i) & ((~(j ^ i)) + 1), 2)]);
+  } else {
+    IDENTITY(data);
+  }
+}
+
+qfunc block_encode_2x2(aux: qnum, data: qbit[]) {
+  within {
+    H(aux);
+  } apply {
+    control (aux == 1) {
+      X(data);
+      U(0, 0, 0, 3.1416, data);
+    }
+  }
+}
+
+qfunc block_encode_2X2_first_qubit(flag: qbit, aux: qbit, data: qbit[]) {
+  lsb: qbit;
+  msb: qnum<data.len - 1, False, 0>;
+  data -> {lsb, msb};
+  flag ^= msb > 0;
+  block_encode_2x2(aux, lsb);
+  {lsb, msb} -> data;
+}
+
+qfunc block_encode_2X2_arbitrary(i: int, j: int, flag: qbit, aux: qbit, data: qbit[]) {
+  within {
+    permute_block(i, j, data);
+  } apply {
+    block_encode_2X2_first_qubit(flag, aux, data);
+  }
+}
+
+qfunc combine_blocks_coeffs(pair_list: int[][], amplitudes: real[], lcu_aux: qnum, flag: qbit, aux: qbit, data: qbit[]) {
+  within {
+    inplace_prepare_amplitudes(amplitudes, 0, lcu_aux);
+  } apply {
+    repeat (index: pair_list.len) {
+      control (lcu_aux == index) {
+        block_encode_2X2_arbitrary(pair_list[index][0], pair_list[index][1], flag, aux, data);
+      }
+    }
+  }
+}
+
+qfunc main(output lcu_aux: qnum, output flag: qbit, output aux: qbit, output data: qnum, output data_ref: qnum) {
+  allocate(3, lcu_aux);
+  allocate(1, flag);
+  allocate(1, aux);
+  prepare_ref(2, data, data_ref);
+  combine_blocks_coeffs([
+    [0, 1],
+    [0, 2],
+    [0, 3],
+    [1, 2],
+    [1, 3],
+    [2, 3]
+  ], [
+    0.3722,
+    0.3397,
+    0.3397,
+    0.3145,
+    0.3145,
+    0.2942,
+    0.5884,
+    0.0
+  ], lcu_aux, flag, aux, data);
+}

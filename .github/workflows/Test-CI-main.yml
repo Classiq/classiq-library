@@ -146,15 +146,36 @@ jobs:
           files: |
             **/*.ipynb
 
-      # Run Notebook Tests
-      - name: Run Notebooks
-        run: python -m pytest --log-cli-level=INFO --durations=0 tests
+      - name: Get changed notebook test files
+        id: changed-files-tests
+        uses: tj-actions/changed-files@v46.0.1
+        with:
+          files: |
+            **/notebooks/**/test_*.py
+
+      # Run Tests
+      - name: Run Notebooks (quick tests)
+        run: python -m pytest -c tests/config_quick_tests.ini
+        env:
+          # to disable a warning in Jupyter notebooks
+          JUPYTER_PLATFORM_DIRS: "1"
+          # Passing which notebooks changed
+          SHOULD_TEST_ALL_FILES: "true" # quick tests should run all files
+          LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
+          LIST_OF_IPYNB_TESTS_CHANGED: "${{ steps.changed-files-tests.outputs.all_changed_files }}"
+          # Passing environment information
+          CLASSIQ_IDE: "https://platform.classiq.io"
+          CLASSIQ_HOST: "https://api.classiq.io"
+
+      - name: Run Notebooks (executing notebooks and testing content)
+        run: python -m pytest -c tests/config_notebook_execute_tests.ini
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
           # Passing which notebooks changed
           SHOULD_TEST_ALL_FILES: "${{ env.SHOULD_TEST_ALL_FILES }}"
           LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
+          LIST_OF_IPYNB_TESTS_CHANGED: "${{ steps.changed-files-tests.outputs.all_changed_files }}"
           # Passing environment information
           CLASSIQ_IDE: "https://platform.classiq.io"
           CLASSIQ_HOST: "https://api.classiq.io"

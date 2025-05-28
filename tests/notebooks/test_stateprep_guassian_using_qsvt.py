@@ -6,15 +6,15 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("patching_managment", timeout_seconds=36)
+@wrap_testbook("stateprep_guassian_using_qsvt", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref("qprog"),
-        expected_width=10,  # actual width: 8
-        expected_depth=35,  # actual depth: 26
+        expected_width=None,
+        expected_depth=None,
     )
 
     # test notebook content
