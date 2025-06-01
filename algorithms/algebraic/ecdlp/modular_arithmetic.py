@@ -12,12 +12,8 @@ from classiq import (
     SWAP,
     QArray,
     apply_to_all,
-    create_model,
-    synthesize,
     free,
     CX,
-    prepare_uniform_trimmed_state,
-    Output,
 )
 from classiq.qmod.symbolic import log, ceiling
 
@@ -142,7 +138,7 @@ def modular_in_place_subtract(x: QNum, y: QNum, modulus: int) -> None:
         The modular difference (x - y) mod modulus is stored in-place in the `y` register.
     """
     # Compute -y mod modulus in-place on y
-    modular_in_place_negate(modulus, y)
+    modular_in_place_negate(y, modulus)
     # Compute x + (-y) mod modulus in-place on y
     modular_in_place_add(x, y, modulus)
 
@@ -240,7 +236,7 @@ def modular_in_place_double(x: QNum, modulus: int) -> None:
 
 @qfunc
 def modular_out_of_place_multiply(
-    modulus: int, x: QArray[QBit], y: QArray[QBit], z: QArray[QBit]
+    x: QArray[QBit], y: QArray[QBit], z: QArray[QBit], modulus: int
 ) -> None:
     """
     Reversible, out-of-place modular multiplication (modular_out_of_place_multiply) of two integers modulo a constant integer modulus.
@@ -248,10 +244,10 @@ def modular_out_of_place_multiply(
     this function computes the product (x * y) mod modulus. The result is held in the third register `z`, which must be initialized to |0>.
 
     Args:
-        modulus (int): Constant integer modulus.
         x (QArray[QBit]): Quantum bit array encoding the first integer x.
         y (QArray[QBit]): Quantum bit array encoding the second integer y.
         z (QArray[QBit]): Quantum bit array for the result. Must be in state |0> initially.
+        modulus (int): Constant integer modulus.
 
     References:
         An algorithm for multiplying two numbers modulo a constant is sketched in Section 4.3.2 of
@@ -270,15 +266,15 @@ def modular_out_of_place_multiply(
 
 
 @qfunc
-def modular_in_place_negate(modulus: int, x: QNum) -> None:
+def modular_in_place_negate(x: QNum, modulus: int) -> None:
     """
     Reversible, in-place modular negation (modular_in_place_negate) of an integer modulo a constant integer modulus.
     Given an n-bit integer x encoded in quantum register `x`, and a constant integer `modulus`,
     this function computes (-x) mod modulus and stores the result in-place in `x`.
 
     Args:
-        modulus (int): Constant integer modulus.
         x (QNum): Quantum numeric register to be negated in-place.
+        modulus (int): Constant integer modulus.
     """
     n = x.size
     neg_modulus = 2**n - modulus - 1
@@ -294,3 +290,29 @@ def modular_in_place_negate(modulus: int, x: QNum) -> None:
     check_if_all_ones(x, is_all_zeros)
     # Bitwise negation: set x to (m'+x)'
     bitwise_negation(x)
+
+
+@qfunc
+def modular_square(x: QArray[QBit], z: QArray[QBit], p: int) -> None:
+    """Modular squaring of x modulo p, storing result in z.
+
+    Implements x^2 mod p using controlled modular addition and doubling.
+    The algorithm is based on the Q# ModularSquDblAddConstantModulus operation.
+
+    Args:
+        x: Input quantum bit array to be squared
+        z: Output quantum bit array to store x^2 mod p
+        p: Classical modulus value
+    """
+    n = x.size
+    assert z.size == n, "Output register z must have the same number of qubits as x"
+    anc = QBit("anc")
+    allocate(1, anc)
+    for i in range(n - 1, 0, -1):
+        control(x[i], lambda: X(anc))
+        control(anc, lambda: modular_in_place_add(x, z, p))
+        control(x[i], lambda: X(anc))
+        modular_in_place_double(z, p)
+    control(x[0], lambda: X(anc))
+    control(anc, lambda: modular_in_place_add(x, z, p))
+    control(x[0], lambda: X(anc))

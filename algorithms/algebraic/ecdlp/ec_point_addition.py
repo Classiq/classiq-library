@@ -13,8 +13,11 @@ from classiq import (
     free,
     execute,
     within_apply,
+    invert,
     bind,
     X,
+    Constraints,
+    Preferences,
 )
 from classiq.qmod import SIGNED
 from classiq.qmod.symbolic import log, ceiling
@@ -26,16 +29,20 @@ from modular_arithmetic import (
     modular_in_place_double,
     modular_out_of_place_multiply,
     modular_in_place_negate,
+    modular_square,
 )
-from kaliski import mock_kaliski_inverse
+from kaliski import mock_kaliski_inverse_modulus_7
 
 
 @qfunc
 def ec_point_add(
     x: QNum,  # x-coordinate of quantum point
     y: QNum,  # y-coordinate of quantum point
+    t0: QNum,  # aux quantum register
+    l: QNum,  # aux quantum register
     G: list[int],  # Classical point coordinates [Gx, Gy] on the curve
     p: int,  # Prime modulus
+    c: QBit,  # Control qubit
 ) -> None:
     """
     Performs in-place elliptic curve point addition of a point whose coordinates are
@@ -46,23 +53,90 @@ def ec_point_add(
     Args:
         x: Quantum register containing the x-coordinate of the quantum point. The result x-coordinate will be stored in-place here.
         y: Quantum register containing the y-coordinate of the quantum point. The result y-coordinate will be stored in-place here.
+        t0: Auxiliary quantum register for temporary storage
+        l: Lamda
         G: List of 2 classical coordinates [Gx, Gy] representing a point on the curve.
         p: Prime modulus for the elliptic curve operations.
+        ctrl: Control qubit that determines whether the point addition is performed.
     """
     # Extract classical coordinates
     Gx = G[0]  # x-coordinate of classical point
     Gy = G[1]  # y-coordinate of classical point
 
-    # STEP 1: Compute terms for lambda (y - Gy) and (x - Gx) mod p (using modular_in_place_subtract_constant)
-    # The results are stored back in y and x respectively.
+    # 1
     modular_in_place_subtract_constant(y, Gy, p)  # y becomes (y - Gy) mod p
+    # 2
     modular_in_place_subtract_constant(x, Gx, p)  # x becomes (x - Gx) mod p
+    # 3
 
-    # STEP 2: Compute modular inverse of (x - Gx) mod p (using modular_out_of_place_multiply)
-    mock_kaliski_inverse(x)
-    temp = QNum("temp", x.size, SIGNED, 0)
-    allocate(x.size, temp)
-    modular_out_of_place_multiply(p, x, y, temp)
+    within_apply(
+        lambda: mock_kaliski_inverse_modulus_7(x, t0),
+        lambda: modular_out_of_place_multiply(t0, y, l, p),
+    )
+
+    within_apply(
+        lambda: modular_out_of_place_multiply(l, x, t0, p),
+        lambda: modular_in_place_subtract(t0, y, p),
+    )
+
+    within_apply(
+        lambda: modular_square(l, t0, p),
+        lambda: (
+            modular_in_place_subtract(t0, x, p),
+            modular_in_place_negate(x, p),
+            modular_in_place_add_constant(x, 3 * Gx, p),
+        ),
+    )
+
+    modular_out_of_place_multiply(l, x, y, p)
+
+    within_apply(
+        lambda: mock_kaliski_inverse_modulus_7(x, t0),
+        lambda: invert(lambda: modular_out_of_place_multiply(t0, y, l, p)),
+    )
+
+    modular_in_place_subtract_constant(y, Gy, p)
+
+    modular_in_place_negate(x, p)
+    modular_in_place_add_constant(x, Gx, p)
+
+    # modular_square(l,t0,p)
+    # 8
+    # modular_in_place_subtract(t0,x,p)
+    # modular_in_place_negate(p,x)
+
+    # 9
+
+    # 10
+    # modular_square(l,t0,p)
+
+    """
+
+    #3,4,5
+    within_apply(
+        lambda: mock_kaliski_inverse_modulus_7(x,t0),
+        lambda: modular_out_of_place_multiply(t0, y, l, p),
+    )
+
+    #6
+    modular_out_of_place_multiply(p, l, x,y)
+    #7
+    print("7")
+    modular_square(l,t0,p)
+    #8
+    print("8")
+    modular_in_place_subtract(x,t0,p)
+    #9
+    print("9")
+    modular_in_place_add_constant(x,3*Gx,p)
+    #10
+    print("10")
+    modular_square(l,t0,p)
+    #11
+    print("11)")
+    modular_out_of_place_multiply(p, l, x,y)
+    """
+
     # x = temp
 
     # TODO: Implement the rest of point addition using modular arithmetic operations (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate)
@@ -106,7 +180,13 @@ def ec_point_double(
 
 
 @qfunc
-def main(anc_0: Output[QNum], anc_1: Output[QNum]) -> None:
+def main(
+    anc_0: Output[QNum],
+    anc_1: Output[QNum],
+    t0: Output[QNum],
+    l: Output[QNum],
+    c: Output[QBit],
+) -> None:
     """
     Test function for elliptic curve point addition.
     Uses a sample curve: y^2 = x^3 + 2x + 3 (mod 7)
@@ -117,20 +197,50 @@ def main(anc_0: Output[QNum], anc_1: Output[QNum]) -> None:
     # Allocate quantum registers for point coordinates
     allocate(3, anc_0)
     allocate(3, anc_1)
+    allocate(3, t0)
+    allocate(3, l)
+    allocate(1, c)
 
     # Initialize quantum point P = (4,5)
-    anc_0 ^= 4  # x-coordinate
-    anc_1 ^= 5  # y-coordinate
+    anc_0 ^= 0  # x-coordinate
+    anc_1 ^= 1  # y-coordinate
 
-    # Test modular addition: should add 2 to anc_0 modulo 7
-    # anc_0 should become (4 + 2) mod 7 = 6
-    ec_point_add(anc_0, anc_1, [2, 3], 7)
+    # Set control qubit to 1 to enable point addition
+
+    # Test modular addition: should add point (2,3) to (4,5) modulo 7
+    ec_point_add(anc_0, anc_1, t0, l, [2, 5], 7, c)
 
 
-# Create and synthesize the model
+# Create and synthesize the model with width optimization
+
+constraints = Constraints(
+    optimization_parameter="width",  # Optimize for minimum width
+)
+
+
+preferences = Preferences(synthesize_all_separately=True, timeout_seconds=3600)
+
+# qmod = create_model(main, constraints=constraints, preferences=preferences)
 qmod = create_model(main)
 qprog = synthesize(qmod)
 
-show(qprog)  # Let's see what's happening in the circuit
+# Print circuit metrics
+# Number of qubits
+num_qubits = qprog.data.width
+
+# Circuit depth
+if hasattr(qprog.data, "circuit_depth"):
+    print("Circuit depth:", qprog.data.circuit_depth)
+elif hasattr(qprog, "transpiled_circuit") and hasattr(
+    qprog.transpiled_circuit, "depth"
+):
+    print("Circuit depth:", qprog.transpiled_circuit.depth)
+else:
+    print("Depth attribute not found. Available attributes:", dir(qprog.data))
+
+print(f"Number of qubits: {num_qubits}")
+
+# Execute and show results
 result = execute(qprog).result()
+print("\nExecution Results:")
 print("Result:", result[0].value.parsed_counts)

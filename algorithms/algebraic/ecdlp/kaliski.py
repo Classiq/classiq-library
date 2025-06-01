@@ -154,7 +154,13 @@ def kaliski_quantum(v: QNum, p: int, m: QArray[QBit]) -> QNum:
 
 
 @qfunc
-def mock_kaliski_inverse(x: QNum) -> None:
+def _set_value(reg: QNum, value: int) -> None:
+    """Helper function to set a value in a quantum register."""
+    reg ^= value
+
+
+@qfunc
+def mock_kaliski_inverse_modulus_7(x: QNum, result: QNum) -> None:
     """
     Mock implementation of Kaliski algorithm for modular inverse modulo 7.
     For input x in range 1-6, computes x^(-1) mod 7.
@@ -168,29 +174,26 @@ def mock_kaliski_inverse(x: QNum) -> None:
 
     Args:
         x (QNum): Input quantum number (should be in range 1-6)
+        result (QNum): Output quantum number to store the inverse
     """
-    # Create a quantum register for the result
-    result = QNum("result", 3)  # 3 bits enough for numbers 0-6
-    allocate(3, result)
-
     # Use a series of controlled operations to set the correct inverse
     # For x = 1: result = 1
-    control(x == 1, lambda: inplace_add(1, result))
+    control(x == 1, lambda: _set_value(result, 1))
 
     # For x = 2: result = 4
-    control(x == 2, lambda: inplace_add(4, result))
+    control(x == 2, lambda: _set_value(result, 4))
 
     # For x = 3: result = 5
-    control(x == 3, lambda: inplace_add(5, result))
+    control(x == 3, lambda: _set_value(result, 5))
 
     # For x = 4: result = 2
-    control(x == 4, lambda: inplace_add(2, result))
+    control(x == 4, lambda: _set_value(result, 2))
 
     # For x = 5: result = 3
-    control(x == 5, lambda: inplace_add(3, result))
+    control(x == 5, lambda: _set_value(result, 3))
 
     # For x = 6: result = 6
-    control(x == 6, lambda: inplace_add(6, result))
+    control(x == 6, lambda: _set_value(result, 6))
 
     # Copy result back to x
-    swap_qnum(x, result)
+    # swap_qnum(x, result)

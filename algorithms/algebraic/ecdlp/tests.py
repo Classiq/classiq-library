@@ -13,6 +13,8 @@ from classiq import (
     X,
     control,
     prepare_uniform_trimmed_state,
+    QArray,
+    Constraints,
 )
 from classiq.qmod import SIGNED
 from modular_arithmetic import (
@@ -23,7 +25,9 @@ from modular_arithmetic import (
     modular_in_place_double,
     modular_out_of_place_multiply,
     modular_in_place_negate,
+    modular_square,
 )
+from kaliski import mock_kaliski_inverse_modulus_7
 
 MODULUS = 5
 
@@ -34,7 +38,7 @@ def run_quantum_test(qmod, test_name: str) -> None:
     """
     qprog = synthesize(qmod)
     # Uncomment to see the circuit
-    # show(qprog)
+    show(qprog)
 
     result = execute(qprog).result()
     print(f"\n{test_name} Test Results:")
@@ -65,104 +69,6 @@ def verify_modular_operation(
     is_correct = quantum_value == expected_result
     print(f"Test {'PASSED' if is_correct else 'FAILED'}")
     return is_correct
-
-
-@qfunc
-def test_modular_add(x: Output[QNum], y: Output[QNum], y_copy: Output[QNum]) -> None:
-    """
-    Tests modular addition (using modular_in_place_add) with fixed inputs: (x + y) mod modulus
-    """
-    allocate(3, x)
-    allocate(3, y)
-    # Set fixed input values
-    x ^= 3  # x = 3
-    y ^= 2  # y = 2
-    y_copy |= y  # y_copy is allocated here
-    modular_in_place_add(x, y, MODULUS)  # x becomes (3 + 2) mod 5 = 0
-
-
-@qfunc
-def test_modular_subtract(
-    x: Output[QNum], y: Output[QNum], y_copy: Output[QNum]
-) -> None:
-    """
-    Tests modular subtraction (using modular_in_place_subtract) with fixed inputs: (x - y) mod modulus
-    """
-    allocate(3, x)
-    allocate(3, y)
-    # Set fixed input values
-    x ^= 4  # x = 4
-    y ^= 2  # y = 2
-    y_copy |= y  # y_copy is allocated here
-    modular_in_place_subtract(x, y, MODULUS)  # x becomes (4 - 2) mod 5 = 2
-
-
-@qfunc
-def test_modular_add_constant(
-    x: Output[QNum], x_copy: Output[QNum], constant: int = 3
-) -> None:
-    """
-    Tests modular addition with constant (using modular_in_place_add_constant) with fixed input: (x + constant) mod modulus
-    """
-    allocate(3, x)
-    # Set fixed input value
-    x ^= 2  # x = 2
-    x_copy |= x  # Copy original x
-    modular_in_place_add_constant(x, constant, MODULUS)  # x becomes (2 + 3) mod 5 = 0
-
-
-@qfunc
-def test_modular_subtract_constant(
-    x: Output[QNum], x_copy: Output[QNum], constant: int = 2
-) -> None:
-    """
-    Tests modular subtraction with constant (using modular_in_place_subtract_constant) with fixed input: (x - constant) mod modulus
-    """
-    allocate(3, x)
-    # Set fixed input value
-    x ^= 4  # x = 4
-    x_copy |= x  # Copy original x
-    modular_in_place_subtract_constant(
-        x, constant, MODULUS
-    )  # x becomes (4 - 2) mod 5 = 2
-
-
-@qfunc
-def test_modular_double(x: Output[QNum], x_copy: Output[QNum]) -> None:
-    """
-    Tests modular doubling (using modular_in_place_double) with fixed input: (2x) mod modulus
-    """
-    allocate(3, x)
-    # Set fixed input value
-    x ^= 3  # x = 3
-    x_copy |= x  # Copy original x
-    modular_in_place_double(x, MODULUS)  # x becomes (2 * 3) mod 5 = 1
-
-
-@qfunc
-def test_modular_multiply(x: Output[QNum], y: Output[QNum], z: Output[QNum]) -> None:
-    """
-    Tests modular multiplication (using modular_out_of_place_multiply) with fixed inputs: (x * y) mod modulus
-    """
-    allocate(3, x)
-    allocate(3, y)
-    allocate(3, z)
-    # Set fixed input values
-    x ^= 3  # x = 3
-    y ^= 4  # y = 4
-    modular_out_of_place_multiply(MODULUS, x, y, z)  # z becomes (3 * 4) mod 5 = 2
-
-
-@qfunc
-def test_modular_negate(x: Output[QNum], x_copy: Output[QNum]) -> None:
-    """
-    Tests modular negation (using modular_in_place_negate) with fixed input: (-x) mod modulus
-    """
-    allocate(3, x)
-    # Set fixed input value
-    x ^= 2  # x = 2
-    x_copy |= x  # Copy original x
-    modular_in_place_negate(MODULUS, x)  # x becomes (-2) mod 5 = 3
 
 
 def run_modular_add_test():
@@ -275,7 +181,7 @@ def run_modular_multiply_test():
         # Set fixed input values
         x ^= 3  # x = 3
         y ^= 4  # y = 4
-        modular_out_of_place_multiply(MODULUS, x, y, z)  # z becomes (3 * 4) mod 5 = 2
+        modular_out_of_place_multiply(x, y, z, MODULUS)  # z becomes (3 * 4) mod 5 = 2
 
     qmod = create_model(main)
     result = run_quantum_test(qmod, "Modular Multiplication")
@@ -291,12 +197,48 @@ def run_modular_negate_test():
         allocate(3, x)
         x ^= 2  # x = 2
         x_copy |= x  # Copy original x
-        modular_in_place_negate(MODULUS, x)  # x becomes (-2) mod 5 = 3
+        modular_in_place_negate(x, MODULUS)  # x becomes (-2) mod 5 = 3
 
     qmod = create_model(main)
     result = run_quantum_test(qmod, "Modular Negation")
     expected = (-2) % MODULUS  # Classical calculation for fixed input
     verify_modular_operation(result, expected, "(-2) mod 5")
+
+
+def run_modular_square_test():
+    print("\nRunning Modular Square Test (using modular_square)...")
+
+    @qfunc
+    def main(x: Output[QNum], z: Output[QNum]) -> None:
+        allocate(3, x)
+        allocate(3, z)
+        x ^= 4  # x = 4
+        modular_square(x, z, MODULUS)  # z becomes (4 * 4) mod 5 = 1
+
+    qmod = create_model(main, constraints=Constraints(optimization_parameter="width"))
+    result = run_quantum_test(qmod, "Modular Square")
+    expected = (4 * 4) % MODULUS  # Classical calculation for fixed input
+    verify_modular_operation(result, expected, "(4 * 4) mod 5", result_key="z")
+
+
+def run_mock_kaliski_modulus_7_test():
+    """
+    A mock test (for Kaliski) that initializes a quantum variable (x) and then calls mock_kaliski_inverse_modulus_7 (from kaliski.py)
+    to compute the inverse of x modulo 7. For example, if x=2, then (2)^(-1) mod 7 = 4.
+    """
+    print("\nRunning Mock Kaliski (Modulus 7) Test...")
+
+    @qfunc
+    def main(x: Output[QNum], result: Output[QNum]) -> None:
+        allocate(3, x)
+        allocate(3, result)
+        x ^= 2  # x = 2 (fixed input)
+        mock_kaliski_inverse_modulus_7(x, result)  # (2)^(-1) mod 7 = 4
+
+    qmod = create_model(main)
+    result = run_quantum_test(qmod, "Mock Kaliski (Modulus 7)")
+    expected = pow(2, -1, 7)  # Classical calculation: (2)^(-1) mod 7 = 4
+    verify_modular_operation(result, expected, "(2)^(-1) mod 7", result_key="result")
 
 
 def run_all_tests():
@@ -311,6 +253,8 @@ def run_all_tests():
     run_modular_double_test()
     run_modular_multiply_test()
     run_modular_negate_test()
+    run_modular_square_test()
+    run_mock_kaliski_modulus_7_test()
 
 
 if __name__ == "__main__":
@@ -333,11 +277,16 @@ if __name__ == "__main__":
             run_modular_multiply_test()
         elif test_name == "negate":
             run_modular_negate_test()
+        elif test_name == "square":
+            run_modular_square_test()
+        elif test_name == "mock_kaliski":
+            run_mock_kaliski_modulus_7_test()
         else:
             print(f"Unknown test: {test_name}")
             print(
-                "Available tests: add, subtract, add_constant, subtract_constant, double, multiply, negate"
+                "Available tests: add, subtract, add_constant, subtract_constant, double, multiply, negate, square, mock_kaliski"
             )
     else:
         # Run all tests if no specific test is requested
+        # run_mock_kaliski_modulus_7_test()
         run_all_tests()
