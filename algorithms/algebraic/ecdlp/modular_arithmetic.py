@@ -278,6 +278,7 @@ def modular_in_place_negate(x: QNum, modulus: int) -> None:
     """
     n = x.size
     neg_modulus = 2**n - modulus - 1
+    print(f"[modular_in_place_negate] neg_modulus: {neg_modulus}")
     is_all_zeros = QBit("is_all_zeros")
     allocate(1, is_all_zeros)
     # Test if the input is all-zeros
@@ -290,6 +291,7 @@ def modular_in_place_negate(x: QNum, modulus: int) -> None:
     check_if_all_ones(x, is_all_zeros)
     # Bitwise negation: set x to (m'+x)'
     bitwise_negation(x)
+    free(is_all_zeros)
 
 
 @qfunc
@@ -316,3 +318,5 @@ def modular_square(x: QArray[QBit], z: QArray[QBit], p: int) -> None:
     control(x[0], lambda: X(anc))
     control(anc, lambda: modular_in_place_add(x, z, p))
     control(x[0], lambda: X(anc))
+
+    free(anc)

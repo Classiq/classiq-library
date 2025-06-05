@@ -1,3 +1,4 @@
+print("modular_arithmetic.py loaded!", __file__)
 from classiq import (
     qfunc,
     QNum,
@@ -29,7 +30,7 @@ from modular_arithmetic import (
 )
 from kaliski import mock_kaliski_inverse_modulus_7
 
-MODULUS = 5
+MODULUS = 7
 
 
 def run_quantum_test(qmod, test_name: str) -> None:
@@ -116,17 +117,17 @@ def run_modular_add_constant_test():
     def main(x: Output[QNum], x_copy: Output[QNum]) -> None:
         allocate(3, x)
         # Set fixed input value
-        x ^= 2  # x = 2
+        x ^= 5  # x = 5
         x_copy |= x  # Copy original x
-        constant = 3  # local int var
+        constant = 9 % MODULUS  # local int var, evaluates to 2 with MODULUS = 7
         modular_in_place_add_constant(
             x, constant, MODULUS
-        )  # x becomes (2 + 3) mod 5 = 0
+        )  # x becomes (5 + 2) mod 7 = 0
 
     qmod = create_model(main)
     result = run_quantum_test(qmod, "Modular Addition with Constant")
-    expected = (2 + 3) % MODULUS  # Classical calculation for fixed input
-    verify_modular_operation(result, expected, "(2 + 3) mod 5")
+    expected = (5 + (9 % MODULUS)) % MODULUS  # Classical calculation for fixed input
+    verify_modular_operation(result, expected, "(5 + 2) mod 7")
 
 
 def run_modular_subtract_constant_test():
@@ -179,14 +180,23 @@ def run_modular_multiply_test():
         allocate(3, y)
         allocate(3, z)
         # Set fixed input values
-        x ^= 3  # x = 3
-        y ^= 4  # y = 4
-        modular_out_of_place_multiply(x, y, z, MODULUS)  # z becomes (3 * 4) mod 5 = 2
+        x ^= 1  # x = 1
+        y ^= 1  # y = 1
+        modular_out_of_place_multiply(x, y, z, MODULUS)  # z becomes (1 * 1) mod 7 = 1
 
     qmod = create_model(main)
     result = run_quantum_test(qmod, "Modular Multiplication")
-    expected = (3 * 4) % MODULUS  # Classical calculation for fixed inputs
-    verify_modular_operation(result, expected, "(3 * 4) mod 5", result_key="z")
+    expected = (
+        1 * 1
+    ) % MODULUS  # Classical calculation for fixed inputs (with MODULUS = 7)
+    verify_modular_operation(result, expected, "(1 * 1) mod 7", result_key="z")
+    # Check that the quantum values of x and y remain unchanged
+    quantum_x = result[0].state["x"]
+    quantum_y = result[0].state["y"]
+    print("Quantum x (after modular_out_of_place_multiply):", quantum_x)
+    print("Quantum y (after modular_out_of_place_multiply):", quantum_y)
+    assert quantum_x == 1, "Input x was changed (expected 1)."
+    assert quantum_y == 1, "Input y was changed (expected 1)."
 
 
 def run_modular_negate_test():
@@ -195,14 +205,16 @@ def run_modular_negate_test():
     @qfunc
     def main(x: Output[QNum], x_copy: Output[QNum]) -> None:
         allocate(3, x)
-        x ^= 2  # x = 2
+        x ^= 4  # x = 4 (binary 100)
         x_copy |= x  # Copy original x
-        modular_in_place_negate(x, MODULUS)  # x becomes (-2) mod 5 = 3
+        modular_in_place_negate(x, MODULUS)  # x becomes (-4) mod 7 = 3
 
     qmod = create_model(main)
     result = run_quantum_test(qmod, "Modular Negation")
-    expected = (-2) % MODULUS  # Classical calculation for fixed input
-    verify_modular_operation(result, expected, "(-2) mod 5")
+    expected = (
+        -4
+    ) % MODULUS  # Classical calculation for fixed input (with MODULUS = 7)
+    verify_modular_operation(result, expected, "(-4) mod 7")
 
 
 def run_modular_square_test():
@@ -232,13 +244,13 @@ def run_mock_kaliski_modulus_7_test():
     def main(x: Output[QNum], result: Output[QNum]) -> None:
         allocate(3, x)
         allocate(3, result)
-        x ^= 2  # x = 2 (fixed input)
-        mock_kaliski_inverse_modulus_7(x, result)  # (2)^(-1) mod 7 = 4
+        x ^= 1  # x = 1 (fixed input)
+        mock_kaliski_inverse_modulus_7(x, result)  # (1)^(-1) mod 7 = 1
 
     qmod = create_model(main)
     result = run_quantum_test(qmod, "Mock Kaliski (Modulus 7)")
-    expected = pow(2, -1, 7)  # Classical calculation: (2)^(-1) mod 7 = 4
-    verify_modular_operation(result, expected, "(2)^(-1) mod 7", result_key="result")
+    expected = pow(1, -1, 7)  # Classical calculation: (1)^(-1) mod 7 = 1
+    verify_modular_operation(result, expected, "(1)^(-1) mod 7", result_key="result")
 
 
 def run_all_tests():
