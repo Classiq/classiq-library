@@ -160,28 +160,30 @@ def ell_double(P: list, curve):
 
 
 @qfunc
-def ec_point_double(
-    x: QNum,  # x-coordinate of point
-    y: QNum,  # y-coordinate of point
-    a: int,  # curve parameter a
-    p: int,  # prime modulus
+def ell_mult_add(
+    x: QNum,
+    y: QNum,
+    t0: QNum,
+    l: QNum,
+    k: QArray[QBit],
+    P: list[int],
+    p: int,
+    a: int,
+    b: int,
 ) -> None:
     """
-    Performs elliptic curve point doubling (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate): 2P = R where P=(x,y)
-    For curve: y^2 = x^3 + ax + b (mod p)
-
-    The doubling is performed using the following formulas (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate):
-    λ = (3x^2 + a)/(2y) mod p
-    x3 = λ^2 - 2x mod p
-    y3 = λ(x - x3) - y mod p
-
-    Args:
-        x, y: Coordinates of point P
-        a: Curve parameter
-        p: Prime modulus
+    Compute (k * P) (scalar multiplication) and add the result (in-place) to res.
+    P is a classical point (list [x, y]), res and k are quantum registers (QNum), and curve is an EllipticCurve object.
+    (Quantum implementation using a double-and-add algorithm.)
     """
-    # TODO: Implement point doubling using modular arithmetic operations (using modular_in_place_add, modular_in_place_subtract, modular_in_place_add_constant, modular_in_place_subtract_constant, modular_in_place_double, modular_out_of_place_multiply, and modular_in_place_negate)
-    pass
+
+    n = k.size
+    for i in range(n):
+
+        control(k[i] == 1, lambda: ec_point_add(x, y, t0, l, P, p))
+        # (Classically) update power (using ell_double) (i.e. power = ell_double(power, curve))
+        curve = EllipticCurve(p=p, a=a, b=b)
+        P = ell_double(P, curve)
 
 
 @qfunc
@@ -211,50 +213,40 @@ def main(
     # ec_point_add(anc_0, anc_1, t0, l, Q, 7)
 
 
-# Create and synthesize the model with width optimization
-
-constraints = Constraints(
-    optimization_parameter="width",  # Optimize for minimum width
-)
-
-
-# preferences = Preferences(synthesize_all_separately=True,timeout_seconds=3600)
-preferences = Preferences(timeout_seconds=3600, optimization_level=1)
-
-# Set up execution preferences for NVIDIA simulator
-execution_preferences = ExecutionPreferences(
-    backend_preferences=ClassiqBackendPreferences(
-        backend_name=ClassiqNvidiaBackendNames.SIMULATOR
-    ),
-    num_shots=1000,  # You can adjust the number of shots as needed
-)
-
-print("Creating model...")
-qmod = create_model(main, constraints=constraints, preferences=preferences)
-# qmod = create_model(main, constraints=constraints, preferences=preferences, execution_preferences=execution_preferences)
-# qmod = create_model(main, execution_preferences=execution_preferences)
-# qmod = create_model(main)
-print("Synthesizing...")
-qprog = synthesize(qmod)
-show(qprog)
-# Print circuit metrics
-# Number of qubits
-num_qubits = qprog.data.width
-
-# Circuit depth
-if hasattr(qprog.data, "circuit_depth"):
-    print("Circuit depth:", qprog.data.circuit_depth)
-elif hasattr(qprog, "transpiled_circuit") and hasattr(
-    qprog.transpiled_circuit, "depth"
-):
-    print("Circuit depth:", qprog.transpiled_circuit.depth)
-else:
-    print("Depth attribute not found. Available attributes:", dir(qprog.data))
-
-print(f"Number of qubits: {num_qubits}")
-
-print("Executing...")
-result = execute(qprog).result()
-print("Execution complete.")
-print("\nExecution Results:")
-print("Result:", result[0].value.parsed_counts)
+if __name__ == "__main__":
+    # Create and synthesize the model with width optimization
+    constraints = Constraints(
+        optimization_parameter="width",
+    )  # Optimize for minimum width
+    preferences = Preferences(timeout_seconds=3600, optimization_level=1)
+    # Set up execution preferences for NVIDIA simulator
+    execution_preferences = ExecutionPreferences(
+        backend_preferences=ClassiqBackendPreferences(
+            backend_name=ClassiqNvidiaBackendNames.SIMULATOR
+        ),
+        num_shots=1000,
+    )
+    print("Creating model...")
+    qmod = create_model(main, constraints=constraints, preferences=preferences)
+    # qmod = create_model(main, constraints=constraints, preferences=preferences, execution_preferences=execution_preferences)
+    # qmod = create_model(main, execution_preferences=execution_preferences)
+    # qmod = create_model(main)
+    print("Synthesizing...")
+    qprog = synthesize(qmod)
+    show(qprog)
+    # Print circuit metrics (number of qubits and circuit depth)
+    num_qubits = qprog.data.width
+    if hasattr(qprog.data, "circuit_depth"):
+        print("Circuit depth:", qprog.data.circuit_depth)
+    elif hasattr(qprog, "transpiled_circuit") and hasattr(
+        qprog.transpiled_circuit, "depth"
+    ):
+        print("Circuit depth:", qprog.transpiled_circuit.depth)
+    else:
+        print("Depth attribute not found. Available attributes:", dir(qprog.data))
+    print(f"Number of qubits: {num_qubits}")
+    print("Executing...")
+    result = execute(qprog).result()
+    print("Execution complete.")
+    print("\nExecution Results:")
+    print("Result:", result[0].value.parsed_counts)
