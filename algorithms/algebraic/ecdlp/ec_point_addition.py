@@ -179,7 +179,7 @@ def ell_mult_add(
 
     n = k.size
     for i in range(n):
-
+        print("i={}, P={} ".format(i, P))
         control(k[i] == 1, lambda: ec_point_add(x, y, t0, l, P, p))
         # (Classically) update power (using ell_double) (i.e. power = ell_double(power, curve))
         curve = EllipticCurve(p=p, a=a, b=b)
@@ -197,8 +197,8 @@ def main(
     # Curve parameters
     p = 7
     # Points on the curve:
-    P = [5, 0]
-    Q = [4, 1]
+    P = [3, 2]
+    Q = [3, 2]
     print(f"[main] Adding point P = {P} and Q = {Q}")
     allocate(3, anc_0)
     allocate(3, anc_1)
