@@ -1,0 +1,19 @@
+qfunc hardware_efficient_layer(q: qbit[], theta0: real, theta1: real, theta2: real, theta3: real) {
+  RY(theta0, q[0]);
+  RY(theta1, q[1]);
+  RY(theta2, q[2]);
+  RY(theta3, q[3]);
+  CX(q[0], q[1]);
+  CX(q[1], q[2]);
+  CX(q[2], q[3]);
+  CX(q[3], q[0]);
+}
+
+qfunc main(theta_0_0: real, theta_0_1: real, theta_0_2: real, theta_0_3: real, theta_1_0: real, theta_1_1: real, theta_1_2: real, theta_1_3: real, theta_2_0: real, theta_2_1: real, theta_2_2: real, theta_2_3: real, theta_3_0: real, theta_3_1: real, theta_3_2: real, theta_3_3: real, theta_4_0: real, theta_4_1: real, theta_4_2: real, theta_4_3: real, output q: qbit[]) {
+  allocate(4, q);
+  hardware_efficient_layer(q, theta_0_0, theta_0_1, theta_0_2, theta_0_3);
+  hardware_efficient_layer(q, theta_1_0, theta_1_1, theta_1_2, theta_1_3);
+  hardware_efficient_layer(q, theta_2_0, theta_2_1, theta_2_2, theta_2_3);
+  hardware_efficient_layer(q, theta_3_0, theta_3_1, theta_3_2, theta_3_3);
+  hardware_efficient_layer(q, theta_4_0, theta_4_1, theta_4_2, theta_4_3);
+}
