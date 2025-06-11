@@ -180,7 +180,7 @@ def ell_mult_add(
     n = k.size
     for i in range(n):
         print("i={}, P={} ".format(i, P))
-        control(k[i] == 1, lambda: ec_point_add(x, y, t0, l, P, p))
+        control(k[i], lambda: ec_point_add(x, y, t0, l, P, p))
         # (Classically) update power (using ell_double) (i.e. power = ell_double(power, curve))
         curve = EllipticCurve(p=p, a=a, b=b)
         P = ell_double(P, curve)
