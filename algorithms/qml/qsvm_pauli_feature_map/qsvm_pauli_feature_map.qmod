@@ -4,8 +4,8 @@ qfunc hadamard_transform_expanded___0(target: qbit[2]) {
   }
 }
 
-qfunc pauli_kernel_expanded___0(data: real[], qba: qbit[2]) {
-  power (2) {
+qfunc pauli_kernel_expanded___0(data: real[], reps: int, qba: qbit[2]) {
+  power (reps) {
     hadamard_transform_expanded___0(qba);
     parametric_suzuki_trotter([[3, 0], [0, 3], [3, 3]], [
       data[0],
@@ -17,8 +17,8 @@ qfunc pauli_kernel_expanded___0(data: real[], qba: qbit[2]) {
 
 qfunc main(data1: real[2], data2: real[2], output qba: qnum<2, False, 0>) {
   allocate(2, qba);
-  pauli_kernel_expanded___0(data1, qba);
+  pauli_kernel_expanded___0(data1, 2, qba);
   invert {
-    pauli_kernel_expanded___0(data2, qba);
+    pauli_kernel_expanded___0(data2, 2, qba);
   }
 }
