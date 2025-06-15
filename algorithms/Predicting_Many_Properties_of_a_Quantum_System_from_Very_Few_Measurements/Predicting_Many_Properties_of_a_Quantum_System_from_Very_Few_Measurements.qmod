@@ -1,0 +1,13 @@
+qfunc prep_state(qarr: qbit[]) {
+  H(qarr[0]);
+  CX(qarr[0], qarr[1]);
+}
+
+qfunc unitary_application_expanded___0(state: qbit[2]) {
+}
+
+qfunc main(output qarr: qbit[2]) {
+  allocate(2, qarr);
+  prep_state(qarr);
+  unitary_application_expanded___0(qarr);
+}
