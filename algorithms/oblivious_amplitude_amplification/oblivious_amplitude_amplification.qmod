@@ -1,4 +1,4 @@
-qfunc check_block(b: qnum, res: qbit) {
+qfunc block_oracle(const b: qnum, permutable res: qbit) {
   res ^= b == 0;
 }
 
@@ -7,7 +7,7 @@ qfunc oblivious_amplitude_amplification(reps: int, block_encoding: qfunc (qnum, 
   repeat (index: reps) {
     grover_operator(lambda(b) {
       phase_oracle(lambda(x, res) {
-        check_block(x, res);
+        block_oracle(x, res);
       }, b);
     }, lambda(b) {
       block_encoding(data, b);
