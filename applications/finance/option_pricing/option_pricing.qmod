@@ -1,17 +1,5 @@
-qstruct OptionPricingState {
-  asset: qnum<5, False, 0>;
-  ind: qbit;
-}
-
-qfunc iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
-  sp_operand(x);
-  power (k) {
-    grover_operator(oracle_operand, sp_operand, x);
-  }
-}
-
-qfunc iqae_oracle(state: OptionPricingState) {
-  Z(state.ind);
+qfunc oracle(est_reg: qbit[]) {
+  Z(est_reg[est_reg.len - 1]);
 }
 
 qfunc load_distribution(asset: qnum) {
@@ -51,11 +39,11 @@ qfunc load_distribution(asset: qnum) {
   ], 0, asset);
 }
 
-qfunc payoff_linear(asset: qnum, ind: qbit) {
+qfunc payoff_linear(const asset: qnum, permutable ind: qbit) {
   ind *= sqrt(abs((((asset * 0.0513152339) + 1.2354548887) - 1.9) / 0.9262271399));
 }
 
-qfunc payoff(asset: qnum, ind: qbit) {
+qfunc payoff(const asset: qnum, permutable ind: qbit) {
   aux: qbit;
   within {
     aux = asset >= ceiling(12.9502500662);
@@ -66,20 +54,23 @@ qfunc payoff(asset: qnum, ind: qbit) {
   }
 }
 
-qfunc european_call_state_preparation(state: OptionPricingState) {
-  load_distribution(state.asset);
-  payoff(state.asset, state.ind);
+qfunc european_call_state_preparation(asset: qnum, ind: qbit) {
+  load_distribution(asset);
+  payoff(asset, ind);
 }
 
-qfunc main(k: int, output ind: qbit) {
-  state: OptionPricingState;
-  asset: qbit[];
-  allocate(state.size, state);
-  iqae_algorithm(k, iqae_oracle, european_call_state_preparation, state);
-  state -> {asset, ind};
+qfunc space_transform(est_reg: qbit[]) {
+  european_call_state_preparation(est_reg[0:est_reg.len - 1], est_reg[est_reg.len - 1]);
 }
 
-cscope ```
-iqae_res = iqae(epsilon=0.05, alpha=0.01)
-save({'iqae_res': iqae_res})
-```
+qfunc main(k: int, output indicator: qbit) {
+  est_reg: qbit[];
+  problem_vars: qbit[5];
+  allocate(problem_vars);
+  allocate(indicator);
+  within {
+    {problem_vars, indicator} -> est_reg;
+  } apply {
+    amplitude_amplification(k, oracle, space_transform, est_reg);
+  }
+}
