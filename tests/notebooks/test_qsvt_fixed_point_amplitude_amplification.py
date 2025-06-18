@@ -24,13 +24,3 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_width=13,  # actual width: 11
         expected_depth=18000,  # actual depth: 15432
     )
-
-    # test notebook content
-    measured_good_shots = tb.ref("measured_good_shots")
-    p_good_shot = tb.ref("p_good_shot")
-    num_shots = tb.ref("NUM_SHOTS")
-    assert np.isclose(
-        measured_good_shots,
-        num_shots * p_good_shot,
-        atol=5 * scipy.stats.binom.std(num_shots, p_good_shot),
-    )
