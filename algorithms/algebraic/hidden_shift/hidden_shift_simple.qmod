@@ -1,17 +1,17 @@
-qfunc arith_func(vars: qbit[4], res: qbit) {
-  res ^= (vars[0] & vars[1]) ^ (vars[2] & vars[3]);
-}
-
-qfunc arith_func_shifted(vars: qbit[4], res: qbit) {
-  res ^= ((vars[0] ^ 1) & vars[1]) ^ (vars[2] & vars[3]);
-}
-
 qfunc hidden_shift(oracle: qfunc (qbit[]), oracle_shifted: qfunc (qbit[]), target: qbit[]) {
   hadamard_transform(target);
   oracle_shifted(target);
   hadamard_transform(target);
   oracle(target);
   hadamard_transform(target);
+}
+
+qfunc arith_func(vars: qbit[4], res: qbit) {
+  res ^= (vars[0] & vars[1]) ^ (vars[2] & vars[3]);
+}
+
+qfunc arith_func_shifted(vars: qbit[4], res: qbit) {
+  res ^= ((vars[0] ^ 1) & vars[1]) ^ (vars[2] & vars[3]);
 }
 
 qfunc main(output s: qbit[]) {
