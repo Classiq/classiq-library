@@ -149,8 +149,6 @@ def validate_quantum_program_size(
     compare_to: QuantumProgram | None = None,
     allow_zero_size: bool = False,
 ) -> None:
-    return
-
     if compare_to is not None:
         assert compare_to.transpiled_circuit is not None  # for mypy
         return validate_quantum_program_size(
