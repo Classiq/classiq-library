@@ -1,6 +1,6 @@
-qfunc main(output state: qbit[], output phase: qnum) {
+qfunc main(output state: qbit[], output phase: qnum<2, UNSIGNED, 2>) {
   allocate(2, state);
-  allocate(2, False, 2, phase);
+  allocate(phase);
   hadamard_transform(state);
   qpe_flexible(lambda(power) {
     suzuki_trotter([

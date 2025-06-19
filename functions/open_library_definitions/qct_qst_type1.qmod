@@ -1,8 +1,0 @@
-qfunc qct_qst_type1(x: qbit[]) {
-  within {
-    _qct_d_operator(x[0:x.len - 1], x[x.len - 1]);
-    _qct_pi_operator(x[0:x.len - 1], x[x.len - 1]);
-  } apply {
-    qft(x);
-  }
-}
