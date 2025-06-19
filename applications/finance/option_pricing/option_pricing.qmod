@@ -39,18 +39,16 @@ qfunc load_distribution(asset: qnum) {
   ], 0, asset);
 }
 
-qfunc payoff_linear(const asset: qnum, permutable ind: qbit) {
+qfunc payoff_linear(const asset: qnum, ind: qbit) {
   ind *= sqrt(abs((((asset * 0.0513152339) + 1.2354548887) - 1.9) / 0.9262271399));
 }
 
-qfunc payoff(const asset: qnum, permutable ind: qbit) {
+qfunc payoff(const asset: qnum, ind: qbit) {
   aux: qbit;
   within {
     aux = asset >= ceiling(12.9502500662);
   } apply {
-    control (aux) {
-      payoff_linear(asset, ind);
-    }
+    payoff_linear(asset, ind);
   }
 }
 
