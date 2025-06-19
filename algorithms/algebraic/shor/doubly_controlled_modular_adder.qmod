@@ -32,7 +32,7 @@ qfunc phase_lad_expanded___1(phi_b: qbit[5]) {
 
 qfunc my_qft_step_expanded___0(qbv: qbit[]) {
   H(qbv[0]);
-  repeat (index: qbv.len - 1) {
+  repeat (index: (-1) + qbv.len) {
     CPHASE(3.1416 * (2.0 ** ((-index) - 1.0)), qbv[0], qbv[index + 1]);
   }
 }
@@ -43,60 +43,58 @@ qfunc qft_ns_expanded___0(qbv: qbit[5]) {
   }
 }
 
-qfunc ctrl_x_expanded___0(ref: int, ctrl: qnum<1, False, 0>, aux: qbit) {
-  control (ctrl == ref) {
-    X(aux);
-  }
-}
-
-qfunc check_msb_expanded___0(ref: int, x: qbit[5], aux: qbit) {
+qfunc check_msb_expanded___0(x: qbit[5], aux: qbit) {
   within {
     invert {
       qft_ns_expanded___0(x);
     }
   } apply {
-    ctrl_x_expanded___0(ref, x[0], aux);
+    aux ^= x[0] == 1;
   }
 }
 
-qfunc ccmod_add_expanded___0(phi_b: qbit[5], c1: qbit, c2: qbit) {
-  ctrl: qbit[2];
-  aux: qbit;
+qfunc check_msb_expanded___1(x: qbit[5], aux: qbit) {
   within {
-    allocate(1, aux);
-    {c1, c2} -> ctrl;
-  } apply {
-    control (ctrl) {
-      phase_lad_expanded___0(phi_b);
-    }
     invert {
-      phase_lad_expanded___1(phi_b);
+      qft_ns_expanded___0(x);
     }
-    check_msb_expanded___0(1, phi_b, aux);
-    control (aux) {
-      phase_lad_expanded___1(phi_b);
-    }
-    within {
-      invert {
-        control (ctrl) {
-          phase_lad_expanded___0(phi_b);
-        }
-      }
-    } apply {
-      check_msb_expanded___0(0, phi_b, aux);
-    }
+  } apply {
+    aux ^= x[0] == 0;
   }
+}
+
+qfunc ccmod_add_expanded___0(phi_b: qbit[5], ctrl: qbit[2]) {
+  aux: qbit;
+  allocate(1, aux);
+  control (ctrl) {
+    phase_lad_expanded___0(phi_b);
+  }
+  invert {
+    phase_lad_expanded___1(phi_b);
+  }
+  check_msb_expanded___0(phi_b, aux);
+  control (aux) {
+    phase_lad_expanded___1(phi_b);
+  }
+  within {
+    invert {
+      control (ctrl) {
+        phase_lad_expanded___0(phi_b);
+      }
+    }
+  } apply {
+    check_msb_expanded___1(phi_b, aux);
+  }
+  free(aux);
 }
 
 qfunc main(output b: qnum<5, False, 0>, output ctrl: qbit[2]) {
   allocate(5, b);
-  allocate(2, ctrl);
   b ^= 8;
-  X(ctrl[0]);
-  X(ctrl[1]);
+  ctrl = 3;
   within {
     qft_expanded___0(b);
   } apply {
-    ccmod_add_expanded___0(b, ctrl[0], ctrl[1]);
+    ccmod_add_expanded___0(b, ctrl);
   }
 }
