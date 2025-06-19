@@ -1,11 +1,13 @@
 qfunc simon_qfunc(f_qfunc: qfunc (qnum, output qnum), x: qnum) {
   res: qnum;
-  hadamard_transform(x);
-  f_qfunc(x, res);
-  hadamard_transform(x);
+  within {
+    hadamard_transform(x);
+  } apply {
+    f_qfunc(x, res);
+  }
 }
 
-qfunc simon_qfunc_with_bipartite_s(partition_index: int, x: qbit[], output res: qbit[]) {
+qfunc simon_qfunc_with_bipartite_s(partition_index: int, const x: qbit[], permutable output res: qbit[]) {
   allocate(x.len, res);
   repeat (i: x.len - partition_index) {
     CX(x[i], res[i]);
@@ -16,8 +18,8 @@ qfunc simon_qfunc_with_bipartite_s(partition_index: int, x: qbit[], output res: 
   }
 }
 
-qfunc main(output x: qnum) {
-  allocate(6, x);
+qfunc main(output x: qnum<6>) {
+  allocate(x);
   simon_qfunc(lambda(x, res) {
     simon_qfunc_with_bipartite_s(4, x, res);
   }, x);
