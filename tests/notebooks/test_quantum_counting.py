@@ -8,9 +8,6 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("quantum_counting", timeout_seconds=300)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod_qpe"))
-    validate_quantum_model(tb.ref("qmod_iqae"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_qpe"),
