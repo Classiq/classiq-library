@@ -1,5 +1,0 @@
-qfunc qft_space_add_const(value: int, phi_b: qbit[]) {
-  repeat (index: phi_b.len) {
-    PHASE(qft_const_adder_phase(index, value, phi_b.len), phi_b[index]);
-  }
-}

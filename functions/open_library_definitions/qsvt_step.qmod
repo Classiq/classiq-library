@@ -1,8 +1,0 @@
-qfunc qsvt_step(phase1: real, phase2: real, proj_cnot_1: qfunc (qbit[], qbit), proj_cnot_2: qfunc (qbit[], qbit), u: qfunc (qbit[]), qvar: qbit[], aux: qbit) {
-  u(qvar);
-  projector_controlled_phase(phase1, proj_cnot_2, qvar, aux);
-  invert {
-    u(qvar);
-  }
-  projector_controlled_phase(phase2, proj_cnot_1, qvar, aux);
-}
