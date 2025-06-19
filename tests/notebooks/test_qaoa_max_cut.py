@@ -4,6 +4,7 @@ from tests.utils_for_testbook import (
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
+import numpy as np
 
 
 @wrap_testbook("qaoa_max_cut", timeout_seconds=300)
@@ -16,6 +17,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    for i, pc in enumerate(tb.ref("best_outcomes")):
+    for i, pc in enumerate(tb.ref_numpy("best_outcomes")):
         cost_value = maxcut_cost(pc.state["v"])
         assert np.isclose(cost_value, -5 / 6)
