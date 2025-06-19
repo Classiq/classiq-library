@@ -146,6 +146,7 @@ def validate_quantum_program_size(
     quantum_program: QuantumProgram,
     expected_width: int | None = None,
     expected_depth: int | None = None,
+    expected_cx_count: int | None = None,
     compare_to: QuantumProgram | None = None,
     allow_zero_size: bool = False,
 ) -> None:
@@ -155,6 +156,7 @@ def validate_quantum_program_size(
             quantum_program,
             expected_width=compare_to.data.width,
             expected_depth=compare_to.transpiled_circuit.depth,
+            expected_cx_count=compare_to.transpiled_circuit.count_ops.get("cx", 0),
         )
 
     actual_width = quantum_program.data.width
@@ -164,6 +166,10 @@ def validate_quantum_program_size(
         assert quantum_program.transpiled_circuit is not None  # for mypy
         actual_depth = quantum_program.transpiled_circuit.depth
         _validate_size(actual_depth, expected_depth, "depth", allow_zero_size)
+
+    actual_cx_count = quantum_program.transpiled_circuit.count_ops.get("cx", 0)
+    # allow_zero_size set to True here since there may be valid circuits with no CX gate.
+    _validate_size(actual_cx_count, expected_cx_count, "cx_count", True)
 
 
 def _validate_size(actual: int, expected: int | None, name: str, allow_zero_size: bool):
