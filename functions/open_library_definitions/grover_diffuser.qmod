@@ -1,9 +1,0 @@
-qfunc grover_diffuser(space_transform: qfunc (qbit[]), packed_vars: qbit[]) {
-  within {
-    invert {
-      space_transform(packed_vars);
-    }
-  } apply {
-    reflect_about_zero(packed_vars);
-  }
-}
