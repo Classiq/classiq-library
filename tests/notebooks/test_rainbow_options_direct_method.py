@@ -4,6 +4,7 @@ from tests.utils_for_testbook import (
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
+import numpy as np
 
 
 @wrap_testbook("rainbow_options_direct_method", timeout_seconds=1000)
