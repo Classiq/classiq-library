@@ -1,4 +1,5 @@
 import json
+import warnings
 import itertools
 import base64
 import pickle
@@ -162,10 +163,20 @@ def validate_quantum_program_size(
     actual_width = quantum_program.data.width
     _validate_size(actual_width, expected_width, "width", allow_zero_size)
 
-    if expected_depth is not None:
-        assert quantum_program.transpiled_circuit is not None  # for mypy
+    if quantum_program.transpiled_circuit is not None:
         actual_depth = quantum_program.transpiled_circuit.depth
         _validate_size(actual_depth, expected_depth, "depth", allow_zero_size)
+
+        actual_cx_count = quantum_program.transpiled_circuit.count_ops.get("cx", 0)
+        # allow_zero_size set to True here since there may be valid circuits with no CX gate.
+        _validate_size(actual_cx_count, expected_cx_count, "cx_count", True)
+    else:
+        if expected_depth is not None:
+            warnings.warn("Cannot validate depth, since there is no transpiled_circuit")
+        if expected_cx_count is not None:
+            warnings.warn(
+                "Cannot validate cx count, since there is no transpiled_circuit"
+            )
 
     actual_cx_count = quantum_program.transpiled_circuit.count_ops.get("cx", 0)
     # allow_zero_size set to True here since there may be valid circuits with no CX gate.
