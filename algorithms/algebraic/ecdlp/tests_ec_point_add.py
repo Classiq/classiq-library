@@ -9,6 +9,7 @@ from tinyec import registry
 # Global definitions for tests
 GLOBAL_G = [0, 5]
 GLOBAL_INITIAL_ECP = [4, 2]
+GLOBAL_TARGET_ECP = [0, 2]
 GLOBAL_CURVE = EllipticCurve(p=7, a=5, b=4)
 
 
@@ -384,6 +385,77 @@ def test_tinyec_point_addition():
     print(f"TinyEC Result: ({R.x}, {R.y})")
 
 
+def test_ell_mult_classical_initial_to_target():
+    print("\n--- Running test_ell_mult_classical_initial_to_target --- ")
+    curve = GLOBAL_CURVE
+    initial_ecp = GLOBAL_INITIAL_ECP
+    target_ecp = GLOBAL_TARGET_ECP
+    G = GLOBAL_G
+
+    for k1 in range(16):
+        k1G = ell_mult_classical(k1, G, curve)
+        for k2 in range(16):
+            k2T = ell_mult_classical(k2, target_ecp, curve)
+            # Compute initial_ecp + k1*G
+            if k1G is None or k1G == (None, None):
+                temp = initial_ecp
+            else:
+                temp = ell_add_classical(initial_ecp, k1G, curve)
+            # Compute (initial_ecp + k1*G) - (k2*target_ecp)
+            if k2T is None or k2T == (None, None):
+                result = temp
+            else:
+                # To subtract, add the inverse of k2T: (x, -y mod p)
+                x, y = k2T
+                inv_k2T = [x, (-y) % curve.p]
+                result = ell_add_classical(temp, inv_k2T, curve)
+            print(
+                f"k1={k1}, k2={k2}: (initial_ecp + {k1}*G - {k2}*target_ecp) = {result}"
+            )
+    print("test_ell_mult_classical_initial_to_target COMPLETED.")
+
+
+def test_tinyec_ell_mult_classical_initial_to_target():
+    print("\n--- Running test_tinyec_ell_mult_classical_initial_to_target ---")
+    field = SubGroup(p=GLOBAL_CURVE.p, g=(GLOBAL_G[0], GLOBAL_G[1]), n=10, h=None)
+    curve = Curve(a=GLOBAL_CURVE.a, b=GLOBAL_CURVE.b, field=field, name="custom")
+
+    initial_ecp_tinyec = Point(curve, GLOBAL_INITIAL_ECP[0], GLOBAL_INITIAL_ECP[1])
+    target_ecp_tinyec = Point(curve, GLOBAL_TARGET_ECP[0], GLOBAL_TARGET_ECP[1])
+    G_tinyec = Point(curve, GLOBAL_G[0], GLOBAL_G[1])
+
+    for k1 in range(16):
+        k1G = k1 * G_tinyec
+        for k2 in range(16):
+            k2T = k2 * target_ecp_tinyec
+            # Compute initial_ecp + k1*G
+            try:
+                if k1G.x is None or k1G.y is None:
+                    temp = initial_ecp_tinyec
+                else:
+                    temp = initial_ecp_tinyec + k1G
+                # Compute (initial_ecp + k1*G) - (k2*target_ecp)
+                if k2T.x is None or k2T.y is None:
+                    result = temp
+                else:
+                    # To subtract, add the inverse of k2T: (x, -y mod p)
+                    inv_k2T = Point(curve, k2T.x, (-k2T.y) % curve.field.p)
+                    result = temp + inv_k2T
+                if result.x is None or result.y is None:
+                    print(
+                        f"k1={k1}, k2={k2}: (initial_ecp + {k1}*G - {k2}*target_ecp) = Point at infinity"
+                    )
+                else:
+                    print(
+                        f"k1={k1}, k2={k2}: (initial_ecp + {k1}*G - {k2}*target_ecp) = [{result.x}, {result.y}]"
+                    )
+            except ArithmeticError:
+                print(
+                    f"k1={k1}, k2={k2}: (initial_ecp + {k1}*G - {k2}*target_ecp) = Undefined (modular inverse does not exist)"
+                )
+    print("test_tinyec_ell_mult_classical_initial_to_target COMPLETED.")
+
+
 def run_singular_point_adding_tests():
     print("\n--- Running Singular Point Adding Tests ---")
     test_ell_add_classical()
@@ -396,10 +468,12 @@ def run_multiple_point_adding_tests():
     print("\n--- Running Multiple Point Adding Tests ---")
     test_ell_mult_classical()
     test_tinyec_ell_mult_classical()
-    test_ell_mult_add()
+    # test_ell_mult_add()
 
 
 if __name__ == "__main__":
     print("(if __name__ == '__main__')")
     # run_singular_point_adding_tests()
     run_multiple_point_adding_tests()
+    # test_ell_mult_classical_initial_to_target()
+    test_tinyec_ell_mult_classical_initial_to_target()

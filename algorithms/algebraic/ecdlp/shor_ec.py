@@ -20,6 +20,13 @@ from classiq import (
     Preferences,
 )
 from ec_point_addition import ell_mult_add, EllipticCurve
+from tests_ec_point_add import (
+    GLOBAL_G,
+    GLOBAL_INITIAL_ECP,
+    GLOBAL_TARGET_ECP,
+    GLOBAL_CURVE,
+)
+from classiq.qmod.symbolic import ceiling, log
 
 # Elliptic curve parameters
 p = 7
@@ -48,13 +55,14 @@ def main(
     allocate(n, x1)
     allocate(n, x2)
 
-    # Initialize ecp to P0 = [2, 6]
-    ecp_x ^= 2
-    ecp_y ^= 6
+    # Initialize ecp to GLOBAL_INITIAL_ECP
+    ecp_x ^= GLOBAL_INITIAL_ECP[0]
+    ecp_y ^= GLOBAL_INITIAL_ECP[1]
 
-    # Classical generator and target
-    G = [3, 2]
-    P = [0, 2]
+    # Use global generator and target
+    G = GLOBAL_G
+    P = GLOBAL_TARGET_ECP
+    curve = GLOBAL_CURVE
 
     # Superposition on x1 and x2
     hadamard_transform(x1)
@@ -64,7 +72,7 @@ def main(
     ell_mult_add(ecp_x, ecp_y, t0, l, x1, G, curve.p, curve.a, curve.b)
     # In-place EC arithmetic step 2: ecp = P0 + x1*G - x2*P
     # To subtract x2*P, add the negative of P (i.e., [P[0], -P[1] mod p])
-    negP = [P[0], (-P[1]) % p]
+    negP = [P[0], (-P[1]) % curve.p]
     ell_mult_add(ecp_x, ecp_y, t0, l, x2, negP, curve.p, curve.a, curve.b)
 
     # Inverse Quantum Fourier Transform on x1 and x2
@@ -72,7 +80,7 @@ def main(
     # invert(lambda: qft(x2))
 
 
-if __name__ == "__main__":
+def run_shor_quantum():
     constraints = Constraints(
         optimization_parameter="width",
     )  # Optimize for minimum width
@@ -98,3 +106,8 @@ if __name__ == "__main__":
     print("Execution complete.")
     print("\nExecution Results:")
     print("Result:", result[0].value.parsed_counts)
+    return result[0].value.parsed_counts
+
+
+if __name__ == "__main__":
+    run_shor_quantum()
