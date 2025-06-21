@@ -1,5 +1,5 @@
 qfunc prep_minus(output out: qbit) {
-  allocate(1, out);
+  allocate(out);
   X(out);
   H(out);
 }
@@ -14,19 +14,21 @@ qfunc my_oracle(predicate: qfunc (qnum, qbit), target: qnum) {
 }
 
 qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
-  hadamard_transform(x);
-  my_oracle(lambda(x, y) {
-    predicate(x, y);
-  }, x);
-  hadamard_transform(x);
+  within {
+    hadamard_transform(x);
+  } apply {
+    my_oracle(lambda(x, y) {
+      predicate(x, y);
+    }, x);
+  }
 }
 
-qfunc simple_predicate(x: qnum, res: qbit) {
+qfunc simple_predicate(const x: qnum, permutable res: qbit) {
   res ^= x > 7;
 }
 
-qfunc main(output x: qnum) {
-  allocate(4, x);
+qfunc main(output x: qnum<4>) {
+  allocate(x);
   deutsch_jozsa(lambda(x, y) {
     simple_predicate(x, y);
   }, x);

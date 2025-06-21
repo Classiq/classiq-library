@@ -9,17 +9,18 @@ qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfun
   }
 }
 
-qfunc moving_one_hamming_dist(pos: int, x: qbit[]) {
+qfunc moving_one_hamming_dist(pos: int, permutable x: qbit[]) {
   X(x[pos]);
 }
 
-qfunc main(t: int, output x: qbit[]) {
-  allocate(4, x);
+qfunc main(t: int, output x: qbit[4]) {
+  allocate(x);
   coin: qbit[];
-  prepare_state([0.25, 0.25, 0.25, 0.25], 0.0, coin);
+  allocate(2, coin);
+  prepare_uniform_trimmed_state(4, coin);
   discrete_quantum_walk(t, lambda(coin) {
     grover_diffuser(lambda(coin) {
-      inplace_prepare_state([0.25, 0.25, 0.25, 0.25], 0.0, coin);
+      prepare_uniform_trimmed_state(4, coin);
     }, coin);
   }, [lambda() {
     moving_one_hamming_dist(0, x);
@@ -31,7 +32,3 @@ qfunc main(t: int, output x: qbit[]) {
     moving_one_hamming_dist(3, x);
   }], coin);
 }
-
-cscope ```
-save({'run': sample({'t': 4})})
-```
