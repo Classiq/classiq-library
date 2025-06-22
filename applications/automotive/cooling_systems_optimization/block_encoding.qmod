@@ -39,7 +39,7 @@ qfunc block_encode_2x2(aux: qnum, data: qbit[]) {
 
 qfunc block_encode_2X2_first_qubit(flag: qbit, aux: qbit, data: qbit[]) {
   lsb: qbit;
-  msb: qnum<data.len - 1, False, 0>;
+  msb: qnum<data.len - 1>;
   data -> {lsb, msb};
   flag ^= msb > 0;
   block_encode_2x2(aux, lsb);
@@ -68,8 +68,8 @@ qfunc combine_blocks_coeffs(pair_list: int[][], amplitudes: real[], lcu_aux: qnu
 
 qfunc main(output lcu_aux: qnum, output flag: qbit, output aux: qbit, output data: qnum, output data_ref: qnum) {
   allocate(3, lcu_aux);
-  allocate(1, flag);
-  allocate(1, aux);
+  allocate(flag);
+  allocate(aux);
   prepare_ref(2, data, data_ref);
   combine_blocks_coeffs([
     [0, 1],
