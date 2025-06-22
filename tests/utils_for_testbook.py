@@ -160,9 +160,10 @@ def validate_quantum_program_size(
     actual_width = quantum_program.data.width
     _validate_size(actual_width, expected_width, "width", allow_zero_size)
 
-    assert quantum_program.transpiled_circuit is not None  # for mypy
-    actual_depth = quantum_program.transpiled_circuit.depth
-    _validate_size(actual_depth, expected_depth, "depth", allow_zero_size)
+    if expected_depth is not None:
+        assert quantum_program.transpiled_circuit is not None  # for mypy
+        actual_depth = quantum_program.transpiled_circuit.depth
+        _validate_size(actual_depth, expected_depth, "depth", allow_zero_size)
 
 
 def _validate_size(actual: int, expected: int | None, name: str, allow_zero_size: bool):
