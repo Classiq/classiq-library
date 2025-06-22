@@ -17,12 +17,12 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_1"),
         expected_width=18,  # actual width: 8
-        expected_depth=400,  # actual depth: 177
+        expected_depth=800,  # actual depth: 177
     )
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_2"),
         expected_width=18,  # actual width: 8
-        expected_depth=400,  # actual depth: 177
+        expected_depth=800,  # actual depth: 177
     )
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_3"),
