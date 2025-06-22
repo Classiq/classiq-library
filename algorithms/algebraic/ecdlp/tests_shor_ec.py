@@ -189,13 +189,81 @@ def test_shor_no_qft():
     )
 
 
-if __name__ == "__main__":
-    test_shor_no_qft_parsed_quantum()
-    test_shor_no_qft()
-
+def test_post_qft_processing():
     """
+    Test post-QFT processing by applying inverse QFT classically to the raw quantum data.
+    """
+    print("\n--- Running test_post_qft_processing ---")
     post_qft_pairs = apply_qft_classically(raw_data)
+    print("Post-QFT pairs:")
+    print(post_qft_pairs)
+
+    # Count distinct pairs
+    distinct_pairs = set()
+    for x1, x2, prob in post_qft_pairs:
+        distinct_pairs.add((x1, x2))
+
+    print(f"\nTotal distinct (x1, x2) pairs after QFT: {len(distinct_pairs)}")
+    print("Distinct pairs:", sorted(list(distinct_pairs)))
+
+
+def test_shor_with_qft():
+    """
+    Test Shor's algorithm with QFT enabled - the x1, x2 values will be post-QFT inverse.
+    """
+    print("\n--- Running test_shor_with_qft ---")
+    quantum_results_raw = run_shor_quantum()
+    print("Quantum results type:", type(quantum_results_raw))
+    print("Quantum results:", quantum_results_raw)
+
+    # Convert the live quantum results to string format for parsing
+    raw_data = str(quantum_results_raw)
+
+    # Parse the quantum results
+    pattern = r"(\{[^\}]+\}): (\d+)"
+    matches = re.findall(pattern, raw_data)
+
+    quantum_results = []
+    for dict_str, count in matches:
+        d = ast.literal_eval(dict_str)
+        d["count"] = int(count)
+        quantum_results.append(d)
+
+    # Extract distinct (x1, x2) pairs from quantum results (these are post-QFT inverse)
+    distinct_pairs = set()
+    pair_counts = defaultdict(int)
+    total_counts = 0
+
+    for res in quantum_results:
+        x1 = res["x1"]
+        x2 = res["x2"]
+        count = res["count"]
+        pair = (x1, x2)
+        distinct_pairs.add(pair)
+        pair_counts[pair] += count
+        total_counts += count
+
+    # Sort pairs by count (probability) in descending order
+    sorted_pairs = sorted(pair_counts.items(), key=lambda x: x[1], reverse=True)
+
+    print(
+        f"\nTotal distinct (x1, x2) pairs from quantum execution: {len(distinct_pairs)}"
+    )
+    print("Distinct pairs sorted by probability (descending):")
+    for pair, count in sorted_pairs:
+        probability = count / total_counts
+        print(f"  {pair}: count={count}, probability={probability:.4f}")
+
+    print(f"\nAll distinct pairs: {sorted(list(distinct_pairs))}")
+
+
+if __name__ == "__main__":
+    # test_shor_no_qft_parsed_quantum()
+    # test_shor_no_qft()
+    # test_post_qft_processing()
+    test_shor_with_qft()
     # Setup curve and points as in previous tests
+    """
     field = SubGroup(p=GLOBAL_CURVE.p, g=(GLOBAL_G[0], GLOBAL_G[1]), n=10, h=None)
     curve = Curve(a=GLOBAL_CURVE.a, b=GLOBAL_CURVE.b, field=field, name="custom")
     initial_ecp_tinyec = Point(curve, GLOBAL_INITIAL_ECP[0], GLOBAL_INITIAL_ECP[1])

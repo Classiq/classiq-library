@@ -76,8 +76,8 @@ def main(
     ell_mult_add(ecp_x, ecp_y, t0, l, x2, negP, curve.p, curve.a, curve.b)
 
     # Inverse Quantum Fourier Transform on x1 and x2
-    # invert(lambda: qft(x1))
-    # invert(lambda: qft(x2))
+    invert(lambda: qft(x1))
+    invert(lambda: qft(x2))
 
 
 def run_shor_quantum():
