@@ -8,15 +8,17 @@ qfunc bv_predicate(a: int, const x: qbit[], permutable res: qbit) {
 
 qfunc bv_function(a: int, x: qbit[]) {
   aux: qbit;
-  hadamard_transform(x);
   within {
-    allocate(aux);
-    X(aux);
-    H(aux);
+    hadamard_transform(x);
   } apply {
-    bv_predicate(a, x, aux);
+    within {
+      allocate(aux);
+      X(aux);
+      H(aux);
+    } apply {
+      bv_predicate(a, x, aux);
+    }
   }
-  hadamard_transform(x);
 }
 
 qfunc main(output x: qnum<5>) {
