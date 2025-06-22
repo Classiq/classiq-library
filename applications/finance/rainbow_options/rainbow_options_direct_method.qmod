@@ -1,52 +1,48 @@
-EPSILON: real = 0.05;
-
-ALPHA: real = 0.1;
-
 qstruct EstimationVars {
-  x1: qnum<2, False, 0>;
-  x2: qnum<2, False, 0>;
-  aux: qnum<5, False, 0>;
-  ind: qbit;
+  x1: qnum<2>;
+  x2: qnum<2>;
+  aux: qnum<5>;
 }
 
-qfunc qmci_oracle(qvars: EstimationVars) {
-  Z(qvars.ind);
+qfunc oracle(est_reg: qbit[]) {
+  Z(est_reg[est_reg.len - 1]);
 }
 
-qfunc affine_max(x1: qnum, x2: qnum, output res: qnum) {
+qfunc affine_max(const x1: qnum, const x2: qnum, permutable output res: qnum) {
   res = max(x1 * 1.0, ((x1 * 0.75) + (x2 * 0.75)) + (-1.25));
 }
 
-qfunc asset_geq_strike_price(x: qnum, output res: qbit) {
+qfunc asset_geq_strike_price(const x: qnum, permutable output res: qbit) {
   res = x > 1.5;
 }
 
-qfunc exponential_amplitude_loading(exp_rate: real, x: qbit[], aux: qbit[], res: qbit) {
-  apply_to_all(X, x);
-  repeat (index: x.len) {
-    control (x[index]) {
-      RY(2 * acos(1 / sqrt(exp(exp_rate * (2 ** index)))), aux[index]);
+qfunc exponential_amplitude_loading(exp_rate: real, const x: qbit[], aux: qbit[], res: qbit) {
+  within {
+    apply_to_all(X, x);
+  } apply {
+    repeat (index: x.len) {
+      control (x[index]) {
+        RY(2 * acos(1 / sqrt(exp(exp_rate * (2 ** index)))), aux[index]);
+      }
     }
   }
-  apply_to_all(X, x);
-  aux_num: qnum<aux.len, False, 0>;
-  aux -> aux_num;
-  control (aux_num == 0) {
-    X(res);
+  aux_num: qnum;
+  within {
+    aux -> aux_num;
+  } apply {
+    res ^= aux_num == 0;
   }
-  aux_num -> aux;
 }
 
-qfunc direct_load_amplitudes(geq_reg: qnum, max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
+qfunc direct_load_amplitudes(const geq_reg: qnum, const max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
   control (geq_reg == 1) {
     exponential_amplitude_loading((1 / (2 ** max_reg.fraction_digits)) * 0.4341, max_reg, aux_reg, ind_reg);
-  }
-  control (geq_reg == 0) {
+  } else {
     RY(2 * asin(13.784 / sqrt(max(193.97 * exp(((0.4341 * (2 ** (max_reg.size - max_reg.fraction_digits))) * (1 - (1 / (2 ** max_reg.size)))) + (-0.7408)), 190))), ind_reg);
   }
 }
 
-qfunc direct_payoff(max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
+qfunc direct_payoff(const max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
   geq_reg: qbit;
   within {
     asset_geq_strike_price(max_reg, geq_reg);
@@ -55,7 +51,7 @@ qfunc direct_payoff(max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
   }
 }
 
-qfunc rainbow_direct(qvars: EstimationVars) {
+qfunc rainbow_direct(qvars: EstimationVars, ind: qbit) {
   inplace_prepare_state([
     0.0656,
     0.4344,
@@ -72,26 +68,22 @@ qfunc rainbow_direct(qvars: EstimationVars) {
   within {
     affine_max(qvars.x1, qvars.x2, max_out);
   } apply {
-    direct_payoff(max_out, qvars.aux, qvars.ind);
+    direct_payoff(max_out, qvars.aux, ind);
   }
 }
 
-qfunc grover_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
-  sp_operand(x);
-  power (k) {
-    grover_operator(oracle_operand, sp_operand, x);
+qfunc space_transform(est_reg: qbit[]) {
+  rainbow_direct(est_reg[0:est_reg.len - 1], est_reg[est_reg.len - 1]);
+}
+
+qfunc main(k: int, output indicator: qbit) {
+  est_reg: qbit[];
+  problem_vars: qbit[9];
+  allocate(problem_vars);
+  allocate(indicator);
+  within {
+    {problem_vars, indicator} -> est_reg;
+  } apply {
+    amplitude_amplification(k, oracle, space_transform, est_reg);
   }
 }
-
-qfunc main(k: int, output ind: qbit) {
-  qvars: EstimationVars;
-  allocate(qvars.size, qvars);
-  grover_algorithm(k, qmci_oracle, rainbow_direct, qvars);
-  state: qbit[];
-  qvars -> {state, ind};
-}
-
-cscope ```
-iqae_res = iqae(epsilon=EPSILON, alpha=ALPHA)
-save({'iqae_res': iqae_res})
-```
