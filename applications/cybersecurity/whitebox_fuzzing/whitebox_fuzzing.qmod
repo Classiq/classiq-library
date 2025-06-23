@@ -8,7 +8,8 @@ qfunc my_grover_operator(oracle_operand: qfunc (), diffuser_operand: qfunc ()) {
   diffuser_operand();
 }
 
-qfunc prep_minus(output out: qbit) {
+qfunc prep_minus(output out: qbit) unchecked (out)
+ {
   allocate(out);
   X(out);
   H(out);
