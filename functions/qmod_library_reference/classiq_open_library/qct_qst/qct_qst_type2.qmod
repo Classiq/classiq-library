@@ -9,7 +9,7 @@ qfunc main(output x: qnum, output q: qbit) {
     0.444890198893713,
     0.375231379859592
   ], 0.0, x);
-  allocate(1, q);
+  allocate(q);
   H(q);
   qct_qst_type2(x, q);
 }

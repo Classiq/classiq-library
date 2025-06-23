@@ -40,7 +40,7 @@ qfunc phase_lad_expanded___1(phi_b: qbit[6]) {
 
 qfunc my_qft_step_expanded___0(qbv: qbit[]) {
   H(qbv[0]);
-  repeat (index: (-1) + qbv.len) {
+  repeat (index: qbv.len - 1) {
     CPHASE(3.1416 * (2.0 ** ((-index) - 1.0)), qbv[0], qbv[index + 1]);
   }
 }
@@ -51,23 +51,13 @@ qfunc qft_ns_expanded___0(qbv: qbit[6]) {
   }
 }
 
-qfunc check_msb_expanded___0(x: qbit[6], aux: qbit) {
+qfunc check_msb_expanded___0(ref: int, x: qbit[6], aux: qbit) {
   within {
     invert {
       qft_ns_expanded___0(x);
     }
   } apply {
-    aux ^= x[0] == 1;
-  }
-}
-
-qfunc check_msb_expanded___1(x: qbit[6], aux: qbit) {
-  within {
-    invert {
-      qft_ns_expanded___0(x);
-    }
-  } apply {
-    aux ^= x[0] == 0;
+    aux ^= ref == x[0];
   }
 }
 
@@ -80,7 +70,7 @@ qfunc ccmod_add_expanded___0(phi_b: qbit[6], ctrl: qbit[2]) {
   invert {
     phase_lad_expanded___1(phi_b);
   }
-  check_msb_expanded___0(phi_b, aux);
+  check_msb_expanded___0(1, phi_b, aux);
   control (aux) {
     phase_lad_expanded___1(phi_b);
   }
@@ -91,7 +81,7 @@ qfunc ccmod_add_expanded___0(phi_b: qbit[6], ctrl: qbit[2]) {
       }
     }
   } apply {
-    check_msb_expanded___1(phi_b, aux);
+    check_msb_expanded___0(0, phi_b, aux);
   }
   free(aux);
 }
@@ -114,7 +104,7 @@ qfunc ccmod_add_expanded___1(phi_b: qbit[6], ctrl: qbit[2]) {
   invert {
     phase_lad_expanded___1(phi_b);
   }
-  check_msb_expanded___0(phi_b, aux);
+  check_msb_expanded___0(1, phi_b, aux);
   control (aux) {
     phase_lad_expanded___1(phi_b);
   }
@@ -125,7 +115,7 @@ qfunc ccmod_add_expanded___1(phi_b: qbit[6], ctrl: qbit[2]) {
       }
     }
   } apply {
-    check_msb_expanded___1(phi_b, aux);
+    check_msb_expanded___0(0, phi_b, aux);
   }
   free(aux);
 }
@@ -148,7 +138,7 @@ qfunc ccmod_add_expanded___2(phi_b: qbit[6], ctrl: qbit[2]) {
   invert {
     phase_lad_expanded___1(phi_b);
   }
-  check_msb_expanded___0(phi_b, aux);
+  check_msb_expanded___0(1, phi_b, aux);
   control (aux) {
     phase_lad_expanded___1(phi_b);
   }
@@ -159,7 +149,7 @@ qfunc ccmod_add_expanded___2(phi_b: qbit[6], ctrl: qbit[2]) {
       }
     }
   } apply {
-    check_msb_expanded___1(phi_b, aux);
+    check_msb_expanded___0(0, phi_b, aux);
   }
   free(aux);
 }
@@ -182,7 +172,7 @@ qfunc ccmod_add_expanded___3(phi_b: qbit[6], ctrl: qbit[2]) {
   invert {
     phase_lad_expanded___1(phi_b);
   }
-  check_msb_expanded___0(phi_b, aux);
+  check_msb_expanded___0(1, phi_b, aux);
   control (aux) {
     phase_lad_expanded___1(phi_b);
   }
@@ -193,7 +183,7 @@ qfunc ccmod_add_expanded___3(phi_b: qbit[6], ctrl: qbit[2]) {
       }
     }
   } apply {
-    check_msb_expanded___1(phi_b, aux);
+    check_msb_expanded___0(0, phi_b, aux);
   }
   free(aux);
 }
@@ -216,7 +206,7 @@ qfunc ccmod_add_expanded___4(phi_b: qbit[6], ctrl: qbit[2]) {
   invert {
     phase_lad_expanded___1(phi_b);
   }
-  check_msb_expanded___0(phi_b, aux);
+  check_msb_expanded___0(1, phi_b, aux);
   control (aux) {
     phase_lad_expanded___1(phi_b);
   }
@@ -227,7 +217,7 @@ qfunc ccmod_add_expanded___4(phi_b: qbit[6], ctrl: qbit[2]) {
       }
     }
   } apply {
-    check_msb_expanded___1(phi_b, aux);
+    check_msb_expanded___0(0, phi_b, aux);
   }
   free(aux);
 }
@@ -268,7 +258,7 @@ qfunc ccmod_add_expanded___5(phi_b: qbit[6], ctrl: qbit[2]) {
   invert {
     phase_lad_expanded___1(phi_b);
   }
-  check_msb_expanded___0(phi_b, aux);
+  check_msb_expanded___0(1, phi_b, aux);
   control (aux) {
     phase_lad_expanded___1(phi_b);
   }
@@ -279,7 +269,7 @@ qfunc ccmod_add_expanded___5(phi_b: qbit[6], ctrl: qbit[2]) {
       }
     }
   } apply {
-    check_msb_expanded___1(phi_b, aux);
+    check_msb_expanded___0(0, phi_b, aux);
   }
   free(aux);
 }
