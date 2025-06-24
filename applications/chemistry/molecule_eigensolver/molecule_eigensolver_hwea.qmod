@@ -1,0 +1,61 @@
+qfunc prepare_basis_state_expanded___0(output arr: qbit[4]) {
+  allocate(4, arr);
+  X(arr[0]);
+  X(arr[2]);
+}
+
+qfunc operands_1qubit_0_lambda___0_0_expanded___0(_: real, permutable q: qbit) {
+  X(q);
+}
+
+qfunc operands_1qubit_1_lambda___0_0_expanded___0(theta: real, q: qbit) {
+  RY(theta, q);
+}
+
+qfunc operands_2qubit_0_lambda___0_0_expanded___0(_: real, const q1: qbit, permutable q2: qbit) {
+  CX(q1, q2);
+}
+
+qfunc full_hea_expanded___0(num_qubits: int, is_parametrized: int[], angle_params: real[], connectivity_map: int[][], reps: int, x: qbit[4]) {
+  repeat (r: reps) {
+    repeat (i1: 2) {
+      repeat (index: num_qubits) {
+        if (is_parametrized[i1] == 1) {
+          if (i1 == 0) {
+            operands_1qubit_0_lambda___0_0_expanded___0(angle_params[(sum(is_parametrized[0:i1]) + index) + floor((12.0 * r) / reps)], x[index]);
+          } else {
+            if (i1 == 1) {
+              operands_1qubit_1_lambda___0_0_expanded___0(angle_params[(sum(is_parametrized[0:i1]) + index) + floor((12.0 * r) / reps)], x[index]);
+            }
+          }
+        } else {
+          if (i1 == 0) {
+            operands_1qubit_0_lambda___0_0_expanded___0(0, x[index]);
+          } else {
+            if (i1 == 1) {
+              operands_1qubit_1_lambda___0_0_expanded___0(0, x[index]);
+            }
+          }
+        }
+      }
+    }
+    repeat (i2: 1) {
+      repeat (index: 3) {
+        if (is_parametrized[i2 + 2] == 1) {
+          if (i2 == 0) {
+            operands_2qubit_0_lambda___0_0_expanded___0(angle_params[(((3 * sum(is_parametrized[2:(i2 + 2)])) + index) + (num_qubits * (is_parametrized[0:2][0] + is_parametrized[0:2][1]))) + floor((12.0 * r) / reps)], x[connectivity_map[index][0]], x[connectivity_map[index][1]]);
+          }
+        } else {
+          if (i2 == 0) {
+            operands_2qubit_0_lambda___0_0_expanded___0(0, x[connectivity_map[index][0]], x[connectivity_map[index][1]]);
+          }
+        }
+      }
+    }
+  }
+}
+
+qfunc main(params: real[12], output state: qbit[4]) {
+  prepare_basis_state_expanded___0(state);
+  full_hea_expanded___0(4, [0, 1, 0], params, [[0, 1], [1, 2], [2, 3]], 3, state);
+}

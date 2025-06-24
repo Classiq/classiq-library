@@ -1,0 +1,20 @@
+qfunc prepare_basis_state_expanded___0(output arr: qbit[1]) {
+  allocate(1, arr);
+}
+
+qfunc main(params: real[1], output state: qbit[1]) {
+  prepare_basis_state_expanded___0(state);
+  multi_suzuki_trotter([
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0}
+          ],
+          coefficient=-0.5
+        }
+      ],
+      num_qubits=1
+    }
+  ], params, 1, 1, state);
+}
