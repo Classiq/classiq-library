@@ -1,0 +1,475 @@
+qfunc prepare_basis_state_expanded___0(output arr: qbit[6]) {
+  allocate(6, arr);
+}
+
+qfunc main(params: real[10], output state: qbit[6]) {
+  prepare_basis_state_expanded___0(state);
+  multi_suzuki_trotter([
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.5
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.5
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4}
+          ],
+          coefficient=0.5
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=1}
+          ],
+          coefficient=0.5
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=2}
+          ],
+          coefficient=0.5
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=0.5
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0}
+          ],
+          coefficient=0.5
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4}
+          ],
+          coefficient=0.5
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=2, index=4}
+          ],
+          coefficient=0.125
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=2, index=4}
+          ],
+          coefficient=0.125
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=2, index=4},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=0.125
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=2, index=4},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=0.125
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=2, index=3}
+          ],
+          coefficient=-0.125
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=2, index=3},
+            IndexedPauli {pauli=3, index=4}
+          ],
+          coefficient=-0.125
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=2, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=-0.125
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=2, index=3},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=-0.125
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=1, index=2}
+          ],
+          coefficient=-0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=0},
+            IndexedPauli {pauli=2, index=2}
+          ],
+          coefficient=-0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=2, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4}
+          ],
+          coefficient=-0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=1, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4}
+          ],
+          coefficient=-0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=1, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=-0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=0},
+            IndexedPauli {pauli=2, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=-0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=2, index=2},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=-0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=1, index=2},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=-0.0625
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=0},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=1, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=1, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=1, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=0},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=1, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=0},
+            IndexedPauli {pauli=3, index=1},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.0625
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=1, index=1},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=1, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=1},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=3, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=1, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=1, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=1, index=1},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=1, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=1},
+            IndexedPauli {pauli=2, index=5}
+          ],
+          coefficient=0.0625
+        }
+      ],
+      num_qubits=6
+    },
+    SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=1, index=1},
+            IndexedPauli {pauli=2, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=1, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=1},
+            IndexedPauli {pauli=2, index=2}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=1, index=2}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=1, index=2},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=3, index=0},
+            IndexedPauli {pauli=1, index=1},
+            IndexedPauli {pauli=2, index=2},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=2, index=1},
+            IndexedPauli {pauli=1, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=0.0625
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {pauli=1, index=1},
+            IndexedPauli {pauli=2, index=2},
+            IndexedPauli {pauli=3, index=3},
+            IndexedPauli {pauli=3, index=4},
+            IndexedPauli {pauli=3, index=5}
+          ],
+          coefficient=0.0625
+        }
+      ],
+      num_qubits=6
+    }
+  ], params, 1, 1, state);
+}
