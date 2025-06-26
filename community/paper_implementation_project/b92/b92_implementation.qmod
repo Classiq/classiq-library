@@ -1,19 +1,20 @@
 qfunc b92(message: bool[], bob_bases: bool[], qba: qbit[]) {
-  // Prepare qubits: 0 -> |0⟩, 1 -> |+⟩
   repeat (i: message.len) {
     if (message[i] == 1) {
       H(qba[i]);
     }
   }
-  // Bob measures in random basis: apply H if basis is X (1)
   repeat (i: bob_bases.len) {
-    if (bob_bases[i] == 1) {
+    if (bob_bases[i] == 0) {
+      X(qba[i]);
+    } else {
       H(qba[i]);
+      X(qba[i]);
     }
   }
 }
 
 qfunc main(output qba: qbit[]) {
   allocate(8, qba);
-  b92([0, 0, 1, 1, 0, 0, 0, 1], [1, 0, 0, 0, 0, 1, 1, 0], qba);
+  b92([0, 0, 1, 1, 0, 0, 0, 1], [1, 1, 0, 1, 1, 1, 0, 1], qba);
 }
