@@ -22,9 +22,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     solution_first_peak = tb.ref("measured_energy")
     resolution = tb.ref("2**(-QPE_SIZE)* normalization")
 
-    exact_result = tb.ref(
-        "np.real(min( np.linalg.eig( hamiltonian_to_matrix(mol_hamiltonian))[0] ))"
-    )
+    exact_result = tb.ref("classical_sol")
 
     for sol in [solution_max_prob, solution_first_peak]:
         assert sol - resolution <= exact_result <= sol + resolution
