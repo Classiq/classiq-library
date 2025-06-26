@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("kidney_exchange_problems", timeout_seconds=300)
+@wrap_testbook("kidney_exchange_problem", timeout_seconds=300)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(str(tb.ref("qmod")))
