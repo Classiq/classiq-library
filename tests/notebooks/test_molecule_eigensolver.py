@@ -12,7 +12,7 @@ import numpy as np
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod_hwea"))
-    validate_quantum_model(tb.ref("serialized_chemistry_model"))
+    validate_quantum_model(tb.ref("qmod_ucc"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_hwea"),
@@ -26,13 +26,8 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    # operator = tb.ref("operator.to_matrix()")
-    # w, v = np.linalg.eig(operator)
-    # exact_result = np.real(min(w))
-    exact_result = tb.ref("np.real(min( np.linalg.eig(operator.to_matrix())[0] ))")
-
-    chemistry_result_dict = tb.ref("chemistry_result_dict")
-    vqe_result = chemistry_result_dict["energy"]
+    vqe_result = tb.ref("optimizer_res")
+    exact_result = tb.ref("expected_energy")
 
     assert np.isclose(
         vqe_result, exact_result, atol=0.02
