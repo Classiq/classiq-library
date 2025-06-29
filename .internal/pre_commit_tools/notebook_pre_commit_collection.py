@@ -84,7 +84,9 @@ def _add_file_to_timeouts(file_name: str) -> None:
 def validate_unique_names() -> bool:
     all_files = PROJECT_ROOT.rglob("*.ipynb")
     base_names = [
-        file.name for file in all_files if ".ipynb_checkpoints" not in file.parts
+        file.name
+        for file in all_files
+        if ".ipynb_checkpoints" not in file.parts and ".git" not in file.parts
     ]
 
     duplicate_names = [name for name, count in Counter(base_names).items() if count > 1]
