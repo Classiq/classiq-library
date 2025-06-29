@@ -12,7 +12,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_model(str(tb.ref("qmod")))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog"),  # type: ignore
+        tb.ref_numpy("qprog"),  # type: ignore
         expected_width=10,
         expected_depth=100,
     )
