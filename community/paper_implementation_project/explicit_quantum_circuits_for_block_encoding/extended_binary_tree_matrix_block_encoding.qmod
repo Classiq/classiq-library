@@ -74,7 +74,7 @@ qfunc BE_extendedBT(l: qnum, j: qnum, data: qnum, ancilla: qbit) {
 }
 
 qfunc main(output j: qnum, output l: qnum, output data: qnum, output anc_M: qbit) {
-  allocate(1, anc_M);
+  allocate(anc_M);
   allocate(1, data);
   allocate(3, l);
   allocate(3, j);

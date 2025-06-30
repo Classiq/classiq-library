@@ -4,17 +4,8 @@ qfunc hadamard_transform_expanded___0(target: qbit[5]) {
   }
 }
 
-qfunc apply_matrix_expanded___0(matrix: real[][], q1: qbit, q2: qbit, q3: qbit) {
-  temp: qbit[3];
-  within {
-    {q1, q2, q3} -> temp;
-  } apply {
-    unitary(matrix, temp);
-  }
-}
-
 qfunc apply_U_ab_expanded___0(q: qbit[5]) {
-  apply_matrix_expanded___0([
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0, 0],
     [
@@ -41,11 +32,11 @@ qfunc apply_U_ab_expanded___0(q: qbit[5]) {
     ],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[0], q[1], q[2]);
+  ], {q[0], q[1], q[2]});
 }
 
 qfunc apply_U_f_expanded___0(q: qbit[5]) {
-  apply_matrix_expanded___0([
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [
       0,
@@ -72,11 +63,11 @@ qfunc apply_U_f_expanded___0(q: qbit[5]) {
     [0, 0, 0, 0, 0, 1, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[0], q[1], q[2]);
+  ], {q[0], q[1], q[2]});
 }
 
 qfunc apply_U_ab_expanded___1(q: qbit[5]) {
-  apply_matrix_expanded___0([
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0, 0],
     [
@@ -103,8 +94,8 @@ qfunc apply_U_ab_expanded___1(q: qbit[5]) {
     ],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[0], q[1], q[3]);
-  apply_matrix_expanded___0([
+  ], {q[0], q[1], q[3]});
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0.5, 0, 0, 0.8660254, 0, 0],
@@ -122,11 +113,11 @@ qfunc apply_U_ab_expanded___1(q: qbit[5]) {
     ],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[1], q[2], q[3]);
+  ], {q[1], q[2], q[3]});
 }
 
 qfunc apply_U_f_expanded___1(q: qbit[5]) {
-  apply_matrix_expanded___0([
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [0, 0.8660254, 0, 0, 0.5, 0, 0, 0],
     [0, 0, 1, 0, 0, 0, 0, 0],
@@ -144,11 +135,11 @@ qfunc apply_U_f_expanded___1(q: qbit[5]) {
     [0, 0, 0, 0, 0, 1, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[0], q[2], q[3]);
+  ], {q[0], q[2], q[3]});
 }
 
 qfunc apply_U_ab_expanded___2(q: qbit[5]) {
-  apply_matrix_expanded___0([
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0, 0],
     [
@@ -175,8 +166,8 @@ qfunc apply_U_ab_expanded___2(q: qbit[5]) {
     ],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[0], q[1], q[4]);
-  apply_matrix_expanded___0([
+  ], {q[0], q[1], q[4]});
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0, 0],
     [
@@ -203,8 +194,8 @@ qfunc apply_U_ab_expanded___2(q: qbit[5]) {
     ],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[1], q[2], q[4]);
-  apply_matrix_expanded___0([
+  ], {q[1], q[2], q[4]});
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0, 0],
     [
@@ -231,11 +222,11 @@ qfunc apply_U_ab_expanded___2(q: qbit[5]) {
     ],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[2], q[3], q[4]);
+  ], {q[2], q[3], q[4]});
 }
 
 qfunc apply_U_f_expanded___2(q: qbit[5]) {
-  apply_matrix_expanded___0([
+  unitary([
     [1, 0, 0, 0, 0, 0, 0, 0],
     [
       0,
@@ -262,7 +253,7 @@ qfunc apply_U_f_expanded___2(q: qbit[5]) {
     [0, 0, 0, 0, 0, 1, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 1]
-  ], q[0], q[3], q[4]);
+  ], {q[0], q[3], q[4]});
 }
 
 qfunc apply_U_expanded___0(q: qbit[5]) {
