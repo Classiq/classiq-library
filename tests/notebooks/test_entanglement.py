@@ -9,12 +9,12 @@ from testbook.client import TestbookNotebookClient
 @wrap_testbook("entanglement", timeout_seconds=60)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
-    validate_quantum_model(tb.ref("model").value)
+    validate_quantum_model(tb.ref("model"))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog").value,
-        expected_width=None,
-        expected_depth=None,
+        tb.ref_pydantic("qprog"),
+        expected_width=2,
+        expected_depth=2,
     )
 
     # test notebook content
