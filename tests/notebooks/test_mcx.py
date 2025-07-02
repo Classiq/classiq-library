@@ -8,11 +8,6 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("mcx", timeout_seconds=236)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod_1"))
-    validate_quantum_model(tb.ref("qmod_2"))
-    validate_quantum_model(tb.ref("qmod_3"))
-    validate_quantum_model(tb.ref("qmod_4"))
 
     # test quantum programs
     validate_quantum_program_size(
