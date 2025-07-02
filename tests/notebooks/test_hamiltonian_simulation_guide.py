@@ -51,9 +51,9 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test notebook content
     time_list = tb.ref("time_list")
-    results_ST = tb.ref_numpy("np.real(magnetization_ST)")
-    results_ewdc = tb.ref_numpy("np.real(magnetization_ewdc)")
-    results_qdrift = tb.ref_numpy("np.real(magnetization_qdrift)")
+    results_ST = tb.ref_numpy("magnetization_ST")
+    results_ewdc = tb.ref_numpy("magnetization_ewdc")
+    results_qdrift = tb.ref_numpy("magnetization_qdrift")
 
     tolerance = 0.1  # that's a large tolerance. we should lower it.
     np.allclose(results_ST, results_ewdc, atol=tolerance)
