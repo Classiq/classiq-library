@@ -1,6 +1,0 @@
-qfunc amplitude_estimation(oracle: qfunc (qbit[]), space_transform: qfunc (qbit[]), phase_var: qnum, packed_vars: qbit[]) {
-  space_transform(packed_vars);
-  qpe(lambda() {
-    grover_operator(oracle, space_transform, packed_vars);
-  }, phase_var);
-}

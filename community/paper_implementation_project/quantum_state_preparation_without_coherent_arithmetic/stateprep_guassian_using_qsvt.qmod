@@ -105,14 +105,8 @@ qfunc u_amp(reg: MyQStruct) {
 }
 
 qfunc main(output x: qnum, output a1: qbit, output a2: qbit, output a3: qbit) {
-  allocate(8, x);
-  allocate(1, a1);
-  allocate(1, a2);
-  allocate(1, a3);
   reg: MyQStruct;
-  within {
-    {x, a1, a2, a3} -> reg;
-  } apply {
-    u_amp(reg);
-  }
+  allocate(reg);
+  u_amp(reg);
+  reg -> {x, a1, a2, a3};
 }

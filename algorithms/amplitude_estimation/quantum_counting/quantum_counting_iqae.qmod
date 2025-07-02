@@ -1,73 +1,33 @@
-DOMAIN_SIZE_QCONST: int = 4;
-
-qstruct IQAEVars {
-  state: OracleVars;
-  ind: qbit;
-}
-
 qstruct OracleVars {
-  a: qnum<2, False, 0>;
-  b: qnum<2, False, 0>;
+  a: qnum<2>;
+  b: qnum<2>;
 }
 
-qfunc reflection_about_zero(x: qbit[]) {
-  lsb: qbit;
-  msbs: qbit[];
+qfunc oracle(est_reg: qbit[]) {
+  Z(est_reg[est_reg.len - 1]);
+}
+
+qfunc arith_equation(const state: OracleVars, permutable res: qbit) {
+  res ^= (state.a + state.b) <= 2;
+}
+
+qfunc iqae_state_preparation(vars: OracleVars, ind: qbit) {
+  hadamard_transform(vars);
+  arith_equation(vars, ind);
+}
+
+qfunc space_transform(est_reg: qbit[]) {
+  iqae_state_preparation(est_reg[0:est_reg.len - 1], est_reg[est_reg.len - 1]);
+}
+
+qfunc main(k: int, output indicator: qbit) {
+  est_reg: qbit[];
+  problem_vars: qbit[4];
+  allocate(problem_vars);
+  allocate(indicator);
   within {
-    apply_to_all(X, x);
-    x -> {lsb, msbs};
+    {problem_vars, indicator} -> est_reg;
   } apply {
-    control (msbs) {
-      Z(lsb);
-    }
+    amplitude_amplification(k, oracle, space_transform, est_reg);
   }
 }
-
-qfunc my_diffuser(sp_operand: qfunc (qbit[]), x: qbit[]) {
-  within {
-    invert {
-      sp_operand(x);
-    }
-  } apply {
-    reflection_about_zero(x);
-  }
-}
-
-qfunc my_grover_operator(oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
-  oracle_operand(x);
-  my_diffuser(sp_operand, x);
-  U(0, 0, 0, 3.1416, x[0]);
-}
-
-qfunc my_iqae_algorithm(k: int, oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: IQAEVars) {
-  sp_operand(x);
-  power (k) {
-    my_grover_operator(oracle_operand, sp_operand, x);
-  }
-}
-
-qfunc iqae_oracle(vars: IQAEVars) {
-  Z(vars.ind);
-}
-
-qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
-  res ^= (a + b) <= 2;
-}
-
-qfunc iqae_state_preparation(vars: IQAEVars) {
-  hadamard_transform(vars.state);
-  arith_equation(vars.state.a, vars.state.b, vars.ind);
-}
-
-qfunc main(k: int, output ind_reg: qbit) {
-  full_reg: IQAEVars;
-  allocate(full_reg.size, full_reg);
-  my_iqae_algorithm(k, iqae_oracle, iqae_state_preparation, full_reg);
-  state_reg: OracleVars;
-  full_reg -> {state_reg, ind_reg};
-}
-
-cscope ```
-iqae_res = iqae(epsilon=1 / (2 ** DOMAIN_SIZE_QCONST * 2), alpha=0.01)
-save({'iqae_res': iqae_res})
-```

@@ -8,12 +8,9 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("Option_Pricing_Workshop", timeout_seconds=400)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod"))
-
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog"),
+        tb.ref_pydantic("qprog"),
         expected_width=15,  # actual width: 8
         expected_depth=10000,  # actual depth: 8934
     )

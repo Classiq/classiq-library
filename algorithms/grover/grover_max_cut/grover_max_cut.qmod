@@ -1,9 +1,9 @@
-qfunc cut_oracle(cut_size: int, nodes: qbit[], res: qbit) {
-  res ^= (-(((((((((((((-2) * nodes[0]) * nodes[1]) - ((2 * nodes[0]) * nodes[2])) + (2 * nodes[0])) - ((2 * nodes[1]) * nodes[2])) - ((2 * nodes[1]) * nodes[3])) + (3 * nodes[1])) - ((2 * nodes[2]) * nodes[4])) + (3 * nodes[2])) - ((2 * nodes[3]) * nodes[4])) + (2 * nodes[3])) + (2 * nodes[4]))) <= (-cut_size);
+qfunc cut_oracle(cut_size: int, const nodes: qbit[], permutable res: qbit) {
+  res ^= cut_size <= ((((((0 + ((nodes[0] * (1 - nodes[1])) + (nodes[1] * (1 - nodes[0])))) + ((nodes[0] * (1 - nodes[2])) + (nodes[2] * (1 - nodes[0])))) + ((nodes[1] * (1 - nodes[2])) + (nodes[2] * (1 - nodes[1])))) + ((nodes[1] * (1 - nodes[3])) + (nodes[3] * (1 - nodes[1])))) + ((nodes[2] * (1 - nodes[4])) + (nodes[4] * (1 - nodes[2])))) + ((nodes[3] * (1 - nodes[4])) + (nodes[4] * (1 - nodes[3]))));
 }
 
 qfunc main(output nodes: qbit[5]) {
-  allocate(nodes.len, nodes);
+  allocate(nodes);
   grover_search(3, lambda(vars) {
     phase_oracle(lambda(vars, res) {
       cut_oracle(4, vars, res);

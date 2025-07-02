@@ -22,12 +22,12 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_model(tb.ref("qmod_2"))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog_1"),
+        tb.ref_pydantic("qprog_1"),
         expected_width=tb.ref("MAX_WIDTH_1"),
         expected_depth=1700,  # actual depth: 1456
     )
     validate_quantum_program_size(
-        tb.ref("qprog_2"),
+        tb.ref_pydantic("qprog_2"),
         expected_width=tb.ref("MAX_WIDTH_2"),
         expected_depth=5500,  # actual depth: 4930
     )
@@ -38,7 +38,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     measured_confidence = tb.ref("conf_interval[1] - conf_interval[0]")
     # based on e^2=(1/2N)*log(2T/alpha) from "Iterative Quantum Amplitude Estimation" since our alpha is low, we want to check within a bigger confidence interval
-    confidence_scale_by_alpha = np.sqrt(np.log(tb.ref("ALPHA_VALUE") / alpha_assertion))
+    confidence_scale_by_alpha = np.sqrt(np.log(tb.ref("ALPHA") / alpha_assertion))
 
     parsed_result = tb.ref("parsed_result")
     assert (

@@ -10,13 +10,13 @@ qstruct BlockEncodedState {
 }
 
 qstruct Block {
-  lcu_aux: qnum<3, False, 0>;
+  lcu_aux: qnum<3>;
   flag: qbit;
   aux: qbit;
 }
 
-qfunc identify_block(state: BlockEncodedState, block_zero_qbit: qbit) {
-  block_qubits: qnum<state.block.size, False, 0>;
+qfunc identify_block(const state: BlockEncodedState, block_zero_qbit: qbit) {
+  block_qubits: qnum<state.block.size>;
   data: qbit[state.data.size];
   state -> {block_qubits, data};
   block_zero_qbit ^= block_qubits == 0;
@@ -79,7 +79,7 @@ qfunc block_encode_2x2(aux: qnum, data: qbit[]) {
 
 qfunc block_encode_2X2_first_qubit(flag: qbit, aux: qbit, data: qbit[]) {
   lsb: qbit;
-  msb: qnum<data.len - 1, False, 0>;
+  msb: qnum<data.len - 1>;
   data -> {lsb, msb};
   flag ^= msb > 0;
   block_encode_2x2(aux, lsb);

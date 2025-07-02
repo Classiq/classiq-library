@@ -11,17 +11,17 @@ qfunc load_probabilities(state: qbit[]) {
   ], 0, state);
 }
 
-qfunc amplitude_loading(io: qbit[], ind: qbit) {
-  linear_pauli_rotations([2], [0.5], [0.4], io, ind);
+qfunc amplitude_loading(x: qbit[], ind: qbit) {
+  linear_pauli_rotations([2], [0.5], [0.4], x, ind);
 }
 
-qfunc state_loading(io: qbit[], ind: qbit) {
-  load_probabilities(io);
-  amplitude_loading(io, ind);
+qfunc state_loading(x: qbit[], ind: qbit) {
+  load_probabilities(x);
+  amplitude_loading(x, ind);
 }
 
-qfunc main(output res: qbit[], output ind: qbit) {
-  allocate(3, res);
-  allocate(1, ind);
+qfunc main(output res: qbit[3], output ind: qbit) {
+  allocate(res);
+  allocate(ind);
   state_loading(res, ind);
 }

@@ -4,30 +4,21 @@ qfunc hadamard_transform_expanded___0(target: qbit[2]) {
   }
 }
 
-qfunc pauli_kernel_expanded___0(data: real[], qba: qbit[2]) {
-  power (2) {
+qfunc pauli_kernel_expanded___0(data: real[], reps: int, qba: qbit[2]) {
+  power (reps) {
     hadamard_transform_expanded___0(qba);
-    suzuki_trotter([
-      PauliTerm {
-        pauli=[3, 0],
-        coefficient=data[0]
-      },
-      PauliTerm {
-        pauli=[0, 3],
-        coefficient=data[1]
-      },
-      PauliTerm {
-        pauli=[3, 3],
-        coefficient=(data[0] - 3.1416) * (data[1] - 3.1416)
-      }
+    parametric_suzuki_trotter([[3, 0], [0, 3], [3, 3]], [
+      data[0],
+      data[1],
+      ((data[0] - 3.1416) * (data[1] - 3.1416))
     ], -1, 1, 1, qba);
   }
 }
 
 qfunc main(data1: real[2], data2: real[2], output qba: qnum<2, False, 0>) {
   allocate(2, qba);
-  pauli_kernel_expanded___0(data1, qba);
+  pauli_kernel_expanded___0(data1, 2, qba);
   invert {
-    pauli_kernel_expanded___0(data2, qba);
+    pauli_kernel_expanded___0(data2, 2, qba);
   }
 }

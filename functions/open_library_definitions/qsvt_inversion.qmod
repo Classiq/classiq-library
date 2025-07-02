@@ -1,7 +1,0 @@
-qfunc qsvt_inversion(phase_seq: real[], block_encoding_cnot: qfunc (qbit[], qbit), u: qfunc (qbit[]), qvar: qbit[], aux: qbit) {
-  qsvt(phase_seq, block_encoding_cnot, block_encoding_cnot, lambda(x) {
-    invert {
-      u(x);
-    }
-  }, qvar, aux);
-}

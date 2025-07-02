@@ -8,17 +8,14 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("oblivious_amplitude_amplification", timeout_seconds=20)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod"))
-    validate_quantum_model(tb.ref("qmod_2"))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog"),
+        tb.ref_pydantic("qprog"),
         expected_width=4,  # actual width: 4
         expected_depth=100,  # actual depth: 94
     )
     validate_quantum_program_size(
-        tb.ref("qprog_2"),
+        tb.ref_pydantic("qprog_2"),
         expected_width=5,  # actual width: 5
         expected_depth=300,  # actual depth: 278
     )

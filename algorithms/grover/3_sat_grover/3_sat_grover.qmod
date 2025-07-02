@@ -1,9 +1,9 @@
-qfunc sat_oracle(x: qbit[], res: qbit) {
+qfunc sat_oracle(const x: qbit[], permutable res: qbit) {
   res ^= ((((((x[0] | x[1]) | x[2]) & (((x[0] ^ 1) | x[1]) | x[2])) & (((x[0] ^ 1) | (x[1] ^ 1)) | (x[2] ^ 1))) & (((x[0] ^ 1) | (x[1] ^ 1)) | x[2])) & ((x[0] | x[1]) | (x[2] ^ 1))) & (((x[0] ^ 1) | x[1]) | (x[2] ^ 1));
 }
 
 qfunc main(output x: qbit[3]) {
-  allocate(x.len, x);
+  allocate(x);
   grover_search(1, lambda(vars) {
     phase_oracle(sat_oracle, vars);
   }, x);

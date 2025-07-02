@@ -13,6 +13,7 @@ from utils_for_tests import (
 )
 
 URL_ALLOW_LIST_FILE = ROOT_DIRECTORY / ".internal" / "url_allow_list.txt"
+URL_GITHUB_PREFIX = "https://github.com/classiq/classiq-library/blob/main/"
 
 # the regex below is taken from this stackoverflow:
 #   https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
@@ -54,6 +55,14 @@ def get_url_allow_list() -> list[str]:
         return []
 
 
+def check_file_instead_of_url(url: str) -> bool:
+    if not url.lower().startswith(URL_GITHUB_PREFIX):
+        return False
+
+    file_location = url[len(URL_GITHUB_PREFIX) :]
+    return (ROOT_DIRECTORY / file_location).is_file()
+
+
 def _test_single_url(
     url: str,
     retry: int = NUM_RETRIES,
@@ -61,6 +70,9 @@ def _test_single_url(
     follow_redirects: bool = True,
 ) -> bool:
     if url in get_url_allow_list():
+        return True
+
+    if check_file_instead_of_url(url):
         return True
 
     if retry == 0:

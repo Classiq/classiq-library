@@ -14,7 +14,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     for qmod in tb.ref("QMODS"):
         validate_quantum_model(qmod)
     # test quantum programs
-    for qprog in tb.ref("QPROGS"):
+    for qprog in tb.ref_pydantic("QPROGS"):
         validate_quantum_program_size(
             qprog,
             expected_width=2,  # actual width: 2

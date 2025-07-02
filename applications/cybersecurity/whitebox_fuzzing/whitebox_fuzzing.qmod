@@ -8,8 +8,9 @@ qfunc my_grover_operator(oracle_operand: qfunc (), diffuser_operand: qfunc ()) {
   diffuser_operand();
 }
 
-qfunc prep_minus(output out: qbit) {
-  allocate(1, out);
+qfunc prep_minus(output out: qbit) unchecked (out)
+ {
+  allocate(out);
   X(out);
   H(out);
 }
@@ -23,17 +24,17 @@ qfunc my_oracle(predicate: qfunc (qbit)) {
   }
 }
 
-qfunc my_predicate(x: qnum, y: qnum, res: qbit) {
+qfunc my_predicate(const x: qnum, const y: qnum, permutable res: qbit) {
   res ^= ((x + y) < 9) and (((x * y) % 4) == 1);
 }
 
-qfunc zero_predicate(x: qnum, y: qnum, res: qbit) {
-  joined: qnum<x.size + y.size, False, 0>;
-  {x, y} -> joined;
-  control (joined == 0) {
-    X(res);
+qfunc zero_predicate(const x: qnum, const y: qnum, permutable res: qbit) {
+  temp: qnum;
+  within {
+    {x, y} -> temp;
+  } apply {
+    res ^= temp == 0;
   }
-  joined -> {x, y};
 }
 
 qfunc my_diffuser(sp_operand: qfunc (qnum, qnum), x: qnum, y: qnum) {
@@ -49,8 +50,8 @@ qfunc my_diffuser(sp_operand: qfunc (qnum, qnum), x: qnum, y: qnum) {
 }
 
 qfunc main(output x: qnum, output y: qnum) {
-  allocate(6, False, 0, x);
-  allocate(6, False, 0, y);
+  allocate(6, x);
+  allocate(6, y);
   my_sp(x, y);
   power (4) {
     my_grover_operator(lambda() {
