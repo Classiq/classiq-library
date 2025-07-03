@@ -9,20 +9,14 @@ qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfun
   }
 }
 
-qfunc quantum_step_clockwise(x: qbit[]) {
-  within {
-    qft(x);
-  } apply {
-    repeat (i: x.len) {
-      PHASE(((2 * pi) * (2 ** i)) / (2 ** x.len), x[i]);
-    }
-  }
+qfunc quantum_step_clockwise(permutable x: qnum) {
+  x += 1;
 }
 
-qfunc main(t: int, output x: qnum) {
+qfunc main(t: int, output x: qnum<floor(log(128, 2)), SIGNED, 0>) {
   coin: qbit;
-  allocate(floor(log(128, 2)), True, 0, x);
-  allocate(1, coin);
+  allocate(x);
+  allocate(coin);
   H(coin);
   S(coin);
   discrete_quantum_walk(t, lambda(coin) {
@@ -35,7 +29,3 @@ qfunc main(t: int, output x: qnum) {
     }
   }], coin);
 }
-
-cscope ```
-save({'run1': sample({'t': 50})})
-```

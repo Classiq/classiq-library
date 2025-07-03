@@ -3,7 +3,7 @@ qstruct QsvtState {
   block: qbit;
 }
 
-qfunc my_projector_controlled_phase(phase: real, proj_cnot: qfunc (qbit[], qbit), state: qbit[], aux: qbit) {
+qfunc my_projector_controlled_phase(phase: real, proj_cnot: qfunc (const qbit[], permutable qbit), state: qbit[], aux: qbit) {
   within {
     proj_cnot(state, aux);
   } apply {
@@ -11,7 +11,7 @@ qfunc my_projector_controlled_phase(phase: real, proj_cnot: qfunc (qbit[], qbit)
   }
 }
 
-qfunc my_qsvt_step(phase1: real, phase2: real, proj_cnot_1: qfunc (qbit[], qbit), proj_cnot_2: qfunc (qbit[], qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
+qfunc my_qsvt_step(phase1: real, phase2: real, proj_cnot_1: qfunc (const qbit[], permutable qbit), proj_cnot_2: qfunc (const qbit[], permutable qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
   u(state);
   my_projector_controlled_phase(phase1, proj_cnot_2, state, aux);
   invert {
@@ -20,7 +20,7 @@ qfunc my_qsvt_step(phase1: real, phase2: real, proj_cnot_1: qfunc (qbit[], qbit)
   my_projector_controlled_phase(phase2, proj_cnot_1, state, aux);
 }
 
-qfunc my_qsvt(phase_seq: real[], proj_cnot_1: qfunc (qbit[], qbit), proj_cnot_2: qfunc (qbit[], qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
+qfunc my_qsvt(phase_seq: real[], proj_cnot_1: qfunc (const qbit[], permutable qbit), proj_cnot_2: qfunc (const qbit[], permutable qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
   H(aux);
   my_projector_controlled_phase(phase_seq[0], proj_cnot_1, state, aux);
   repeat (index: floor((phase_seq.len - 1) / 2)) {
@@ -35,7 +35,7 @@ qfunc my_qsvt(phase_seq: real[], proj_cnot_1: qfunc (qbit[], qbit), proj_cnot_2:
   H(aux);
 }
 
-qfunc _projector_cnot(qsvt_state: QsvtState, aux: qbit) {
+qfunc _projector_cnot(const qsvt_state: QsvtState, permutable aux: qbit) {
   aux ^= qsvt_state.block == 0;
 }
 
@@ -55,7 +55,7 @@ qfunc main(output qsvt_state: QsvtState, output aux: qbit) {
     0.534522483824849,
     0.801783725737273
   ], 0, qsvt_state.state);
-  allocate(1, aux);
+  allocate(aux);
   my_qsvt_inversion([
     4.71679593532096,
     3.12191231960485,

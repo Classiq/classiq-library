@@ -1,17 +1,16 @@
 qstruct OracleVars {
-  a: qnum<2, False, 0>;
-  b: qnum<2, False, 0>;
+  a: qnum<2>;
+  b: qnum<2>;
 }
 
 qfunc reflection_about_zero(x: qbit[]) {
   lsb: qbit;
   msbs: qbit[];
   within {
-    apply_to_all(X, x);
-    x -> {lsb, msbs};
+    x ^= (2 ** x.len) - 1;
   } apply {
-    control (msbs) {
-      Z(lsb);
+    control (x[0:(x.len - 1)]) {
+      Z(x[x.len - 1]);
     }
   }
 }
@@ -32,25 +31,18 @@ qfunc my_grover_operator(oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit
   U(0, 0, 0, 3.1416, x[0]);
 }
 
-qfunc arith_equation(a: qnum, b: qnum, res: qbit) {
-  res ^= (a + b) <= 2;
+qfunc arith_equation(const state: OracleVars, permutable res: qbit) {
+  res ^= (state.a + state.b) <= 2;
 }
 
 qfunc arith_oracle(state: OracleVars) {
-  aux: qbit;
-  within {
-    allocate(1, aux);
-    X(aux);
-    H(aux);
-  } apply {
-    arith_equation(state.a, state.b, aux);
-  }
+  phase_oracle(arith_equation, state);
 }
 
-qfunc main(output phase_reg: qnum) {
+qfunc main(output phase_reg: qnum<5, UNSIGNED, 5>) {
   state_reg: OracleVars;
-  allocate(state_reg.size, state_reg);
-  allocate(5, False, 5, phase_reg);
+  allocate(state_reg);
+  allocate(phase_reg);
   hadamard_transform(state_reg);
   qpe(lambda() {
     my_grover_operator(arith_oracle, lambda(x) {

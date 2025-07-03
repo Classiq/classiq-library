@@ -4,7 +4,7 @@ qstruct TimeIndexAndGroup {
 }
 
 qfunc simple_eig_inv(gamma: real, delta: real, c_param: real, phase: qnum, output indicator: qbit) {
-  allocate(1, indicator);
+  allocate(indicator);
   indicator *= c_param / ((gamma * phase) + delta);
 }
 
