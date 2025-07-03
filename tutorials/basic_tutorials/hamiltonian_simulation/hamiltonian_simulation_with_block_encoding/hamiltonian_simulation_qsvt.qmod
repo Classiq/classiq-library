@@ -68,10 +68,10 @@ qfunc main(output qsvt_aux: qbit, output block_exp: qbit, output state: BlockEnc
   allocate(block_exp);
   allocate(state.size, state);
   inplace_prepare_amplitudes([
-    0.397978674268,
-    0.031780093975,
-    0.540699063189,
-    0.740437386631
+    0.146212489794,
+    0.313243858941,
+    0.540655468275,
+    0.766936670976
   ], 0.0, state.data);
   within {
     H(block_exp);

@@ -4,41 +4,41 @@
     "optimization_parameter": "no_opt"
   },
   "preferences": {
+    "machine_precision": 8,
     "custom_hardware_settings": {
       "basis_gates": [
-        "rz",
-        "cz",
-        "t",
+        "x",
+        "cy",
+        "cx",
+        "h",
+        "rx",
+        "u",
+        "z",
         "p",
         "u2",
-        "rx",
-        "sdg",
-        "id",
-        "ry",
-        "u1",
-        "s",
-        "h",
-        "z",
-        "r",
-        "tdg",
-        "cx",
-        "x",
-        "sxdg",
+        "rz",
         "sx",
+        "r",
+        "ry",
+        "id",
+        "cz",
         "y",
-        "cy",
-        "u"
+        "u1",
+        "sxdg",
+        "tdg",
+        "t",
+        "s",
+        "sdg"
       ],
       "is_symmetric_connectivity": true
     },
     "debug_mode": true,
-    "machine_precision": 8,
+    "synthesize_all_separately": false,
     "optimization_level": 3,
     "output_format": ["qasm"],
     "pretty_qasm": true,
-    "random_seed": 758170018,
-    "synthesize_all_separately": false,
+    "transpilation_option": "auto optimize",
     "timeout_seconds": 300,
-    "random_seed": 416423591
+    "random_seed": 1774612073
   }
 }

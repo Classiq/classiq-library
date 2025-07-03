@@ -1,22 +1,22 @@
 {
   "constraints": {
-    "max_gate_count": {},
     "max_width": 18,
+    "max_gate_count": {},
     "optimization_parameter": "depth"
   },
   "preferences": {
+    "machine_precision": 8,
     "custom_hardware_settings": {
       "basis_gates": ["cx", "u"],
       "is_symmetric_connectivity": true
     },
     "debug_mode": true,
-    "machine_precision": 8,
+    "synthesize_all_separately": false,
     "optimization_level": 3,
     "output_format": ["qasm"],
     "pretty_qasm": true,
-    "random_seed": -1,
-    "synthesize_all_separately": false,
+    "transpilation_option": "auto optimize",
     "timeout_seconds": 300,
-    "transpilation_option": "auto optimize"
+    "random_seed": -1
   }
 }
