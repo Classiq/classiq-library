@@ -8,9 +8,6 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("example_exponentiation", timeout_seconds=216)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod"))
-    validate_quantum_model(tb.ref("qmod_minimize_error"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),

@@ -1,20 +1,4 @@
-HAMILTONIAN: PauliTerm[] = [
-  PauliTerm {
-    pauli=[Pauli::Z],
-    coefficient=1
-  },
-  PauliTerm {
-    pauli=[Pauli::X],
-    coefficient=0.1
-  }
-];
-
 qfunc main(output q: qbit, angles: real[1]) {
-  allocate(1, q);
+  allocate(q);
   RY(angles[0], q);
 }
-
-cscope ```
-res = vqe(HAMILTONIAN, False, [], optimizer=Optimizer.COBYLA, max_iteration=1000, tolerance=0.001, step_size=0, skip_compute_variance=False, alpha_cvar=1.0)
-save({'result': res})
-```

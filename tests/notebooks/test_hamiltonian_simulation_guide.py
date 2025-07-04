@@ -12,15 +12,6 @@ import numpy as np
     "hamiltonian_simulation_guide", timeout_seconds=2000
 )  # 2025.03.06 bump from 1000 seconds
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod_trotter"))
-    validate_quantum_model(tb.ref("qmod_exponentiation"))
-    validate_quantum_model(tb.ref("qmod_qdrift"))
-    validate_quantum_model(tb.ref("qmod_magnetization_trotter"))
-    validate_quantum_model(tb.ref("qmod_magnetization_qdrift"))
-    for qmod in tb.ref("qmods_magnetization_exponentiation"):
-        validate_quantum_model(qmod)
-
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_trotter"),
@@ -60,9 +51,9 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test notebook content
     time_list = tb.ref("time_list")
-    results_ST = tb.ref_numpy("np.real(magnetization_ST)")
-    results_ewdc = tb.ref_numpy("np.real(magnetization_ewdc)")
-    results_qdrift = tb.ref_numpy("np.real(magnetization_qdrift)")
+    results_ST = tb.ref_numpy("magnetization_ST")
+    results_ewdc = tb.ref_numpy("magnetization_ewdc")
+    results_qdrift = tb.ref_numpy("magnetization_qdrift")
 
     tolerance = 0.1  # that's a large tolerance. we should lower it.
     np.allclose(results_ST, results_ewdc, atol=tolerance)

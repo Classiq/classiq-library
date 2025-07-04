@@ -64,14 +64,14 @@ qfunc my_qsvt(phases: real[], qsvt_aux: qbit, state: BlockEncodedState) {
 }
 
 qfunc main(output qsvt_aux: qbit, output block_exp: qbit, output state: BlockEncodedState) {
-  allocate(1, qsvt_aux);
-  allocate(1, block_exp);
+  allocate(qsvt_aux);
+  allocate(block_exp);
   allocate(state.size, state);
   inplace_prepare_amplitudes([
-    0.41828292898,
-    0.722188826042,
-    0.029961060109,
-    0.550077290698
+    0.600891140544,
+    0.744828663977,
+    0.04147392953,
+    0.287123687117
   ], 0.0, state.data);
   within {
     H(block_exp);
