@@ -3,18 +3,14 @@ qfunc qsct_2d(xy_variable: qnum[2]) {
   qct_type2(xy_variable[1]);
 }
 
-qfunc inverse_amplitude_load(prefactor: real, phase: qnum, ind: qbit) {
-  ind *= prefactor / phase;
-}
-
 qfunc matrix_inversion_HHL(prefactor: real, my_unitary: qfunc (int, qbit[]), state: qbit[], phase: qnum, output indicator: qbit) {
-  allocate(1, indicator);
+  allocate(indicator);
   within {
     qpe_flexible(lambda(power) {
       my_unitary(power, state);
     }, phase);
   } apply {
-    inverse_amplitude_load(prefactor, phase, indicator);
+    indicator *= prefactor / phase;
   }
 }
 
@@ -22,8 +18,7 @@ qfunc powered_hamiltonian_evolution(hamiltonian: PauliTerm[], scaling: real, p: 
   suzuki_trotter(hamiltonian, p * ((-6.28318530718) * scaling), 1, 1, qba);
 }
 
-qfunc main(output x_variable: qnum<3, False, 0>, output y_variable: qnum<3, False, 0>, output phase: qnum, output indicator: qbit) {
-  xy_variable: qnum<3, False, 0>[2];
+qfunc main(output xy_variable: qnum<3>[2], output phase: qnum<6>, output indicator: qbit) {
   prepare_amplitudes([
     0.000929993206,
     0.006286469531,
@@ -90,7 +85,7 @@ qfunc main(output x_variable: qnum<3, False, 0>, output y_variable: qnum<3, Fals
     0.006286469531,
     0.000929993206
   ], 0.0, xy_variable);
-  allocate(6, phase);
+  allocate(phase);
   within {
     qsct_2d(xy_variable);
   } apply {
@@ -275,5 +270,4 @@ qfunc main(output x_variable: qnum<3, False, 0>, output y_variable: qnum<3, Fals
       ], 0.101321183642, p, target);
     }, xy_variable, phase, indicator);
   }
-  xy_variable -> {x_variable, y_variable};
 }
