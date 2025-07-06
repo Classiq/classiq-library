@@ -82,7 +82,7 @@ show(quantum_program)
 
 result = execute(quantum_program).result()
 print(result[0].value.parsed_counts)
-# [{'res': 1}: 1000]
+# [{'res': 1}: 2048]
 ```
 
 Let's unravel the code above:
