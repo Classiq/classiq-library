@@ -14,12 +14,12 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # no qmods are created (synthesized directly from main)
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref("qprog"),
+        tb.ref_pydantic("qprog"),
         expected_width=2,
         expected_depth=3,
     )
     validate_quantum_program_size(
-        tb.ref("qprog_bell"),
+        tb.ref_pydantic("qprog_bell"),
         expected_width=2,
         expected_depth=3,
     )
