@@ -23,9 +23,9 @@ qfunc encoder_ansatz(exe_params: real[], coded: qbit[], trash: qbit[]) {
   }
 }
 
-qfunc main(w: real[10], input: real[4], output decoded: qbit[4]) {
+qfunc main(w: real[10], input_data: real[4], output decoded: qbit[4]) {
   allocate(decoded);
-  angle_encoding(input, decoded);
+  angle_encoding(input_data, decoded);
   encoder_ansatz(w, decoded[0:2], decoded[2:4]);
   repeat (i: 2) {
     RESET(decoded[2 + i]);
