@@ -44,8 +44,8 @@ def test_qmods(qmod_path: str):
     if "functions/open_library_definitions" in qmod_path:
         return  # skipped
 
-    assert qmod_pre_commit_collection.is_valid_qmod(
-        qmod_path, automatically_add_timeout=False
+    qmod_pre_commit_collection.is_valid_qmod(
+        qmod_path, automatically_add_timeout=False, assert_if_fails=True
     )
 
 
