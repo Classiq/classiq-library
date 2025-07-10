@@ -20,7 +20,11 @@ def main(full_file_paths: Iterable[str]) -> bool:
     return validate_unique_names() and all(map(is_valid_qmod, full_file_paths))
 
 
-def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> bool:
+def is_valid_qmod(
+    file_path: str,
+    automatically_add_timeout: bool = True,
+    assert_if_fails: bool = False,
+) -> bool:
     file_name = os.path.basename(file_path)
 
     errors = []
@@ -56,11 +60,18 @@ def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> boo
                 "    Alternatively, you may install pre-commit. It will automatically add a timeout entry in the next time you run 'git commit'."
             )
 
-    if errors:
-        spacing = "\n\t"  # f-string cannot include backslash
-        print(f"File `{file_path}` has error(s):{spacing}{spacing.join(errors)}")
+    spacing = "\n\t"  # f-string cannot include backslash
+    errors_combined_message = (
+        f"File `{file_path}` has error(s):{spacing}{spacing.join(errors)}"
+    )
 
-    return not errors
+    if assert_if_fails:
+        assert not errors, errors_combined_message
+    else:
+        if errors:
+            print(errors_combined_message)
+
+        return not errors
 
 
 def should_notebook_be_tested(file_path: str) -> bool:
