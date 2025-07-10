@@ -8,4 +8,19 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("hhl_lanchester", timeout_seconds=450)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    pass  # TODO
+    # test models
+    validate_quantum_model(tb.ref("qmod_hhl_swap_test"))
+    validate_quantum_model(tb.ref("qmod_hhl_basic"))
+    # test quantum programs
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog_hhl_swap"),
+        expected_width=tb.ref("MAX_WIDTH_SWAP_TEST"),
+    )
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog_hhl_basic"),
+        expected_width=tb.ref("MAX_WIDTH_BASIC"),
+    )
+
+    # Fidelity between basic HHL and classical solutions: 0.9805806756909201
+    assert 0.97 <= tb.ref("fidelity_basic") <= 0.99
+    assert 0.98 <= tb.ref("fidelity") <= 1
