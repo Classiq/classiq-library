@@ -50,7 +50,7 @@ jobs:
             if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
               echo "PR from a fork detected. Checking out the fork's branch."
               git remote add fork 'https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git'
-              git fetch fork '${{ github.event.pull_request.head.ref }}''
+              git fetch fork '${{ github.event.pull_request.head.ref }}'
               git checkout -B ci-testing-branch FETCH_HEAD # Tested code is comming from this branch (contributer's)
             else
               echo "PR from the same repository detected. Checking out the branch."
