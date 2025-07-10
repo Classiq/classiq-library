@@ -21,12 +21,12 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # test notebook content
     parsed_result = tb.ref("parsed_result")
     conf_interval = tb.ref("conf_interval")
-    ALPHA_VALUE = tb.ref("ALPHA_VALUE")
-    expected_payoff = 23.0238
-    ALPHA_ASSERTION = 1e-5
+    ALPHA = tb.ref("ALPHA")
+    expected_payoff = tb.ref("expected_payoff")
+    ALPHA_ASSERTION = tb.ref("ALPHA_ASSERTION")
     measured_confidence = conf_interval[1] - conf_interval[0]
     confidence_scale_by_alpha = np.sqrt(
-        np.log(ALPHA_VALUE / ALPHA_ASSERTION)
+        np.log(ALPHA / ALPHA_ASSERTION)
     )  # based on e^2=(1/2N)*log(2T/alpha) from "Iterative Quantum Amplitude Estimation" since our alpha is low, we want to check within a bigger confidence interval
     assert (
         np.abs(parsed_result - expected_payoff)
