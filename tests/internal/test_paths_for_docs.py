@@ -1,4 +1,3 @@
-import os
 import subprocess
 from pathlib import Path
 
@@ -7,6 +6,7 @@ import yaml
 ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
 PATHS_FOR_DOCS = ROOT / ".internal" / "paths_for_docs.yaml"
 DOCS_DIRECTORIES = ROOT / ".internal" / "docs_directories.txt"
+IMAGE_WILDCARD = "*.png"
 
 """
 This test checks if all paths in the files_to_copy_for_docs.yaml file exist.
@@ -23,7 +23,7 @@ def test_paths_to_copy_for_docs():
     for path in paths_to_copy.values():
         # png files are byproduct of the conversion from Jupyter to Markdown and cannot
         # be checked for existence in advance
-        if not (ROOT / path).exists() and Path(path).suffix != ".png":
+        if Path(path).name != IMAGE_WILDCARD and not (ROOT / path).exists():
             missing_paths.append(path)
 
     assert not missing_paths, f"The following paths do not exist: {missing_paths}"

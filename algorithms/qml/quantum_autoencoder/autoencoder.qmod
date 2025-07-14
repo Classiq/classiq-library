@@ -23,10 +23,10 @@ qfunc encoder_ansatz(exe_params: real[], coded: qbit[], trash: qbit[]) {
   }
 }
 
-qfunc main(w: real[10], input: real[4], output trash: qbit[2]) {
+qfunc main(w: real[10], input_data: real[4], output trash: qbit[2]) {
   coded: qbit[];
   allocate(2, coded);
   allocate(trash);
-  angle_encoding(input, {coded, trash});
+  angle_encoding(input_data, {coded, trash});
   encoder_ansatz(w, coded, trash);
 }

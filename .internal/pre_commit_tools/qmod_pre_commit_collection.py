@@ -20,7 +20,11 @@ def main(full_file_paths: Iterable[str]) -> bool:
     return validate_unique_names() and all(map(is_valid_qmod, full_file_paths))
 
 
-def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> bool:
+def is_valid_qmod(
+    file_path: str,
+    automatically_add_timeout: bool = True,
+    assert_if_fails: bool = False,
+) -> bool:
     file_name = os.path.basename(file_path)
 
     errors = []
@@ -30,6 +34,13 @@ def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> boo
             "File naming format error:\n"
             "    Dash (-) is not allowed in file named. please use underscore (_)\n"
             f"    for example, you may change '{file_path}' to '{file_path.replace('-', '_')}'."
+        )
+
+    if _does_contain_space_in_file_name(file_name):
+        errors.append(
+            "File naming format error:\n"
+            "    Space is not allowed in file named. please use underscore (_)\n"
+            f"    for example, you may change '{file_path}' to '{file_path.replace(' ', '_')}'."
         )
 
     if not _is_file_in_timeouts(file_name) and should_notebook_be_tested(file_path):
@@ -49,11 +60,18 @@ def is_valid_qmod(file_path: str, automatically_add_timeout: bool = True) -> boo
                 "    Alternatively, you may install pre-commit. It will automatically add a timeout entry in the next time you run 'git commit'."
             )
 
-    if errors:
-        spacing = "\n\t"  # f-string cannot include backslash
-        print(f"File `{file_path}` has error(s):{spacing}{spacing.join(errors)}")
+    spacing = "\n\t"  # f-string cannot include backslash
+    errors_combined_message = (
+        f"File `{file_path}` has error(s):{spacing}{spacing.join(errors)}"
+    )
 
-    return not errors
+    if assert_if_fails:
+        assert not errors, errors_combined_message
+    else:
+        if errors:
+            print(errors_combined_message)
+
+        return not errors
 
 
 def should_notebook_be_tested(file_path: str) -> bool:
@@ -62,6 +80,10 @@ def should_notebook_be_tested(file_path: str) -> bool:
 
 def _does_contain_dash_in_file_name(file_name: str) -> bool:
     return "-" in file_name
+
+
+def _does_contain_space_in_file_name(file_name: str) -> bool:
+    return " " in file_name
 
 
 def _is_file_in_timeouts(file_name: str) -> bool:
