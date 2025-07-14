@@ -1,0 +1,36 @@
+qfunc angle_encoding(exe_params: real[], qbv: qbit[]) {
+  repeat (index: exe_params.len) {
+    RY(pi * exe_params[index], qbv[index]);
+  }
+}
+
+qfunc encoder_ansatz(exe_params: real[], coded: qbit[], trash: qbit[]) {
+  x: qbit[];
+  within {
+    {coded, trash} -> x;
+  } apply {
+    repeat (r: trash.len) {
+      repeat (i: trash.len + coded.len) {
+        RY(exe_params[(r * (trash.len + coded.len)) + i], x[i]);
+      }
+      repeat (i: (trash.len + coded.len) - 1) {
+        CX(x[i], x[i + 1]);
+      }
+    }
+  }
+  repeat (i: trash.len) {
+    RY(exe_params[(trash.len * (trash.len + coded.len)) + i], trash[i]);
+  }
+}
+
+qfunc main(w: real[10], input_data: real[4], output decoded: qbit[4]) {
+  allocate(decoded);
+  angle_encoding(input_data, decoded);
+  encoder_ansatz(w, decoded[0:2], decoded[2:4]);
+  repeat (i: 2) {
+    RESET(decoded[2 + i]);
+  }
+  invert {
+    encoder_ansatz(w, decoded[0:2], decoded[2:4]);
+  }
+}

@@ -1,37 +1,34 @@
 {
   "constraints": {
-    "max_width": 21,
     "max_gate_count": {},
-    "optimization_parameter": "depth"
+    "optimization_parameter": "no_opt"
   },
   "preferences": {
     "machine_precision": 8,
-    "backend_service_provider": "IBM Quantum",
-    "backend_name": "ibm_brisbane",
     "custom_hardware_settings": {
       "basis_gates": [
-        "rx",
-        "u2",
-        "tdg",
-        "z",
-        "cx",
-        "x",
-        "s",
-        "id",
-        "ry",
         "y",
-        "rz",
+        "p",
         "sx",
-        "cy",
-        "cz",
-        "sdg",
+        "tdg",
         "u1",
-        "h",
+        "ry",
+        "r",
+        "sdg",
+        "cx",
+        "u2",
+        "sxdg",
         "u",
         "t",
-        "r",
-        "sxdg",
-        "p"
+        "rz",
+        "cz",
+        "x",
+        "rx",
+        "h",
+        "cy",
+        "id",
+        "z",
+        "s"
       ],
       "is_symmetric_connectivity": true
     },
@@ -42,6 +39,6 @@
     "pretty_qasm": true,
     "transpilation_option": "auto optimize",
     "timeout_seconds": 300,
-    "random_seed": 1105094730
+    "random_seed": 2679244727
   }
 }

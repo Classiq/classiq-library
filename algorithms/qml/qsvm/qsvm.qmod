@@ -7,8 +7,8 @@ qfunc bloch_feature_map(data: real[], qba: qbit[]) {
   }
 }
 
-qfunc main(data1: real[2], data2: real[2], output qba: qnum) {
-  allocate(ceiling(data1.len / 2), qba);
+qfunc main(data1: real[2], data2: real[2], output qba: qnum<ceiling(1.0)>) {
+  allocate(qba);
   bloch_feature_map(data1, qba);
   invert {
     bloch_feature_map(data2, qba);
