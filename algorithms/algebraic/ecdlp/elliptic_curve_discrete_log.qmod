@@ -1,3 +1,8 @@
+qstruct EllipticCurvePoint {
+  x: qnum<3>;
+  y: qnum<3>;
+}
+
 qfunc hadamard_transform_expanded___0(target: qbit[3]) {
   repeat (index: 3) {
     H(target[index]);
@@ -203,7 +208,7 @@ qfunc modular_in_place_subtract_expanded___0(x: qnum<3, False, 0>, y: qnum<3, Fa
   modular_in_place_add_expanded___0(x, y);
 }
 
-qfunc modular_square_expanded___0(x: qbit[3], z: qbit[3]) {
+qfunc modular_out_of_place_square_expanded___0(x: qbit[3], z: qbit[3]) {
   anc: qbit;
   allocate(1, anc);
   control (x[2]) {
@@ -263,48 +268,48 @@ qfunc mock_kaliski_inverse_modulus_7_expanded___1(x: qnum<3, False, 0>, result: 
   }
 }
 
-qfunc ec_point_add_expanded___0(x: qnum<3, False, 0>, y: qnum<3, False, 0>) {
-  l: qnum<3, False, 0>;
-  allocate(3, l);
+qfunc ec_point_add_expanded___0(ecp: EllipticCurvePoint) {
+  slope: qnum<3, False, 0>;
+  allocate(3, slope);
   t0: qnum<3, False, 0>;
   allocate(3, t0);
-  temp: qnum<3, False, 0>;
-  allocate(3, temp);
-  modular_in_place_subtract_constant_expanded___0(y);
-  modular_in_place_subtract_constant_expanded___1(x);
+  t1: qnum<3, False, 0>;
+  allocate(3, t1);
+  modular_in_place_subtract_constant_expanded___0(ecp.y);
+  modular_in_place_subtract_constant_expanded___1(ecp.x);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___0(x, t0);
+    mock_kaliski_inverse_modulus_7_expanded___0(ecp.x, t0);
   } apply {
-    modular_out_of_place_multiply_expanded___0(t0, y, l);
+    modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
   within {
-    modular_out_of_place_multiply_expanded___0(l, x, t0);
+    modular_out_of_place_multiply_expanded___0(slope, ecp.x, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, y);
+    modular_in_place_subtract_expanded___0(t0, ecp.y);
   }
   within {
-    modular_square_expanded___0(l, t0);
+    modular_out_of_place_square_expanded___0(slope, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, x);
-    modular_in_place_negate_expanded___0(x);
-    modular_in_place_add_constant_expanded___1(x);
+    modular_in_place_subtract_expanded___0(t0, ecp.x);
+    modular_in_place_negate_expanded___0(ecp.x);
+    modular_in_place_add_constant_expanded___1(ecp.x);
   }
-  modular_out_of_place_multiply_expanded___0(l, x, y);
+  modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___1(x, t0);
+    mock_kaliski_inverse_modulus_7_expanded___1(ecp.x, t0);
   } apply {
     within {
-      modular_out_of_place_multiply_expanded___0(t0, y, temp);
+      modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
-      modular_in_place_subtract_expanded___0(temp, l);
+      modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
-  modular_in_place_subtract_constant_expanded___0(y);
-  modular_in_place_negate_expanded___0(x);
-  modular_in_place_add_constant_expanded___1(x);
-  free(l);
+  modular_in_place_subtract_constant_expanded___0(ecp.y);
+  modular_in_place_negate_expanded___0(ecp.x);
+  modular_in_place_add_constant_expanded___1(ecp.x);
+  free(slope);
   free(t0);
-  free(temp);
+  free(t1);
 }
 
 qfunc modular_in_place_add_constant_expanded___2(x: qnum<3, False, 0>) {
@@ -353,103 +358,103 @@ qfunc modular_in_place_subtract_constant_expanded___3(x: qnum<3, False, 0>) {
   modular_in_place_add_constant_expanded___3(x);
 }
 
-qfunc ec_point_add_expanded___1(x: qnum<3, False, 0>, y: qnum<3, False, 0>) {
-  l: qnum<3, False, 0>;
-  allocate(3, l);
+qfunc ec_point_add_expanded___1(ecp: EllipticCurvePoint) {
+  slope: qnum<3, False, 0>;
+  allocate(3, slope);
   t0: qnum<3, False, 0>;
   allocate(3, t0);
-  temp: qnum<3, False, 0>;
-  allocate(3, temp);
-  modular_in_place_subtract_constant_expanded___2(y);
-  modular_in_place_subtract_constant_expanded___3(x);
+  t1: qnum<3, False, 0>;
+  allocate(3, t1);
+  modular_in_place_subtract_constant_expanded___2(ecp.y);
+  modular_in_place_subtract_constant_expanded___3(ecp.x);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___0(x, t0);
+    mock_kaliski_inverse_modulus_7_expanded___0(ecp.x, t0);
   } apply {
-    modular_out_of_place_multiply_expanded___0(t0, y, l);
+    modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
   within {
-    modular_out_of_place_multiply_expanded___0(l, x, t0);
+    modular_out_of_place_multiply_expanded___0(slope, ecp.x, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, y);
+    modular_in_place_subtract_expanded___0(t0, ecp.y);
   }
   within {
-    modular_square_expanded___0(l, t0);
+    modular_out_of_place_square_expanded___0(slope, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, x);
-    modular_in_place_negate_expanded___0(x);
-    modular_in_place_add_constant_expanded___2(x);
+    modular_in_place_subtract_expanded___0(t0, ecp.x);
+    modular_in_place_negate_expanded___0(ecp.x);
+    modular_in_place_add_constant_expanded___2(ecp.x);
   }
-  modular_out_of_place_multiply_expanded___0(l, x, y);
+  modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___1(x, t0);
+    mock_kaliski_inverse_modulus_7_expanded___1(ecp.x, t0);
   } apply {
     within {
-      modular_out_of_place_multiply_expanded___0(t0, y, temp);
+      modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
-      modular_in_place_subtract_expanded___0(temp, l);
+      modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
-  modular_in_place_subtract_constant_expanded___2(y);
-  modular_in_place_negate_expanded___0(x);
-  modular_in_place_add_constant_expanded___0(x);
-  free(l);
+  modular_in_place_subtract_constant_expanded___2(ecp.y);
+  modular_in_place_negate_expanded___0(ecp.x);
+  modular_in_place_add_constant_expanded___0(ecp.x);
+  free(slope);
   free(t0);
-  free(temp);
+  free(t1);
 }
 
-qfunc ec_point_add_expanded___2(x: qnum<3, False, 0>, y: qnum<3, False, 0>) {
-  l: qnum<3, False, 0>;
-  allocate(3, l);
+qfunc ec_point_add_expanded___2(ecp: EllipticCurvePoint) {
+  slope: qnum<3, False, 0>;
+  allocate(3, slope);
   t0: qnum<3, False, 0>;
   allocate(3, t0);
-  temp: qnum<3, False, 0>;
-  allocate(3, temp);
-  modular_in_place_subtract_constant_expanded___3(y);
-  modular_in_place_subtract_constant_expanded___1(x);
+  t1: qnum<3, False, 0>;
+  allocate(3, t1);
+  modular_in_place_subtract_constant_expanded___3(ecp.y);
+  modular_in_place_subtract_constant_expanded___1(ecp.x);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___0(x, t0);
+    mock_kaliski_inverse_modulus_7_expanded___0(ecp.x, t0);
   } apply {
-    modular_out_of_place_multiply_expanded___0(t0, y, l);
+    modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
   within {
-    modular_out_of_place_multiply_expanded___0(l, x, t0);
+    modular_out_of_place_multiply_expanded___0(slope, ecp.x, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, y);
+    modular_in_place_subtract_expanded___0(t0, ecp.y);
   }
   within {
-    modular_square_expanded___0(l, t0);
+    modular_out_of_place_square_expanded___0(slope, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, x);
-    modular_in_place_negate_expanded___0(x);
-    modular_in_place_add_constant_expanded___1(x);
+    modular_in_place_subtract_expanded___0(t0, ecp.x);
+    modular_in_place_negate_expanded___0(ecp.x);
+    modular_in_place_add_constant_expanded___1(ecp.x);
   }
-  modular_out_of_place_multiply_expanded___0(l, x, y);
+  modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___1(x, t0);
+    mock_kaliski_inverse_modulus_7_expanded___1(ecp.x, t0);
   } apply {
     within {
-      modular_out_of_place_multiply_expanded___0(t0, y, temp);
+      modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
-      modular_in_place_subtract_expanded___0(temp, l);
+      modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
-  modular_in_place_subtract_constant_expanded___3(y);
-  modular_in_place_negate_expanded___0(x);
-  modular_in_place_add_constant_expanded___1(x);
-  free(l);
+  modular_in_place_subtract_constant_expanded___3(ecp.y);
+  modular_in_place_negate_expanded___0(ecp.x);
+  modular_in_place_add_constant_expanded___1(ecp.x);
+  free(slope);
   free(t0);
-  free(temp);
+  free(t1);
 }
 
-qfunc ell_mult_add_expanded___0(x: qnum<3, False, 0>, y: qnum<3, False, 0>, k: qbit[3]) {
+qfunc ec_scalar_mult_add_expanded___0(ecp: EllipticCurvePoint, k: qbit[3]) {
   control (k[0]) {
-    ec_point_add_expanded___0(x, y);
+    ec_point_add_expanded___0(ecp);
   }
   control (k[1]) {
-    ec_point_add_expanded___1(x, y);
+    ec_point_add_expanded___1(ecp);
   }
   control (k[2]) {
-    ec_point_add_expanded___2(x, y);
+    ec_point_add_expanded___2(ecp);
   }
 }
 
@@ -469,17 +474,17 @@ qfunc qft_expanded___0(target: qbit[3]) {
   qft_no_swap_expanded___0(target);
 }
 
-qfunc main_shor_ecdlp_expanded___0(output ecp_x: qnum<3, False, 0>, output ecp_y: qnum<3, False, 0>, output x1: qnum<3, False, 0>, output x2: qnum<3, False, 0>) {
-  allocate(3, ecp_x);
-  allocate(3, ecp_y);
+qfunc main_shor_ecdlp_expanded___0(output x1: qnum<3, False, 0>, output x2: qnum<3, False, 0>) {
   allocate(3, x1);
   allocate(3, x2);
-  ecp_x ^= 4;
-  ecp_y ^= 2;
+  point: EllipticCurvePoint;
+  allocate(6, point);
+  point.x ^= 4;
+  point.y ^= 2;
   hadamard_transform_expanded___0(x1);
   hadamard_transform_expanded___0(x2);
-  ell_mult_add_expanded___0(ecp_x, ecp_y, x1);
-  ell_mult_add_expanded___0(ecp_x, ecp_y, x2);
+  ec_scalar_mult_add_expanded___0(point, x1);
+  ec_scalar_mult_add_expanded___0(point, x2);
   invert {
     qft_expanded___0(x1);
   }
@@ -488,6 +493,6 @@ qfunc main_shor_ecdlp_expanded___0(output ecp_x: qnum<3, False, 0>, output ecp_y
   }
 }
 
-qfunc main(output ecp_x: qnum<3, False, 0>, output ecp_y: qnum<3, False, 0>, output x1: qnum<3, False, 0>, output x2: qnum<3, False, 0>) {
-  main_shor_ecdlp_expanded___0(ecp_x, ecp_y, x1, x2);
+qfunc main(output x1: qnum<3, False, 0>, output x2: qnum<3, False, 0>) {
+  main_shor_ecdlp_expanded___0(x1, x2);
 }
