@@ -477,14 +477,14 @@ qfunc qft_expanded___0(target: qbit[3]) {
 qfunc main_shor_ecdlp_expanded___0(output x1: qnum<3, False, 0>, output x2: qnum<3, False, 0>) {
   allocate(3, x1);
   allocate(3, x2);
-  point: EllipticCurvePoint;
-  allocate(6, point);
-  point.x ^= 4;
-  point.y ^= 2;
+  ecp: EllipticCurvePoint;
+  allocate(6, ecp);
+  ecp.x ^= 4;
+  ecp.y ^= 2;
   hadamard_transform_expanded___0(x1);
   hadamard_transform_expanded___0(x2);
-  ec_scalar_mult_add_expanded___0(point, x1);
-  ec_scalar_mult_add_expanded___0(point, x2);
+  ec_scalar_mult_add_expanded___0(ecp, x1);
+  ec_scalar_mult_add_expanded___0(ecp, x2);
   invert {
     qft_expanded___0(x1);
   }
