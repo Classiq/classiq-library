@@ -78,7 +78,7 @@ qfunc ccmod_add_expanded___0(phi_b: qbit[5], ctrl: qbit[2]) {
   free(aux);
 }
 
-qfunc main(output b: qnum<5, False, 0>, output ctrl: qbit[2]) {
+qfunc main(output b: qnum<5, False, 0>, output ctrl: qnum<2, False, 0>) {
   allocate(5, b);
   b ^= 8;
   ctrl = 3;
