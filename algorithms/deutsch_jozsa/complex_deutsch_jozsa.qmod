@@ -1,23 +1,8 @@
-qfunc prep_minus(output out: qbit) {
-  allocate(out);
-  X(out);
-  H(out);
-}
-
-qfunc my_oracle(predicate: qfunc (qnum, qbit), target: qnum) {
-  aux: qbit;
-  within {
-    prep_minus(aux);
-  } apply {
-    predicate(target, aux);
-  }
-}
-
 qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
   within {
     hadamard_transform(x);
   } apply {
-    my_oracle(lambda(x, y) {
+    phase_oracle(lambda(x, y) {
       predicate(x, y);
     }, x);
   }
