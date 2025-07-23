@@ -11,9 +11,7 @@ qfunc increment(x: qbit[]) {
   X(x[0]);
 }
 
-qfunc single_step_walk(x: qnum) {
-  coin: qbit;
-  allocate(coin);
+qfunc single_step_walk(coin: qbit, x: qnum) {
   H(coin);
   control (coin == 0) {
     increment(x);
@@ -26,5 +24,7 @@ qfunc single_step_walk(x: qnum) {
 
 qfunc main(output x: qnum<6, UNSIGNED, 0>) {
   allocate(x);
-  single_step_walk(x);
+  coin: qbit;
+  allocate(coin);
+  single_step_walk(coin, x);
 }
