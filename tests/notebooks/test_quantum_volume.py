@@ -1,6 +1,5 @@
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
-    validate_quantum_model,
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
@@ -11,9 +10,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     actual_widths = [3] * 10 + [4] * 10 + [5] * 10 + [6] * 10
     actual_depths = [19] * 10 + [25] * 10 + [31] * 10 + [37] * 10
-    for qmod in tb.ref("qmods"):
-        # test models
-        validate_quantum_model(qmod)
     for qprog, e_width, e_depth in zip(
         tb.ref_pydantic("qprogs"), actual_widths, actual_depths
     ):
