@@ -1,0 +1,90 @@
+name: "Publish new notebooks"
+
+on:
+  workflow_dispatch:
+    inputs:
+      files_list:
+        description: "Space-separated list of new notebooks (e.g. 'folder_1/file1.ipynb folder_3/sub/file2.ipynb')"
+        required: true
+  # push:
+  #   branches:
+  #     - main
+  pull_request:
+    branches:
+      - new_slack_message
+    paths:
+      - "algorithms/**/*.ipynb"
+      - "applications/**/*.ipynb"
+      - "tutorials/**/*.ipynb"
+
+jobs:
+  publish-private:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # we don't expect PRs with more than 5~10 commits
+          fetch-depth: 50
+
+      #
+      # In case it's a merge to main:
+      #
+      - name: Fetch main branch
+        if: ${{ github.event_name == 'push' }}
+        run: git fetch origin main
+
+      - name: Get changed notebook files (merge case)
+        id: changed
+        if: ${{ github.event_name == 'push' }}
+        uses: tj-actions/changed-files@v46.0.1
+        with:
+          base_sha: ${{ github.event.before }}
+          sha: ${{ github.sha }}
+          files: |
+            algorithms/**/*.ipynb
+            applications/**/*.ipynb
+            tutorials/**/*.ipynb
+
+      # Decide which list of notebooks to use
+      - name: Determine notebook list
+        id: notebook-list
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            NOTEBOOKS='${{ github.event.inputs.files_list }}'
+          else
+            NOTEBOOKS='${{ steps.changed.outputs.added_files }}'
+          fi
+          echo "NOTEBOOKS=$NOTEBOOKS" >> $GITHUB_ENV
+
+      # Stop early if no notebooks found
+      - name: Skip if no notebooks
+        if: ${{ env.NOTEBOOKS == '' }}
+        run: |
+          echo "No notebooks to process. Ending here."
+          exit 0
+
+      # Generate Slack message from resolved notebooks
+      - name: Generate Slack message
+        id: slack-msg
+        run: |
+          python .internal/generate_slack_message.py '$NOTEBOOKS_LIST' | tee slack_message.txt
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          cat slack_message.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # Send Slack notification
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v2.1
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN_PRIVATE }}
+          payload: |
+            {
+              "channel": "notebook-release-announcements",
+              "text": "${{ steps.slack-msg.outputs.message }}"
+            }
