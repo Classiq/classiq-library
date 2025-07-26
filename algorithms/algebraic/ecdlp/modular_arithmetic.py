@@ -129,6 +129,7 @@ def modular_in_place_subtract(x: QNum, y: QNum, modulus: int) -> None:
     Given two n-bit integers x and y encoded in quantum registers `x` and `y`, and a constant integer `modulus`,
     this function computes the difference (x - y) mod modulus in a reversible manner.
     The result is stored in-place in the `y` register.
+    |x>|y> -> |x>|(x-y) % p>
 
     Algorithm:
     1. Compute (-y) mod modulus in-place on y
