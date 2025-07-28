@@ -1,5 +1,6 @@
 qfunc prepare_basis_state_expanded___0(output arr: qbit[1]) {
   allocate(1, arr);
+  X(arr[0]);
 }
 
 qfunc main(params: real[1], output state: qbit[1]) {
