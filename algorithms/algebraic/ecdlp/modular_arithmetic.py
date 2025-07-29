@@ -192,27 +192,6 @@ def modular_in_place_add_constant(x: QNum, constant: int, modulus: int) -> None:
     free(carry)
 
 
-@qfunc
-def modular_in_place_subtract_constant(x: QNum, constant: int, modulus: int) -> None:
-    """
-    Computes (x - constant) mod modulus in-place on x.
-    Uses modular_in_place_add_constant with negated constant.
-
-    This function demonstrates:
-    1. Reduction of subtraction to addition with negative constant
-    2. Efficient reuse of existing quantum arithmetic functions
-    3. Modular arithmetic properties: (x - c) ≡ (x + (-c mod p)) (mod p)
-
-    Args:
-        x (QNum): The quantum register to subtract from.
-        constant (int): The classical integer constant to subtract.
-        modulus (int): The integer modulus.
-    """
-    # Compute -constant mod modulus and use add_constant
-    neg_const = (-constant) % modulus
-    modular_in_place_add_constant(x, neg_const, modulus)
-
-
 # Doubling and Shifting
 
 
@@ -369,9 +348,9 @@ def _set_value(reg: QNum, value: int) -> None:
 
 
 @qfunc
-def mock_kaliski_inverse_modulus_7(x: QNum, result: QNum) -> None:
+def mock_inverse_modulus_7(x: QNum, result: QNum) -> None:
     """
-    Mock implementation of Kaliski algorithm for modular inverse modulo 7.
+    Mock implementation for modular inverse modulo 7.
     For input x in range 1-6, computes x^(-1) mod 7.
     The modular inverses modulo 7 are:
     1^(-1) = 1 mod 7
