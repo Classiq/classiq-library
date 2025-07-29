@@ -28,10 +28,6 @@ qfunc modular_in_place_add_constant_expanded___0(x: qnum<3, False, 0>) {
   free(carry);
 }
 
-qfunc modular_in_place_subtract_constant_expanded___0(x: qnum<3, False, 0>) {
-  modular_in_place_add_constant_expanded___0(x);
-}
-
 qfunc modular_in_place_add_constant_expanded___1(x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
@@ -49,10 +45,6 @@ qfunc modular_in_place_add_constant_expanded___1(x: qnum<3, False, 0>) {
     X(carry);
   }
   free(carry);
-}
-
-qfunc modular_in_place_subtract_constant_expanded___1(x: qnum<3, False, 0>) {
-  modular_in_place_add_constant_expanded___1(x);
 }
 
 qfunc _set_value_expanded___0(reg: qnum<3, False, 0>) {
@@ -79,7 +71,7 @@ qfunc _set_value_expanded___5(reg: qnum<3, False, 0>) {
   reg ^= 6;
 }
 
-qfunc mock_kaliski_inverse_modulus_7_expanded___0(x: qnum<3, False, 0>, result: qnum<3, False, 0>) {
+qfunc mock_inverse_modulus_7_expanded___0(x: qnum<3, False, 0>, result: qnum<3, False, 0>) {
   control (x == 1) {
     _set_value_expanded___0(result);
   }
@@ -247,7 +239,7 @@ qfunc _set_value_expanded___6(reg: qnum<3, False, 0>) {
   reg ^= 1;
 }
 
-qfunc mock_kaliski_inverse_modulus_7_expanded___1(x: qnum<3, False, 0>, result: qnum<3, False, 0>) {
+qfunc mock_inverse_modulus_7_expanded___1(x: qnum<3, False, 0>, result: qnum<3, False, 0>) {
   control (x == 1) {
     _set_value_expanded___6(result);
   }
@@ -274,11 +266,10 @@ qfunc ec_point_add_expanded___0(ecp: EllipticCurvePoint) {
   t0: qnum<3, False, 0>;
   allocate(3, t0);
   t1: qnum<3, False, 0>;
-  allocate(3, t1);
-  modular_in_place_subtract_constant_expanded___0(ecp.y);
-  modular_in_place_subtract_constant_expanded___1(ecp.x);
+  modular_in_place_add_constant_expanded___0(ecp.y);
+  modular_in_place_add_constant_expanded___1(ecp.x);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___0(ecp.x, t0);
+    mock_inverse_modulus_7_expanded___0(ecp.x, t0);
   } apply {
     modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
@@ -296,20 +287,20 @@ qfunc ec_point_add_expanded___0(ecp: EllipticCurvePoint) {
   }
   modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___1(ecp.x, t0);
+    mock_inverse_modulus_7_expanded___1(ecp.x, t0);
   } apply {
     within {
+      allocate(3, t1);
       modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
       modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
-  modular_in_place_subtract_constant_expanded___0(ecp.y);
+  modular_in_place_add_constant_expanded___0(ecp.y);
   modular_in_place_negate_expanded___0(ecp.x);
   modular_in_place_add_constant_expanded___1(ecp.x);
   free(slope);
   free(t0);
-  free(t1);
 }
 
 qfunc modular_in_place_add_constant_expanded___2(x: qnum<3, False, 0>) {
@@ -331,10 +322,6 @@ qfunc modular_in_place_add_constant_expanded___2(x: qnum<3, False, 0>) {
   free(carry);
 }
 
-qfunc modular_in_place_subtract_constant_expanded___2(x: qnum<3, False, 0>) {
-  modular_in_place_add_constant_expanded___2(x);
-}
-
 qfunc modular_in_place_add_constant_expanded___3(x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
@@ -354,21 +341,16 @@ qfunc modular_in_place_add_constant_expanded___3(x: qnum<3, False, 0>) {
   free(carry);
 }
 
-qfunc modular_in_place_subtract_constant_expanded___3(x: qnum<3, False, 0>) {
-  modular_in_place_add_constant_expanded___3(x);
-}
-
 qfunc ec_point_add_expanded___1(ecp: EllipticCurvePoint) {
   slope: qnum<3, False, 0>;
   allocate(3, slope);
   t0: qnum<3, False, 0>;
   allocate(3, t0);
   t1: qnum<3, False, 0>;
-  allocate(3, t1);
-  modular_in_place_subtract_constant_expanded___2(ecp.y);
-  modular_in_place_subtract_constant_expanded___3(ecp.x);
+  modular_in_place_add_constant_expanded___2(ecp.y);
+  modular_in_place_add_constant_expanded___3(ecp.x);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___0(ecp.x, t0);
+    mock_inverse_modulus_7_expanded___0(ecp.x, t0);
   } apply {
     modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
@@ -386,20 +368,20 @@ qfunc ec_point_add_expanded___1(ecp: EllipticCurvePoint) {
   }
   modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___1(ecp.x, t0);
+    mock_inverse_modulus_7_expanded___1(ecp.x, t0);
   } apply {
     within {
+      allocate(3, t1);
       modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
       modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
-  modular_in_place_subtract_constant_expanded___2(ecp.y);
+  modular_in_place_add_constant_expanded___2(ecp.y);
   modular_in_place_negate_expanded___0(ecp.x);
   modular_in_place_add_constant_expanded___0(ecp.x);
   free(slope);
   free(t0);
-  free(t1);
 }
 
 qfunc ec_point_add_expanded___2(ecp: EllipticCurvePoint) {
@@ -408,11 +390,10 @@ qfunc ec_point_add_expanded___2(ecp: EllipticCurvePoint) {
   t0: qnum<3, False, 0>;
   allocate(3, t0);
   t1: qnum<3, False, 0>;
-  allocate(3, t1);
-  modular_in_place_subtract_constant_expanded___3(ecp.y);
-  modular_in_place_subtract_constant_expanded___1(ecp.x);
+  modular_in_place_add_constant_expanded___3(ecp.y);
+  modular_in_place_add_constant_expanded___1(ecp.x);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___0(ecp.x, t0);
+    mock_inverse_modulus_7_expanded___0(ecp.x, t0);
   } apply {
     modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
@@ -430,20 +411,20 @@ qfunc ec_point_add_expanded___2(ecp: EllipticCurvePoint) {
   }
   modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   within {
-    mock_kaliski_inverse_modulus_7_expanded___1(ecp.x, t0);
+    mock_inverse_modulus_7_expanded___1(ecp.x, t0);
   } apply {
     within {
+      allocate(3, t1);
       modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
       modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
-  modular_in_place_subtract_constant_expanded___3(ecp.y);
+  modular_in_place_add_constant_expanded___3(ecp.y);
   modular_in_place_negate_expanded___0(ecp.x);
   modular_in_place_add_constant_expanded___1(ecp.x);
   free(slope);
   free(t0);
-  free(t1);
 }
 
 qfunc ec_scalar_mult_add_expanded___0(ecp: EllipticCurvePoint, k: qbit[3]) {
