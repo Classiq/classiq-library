@@ -1,5 +1,5 @@
-qfunc suzuki_trotter1_with_power_logic(hamiltonian: SparsePauliOp, pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real, target: qbit[]) {
-  suzuki_trotter(hamiltonian, evolution_coefficient * pw, 1, ceiling(r0 * (reps_scaling_factor ** log(pw, 2))), target);
+qfunc suzuki_trotter2_with_power_logic(hamiltonian: SparsePauliOp, pw: int, r0: int, reps_scaling_factor: real, evolution_coefficient: real, target: qbit[]) {
+  suzuki_trotter(hamiltonian, evolution_coefficient * pw, 2, ceiling(r0 * (reps_scaling_factor ** log(pw, 2))), target);
 }
 
 qfunc main(output phase_result: qnum<7, SIGNED, 7>) {
@@ -12,7 +12,7 @@ qfunc main(output phase_result: qnum<7, SIGNED, 7>) {
   ], 0.0, state);
   allocate(phase_result);
   qpe_flexible(lambda(pw) {
-    suzuki_trotter1_with_power_logic(SparsePauliOp {
+    suzuki_trotter2_with_power_logic(SparsePauliOp {
       terms=[
         SparsePauliTerm {
           paulis=[
@@ -146,6 +146,6 @@ qfunc main(output phase_result: qnum<7, SIGNED, 7>) {
         }
       ],
       num_qubits=2
-    }, pw, 0.75, 2, -6.283185307179586, state);
+    }, pw, 2, 1.5, -6.283185307179586, state);
   }, phase_result);
 }
