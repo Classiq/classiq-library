@@ -1,0 +1,85 @@
+name: "Setup classiq nightly"
+description: "setup python ; install classiq nighyly from aws ; install quenne ; setup M2M token"
+
+inputs:
+  aws-role:
+    required: true
+    description: "AWS_ROLE"
+  codeartifact-domain:
+    required: true
+    description: "CODEARTIFACT_DOMAIN"
+  codeartifact-owner:
+    required: true
+    description: "CODEARTIFACT_OWNER"
+  codeartifact-region:
+    required: true
+    description: "CODEARTIFACT_REGION"
+  nightly-m2m-secret-arn:
+    required: true
+    description: "NIGHTLY_M2M_SECRET_ARN"
+  pypi-nightly-name:
+    required: true
+    description: "PYPI_NIGHTLY_NAME"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    # Configure AWS credentials
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4.0.2
+      with:
+        role-to-assume: ${{ inputs.aws-role }}
+        aws-region: us-east-1
+        mask-aws-account-id: true
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        set -e
+        python -m pip install -U pip \
+            --extra-index-url https://pypi.org/simple
+        # Install "classiq" separately
+        export CODEARTIFACT_AUTH_TOKEN="$( \
+            aws codeartifact get-authorization-token \
+            --domain ${{ inputs.codeartifact-domain }} \
+            --domain-owner ${{ inputs.codeartifact-owner }} \
+            --region ${{ inputs.codeartifact-region }} \
+            --query authorizationToken \
+            --output text \
+        )"
+        python -m pip install -U --pre \
+            --extra-index-url "https://aws:$CODEARTIFACT_AUTH_TOKEN@${{ inputs.codeartifact-domain }}-${{ inputs.codeartifact-owner }}.d.codeartifact.${{ inputs.codeartifact-region }}.amazonaws.com/pypi/${{ inputs.pypi-nightly-name }}/simple/" \
+            --extra-index-url https://pypi.org/simple \
+            classiq
+        # Install everything from the requirements, other than "classiq".
+        python -m pip install -U $(grep -ivE "classiq" requirements.txt) \
+            --extra-index-url https://pypi.org/simple
+        python -m pip install -U -r requirements_tests.txt \
+            --extra-index-url https://pypi.org/simple
+
+    - name: Install couenne solver
+      shell: bash
+      env:
+        COUENNE_SOURCE: "s3://public-library-resources/couenne.gz"
+        COUENNE_FILE: ${{ runner.temp }}/couenne.gz
+        LOCAL_BIN: ${{ runner.temp }}/.local/bin
+      run: |
+        set -eux
+        aws s3 cp "$COUENNE_SOURCE" "$COUENNE_FILE"
+        mkdir -p "$LOCAL_BIN"
+        echo "$LOCAL_BIN" >>"$GITHUB_PATH"
+        gzip -dc "$COUENNE_FILE" >"${LOCAL_BIN}/couenne"
+        chmod ugo+x "${LOCAL_BIN}/couenne"
+
+    # Set authentication with M2M token
+    - name: Set authentication
+      shell: bash
+      run: .github/scripts/get_m2m_token.sh
+      env:
+        IS_DEV: "true"
+        M2M_SECRET_ARN: "${{ inputs.nightly-m2m-secret-arn }}"
