@@ -1,12 +1,8 @@
-qfunc my_mcx(x: qnum, y: qbit) {
-  control (x == ((2 ** x.size) - 1)) {
-    X(y);
-  }
-}
-
 qfunc increment(x: qbit[]) {
   repeat (i: x.len - 1) {
-    my_mcx(x[0:(x.len - 1) - i], x[(x.len - 1) - i]);
+    control (x[0:((x.len - 1) - i)]) {
+      X(x[(x.len - 1) - i]);
+    }
   }
   X(x[0]);
 }
