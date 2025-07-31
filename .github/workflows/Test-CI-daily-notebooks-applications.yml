@@ -1,8 +1,8 @@
-name: "Test CI (daily) (notebooks: applications)"
+name: "Test CI (weekly) (notebooks: applications)"
 
 on:
   schedule:
-    - cron: "00 01 * * *" # 01:00 UTC
+    - cron: "00 19 * * 6" # Saturday, 19:00 UTC
   workflow_dispatch:
 
 defaults:

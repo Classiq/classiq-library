@@ -1,8 +1,8 @@
-name: "Test CI (daily) (internal)"
+name: "Test CI (weekly) (internal)"
 
 on:
   schedule:
-    - cron: "00 20 * * *" # 20:00 UTC
+    - cron: "30 14 * * 6" # Saturday, 14:30 UTC
   workflow_dispatch:
 
 defaults:
