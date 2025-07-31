@@ -23,30 +23,24 @@ qstruct BEBlock {
   lcu2: qbit;
 }
 
-qfunc hadamard_transform_expanded___0(target: qbit[7]) {
-  repeat (index: 7) {
-    H(target[index]);
-  }
-}
-
-qfunc prepare_ref_expanded___0(data: qnum<7, False, 0>, output data_ref: qnum<7, False, 0>) {
-  hadamard_transform_expanded___0(data);
-  data_ref = data;
-}
-
 qfunc unitaries_5_lambda___0_0_expanded___0(permutable extended_qnum_captured__derivative_dirichlet_be__8: qnum<4, False, 0>) {
-  extended_qnum_captured__derivative_dirichlet_be__8 += 1;
-}
-
-qfunc unitaries_6_lambda___0_0_expanded___0(permutable extended_qnum_captured__derivative_dirichlet_be__8: qnum<4, False, 0>) {
   extended_qnum_captured__derivative_dirichlet_be__8 += -1;
 }
 
-qfunc _load_phases_expanded___0(target: qbit[1]) {
-  RZ(3.1416, target[0]);
+qfunc phase_minus_expanded___0(x: qbit[4]) {
+  RY(6.2832, x[0]);
 }
 
-qfunc lcu_expanded___0(block: qnum<1, False, 0>, permutable extended_qnum_captured__derivative_dirichlet_be__8: qnum<4, False, 0>) {
+qfunc unitaries_6_lambda___0_0_expanded___0(extended_qnum_captured__derivative_dirichlet_be__8: qnum<4, False, 0>) {
+  extended_qnum_captured__derivative_dirichlet_be__8 += 1;
+  phase_minus_expanded___0(extended_qnum_captured__derivative_dirichlet_be__8);
+}
+
+qfunc _load_phases_expanded___0(target: qbit[1]) {
+  RZ(0, target[0]);
+}
+
+qfunc lcu_expanded___0(block: qnum<1, False, 0>, extended_qnum_captured__derivative_dirichlet_be__8: qnum<4, False, 0>) {
   within {
     inplace_prepare_state([0.5, 0.5], 0, block);
   } apply {
@@ -80,9 +74,9 @@ qfunc unitaries_3_lambda___0_0_expanded___0(x_captured__derivative_be__5: qnum<3
 
 qfunc prepare_bounday_x_expanded___0(x: qbit[2]) {
   inplace_prepare_amplitudes([
-    (-0.8018),
-    0.5345,
-    (-0.2673),
+    (-0.6882),
+    0.6882,
+    (-0.2294),
     0.0
   ], 0.0, x[0:2]);
 }
@@ -121,13 +115,9 @@ qfunc unitaries_4_lambda___0_0_expanded___0(x_captured__derivative_be__5: qnum<3
   derivative_boundaries_be_expanded___0(x_captured__derivative_be__5, flag_captured__derivative_be__5);
 }
 
-qfunc _load_phases_expanded___1(target: qbit[1]) {
-  RZ(0, target[0]);
-}
-
 qfunc lcu_expanded___1(block: qnum<1, False, 0>, lcu2_captured__derivative_be__5: qbit, x_captured__derivative_be__5: qnum<3, False, 0>, flag_captured__derivative_be__5: qbit) {
   within {
-    inplace_prepare_state([0.3483, 0.6517], 0, block);
+    inplace_prepare_state([0.3145, 0.6855], 0, block);
   } apply {
     repeat (i: 2) {
       control (block == i) {
@@ -140,7 +130,7 @@ qfunc lcu_expanded___1(block: qnum<1, False, 0>, lcu2_captured__derivative_be__5
         }
       }
     }
-    _load_phases_expanded___1(block);
+    _load_phases_expanded___0(block);
   }
 }
 
@@ -150,7 +140,7 @@ qfunc derivative_be_expanded___0(x: qnum<3, False, 0>, flag: qbit, lcu1: qbit, l
 
 qfunc v_be_expanded___0(v: qnum<3, True, 0>, ind: qbit) {
   ind *= 0.25 * v;
-  X(ind);
+  ind ^= 1;
 }
 
 qfunc zeta_be_expanded___0(x: qnum<3, False, 0>, v: qnum<3, True, 0>, flag: qbit) {
@@ -184,9 +174,7 @@ qfunc load_v_H_vector_expanded___0(v: qnum<3, True, 0>) {
 
 qfunc force_term_be_expanded___0(v: qnum<3, True, 0>, flag: qbit) {
   flag ^= v != 0;
-  invert {
-    load_v_H_vector_expanded___0(v);
-  }
+  load_v_H_vector_expanded___0(v);
 }
 
 qfunc load_v_vector_expanded___0(v: qnum<3, True, 0>) {
@@ -203,13 +191,15 @@ qfunc load_v_vector_expanded___0(v: qnum<3, True, 0>) {
 }
 
 qfunc current_term_be_expanded___0(v: qnum<3, True, 0>, flag: qbit) {
-  load_v_vector_expanded___0(v);
+  invert {
+    load_v_vector_expanded___0(v);
+  }
   flag ^= v != 0;
 }
 
 qfunc equalize_amplitude_expanded___0(E_field: qnum<1, False, 0>, ind: qbit) {
   ind *= (0.9505 * E_field) + 0.0495;
-  X(ind);
+  ind ^= 1;
 }
 
 qfunc off_diag_be_expanded___0(be: BE) {
@@ -230,7 +220,7 @@ qfunc unitaries_2_lambda___0_0_expanded___0(const be_lcu___be_captured__full_be_
   IDENTITY(be_lcu___be_captured__full_be__1);
 }
 
-qfunc _load_phases_expanded___2(target: qbit[2]) {
+qfunc _load_phases_expanded___1(target: qbit[2]) {
   RZ(-2.3562, target[0]);
   CX(target[0], target[1]);
   RZ(-0.7854, target[1]);
@@ -238,9 +228,9 @@ qfunc _load_phases_expanded___2(target: qbit[2]) {
   RZ(-0.7854, target[1]);
 }
 
-qfunc lcu2_expanded___0(block: qnum<2, False, 0>, be_lcu___be_captured__full_be__1: BE) {
+qfunc lcu_expanded___2(block: qnum<2, False, 0>, be_lcu___be_captured__full_be__1: BE) {
   within {
-    inplace_prepare_state([0.0875, 0.8254, 0.0871, 0], 0, block);
+    inplace_prepare_state([0.096, 0.8177, 0.0863, 0], 0, block);
   } apply {
     repeat (i: 3) {
       control (block == i) {
@@ -257,18 +247,15 @@ qfunc lcu2_expanded___0(block: qnum<2, False, 0>, be_lcu___be_captured__full_be_
         }
       }
     }
-    _load_phases_expanded___2(block);
+    _load_phases_expanded___1(block);
   }
 }
 
 qfunc full_be_expanded___0(be_lcu: BELcu) {
-  lcu2_expanded___0(be_lcu.lcu, be_lcu.be);
+  lcu_expanded___2(be_lcu.lcu, be_lcu.be);
 }
 
-qfunc main(output data: qnum<7, False, 0>, output data_ref: qnum<7, False, 0>, output block: qnum<8, False, 0>) {
-  be_lcu: BELcu;
-  allocate(15, be_lcu);
-  prepare_ref_expanded___0({be_lcu.be.data}, data_ref);
-  full_be_expanded___0(be_lcu);
-  be_lcu -> {data, block};
+qfunc main(output state: BELcu) {
+  allocate(15, state);
+  full_be_expanded___0(state);
 }
