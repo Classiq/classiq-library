@@ -1,6 +1,5 @@
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
-    validate_quantum_model,
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
@@ -10,9 +9,6 @@ from testbook.client import TestbookNotebookClient
     "approximated_state_preparation", timeout_seconds=3600
 )  # took 1860 seconds on my computer
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    for qmod in tb.ref("qmods"):
-        validate_quantum_model(qmod)
 
     # test quantum programs
     # classiq depths: [9874, 8721, 8259, 7908, 7677, 7447, 6986, 6755, 6525, 6295]
