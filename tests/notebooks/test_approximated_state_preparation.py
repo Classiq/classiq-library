@@ -11,8 +11,8 @@ from testbook.client import TestbookNotebookClient
 def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test quantum programs
-    # classiq depths: [9874, 8721, 8259, 7908, 7677, 7447, 6986, 6755, 6525, 6295]
-    # cx-counts depths: [6548, 5748, 5428, 5196, 5036, 4876, 4556, 4396, 4236, 4076]
+    # classiq depths: [114, 8662, 7853, 7622, 7392, 6932, 6702, 6472, 6241, 6010]
+    # cx-counts depths: [62, 5722, 5171, 5011, 4851, 4531, 4371, 4211, 4051, 3891]
     # The depth has to improve from the previous runs. The difference between runs 0 and 1 is an exception,
     # since for 0 error we use a different algorithm for exact state preparation.
     qprogs = tb.ref_pydantic("qprogs")
@@ -36,5 +36,5 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test notebook content
     cx_counts = tb.ref("cx_counts")
-    for i in range(1, len(cx_counts)):
+    for i in range(2, len(cx_counts)):
         assert cx_counts[i] < cx_counts[i - 1]
