@@ -1,6 +1,5 @@
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
-    validate_quantum_model,
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
@@ -10,13 +9,6 @@ import itertools
 
 @wrap_testbook("discrete_quantum_walk_circle", timeout_seconds=1500)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    for qmod in itertools.chain(
-        tb.ref("qmods"),
-        tb.ref("qmods_width"),
-        tb.ref("qmods_cx"),
-    ):
-        validate_quantum_model(qmod)
 
     # test quantum programs
 

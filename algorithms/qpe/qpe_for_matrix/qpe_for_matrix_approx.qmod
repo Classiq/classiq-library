@@ -1,32 +1,13 @@
-qfunc load_b(amplitudes: real[], output state: qbit[]) {
-  prepare_amplitudes(amplitudes, 0.0, state);
-}
-
-qfunc hhl(rhs_vector: real[], precision: int, hamiltonian_evolution_with_power: qfunc (int, qbit[]), output state: qbit[], output phase: qnum, output indicator: qbit) {
-  allocate(precision, UNSIGNED, precision, phase);
-  load_b([
-    0.1825741858,
-    0.3651483717,
-    0.7302967433,
-    0.5477225575
-  ], state);
-  allocate(indicator);
-  within {
-    qpe_flexible(lambda(k) {
-      hamiltonian_evolution_with_power(k, state);
-    }, phase);
-  } apply {
-    indicator *= (1 / (2 ** phase.size)) / phase;
-  }
-}
-
-qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
-  hhl([
-    0.1825741858,
-    0.3651483717,
-    0.7302967433,
-    0.5477225575
-  ], 4, lambda(pw, target) {
+qfunc main(output phase_result: qnum<7, SIGNED, 7>) {
+  state: qbit[];
+  prepare_amplitudes([
+    0.527825923553952,
+    0.585303023025052,
+    0.52526673531944,
+    0.320803713240682
+  ], 0.0, state);
+  allocate(phase_result);
+  qpe_flexible(lambda(pw) {
     suzuki_trotter(SparsePauliOp {
       terms=[
         SparsePauliTerm {
@@ -40,7 +21,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=0.4075
+          coefficient=0.170275868020401
         },
         SparsePauliTerm {
           paulis=[
@@ -53,7 +34,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=-0.0525
+          coefficient=0.006402508858261
         },
         SparsePauliTerm {
           paulis=[
@@ -66,7 +47,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=-0.0175
+          coefficient=0.007081098632841
         },
         SparsePauliTerm {
           paulis=[
@@ -79,7 +60,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=-0.0575
+          coefficient=-0.0182021433543
         },
         SparsePauliTerm {
           paulis=[
@@ -92,7 +73,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=-0.03
+          coefficient=0.045450792419618
         },
         SparsePauliTerm {
           paulis=[
@@ -105,7 +86,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=0.02
+          coefficient=0.053802206495997
         },
         SparsePauliTerm {
           paulis=[
@@ -118,7 +99,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=-0.025
+          coefficient=0.017903343261098
         },
         SparsePauliTerm {
           paulis=[
@@ -131,7 +112,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=0.045
+          coefficient=0.07361726246874
         },
         SparsePauliTerm {
           paulis=[
@@ -144,7 +125,7 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=-0.16
+          coefficient=0.066657549245314
         },
         SparsePauliTerm {
           paulis=[
@@ -157,10 +138,10 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
               index=1
             }
           ],
-          coefficient=-0.06
+          coefficient=0.040607227243431
         }
       ],
       num_qubits=2
-    }, (-6.2831853072) * pw, 1, 4 * ceiling(1.8 ** log(pw, 2)), target);
-  }, res, phase, indicator);
+    }, (-6.283185307179586) * pw, 2, ceiling(2 * (1.5 ** log(pw, 2))), state);
+  }, phase_result);
 }
