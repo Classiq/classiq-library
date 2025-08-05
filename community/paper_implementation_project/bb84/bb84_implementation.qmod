@@ -1,4 +1,4 @@
-qfunc bb84(message: bool[], alice_bases: bool[], bob_bases: bool[], qba: qbit[]) {
+qfunc bb84(message: int[], alice_bases: int[], bob_bases: int[], qba: qbit[]) {
   repeat (i: message.len) {
     if (message[i] == 1) {
       X(qba[i]);

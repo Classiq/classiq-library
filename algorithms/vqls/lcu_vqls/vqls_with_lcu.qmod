@@ -4,7 +4,7 @@ qfunc apply_ry_on_all_expanded___0(params: real[], io: qbit[3]) {
   }
 }
 
-qfunc apply_fixed_3_qubit_system_ansatz_expanded___0(angles: real[], system_qubits: qbit[3]) {
+qfunc apply_fixed_3_qubit_system_ansatz_expanded___0(angles: real[9], system_qubits: qbit[3]) {
   apply_ry_on_all_expanded___0([
     angles[0],
     angles[1],
@@ -34,34 +34,34 @@ qfunc ansatz_0_lambda___0_0_expanded___0(params_captured__main__0: real[9], syst
   apply_fixed_3_qubit_system_ansatz_expanded___0(params_captured__main__0, system_qubits_captured__main__0);
 }
 
-qfunc cases_0_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], const x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc cases_0_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, const x_captured__apply_pauli_term__6: qbit[3]) {
   IDENTITY(x_captured__apply_pauli_term__6[pauli_string_captured__apply_pauli_term__6[i_captured__apply_pauli_term__6].index]);
 }
 
-qfunc cases_1_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], permutable x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc cases_1_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, permutable x_captured__apply_pauli_term__6: qbit[3]) {
   X(x_captured__apply_pauli_term__6[pauli_string_captured__apply_pauli_term__6[i_captured__apply_pauli_term__6].index]);
 }
 
-qfunc cases_2_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], permutable x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc cases_2_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, permutable x_captured__apply_pauli_term__6: qbit[3]) {
   Y(x_captured__apply_pauli_term__6[pauli_string_captured__apply_pauli_term__6[i_captured__apply_pauli_term__6].index]);
 }
 
-qfunc cases_3_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], const x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc cases_3_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, const x_captured__apply_pauli_term__6: qbit[3]) {
   Z(x_captured__apply_pauli_term__6[pauli_string_captured__apply_pauli_term__6[i_captured__apply_pauli_term__6].index]);
 }
 
-qfunc switch_expanded___0(selector: int, i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], permutable x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc switch_expanded___0(selector: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, permutable x_captured__apply_pauli_term__6: qbit[3]) {
   if (selector == 0) {
-    cases_0_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6, pauli_string_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
+    cases_0_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6, i_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
   } else {
     if (selector == 1) {
-      cases_1_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6, pauli_string_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
+      cases_1_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6, i_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
     } else {
       if (selector == 2) {
-        cases_2_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6, pauli_string_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
+        cases_2_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6, i_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
       } else {
         if (selector == 3) {
-          cases_3_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6, pauli_string_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
+          cases_3_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6, i_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
         }
       }
     }
@@ -70,7 +70,7 @@ qfunc switch_expanded___0(selector: int, i_captured__apply_pauli_term__6: int, p
 
 qfunc apply_pauli_term_expanded___0(pauli_string: IndexedPauli[], x: qbit[3]) {
   repeat (i: 1) {
-    switch_expanded___0(pauli_string[i].pauli, i, pauli_string, x);
+    switch_expanded___0(pauli_string[i].pauli, pauli_string, i, x);
   }
 }
 
@@ -80,34 +80,34 @@ qfunc unitaries_0_lambda___0_0_expanded___0(data_captured__lcu_pauli__3: qbit[3]
   ], data_captured__lcu_pauli__3);
 }
 
-qfunc cases_4_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], const x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc cases_4_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, const x_captured__apply_pauli_term__6: qbit[3]) {
   IDENTITY(x_captured__apply_pauli_term__6[pauli_string_captured__apply_pauli_term__6[i_captured__apply_pauli_term__6].index]);
 }
 
-qfunc cases_5_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], permutable x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc cases_5_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, permutable x_captured__apply_pauli_term__6: qbit[3]) {
   X(x_captured__apply_pauli_term__6[pauli_string_captured__apply_pauli_term__6[i_captured__apply_pauli_term__6].index]);
 }
 
-qfunc cases_6_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], permutable x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc cases_6_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, permutable x_captured__apply_pauli_term__6: qbit[3]) {
   Y(x_captured__apply_pauli_term__6[pauli_string_captured__apply_pauli_term__6[i_captured__apply_pauli_term__6].index]);
 }
 
-qfunc cases_7_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], const x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc cases_7_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, const x_captured__apply_pauli_term__6: qbit[3]) {
   Z(x_captured__apply_pauli_term__6[pauli_string_captured__apply_pauli_term__6[i_captured__apply_pauli_term__6].index]);
 }
 
-qfunc switch_expanded___1(selector: int, i_captured__apply_pauli_term__6: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], permutable x_captured__apply_pauli_term__6: qbit[3]) {
+qfunc switch_expanded___1(selector: int, pauli_string_captured__apply_pauli_term__6: IndexedPauli[], i_captured__apply_pauli_term__6: int, permutable x_captured__apply_pauli_term__6: qbit[3]) {
   if (selector == 0) {
-    cases_4_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6, pauli_string_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
+    cases_4_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6, i_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
   } else {
     if (selector == 1) {
-      cases_5_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6, pauli_string_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
+      cases_5_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6, i_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
     } else {
       if (selector == 2) {
-        cases_6_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6, pauli_string_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
+        cases_6_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6, i_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
       } else {
         if (selector == 3) {
-          cases_7_lambda___0_0_expanded___0(i_captured__apply_pauli_term__6, pauli_string_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
+          cases_7_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__6, i_captured__apply_pauli_term__6, x_captured__apply_pauli_term__6);
         }
       }
     }
@@ -116,7 +116,7 @@ qfunc switch_expanded___1(selector: int, i_captured__apply_pauli_term__6: int, p
 
 qfunc apply_pauli_term_expanded___1(pauli_string: IndexedPauli[], x: qbit[3]) {
   repeat (i: 3) {
-    switch_expanded___1(pauli_string[i].pauli, i, pauli_string, x);
+    switch_expanded___1(pauli_string[i].pauli, pauli_string, i, x);
   }
 }
 

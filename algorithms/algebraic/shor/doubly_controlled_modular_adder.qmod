@@ -1,8 +1,8 @@
 qfunc qft_no_swap_expanded___0(qbv: qbit[5]) {
   repeat (i: 5) {
     H(qbv[i]);
-    repeat (j: 4 - i) {
-      CPHASE(3.1416 * (2.0 ** ((-j) - 1.0)), qbv[(i + j) + 1], qbv[i]);
+    repeat (j: (5 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
     }
   }
 }
@@ -33,7 +33,7 @@ qfunc phase_lad_expanded___1(phi_b: qbit[5]) {
 qfunc my_qft_step_expanded___0(qbv: qbit[]) {
   H(qbv[0]);
   repeat (index: qbv.len - 1) {
-    CPHASE(3.1416 * (2.0 ** ((-index) - 1.0)), qbv[0], qbv[index + 1]);
+    CPHASE(pi / (2 ** (index + 1)), qbv[0], qbv[index + 1]);
   }
 }
 
