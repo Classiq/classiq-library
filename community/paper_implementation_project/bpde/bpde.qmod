@@ -53,6 +53,6 @@ qfunc main(output readout: qbit, delta_e: real) {
       num_qubits=1
     }, 1.0, 2, 2, state);
   }
-  PHASE(1.0 * delta_e, readout);
+  PHASE(delta_e * 1.0, readout);
   H(readout);
 }

@@ -7,8 +7,8 @@ qfunc hadamard_transform_expanded___0(target: qbit[10]) {
 qfunc qft_no_swap_expanded___0(qbv: qbit[6]) {
   repeat (i: 6) {
     H(qbv[i]);
-    repeat (j: 5 - i) {
-      CPHASE(3.1416 * (2.0 ** ((-j) - 1.0)), qbv[(i + j) + 1], qbv[i]);
+    repeat (j: (6 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
     }
   }
 }
@@ -41,7 +41,7 @@ qfunc phase_lad_expanded___1(phi_b: qbit[6]) {
 qfunc my_qft_step_expanded___0(qbv: qbit[]) {
   H(qbv[0]);
   repeat (index: qbv.len - 1) {
-    CPHASE(3.1416 * (2.0 ** ((-index) - 1.0)), qbv[0], qbv[index + 1]);
+    CPHASE(pi / (2 ** (index + 1)), qbv[0], qbv[index + 1]);
   }
 }
 
@@ -365,8 +365,8 @@ qfunc mod_exp_func_expanded___0(x: qbit[5], pow: qbit[10]) {
 qfunc qft_no_swap_expanded___1(qbv: qbit[10]) {
   repeat (i: 10) {
     H(qbv[i]);
-    repeat (j: 9 - i) {
-      CPHASE(3.1416 * (2.0 ** ((-j) - 1.0)), qbv[(i + j) + 1], qbv[i]);
+    repeat (j: (10 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
     }
   }
 }
