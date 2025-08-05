@@ -23,7 +23,7 @@ qfunc binary_to_one_hot_expanded___0(input binary: qnum<2, False, 0>, output one
 
 qfunc inplace_one_hot_to_unary_expanded___0(qvar: qbit[4]) {
   repeat (i: 3) {
-    CX(qvar[3 - i], qvar[2 - i]);
+    CX(qvar[(4 - i) - 1], qvar[(4 - i) - 2]);
   }
   X(qvar[0]);
 }
@@ -52,14 +52,14 @@ qfunc _dicke_split_cycle_shift_expanded___0(qvar: qbit[6]) {
     CX(qvar[1], qvar[0]);
   } apply {
     control (qvar[0]) {
-      RY(2.300523983021863, qvar[1]);
+      RY(2.30052398302186, qvar[1]);
     }
   }
   within {
     CX(qvar[2], qvar[0]);
   } apply {
     control (qvar[0] & qvar[1]) {
-      RY(1.9106332362490186, qvar[2]);
+      RY(1.91063323624902, qvar[2]);
     }
   }
 }
@@ -69,14 +69,14 @@ qfunc _dicke_split_cycle_shift_expanded___1(qvar: qbit[5]) {
     CX(qvar[1], qvar[0]);
   } apply {
     control (qvar[0]) {
-      RY(2.214297435588181, qvar[1]);
+      RY(2.21429743558818, qvar[1]);
     }
   }
   within {
     CX(qvar[2], qvar[0]);
   } apply {
     control (qvar[0] & qvar[1]) {
-      RY(1.7721542475852274, qvar[2]);
+      RY(1.77215424758523, qvar[2]);
     }
   }
 }
@@ -86,14 +86,14 @@ qfunc _dicke_split_cycle_shift_expanded___2(qvar: qbit[4]) {
     CX(qvar[1], qvar[0]);
   } apply {
     control (qvar[0]) {
-      RY(2.0943951023931957, qvar[1]);
+      RY(2.0943951023932, qvar[1]);
     }
   }
   within {
     CX(qvar[2], qvar[0]);
   } apply {
     control (qvar[0] & qvar[1]) {
-      RY(1.5707963267948968, qvar[2]);
+      RY(1.5707963267948999, qvar[2]);
     }
   }
 }
@@ -103,14 +103,14 @@ qfunc _dicke_split_cycle_shift_expanded___3(qvar: qbit[3]) {
     CX(qvar[1], qvar[0]);
   } apply {
     control (qvar[0]) {
-      RY(1.9106332362490186, qvar[1]);
+      RY(1.91063323624902, qvar[1]);
     }
   }
   within {
     CX(qvar[2], qvar[0]);
   } apply {
     control (qvar[0] & qvar[1]) {
-      RY(1.2309594173407747, qvar[2]);
+      RY(1.23095941734077, qvar[2]);
     }
   }
 }
@@ -120,7 +120,7 @@ qfunc _dicke_split_cycle_shift_expanded___4(qvar: qbit[2]) {
     CX(qvar[1], qvar[0]);
   } apply {
     control (qvar[0]) {
-      RY(1.5707963267948968, qvar[1]);
+      RY(1.5707963267948999, qvar[1]);
     }
   }
 }

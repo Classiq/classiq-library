@@ -36,8 +36,8 @@ qfunc unitaries_6_lambda___0_0_expanded___0(extended_qnum_captured__derivative_d
   phase_minus_expanded___0(extended_qnum_captured__derivative_dirichlet_be__8);
 }
 
-qfunc _load_phases_expanded___0(target: qbit[1]) {
-  RZ(0, target[0]);
+qfunc apply_phase_table_expanded___0(target: qbit[1]) {
+  PHASE(0, target[0]);
 }
 
 qfunc lcu_expanded___0(block: qnum<1, False, 0>, extended_qnum_captured__derivative_dirichlet_be__8: qnum<4, False, 0>) {
@@ -55,7 +55,7 @@ qfunc lcu_expanded___0(block: qnum<1, False, 0>, extended_qnum_captured__derivat
         }
       }
     }
-    _load_phases_expanded___0(block);
+    apply_phase_table_expanded___0(block);
   }
 }
 
@@ -70,6 +70,12 @@ qfunc derivative_dirichlet_be_expanded___0(x: qnum<3, False, 0>, flag: qbit, lcu
 
 qfunc unitaries_3_lambda___0_0_expanded___0(x_captured__derivative_be__5: qnum<3, False, 0>, flag_captured__derivative_be__5: qbit, lcu2_captured__derivative_be__5: qbit) {
   derivative_dirichlet_be_expanded___0(x_captured__derivative_be__5, flag_captured__derivative_be__5, lcu2_captured__derivative_be__5);
+}
+
+qfunc apply_to_all_expanded___0(permutable target: qbit[2]) {
+  repeat (index: 2) {
+    X(target[index]);
+  }
 }
 
 qfunc prepare_bounday_x_expanded___0(x: qbit[2]) {
@@ -88,26 +94,16 @@ qfunc derivative_boundary_min_be_expanded___0(x: qnum<2, False, 0>, flag: qbit) 
   flag ^= x != 0;
 }
 
-qfunc apply_to_all_expanded___0(permutable target: qbit[2]) {
-  repeat (index: 2) {
-    X(target[index]);
-  }
-}
-
-qfunc derivative_boundary_max_be_expanded___0(x: qnum<2, False, 0>, flag: qbit) {
-  within {
-    apply_to_all_expanded___0(x);
-  } apply {
-    RY(6.2832, flag);
-    derivative_boundary_min_be_expanded___0(x, flag);
-  }
-}
-
 qfunc derivative_boundaries_be_expanded___0(x: qbit[3], flag: qbit) {
-  control (x[2] == 0) {
+  within {
+    control (x[2]) {
+      apply_to_all_expanded___0(x[0:2]);
+    }
+  } apply {
+    control (x[2]) {
+      RY(6.2832, flag);
+    }
     derivative_boundary_min_be_expanded___0(x[0:2], flag);
-  } else {
-    derivative_boundary_max_be_expanded___0(x[0:2], flag);
   }
 }
 
@@ -130,7 +126,7 @@ qfunc lcu_expanded___1(block: qnum<1, False, 0>, lcu2_captured__derivative_be__5
         }
       }
     }
-    _load_phases_expanded___0(block);
+    apply_phase_table_expanded___0(block);
   }
 }
 
@@ -161,7 +157,7 @@ qfunc unitaries_0_lambda___0_0_expanded___0(be_lcu___be_captured__full_be__1: BE
 
 qfunc load_v_H_vector_expanded___0(v: qnum<3, True, 0>) {
   inplace_prepare_amplitudes([
-    0.0,
+    (-0.0),
     (-0.6449),
     (-0.2878),
     (-0.0354),
@@ -220,17 +216,22 @@ qfunc unitaries_2_lambda___0_0_expanded___0(const be_lcu___be_captured__full_be_
   IDENTITY(be_lcu___be_captured__full_be__1);
 }
 
-qfunc _load_phases_expanded___1(target: qbit[2]) {
-  RZ(-2.3562, target[0]);
+qfunc apply_phase_table_expanded___1(target: qbit[2]) {
+  PHASE(-2.3562, target[0]);
   CX(target[0], target[1]);
-  RZ(-0.7854, target[1]);
+  PHASE(-0.7854, target[1]);
   CX(target[0], target[1]);
-  RZ(-0.7854, target[1]);
+  PHASE(-0.7854, target[1]);
 }
 
 qfunc lcu_expanded___2(block: qnum<2, False, 0>, be_lcu___be_captured__full_be__1: BE) {
   within {
-    inplace_prepare_state([0.096, 0.8177, 0.0863, 0], 0, block);
+    inplace_prepare_state([
+      0.096,
+      0.8177,
+      0.0863,
+      0.0
+    ], 0, block);
   } apply {
     repeat (i: 3) {
       control (block == i) {
@@ -247,7 +248,7 @@ qfunc lcu_expanded___2(block: qnum<2, False, 0>, be_lcu___be_captured__full_be__
         }
       }
     }
-    _load_phases_expanded___1(block);
+    apply_phase_table_expanded___1(block);
   }
 }
 

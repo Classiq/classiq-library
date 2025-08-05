@@ -407,8 +407,8 @@ qfunc unitary_with_power_0_lambda___0_0_expanded___0(p: int, state_captured__mai
 qfunc qft_no_swap_expanded___0(qbv: qbit[7]) {
   repeat (i: 7) {
     H(qbv[i]);
-    repeat (j: 6 - i) {
-      CPHASE(3.1416 * (2.0 ** ((-j) - 1.0)), qbv[(i + j) + 1], qbv[i]);
+    repeat (j: (7 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
     }
   }
 }
