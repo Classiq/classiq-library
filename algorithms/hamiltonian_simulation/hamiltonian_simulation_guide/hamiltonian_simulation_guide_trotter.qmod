@@ -1,0 +1,39 @@
+qfunc main(output qba: qbit[]) {
+  allocate(2, qba);
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          }
+        ],
+        coefficient=0.3
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          }
+        ],
+        coefficient=0.7
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          }
+        ],
+        coefficient=0.2
+      }
+    ],
+    num_qubits=2
+  }, 1.0, 1, 10, qba);
+}
