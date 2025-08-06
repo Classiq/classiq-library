@@ -136,12 +136,12 @@ qfunc unitaries_2_lambda___0_0_expanded___0(data_captured__lcu_pauli__3: qbit[3]
   ], data_captured__lcu_pauli__3);
 }
 
-qfunc _load_phases_expanded___0(target: qbit[2]) {
-  RZ(0, target[0]);
+qfunc apply_phase_table_expanded___0(target: qbit[2]) {
+  PHASE(0, target[0]);
   CX(target[0], target[1]);
-  RZ(0, target[1]);
+  PHASE(0, target[1]);
   CX(target[0], target[1]);
-  RZ(0, target[1]);
+  PHASE(0, target[1]);
 }
 
 qfunc lcu_expanded___0(block: qnum<2, False, 0>, data_captured__lcu_pauli__3: qbit[3]) {
@@ -163,7 +163,7 @@ qfunc lcu_expanded___0(block: qnum<2, False, 0>, data_captured__lcu_pauli__3: qb
         }
       }
     }
-    _load_phases_expanded___0(block);
+    apply_phase_table_expanded___0(block);
   }
 }
 
