@@ -69,7 +69,7 @@ def _test_single_url(
     use_head: bool = True,
     follow_redirects: bool = True,
 ) -> bool:
-    if any(allowed in url for allowed in get_url_allow_list()):
+    if any(url.startswith(allowed) for allowed in get_url_allow_list()):
         return True
 
     if check_file_instead_of_url(url):
