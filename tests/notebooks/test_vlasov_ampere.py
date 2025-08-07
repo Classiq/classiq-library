@@ -16,8 +16,9 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_width=25,  # actual width: 25
         expected_depth=2300,  # actual depth: 2181
     )
-    measured_be = tb.ref("mat_be")
-    classical_be = tb.ref("mat_classical")
+
+    measured_be = tb.ref_numpy("mat_be")
+    classical_be = tb.ref_numpy("mat_classical")
     norm_factor = tb.ref("BE_NORM_FACTOR")
     phase = np.angle(measured_be[0, 0] / classical_be[0, 0])
     assert np.allclose(measured_be * norm_factor * np.exp(-1j * phase), classical_be)
