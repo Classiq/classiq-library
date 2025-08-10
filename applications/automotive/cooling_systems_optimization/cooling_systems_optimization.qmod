@@ -43,6 +43,58 @@ qfunc inplace_prepare_complex_amplitudes_expanded___2(magnitudes: real[], target
   apply_phase_table_expanded___2(target);
 }
 
+qfunc apply_phase_table_expanded___3(target: qbit[2]) {
+  PHASE(-1.5708, target[0]);
+  CX(target[0], target[1]);
+  PHASE(1.5708, target[1]);
+  CX(target[0], target[1]);
+  PHASE(-1.5708, target[1]);
+}
+
+qfunc inplace_prepare_complex_amplitudes_expanded___3(magnitudes: real[], target: qbit[2]) {
+  inplace_prepare_amplitudes(magnitudes, 0, target);
+  apply_phase_table_expanded___3(target);
+}
+
+qfunc apply_phase_table_expanded___4(target: qbit[2]) {
+  PHASE(1.5708, target[0]);
+  CX(target[0], target[1]);
+  PHASE(-1.5708, target[1]);
+  CX(target[0], target[1]);
+  PHASE(1.5708, target[1]);
+}
+
+qfunc inplace_prepare_complex_amplitudes_expanded___4(magnitudes: real[], target: qbit[2]) {
+  inplace_prepare_amplitudes(magnitudes, 0, target);
+  apply_phase_table_expanded___4(target);
+}
+
+qfunc apply_phase_table_expanded___5(target: qbit[2]) {
+  PHASE(-1.5708, target[0]);
+  CX(target[0], target[1]);
+  PHASE(-1.5708, target[1]);
+  CX(target[0], target[1]);
+  PHASE(-1.5708, target[1]);
+}
+
+qfunc inplace_prepare_complex_amplitudes_expanded___5(magnitudes: real[], target: qbit[2]) {
+  inplace_prepare_amplitudes(magnitudes, 0, target);
+  apply_phase_table_expanded___5(target);
+}
+
+qfunc apply_phase_table_expanded___6(target: qbit[2]) {
+  PHASE(-1.5708, target[0]);
+  CX(target[0], target[1]);
+  PHASE(-1.5708, target[1]);
+  CX(target[0], target[1]);
+  PHASE(-1.5708, target[1]);
+}
+
+qfunc inplace_prepare_complex_amplitudes_expanded___6(magnitudes: real[], target: qbit[2]) {
+  inplace_prepare_amplitudes(magnitudes, 0, target);
+  apply_phase_table_expanded___6(target);
+}
+
 qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
   dummy_data: qbit;
   full_qae: qbit[2];
@@ -177,7 +229,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 16) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.6017,
       0.6842,
       0.3095,
@@ -193,7 +245,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 18) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.6017,
       0.6842,
       0.3095,
@@ -209,7 +261,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 20) {
-    inplace_prepare_complex_amplitudes_expanded___2([
+    inplace_prepare_complex_amplitudes_expanded___4([
       0.2004,
       0.7658,
       0.5911,
@@ -225,7 +277,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 22) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.4491,
       0.7458,
       0.4215,
@@ -289,7 +341,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 30) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.7152,
       0.6078,
       0.2234,
@@ -305,13 +357,13 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 32) {
-    inplace_prepare_complex_amplitudes_expanded___0([0.0, 0.0, 0.0, 1.0], full_qae);
+    inplace_prepare_complex_amplitudes_expanded___5([0.0, 0.0, 0.0, 1.0], full_qae);
   }
   control (reg == 33) {
-    inplace_prepare_complex_amplitudes_expanded___0([0.0, 0.0, 0.0, 1.0], full_qae);
+    inplace_prepare_complex_amplitudes_expanded___5([0.0, 0.0, 0.0, 1.0], full_qae);
   }
   control (reg == 34) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.0613,
       0.7334,
       0.6747,
@@ -319,7 +371,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 35) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.0865,
       0.7419,
       0.6604,
@@ -335,7 +387,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 37) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.0088,
       0.7114,
       0.7027,
@@ -343,7 +395,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 38) {
-    inplace_prepare_complex_amplitudes_expanded___2([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.2743,
       0.7698,
       0.5429,
@@ -351,7 +403,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 39) {
-    inplace_prepare_complex_amplitudes_expanded___2([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.2743,
       0.7698,
       0.5429,
@@ -359,7 +411,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 40) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.3665,
       0.763,
       0.48,
@@ -383,7 +435,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 43) {
-    inplace_prepare_complex_amplitudes_expanded___2([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.4702,
       0.7397,
       0.4063,
@@ -407,7 +459,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 46) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.5745,
       0.6983,
       0.3298,
@@ -423,7 +475,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 48) {
-    inplace_prepare_complex_amplitudes_expanded___0([
+    inplace_prepare_complex_amplitudes_expanded___6([
       0.0014,
       0.7064,
       0.7078,
@@ -431,7 +483,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 49) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.2742,
       0.7698,
       0.543,
@@ -439,7 +491,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 50) {
-    inplace_prepare_complex_amplitudes_expanded___2([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.4518,
       0.7451,
       0.4196,
@@ -447,7 +499,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 51) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.4856,
       0.7347,
       0.3951,
@@ -455,7 +507,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 52) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___3([
       0.0124,
       0.7131,
       0.7008,
@@ -463,7 +515,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
     ], full_qae);
   }
   control (reg == 53) {
-    inplace_prepare_complex_amplitudes_expanded___1([
+    inplace_prepare_complex_amplitudes_expanded___4([
       0.3408,
       0.7662,
       0.4978,
@@ -576,7 +628,7 @@ qfunc qaoa_layer_expanded___0(qae_phase: qbit[1], reg: qbit[6], gamma: real, bet
   mixer_layer_expanded___0(reg, beta);
 }
 
-qfunc qaoa_circuit_expanded___0(gammas: real[], betas: real[], reg: qbit[6]) {
+qfunc qaoa_circuit_expanded___0(gammas: real[1], betas: real[1], reg: qbit[6]) {
   qae_phase: qbit[1];
   allocate(1, qae_phase);
   hadamard_transform_expanded___0(reg);
