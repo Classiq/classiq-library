@@ -9,6 +9,24 @@ qfunc hadamard_transform_expanded___0(target: qbit[3]) {
   }
 }
 
+qfunc _prepare_uniform_trimmed_state_step_expanded___0(size_lsb: int, ctrl_val: int, lsbs_val: int, ctrl_var: qnum, rotation_var: qbit) {
+  if (lsbs_val != 0) {
+    control (ctrl_var == ctrl_val) {
+      RY((((-2) * asin(sqrt(Min(1, (2.0 ** size_lsb) / lsbs_val)))) - 1.5708) + pi, rotation_var);
+    }
+  }
+}
+
+qfunc prepare_uniform_trimmed_state_expanded___0(m: int, q: qbit[3]) {
+  hadamard_transform_expanded___0(q);
+  if (m < 8) {
+    RY((((-2) * asin(sqrt(Min(1, 4.0 / m)))) - 1.5708) + pi, q[2]);
+  }
+  repeat (i: 2) {
+    _prepare_uniform_trimmed_state_step_expanded___0(1 - i, floor((2.0 ** (i - 2.0)) * m), Mod(m, 2 ** (2 - i)), q[2 - i:3], q[1 - i]);
+  }
+}
+
 qfunc modular_in_place_add_constant_expanded___0(x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
@@ -296,10 +314,10 @@ qfunc ec_point_add_expanded___0(ecp: EllipticCurvePoint) {
       modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
+  free(slope);
   modular_in_place_add_constant_expanded___0(ecp.y);
   modular_in_place_negate_expanded___0(ecp.x);
   modular_in_place_add_constant_expanded___1(ecp.x);
-  free(slope);
   free(t0);
 }
 
@@ -377,10 +395,10 @@ qfunc ec_point_add_expanded___1(ecp: EllipticCurvePoint) {
       modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
+  free(slope);
   modular_in_place_add_constant_expanded___2(ecp.y);
   modular_in_place_negate_expanded___0(ecp.x);
   modular_in_place_add_constant_expanded___0(ecp.x);
-  free(slope);
   free(t0);
 }
 
@@ -420,10 +438,10 @@ qfunc ec_point_add_expanded___2(ecp: EllipticCurvePoint) {
       modular_in_place_subtract_expanded___0(t1, slope);
     }
   }
+  free(slope);
   modular_in_place_add_constant_expanded___3(ecp.y);
   modular_in_place_negate_expanded___0(ecp.x);
   modular_in_place_add_constant_expanded___1(ecp.x);
-  free(slope);
   free(t0);
 }
 
@@ -455,15 +473,14 @@ qfunc qft_expanded___0(target: qbit[3]) {
   qft_no_swap_expanded___0(target);
 }
 
-qfunc main_shor_ecdlp_expanded___0(output x1: qnum<3, False, 0>, output x2: qnum<3, False, 0>) {
-  allocate(3, x1);
-  allocate(3, x2);
-  ecp: EllipticCurvePoint;
+qfunc ecdlp_oracle_expanded___0(output x1: qnum<3, False, 3>, output x2: qnum<3, False, 3>, output ecp: EllipticCurvePoint) {
+  allocate(3, False, 3, x1);
+  allocate(3, False, 3, x2);
   allocate(6, ecp);
   ecp.x ^= 4;
   ecp.y ^= 2;
-  hadamard_transform_expanded___0(x1);
-  hadamard_transform_expanded___0(x2);
+  prepare_uniform_trimmed_state_expanded___0(5, x1);
+  prepare_uniform_trimmed_state_expanded___0(5, x2);
   ec_scalar_mult_add_expanded___0(ecp, x1);
   ec_scalar_mult_add_expanded___0(ecp, x2);
   invert {
@@ -474,6 +491,6 @@ qfunc main_shor_ecdlp_expanded___0(output x1: qnum<3, False, 0>, output x2: qnum
   }
 }
 
-qfunc main(output x1: qnum<3, False, 0>, output x2: qnum<3, False, 0>) {
-  main_shor_ecdlp_expanded___0(x1, x2);
+qfunc main(output x1: qnum<3, False, 3>, output x2: qnum<3, False, 3>, output ecp: EllipticCurvePoint) {
+  ecdlp_oracle_expanded___0(x1, x2, ecp);
 }
