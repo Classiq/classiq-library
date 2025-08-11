@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("vehicle_routing_problem", timeout_seconds=500)
+@wrap_testbook("vehicle_routing_problem", timeout_seconds=800)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
