@@ -576,7 +576,7 @@ qfunc qaoa_layer_expanded___0(qae_phase: qbit[1], reg: qbit[6], gamma: real, bet
   mixer_layer_expanded___0(reg, beta);
 }
 
-qfunc qaoa_circuit_expanded___0(gammas: real[], betas: real[], reg: qbit[6]) {
+qfunc qaoa_circuit_expanded___0(gammas: real[1], betas: real[1], reg: qbit[6]) {
   qae_phase: qbit[1];
   allocate(1, qae_phase);
   hadamard_transform_expanded___0(reg);
