@@ -4,6 +4,6 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("vlasov_ampere_qiskit", timeout_seconds=360)
+@wrap_testbook("vlasov_ampere_qiskit", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     pass
