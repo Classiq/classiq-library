@@ -1,0 +1,107 @@
+:root {
+  p {
+    /* letter-spacing: 0.5px; */
+    /* font-weight: 400; */
+    /* line-height: 160%; */
+    /* font-size: 18px; */
+  }
+
+  .md-header,
+  .md-header__inner,
+  .md-header .md-tabs,
+  .md-footer .md-footer-meta {
+    background-color: #313131 !important;
+  }
+
+  .md-footer,
+  .md-footer__inner {
+    background-color: #393939 !important;
+  }
+}
+[data-md-color-scheme="default"] {
+  --md-default-fg-color: #313131;
+  --md-default-bg-color: #ffffff;
+  --md-primary-fg-color: #119da4;
+  --md-accent-fg-color: #119da4;
+
+  --md-primary-fg-color--light: #119da4;
+  --md-primary-bg-color--light: #119da4;
+  --md-accent-fg-color--light: #119da4;
+
+  --md-typeset-color: #1e1e1e;
+  --md-typeset-color--light: #1e1e1e;
+  /* --md-typeset-color--dark: #f4f9e9; */
+  --md-typeset-a-color: #0c7489;
+  --md-typeset-a-color--light: #0c7489;
+  --md-typeset-a-color--dark: #39ccd3;
+}
+
+[data-md-color-scheme="slate"] {
+  /* --md-default-fg-color: #f4f9e9; */
+  --md-default-bg-color: #191919;
+
+  --md-primary-fg-color: #119da4;
+  --md-accent-fg-color: #119da4;
+
+  /* --md-typeset-color: #f4f9e9; */
+  --md-typeset-a-color: #39ccd3;
+}
+
+[data-md-color-scheme="default"] .md-search__input {
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #f5f5f5;
+}
+
+.md-search__input + .md-search__icon {
+  color: var(--md-default-fg-color--light);
+}
+[data-md-color-scheme="default"] .md-search__input::placeholder {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+@media (prefers-color-scheme: dark) {
+  .md-header,
+  .md-header__inner,
+  .md-footer .md-footer-meta {
+    background-color: #1e1e1e !important;
+  }
+
+  .md-footer,
+  .md-footer__inner {
+    background-color: #393939 !important;
+  }
+}
+
+/* Don't display the default Material Mkdocs header title
+(which uses config.site_name property), since we use the classiq-logo.svg instead.
+*/
+.md-header__topic {
+  display: none;
+}
+
+.md-header__source {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  max-width: none;
+  width: auto;
+}
+
+@media (max-width: 60em) {
+  .md-header__source .md-source__repository {
+    display: none;
+  }
+}
+
+.md-source__repository {
+  max-width: 100%;
+}
+
+/* Scope only buttons inside the doc-buttons section */
+.doc-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.2rem;
+  flex-wrap: wrap;
+  margin: 1.5em 0;
+}

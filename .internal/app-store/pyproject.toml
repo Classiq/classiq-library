@@ -1,0 +1,19 @@
+[project]
+name = "classiq-app-store"
+version = "0.1.0"
+description = "Used to define and lock dependencies of building the app store"
+requires-python = ">=3.11, <3.14"
+dependencies = [
+    "mkdocs-material>=9.5.32,<10.0.0" ,
+    "mkdocs-awesome-pages-plugin>=2.9.2",
+    "mkdocstrings[python]>=0.25.1",
+    "numexpr>=2.10,!=2.11.0",
+    "app_store_plugins"
+]
+
+[tool.uv.sources]
+app_store_plugins = { path = "./mkdocs-plugins", editable = true }
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

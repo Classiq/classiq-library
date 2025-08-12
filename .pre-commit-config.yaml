@@ -10,6 +10,12 @@ repos:
       - id: check-symlinks
       - id: check-json
       - id: check-yaml
+        exclude: '\.internal/app-store/mkdocs\.yml'
+      - id: check-yaml
+        name: Check MkDocs YAML
+        files: .internal/app-store/mkdocs.yml
+        args:
+          - "--unsafe"
       - id: end-of-file-fixer
       - id: trailing-whitespace
   - repo: https://github.com/pre-commit/mirrors-prettier

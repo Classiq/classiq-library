@@ -1,0 +1,20 @@
+[project]
+name = "app-store-plugins"
+version = "0.1.0"
+description = "MkDocs plugins for the Classiq application store"
+authors = [{ name = "Classiq Technologies", email = "support@classiq.io" }]
+homepage = "https://classiq.io"
+documentation = "https://docs.classiq.io/"
+license = "LicenseRef-Proprietary"
+requires-python = ">=3.11, <3.14"
+dependencies = [
+    "nbconvert>=7.16.4,<8.0.0",
+    "mkdocs>=1.6.1,<2.0.0"
+]
+
+[project.entry-points."mkdocs.plugins"]
+jupyter_to_markdown = "app_store_plugins.jupyter_to_markdown:JupyterToMarkdown"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,100 @@
+site_name: Classiq App Store
+site_url: https://apps.classiq.io/
+site_description: The official application store for the Classiq software platform for quantum computing
+site_author: &classiq Classiq Technologies
+copyright: *classiq
+repo_url: https://github.com/Classiq/classiq-library
+repo_name: Classiq Library
+extra:
+  social:
+    - icon: fontawesome/brands/slack
+      link: https://short.classiq.io/join-slack
+    - icon: fontawesome/brands/github
+      link: https://github.com/Classiq/
+    - icon: fontawesome/brands/linkedin
+      link: https://il.linkedin.com/company/classiq-technologies
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/classiq/
+    - icon: classiq
+      link: https://platform.classiq.io
+  analytics:
+    provider: google
+    property: G-19EQ2QHSD9
+
+nav:
+  - Home:
+      - index.md
+  - ...
+
+theme:
+  name: material
+  custom_dir: docs/overrides # integrations (Google Tag Manager, HubSpot, etc.)
+  font:
+    text: "Roboto"
+  favicon: resources/images/ClassiqFavicon.png
+  logo: resources/images/classiq-logo.svg
+  icon:
+    repo: material/github
+  palette:
+    - scheme: default
+      primary: custom
+      accent: custom
+      media: "(prefers-color-scheme: light)"
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.footer
+    - navigation.indexes
+    - navigation.tracking
+    - navigation.top
+    - content.tabs.link
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+markdown_extensions:
+  - md_in_html
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - attr_list
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - overrides/.icons
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+
+plugins:
+  - search
+  - jupyter_to_markdown
+  - awesome-pages:
+      filename: pages.yml
+      collapse_single_pages: true
+
+extra_css:
+  - css/page_format.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/remove_highlights.js
