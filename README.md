@@ -79,8 +79,8 @@ quantum_program = synthesize(main)
 
 show(quantum_program)
 
-result = execute(quantum_program).result()
-print(result[0].value.parsed_counts)
+result = execute(quantum_program).result_value()
+print(result.parsed_counts)
 # [{'res': 1}: 2048]
 ```
 
