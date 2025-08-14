@@ -239,9 +239,11 @@ def prepare_5(var: Output[QArray]) -> None:
 def main(res: Output[QNum]) -> None:
     a = QNum("a")
     b = QNum("b")
+
     prepare_3(a)
     prepare_5(b)
-    res |= a + b  # should be 8
+
+    res |= a + b  # 3+5 should be 8
 
 
 model = create_model(main)
