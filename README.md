@@ -222,18 +222,7 @@ With Classiq, you can build anything. Classiq provides a powerful modeling langu
 ### Example: Calculating 3+5 with Classiq
 
 ```python
-from classiq import (
-    QArray,
-    Output,
-    allocate,
-    qfunc,
-    X,
-    QNum,
-    synthesize,
-    create_model,
-    show,
-    execute,
-)
+from classiq import *
 
 
 @qfunc
