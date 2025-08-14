@@ -2,6 +2,7 @@
 [![Version](https://badge.fury.io/py/classiq.svg)](https://badge.fury.io/py/classiq)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/classiq)
 [![Downloads](https://static.pepy.tech/badge/classiq)](https://pepy.tech/project/classiq)
+[![DOI](https://zenodo.org/badge/DOI/10.48550/arXiv.2412.07372.svg)](https://doi.org/10.48550/arXiv.2412.07372)
 
 <div align="center">
     <img src="README_resources/classiq-logo.svg" width="300" height="150">
