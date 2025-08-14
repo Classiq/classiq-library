@@ -163,6 +163,8 @@ jobs:
           SHOULD_TEST_ALL_FILES: "true" # quick tests should run all files
           LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
           LIST_OF_IPYNB_TESTS_CHANGED: "${{ steps.changed-files-tests.outputs.all_changed_files }}"
+          # Altering test behavior
+          LIMIT_TEST_LINKS_TO_FILES_ONLY: "true"
           # Passing environment information
           CLASSIQ_IDE: "https://platform.classiq.io"
           CLASSIQ_HOST: "https://api.classiq.io"
@@ -176,6 +178,8 @@ jobs:
           SHOULD_TEST_ALL_FILES: "${{ env.SHOULD_TEST_ALL_FILES }}"
           LIST_OF_IPYNB_CHANGED: "${{ steps.changed-files-ipynb.outputs.all_changed_files }}"
           LIST_OF_IPYNB_TESTS_CHANGED: "${{ steps.changed-files-tests.outputs.all_changed_files }}"
+          # Altering test behavior
+          LIMIT_TEST_LINKS_TO_FILES_ONLY: "false"
           # Passing environment information
           CLASSIQ_IDE: "https://platform.classiq.io"
           CLASSIQ_HOST: "https://api.classiq.io"
