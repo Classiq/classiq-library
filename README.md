@@ -226,17 +226,17 @@ from classiq import *
 
 
 @qfunc
-def prepare_3(x: Output[QArray]) -> None:
-    allocate(2, x)
-    X(x[0])
-    X(x[1])
+def prepare_3(var: Output[QArray]) -> None:
+    allocate(2, var)
+    X(var[0])
+    X(var[1])
 
 
 @qfunc
-def prepare_5(x: Output[QArray]) -> None:
-    allocate(3, x)
-    X(x[0])
-    X(x[2])
+def prepare_5(var: Output[QArray]) -> None:
+    allocate(3, var)
+    X(var[0])
+    X(var[2])
 
 
 @qfunc
