@@ -1,3 +1,4 @@
+import os
 import re
 import time
 from collections.abc import Iterable
@@ -69,10 +70,13 @@ def _test_single_url(
     use_head: bool = True,
     follow_redirects: bool = True,
 ) -> bool:
-    if any(url.startswith(allowed) for allowed in get_url_allow_list()):
+    if check_file_instead_of_url(url):
         return True
 
-    if check_file_instead_of_url(url):
+    if os.environ.get("LIMIT_TEST_LINKS_TO_FILES_ONLY", "false").lower() == "true":
+        return True  # if we only wish to check files, then we end this test here.
+
+    if any(url.startswith(allowed) for allowed in get_url_allow_list()):
         return True
 
     if retry == 0:
