@@ -79,8 +79,7 @@ def main(res: Output[QBit]):
     X(res)
 
 
-model = create_model(main)
-quantum_program = synthesize(model)
+quantum_program = synthesize(main)
 
 show(quantum_program)
 
