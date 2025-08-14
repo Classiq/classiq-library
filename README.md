@@ -250,8 +250,7 @@ def main(res: Output[QNum]) -> None:
     res |= a + b  # 3+5 should be 8
 
 
-model = create_model(main)
-quantum_program = synthesize(model)
+quantum_program = synthesize(main)
 
 show(quantum_program)
 
