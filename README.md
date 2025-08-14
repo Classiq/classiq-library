@@ -23,7 +23,7 @@ Whether you're a researcher, developer, or student, Classiq helps you simplify c
    &emsp;|&emsp;
    <a href="https://docs.classiq.io/latest/">📖 Documentation</a>
    &emsp; | &emsp;
-   <a href="https://docs.classiq.io/latest/">Getting Started</a>
+   <a href="https://docs.classiq.io/latest/classiq_101/">Getting Started</a>
    &emsp;
 </p>
 
