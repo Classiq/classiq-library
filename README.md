@@ -55,7 +55,7 @@ This repository has 2 kinds of demos: `.qmod` and `.ipynb`.
 The `.qmod` files are intended for usage with [Classiq's platform](https://platform.classiq.io/).
 Upload those `.qmod` files into the [Synthesis tab](https://platform.classiq.io/synthesis)
 
-The `.ipynb` files are intended to be viewed inside [JupyterLab](https://jupyter.org/).
+The `.ipynb` files are intended to be viewed inside [JupyterLab](https://jupyter.org/) (or by programs that support such files, such as VSCode).
 
 # Create Quantum Programs with Classiq
 
@@ -90,9 +90,8 @@ print(result.dataframe)
 Let's unravel the code above:
 
 1. `def main` : We define the logic of our quantum program. We'll expand on this point soon below.
-2. `create_model` : We convert the logic we defined into a Model.
-3. `synthesize` : We synthesize the Model into a Quantum Program. From a logical definition of quantum operations, into a series of quantum gates.
-4. `execute` : Executing the quantum program. Can be executed on a physical quantum computer, or on simulations.
+2. `synthesize` : We synthesize the logic we defined into a Quantum Program. From a logical definition of quantum operations, into a series of quantum gates.
+3. `execute` : Executing the quantum program. Can be executed on a physical quantum computer, or on simulations. Defaults to simulations.
 
 ## 1) Defining the Logic of Quantum Programs
 
@@ -149,26 +148,16 @@ def angle_encoding(exe_params: CArray[CReal], qbv: Output[QArray[QBit]]) -> None
 
 For more, see this repository :)
 
-## 2) Logic to Models
-
-As we saw above, the `main` function can be converted to a model using `model = create_model(main)`.
-
-A model is built out of 2 parts: a `qmod`, and `synthesis options`.
-The former is a quantum language used for defining quantum programs, while the latter is a configuration for the execution of the program.
-
-The model can be saved via `write_qmod(model, "file_name")`, which will save 2 files: `file_name.qmod` and `file_name.synthesis_options.json`.
-You may encounter these files in this repository.
-
-## 3) Synthesis : Models to Quantum Program
+## 2) Synthesis : Logic to Quantum Program
 
 This is where the magic happens.
-Taking a model, which is a set of logical operations, and synthesizing it into physical qubits and the gates entangling them, is not an easy task.
+Taking a the `main` function, which is a set of logical operations, and synthesizing it into physical qubits and the gates entangling them, is not an easy task.
 
 Classiq's synthesis engine is able to optimize this process, whether by requiring the minimal amount of physical qubits, thus reusing as many qubits as possible, or by requiring minimal circuit width, thus lowering execution time and possible errors.
 
-## 4) Execution
+## 3) Execution
 
-Classiq provides an easy-to-use way to execute quantum programs, and provides various insights of the execution results.
+Classiq provides an easy-to-use way to execute quantum programs, and provides various insights of the execution results together with a familiar interface: `pandas.DataFrame`.
 
 ## Diagrams
 
@@ -260,7 +249,7 @@ print(result.dataframe)
 
 ## IDE : Classiq's Platform
 
-The examples found in this repository can be accessed via [Classiq's platform](https://platform.classiq.io/), in the [`model`](https://platform.classiq.io/dsl-synthesis) tab, under the same folder structure.
+Every example found in this repository can also be accessed via [Classiq's platform](https://platform.classiq.io/), in the [`model`](https://platform.classiq.io/dsl-synthesis) tab, under the same folder structure.
 
 Additionally, one may write their own model in the model editor (highlighted in green) or upload his own model (highlighted in red)
 
