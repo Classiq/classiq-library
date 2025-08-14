@@ -255,8 +255,12 @@ quantum_program = synthesize(main)
 show(quantum_program)
 
 result = execute(quantum_program).result_value()
-print(result.parsed_counts)
+print(result.dataframe)
 ```
+
+|     | res | count | probability | bitstring |
+| --: | --: | ----: | ----------: | --------: |
+|   0 |   8 |  2048 |           1 |      1000 |
 
 ## IDE : Classiq's Platform
 
