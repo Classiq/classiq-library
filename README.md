@@ -222,14 +222,14 @@ from classiq import *
 
 
 @qfunc
-def get_3(x: Output[QArray]) -> None:
+def prepare_3(x: Output[QArray]) -> None:
     allocate(2, x)
     X(x[0])
     X(x[1])
 
 
 @qfunc
-def get_5(x: Output[QArray]) -> None:
+def prepare_5(x: Output[QArray]) -> None:
     allocate(3, x)
     X(x[0])
     X(x[2])
@@ -239,8 +239,8 @@ def get_5(x: Output[QArray]) -> None:
 def main(res: Output[QNum]) -> None:
     a = QNum("a")
     b = QNum("b")
-    get_3(a)
-    get_5(b)
+    prepare_3(a)
+    prepare_5(b)
     res |= a + b  # should be 8
 
 
