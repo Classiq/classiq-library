@@ -28,10 +28,17 @@ NUM_RETRIES = 5
 
 @pytest.mark.parametrize("notebook_path", iterate_notebook_names())
 def test_links(notebook_path: str) -> None:
+    broken_links_messages = []
     for cell_index, url in iterate_links_from_notebook(notebook_path):
-        assert _test_single_url(
-            url
-        ), f'Broken link found! in file "{notebook_path}", cell number {cell_index} (counting only markdown cells), broken url: "{url}"'
+        if not _test_single_url(url):
+            broken_links_messages.append(
+                f'Broken link found! (#{len(broken_links_messages)+1}) in file "{notebook_path}", cell number {cell_index} (counting only markdown cells), broken url: "{url}"'
+            )
+
+    assert not broken_links_messages, (
+        f'Found {len(broken_links_messages)} broken links in "{notebook_path}": \n\t'
+        + "\n\t".join(broken_links_messages)
+    )
 
 
 def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
