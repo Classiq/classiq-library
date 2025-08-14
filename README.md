@@ -247,6 +247,8 @@ print(result.dataframe)
 | --: | --: | ----: | ----------: | --------: |
 |   0 |   8 |  2048 |           1 |      1000 |
 
+For some pre-built state preparations, read [here](https://docs.classiq.io/latest/qmod-reference/api-reference/functions/open_library/state_preparation/?h=state)
+
 ## IDE : Classiq's Platform
 
 Every example found in this repository can also be accessed via [Classiq's platform](https://platform.classiq.io/), in the [`model`](https://platform.classiq.io/dsl-synthesis) tab, under the same folder structure.
