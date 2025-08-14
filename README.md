@@ -215,7 +215,7 @@ With Classiq, you can build anything. Classiq provides a powerful modeling langu
 
 ## SDK : Classiq's Python Interface
 
-### Example: 3+5 with Classiq
+### Example: Calculating 3+5 with Classiq
 
 ```python
 from classiq import (
