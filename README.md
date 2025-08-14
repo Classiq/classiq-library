@@ -84,9 +84,12 @@ quantum_program = synthesize(main)
 show(quantum_program)
 
 result = execute(quantum_program).result_value()
-print(result.parsed_counts)
-# [{'res': 1}: 2048]
+print(result.dataframe)
 ```
+
+|     | res | count | probability | bitstring |
+| --: | --: | ----: | ----------: | --------: |
+|   0 |   1 |  2048 |           1 |         1 |
 
 Let's unravel the code above:
 
