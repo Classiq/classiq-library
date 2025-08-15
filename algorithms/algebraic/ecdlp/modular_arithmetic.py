@@ -229,7 +229,7 @@ def modular_out_of_place_square(
 
 
 @qfunc
-def _set_value(reg: Permutable[QNum], value: int) -> None:
+def set_value(reg: Permutable[QNum], value: int) -> None:
     """Helper function to set a value in a quantum register."""
     reg ^= value
 
@@ -239,33 +239,30 @@ def mock_inverse_modulus(
     x: Const[QNum], result: Permutable[QNum], modulus: int
 ) -> None:
     """
-    Performs the transformation |x>|0> → |x>|x^(-1) mod 7> for x in 1..6.
-    This is a mock implementation implemented with a lookup table approach.
+    Performs the transformation |x>|0> → |x>|x^(-1) mod modulus> for x in 1..modulus-1.
+    This is a mock implementation using controlled operations based on lookup table values.
     """
-    result ^= subscript([0, 1, 4, 5, 2, 3, 6, 0], x)
+    # Generate the lookup table for modular inverses
+    inverse_table = create_modular_inverse_table(modulus)
+
+    # Apply controlled operations for each possible input value
+    for i in range(1, modulus):
+        if inverse_table[i] != 0:  # Only set if inverse exists
+            control(x == i, lambda inv=inverse_table[i]: set_value(result, inv))
 
 
-@qfunc
-def mock_inverse_modulus_7(x: Const[QNum], result: Permutable[QNum]) -> None:
+def create_modular_inverse_table(modulus: int) -> list[int]:
     """
-    Performs the transformation |x>|0> → |x>|x^(-1) mod 7> for x in 1..6.
-    This is a mock implementation implemented with a lookup table approach.
+    Creates a lookup table for modular inverses using Python's built-in pow() function.
     """
-    # Use a series of controlled operations to set the correct inverse
-    # For x = 1: result = 1
-    control(x == 1, lambda: _set_value(result, 1))
+    table = [0] * modulus
 
-    # For x = 2: result = 4
-    control(x == 2, lambda: _set_value(result, 4))
+    for i in range(1, modulus):
+        try:
+            # pow(i, -1, modulus) computes modular inverse
+            table[i] = pow(i, -1, modulus)
+        except ValueError:
+            # No inverse exists (gcd(i, modulus) != 1)
+            table[i] = 0
 
-    # For x = 3: result = 5
-    control(x == 3, lambda: _set_value(result, 5))
-
-    # For x = 4: result = 2
-    control(x == 4, lambda: _set_value(result, 2))
-
-    # For x = 5: result = 3
-    control(x == 5, lambda: _set_value(result, 3))
-
-    # For x = 6: result = 6
-    control(x == 6, lambda: _set_value(result, 6))
+    return table
