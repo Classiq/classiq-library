@@ -47,48 +47,48 @@ qfunc modular_in_place_add_constant_expanded___1(permutable x: qnum<3, False, 0>
   free(carry);
 }
 
-qfunc _set_value_expanded___0(permutable reg: qnum<3, False, 0>) {
+qfunc set_value_expanded___0(permutable reg: qnum<3, False, 0>) {
   reg ^= 1;
 }
 
-qfunc _set_value_expanded___1(permutable reg: qnum<3, False, 0>) {
+qfunc set_value_expanded___1(permutable reg: qnum<3, False, 0>) {
   reg ^= 4;
 }
 
-qfunc _set_value_expanded___2(permutable reg: qnum<3, False, 0>) {
+qfunc set_value_expanded___2(permutable reg: qnum<3, False, 0>) {
   reg ^= 5;
 }
 
-qfunc _set_value_expanded___3(permutable reg: qnum<3, False, 0>) {
+qfunc set_value_expanded___3(permutable reg: qnum<3, False, 0>) {
   reg ^= 2;
 }
 
-qfunc _set_value_expanded___4(permutable reg: qnum<3, False, 0>) {
+qfunc set_value_expanded___4(permutable reg: qnum<3, False, 0>) {
   reg ^= 3;
 }
 
-qfunc _set_value_expanded___5(permutable reg: qnum<3, False, 0>) {
+qfunc set_value_expanded___5(permutable reg: qnum<3, False, 0>) {
   reg ^= 6;
 }
 
-qfunc mock_inverse_modulus_7_expanded___0(const x: qnum<3, False, 0>, permutable result: qnum<3, False, 0>) {
+qfunc mock_inverse_modulus_expanded___0(const x: qnum<3, False, 0>, permutable result: qnum<3, False, 0>) {
   control (x == 1) {
-    _set_value_expanded___0(result);
+    set_value_expanded___0(result);
   }
   control (x == 2) {
-    _set_value_expanded___1(result);
+    set_value_expanded___1(result);
   }
   control (x == 3) {
-    _set_value_expanded___2(result);
+    set_value_expanded___2(result);
   }
   control (x == 4) {
-    _set_value_expanded___3(result);
+    set_value_expanded___3(result);
   }
   control (x == 5) {
-    _set_value_expanded___4(result);
+    set_value_expanded___4(result);
   }
   control (x == 6) {
-    _set_value_expanded___5(result);
+    set_value_expanded___5(result);
   }
 }
 
@@ -209,28 +209,28 @@ qfunc modular_in_place_subtract_expanded___0(const x: qnum<3, False, 0>, permuta
   modular_in_place_add_expanded___0(x, y);
 }
 
-qfunc _set_value_expanded___6(permutable reg: qnum<3, False, 0>) {
+qfunc set_value_expanded___6(permutable reg: qnum<3, False, 0>) {
   reg ^= 1;
 }
 
-qfunc mock_inverse_modulus_7_expanded___1(const x: qnum<3, False, 0>, permutable result: qnum<3, False, 0>) {
+qfunc mock_inverse_modulus_expanded___1(const x: qnum<3, False, 0>, permutable result: qnum<3, False, 0>) {
   control (x == 1) {
-    _set_value_expanded___6(result);
+    set_value_expanded___6(result);
   }
   control (x == 2) {
-    _set_value_expanded___1(result);
+    set_value_expanded___1(result);
   }
   control (x == 3) {
-    _set_value_expanded___2(result);
+    set_value_expanded___2(result);
   }
   control (x == 4) {
-    _set_value_expanded___3(result);
+    set_value_expanded___3(result);
   }
   control (x == 5) {
-    _set_value_expanded___4(result);
+    set_value_expanded___4(result);
   }
   control (x == 6) {
-    _set_value_expanded___5(result);
+    set_value_expanded___5(result);
   }
 }
 
@@ -242,7 +242,7 @@ qfunc ec_point_add_expanded___0(permutable ecp: EllipticCurvePoint) {
   modular_in_place_add_constant_expanded___0(ecp.y);
   modular_in_place_add_constant_expanded___1(ecp.x);
   within {
-    mock_inverse_modulus_7_expanded___0(ecp.x, t0);
+    mock_inverse_modulus_expanded___0(ecp.x, t0);
   } apply {
     modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
@@ -261,7 +261,7 @@ qfunc ec_point_add_expanded___0(permutable ecp: EllipticCurvePoint) {
   modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   t1: qnum<3, False, 0>;
   within {
-    mock_inverse_modulus_7_expanded___1(ecp.x, t0);
+    mock_inverse_modulus_expanded___1(ecp.x, t0);
   } apply {
     within {
       allocate(3, t1);
@@ -323,7 +323,7 @@ qfunc ec_point_add_expanded___1(permutable ecp: EllipticCurvePoint) {
   modular_in_place_add_constant_expanded___2(ecp.y);
   modular_in_place_add_constant_expanded___3(ecp.x);
   within {
-    mock_inverse_modulus_7_expanded___0(ecp.x, t0);
+    mock_inverse_modulus_expanded___0(ecp.x, t0);
   } apply {
     modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
@@ -342,7 +342,7 @@ qfunc ec_point_add_expanded___1(permutable ecp: EllipticCurvePoint) {
   modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   t1: qnum<3, False, 0>;
   within {
-    mock_inverse_modulus_7_expanded___1(ecp.x, t0);
+    mock_inverse_modulus_expanded___1(ecp.x, t0);
   } apply {
     within {
       allocate(3, t1);
@@ -366,7 +366,7 @@ qfunc ec_point_add_expanded___2(permutable ecp: EllipticCurvePoint) {
   modular_in_place_add_constant_expanded___3(ecp.y);
   modular_in_place_add_constant_expanded___1(ecp.x);
   within {
-    mock_inverse_modulus_7_expanded___0(ecp.x, t0);
+    mock_inverse_modulus_expanded___0(ecp.x, t0);
   } apply {
     modular_out_of_place_multiply_expanded___0(t0, ecp.y, slope);
   }
@@ -385,7 +385,7 @@ qfunc ec_point_add_expanded___2(permutable ecp: EllipticCurvePoint) {
   modular_out_of_place_multiply_expanded___0(slope, ecp.x, ecp.y);
   t1: qnum<3, False, 0>;
   within {
-    mock_inverse_modulus_7_expanded___1(ecp.x, t0);
+    mock_inverse_modulus_expanded___1(ecp.x, t0);
   } apply {
     within {
       allocate(3, t1);
