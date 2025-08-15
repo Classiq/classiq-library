@@ -9,24 +9,6 @@ qfunc hadamard_transform_expanded___0(target: qbit[3]) {
   }
 }
 
-qfunc _prepare_uniform_trimmed_state_step_expanded___0(size_lsb: int, ctrl_val: int, lsbs_val: int, ctrl_var: qnum, rotation_var: qbit) {
-  if (lsbs_val != 0) {
-    control (ctrl_var == ctrl_val) {
-      RY((((-2) * asin(sqrt(Min(1, (2.0 ** size_lsb) / lsbs_val)))) - 1.5708) + pi, rotation_var);
-    }
-  }
-}
-
-qfunc prepare_uniform_trimmed_state_expanded___0(m: int, q: qbit[3]) {
-  hadamard_transform_expanded___0(q);
-  if (m < 8) {
-    RY((((-2) * asin(sqrt(Min(1, 4.0 / m)))) - 1.5708) + pi, q[2]);
-  }
-  repeat (i: 2) {
-    _prepare_uniform_trimmed_state_step_expanded___0(1 - i, floor((2.0 ** (i - 2.0)) * m), Mod(m, 2 ** (2 - i)), q[2 - i:3], q[1 - i]);
-  }
-}
-
 qfunc modular_in_place_add_constant_expanded___0(permutable x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
@@ -123,9 +105,7 @@ qfunc modular_in_place_add_expanded___0(const x: qnum<3, False, 0>, permutable y
   control (carry) {
     y += 7;
   }
-  control (y >= x) {
-    X(carry);
-  }
+  carry ^= y >= x;
   free(carry);
 }
 
@@ -174,25 +154,36 @@ qfunc modular_out_of_place_multiply_expanded___0(const x: qbit[3], const y: qbit
   }
 }
 
-qfunc apply_to_all_expanded___0(permutable target: qbit[3]) {
-  repeat (index: 3) {
-    X(target[index]);
-  }
-}
-
-qfunc check_if_all_zero_expanded___0(permutable x: qbit[3], permutable ancilla: qbit) {
+qfunc modular_out_of_place_square_expanded___0(const x: qbit[3], permutable z: qbit[3]) {
+  anc: qbit;
   within {
-    apply_to_all_expanded___0(x);
+    anc = x[2];
   } apply {
-    control (x) {
-      X(ancilla);
+    control (anc) {
+      modular_in_place_add_expanded___0(x, z);
+    }
+  }
+  modular_in_place_double_expanded___0(z);
+  within {
+    anc = x[1];
+  } apply {
+    control (anc) {
+      modular_in_place_add_expanded___0(x, z);
+    }
+  }
+  modular_in_place_double_expanded___0(z);
+  within {
+    anc = x[0];
+  } apply {
+    control (anc) {
+      modular_in_place_add_expanded___0(x, z);
     }
   }
 }
 
-qfunc check_if_all_ones_expanded___0(permutable x: qbit[3], permutable ancilla: qbit) {
-  control (x) {
-    X(ancilla);
+qfunc apply_to_all_expanded___0(permutable target: qbit[3]) {
+  repeat (index: 3) {
+    X(target[index]);
   }
 }
 
@@ -203,12 +194,12 @@ qfunc bitwise_negation_expanded___0(permutable arr: qbit[3]) {
 qfunc modular_in_place_negate_expanded___0(permutable x: qnum<3, False, 0>) {
   is_all_zeros: qbit;
   allocate(1, is_all_zeros);
-  check_if_all_zero_expanded___0(x, is_all_zeros);
+  is_all_zeros ^= x == 0;
   control (is_all_zeros) {
     x += 7;
   }
   x += 0;
-  check_if_all_ones_expanded___0(x, is_all_zeros);
+  is_all_zeros ^= x == 7;
   bitwise_negation_expanded___0(x);
   free(is_all_zeros);
 }
@@ -216,41 +207,6 @@ qfunc modular_in_place_negate_expanded___0(permutable x: qnum<3, False, 0>) {
 qfunc modular_in_place_subtract_expanded___0(const x: qnum<3, False, 0>, permutable y: qnum<3, False, 0>) {
   modular_in_place_negate_expanded___0(y);
   modular_in_place_add_expanded___0(x, y);
-}
-
-qfunc modular_out_of_place_square_expanded___0(const x: qbit[3], permutable z: qbit[3]) {
-  anc: qbit;
-  allocate(1, anc);
-  control (x[2]) {
-    X(anc);
-  }
-  control (anc) {
-    modular_in_place_add_expanded___0(x, z);
-  }
-  control (x[2]) {
-    X(anc);
-  }
-  modular_in_place_double_expanded___0(z);
-  control (x[1]) {
-    X(anc);
-  }
-  control (anc) {
-    modular_in_place_add_expanded___0(x, z);
-  }
-  control (x[1]) {
-    X(anc);
-  }
-  modular_in_place_double_expanded___0(z);
-  control (x[0]) {
-    X(anc);
-  }
-  control (anc) {
-    modular_in_place_add_expanded___0(x, z);
-  }
-  control (x[0]) {
-    X(anc);
-  }
-  free(anc);
 }
 
 qfunc _set_value_expanded___6(permutable reg: qnum<3, False, 0>) {
@@ -293,7 +249,7 @@ qfunc ec_point_add_expanded___0(permutable ecp: EllipticCurvePoint) {
   within {
     modular_out_of_place_multiply_expanded___0(slope, ecp.x, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, ecp.y);
+    ecp.y ^= t0;
   }
   within {
     modular_out_of_place_square_expanded___0(slope, t0);
@@ -311,7 +267,7 @@ qfunc ec_point_add_expanded___0(permutable ecp: EllipticCurvePoint) {
       allocate(3, t1);
       modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
-      modular_in_place_subtract_expanded___0(t1, slope);
+      slope ^= t1;
     }
   }
   free(slope);
@@ -374,7 +330,7 @@ qfunc ec_point_add_expanded___1(permutable ecp: EllipticCurvePoint) {
   within {
     modular_out_of_place_multiply_expanded___0(slope, ecp.x, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, ecp.y);
+    ecp.y ^= t0;
   }
   within {
     modular_out_of_place_square_expanded___0(slope, t0);
@@ -392,7 +348,7 @@ qfunc ec_point_add_expanded___1(permutable ecp: EllipticCurvePoint) {
       allocate(3, t1);
       modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
-      modular_in_place_subtract_expanded___0(t1, slope);
+      slope ^= t1;
     }
   }
   free(slope);
@@ -417,7 +373,7 @@ qfunc ec_point_add_expanded___2(permutable ecp: EllipticCurvePoint) {
   within {
     modular_out_of_place_multiply_expanded___0(slope, ecp.x, t0);
   } apply {
-    modular_in_place_subtract_expanded___0(t0, ecp.y);
+    ecp.y ^= t0;
   }
   within {
     modular_out_of_place_square_expanded___0(slope, t0);
@@ -435,7 +391,7 @@ qfunc ec_point_add_expanded___2(permutable ecp: EllipticCurvePoint) {
       allocate(3, t1);
       modular_out_of_place_multiply_expanded___0(t0, ecp.y, t1);
     } apply {
-      modular_in_place_subtract_expanded___0(t1, slope);
+      slope ^= t1;
     }
   }
   free(slope);
@@ -479,8 +435,8 @@ qfunc shor_ecdlp_expanded___0(output x1: qnum<3, False, 3>, output x2: qnum<3, F
   allocate(6, ecp);
   ecp.x ^= 4;
   ecp.y ^= 2;
-  prepare_uniform_trimmed_state_expanded___0(5, x1);
-  prepare_uniform_trimmed_state_expanded___0(5, x2);
+  hadamard_transform_expanded___0(x1);
+  hadamard_transform_expanded___0(x2);
   ec_scalar_mult_add_expanded___0(ecp, x1);
   ec_scalar_mult_add_expanded___0(ecp, x2);
   invert {

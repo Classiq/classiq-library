@@ -6,6 +6,7 @@ Based on: Martin Roetteler, Michael Naehrig, Krysta M. Svore, and Kristin Lauter
 """
 
 from classiq import *
+from classiq.qmod.symbolic import subscript
 
 
 # Basic Modular Arithmetic Operations
@@ -17,8 +18,8 @@ def modular_in_place_add(x: Const[QNum], y: Permutable[QNum], modulus: int) -> N
     Performs the transformation |x>|y> → |x>|(x + y) mod modulus>.
     """
     # Use a carry qubit to detect overflow
-    carry = QBit("carry")
-    allocate(1, carry)
+    carry = QBit()
+    allocate(carry)
 
     # Create temporary register that combines y and carry
     res_and_carry = QNum("res_and_carry", y.size + 1, SIGNED, 0)
@@ -39,27 +40,10 @@ def modular_in_place_add(x: Const[QNum], y: Permutable[QNum], modulus: int) -> N
     control(carry, lambda: inplace_add(modulus, y))
 
     # Update carry qubit based on comparison (y >= x after operation)
-    control(y >= x, lambda: X(carry))
+    carry ^= y >= x
 
     # Clean up auxiliary qubit
     free(carry)
-
-
-@qfunc
-def check_if_all_zero(x: Permutable[QArray[QBit]], ancilla: Permutable[QBit]) -> None:
-    """
-    Sets the ancilla qubit to 1 if all qubits in the quantum array `x` are zero, otherwise sets it to 0.
-    Uses within_apply to handle the compute/uncompute of X gates.
-    """
-    within_apply(lambda: apply_to_all(X, x), lambda: control(x, lambda: X(ancilla)))
-
-
-@qfunc
-def check_if_all_ones(x: Permutable[QArray[QBit]], ancilla: Permutable[QBit]) -> None:
-    """
-    Sets the ancilla qubit to 1 if all qubits in the quantum array `x` are one, otherwise sets it to 0.
-    """
-    control(x, lambda: X(ancilla))
 
 
 @qfunc
@@ -78,11 +62,11 @@ def modular_in_place_negate(x: Permutable[QNum], modulus: int) -> None:
     n = x.size
     neg_modulus = 2**n - modulus - 1
 
-    is_all_zeros = QBit("is_all_zeros")
-    allocate(1, is_all_zeros)
+    is_all_zeros = QBit()
+    allocate(is_all_zeros)
 
     # Test if the input is all-zeros
-    check_if_all_zero(x, is_all_zeros)
+    is_all_zeros ^= x == 0
 
     # If all-zeros, then put the modulus in x
     control(is_all_zeros, lambda: inplace_add(modulus, x))
@@ -91,7 +75,7 @@ def modular_in_place_negate(x: Permutable[QNum], modulus: int) -> None:
     inplace_add(neg_modulus, x)
 
     # If x=0, then we have neg_modulus + modulus = all ones
-    check_if_all_ones(x, is_all_zeros)
+    is_all_zeros ^= x == (2**x.size - 1)
 
     # Bitwise negation: set x to (neg_modulus + x)'
     bitwise_negation(x)
@@ -123,8 +107,8 @@ def modular_in_place_add_constant(
     Performs the transformation |x> → |(x + constant) mod modulus>.
     """
     # Allocate a single carry qubit
-    carry = QBit("carry")
-    allocate(1, carry)
+    carry = QBit()
+    allocate(carry)
 
     # Create and allocate temporary register to hold x + carry
     temp = QNum("temp", x.size + 1, SIGNED, 0)
@@ -154,9 +138,7 @@ def modular_in_place_add_constant(
 @qfunc
 def shift_left(reg: Permutable[QArray[QBit]]) -> None:
     """
-    Performs a logical left shift on the quantum register array `reg` using SWAP gates.
-    The most significant bit is set to 0, and all other bits are shifted left by one position.
-    This is equivalent to multiplication by 2.
+    Performs a left shift on the quantum register array `reg` using SWAP gates.
     """
     n = reg.size
     # Shift bits left using SWAP gates
@@ -169,8 +151,8 @@ def modular_in_place_double(x: Permutable[QNum], modulus: int) -> None:
     """
     Performs the transformation |x> → |(2x) mod modulus>.
     """
-    carry = QBit("carry")
-    allocate(1, carry)
+    carry = QBit()
+    allocate(carry)
     res_and_carry = QNum("res_and_carry", x.size + 1, SIGNED, 0)
 
     within_apply(
@@ -228,23 +210,19 @@ def modular_out_of_place_square(
     """
     n = x.size
     assert z.size == n, "Output register z must have the same number of qubits as x"
-
-    anc = QBit("anc")
-    allocate(1, anc)
-
+    anc = QBit()
     # Process bits from MSB-1 down to 1
     for i in range(n - 1, 0, -1):
-        control(x[i], lambda: X(anc))
-        control(anc, lambda: modular_in_place_add(x, z, p))
-        control(x[i], lambda: X(anc))
+        within_apply(
+            lambda: assign(x[i], anc),
+            lambda: control(anc, lambda: modular_in_place_add(x, z, p)),
+        )
         modular_in_place_double(z, p)
-
     # Process LSB (bit 0) - no doubling after this
-    control(x[0], lambda: X(anc))
-    control(anc, lambda: modular_in_place_add(x, z, p))
-    control(x[0], lambda: X(anc))
-
-    free(anc)
+    within_apply(
+        lambda: assign(x[0], anc),
+        lambda: control(anc, lambda: modular_in_place_add(x, z, p)),
+    )
 
 
 # Modular Inverse (Mock Implementation for Educational Purposes)
@@ -254,6 +232,17 @@ def modular_out_of_place_square(
 def _set_value(reg: Permutable[QNum], value: int) -> None:
     """Helper function to set a value in a quantum register."""
     reg ^= value
+
+
+@qfunc
+def mock_inverse_modulus(
+    x: Const[QNum], result: Permutable[QNum], modulus: int
+) -> None:
+    """
+    Performs the transformation |x>|0> → |x>|x^(-1) mod 7> for x in 1..6.
+    This is a mock implementation implemented with a lookup table approach.
+    """
+    result ^= subscript([0, 1, 4, 5, 2, 3, 6, 0], x)
 
 
 @qfunc
