@@ -225,7 +225,7 @@ def modular_out_of_place_square(
     )
 
 
-# Modular Inverse (Mock Implementation for Educational Purposes)
+# Modular Inverse (Mock Implementation for Practical Exexcution Purposes)
 
 
 @qfunc
