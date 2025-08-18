@@ -416,8 +416,8 @@ qfunc ec_scalar_mult_add_expanded___0(permutable ecp: EllipticCurvePoint, permut
 qfunc qft_no_swap_expanded___0(qbv: qbit[3]) {
   repeat (i: 3) {
     H(qbv[i]);
-    repeat (j: 2 - i) {
-      CPHASE(3.1416 * (2.0 ** ((-j) - 1.0)), qbv[(i + j) + 1], qbv[i]);
+    repeat (j: (3 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
     }
   }
 }
