@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.191
+---
+
 # Quantum Entry Point
 
 A quantum model in Qmod is compiled into a quantum program - a concrete executable

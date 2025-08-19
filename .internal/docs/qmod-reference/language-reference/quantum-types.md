@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.650
+---
+
 # Quantum Types
 
 <!-- cspell:ignore qbit, qnum, structs -->

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.095
+---
+
 # **Getting started with Classiq Studio**
 
 This page contains a detailed guide on how to use the Classiq Studio.

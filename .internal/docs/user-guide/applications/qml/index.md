@@ -1,3 +1,8 @@
+---
+search:
+    boost: 1.688
+---
+
 # Quantum Machine Learning
 
 Quantum machine learning (QML) is a field that seeks to combine the principles of

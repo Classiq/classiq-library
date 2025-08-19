@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.697
+---
+
 # Control
 
 The _control_ statement applies a unitary operation conditionally, depending on a quantum state,

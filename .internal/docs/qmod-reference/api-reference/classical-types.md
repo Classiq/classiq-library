@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 1.3
+    boost: 3.387
 ---
 
 This is a list of the classical types that are built-in in `Qmod`.

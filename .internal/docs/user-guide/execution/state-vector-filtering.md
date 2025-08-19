@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.610
+---
+
 # State Vector Filtering
 
 Before measurement, a quantum circuit creates a state which can be described

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.460
+---
+
 # New version
 
 The Quantum Program visualization bridges the high-level algorithm descriptions (as it is captured in Qmod) with their quantum implementations (as synthesized by the Classiq engine). The tool offers two key innovations: **functional block hierarchies** and **quantum data flow** representations.

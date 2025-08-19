@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.809
+---
+
 # Quantum Variables
 
 A model operates on quantum objects, by modifying their states using different kinds of

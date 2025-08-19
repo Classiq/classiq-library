@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.028
+---
+
 ::: classiq.execute
 ::: classiq.execution.ExecutionSession
 ::: classiq.execution.ExecutionPreferences

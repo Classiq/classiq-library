@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Supported Cloud Providers
 
 Classiq offers integration with multiple cloud providers, to allow seamless

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.048
+---
+
 # Quantum Program Visualization Tool
 
 The Classiq analyzer application helps you visualize and analyze quantum programs.

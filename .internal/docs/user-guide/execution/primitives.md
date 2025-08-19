@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.098
+---
+
 # Execution Primitives
 
 As well as designing quantum programs, the Classiq quantum model contains

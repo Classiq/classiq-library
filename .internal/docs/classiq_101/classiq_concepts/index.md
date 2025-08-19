@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.979
+---
+
 # Classiq Concepts
 
 Classiq allows you to design, optimize, analyze, and execute quantum programs. This section covers how to do all these with Classiq.

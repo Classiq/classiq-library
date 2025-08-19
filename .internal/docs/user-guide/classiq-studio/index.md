@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.420
+---
+
 # **Classiq Studio - Web-based IDE with Classiq inside**
 
 Classiq Studio is a VSCode environment part of the Classiq platform.

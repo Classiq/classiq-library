@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.204
+---
+
 # Datasets
 
 Pytorch provides two classes: `DataSet` and `DataLoader`.

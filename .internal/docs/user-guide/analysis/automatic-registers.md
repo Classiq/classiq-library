@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.434
+---
+
 # Automatic Registers Resolution
 
 The Classiq engine supports the automatic merging of registers. This means that the quantum program opens with all the known registers already collapsed.

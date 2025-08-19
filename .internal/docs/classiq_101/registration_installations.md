@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.540
+---
+
 # Registration and Installation
 
 To use [Classiq platform](https://platform.classiq.io/) for free for non-commercial purposes, you must register. Then you can optionally use our coding studio (web-based IDE) or install the Python SDK package and authenticate your account. This page guides you through the steps.

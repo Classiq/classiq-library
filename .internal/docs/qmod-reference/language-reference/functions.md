@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.376
+---
+
 # Quantum Functions
 
 Quantum functions are operations that modify the state of quantum objects, which are

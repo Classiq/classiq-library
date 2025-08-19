@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.972
+---
+
 # Supported Modeling
 
 Classiq supports a limited set of modeling configurations. The following tables describe them.

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.365
+---
+
 # Invert
 
 The _invert_ statement applies the adjoint (conjugate transpose) of the unitary operation

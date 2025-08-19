@@ -1,43 +1,53 @@
 ---
 search:
-    boost: 1.5
+    boost: 2.927
 ---
 
 # Phase
 
-The _phase_ statement is used to encode in the phase of a quantum state the result of
-some arithmetic computation. It applies a relative phase to computational-basis states of
-variables, which is proportionate to the value of a specified expression over these variables.
-_phase_ statements are often used to compute the cost of an optimization problem.
+The _phase_ statement is used to compute and encode the result of some
+arithmetic computation in the phase of the respective quantum states. It applies
+a relative phase to computational-basis states of quantum variables proportional
+to the value of a specified expression over these variables. The _phase_
+statement can also specify a fixed rotation angle, i.e., a "global" phase, using
+an expression with no quantum variables. When a fixed phase rotation occurs
+under a controlled context, it affects only the controlling states. Otherwise, a
+fixed _phase_ statement is undetectable.
+
+_phase_ statements with a quantum expression are often used to compute the cost
+of an optimization problem. Applying a fixed _phase_ is useful in expressing
+phase oracles and reflections.
 
 ## Syntax
 
 === "Native"
 
-    **phase** **(** _quantum-expression_ [ **,** _coefficient_ ] **)**
+    **phase** **(** _phase-expression_ [ **,** _coefficient_ ] **)**
 
 === "Python"
 
     [comment]: DO_NOT_TEST
     ```python
-    def phase(expr: SymbolicExpr, coefficient: float = 1.0) -> None:
+    def phase(phase_expr: SymbolicExpr, coefficient: float = 1.0) -> None:
         pass
     ```
 
 ## Semantics
 
--   _quantum-expression_ consists of quantum scalar variables, numeric constant
+-   _phase-expression_ may consist of quantum scalar variables, numeric constant
     literals, and classical scalar variables, composed using arithmetic operators.
     See below the set of supported operators.
--   _coefficient_ expression is optional, and may include an execution
-    parameter. Note that an execution parameter cannot occur in _quantum-expression_.
+-   The _coefficient_ expression is optional, and may include an execution
+    parameter. Note that an execution parameter cannot occur in _phase-expression_ if it
+    contains quantum variables.
     If not provided, the default coefficient value is 1.0.
 -   The operation rotates each computational basis state about the Z axis by an angle equal
-    to the value of _quantum-expression_, multiplied by coefficient if specified.
--   For _quantum-expression_ over quantum variable $x_1, x_2, ... x_n$ that computes the
-    function $f(x_1, x_2, ... x_n)$, and coefficient = $\theta$ the operation performed by
-    the statement is -
-    $|x\rangle \rightarrow e^{i \theta f(x_1, x_2, ... x_n)}|x\rangle$
+    to the value of _phase-expression_, multiplied by _coefficient_ if specified.
+-   For _phase-expression_ over quantum variable $x_1, x_2, \ldots, x_n$ that computes the
+    function $f(x_1, x_2, \ldots, x_n)$ and _coefficient_ $=\theta$, the operation performed by
+    the statement is $|x\rangle \rightarrow e^{i\theta f(x_1, x_2, \ldots, x_n)} |x\rangle$.
+-   For _phase-expression_ without quantum variables that evaluates to $\theta$, the operation
+    performed by the statement is $|x\rangle \rightarrow e^{i\theta} |x\rangle$.
 -   The expression must be a polynomial in the quantum variables. It is compiled into an Ising-model
     Hamiltonian, which is evolved per the specified coefficient.
 
@@ -52,6 +62,18 @@ The following operators are supported:
 
 Note that when the expression consists of a single one-qubit variable, _phase_ statement
 is equivalent to the core-library function `PHASE()`.
+
+### Classical Phase
+
+-   _phase-expression_ is a classical real expression. It may contain
+    [execution parameters](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-entry-point/#model-execution-parameters).
+-   If the _phase_ statement is not called in a controlled context (inside the
+    body of a [`control`](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/control/)
+    statement), it has no effect.
+    Alternatively, if the _phase_ statement is controlled, the _phase_ statement
+    is replaced by a `PHASE` call with one of the control qubits as the target.
+    This holds even if the wrapping `control` is located in a different
+    function.
 
 ## Examples
 
@@ -147,3 +169,53 @@ high probability an optimal solution.
             )
             apply_to_all(lambda q: RX(betas[i], q), v)
     ```
+
+### Example 3
+
+The following model applies `phase` with an angle specified as a classical
+expression, thus inserting a fixed phase under controlled contexts. In each
+case, the states that satisfy the control condition rotate by $\frac{\pi}{4}$
+relative to those that do not.
+
+=== "Native"
+
+    ```
+    qfunc main(output qarr: qbit[2]) {
+      allocate(qarr);
+      hadamard_transform(qarr);
+      control (qarr[0]) {
+        phase (pi / 4);
+      }
+      control (qarr) {
+        phase (pi / 4);
+      }
+    }
+    ```
+
+=== "Python"
+
+    ```python
+    from classiq import *
+    from classiq.qmod.symbolic import pi
+
+
+    @qfunc
+    def main(qarr: Output[QArray[2]]):
+        allocate(qarr)
+        hadamard_transform(qarr)
+        control(qarr[0], lambda: phase(pi / 4))
+        control(qarr, lambda: phase(pi / 4))
+    ```
+
+The cumulative result of both statements revealed by running a state-vector
+simulation is a uniform superposition of the four states with the following
+phases:
+
+$$
+\begin{aligned}
+  |[0,0]\rangle&: 0 \\
+  |[0,1]\rangle&: 0 \\
+  |[1,0]\rangle&: \frac{\pi}{4} \\
+  |[1,1]\rangle&: \frac{\pi}{2} \\
+\end{aligned}
+$$

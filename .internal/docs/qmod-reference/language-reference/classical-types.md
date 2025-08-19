@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.823
+---
+
 # Classical Types
 
 <!-- cspell:ignore struct, structs, subclassing -->
