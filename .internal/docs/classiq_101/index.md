@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.233
+---
+
 # Getting Started
 
 Welcome to Classiq!

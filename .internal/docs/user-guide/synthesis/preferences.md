@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.084
+---
+
 # Synthesis Preferences
 
 You can modify these synthesis process preferences:

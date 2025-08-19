@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.463
+---
+
 # The Classiq Tutorial
 
 Welcome to The Classiq Tutorial!

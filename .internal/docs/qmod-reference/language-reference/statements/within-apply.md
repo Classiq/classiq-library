@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.541
+---
+
 # Within-apply
 
 The _within-apply_ statement performs the common quantum pattern $U^{\dagger} V U$. It

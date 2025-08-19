@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.872
+---
+
 # Getting Started with Quantum Program Synthesis
 
 The first steps in quantum program synthesis are defining the algorithms, its constraints,

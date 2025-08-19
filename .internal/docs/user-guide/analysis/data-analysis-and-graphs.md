@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.334
+---
+
 # Data Analysis and Graphs
 
 The input to the analyzer tool is a quantum program in OpenQasm or Cirq format.

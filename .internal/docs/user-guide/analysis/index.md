@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.594
+---
+
 # Analysis
 
 The Classiq product requires information from the synthesis so it can automatically generate a quantum program. This fact is even more important for large quantum programs, where simulation may not even be an option.

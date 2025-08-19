@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.183
+---
+
 # Bind
 
 The _bind_ statement (operator `->`) is used to rewire the qubits referenced by one

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.716
+---
+
 # Qmod - the Quantum Modeling Language
 
 The Qmod language lets you describe quantum algorithms at a high level of abstraction.

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.148
+---
+
 # Hardware-Aware Synthesis
 
 Quantum computers differ from one other in many significant parameters, such as basis

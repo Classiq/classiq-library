@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Execution on Google Cloud Platform
 
 Classiq offers execution on a GPU based simulator that is located in the Google Cloud Platform.

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.249
+---
+
 # Basic version
 
 Once you have loaded the quantum program input, the analyzer displays an interactive chart, like this:

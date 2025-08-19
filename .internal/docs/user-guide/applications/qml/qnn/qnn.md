@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.545
+---
+
 # Quantum Neural Networks (QNN)
 
 The Classiq QNN package is integrated with PyTorch so you can define `torch` networks with the addition of quantum layers (which are quantum programs).

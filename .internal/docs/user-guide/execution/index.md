@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.266
+---
+
 # Execution
 
 The Classiq Platform allows you to execute quantum programs on quantum hardware or simulators of your choice.

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 1.579
+---
+
 # What's Next?
 
 Congratulations on completing Classiq 101!

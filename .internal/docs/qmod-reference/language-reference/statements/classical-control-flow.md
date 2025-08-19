@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.471
+---
+
 # Classical Control Flow
 
 Loops and conditionals on classical expressions are useful means to describe reusable

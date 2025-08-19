@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.611
+---
+
 # Amplitude-Encoding Assignment
 
 Amplitude-encoding assignment represents the evaluation of an expression over a quantum variable

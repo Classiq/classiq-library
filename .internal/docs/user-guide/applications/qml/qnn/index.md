@@ -1,3 +1,8 @@
+---
+search:
+    boost: 1.154
+---
+
 # Quantum Neural Networks
 
 -   [QNN](qnn.md)

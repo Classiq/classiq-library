@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Execution on Amazon Braket Cloud
 
 The Classiq executor supports execution on Amazon Braket's cloud simulators and hardware.
