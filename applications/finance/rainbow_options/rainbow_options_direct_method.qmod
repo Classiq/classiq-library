@@ -12,10 +12,6 @@ qfunc affine_max(const x1: qnum, const x2: qnum, permutable output res: qnum) {
   res = max(x1 * 1.0, ((x1 * 0.75) + (x2 * 0.75)) + (-1.25));
 }
 
-qfunc asset_geq_strike_price(const x: qnum, permutable output res: qbit) {
-  res = x > 1.5;
-}
-
 qfunc exponential_amplitude_loading(exp_rate: real, const x: qbit[], aux: qbit[], res: qbit) {
   within {
     apply_to_all(X, x);
@@ -34,20 +30,11 @@ qfunc exponential_amplitude_loading(exp_rate: real, const x: qbit[], aux: qbit[]
   }
 }
 
-qfunc direct_load_amplitudes(const geq_reg: qnum, const max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
-  control (geq_reg == 1) {
+qfunc direct_payoff(const max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
+  control (max_reg > 1.5) {
     exponential_amplitude_loading((1 / (2 ** max_reg.fraction_digits)) * 0.4341, max_reg, aux_reg, ind_reg);
   } else {
     RY(2 * asin(13.784 / sqrt(max(193.97 * exp(((0.4341 * (2 ** (max_reg.size - max_reg.fraction_digits))) * (1 - (1 / (2 ** max_reg.size)))) + (-0.7408)), 190))), ind_reg);
-  }
-}
-
-qfunc direct_payoff(const max_reg: qnum, aux_reg: qnum, ind_reg: qbit) {
-  geq_reg: qbit;
-  within {
-    asset_geq_strike_price(max_reg, geq_reg);
-  } apply {
-    direct_load_amplitudes(geq_reg, max_reg, aux_reg, ind_reg);
   }
 }
 
