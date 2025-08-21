@@ -126,7 +126,7 @@ def modular_in_place_add_constant(
 
     # If carry is set, we need to add modulus back
     control(carry, lambda: inplace_add(modulus, x))
-    control(x >= constant, lambda: X(carry))
+    carry ^= x >= constant
 
     # Free the temporary registers
     free(carry)
@@ -213,16 +213,10 @@ def modular_out_of_place_square(
     anc = QBit()
     # Process bits from MSB-1 down to 1
     for i in range(n - 1, 0, -1):
-        within_apply(
-            lambda: assign(x[i], anc),
-            lambda: control(anc, lambda: modular_in_place_add(x, z, p)),
-        )
+        control(x[i], lambda: modular_in_place_add(x, z, p))
         modular_in_place_double(z, p)
     # Process LSB (bit 0) - no doubling after this
-    within_apply(
-        lambda: assign(x[0], anc),
-        lambda: control(anc, lambda: modular_in_place_add(x, z, p)),
-    )
+    control(x[0], lambda: modular_in_place_add(x, z, p))
 
 
 # Modular Inverse (Mock Implementation for Practical Exexcution Purposes)

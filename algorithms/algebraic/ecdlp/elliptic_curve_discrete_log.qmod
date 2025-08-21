@@ -22,9 +22,7 @@ qfunc modular_in_place_add_constant_expanded___0(permutable x: qnum<3, False, 0>
   control (carry) {
     x += 7;
   }
-  control (x >= 2) {
-    X(carry);
-  }
+  carry ^= x >= 2;
   free(carry);
 }
 
@@ -41,9 +39,7 @@ qfunc modular_in_place_add_constant_expanded___1(permutable x: qnum<3, False, 0>
   control (carry) {
     x += 7;
   }
-  control (x >= 0) {
-    X(carry);
-  }
+  carry ^= x >= 0;
   free(carry);
 }
 
@@ -156,28 +152,16 @@ qfunc modular_out_of_place_multiply_expanded___0(const x: qbit[3], const y: qbit
 
 qfunc modular_out_of_place_square_expanded___0(const x: qbit[3], permutable z: qbit[3]) {
   anc: qbit;
-  within {
-    anc = x[2];
-  } apply {
-    control (anc) {
-      modular_in_place_add_expanded___0(x, z);
-    }
+  control (x[2]) {
+    modular_in_place_add_expanded___0(x, z);
   }
   modular_in_place_double_expanded___0(z);
-  within {
-    anc = x[1];
-  } apply {
-    control (anc) {
-      modular_in_place_add_expanded___0(x, z);
-    }
+  control (x[1]) {
+    modular_in_place_add_expanded___0(x, z);
   }
   modular_in_place_double_expanded___0(z);
-  within {
-    anc = x[0];
-  } apply {
-    control (anc) {
-      modular_in_place_add_expanded___0(x, z);
-    }
+  control (x[0]) {
+    modular_in_place_add_expanded___0(x, z);
   }
 }
 
@@ -290,9 +274,7 @@ qfunc modular_in_place_add_constant_expanded___2(permutable x: qnum<3, False, 0>
   control (carry) {
     x += 7;
   }
-  control (x >= 6) {
-    X(carry);
-  }
+  carry ^= x >= 6;
   free(carry);
 }
 
@@ -309,9 +291,7 @@ qfunc modular_in_place_add_constant_expanded___3(permutable x: qnum<3, False, 0>
   control (carry) {
     x += 7;
   }
-  control (x >= 5) {
-    X(carry);
-  }
+  carry ^= x >= 5;
   free(carry);
 }
 
