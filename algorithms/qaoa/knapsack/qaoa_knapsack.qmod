@@ -4,13 +4,8 @@ qstruct KnapsackVars {
 }
 
 qfunc apply_cost(gamma: real, v: KnapsackVars) {
-  aux: qbit;
-  within {
-    aux = ((v.a * 2) + (v.b * 3)) <= 12;
-  } apply {
-    control (aux) {
-      phase (-((v.a * 3) + (v.b * 5)), gamma);
-    }
+  control (((v.a * 2) + (v.b * 3)) <= 12) {
+    phase (-((v.a * 3) + (v.b * 5)), gamma);
   }
 }
 
