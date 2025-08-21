@@ -3,6 +3,34 @@ qstruct OracleVars {
   b: qnum<2>;
 }
 
+qfunc reflection_about_zero(x: qbit[]) {
+  lsb: qbit;
+  msbs: qbit[];
+  within {
+    x ^= (2 ** x.len) - 1;
+  } apply {
+    control (x[0:(x.len - 1)]) {
+      Z(x[x.len - 1]);
+    }
+  }
+}
+
+qfunc my_diffuser(sp_operand: qfunc (qbit[]), x: qbit[]) {
+  within {
+    invert {
+      sp_operand(x);
+    }
+  } apply {
+    reflection_about_zero(x);
+  }
+}
+
+qfunc my_grover_operator(oracle_operand: qfunc (qbit[]), sp_operand: qfunc (qbit[]), x: qbit[]) {
+  oracle_operand(x);
+  my_diffuser(sp_operand, x);
+  U(0, 0, 0, 3.1416, x[0]);
+}
+
 qfunc arith_equation(const state: OracleVars, permutable res: qbit) {
   res ^= (state.a + state.b) <= 2;
 }
@@ -17,6 +45,8 @@ qfunc main(output phase_reg: qnum<5, UNSIGNED, 5>) {
   allocate(phase_reg);
   hadamard_transform(state_reg);
   qpe(lambda() {
-    grover_operator(arith_oracle, hadamard_transform, state_reg);
+    my_grover_operator(arith_oracle, lambda(x) {
+      hadamard_transform(x);
+    }, state_reg);
   }, phase_reg);
 }
