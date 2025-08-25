@@ -20,7 +20,7 @@ qfunc hhl(rhs_vector: real[], precision: int, hamiltonian_evolution_with_power: 
   }
 }
 
-qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
+qfunc main(output res: qnum, output phase_var: qnum, output indicator: qbit) {
   hhl([
     0.1825741858,
     0.3651483717,
@@ -162,5 +162,5 @@ qfunc main(output res: qnum, output phase: qnum, output indicator: qbit) {
       ],
       num_qubits=2
     }, (-6.2831853072) * pw, 1, 4 * ceiling(1.8 ** log(pw, 2)), target);
-  }, res, phase, indicator);
+  }, res, phase_var, indicator);
 }
