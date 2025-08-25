@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Execution on Classiq simulators
 
 Classiq offers execution on simulators that are located at the Classiq backend.

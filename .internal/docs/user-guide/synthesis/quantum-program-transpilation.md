@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.252
+---
+
 # Quantum Program Transpilation
 
 Transpilation is the process of optimizing an already-synthesized quantum program and

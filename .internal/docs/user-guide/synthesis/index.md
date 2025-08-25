@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.251
+---
+
 # Quantum Program Synthesis
 
 Quantum algorithm design is a complex task, and solutions based on the

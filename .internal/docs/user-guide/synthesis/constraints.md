@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.836
+---
+
 # Quantum Program Constraints
 
 When synthesizing a quantum program, you can pass in constraints to the generation; for example, requiring that no more than 53 qubits are used.

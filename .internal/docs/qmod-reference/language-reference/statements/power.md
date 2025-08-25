@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.109
+---
+
 # Power
 
 The _power_ statement applies the unitary operation raised to some integer power,

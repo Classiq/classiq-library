@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Execution on Alice and Bob Quantum Cloud
 
 The Classiq executor supports execution on Alice and Bob logical hardwares.

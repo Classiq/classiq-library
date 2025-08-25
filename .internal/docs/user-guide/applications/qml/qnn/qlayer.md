@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.944
+---
+
 # Quantum Layer
 
 The Classiq engine exports the `QLayer` object, which inherits from `torch.nn.Module` (like most objects in the `torch.nn` namespace), and it acts like one.

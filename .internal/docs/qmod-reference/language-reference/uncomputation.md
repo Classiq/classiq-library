@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.163
+---
+
 # Uncomputation
 
 <!-- cspell:ignore permutable, Toffoli -->

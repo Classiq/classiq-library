@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.776
+---
+
 # Generative Descriptions
 
 Qmod supports classical variables, expressions, and control-flow statements. In addition,

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.130
+---
+
 # Execution Session
 
 This section explains how to execute a quantum program using the `ExecutionSession` class.

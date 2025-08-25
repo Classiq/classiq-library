@@ -57,6 +57,10 @@ Upload those `.qmod` files into the [Synthesis tab](https://platform.classiq.io/
 
 The `.ipynb` files are intended to be viewed inside [JupyterLab](https://jupyter.org/).
 
+## Use the library with AI agents
+
+See the [Classiq documentation](https://docs.classiq.io/latest/user-guide/ai/) to learn how to use the Classiq library with AI agents.
+
 # Create Quantum Programs with Classiq
 
 The simplest quantum circuit has 1 qubit and has a single `X` gate.

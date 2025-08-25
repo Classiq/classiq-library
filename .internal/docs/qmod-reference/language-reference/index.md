@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.358
+---
+
 # Qmod Language Reference
 
 The Qmod reference manual describes the language concepts and constructs, and demonstrates

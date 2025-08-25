@@ -1,10 +1,16 @@
-qfunc prepare_ref(num_qubits: int, output data: qnum, output data_ref: qnum) {
+qfunc hadamard_transform_expanded___0(target: qbit[]) {
+  repeat (index: target.len) {
+    H(target[index]);
+  }
+}
+
+qfunc prepare_ref_expanded___0(num_qubits: int, output data: qnum, output data_ref: qnum) {
   allocate(num_qubits, data);
-  hadamard_transform(data);
+  hadamard_transform_expanded___0(data);
   data_ref = data;
 }
 
-qfunc permute_block(i: int, j: int, data: qbit[]) {
+qfunc permute_block_expanded___0(i: int, j: int, data: qbit[]) {
   repeat (k: data.len) {
     if (((i >> k) & 1) == 1) {
       X(data[k]);
@@ -26,52 +32,124 @@ qfunc permute_block(i: int, j: int, data: qbit[]) {
   }
 }
 
-qfunc block_encode_2x2(aux: qnum, data: qbit[]) {
-  within {
-    H(aux);
-  } apply {
-    control (aux == 1) {
-      X(data);
-      U(0, 0, 0, 3.1416, data);
-    }
-  }
+qfunc cases_0_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__8: IndexedPauli[], i_captured__apply_pauli_term__8: int, const x_captured__apply_pauli_term__8: qbit[1]) {
+  IDENTITY(x_captured__apply_pauli_term__8[pauli_string_captured__apply_pauli_term__8[i_captured__apply_pauli_term__8].index]);
 }
 
-qfunc block_encode_2X2_first_qubit(flag: qbit, aux: qbit, data: qbit[]) {
-  lsb: qbit;
-  msb: qnum<data.len - 1>;
-  data -> {lsb, msb};
-  flag ^= msb > 0;
-  block_encode_2x2(aux, lsb);
-  {lsb, msb} -> data;
+qfunc cases_1_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__8: IndexedPauli[], i_captured__apply_pauli_term__8: int, permutable x_captured__apply_pauli_term__8: qbit[1]) {
+  X(x_captured__apply_pauli_term__8[pauli_string_captured__apply_pauli_term__8[i_captured__apply_pauli_term__8].index]);
 }
 
-qfunc block_encode_2X2_arbitrary(i: int, j: int, flag: qbit, aux: qbit, data: qbit[]) {
-  within {
-    permute_block(i, j, data);
-  } apply {
-    block_encode_2X2_first_qubit(flag, aux, data);
-  }
+qfunc cases_2_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__8: IndexedPauli[], i_captured__apply_pauli_term__8: int, permutable x_captured__apply_pauli_term__8: qbit[1]) {
+  Y(x_captured__apply_pauli_term__8[pauli_string_captured__apply_pauli_term__8[i_captured__apply_pauli_term__8].index]);
 }
 
-qfunc combine_blocks_coeffs(pair_list: int[][], amplitudes: real[], lcu_aux: qnum, flag: qbit, aux: qbit, data: qbit[]) {
-  within {
-    inplace_prepare_amplitudes(amplitudes, 0, lcu_aux);
-  } apply {
-    repeat (index: pair_list.len) {
-      control (lcu_aux == index) {
-        block_encode_2X2_arbitrary(pair_list[index][0], pair_list[index][1], flag, aux, data);
+qfunc cases_3_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__8: IndexedPauli[], i_captured__apply_pauli_term__8: int, const x_captured__apply_pauli_term__8: qbit[1]) {
+  Z(x_captured__apply_pauli_term__8[pauli_string_captured__apply_pauli_term__8[i_captured__apply_pauli_term__8].index]);
+}
+
+qfunc switch_expanded___0(selector: int, pauli_string_captured__apply_pauli_term__8: IndexedPauli[], i_captured__apply_pauli_term__8: int, permutable x_captured__apply_pauli_term__8: qbit[1]) {
+  if (selector == 0) {
+    cases_0_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__8, i_captured__apply_pauli_term__8, x_captured__apply_pauli_term__8);
+  } else {
+    if (selector == 1) {
+      cases_1_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__8, i_captured__apply_pauli_term__8, x_captured__apply_pauli_term__8);
+    } else {
+      if (selector == 2) {
+        cases_2_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__8, i_captured__apply_pauli_term__8, x_captured__apply_pauli_term__8);
+      } else {
+        if (selector == 3) {
+          cases_3_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__8, i_captured__apply_pauli_term__8, x_captured__apply_pauli_term__8);
+        }
       }
     }
   }
 }
 
-qfunc main(output lcu_aux: qnum, output flag: qbit, output aux: qbit, output data: qnum, output data_ref: qnum) {
+qfunc apply_pauli_term_expanded___0(pauli_string: IndexedPauli[], x: qbit[1]) {
+  repeat (i: 1) {
+    switch_expanded___0(pauli_string[i].pauli, pauli_string, i, x);
+  }
+}
+
+qfunc unitaries_0_lambda___0_0_expanded___0(data_captured__lcu_pauli__5: qbit[1]) {
+  apply_pauli_term_expanded___0([
+    IndexedPauli {pauli=0, index=0}
+  ], data_captured__lcu_pauli__5);
+}
+
+qfunc unitaries_1_lambda___0_0_expanded___0(data_captured__lcu_pauli__5: qbit[1]) {
+  apply_pauli_term_expanded___0([
+    IndexedPauli {pauli=1, index=0}
+  ], data_captured__lcu_pauli__5);
+}
+
+qfunc apply_phase_table_expanded___0(target: qbit[1]) {
+  PHASE(3.1416, target[0]);
+}
+
+qfunc lcu_expanded___0(block: qnum<1, False, 0>, data_captured__lcu_pauli__5: qbit[1]) {
+  within {
+    inplace_prepare_state([0.5, 0.5], 0, block);
+  } apply {
+    repeat (i: 2) {
+      control (block == i) {
+        if (i == 0) {
+          unitaries_0_lambda___0_0_expanded___0(data_captured__lcu_pauli__5);
+        } else {
+          if (i == 1) {
+            unitaries_1_lambda___0_0_expanded___0(data_captured__lcu_pauli__5);
+          }
+        }
+      }
+    }
+    apply_phase_table_expanded___0(block);
+  }
+}
+
+qfunc lcu_pauli_expanded___0(data: qbit[1], block: qnum<1, False, 0>) {
+  lcu_expanded___0(block, data);
+}
+
+qfunc block_encode_2x2_expanded___0(aux: qnum<1, False, 0>, data: qbit[1]) {
+  lcu_pauli_expanded___0(data, aux);
+}
+
+qfunc block_encode_2X2_first_qubit_expanded___0(flag: qbit, aux: qbit, data: qbit[]) {
+  lsb: qbit;
+  msb: qnum<data.len - 1, False, 0>;
+  data -> {lsb, msb};
+  flag ^= msb > 0;
+  block_encode_2x2_expanded___0(aux, lsb);
+  {lsb, msb} -> data;
+}
+
+qfunc block_encode_2X2_arbitrary_expanded___0(i: int, j: int, flag: qbit, aux: qbit, data: qbit[]) {
+  within {
+    permute_block_expanded___0(i, j, data);
+  } apply {
+    block_encode_2X2_first_qubit_expanded___0(flag, aux, data);
+  }
+}
+
+qfunc combine_blocks_coeffs_expanded___0(pair_list: int[][], amplitudes: real[], lcu_aux: qnum<3, False, 0>, flag: qbit, aux: qbit, data: qbit[]) {
+  within {
+    inplace_prepare_amplitudes(amplitudes, 0, lcu_aux);
+  } apply {
+    repeat (index: 6) {
+      control (lcu_aux == index) {
+        block_encode_2X2_arbitrary_expanded___0(pair_list[index][0], pair_list[index][1], flag, aux, data);
+      }
+    }
+  }
+}
+
+qfunc main(output lcu_aux: qnum<3, False, 0>, output flag: qbit, output aux: qbit, output data: qnum, output data_ref: qnum) {
   allocate(3, lcu_aux);
-  allocate(flag);
-  allocate(aux);
-  prepare_ref(2, data, data_ref);
-  combine_blocks_coeffs([
+  allocate(1, flag);
+  allocate(1, aux);
+  prepare_ref_expanded___0(2, data, data_ref);
+  combine_blocks_coeffs_expanded___0([
     [0, 1],
     [0, 2],
     [0, 3],

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Execution on IBM Quantum Cloud
 
 The Classiq executor supports execution on IBM simulators and hardware.

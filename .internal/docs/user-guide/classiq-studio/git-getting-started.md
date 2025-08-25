@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.906
+---
+
 # **Getting started with git**
 
 This page contains a practical guide on how to get started with git and GitHub, so you can get the most out of working with Classiq Studio and writing code in general

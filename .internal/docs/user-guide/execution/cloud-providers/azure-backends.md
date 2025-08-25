@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Execution on Azure Quantum Cloud
 
 The Classiq executor supports execution on Azure Quantum cloud simulators and hardware.

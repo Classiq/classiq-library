@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.365
+---
+
 ::: classiq.synthesize
 ::: classiq.show
 ::: classiq.QuantumProgram

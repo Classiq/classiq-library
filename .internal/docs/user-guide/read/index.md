@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.625
+---
+
 # Read
 
 The following are 'how-to' guides addressing specific topics:

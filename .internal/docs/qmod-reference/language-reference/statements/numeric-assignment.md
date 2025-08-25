@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.230
+---
+
 # Numeric Assignment
 
 Scalar quantum variables (`qnum` and `qbit`) can be assigned the result of arithmetic/logical

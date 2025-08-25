@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2
+    boost: 2.945
 ---
 
 <!-- spell-checker: disable -->

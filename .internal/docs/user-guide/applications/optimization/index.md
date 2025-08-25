@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.200
+---
+
 # Combinatorial Optimization
 
 The Classiq combinatorial optimization platform is a quantum software engine for optimization problems that you define.

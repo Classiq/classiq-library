@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Execution on IonQ Quantum Cloud
 
 The Classiq executor supports execution on IonQ hardware and simulator.

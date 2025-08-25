@@ -3,6 +3,8 @@ hide:
     - navigation
     - toc
     - footer
+search:
+    boost: 3.958
 ---
 
 <style>

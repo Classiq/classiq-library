@@ -1,3 +1,8 @@
+---
+search:
+    boost: 0.900
+---
+
 # Execution on Intel Backends
 
 The Classiq executor supports execution on Intel® simulators.
