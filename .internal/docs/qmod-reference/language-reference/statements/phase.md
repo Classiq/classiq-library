@@ -57,23 +57,19 @@ The following operators are supported:
 -   Subtract: `-` (binary)
 -   Negate: `-` (unary)
 -   Multiply: `*`
--   Divide: `/`
+-   Divide: `/` (by a classical value)
 -   Power: `**` (quantum base, positive classical integer exponent)
+
+The following operators are supported only when applied to `QBit`, `QNum[1]`,
+and the classical integers `0` and `1`:
+
+-   Bitwise Or: `|`
+-   Bitwise And: `&`
+-   Bitwise Xor: `^`
+-   Bitwise Not: `~`
 
 Note that when the expression consists of a single one-qubit variable, _phase_ statement
 is equivalent to the core-library function `PHASE()`.
-
-### Classical Phase
-
--   _phase-expression_ is a classical real expression. It may contain
-    [execution parameters](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-entry-point/#model-execution-parameters).
--   If the _phase_ statement is not called in a controlled context (inside the
-    body of a [`control`](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/control/)
-    statement), it has no effect.
-    Alternatively, if the _phase_ statement is controlled, the _phase_ statement
-    is replaced by a `PHASE` call with one of the control qubits as the target.
-    This holds even if the wrapping `control` is located in a different
-    function.
 
 ## Examples
 
