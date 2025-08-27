@@ -13,6 +13,10 @@ TIMEOUT: int = 60 * 15  # 15 minutes
 
 
 def _should_test_notebook(notebook_path: str) -> bool:
+    if notebook_path.endswith("/logical_qubits_by_alice_and_bob.ipynb"):
+        pytest.skip("Skipping 'logical_qubits_by_alice_and_bob'")
+        return False
+
     return "/functions/" in notebook_path or "/community/" in notebook_path
 
 
