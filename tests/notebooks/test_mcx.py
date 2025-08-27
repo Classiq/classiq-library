@@ -6,7 +6,9 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("mcx", timeout_seconds=350)
+@wrap_testbook(
+    "mcx", timeout_seconds=350
+)  # changed timeout due to additional time synthesis needs with optimization parameter
 def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test quantum programs
