@@ -1,0 +1,52 @@
+name: "Test CI (weekly) (notebooks: alice and bob)"
+
+on:
+  schedule:
+    - cron: "00 16 * * 6" # Saturday, 16:00 UTC
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  nightly-test:
+    permissions:
+      id-token: write
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup python and classiq and nightly aws
+        uses: ./.github/actions/setup_classiq_on_nightly
+        with:
+          aws-role: ${{ secrets.AWS_ROLE }}
+          codeartifact-domain: ${{ secrets.CODEARTIFACT_DOMAIN }}
+          codeartifact-owner: ${{ secrets.CODEARTIFACT_OWNER }}
+          codeartifact-region: ${{ secrets.CODEARTIFACT_REGION }}
+          nightly-m2m-secret-arn: ${{ secrets.NIGHTLY_M2M_SECRET_ARN }}
+          pypi-nightly-name: ${{ secrets.PYPI_NIGHTLY_NAME }}
+
+      - name: Get notebooks to tests
+        id: list-files
+        run: |
+          shopt -s globstar
+          echo "files=$(echo **/logical_qubits_by_alice_and_bob.ipynb)" >> $GITHUB_OUTPUT
+
+      # Run Notebook Tests
+      - name: Run Notebooks
+        run: python -m pytest --durations=0 tests/notebooks
+        env:
+          # to disable a warning in Jupyter notebooks
+          JUPYTER_PLATFORM_DIRS: "1"
+          # Passing which notebooks changed
+          SHOULD_TEST_ALL_FILES: "false"
+          LIST_OF_IPYNB_CHANGED: "${{ steps.list-files.outputs.files }}"
+          LIST_OF_IPYNB_TESTS_CHANGED: ""
+          # Passing environment information
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://staging.api.classiq.io"
