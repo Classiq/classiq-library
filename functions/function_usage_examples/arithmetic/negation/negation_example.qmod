@@ -1,5 +1,5 @@
 qfunc main(output a: qnum, output b: qnum) {
-  allocate(3, True, 0, a);
+  allocate(3, SIGNED, 0, a);
   hadamard_transform(a);
   b = -a;
 }
