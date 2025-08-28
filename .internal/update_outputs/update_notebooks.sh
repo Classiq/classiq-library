@@ -46,10 +46,17 @@ find . -type f -name "*bernstein*.ipynb" | xargs -P2 -I{} "$current_folder/updat
 echo
 echo
 echo "======= Creating PR ======="
+# 1. Add all .py files recursively
+find . -name "*.ipynb" -exec git add {} +
+# 2. Restore all .txt files to discard their changes
+find . -name "*.synthesis_options.json" -exec git restore {} +
+# 3. Commit the staged .py files
+git commit -m "Updating notebooks output"
+
 # running twice so that we'd include the pre-commit updates
-git commit -a -m "Updating notebooks output" || git commit -a -m "Updating notebooks output"
-# # running once, so that failure on pre-commit would fail this script
-# git commit -a -m "Updating notebooks output" || { echo "pre-commit failed. please fix manually"; exit 1; }
+find . -name "*.ipynb" -exec git add {} +
+git commit -m "Updating notebooks output"
+
 
 gh pr create --fill
 gh pr view --web

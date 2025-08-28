@@ -45,6 +45,7 @@ def hook_random_seed(jupyter_notebook_file_path: str):
 def main(full_paths: list[str]) -> None:
     for file_path in full_paths:
         hook_random_seed(file_path)
+    return True
 
 
 if __name__ == "__main__":

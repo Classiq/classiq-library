@@ -12,11 +12,10 @@ current_folder="$(realpath "$(dirname "$0")")"
 # disable popping browser for `show(qprog)`
 export BROWSER="$current_folder/fake_browser.sh"
 
-
 "$current_folder/hook_add_random_seed.py" "$notebook_path"
 
-
-cd "$notebook_dir"
+pushd "$notebook_dir" > /dev/null
 jupyter nbconvert --to notebook --execute --inplace "$notebook_name"
+popd > /dev/null
 
 "$current_folder/hook_remove_random_seed.py" "$notebook_path"
