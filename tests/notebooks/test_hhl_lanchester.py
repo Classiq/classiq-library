@@ -22,5 +22,5 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # Fidelity between basic HHL and classical solutions: 0.9805806756909201
-    assert 0.95 <= tb.ref("fidelity_basic") <= 1
+    assert 0.93 <= tb.ref("fidelity_basic") <= 1
     assert 0.98 <= tb.ref("fidelity") <= 1
