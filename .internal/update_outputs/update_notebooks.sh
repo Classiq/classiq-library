@@ -10,8 +10,8 @@
 echo "======= Init ======="
 cd "$(git rev-parse --show-toplevel)"
 
-git checkout main
-git pull
+# git checkout main
+# git pull
 
 echo
 git checkout -b "updating_notebooks_$(date '+%Y.%m.%d_%H.%M')"
