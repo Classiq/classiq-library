@@ -33,7 +33,9 @@ jobs:
               file.filename.endsWith(".ipynb") && file.status === "added"
             );
 
+            console.log(`setting notebook_count to ${notebookCount}`);
             core.setOutput("notebook_count", newNotebooks.length);
+            console.log(`setting notebook_files to:\n${notebookFiles}`);
             core.setOutput("notebook_files", newNotebooks.map(f => f.filename).join("\n"));
 
       - name: Add 'new notebook' label
