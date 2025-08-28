@@ -33,6 +33,7 @@ jobs:
               file.filename.endsWith(".ipynb") && file.status === "added"
             );
 
+            console.log(`setting notebook_count to ${newNotebooks.length}`);
             core.setOutput("notebook_count", newNotebooks.length);
             core.setOutput("notebook_files", newNotebooks.map(f => f.filename).join("\n"));
 
