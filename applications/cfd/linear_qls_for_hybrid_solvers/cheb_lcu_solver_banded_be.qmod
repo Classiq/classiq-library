@@ -1,4 +1,6 @@
-qfunc reflect_about_zero_expanded___0(const packed_vars: qbit[5]) unchecked (packed_vars)
+@disable_perm_check
+@disable_const_checks(packed_vars)
+qperm reflect_about_zero_expanded___0(const packed_vars: qbit[5])
  {
   msbs: qnum<4, False, 0>;
   lsb: qbit;
@@ -23,7 +25,7 @@ qfunc unitaries_0_lambda___0_0_expanded___0(data_captured__be_e3__6: qbit) {
   RY(3.1416, data_captured__be_e3__6);
 }
 
-qfunc unitaries_1_lambda___0_0_expanded___0(permutable data_captured__be_e3__6: qbit) {
+qperm unitaries_1_lambda___0_0_expanded___0(data_captured__be_e3__6: qbit) {
   X(data_captured__be_e3__6);
 }
 
@@ -54,7 +56,7 @@ qfunc be_e3_expanded___0(data: qbit, block: qbit) {
   lcu_expanded___0(block, data);
 }
 
-qfunc apply_to_all_expanded___0(permutable target: qbit[2]) {
+qperm apply_to_all_expanded___0(target: qbit[2]) {
   repeat (index: 2) {
     X(target[index]);
   }
