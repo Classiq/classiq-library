@@ -3,7 +3,7 @@ qstruct OracleVars {
   b: qnum<2>;
 }
 
-qfunc arith_equation(const state: OracleVars, permutable res: qbit) {
+qperm arith_equation(const state: OracleVars, res: qbit) {
   res ^= (state.a + state.b) <= 2;
 }
 

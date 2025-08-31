@@ -8,7 +8,7 @@ qfunc my_grover_operator(oracle_operand: qfunc (), diffuser_operand: qfunc ()) {
   diffuser_operand();
 }
 
-qfunc prep_minus(output out: qbit) unchecked (out)
+qfunc prep_minus(output out: qbit)
  {
   allocate(out);
   X(out);
@@ -24,11 +24,11 @@ qfunc my_oracle(predicate: qfunc (qbit)) {
   }
 }
 
-qfunc my_predicate(const x: qnum, const y: qnum, permutable res: qbit) {
+qperm my_predicate(const x: qnum, const y: qnum, res: qbit) {
   res ^= ((x + y) < 9) and (((x * y) % 4) == 1);
 }
 
-qfunc zero_predicate(const x: qnum, const y: qnum, permutable res: qbit) {
+qperm zero_predicate(const x: qnum, const y: qnum, res: qbit) {
   temp: qnum;
   within {
     {x, y} -> temp;

@@ -1,4 +1,6 @@
-qfunc reflect_about_zero_expanded___0(const packed_vars: qbit[5]) unchecked (packed_vars)
+@disable_perm_check
+@disable_const_checks(packed_vars)
+qperm reflect_about_zero_expanded___0(const packed_vars: qbit[5])
  {
   msbs: qnum<4, False, 0>;
   lsb: qbit;

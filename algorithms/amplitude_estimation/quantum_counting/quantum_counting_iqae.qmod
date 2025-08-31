@@ -7,7 +7,7 @@ qfunc oracle(est_reg: qbit[]) {
   Z(est_reg[est_reg.len - 1]);
 }
 
-qfunc arith_equation(const state: OracleVars, permutable res: qbit) {
+qperm arith_equation(const state: OracleVars, res: qbit) {
   res ^= (state.a + state.b) <= 2;
 }
 
