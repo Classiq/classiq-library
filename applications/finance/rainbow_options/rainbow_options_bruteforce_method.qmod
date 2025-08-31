@@ -7,7 +7,7 @@ qfunc oracle(est_reg: qbit[]) {
   Z(est_reg[est_reg.len - 1]);
 }
 
-qfunc affine_max(const x1: qnum, const x2: qnum, permutable output res: qnum) {
+qperm affine_max(const x1: qnum, const x2: qnum, output res: qnum) {
   res = max(x1 * 1.0, ((x1 * 0.5) + (x2 * 0.5)) + (-1.5));
 }
 

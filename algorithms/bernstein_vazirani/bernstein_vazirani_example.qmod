@@ -1,4 +1,4 @@
-qfunc bv_predicate(a: int, const x: qbit[], permutable res: qbit) {
+qperm bv_predicate(a: int, const x: qbit[], res: qbit) {
   repeat (i: x.len) {
     if ((floor(a / (2 ** i)) % 2) == 1) {
       CX(x[i], res);

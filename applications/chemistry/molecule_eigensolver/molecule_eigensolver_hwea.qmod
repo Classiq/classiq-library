@@ -4,7 +4,7 @@ qfunc prepare_basis_state_expanded___0(output arr: qbit[4]) {
   X(arr[2]);
 }
 
-qfunc operands_1qubit_0_lambda___0_0_expanded___0(_: real, permutable q: qbit) {
+qperm operands_1qubit_0_lambda___0_0_expanded___0(_: real, q: qbit) {
   X(q);
 }
 
@@ -12,7 +12,7 @@ qfunc operands_1qubit_1_lambda___0_0_expanded___0(theta: real, q: qbit) {
   RY(theta, q);
 }
 
-qfunc operands_2qubit_0_lambda___0_0_expanded___0(_: real, const q1: qbit, permutable q2: qbit) {
+qperm operands_2qubit_0_lambda___0_0_expanded___0(_: real, const q1: qbit, q2: qbit) {
   CX(q1, q2);
 }
 

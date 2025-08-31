@@ -12,8 +12,8 @@ from classiq.qmod.symbolic import subscript
 # Basic Modular Arithmetic Operations
 
 
-@qfunc
-def modular_in_place_add(x: Const[QNum], y: Permutable[QNum], modulus: int) -> None:
+@qperm
+def modular_in_place_add(x: Const[QNum], y: QNum, modulus: int) -> None:
     """
     Performs the transformation |x>|y> → |x>|(x + y) mod modulus>.
     """
@@ -46,16 +46,16 @@ def modular_in_place_add(x: Const[QNum], y: Permutable[QNum], modulus: int) -> N
     free(carry)
 
 
-@qfunc
-def bitwise_negation(arr: Permutable[QArray[QBit]]) -> None:
+@qperm
+def bitwise_negation(arr: QArray[QBit]) -> None:
     """
     Applies an X gate (bitwise NOT) to each qubit in the quantum array `arr`.
     """
     apply_to_all(X, arr)
 
 
-@qfunc
-def modular_in_place_negate(x: Permutable[QNum], modulus: int) -> None:
+@qperm
+def modular_in_place_negate(x: QNum, modulus: int) -> None:
     """
     Performs the transformation |x> → |(-x) mod modulus>.
     """
@@ -83,9 +83,9 @@ def modular_in_place_negate(x: Permutable[QNum], modulus: int) -> None:
     free(is_all_zeros)
 
 
-@qfunc
+@qperm
 def modular_in_place_subtract(
-    x: Const[QNum], y: Permutable[QNum], modulus: int
+    x: Const[QNum], y: QNum, modulus: int
 ) -> None:
     """
     Performs the transformation |x>|y> → |x>|(x - y) mod modulus>.
@@ -99,9 +99,9 @@ def modular_in_place_subtract(
 # Constant Operations
 
 
-@qfunc
+@qperm
 def modular_in_place_add_constant(
-    x: Permutable[QNum], constant: int, modulus: int
+    x: QNum, constant: int, modulus: int
 ) -> None:
     """
     Performs the transformation |x> → |(x + constant) mod modulus>.
@@ -135,8 +135,8 @@ def modular_in_place_add_constant(
 # Doubling and Shifting
 
 
-@qfunc
-def shift_left(reg: Permutable[QArray[QBit]]) -> None:
+@qperm
+def shift_left(reg: QArray[QBit]) -> None:
     """
     Performs a left shift on the quantum register array `reg` using SWAP gates.
     """
@@ -146,8 +146,8 @@ def shift_left(reg: Permutable[QArray[QBit]]) -> None:
         SWAP(reg[i], reg[i - 1])
 
 
-@qfunc
-def modular_in_place_double(x: Permutable[QNum], modulus: int) -> None:
+@qperm
+def modular_in_place_double(x: QNum, modulus: int) -> None:
     """
     Performs the transformation |x> → |(2x) mod modulus>.
     """
@@ -182,11 +182,11 @@ def modular_in_place_double(x: Permutable[QNum], modulus: int) -> None:
 # Multiplication Operations
 
 
-@qfunc
+@qperm
 def modular_out_of_place_multiply(
     x: Const[QArray[QBit]],
     y: Const[QArray[QBit]],
-    z: Permutable[QArray[QBit]],
+    z: QArray[QBit],
     modulus: int,
 ) -> None:
     """
@@ -201,9 +201,9 @@ def modular_out_of_place_multiply(
             modular_in_place_double(z, modulus)
 
 
-@qfunc
+@qperm
 def modular_out_of_place_square(
-    x: Const[QArray[QBit]], z: Permutable[QArray[QBit]], p: int
+    x: Const[QArray[QBit]], z: QArray[QBit], p: int
 ) -> None:
     """
     Performs the transformation |x>|0> → |x>|(x^2) mod p>.
@@ -222,15 +222,15 @@ def modular_out_of_place_square(
 # Modular Inverse (Mock Implementation for Practical Exexcution Purposes)
 
 
-@qfunc
-def set_value(reg: Permutable[QNum], value: int) -> None:
+@qperm
+def set_value(reg: QNum, value: int) -> None:
     """Helper function to set a value in a quantum register."""
     reg ^= value
 
 
-@qfunc
+@qperm
 def mock_inverse_modulus(
-    x: Const[QNum], result: Permutable[QNum], modulus: int
+    x: Const[QNum], result: QNum, modulus: int
 ) -> None:
     """
     Performs the transformation |x>|0> → |x>|x^(-1) mod modulus> for x in 1..modulus-1.

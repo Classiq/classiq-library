@@ -15,11 +15,11 @@ qfunc prepare_minus_state(x: qbit) {
   H(x);
 }
 
-qfunc oracle_black_box(permutable res: qnum, const a: qnum, const b: qnum, const c: qnum) {
+qperm oracle_black_box(res: qnum, const a: qnum, const b: qnum, const c: qnum) {
   res ^= c == ((2 * a) + b);
 }
 
-qfunc oracle_function(const a: qnum, const b: qnum, const c: qnum) {
+qperm oracle_function(const a: qnum, const b: qnum, const c: qnum) {
   aux: qbit;
   allocate(aux);
   prepare_minus_state(aux);
@@ -30,7 +30,7 @@ qfunc oracle_function(const a: qnum, const b: qnum, const c: qnum) {
   free(aux);
 }
 
-qfunc not_equal_zero(permutable aux: qbit, const x: qnum) {
+qperm not_equal_zero(aux: qbit, const x: qnum) {
   aux ^= x == 0;
   X(aux);
 }
