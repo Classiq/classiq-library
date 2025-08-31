@@ -9,7 +9,7 @@ qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfun
   }
 }
 
-qfunc moving_one_hamming_dist(pos: int, permutable x: qbit[]) {
+qperm moving_one_hamming_dist(pos: int, x: qbit[]) {
   X(x[pos]);
 }
 

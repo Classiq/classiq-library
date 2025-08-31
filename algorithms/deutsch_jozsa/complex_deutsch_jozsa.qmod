@@ -8,7 +8,7 @@ qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
   }
 }
 
-qfunc complex_predicate(const x: qnum, permutable res: qbit) {
+qperm complex_predicate(const x: qnum, res: qbit) {
   res ^= max(x ^ 4, x & 3) >= 4;
 }
 

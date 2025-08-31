@@ -7,7 +7,7 @@ qfunc simon_qfunc(f_qfunc: qfunc (qnum, output qnum), x: qnum) {
   }
 }
 
-qfunc simon_qfunc_simple(s: int, const x: qnum, permutable output res: qnum) {
+qperm simon_qfunc_simple(s: int, const x: qnum, output res: qnum) {
   res = min(x, x ^ s);
 }
 

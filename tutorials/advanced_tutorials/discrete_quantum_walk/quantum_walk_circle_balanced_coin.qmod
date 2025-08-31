@@ -9,7 +9,7 @@ qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfun
   }
 }
 
-qfunc quantum_step_clockwise(permutable x: qnum) {
+qperm quantum_step_clockwise(x: qnum) {
   x += 1;
 }
 
