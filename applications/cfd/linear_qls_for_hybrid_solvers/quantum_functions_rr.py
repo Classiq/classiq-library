@@ -119,3 +119,45 @@ def block_encode_banded(
 
     X(ind)
     bind([s, ind], block)
+
+
+@qfunc
+def be_e3(data: QBit, block: QBit):
+    lcu(
+        coefficients=[1, 1],
+        unitaries=[lambda: RY(np.pi, data), lambda: X(data)],
+        block=block,
+    )
+
+
+@qfunc
+def symmetrize_block_encoding(
+    be_qfunc: QCallable, e3_block: QBit, e3_data: QBit, sym_block: QBit
+):
+    lcu(
+        coefficients=[1, 1],
+        unitaries=[
+            lambda: (be_qfunc(), be_e3(e3_data, e3_block)),
+            lambda: invert(lambda: (be_qfunc(), be_e3(e3_data, e3_block))),
+        ],
+        block=sym_block,
+    )
+
+
+@qfunc
+def block_encode_banded_sym(
+    offsets: CArray[CInt],
+    diags: CArray[CArray[CReal]],
+    prep_diag: CArray[CReal],
+    block: QArray,
+    data: QArray,
+) -> None:
+
+    symmetrize_block_encoding(
+        be_qfunc=lambda: block_encode_banded(
+            offsets, diags, prep_diag, block[0 : block.len - 2], data[0 : data.len - 1]
+        ),
+        e3_block=block[block.len - 2],
+        e3_data=data[data.len - 1],
+        sym_block=block[block.len - 1],
+    )
