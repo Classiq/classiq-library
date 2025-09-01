@@ -265,14 +265,14 @@ Additionally, one may write their own model in the model editor (highlighted in 
 1. Create a model (paste in the [`model`](https://platform.classiq.io/dsl-synthesis) tab)
 
 ```
-qfunc get_3(output x: qnum){
-allocate<2>(x);
+qfunc get_3(output x: qbit[]){
+ allocate(2,x);
  X(x[0]);
  X(x[1]);
 }
 
-qfunc get_5(output x: qnum){
- allocate<3>(x);
+qfunc get_5(output x: qbit[]){
+ allocate(3,x);
  X(x[0]);
  X(x[2]);
 }
