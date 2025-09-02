@@ -26,6 +26,10 @@ def get_graycode_ctrls(size):
 @qfunc
 def multiplex_ra(a_y: float, a_z: float, angles: list[float], qba: QArray, ind: QBit):
     assert a_y**2 + a_z**2 == 1
+    # TODO support general (0,a_y,a_z) rotation
+    assert (
+        a_z == 1.0 or a_y == 1.0
+    ), "currently only strict y or z rotations are supported"
     size = max(1, (len(angles) - 1).bit_length())
     extended_angles = angles + [0] * (2**size - len(angles))
     transformed_angles = get_graycode_angles_wh(size, extended_angles)
@@ -34,10 +38,9 @@ def multiplex_ra(a_y: float, a_z: float, angles: list[float], qba: QArray, ind: 
     for k in range(2**size):
         if a_z == 0.0:
             RY(transformed_angles[k], ind)
-        elif a_y == 0.0:
-            RZ(transformed_angles[k], ind)
         else:
-            pass
+            RZ(transformed_angles[k], ind)
+
         CX(qba[controllers[k]], ind),
 
 

@@ -1,4 +1,4 @@
-# Rolls Royce / Classiq Project
+# Quantum Linear Solvers for CFD matrices
 
 This directory contains quantum linear solvers developed for **computational fluid dynamics (CFD)** applications.
 The solvers are designed to integrate with **hybrid classical–quantum** workflows,
