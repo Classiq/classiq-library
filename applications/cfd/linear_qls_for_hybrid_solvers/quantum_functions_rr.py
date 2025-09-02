@@ -122,25 +122,45 @@ def block_encode_banded(
 
 
 @qfunc
+def block_encode_banded_controlled(
+    ctrl_state: CInt,
+    offsets: CArray[CInt],
+    diags: CArray[CArray[CReal]],
+    prep_diag: CArray[CReal],
+    block: QNum,
+    data: QNum,
+    ctrl: QNum,
+) -> None:
+    s = QNum(size=block.size - 1)
+    ind = QBit()
+    bind(block, [s, ind])
+    if offsets.len < 2 ** ((offsets.len - 1).bit_length()):
+        """
+        Efficient controlled version when the number of diagonals is not an exact power of 2.
+        """
+        within_apply(
+            lambda: control(
+                ctrl == ctrl_state,
+                lambda: inplace_prepare_state(prep_diag, 0.0, s),
+                lambda: apply_to_all(X, s),
+            ),
+            lambda: load_banded_diagonals(offsets, diags, ind, data, s),
+        )
+        control(ctrl == ctrl_state, lambda: X(ind))
+    else:
+        control(
+            ctrl == ctrl_state,
+            lambda: block_encode_banded(offsets, diags, prep_diag, block, data),
+        )
+    bind([s, ind], block)
+
+
+@qfunc
 def be_e3(data: QBit, block: QBit):
     lcu(
         coefficients=[1, 1],
         unitaries=[lambda: RY(np.pi, data), lambda: X(data)],
         block=block,
-    )
-
-
-@qfunc
-def symmetrize_block_encoding(
-    be_qfunc: QCallable, e3_block: QBit, e3_data: QBit, sym_block: QBit
-):
-    lcu(
-        coefficients=[1, 1],
-        unitaries=[
-            lambda: (be_qfunc(), be_e3(e3_data, e3_block)),
-            lambda: invert(lambda: (be_qfunc(), be_e3(e3_data, e3_block))),
-        ],
-        block=sym_block,
     )
 
 
@@ -152,12 +172,46 @@ def block_encode_banded_sym(
     block: QArray,
     data: QArray,
 ) -> None:
-
-    symmetrize_block_encoding(
-        be_qfunc=lambda: block_encode_banded(
-            offsets, diags, prep_diag, block[0 : block.len - 2], data[0 : data.len - 1]
+    """
+    This is a simple LCU of block encoding the upper-right and lower-left block.
+    However, we use an explicit controlled version of block_encode_banded, given by the function
+    block_encode_banded_controlled.
+    """
+    lcu_block = QBit()
+    sym_block = QBit()
+    sym_data = QBit()
+    reduced_block = QArray()
+    reduced_data = QArray()
+    within_apply(
+        lambda: (
+            bind(
+                data, [reduced_data, sym_data]
+            ),  # separate to different variables for clarity
+            bind(block, [reduced_block, sym_block, lcu_block]),
+            H(lcu_block),
         ),
-        e3_block=block[block.len - 2],
-        e3_data=data[data.len - 1],
-        sym_block=block[block.len - 1],
+        lambda: (
+            control(lcu_block == 1, lambda: be_e3(sym_data, sym_block)),
+            block_encode_banded_controlled(
+                ctrl=lcu_block,
+                ctrl_state=1,
+                offsets=offsets,
+                diags=diags,
+                prep_diag=prep_diag,
+                block=reduced_block,
+                data=reduced_data,
+            ),
+            control(lcu_block == 0, lambda: invert(lambda: be_e3(sym_data, sym_block))),
+            invert(
+                lambda: block_encode_banded_controlled(
+                    ctrl=lcu_block,
+                    ctrl_state=0,
+                    offsets=offsets,
+                    diags=diags,
+                    prep_diag=prep_diag,
+                    block=reduced_block,
+                    data=reduced_data,
+                )
+            ),
+        ),
     )
