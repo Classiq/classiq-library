@@ -10,7 +10,6 @@ def get_projected_state_vector(  # type: ignore[no-untyped-def]
     """
     This function returns a reduced statevector from execution results.
     measured var: the name of the reduced variable
-    projections: on which values of the other variables to project, e.g., {"ind": 1}
     """
     projected_size = len(execution_result.output_qubits_map[measured_var])
     proj_statevector = np.zeros(2**projected_size).astype(complex)
@@ -132,9 +131,9 @@ def nonzero_diagonals(sparse_mat: csr_matrix) -> list[int]:
     Return a sorted list of diagonal offsets (k) for which the
     diagonal of the sparse matrix is non-zero (i.e., has at least one nonzero element).
 
-    k = 0 → main diagonal
-    k > 0 → superdiagonals
-    k < 0 → subdiagonals
+    k = 0 -> main diagonal
+    k > 0 -> superdiagonals
+    k < 0 -> subdiagonals
     """
     if not isinstance(sparse_mat, csr_matrix):
         raise TypeError("Input must be a scipy.sparse.csr_matrix")
