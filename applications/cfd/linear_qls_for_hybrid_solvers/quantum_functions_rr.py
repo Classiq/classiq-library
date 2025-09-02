@@ -131,13 +131,13 @@ def block_encode_banded_controlled(
     data: QNum,
     ctrl: QNum,
 ) -> None:
-    s = QNum(size=block.size - 1)
-    ind = QBit()
-    bind(block, [s, ind])
     if offsets.len < 2 ** ((offsets.len - 1).bit_length()):
         """
         Efficient controlled version when the number of diagonals is not an exact power of 2.
         """
+        s = QNum(size=block.size - 1)
+        ind = QBit()
+        bind(block, [s, ind])
         within_apply(
             lambda: control(
                 ctrl == ctrl_state,
@@ -147,12 +147,12 @@ def block_encode_banded_controlled(
             lambda: load_banded_diagonals(offsets, diags, ind, data, s),
         )
         control(ctrl == ctrl_state, lambda: X(ind))
+        bind([s, ind], block)
     else:
         control(
             ctrl == ctrl_state,
             lambda: block_encode_banded(offsets, diags, prep_diag, block, data),
         )
-    bind([s, ind], block)
 
 
 @qfunc

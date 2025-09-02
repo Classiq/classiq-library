@@ -6,7 +6,6 @@ from scipy.sparse import csr_matrix
 def get_projected_state_vector(  # type: ignore[no-untyped-def]
     execution_result,
     measured_var: str,
-    projections: dict,
 ) -> np.ndarray:
     """
     This function returns a reduced statevector from execution results.
@@ -17,11 +16,6 @@ def get_projected_state_vector(  # type: ignore[no-untyped-def]
     proj_statevector = np.zeros(2**projected_size).astype(complex)
     df = execution_result.dataframe
     filtered_st = df[np.abs(df.amplitude) > 1e-12]
-
-    # Filter only the successful states.
-    filtered_st = filtered_st.query(
-        " and ".join(f"{k} == @{k}" for k in projections), local_dict=projections
-    )
 
     # Allocate values
     proj_statevector[filtered_st[measured_var]] = filtered_st.amplitude
