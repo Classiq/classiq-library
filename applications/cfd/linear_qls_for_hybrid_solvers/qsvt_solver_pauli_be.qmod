@@ -1,0 +1,690 @@
+qstruct BlockEncodedState {
+  data: qnum<3>;
+  block: qnum<5>;
+}
+
+qfunc projector_expanded___0(be: BlockEncodedState, res: qbit) {
+  res ^= be.block == 0;
+}
+
+qfunc projector_controlled_phase_expanded___0(phase: real, qvar: qbit[8], aux: qbit) {
+  within {
+    projector_expanded___0(qvar, aux);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qfunc multiplex_ra_expanded___0(qba: qbit[5], ind: qbit) {
+  RZ(-1.1781, ind);
+  CX(qba[0], ind);
+  RZ(-0.1963, ind);
+  CX(qba[1], ind);
+  RZ(-0.1963, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0.1963, ind);
+  CX(qba[1], ind);
+  RZ(-0.1963, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[3], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(-0.1963, ind);
+  CX(qba[1], ind);
+  RZ(0.1963, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(-0.1963, ind);
+  CX(qba[1], ind);
+  RZ(0.589, ind);
+  CX(qba[0], ind);
+  RZ(-0.3927, ind);
+  CX(qba[4], ind);
+  RZ(0.3927, ind);
+  CX(qba[0], ind);
+  RZ(0.9817, ind);
+  CX(qba[1], ind);
+  RZ(0.1963, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(-0.1963, ind);
+  CX(qba[1], ind);
+  RZ(0.1963, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[3], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0.1963, ind);
+  CX(qba[1], ind);
+  RZ(-0.1963, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0.1963, ind);
+  CX(qba[1], ind);
+  RZ(0.1963, ind);
+  CX(qba[0], ind);
+  RZ(-0.3927, ind);
+  CX(qba[4], ind);
+}
+
+qfunc multiplex_ra_expanded___1(qba: qbit[5], ind: qbit) {
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(1.1781, ind);
+  CX(qba[1], ind);
+  RY(0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[2], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(-0.3927, ind);
+  CX(qba[1], ind);
+  RY(0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[3], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0.3927, ind);
+  CX(qba[1], ind);
+  RY(-0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[2], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0.3927, ind);
+  CX(qba[1], ind);
+  RY(-0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[4], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(-1.1781, ind);
+  CX(qba[1], ind);
+  RY(-0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[2], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0.3927, ind);
+  CX(qba[1], ind);
+  RY(-0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[3], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(-0.3927, ind);
+  CX(qba[1], ind);
+  RY(0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[2], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(-0.3927, ind);
+  CX(qba[1], ind);
+  RY(0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[4], ind);
+}
+
+qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
+  RZ(-1.1781, ind);
+  CX(qba[0], ind);
+  RZ(-0.3927, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0.7854, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[3], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(-0.3927, ind);
+  CX(qba[0], ind);
+  RZ(-0.3927, ind);
+  CX(qba[4], ind);
+  RZ(0.3927, ind);
+  CX(qba[0], ind);
+  RZ(0.3927, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[3], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(0.7854, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0.3927, ind);
+  CX(qba[0], ind);
+  RZ(-0.3927, ind);
+  CX(qba[4], ind);
+}
+
+qfunc multiplex_ra_expanded___3(qba: qbit[5], ind: qbit) {
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0.7854, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[2], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[3], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[2], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0.7854, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[4], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(-0.7854, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[2], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[3], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[2], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(-0.7854, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[4], ind);
+}
+
+qfunc multiplex_ra_expanded___4(qba: qbit[5], ind: qbit) {
+  RZ(-1.1781, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(0.3927, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0.7854, ind);
+  CX(qba[3], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0.3927, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(-0.3927, ind);
+  CX(qba[4], ind);
+  RZ(0.3927, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[2], ind);
+  RZ(-0.3927, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[3], ind);
+  RZ(0.7854, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(-0.3927, ind);
+  CX(qba[2], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(0, ind);
+  CX(qba[1], ind);
+  RZ(0, ind);
+  CX(qba[0], ind);
+  RZ(-0.3927, ind);
+  CX(qba[4], ind);
+}
+
+qfunc multiplex_ra_expanded___5(qba: qbit[5], ind: qbit) {
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0.3927, ind);
+  CX(qba[2], ind);
+  RY(-0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[3], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(-0.3927, ind);
+  CX(qba[2], ind);
+  RY(0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[4], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(-0.3927, ind);
+  CX(qba[2], ind);
+  RY(0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[3], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0.3927, ind);
+  CX(qba[2], ind);
+  RY(-0.3927, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[1], ind);
+  RY(0, ind);
+  CX(qba[0], ind);
+  RY(0, ind);
+  CX(qba[4], ind);
+}
+
+qfunc apply_phase_table_expanded___0(target: qbit[5]) {
+  PHASE(-0.9817, target[0]);
+  CX(target[0], target[1]);
+  PHASE(-0.1963, target[1]);
+  CX(target[0], target[1]);
+  PHASE(-1.1781, target[1]);
+  CX(target[1], target[2]);
+  PHASE(0, target[2]);
+  CX(target[0], target[2]);
+  PHASE(-0.589, target[2]);
+  CX(target[1], target[2]);
+  PHASE(0.1963, target[2]);
+  CX(target[0], target[2]);
+  PHASE(-0.7854, target[2]);
+  CX(target[2], target[3]);
+  PHASE(0.3927, target[3]);
+  CX(target[0], target[3]);
+  PHASE(0.589, target[3]);
+  CX(target[1], target[3]);
+  PHASE(-0.1963, target[3]);
+  CX(target[0], target[3]);
+  PHASE(-1.1781, target[3]);
+  CX(target[2], target[3]);
+  PHASE(0, target[3]);
+  CX(target[0], target[3]);
+  PHASE(0.1963, target[3]);
+  CX(target[1], target[3]);
+  PHASE(0.1963, target[3]);
+  CX(target[0], target[3]);
+  PHASE(0.7854, target[3]);
+  CX(target[3], target[4]);
+  PHASE(-1.5708, target[4]);
+  CX(target[0], target[4]);
+  PHASE(0.589, target[4]);
+  CX(target[1], target[4]);
+  PHASE(0.589, target[4]);
+  CX(target[0], target[4]);
+  PHASE(0.7854, target[4]);
+  CX(target[2], target[4]);
+  PHASE(0.3927, target[4]);
+  CX(target[0], target[4]);
+  PHASE(-0.589, target[4]);
+  CX(target[1], target[4]);
+  PHASE(0.1963, target[4]);
+  CX(target[0], target[4]);
+  PHASE(0.3927, target[4]);
+  CX(target[3], target[4]);
+  PHASE(-0.7854, target[4]);
+  CX(target[0], target[4]);
+  PHASE(-0.1963, target[4]);
+  CX(target[1], target[4]);
+  PHASE(-0.9817, target[4]);
+  CX(target[0], target[4]);
+  PHASE(1.5708, target[4]);
+  CX(target[2], target[4]);
+  PHASE(-0.3927, target[4]);
+  CX(target[0], target[4]);
+  PHASE(0.1963, target[4]);
+  CX(target[1], target[4]);
+  PHASE(-0.589, target[4]);
+  CX(target[0], target[4]);
+  PHASE(0.3927, target[4]);
+}
+
+qfunc lcu_paulis_graycode_expanded___0(data: qbit[3], block: qbit[5]) {
+  within {
+    inplace_prepare_state([
+      0.2976,
+      0.0224,
+      0.0201,
+      0.0211,
+      0.0169,
+      0.014,
+      0.0017,
+      0.0241,
+      0.1381,
+      0.0223,
+      0.0201,
+      0.0223,
+      0.0186,
+      0.0223,
+      0.0101,
+      0.0223,
+      0.0791,
+      0.0791,
+      0.0017,
+      0.0017,
+      0.036,
+      0.036,
+      0.036,
+      0.036,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ], 0.0, block);
+  } apply {
+    multiplex_ra_expanded___0(block, data[0]);
+    multiplex_ra_expanded___1(block, data[0]);
+    multiplex_ra_expanded___2(block, data[1]);
+    multiplex_ra_expanded___3(block, data[1]);
+    multiplex_ra_expanded___4(block, data[2]);
+    multiplex_ra_expanded___5(block, data[2]);
+    apply_phase_table_expanded___0(block);
+  }
+}
+
+qfunc be_qfunc_expanded___0(be: BlockEncodedState) {
+  lcu_paulis_graycode_expanded___0(be.data, be.block);
+}
+
+qfunc u_0_lambda___0_0_expanded___0(x: qbit[8]) {
+  invert {
+    be_qfunc_expanded___0(x);
+  }
+}
+
+qfunc qsvt_step_expanded___0(phase1: real, phase2: real, qvar: qbit[8], aux: qbit) {
+  u_0_lambda___0_0_expanded___0(qvar);
+  projector_controlled_phase_expanded___0(phase1, qvar, aux);
+  invert {
+    u_0_lambda___0_0_expanded___0(qvar);
+  }
+  projector_controlled_phase_expanded___0(phase2, qvar, aux);
+}
+
+qfunc qsvt_expanded___0(phase_seq: real[], qvar: qbit[8], aux: qbit) {
+  H(aux);
+  projector_controlled_phase_expanded___0(phase_seq[0], qvar, aux);
+  repeat (index: 50) {
+    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
+  }
+  if (False) {
+  } else {
+    u_0_lambda___0_0_expanded___0(qvar);
+    projector_controlled_phase_expanded___0(phase_seq[101], qvar, aux);
+  }
+  H(aux);
+}
+
+qfunc qsvt_inversion_expanded___0(phase_seq: real[], qvar: qbit[8], aux: qbit) {
+  qsvt_expanded___0(phase_seq, qvar, aux);
+}
+
+qfunc main(output qsvt_aux: qbit, output data: qnum<3, False, 0>, output block: qnum<5, False, 0>) {
+  allocate(1, qsvt_aux);
+  allocate(5, block);
+  prepare_amplitudes([
+    0.6193,
+    (-0.3565),
+    (-0.435),
+    (-0.2763),
+    0.1567,
+    0.4192,
+    0.1533,
+    0.0
+  ], 0, data);
+  be_state: BlockEncodedState;
+  within {
+    {data, block} -> be_state;
+  } apply {
+    qsvt_inversion_expanded___0([
+      4.5343,
+      2.8575,
+      2.982,
+      3.2181,
+      3.2134,
+      3.0952,
+      3.0938,
+      3.1957,
+      3.1526,
+      3.1059,
+      3.1347,
+      3.1847,
+      3.1204,
+      3.1264,
+      3.1551,
+      3.1637,
+      3.108,
+      3.1511,
+      3.1525,
+      3.1425,
+      3.1149,
+      3.1693,
+      3.1366,
+      3.1363,
+      3.1303,
+      3.1701,
+      3.1182,
+      3.146,
+      3.1406,
+      3.1593,
+      3.1113,
+      3.1624,
+      3.137,
+      3.1487,
+      3.1175,
+      3.1722,
+      3.123,
+      3.1487,
+      3.1284,
+      3.1701,
+      3.1109,
+      3.1594,
+      3.1319,
+      3.1607,
+      3.109,
+      3.1718,
+      3.1255,
+      3.1549,
+      3.114,
+      3.1774,
+      3.1244,
+      3.1244,
+      3.1774,
+      3.114,
+      3.1549,
+      3.1255,
+      3.1718,
+      3.109,
+      3.1607,
+      3.1319,
+      3.1594,
+      3.1109,
+      3.1701,
+      3.1284,
+      3.1487,
+      3.123,
+      3.1722,
+      3.1175,
+      3.1487,
+      3.137,
+      3.1624,
+      3.1113,
+      3.1593,
+      3.1406,
+      3.146,
+      3.1182,
+      3.1701,
+      3.1303,
+      3.1363,
+      3.1366,
+      3.1693,
+      3.1149,
+      3.1425,
+      3.1525,
+      3.1511,
+      3.108,
+      3.1637,
+      3.1551,
+      3.1264,
+      3.1204,
+      3.1847,
+      3.1347,
+      3.1059,
+      3.1526,
+      3.1957,
+      3.0938,
+      3.0952,
+      3.2134,
+      3.2181,
+      2.982,
+      2.8575,
+      (-315.9082)
+    ], be_state, qsvt_aux);
+  }
+}
