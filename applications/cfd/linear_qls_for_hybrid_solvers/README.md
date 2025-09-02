@@ -12,8 +12,8 @@ The code was developed in collaboration with **Rolls-Royce** as part of a joint 
 
 The code provides two block-encoding implementations for the CFD matrices:
 
-- **LCU from Pauli decomposition**, using a Graycode approach
-- **LCU from banded diagonals** according to [Lapworth & S&uuml;nderhauf](https://arxiv.org/abs/2502.20908)
+- **LCU for Pauli decomposition**, using a Graycode approach
+- **LCU for banded diagonals** according to [Lapworth & S&uuml;nderhauf](https://arxiv.org/abs/2502.20908)
 
 ## Notebooks
 
