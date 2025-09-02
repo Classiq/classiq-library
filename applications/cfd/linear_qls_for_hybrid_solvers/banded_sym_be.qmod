@@ -1,0 +1,158 @@
+qfunc unitaries_0_lambda___0_0_expanded___0(data_captured__be_e3__3: qbit) {
+  RY(3.1416, data_captured__be_e3__3);
+}
+
+qfunc unitaries_1_lambda___0_0_expanded___0(permutable data_captured__be_e3__3: qbit) {
+  X(data_captured__be_e3__3);
+}
+
+qfunc apply_phase_table_expanded___0(target: qbit[1]) {
+  PHASE(0, target[0]);
+}
+
+qfunc lcu_expanded___0(block: qnum<1, False, 0>, data_captured__be_e3__3: qbit) {
+  within {
+    inplace_prepare_state([0.5, 0.5], 0, block);
+  } apply {
+    repeat (i: 2) {
+      control (block == i) {
+        if (i == 0) {
+          unitaries_0_lambda___0_0_expanded___0(data_captured__be_e3__3);
+        } else {
+          if (i == 1) {
+            unitaries_1_lambda___0_0_expanded___0(data_captured__be_e3__3);
+          }
+        }
+      }
+    }
+    apply_phase_table_expanded___0(block);
+  }
+}
+
+qfunc be_e3_expanded___0(data: qbit, block: qbit) {
+  lcu_expanded___0(block, data);
+}
+
+qfunc apply_to_all_expanded___0(permutable target: qbit[2]) {
+  repeat (index: 2) {
+    X(target[index]);
+  }
+}
+
+qfunc load_diagonal_expanded___0(offset: int, diag: real[], ind: qbit, x: qnum<3, False, 0>) {
+  if (offset != 0) {
+    x += offset;
+  }
+  ind *= diag[x];
+}
+
+qfunc load_banded_diagonals_expanded___0(offsets: int[], diags: real[][], ind: qbit, x: qnum<3, False, 0>, s: qnum<2, False, 0>) {
+  repeat (i: 3) {
+    control (s == i) {
+      load_diagonal_expanded___0(-offsets[i], diags[i], ind, x);
+    }
+  }
+}
+
+qfunc block_encode_banded_controlled_expanded___0(ctrl_state: int, offsets: int[], diags: real[][], prep_diag: real[], block: qnum<3, False, 0>, data: qnum<3, False, 0>, ctrl: qnum<1, False, 0>) {
+  s: qnum<2, False, 0>;
+  ind: qbit;
+  block -> {s, ind};
+  within {
+    control (ctrl == ctrl_state) {
+      inplace_prepare_state(prep_diag, 0.0, s);
+    } else {
+      apply_to_all_expanded___0(s);
+    }
+  } apply {
+    load_banded_diagonals_expanded___0(offsets, diags, ind, data, s);
+  }
+  control (ctrl == ctrl_state) {
+    X(ind);
+  }
+  {s, ind} -> block;
+}
+
+qfunc block_encode_banded_sym_expanded___0(offsets: int[], diags: real[][], prep_diag: real[], block: qbit[5], data: qbit[4]) {
+  lcu_block: qbit;
+  sym_block: qbit;
+  sym_data: qbit;
+  reduced_block: qbit[3];
+  reduced_data: qbit[3];
+  within {
+    data -> {reduced_data, sym_data};
+    block -> {reduced_block, sym_block, lcu_block};
+    H(lcu_block);
+  } apply {
+    control (lcu_block == 1) {
+      be_e3_expanded___0(sym_data, sym_block);
+    }
+    block_encode_banded_controlled_expanded___0(1, offsets, diags, prep_diag, reduced_block, reduced_data, lcu_block);
+    control (lcu_block == 0) {
+      invert {
+        be_e3_expanded___0(sym_data, sym_block);
+      }
+    }
+    invert {
+      block_encode_banded_controlled_expanded___0(0, offsets, diags, prep_diag, reduced_block, reduced_data, lcu_block);
+    }
+  }
+}
+
+qfunc block_encode_banded_matrix_expanded___0(block: qnum<5, False, 0>, data: qnum<4, False, 0>) {
+  block_encode_banded_sym_expanded___0([(-1), 0, 1], [
+    [
+      0.0,
+      (-1.0),
+      (-0.9291),
+      (-0.88),
+      (-0.8645),
+      (-0.8976),
+      (-0.9701),
+      0.0
+    ],
+    [
+      1.0,
+      0.9336,
+      0.8755,
+      0.8443,
+      0.8528,
+      0.9039,
+      0.9886,
+      0.5146
+    ],
+    [
+      (-0.9324),
+      (-0.8663),
+      (-0.8205),
+      (-0.8061),
+      (-0.8369),
+      (-0.9046),
+      (-1.0),
+      0.0
+    ]
+  ], [0.2416, 0.4992, 0.2591, 0], block, data);
+}
+
+qfunc main(output data: qnum<4, False, 0>, output block: qnum<5, False, 0>) {
+  allocate(5, block);
+  prepare_amplitudes([
+    0.2165,
+    (-0.1797),
+    0.1978,
+    (-0.3122),
+    0.2275,
+    0.2377,
+    0.4016,
+    0.0035,
+    (-0.1922),
+    0.1287,
+    0.2099,
+    (-0.2716),
+    (-0.2782),
+    0.3831,
+    (-0.3014),
+    (-0.1683)
+  ], 0.0, data);
+  block_encode_banded_matrix_expanded___0(block, data);
+}

@@ -1,0 +1,77 @@
+qfunc load_diagonal_expanded___0(offset: int, diag: real[], ind: qbit, x: qnum<3, False, 0>) {
+  if (offset != 0) {
+    x += offset;
+  }
+  ind *= diag[x];
+}
+
+qfunc load_banded_diagonals_expanded___0(offsets: int[], diags: real[][], ind: qbit, x: qnum<3, False, 0>, s: qnum<2, False, 0>) {
+  repeat (i: 3) {
+    control (s == i) {
+      load_diagonal_expanded___0(-offsets[i], diags[i], ind, x);
+    }
+  }
+}
+
+qfunc block_encode_banded_expanded___0(offsets: int[], diags: real[][], prep_diag: real[], block: qnum<3, False, 0>, data: qnum<3, False, 0>) {
+  s: qnum<2, False, 0>;
+  ind: qbit;
+  block -> {s, ind};
+  within {
+    inplace_prepare_state(prep_diag, 0.0, s);
+  } apply {
+    load_banded_diagonals_expanded___0(offsets, diags, ind, data, s);
+  }
+  X(ind);
+  {s, ind} -> block;
+}
+
+qfunc block_encode_banded_matrix_expanded___0(block: qnum<3, False, 0>, data: qnum<3, False, 0>) {
+  block_encode_banded_expanded___0([(-1), 0, 1], [
+    [
+      0.0,
+      (-1.0),
+      (-0.9291),
+      (-0.88),
+      (-0.8645),
+      (-0.8976),
+      (-0.9701),
+      0.0
+    ],
+    [
+      1.0,
+      0.9336,
+      0.8755,
+      0.8443,
+      0.8528,
+      0.9039,
+      0.9886,
+      0.5146
+    ],
+    [
+      (-0.9324),
+      (-0.8663),
+      (-0.8205),
+      (-0.8061),
+      (-0.8369),
+      (-0.9046),
+      (-1.0),
+      0.0
+    ]
+  ], [0.2416, 0.4992, 0.2591, 0], block, data);
+}
+
+qfunc main(output data: qnum<3, False, 0>, output block: qnum<3, False, 0>) {
+  allocate(3, block);
+  prepare_amplitudes([
+    (-0.7009),
+    0.5865,
+    0.1636,
+    (-0.2686),
+    (-0.1195),
+    (-0.1173),
+    (-0.0429),
+    (-0.1897)
+  ], 0.0, data);
+  block_encode_banded_matrix_expanded___0(block, data);
+}
