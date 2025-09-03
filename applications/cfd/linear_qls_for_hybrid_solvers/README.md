@@ -3,7 +3,6 @@
 This directory contains quantum linear solvers developed for **computational fluid dynamics (CFD)** applications.
 The solvers are designed to integrate with **hybrid classical–quantum** workflows,
 such as the segregated SIMPLE solver and the implicit coupled solver in the [qc-cfd repository](https://github.com/rolls-royce/qc-cfd/tree/main/1D-Nozzle).
-The code was developed in collaboration with **Rolls-Royce** as part of a joint project.
 
 ## Solvers
 
