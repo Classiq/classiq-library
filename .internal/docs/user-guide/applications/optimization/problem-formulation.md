@@ -1,7 +1,5 @@
 [comment]: SINGLE_FILE
 
-# Problem Formulation
-
 In the PYOMO language, like any other algebraic modeling languages (AMLs),
 the optimization problem consists of three main components:
 decision variables, constraints, and an objective function.

@@ -16,5 +16,6 @@ search:
             - projector_controlled_double_phase
             - qsvt_lcu_step
             - qsvt_lcu
+            - gqsp
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->

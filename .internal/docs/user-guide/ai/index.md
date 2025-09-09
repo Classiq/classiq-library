@@ -1,13 +1,25 @@
-# Use AI
+# Use AI with Classiq
 
-## Use the documentation and the Classiq Library as part of an AI agent work
+## Overview
 
 We have architected our Classiq Library and SDK with enhanced AI agent compatibility, enabling AI agents to perform quantum development within integrated development environments. This supports AI-first IDEs like Cursor as well as VSCode with AI extensions like Cline and Claude Code, and other IDE-integrated AI coding assistants.
-Soon, this AI agent integration will be available directly within our Studio environment with no setup required.
 
-Please follow these steps in order to set up the Classiq Library and documentation use it with AI agents.
+## Cline Agent in Classiq Studio
 
-## Setup
+The Cline agent is now available directly within our Classiq Studio environment! This provides seamless AI-powered quantum development without any additional setup.
+
+### Quick Start
+
+To start using the Cline agent in Studio:
+
+1. **Set your API key**: Configure an API key for your preferred LLM provider (among those supported by Cline)
+2. **Start coding**: The Cline agent will be ready to assist with quantum algorithm development using the Classiq SDK
+
+This integration allows you to leverage AI assistance for quantum programming directly within the Studio interface, making quantum development more accessible and efficient.
+
+## Local Development Setup
+
+For local development with AI agents, follow these steps to set up the Classiq Library and documentation:
 
 ### Prerequisites
 
@@ -48,7 +60,9 @@ Please follow these steps in order to set up the Classiq Library and documentati
     - Ensure your IDE is using the Python environment where you installed Classiq
     - Set up any virtual environment if desired
 
-## AI Agent Initial Prompt
+## AI Agent Configuration
+
+### Initial Prompt for AI Agents
 
 When working with AI agents to write quantum code using Classiq, use this initial prompt:
 

@@ -1,13 +1,13 @@
 [comment]: SINGLE_FILE_SLOW
 
-# Intro
+## Intro
 
 In this example, we will show a simple example of parametric quantum program (PQC).
 
 We will take 1 input from the user, and consider 1 weight, while utilizing 1 qubit in the PQC.
 During this example, the goal of the learning process is to assess the right angle for a `Rx` gate for performing a "NOT" operation (spoiler, the correct answer is $\pi$).
 
-# General flow
+## General flow
 
 In [section 1](#step-1-create-our-torchnnmodule) we will see the code required for defining a quantum layer.
 This will include:
@@ -27,9 +27,9 @@ If you're not familiar with PyTorch, it is highly recommended that you'll check 
 -   [Tensors](https://pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html)
 -   [Datasets & DataLoaders](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html)
 
-# Step 1 - Create our `torch.nn.Module`
+## Step 1 - Create our `torch.nn.Module`
 
-## Step 1.1 - Create our parametric quantum program
+### Step 1.1 - Create our parametric quantum program
 
 Our quantum model will be defined and synthesized as follows:
 
@@ -68,7 +68,7 @@ quantum_program = synthesize(main)
 
 The input (`input_0`), logically indicating the state `|0>` or `|1>`, is transformed into an angle, either `0` or `pi`.
 
-## Step 1.2 - Create the Post-processing
+### Step 1.2 - Create the Post-processing
 
 Post-process the result of executing the quantum program to obtain a single number (`float`) and a single dimension `Tensor`.
 
@@ -95,7 +95,7 @@ def post_process(result: SavedResult) -> torch.Tensor:
     return torch.tensor(p_zero)
 ```
 
-## Step 1.3 - Create a network
+### Step 1.3 - Create a network
 
 Now we're going to define a network, just like any other PyTorch network, only that this time, we will have only 1 layer, and it will be a quantum layer.
 
@@ -123,7 +123,7 @@ class Net(torch.nn.Module):
 model = Net()
 ```
 
-## Step 2 - Choose a dataset, loss function, and optimizer
+### Step 2 - Choose a dataset, loss function, and optimizer
 
 We will use the `DATALOADER_NOT` dataset, defined [here](datasets.md), as well as [`L1Loss`](https://pytorch.org/docs/stable/generated/torch.nn.L1Loss.html) and [SGD](https://pytorch.org/docs/stable/generated/torch.optim.SGD.html)
 
@@ -142,7 +142,7 @@ loss_func = nn.L1Loss()
 optimizer = optim.SGD(model.parameters(), lr=_LEARNING_RATE)
 ```
 
-## Step 3 - Train
+### Step 3 - Train
 
 For the training process, we will use a loop similar to [the one recommended by PyTorch](https://pytorch.org/tutorials/beginner/blitz/neural_networks_tutorial.html#update-the-weights)
 
@@ -175,7 +175,7 @@ def train(
 train(model, data_loader, loss_func, optimizer)
 ```
 
-## Step 4 - Test
+### Step 4 - Test
 
 Lastly, we will test our network accuracy, using [the following answer](https://stackoverflow.com/questions/52176178/pytorch-model-accuracy-test#answer-64838681)
 
@@ -216,7 +216,7 @@ Finally, we safely teardown the `QLayer` instance.
 model.qlayer.teardown()
 ```
 
-# Summary
+## Summary
 
 In this example, we wrote a fully working Quantum Neural Network from scratch, trained it, and saw its success at learning the requested transformation.
 
