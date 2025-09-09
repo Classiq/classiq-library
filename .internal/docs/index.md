@@ -24,6 +24,14 @@ search:
   justify-content: center !important;
   display: flex !important;
 }
+.card h2 {
+  font-size: 40px !important;
+  justify-content: center !important;
+  display: flex !important;
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+
 
 /* Responsive fix for mobile main title */
 @media screen and (max-width: 600px) {
@@ -35,6 +43,9 @@ search:
   }
   .card h1 {
     font-size: 25px !important;
+  }
+  .card h2 {
+  font-size: 25px !important;
   }
 }
 
@@ -48,7 +59,7 @@ search:
 
 <div class="card" markdown>
 
-<a href="user-guide/" markdown="block"><h1>User Guide</h1></a>
+<a href="user-guide/" markdown="block"><h2>User Guide</h2></a>
 
 ---
 
@@ -58,7 +69,7 @@ search:
 
 <div class="card" markdown>
 
-<a href="explore/" markdown="block"><h1>Library</h1></a>
+<a href="explore/" markdown="block"><h2>Library</h2></a>
 
 ---
 
@@ -70,7 +81,7 @@ search:
 
 <div class="card" markdown>
 
-<a href="qmod-reference/" markdown="block"><h1>Reference Materials</h1></a>
+<a href="qmod-reference/" markdown="block"><h2>Reference Materials</h2></a>
 
 ---
 
@@ -82,5 +93,5 @@ search:
 
 </div>
 
-[Getting Started](./classiq_101/){ .md-button }
-[The Classiq Tutorial](./classiq_101/classiq_tutorial.md){ .md-button }
+[Getting Started](./getting-started/){ .md-button }
+[Classiq Overview](./getting-started/classiq_tutorial/classiq_overview_tutorial.ipynb){ .md-button }

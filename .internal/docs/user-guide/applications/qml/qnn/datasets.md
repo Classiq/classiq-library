@@ -46,15 +46,15 @@ More specifically, since we generate this data, we set the expected output state
 Additionally, we define the post-processing to return the probability of measuring `|00...0>` in the output state.
 Thus, for the output `|00...0>`, the post processed output is `1`, corresponding to `100%`, and for the output `|11...1>`, the post processed output is `0`.
 
-## DatasetXor
+### DatasetXor
 
 This dataset is used for training a network to learn the "XOR" operation.
 This may take, similar to `DatasetNot`, the amount of qubits in the constructor.
 The "XOR" operation on more than 2 inputs is defined as "a quantum program that outputs a 1 when the number of 1s at its inputs is odd, and a 0 when the number of incoming 1s is even" (credit: [wikipedia](https://en.wikipedia.org/wiki/XOR_gate#More_than_two_inputs))
 
-# Usage examples
+## Usage examples
 
-## Using pre-configured `DataLoader`s
+### Using pre-configured `DataLoader`s
 
 ```python
 from classiq.applications.qnn.datasets import DATALOADER_NOT
@@ -64,7 +64,7 @@ for data, label in DATALOADER_NOT:
     print(f"with the following labels: {label}")
 ```
 
-## Using pre-configures `Dataset`s
+### Using pre-configures `Dataset`s
 
 ```python
 from classiq.applications.qnn.datasets import DATASET_NOT
@@ -77,9 +77,9 @@ for data, label in DATALOADER_NOT:
     print(f"with the following labels: {label}")
 ```
 
-## Using the `DatasetNot` class
+### Using the `DatasetNot` class
 
-### without using our pre-defined transformers
+#### without using our pre-defined transformers
 
 ```python
 from classiq.applications.qnn.datasets import DatasetNot
@@ -96,7 +96,7 @@ for data, label in DATALOADER_NOT:
     print(f"with the following labels: {label}")
 ```
 
-### with our pre-defined transformers
+#### with our pre-defined transformers
 
 ```python
 from classiq.applications.qnn.datasets import (
