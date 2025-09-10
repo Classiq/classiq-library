@@ -115,6 +115,7 @@ jobs:
           python -m pip install -U pip
           python -m pip install -U -r requirements.txt
           python -m pip install -U -r requirements_tests.txt
+          curl --max-time 15 https://platform.classiq.io/versions || exit 1
 
       - name: Install couenne solver
         env:
