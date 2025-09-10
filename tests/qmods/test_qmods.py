@@ -14,7 +14,7 @@ CHANGED_QMODS = os.environ.get("LIST_OF_QMOD_CHANGED", "").split()
 
 
 def _should_test_file(qmod_file: Path) -> bool:
-    return qmod_file.name in CHANGED_QMODS
+    return str(qmod_file.relative_to(ROOT_DIRECTORY)) in CHANGED_QMODS
 
 
 def all_qmods_params() -> Iterator[ParameterSet]:
