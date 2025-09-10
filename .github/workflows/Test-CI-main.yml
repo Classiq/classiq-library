@@ -185,9 +185,6 @@ jobs:
           LIST_OF_IPYNB_TESTS_CHANGED: "${{ steps.changed-files-tests.outputs.all_changed_files }}"
           # Altering test behavior
           LIMIT_TEST_LINKS_TO_FILES_ONLY: "true"
-          # Passing environment information
-          CLASSIQ_IDE: "https://platform.classiq.io"
-          CLASSIQ_HOST: "https://api.classiq.io"
 
       - name: Run Notebooks (executing notebooks and testing content)
         run: python -m pytest -c tests/config_notebook_execute_tests.ini
@@ -201,6 +198,3 @@ jobs:
           LIST_OF_QMOD_CHANGED: "${{ steps.changed-files-qmod.outputs.all_changed_files }}"
           # Altering test behavior
           LIMIT_TEST_LINKS_TO_FILES_ONLY: "false"
-          # Passing environment information
-          CLASSIQ_IDE: "https://platform.classiq.io"
-          CLASSIQ_HOST: "https://api.classiq.io"
