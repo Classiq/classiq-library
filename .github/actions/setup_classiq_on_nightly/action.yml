@@ -65,15 +65,14 @@ runs:
     - name: Install couenne solver
       shell: bash
       env:
-        COUENNE_SOURCE: "s3://public-library-resources/couenne.gz"
-        COUENNE_FILE: ${{ runner.temp }}/couenne.gz
+        COIN_DIST_URL: https://github.com/ampl/coin/releases/download/v20191215/coin-linux64.tar.gz
         LOCAL_BIN: ${{ runner.temp }}/.local/bin
       run: |
         set -eux
-        aws s3 cp "$COUENNE_SOURCE" "$COUENNE_FILE"
         mkdir -p "$LOCAL_BIN"
         echo "$LOCAL_BIN" >>"$GITHUB_PATH"
-        gzip -dc "$COUENNE_FILE" >"${LOCAL_BIN}/couenne"
+        wget -nv -O- "$COIN_DIST_URL" | tar -C "$RUNNER_TEMP" -xvz
+        cp "${RUNNER_TEMP}/couenne" "${LOCAL_BIN}/couenne"
         chmod ugo+x "${LOCAL_BIN}/couenne"
 
     # Set authentication with M2M token
