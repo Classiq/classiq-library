@@ -18,9 +18,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  S3_BUCKET_SOURCE: s3://public-library-resources
-
 jobs:
   test:
     permissions:
@@ -118,20 +115,20 @@ jobs:
 
       - name: Install couenne solver
         env:
-          COUENNE_SOURCE: ${{ env.S3_BUCKET_SOURCE }}/couenne.gz
-          COUENNE_FILE: ${{ runner.temp }}/couenne.gz
+          COIN_DIST_URL: https://github.com/ampl/coin/releases/download/v20191215/coin-linux64.tar.gz
           LOCAL_BIN: ${{ runner.temp }}/.local/bin
         run: |
           set -eux
-          aws s3 cp "$COUENNE_SOURCE" "$COUENNE_FILE"
           mkdir -p "$LOCAL_BIN"
           echo "$LOCAL_BIN" >>"$GITHUB_PATH"
-          gzip -dc "$COUENNE_FILE" >"${LOCAL_BIN}/couenne"
+          wget -nv -O- "$COIN_DIST_URL" | tar -C "$RUNNER_TEMP" -xvz
+          cp "${RUNNER_TEMP}/couenne" "${LOCAL_BIN}/couenne"
           chmod ugo+x "${LOCAL_BIN}/couenne"
 
       - name: Download and install Qmod parser
         env:
           WHL_FILE_NAME: qmod_parser-0.0.0-cp311-cp311-linux_x86_64.whl
+          S3_BUCKET_SOURCE: s3://public-library-resources
         run: |
           set -eux
           classiq_version=$(pip show classiq | awk '/Version:/ {print $2}')
