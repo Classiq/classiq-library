@@ -24,12 +24,23 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_depth=1100,  # actual 880
     )
 
-    res_names = ["res_3_sat_small", "res_3_sat_large", "res_max_cut"]
-    formula_names = ["small_3sat_formula", "large_3sat_formula", "cut_predicate"]
-    var_names = ["x", "x", "nodes"]
-    for res_name, formula_name, var_name in zip(res_names, formula_names, var_names):
+    # test SAT
+    res_names = [
+        "res_3_sat_small",
+        "res_3_sat_large",
+    ]
+    formula_names = ["small_3sat_formula", "large_3sat_formula"]
+    for res_name, formula_name in zip(res_names, formula_names):
         res = tb.ref_pydantic(res_name)
         prob = res.parsed_counts[0].shots / res.num_shots
-        state = res.parsed_counts[0].state[var_name]
+        state = res.parsed_counts[0].state["x"]
         orcale_cl = tb.get(formula_name)
         assert orcale_cl(state) == True and prob > 0.08
+
+    # test Max Cut
+    cut_size = tb.ref_pydantic("CUT_SIZE")
+    res = tb.ref_pydantic("res_max_cut")
+    prob = res.parsed_counts[0].shots / res.num_shots
+    state = res.parsed_counts[0].state["nodes"]
+    orcale_cl = tb.get("cut_predicate")
+    assert orcale_cl(cut_size, state) == True and prob > 0.08
