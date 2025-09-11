@@ -52,7 +52,7 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
 
         for decorator in [
             _build_patch_testbook_client_decorator(notebook_name),
-            testbook(notebook_path, execute=True, timeout=timeout_seconds),
+            _build_testbook_decorator(notebook_path, timeout_seconds),
             _build_cd_decorator(notebook_path),
             _build_skip_decorator(notebook_path),
         ]:
@@ -60,6 +60,18 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
         return func
 
     return inner_decorator
+
+
+def _build_testbook_decorator(notebook_path: str, timeout_seconds: float) -> Callable:
+    def inner(func: Callable) -> Any:
+        def inner(*args: Any, **kwargs: Any) -> Any:
+            with testbook(notebook_path, execute=True, timeout=timeout_seconds) as tb:
+                tb.execute()
+                return func(tb, *args, *kwargs)
+
+        return inner
+
+    return inner
 
 
 def _build_patch_testbook_client_decorator(notebook_name: str) -> Callable:
