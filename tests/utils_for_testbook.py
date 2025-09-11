@@ -1,4 +1,5 @@
 import json
+import re
 import warnings
 import itertools
 import base64
@@ -6,7 +7,7 @@ import pickle
 import os
 from typing import Any, Callable
 import pytest
-
+from pathlib import Path
 from testbook import testbook
 from tests.utils_for_tests import (
     resolve_notebook_path,
@@ -62,11 +63,42 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
     return inner_decorator
 
 
+def _read_qmod_files(file_path: str):
+    return {
+        str(qmod_path): qmod_path.read_text()
+        for qmod_path in Path(file_path).parent.glob("*.qmod")
+    }
+
+
+def _normalize_qmod_code(code: str) -> str:
+    code = code.strip()
+    float_pattern = r"[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?"
+    code = re.sub(rf"\({float_pattern}\)", "<NUMBER>", code)
+    code = re.sub(rf"(?<=\W){float_pattern}", "<NUMBER>", code)
+    code = re.sub(r"\s+", "", code)
+    code = re.sub(r"Pauli::[IXYZ]", "<PAULI>", code)
+    return code
+
+
+def _compare_qmods(qmods: dict[str, str], new_qmods: dict[str, str]) -> None:
+    if len(new_qmods) > len(qmods):
+        uncommitted_files = [file for file in new_qmods if file not in qmods]
+        raise AssertionError(
+            f"Found uncommitted Qmod files: {', '.join(uncommitted_files)}"
+        )
+    for file in qmods:
+        assert _normalize_qmod_code(qmods[file]) == _normalize_qmod_code(
+            new_qmods[file]
+        ), f"Qmod file {file.split('/')[-1]} is not up-to-date"
+
+
 def _build_testbook_decorator(notebook_path: str, timeout_seconds: float) -> Callable:
     def inner(func: Callable) -> Any:
         def inner(*args: Any, **kwargs: Any) -> Any:
+            qmods = _read_qmod_files(notebook_path)
             with testbook(notebook_path, execute=True, timeout=timeout_seconds) as tb:
-                tb.execute()
+                new_qmods = _read_qmod_files(notebook_path)
+                _compare_qmods(qmods, new_qmods)
                 return func(tb, *args, *kwargs)
 
         return inner
