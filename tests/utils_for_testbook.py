@@ -19,6 +19,7 @@ from classiq.interface.generator.quantum_program import QuantumProgram
 
 from testbook.client import TestbookNotebookClient
 
+QMOD_COMPARISON_FIRST_FLAG = "QMOD_COMPARISON_FIRST"
 _PATCHED = False
 
 
@@ -50,10 +51,11 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
         _patch_testbook()
 
         notebook_path = resolve_notebook_path(notebook_name)
+        qmod_comp_first = os.environ.get(QMOD_COMPARISON_FIRST_FLAG, "false") == "true"
 
         for decorator in [
             _build_patch_testbook_client_decorator(notebook_name),
-            _build_testbook_decorator(notebook_path, timeout_seconds),
+            _build_testbook_decorator(notebook_path, timeout_seconds, qmod_comp_first),
             _build_cd_decorator(notebook_path),
             _build_skip_decorator(notebook_path),
         ]:
@@ -92,14 +94,20 @@ def _compare_qmods(qmods: dict[str, str], new_qmods: dict[str, str]) -> None:
         ), f"Qmod file {file.split('/')[-1]} is not up-to-date"
 
 
-def _build_testbook_decorator(notebook_path: str, timeout_seconds: float) -> Callable:
+def _build_testbook_decorator(
+    notebook_path: str, timeout_seconds: float, qmod_comp_first: bool
+) -> Callable:
     def inner(func: Callable) -> Any:
         def inner(*args: Any, **kwargs: Any) -> Any:
             qmods = _read_qmod_files(notebook_path)
             with testbook(notebook_path, execute=True, timeout=timeout_seconds) as tb:
+                if not qmod_comp_first:
+                    result = func(tb, *args, *kwargs)
                 new_qmods = _read_qmod_files(notebook_path)
                 _compare_qmods(qmods, new_qmods)
-                return func(tb, *args, *kwargs)
+                if qmod_comp_first:
+                    result = func(tb, *args, *kwargs)
+                return result
 
         return inner
 
