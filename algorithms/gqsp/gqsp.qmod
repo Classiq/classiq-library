@@ -1,0 +1,49 @@
+qfunc _gqsp_r_gate(theta: real, phi: real, _lambda: real, q: qbit) {
+  within {
+    X(q);
+  } apply {
+    U(2 * theta, phi, _lambda, 0, q);
+  }
+  Z(q);
+}
+
+qfunc u_func(x: qnum) {
+  phase (6.2832 * x);
+}
+
+qfunc main(output x: qnum<7, UNSIGNED, 7>, output ind: qbit) {
+  allocate(ind);
+  allocate(x);
+  hadamard_transform(x);
+  gqsp(lambda() {
+    u_func(x);
+  }, ind, [
+    [
+      0.1874,
+      0.0,
+      0.598,
+      0.0,
+      0.598,
+      0.0,
+      1.3834
+    ],
+    [
+      (-0.0),
+      0.0,
+      (-0.0),
+      0.0,
+      (-0.0),
+      (-3.1416),
+      0.0
+    ],
+    [
+      3.1416,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ], 3);
+}
