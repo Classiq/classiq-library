@@ -48,22 +48,22 @@ qfunc short_time_magnus(a: real, b: real, qbe_st: MagnusBE) {
     H(qbe_st.qsvt_exp_lcu);
   } apply {
     qsvt_lcu([
-      4.7123,
+      3.1416,
       3.1413,
       3.0909,
-      1.7374,
+      1.7373,
       3.0909,
       3.1413,
-      (-17.2788)
+      (-15.708)
     ], [
-      4.7123,
+      3.1416,
       3.1416,
       3.1383,
-      2.8234,
-      2.8234,
+      2.8233,
+      2.8233,
       3.1383,
       3.1416,
-      (-20.4204)
+      (-18.8496)
     ], time_dependent_projector, time_dependent_projector, lambda(x) {
       short_time_summation(a, b, x);
     }, qbe_st.time_dependent, qbe_st.qsvt_exp_aux, qbe_st.qsvt_exp_lcu);
@@ -72,14 +72,14 @@ qfunc short_time_magnus(a: real, b: real, qbe_st: MagnusBE) {
 
 qfunc long_slice_evolution(a: real, b: real, qbe: LongSliceBE) {
   qsvt([
-    4.4226,
-    3.0652,
-    4.6791,
-    3.5232,
-    (-2.7599),
-    4.6791,
-    9.3483,
-    (-20.7101)
+    3.1226,
+    3.4812,
+    4.3458,
+    2.7132,
+    2.7132,
+    4.3458,
+    3.4812,
+    (-18.8685)
   ], magnus_projector, magnus_projector, lambda(x) {
     short_time_magnus(a, b, x);
   }, qbe.magnus, qbe.qsvt_amplification_aux);
