@@ -1,0 +1,74 @@
+name: "Send Qmods Slack notification"
+description: "Send failing Qmods notification from pytest output"
+
+inputs:
+  slack_bot_token:
+    description: "Token to authenticate with slack bot"
+    required: true
+  pytest_output:
+    required: true
+    description: "Pytest output file path"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Print failing tests
+      shell: bash
+      run: |
+        echo FAILING_TESTS=$(
+          yq -o json -I 0 -p xml '
+                .testsuites[].testcase[] | select(.failure // .error) |
+                select((.failure // .error)["+@message"] | test("^((AssertionError: Qmod file)|(AssertionError: Found uncommitted Qmod)).*")) |
+                {
+                  "name": (.["+@classname"] + "::" + .["+@name"]),
+                  "message": (.failure // .error)["+@message"]
+                }
+              '  ${{ inputs.pytest_output }} | \
+              jq -r -s '
+                sort_by(.name) | .[] |
+                "• " + .name + ": " + (.message | @html | split("\n") | .[0]) + "\n"
+                '
+        ) >> $GITHUB_ENV
+
+    - name: Send JSON to slack workflow
+      id: slack
+      if: ${{ env.FAILING_TESTS }}
+      uses: slackapi/slack-github-action@v2.1
+      with:
+        method: chat.postMessage
+        token: ${{ inputs.slack_bot_token }}
+        payload: |
+          {
+              "channel": "ci-notebooks-alerts",
+              "blocks": [
+                  {
+                      "type": "header",
+                      "text": {
+                          "type": "plain_text",
+                          "text": "Notification - Classiq library tests failed on branch ${{ github.ref_name }}",
+                          "emoji": true
+                      }
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
+                          "text": "Some Classiq library demos failed.\n*Make sure to take a look*"
+                      }
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
+                          "text": "${{ env.FAILING_TESTS }}"
+                      }
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
+                          "text": "<https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}|Failed action URL>"
+                      }
+                  }
+              ]
+          }
