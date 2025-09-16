@@ -39,7 +39,7 @@ jobs:
 
       # Run Notebook Tests
       - name: Run Notebooks
-        run: python -m pytest --durations=0 tests/notebooks
+        run: python -m pytest --durations=0 --junitxml=pytest-results/test-results-applications.xml tests/notebooks
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
@@ -50,5 +50,71 @@ jobs:
           # Passing environment information
           CLASSIQ_IDE: "https://nightly.platform.classiq.io"
           CLASSIQ_HOST: "https://nightly.platform.classiq.io"
-          # Altering test behavior
-          QMOD_COMPARISON_FIRST: "true"
+
+      - name: Print failing tests
+        if: failure()
+        run: |
+          if [ -z "$(find ./pytest-results -name "*.xml")" ]; then
+            # Don't do anything if we don't have any results
+            exit 0
+          fi
+          {
+            echo "# Failing tests"
+            echo "| Test | Message |"
+            echo "| ---- | ------- |"
+            yq -o json -I 0 -p xml '
+                .testsuites[].testcase[] | select(.failure // .error) |
+                select((.failure // .error)["+@message"] | test("^((AssertionError: Qmod file)|(AssertionError: Found uncommitted Qmod)).*")) |
+                {
+                  "name": (.["+@classname"] + "::" + .["+@name"]),
+                  "message": (.failure // .error)["+@message"]
+                }
+              '  ./pytest-results/*.xml | \
+              jq -r -s '
+                sort_by(.name) | .[] |
+                "| " + .name + " | " + (.message | @html | split("\n") | .[0]) + " |"
+                '
+          }>>"$GITHUB_STEP_SUMMARY"
+
+      - name: Send JSON to slack workflow
+        id: slack
+        if: failure()
+        uses: slackapi/slack-github-action@v2.1
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            {
+                "channel": "ci-notebooks-alerts",
+                "blocks": [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Notification - Classiq library tests failed on branch ${{ github.ref_name }}",
+                            "emoji": true
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "Some Classiq library demos failed.\n*Make sure to take a look*"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "$GITHUB_STEP_SUMMARY"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}|Failed action URL>"
+                        }
+                    }
+                ]
+            }
