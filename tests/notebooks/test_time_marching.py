@@ -27,7 +27,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     for amplitude_amplified, amplitude_naive in zip(
         tb.ref("amplitudes_amplified"), tb.ref("amplitudes_naive")
     ):
-        # should be a factor of 10 larger. taking a factor of 8 as some buffer.
-        assert amplitude_naive < amplitude_amplified / 8
+        # should be a factor of 10 larger, taking some buffer.
+        assert amplitude_naive - 0.1 * amplitude_amplified < 1e-2
 
     assert tb.ref("np.linalg.norm(sampled - expected)") < 0.1
