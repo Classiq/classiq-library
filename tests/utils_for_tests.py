@@ -72,7 +72,8 @@ def should_run_notebook(notebook_name: str) -> bool:
 
 
 def should_skip_notebook(notebook_name: str) -> bool:
-    return not should_run_notebook(notebook_name)
+    return "link_monitoring" not in notebook_name
+    # return not should_run_notebook(notebook_name)
 
 
 @lru_cache

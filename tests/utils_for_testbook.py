@@ -89,8 +89,9 @@ def _compare_qmods(qmods: dict[str, str], new_qmods: dict[str, str]) -> None:
             f"Found uncommitted Qmod files: {', '.join(uncommitted_files)}"
         )
     for file in qmods:
-        assert _normalize_qmod_code(qmods[file]) == _normalize_qmod_code(
-            new_qmods[file]
+        assert (
+            _normalize_qmod_code(qmods[file]) == _normalize_qmod_code(new_qmods[file])
+            and False
         ), f"Qmod file {file.split('/')[-1]} is not up-to-date"
 
 
