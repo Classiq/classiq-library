@@ -18,7 +18,13 @@ git checkout -b "updating_notebooks_$(date '+%Y.%m.%d_%H.%M')"
 echo
 
 echo "Updating pip"
-python -m pip install -U -r requirements.txt -r requirements_tests.txt
+if [ "$UPDATER_SILENCE_PIP" = "true" ] || [ "$UPDATER_SILENCE_PIP" = "1" ]; then
+    out="/dev/null"
+else
+    out="&1"
+fi
+python -m pip install -U -r requirements.txt -r requirements_tests.txt >"$out"
+echo "Updating pip - done"
 
 #
 # 2) Update the notebooks
