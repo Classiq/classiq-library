@@ -30,10 +30,15 @@ cp "$notebook_path" "$notebook_copy_path"
 
 pushd "$notebook_dir" > /dev/null
 jupyter nbconvert --to notebook --execute --inplace "$notebook_copy_name" --ExecutePreprocessor.kernel_name=python3
+status=$?
 popd > /dev/null
 
 "$current_folder/hook_remove_random_seed.py" "$notebook_copy_path"
 
-"$current_folder/update_links.py" "$notebook_path" "$notebook_copy_path"
+if [ $status -eq 0 ]; then
+	"$current_folder/update_links.py" "$notebook_path" "$notebook_copy_path"
+else
+	echo "NOT updating links for ${notebook_path} since 'jupyter nbconvert' failes with exit code ${status}"
+fi
 
 rm "$notebook_copy_path"
