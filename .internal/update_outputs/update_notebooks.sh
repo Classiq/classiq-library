@@ -15,6 +15,8 @@ if [[ " $* " == *" --help "* ]]; then
   echo "UPDATER_MAX_THREADS=1 UPDATER_SILENCE_PIP=1 UPDATER_FOLDER=algorithms/algebraic .internal/update_outputs/update_notebooks.sh"
   echo
   echo "UPDATER_MAX_THREADS=true UPDATER_SILENCE_PIP=true UPDATER_TRACK_TIME=false UPDATER_MODE=test_small .internal/update_outputs/update_notebooks.sh"
+  echo
+  echo "UPDATER_MAX_THREADS=1 UPDATER_SILENCE_PIP=1 UPDATER_LINKS_ONLY=0 UPDATER_FOLDER=algorithms/algebraic .internal/update_outputs/update_notebooks.sh"
   exit 0
 fi
 
@@ -88,8 +90,14 @@ else
   esac
 fi
 
+if [ "$UPDATER_LINKS_ONLY" = "false" ] || [ "$UPDATER_LINKS_ONLY" = "0" ]; then
+    links_only_flag=""
+else
+    links_only_flag="--links-only"
+fi
+
 # Execute the command
-eval "$FIND_CMD" | xargs -P"$MAX_THREADS" -I{} "$current_folder/update_single_notebook.sh" "{}" --links-only
+eval "$FIND_CMD" | xargs -P"$MAX_THREADS" -I{} "$current_folder/update_single_notebook.sh" "{}" "$links_only_flag"
 
 #
 # 3) Commit the changes + open PR
