@@ -18,17 +18,20 @@ if [[ " $* " == *" --help "* ]]; then
   exit 0
 fi
 
-
-
-
 #
 # 1) Initialization - `git pull` + create-new-branch
 #
 echo "======= Init ======="
 cd "$(git rev-parse --show-toplevel)"
 
+if [ "$UPDATER_SILENCE_GIT" = "true" ] || [ "$UPDATER_SILENCE_GIT" = "1" ]; then
+    out_git="/dev/null"
+else
+    out_git="&1"
+fi
+
 git checkout main
-git pull
+git pull >"$out_git"
 
 echo
 git checkout -b "updating_notebooks_$(date '+%Y.%m.%d_%H.%M')"
@@ -36,11 +39,11 @@ echo
 
 echo "Updating pip"
 if [ "$UPDATER_SILENCE_PIP" = "true" ] || [ "$UPDATER_SILENCE_PIP" = "1" ]; then
-    out="/dev/null"
+    out_pip="/dev/null"
 else
-    out="&1"
+    out_pip="&1"
 fi
-python -m pip install -U -r requirements.txt -r requirements_tests.txt >"$out"
+python -m pip install -U -r requirements.txt -r requirements_tests.txt >"$out_pip"
 echo "Updating pip - done"
 
 #
