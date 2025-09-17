@@ -12,6 +12,8 @@ current_folder="$(realpath "$(dirname "$0")")"
 # disable popping browser for `show(qprog)`
 export BROWSER="$current_folder/fake_browser.sh"
 
+# trigger circuit creation in backend
+export OPENVSCODE="some-dummy-value"
 # make a copy
 notebook_copy_path="$notebook_path.temp.ipynb"
 notebook_copy_name=$(basename "$notebook_copy_path")
