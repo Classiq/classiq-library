@@ -99,5 +99,5 @@ find . -name "*.ipynb" -exec git add {} +
 git commit -m "Updating notebooks output"
 
 
-gh pr create --fill
+gh pr create --fill --label "Updating output"
 gh pr view --web
