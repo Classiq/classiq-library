@@ -31,13 +31,20 @@ def hook_random_seed(jupyter_notebook_file_path: str):
     with open(jupyter_notebook_file_path, "r") as f:
         data = json.load(f)
 
+    version = int(data.get("nbformat", "0")), int(data.get("nbformat_minor", "0"))
+    if version < (4, 5):
+        cell_set_random = CELL_SET_RANDOM.copy()
+        cell_set_random.pop("id")
+    else:
+        cell_set_random = CELL_SET_RANDOM
+
     if (
         type(data) is dict
         and "cells" in data
         and type(data["cells"]) is list
         and len(data["cells"]) > 0
     ):
-        data["cells"].insert(0, CELL_SET_RANDOM)
+        data["cells"].insert(0, cell_set_random)
         with open(jupyter_notebook_file_path, "w") as f:
             json.dump(data, f, indent=1)
 
