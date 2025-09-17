@@ -59,10 +59,31 @@ fi
 #
 # Executing
 #
+
+# (maybe) track timing
+if [ "$UPDATER_TRACK_TIME" = "false" ] || [ "$UPDATER_TRACK_TIME" = "0" ]; then
+  out="/dev/null"
+else
+  out="/dev/stdout"
+fi
+
+# record start time
+start=$(date +%s)
+printf "Starting at %s : \"%s\"\n" "$(date)" "$notebook_path" >"$out"
+
+# execute
 pushd "$notebook_dir" > /dev/null
 jupyter nbconvert --to notebook --execute --inplace "$notebook_copy_name" --ExecutePreprocessor.kernel_name=python3
 status=$?
 popd > /dev/null
+
+# record end time
+end=$(date +%s)
+elapsed=$((end - start))
+
+# format hh:mm:ss
+printf -v duration "%02d:%02d:%02d" $((elapsed/3600)) $((elapsed%3600/60)) $((elapsed%60))
+printf "Ended    at %s : \"%s\" : took %s\n" "$(date)" "$notebook_path" "$duration" >"$out"
 
 #
 # Post execution

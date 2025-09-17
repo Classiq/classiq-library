@@ -14,7 +14,7 @@ if [[ " $* " == *" --help "* ]]; then
   echo "example usage:"
   echo "UPDATER_MAX_THREADS=1 UPDATER_SILENCE_PIP=1 UPDATER_FOLDER=algorithms/algebraic .internal/update_outputs/update_notebooks.sh"
   echo
-  echo "UPDATER_MAX_THREADS=1 UPDATER_SILENCE_PIP=1 UPDATER_MODE=test_small .internal/update_outputs/update_notebooks.sh"
+  echo "UPDATER_MAX_THREADS=true UPDATER_SILENCE_PIP=true UPDATER_TRACK_TIME=false UPDATER_MODE=test_small .internal/update_outputs/update_notebooks.sh"
   exit 0
 fi
 
@@ -27,7 +27,7 @@ cd "$(git rev-parse --show-toplevel)"
 if [ "$UPDATER_SILENCE_GIT" = "true" ] || [ "$UPDATER_SILENCE_GIT" = "1" ]; then
     out_git="/dev/null"
 else
-    out_git="&1"
+    out_git="/dev/stdout"
 fi
 
 git checkout main
@@ -41,7 +41,7 @@ echo "Updating pip"
 if [ "$UPDATER_SILENCE_PIP" = "true" ] || [ "$UPDATER_SILENCE_PIP" = "1" ]; then
     out_pip="/dev/null"
 else
-    out_pip="&1"
+    out_pip="/dev/stdout"
 fi
 python -m pip install -U -r requirements.txt -r requirements_tests.txt >"$out_pip"
 echo "Updating pip - done"
