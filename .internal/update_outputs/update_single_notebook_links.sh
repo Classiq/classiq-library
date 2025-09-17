@@ -14,6 +14,13 @@ export BROWSER="$current_folder/fake_browser.sh"
 
 # trigger circuit creation in backend
 export OPENVSCODE="some-dummy-value"
+
+# validations, before starting copy
+if ! jupyter kernelspec list | tail -n +2 | awk '{print $1}' | grep -xq "python3"; then
+  echo "Kernel python3 not found" >&2
+  exit 1
+fi
+
 # make a copy
 notebook_copy_path="$notebook_path.temp.ipynb"
 notebook_copy_name=$(basename "$notebook_copy_path")
@@ -22,7 +29,7 @@ cp "$notebook_path" "$notebook_copy_path"
 "$current_folder/hook_add_random_seed.py" "$notebook_copy_path"
 
 pushd "$notebook_dir" > /dev/null
-jupyter nbconvert --to notebook --execute --inplace "$notebook_copy_name"
+jupyter nbconvert --to notebook --execute --inplace "$notebook_copy_name" --ExecutePreprocessor.kernel_name=python3
 popd > /dev/null
 
 "$current_folder/hook_remove_random_seed.py" "$notebook_copy_path"
