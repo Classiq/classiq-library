@@ -37,14 +37,21 @@ echo
 git checkout -b "updating_notebooks_$(date '+%Y.%m.%d_%H.%M')"
 echo
 
-echo "Updating pip"
+echo "[*] Updating pip"
 if [ "$UPDATER_SILENCE_PIP" = "true" ] || [ "$UPDATER_SILENCE_PIP" = "1" ]; then
     out_pip="/dev/null"
 else
     out_pip="/dev/stdout"
 fi
+start=$(date +%s)
+
 python -m pip install -U -r requirements.txt -r requirements_tests.txt >"$out_pip"
-echo "Updating pip - done"
+
+end=$(date +%s)
+elapsed=$((end - start))
+# format hh:mm:ss
+printf -v duration "%02d:%02d:%02d" $((elapsed/3600)) $((elapsed%3600/60)) $((elapsed%60))
+printf "[*] Updating pip - done : took %s\n" "$duration"
 
 #
 # 2) Update the notebooks
