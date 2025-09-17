@@ -69,7 +69,7 @@ fi
 
 # record start time
 start=$(date +%s)
-printf "Starting at %s : \"%s\"\n" "$(date)" "$notebook_path" >"$out"
+printf "[*] Starting at %s : \"%s\"\n" "$(date)" "$notebook_path" >"$out"
 
 # execute
 pushd "$notebook_dir" > /dev/null
@@ -83,7 +83,7 @@ elapsed=$((end - start))
 
 # format hh:mm:ss
 printf -v duration "%02d:%02d:%02d" $((elapsed/3600)) $((elapsed%3600/60)) $((elapsed%60))
-printf "Ended    at %s : \"%s\" : took %s\n" "$(date)" "$notebook_path" "$duration" >"$out"
+printf "[*] Ended    at %s : \"%s\" : took %s\n" "$(date)" "$notebook_path" "$duration" >"$out"
 
 #
 # Post execution
