@@ -105,16 +105,18 @@ eval "$FIND_CMD" | xargs -P"$MAX_THREADS" -I{} "$current_folder/update_single_no
 echo
 echo
 echo "======= Creating PR ======="
-# 1. Add all .py files recursively
-find . -name "*.ipynb" -exec git add {} +
-# 2. Restore all .txt files to discard their changes
+# 1. Restore all .synthesis_options.json files to discard their changes
 find . -name "*.synthesis_options.json" -exec git restore {} +
-# 3. Commit the staged .py files
+# 2. Add all .ipynb files recursively
+find . -name "*.ipynb" -exec git add {} +
+# 3. Commit the staged .ipynb files
 git commit -m "Updating notebooks output"
 
-# running twice so that we'd include the pre-commit updates
-find . -name "*.ipynb" -exec git add {} +
-git commit -m "Updating notebooks output"
+if [ $status -ne 0 ]; then
+	# running twice so that we'd include the pre-commit updates
+	find . -name "*.ipynb" -exec git add {} +
+	git commit -m "Updating notebooks output"
+fi
 
 
 gh pr create --fill --label "Updating output"
