@@ -79,7 +79,7 @@ else
 fi
 
 # Execute the command
-eval "$FIND_CMD" | xargs -P"$MAX_THREADS" -I{} "$current_folder/update_single_notebook_links.sh" "{}"
+eval "$FIND_CMD" | xargs -P"$MAX_THREADS" -I{} "$current_folder/update_single_notebook.sh" "{}" --links-only
 
 #
 # 3) Commit the changes + open PR
