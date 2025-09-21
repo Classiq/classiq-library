@@ -39,6 +39,14 @@ echo
 git checkout -b "updating_notebooks_$(date '+%Y.%m.%d_%H.%M')"
 echo
 
+# is outside venv; return 0 = outside venv; return 1 = inside venv
+python -c "import sys; sys.exit(not hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix))"
+if [ $? -eq 0 ]; then
+  echo "Please enter venv"
+  exit 1
+fi
+
+
 echo "[*] Updating pip"
 if [ "$UPDATER_SILENCE_PIP" = "true" ] || [ "$UPDATER_SILENCE_PIP" = "1" ]; then
     out_pip="/dev/null"
@@ -112,7 +120,7 @@ find . -name "*.ipynb" -exec git add {} +
 # 3. Commit the staged .ipynb files
 git commit -m "Updating notebooks output"
 
-if [ $status -ne 0 ]; then
+if [ $? -ne 0 ]; then
 	# running twice so that we'd include the pre-commit updates
 	find . -name "*.ipynb" -exec git add {} +
 	git commit -m "Updating notebooks output"
