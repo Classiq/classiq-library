@@ -28,6 +28,37 @@ repos:
 
   - repo: local
     hooks:
+      - id: upgrade-nbformat
+        name: Upgrade notebooks nbformat
+        entry: .internal/pre_commit_tools/set_nbformat.py
+        language: python
+        files: ^\S+\.ipynb$
+        additional_dependencies:
+          - "nbformat"
+        require_serial: true
+      - id: extra-nbstripout
+        name: Strip further stuff from notebooks
+        entry: .internal/pre_commit_tools/extra_nbstripout.py
+        language: python
+        files: ^\S+\.ipynb$
+        additional_dependencies:
+          - "nbformat"
+        require_serial: true
+
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+        args:
+          [
+            --keep-output,
+            --keep-count,
+            --drop-empty-cells,
+            --keep-metadata-keys=cell.metadata.scrolled,
+          ]
+
+  - repo: local
+    hooks:
       - id: notebook-pre-commit
         name: Notebook pre commit collection
         description: Ensure notebooks conventions
