@@ -1,0 +1,8 @@
+qfunc unitary_application(state: qbit[]) {
+  H(state[0]);
+}
+
+qfunc main(output qarr: qbit[]) {
+  prepare_bell_state(1, qarr);
+  unitary_application(qarr);
+}
