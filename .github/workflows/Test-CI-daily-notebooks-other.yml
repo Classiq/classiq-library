@@ -50,4 +50,3 @@ jobs:
         uses: ./.github/actions/send_qmods_slack_notification
         with:
           slack_bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-          pytest_output: ./pytest-results/test-results-other.xml
