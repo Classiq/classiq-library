@@ -5,9 +5,6 @@ inputs:
   slack_bot_token:
     description: "Token to authenticate with slack bot"
     required: true
-  pytest_output:
-    required: true
-    description: "Pytest output file path"
 
 runs:
   using: "composite"
@@ -23,7 +20,7 @@ runs:
                   "name": (.["+@classname"] + "::" + .["+@name"]),
                   "message": (.failure // .error)["+@message"]
                 }
-              '  ${{ inputs.pytest_output }} | \
+              '  ./pytest-results/test-results.xml | \
               jq -r -s '
                 sort_by(.name) | .[] |
                 "• " + .name + ": " + (.message | @html | split("\n") | .[0]) + "\n"
