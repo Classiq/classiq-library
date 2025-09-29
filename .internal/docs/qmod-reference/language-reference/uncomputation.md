@@ -5,7 +5,7 @@ search:
 
 # Uncomputation
 
-<!-- cspell:ignore permutable, Toffoli -->
+<!-- cspell:ignore Toffoli -->
 
 Uncomputation is the process of reversing the effects of quantum operations,
 restoring the state of qubits to their initial $|0\rangle$ state. Failing to
@@ -16,53 +16,70 @@ inaccessible outside of it. Hence, local variables must be used in a way that
 enables subsequent uncomputation. Specifically, their interactions with other
 objects must be restrictive to be subsequently disentangled from them.
 
-In order to enforce the restrictions, quantum variable use contexts are
-classified. Also, explicit declarations are used to specify the intended use of
-function parameters.
+To enforce the restrictions, quantum operations are classified into arbitrary
+functions and _permutation_-only functions. In addition, each of an operation's
+parameters is classified as either _const_ or _non-const_.
 
-## Variable use classification
+-   **permutation**: A quantum operation is a _permutation_ if it maps
+    computational-basis states to computational-basis states (with possible
+    phase shifts). Such an operation neither introduces nor destroys quantum
+    superpositions, and its computation can be described classically.
+-   **const**: A parameter of a quantum operation is constant if it is
+    immutable up to a phase. That is, the magnitudes of its computational-basis
+    state components remain unchanged, while their phases may shift.
 
-### Use categories
+_permutation_ functions are explicity declared using the keyword
+`qperm`. _const_ parameters are explicity declared using the keyword
+`const`. See more under [Function Declarations](functions.md).
 
-Quantum variables figure in expressions in different contexts. These contexts
-determine whether and in which way the state of the object can change. There
-are three use categories in this respect:
+??? Examples
 
--   _mutable_ - the object's state may change arbitrarily.
--   _permutable_ - the object is mutable "classically" up to a phase, that is, its state may go through
-    computational-basis permutations and phase shifts, but no superposition is
-    introduced or destroyed.
--   _const_ - the object is immutable up to a phase, that is, its computational-basis state
-    components remain constant in their magnitude, but their phases may shift.
+    - `Z` is a _permutation_ and its parameter is _const_ as it merely flips the phase
+      of the $|1\rangle$ state.
+    - `X` is a _permutation_ but its parameter is not _const_ as it flips between
+      $|0\rangle$ and $|1\rangle$.
+    - `H` is not a _permutation_ and its parameter is not _const_, as it
+      introduces superposition.
+    - `SWAP` is a _permutation_ but its two parameters are not _const_, as it
+      swaps between $|01\rangle$ and $|10\rangle$.
 
-### Use contexts
+## Quantum operations classification
 
-Following are the use categories of quantum variables in different constructs:
+Each quantum operation is classified as either an arbitrary mutation of the quantum
+state or strictly a _permutation_ of computational-basis states, according to the
+following rules:
 
--   An argument in a function call is determined by the mutability modifier used in
-    the parameter declaration (mutable by default, or using the keywords
-    `permutable` and `const`, see more under [Function Declarations](functions.md)).
--   If multiple parameters of a function are declared `permutable`, their _combined_
-    state may go through permutations. Specifically, swapping qubits
-    between two permutable parameters is allowed.
--   Use as right-value quantum expression is _const_. Right-value expressions occur
-    in the following contexts:
-    -   On the right-hand side of a numeric-assignment and amplitude-encoding assignment.
-    -   As the condition in _control_ statement.
-    -   As the argument of _phase_ statement.
--   Use as left-value expression in numeric assignment (both out-of-place and
-    in-place) is _permutable_.
--   Use as left-value in amplitude-encoding assignment is _mutable_ (introducing
-    superposition into the state).
--   Use as the argument of _allocate_ statement is considered _permutable_.
+-   A function call is a _permutation_ if the callee is declared as `qperm`.
+-   A numeric assignment (both out-of-place and in-place) is a _permutation_.
+-   Amplitude-encoding assignment is _non-permutation_.
+-   Phase statement is a _permutation_.
+-   A compound statement is a _permutation_ if its body contains only _permutation_
+    operations. For example, a _control_ statement is a _permutation_ if all
+    statements inside its _then_ and _else_ clauses are _permutations_.
+-   Bind statement is considered a _permutation_, as are `allocate` and
+    `free`.
 
-### Enforcement of parameter restrictions
+In addition, each use of a quantum variable is classified as either _const_ or
+_non-const_:
 
-The parameters of a quantum function may be declared with the modifiers
-`permutable` or `const`. Generally, a `const` parameter is restricted to
-_const_ use contexts and a `permutable` parameter is restricted to either
-_const_ or _permutable_ use contexts. Violation of these restrictions results
-in a compilation error.
+-   An argument in a function call is classified according to the modifier used
+    in the matching parameter declaration.
+-   Use as right-value quantum expression is _const_. Right-value expressions
+    occur in the following contexts:
+    -   On the right-hand side of a numeric assignment or amplitude-encoding assignment.
+    -   As the condition in a _control_ statement.
+    -   As the argument of a _phase_ statement.
+-   Use as left-value expression in numeric assignments (both out-of-place and
+    in-place) and amplitude-encoding assignments is _non-const_.
+-   Arguments to a _bind_ statement are treated specially: they are not
+    immediately classified, but are instead bound together and assigned a
+    joint classification of either _const_ or _non-const_.
+
+### Enforcement of function classification
+
+Generally, a `qperm` function is restricted to use only _permutation_
+operations, and a `const` parameter is restricted to _const_ use contexts.
+Violation of these restrictions results in a compilation error.
 
 However, flexibility is often required in the implementation of lower-level
 building blocks. The cumulative effect of the function on the quantum
@@ -72,47 +89,55 @@ and arithmetic addition in the Fourier bases. Both are permutation-only operatio
 taken as a whole, but internally use Hadamard gates and rotations.
 
 It is not scalable to validate the correct cumulative effect of a description
-automatically in the general case. But you can suppress the fine-grained
-enforcement of variable use with the `unchecked` specifier using the following
-syntax:
+automatically in the general case. However, you can suppress the fine-grained
+enforcement of function classification with the `disable_perm_check` and
+`disable_const_checks` specifiers using the following syntax:
 
 === "Native"
 
-    **qfunc** _name_ **(** _parameters_ **)** **unchecked** **(** _unchecked_parameters_ **)** **{** _statements_ **}**
+    Before a function definition you may specify the following decorators:
 
-    _unchecked_parameters_ is a list of one or more comma-separated parameter names
+    **@disable_perm_check**
+
+    **@disable_const_checks** [ **(** _parameters_ **)** ]
+
+    Where _parameters_ is an optional list of comma-separated parameter names (if
+    the list is omitted, the checks are disabled for all _const_ parameters).
 
 === "Python"
 
-    The decorator `@qfunc` has the optional parameter `unchecked` declared thus -
+    The decorators `@qfunc` and `@qperm` have the optional parameters
+    `disable_perm_check` and `disable_const_checks` declared thus -
 
-      unchecked: Optional[list[str]] = None
+      disable_perm_check: bool = False
 
-    The argument list contains one or more names of the decorated function
-    parameters
+      disable_const_checks: Union[list[str], bool] = False
 
-The compiler does not enforce use context restrictions on quantum parameters
-listed as _unchecked_.
+    `disable_const_checks` may contain a list of parameter names, or a boolean
+    to disable the checks for all _const_ parameters.
+
+When `disable_perm_check` is used, the compiler does not enforce the usage of
+_non-permutation_ operations. When `disable_const_checks` is used, the compiler
+does not enforce use context restrictions on the listed parameters (or all
+parameters if none specified).
 
 ### Examples
 
-#### Example 1 - Correct use of permutable and const parameters
+#### Example 1 - Correct use of permutation and const parameters
 
-In the example below, function `foo` has two parameters - `param1` is declared
-`const`, and `param2` is declared `permutable`. Their use in `foo`'s body is
-consistent with their declaration. Note that the restriction on `param2` is
-carried over to its use in the lambda expression passed to `apply_to_all`. In
-this case, the parameter of function `Z` is declared `const` since it is merely
-a relative phase flip.
+In the example below, function `foo` is declared `qperm`, and its first
+parameter `param1` is declared `const`. The definition of `foo` is consistent
+with these declarations. Note that the restriction on `param1` is carried over
+to its use in the lambda expression passed to `apply_to_all`.
 
 === "Native"
 
     ```
-    qfunc foo(const param1: qnum, permutable output param2: qnum) {
-      param2 = param1 + 1;  // OK - assignment LHS is permutable and RHS is const
+    qperm foo(const param1: qnum, output param2: qnum) {
+      param2 = param1 + 1;  // OK - assignment is a permutation and RHS is const
       apply_to_all(lambda(qb) {
         Z(qb);
-      }, param2);  // OK - the parameter of 'Z' is const
+      }, param1);  // OK - the parameter of 'Z' is const
     }
     ```
 
@@ -122,27 +147,26 @@ a relative phase flip.
     from classiq import *
 
 
-    @qfunc
-    def foo(param1: Const[QNum], param2: Output[Permutable[QNum]]):
-        param2 |= param1 + 1  # OK - assignment LHS is permutable and RHS is const
+    @qperm
+    def foo(param1: Const[QNum], param2: Output[QNum]):
+        param2 |= param1 + 1  # OK - assignment is a permutation and RHS is const
         apply_to_all(lambda qb: Z(qb), param1)  # OK - the parameter of 'Z' is const
     ```
 
-#### Example 2 - Incorrect use of permutable and const parameters
+#### Example 2 - Incorrect use of permutation and const parameters
 
 The example below demonstrates violations of the restrictions on the use of
-parameters. Like in the previous example, function `foo` has two parameters -
-`param1` is declared `const`, and `param2` is declared `permutable`. However,
-the use of these parameters in both lines is inconsistent with their
-declaration.
+parameters and operations. As in the previous example, the function `foo` is
+declared `qperm` and its first parameter `param1` is declared `const`. However,
+the use of `param1` violates the restriction, and the function uses a
+_non-permutation_ operation as well.
 
 === "Native"
 
     ```
-    qfunc foo(const param1: qnum, permutable output param2: qnum) {
-      param1 += 2;  // Error - LHS is permutable but 'param1' is const
-      hadamard_transform(param2);  // Error - the parameter of 'hadamard_transform'
-    }                              // is mutable but 'param2' is permutable
+    qperm foo(const param1: qnum, output param2: qnum) {
+      param1 += 2;  // Error - LHS is non-const
+      hadamard_transform(param2);  // Error - 'hadamard_transform' is non-permutation
     ```
 
 === "Python"
@@ -151,25 +175,24 @@ declaration.
     from classiq import *
 
 
-    @qfunc
-    def foo(param1: Const[QNum], param2: Output[Permutable[QNum]]):
-        param1 += 2  # Error - LHS is permutable but 'param1' is const
-        hadamard_transform(param2)  # Error - the parameter of 'hadamard_transform'
-        # is mutable but 'param2' is permutable
+    @qperm
+    def foo(param1: Const[QNum], param2: Output[QNum]):
+        param1 += 2  # Error - LHS is non-const
+        hadamard_transform(param2)  # Error - 'hadamard_transform' is non-permutation
     ```
 
-#### Example 3 - Unchecked parameter
+#### Example 3 - Disabling permutation check
 
 In the example below, function `my_cx` implements the CX operation using a
 simple equivalence - applying phase flip in the Hadamard basis. The cumulative
-operation on parameter `tgt` is a state permutation, but individual calls to
-`H` are not. The `unchecked` specifier is used to suppress compiler errors in
-this case.
+operation on the quantum state is a _permutation_, but individual calls to `H` are
+not. The `disable_perm_check` is used to suppress compiler errors in this case.
 
 === "Native"
 
     ```
-    qfunc my_cx(const ctrl: qbit, permutable tgt: qbit) unchecked (tgt) {
+    @disable_perm_check
+    qperm my_cx(const ctrl: qbit, tgt: qbit) {
       H(tgt);
       CZ(ctrl, tgt);
       H(tgt);
@@ -182,10 +205,45 @@ this case.
     from classiq import *
 
 
-    @qfunc(unchecked=["tgt"])
-    def my_cx(ctrl: Const[QBit], tgt: Permutable[QBit]):
+    @qperm(disable_perm_check=True)
+    def my_cx(ctrl: Const[QBit], tgt: QBit):
         H(tgt)
         CZ(ctrl, tgt)
+        H(tgt)
+    ```
+
+#### Example 4 - Disabling permutation check and const checks
+
+In the example below, function `my_z` implements the Z operation using a
+simple equivalence - applying bit flip in the Hadamard basis. The cumulative
+operation on the quantum state is a _permutation_, but individual calls to `H` are
+not. Also, the cumulative operation on the `tgt` is _const_, but individual
+calls are not.
+The `disable_perm_check` and `disable_const_checks` are used to suppress
+compiler errors in this case.
+
+=== "Native"
+
+    ```
+    @disable_perm_check
+    @disable_const_checks
+    qperm my_z(const tgt: qbit) {
+      H(tgt);
+      X(tgt);
+      H(tgt);
+    }
+    ```
+
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qperm(disable_perm_check=True, disable_const_checks=True)
+    def my_z(tgt: Const[QBit]):
+        H(tgt)
+        X(tgt)
         H(tgt)
     ```
 
@@ -209,8 +267,7 @@ in the scope of the statement.
 following rules guarantee that uncomputation candidates can be handled
 correctly:
 
--   An uncomputation candidate can only be used in either _permutable_ or _const_
-    contexts.
+-   An uncomputation candidate must not be used in a _non-permutation_ operation.
 -   A variable initialized inside a _within_ block of a _within-apply_ statement can
     only be used in _const_ contexts inside the _apply_ block.
 -   A variable becomes a _dependency_ of an uncomputation candidate when used
@@ -226,8 +283,8 @@ Violating these rules will result in a compilation error.
 
 The example below demonstrates the use of a local variable initialized inside a
 _within_ block of a _within-apply_ statement. Variable `aux` is initialized as
-the left-value expression of an assignment statement, which is a _permutable_
-context. In the _apply_ block, it is used as the condition of a _control_
+the left-value expression of an assignment statement, which is a _permutation_
+operation. In the _apply_ block, it is used as the condition of a _control_
 statement, which is a _const_ context. Both uses are valid, and the variable is
 uncomputed and freed correctly after the _within-apply_ statement.
 
@@ -272,9 +329,9 @@ The code below is a modification of _Example 1_ above, with a couple of lines
 added to demonstrate violations of the rules for correct use of a variable
 initialized inside the _within_ block of a _within-apply_ statement. Here,
 variable `aux` is also used as the argument of function `H` in the _within_
-block. This is an arbitrarily mutable context (indeed `H` introduces
+block. This is an arbitrarily _non-permutation_ operation (indeed `H` introduces
 superposition between computational-basis states). In addition, `aux` is used
-as the argument of function `X` in the _apply_ block, which is non-constant
+as the argument of function `X` in the _apply_ block, which is _non-const_
 context. Both uses are illegal, and both are reported as errors by the
 compiler.
 
@@ -374,8 +431,8 @@ function. Function `rand_increment` initializes a local variable `temp` in a
 superposition state, using `prepare_state`, and is subsequently entangled with
 the parameter `qn`. This makes it impossible to uncompute `temp`. `temp` is a
 local variable and therefore an uncomputation candidate. Passing it as argument
-to `prepare_state` is flagged as an error, because the parameter is not
-declared `permutable`. Note that if `rand_increment` would output `temp`
+to `prepare_state` is flagged as an error, because it is not a _permutation_.
+Note that if `rand_increment` would output `temp`
 instead of declaring it as a local variable, the function would be legal.
 
 === "Native"

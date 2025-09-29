@@ -109,14 +109,15 @@ superposition.
 === "Native"
 
     ```
-    qfunc my_cond_phase_flip(predicate: qfunc (permutable qbit), const target: qbit)
-            unchecked(target) {
+    @disable_perm_check
+    @disable_const_checks
+    qperm my_cond_phase_flip(predicate: qperm (qbit), const target: qbit) {
       H(target);
       predicate(target);
       H(target);
     }
 
-    qfunc my_phase_oracle(predicate: qfunc (permutable qbit)) {
+    qperm my_phase_oracle(predicate: qperm (qbit)) {
       aux: qbit;
       within {
         allocate(aux);
@@ -133,15 +134,15 @@ superposition.
     from classiq import *
 
 
-    @qfunc(unchecked=["target"])
-    def my_cond_phase_flip(predicate: QCallable[Permutable[QBit]], target: Const[QBit]):
+    @qperm(disable_perm_check=True, disable_const_checks=True)
+    def my_cond_phase_flip(predicate: QPerm[QBit], target: Const[QBit]):
         H(target)
         predicate(target)
         H(target)
 
 
-    @qfunc
-    def my_phase_oracle(predicate: QCallable[Permutable[QBit]]):
+    @qperm
+    def my_phase_oracle(predicate: QPerm[QBit]):
         aux = QBit()
         within_apply(
             lambda: (allocate(aux), X(aux)), lambda: my_cond_phase_flip(predicate, aux)

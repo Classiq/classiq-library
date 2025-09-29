@@ -42,18 +42,19 @@ implementation as a sequence of statements.
 
 === "Native"
 
-    **qfunc** _name_ **(** _parameters_ **)** **{** _statements_ **}**
+    (**qfunc** | **qperm**) _name_ **(** _parameters_ **)** **{** _statements_ **}**
 
     _parameters_ is a list of zero or more comma-separated declarations in one of the
     three forms:
 
-    - \[ **output** | **input** \] \[ **permutable** | **const** \] _name_ **:** _quantum-type_
+    - \[ **output** | **input** \] \[ **const** \] _name_ **:** _quantum-type_
     - _name_ **:** _classical-type_
-    - _name_ **:** **qfunc** [ **[** **]** ] **(** _parameters_ **)**
+    - _name_ **:** (**qfunc** | **qperm**) [ **[** **]** ] **(** _parameters_ **)**
 
 === "Python"
 
-    A quantum function is defined with a regular Python function decorated with `@qfunc`.
+    A quantum function is defined with a regular Python function decorated with `@qfunc`
+    or `@qperm`.
 
     The Qmod compiler extracts the signature of the quantum function from the Python type
     hints. Type hints must be specified for all parameters, and must be Qmod types or, in
@@ -61,12 +62,18 @@ implementation as a sequence of statements.
     [Generative Descriptions](generative-descriptions.md)).
 
     Direction modifiers for quantum arguments are represented with the generic classes
-    `Input` and `Output`. Mutability modifiers for quantum arguments are represented with
-    the generic classes `Permutable` and `Const`.
+    `Input` and `Output`. The _const_ modifier for quantum arguments
+    is represented with the generic class `Const`.
 
 ## Semantics
 
 -   A function definition introduces a new function symbol into the global namespace.
+-   The `qfunc` keyword designates a quantum function that modifies the quantum state
+    arbitrarily, while the `qperm` keyword designates a quantum function that modifies
+    the quantum state only as a permutation over computational-basis states (i.e.,
+    does not introduce or destroy superpositions). The `qperm` declaration provides the
+    corresponding guarantees for the caller and restrictions on the function's implementation.
+    See [Uncomputation](uncomputation.md) for more details.
 -   Parameters can be used as variables in the body of the function, based on their
     declared types. For more on Qmod types, see [Quantum Types](quantum-types.md) and
     [Classical Types](classical-types.md).
@@ -75,8 +82,9 @@ implementation as a sequence of statements.
 -   The direction modifiers `input` and `output` may be used to specify whether a quantum
     parameter is input-only or output-only. Note that direction modifiers cannot be used
     with classical or function parameters.
--   The mutability modifiers `permutable` and `const` specify guarantees (and
-    restrictions) on how the state of a quantum parameter may change within the function.
+-   The `const` modifier provides guarantees (and restrictions) on how the
+    quantum state may change within the function. Specifialy, a _const_
+    parameter is immutable up to a phase.
     See [Uncomputation](uncomputation.md) for more details.
 -   Qmod functions can also take functions as arguments. For details on this capability,
     see [Operators](operators.md).

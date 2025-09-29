@@ -85,3 +85,15 @@ Following is a brief description of the steps to configure and acquire these det
 
 4. Add the `Jobs.ReadWrite` permission (under `Azure Quantum`) to the application (see
    [Azure documentation](https://learn.microsoft.com/en-us/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps#assign-app-roles-to-applications)).
+
+## Supported Backends
+
+Included hardware:
+
+-   "ionq.qpu.aria-1"
+-   "ionq.qpu.aria-2"
+
+Included simulators:
+
+-   "ionq.simulator"
+-   "rigetti.sim.qvm"

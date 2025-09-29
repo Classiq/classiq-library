@@ -104,6 +104,7 @@ Welcome to the Classiq Support Center. This page is designed to help you quickly
 
 ## Need More Help?
 
-If your question is not answered here:
+If your question is not answered here, please:
 
-Reach out in the `#support-and-questions` channel on [the community Slack](https://short.classiq.io/join-slack).
+-   Reach out in the `#support-and-questions` channel on [our community Slack](https://short.classiq.io/join-slack).
+-   For additional assistance, to report a bug, or to request a feature, submit a ticket via our [Support Center](https://classiq-community.freshdesk.com/support/home).
