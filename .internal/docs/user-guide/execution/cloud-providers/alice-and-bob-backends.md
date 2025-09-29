@@ -29,11 +29,6 @@ The rate at which the cat qubit is stabilized using two-photon dissipation. High
 
 The number of times information is duplicated in the repetition code. Phase-flip probability decreases exponentially with this parameter, bit-flip probability increases linearly.
 
-### Supported Backends
-
--   _**LOGICAL_EARLY**_
--   _**LOGICAL_TARGET**_
-
 ## Execution
 
 === "SDK"
@@ -106,3 +101,9 @@ The number of times information is duplicated in the repetition code. Phase-flip
     **_After synthesizing_**, you will be navigated to **_Execution_** page, or you can just navigate to it and choose **_Alice & Bob_** backend(s)
 
     ![Execute Alice & Bob](resources/execute_alicebob.png)
+
+## Supported Backends
+
+-   "LOGICAL_EARLY"
+-   "LOGICAL_TARGET"
+-   "LOGICAL_NOISELESS"

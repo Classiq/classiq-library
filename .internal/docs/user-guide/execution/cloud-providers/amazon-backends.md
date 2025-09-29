@@ -3,6 +3,8 @@ search:
     boost: 0.900
 ---
 
+<!-- cspell:ignore Ankaa -->
+
 # Execution on Amazon Braket Cloud
 
 The Classiq executor supports execution on Amazon Braket's cloud simulators and hardware.
@@ -91,10 +93,10 @@ The Classiq executor supports any available gate-based Amazon Braket simulator a
 
 Included hardware:
 
--   "IonQ device"
--   "Lucy"
--   "Aspen-11"
--   "Aspen-M-1"
+-   "Forte 1"
+-   "Emerald"
+-   "Ankaa-3"
+-   "Garnet"
 
 Included simulators:
 

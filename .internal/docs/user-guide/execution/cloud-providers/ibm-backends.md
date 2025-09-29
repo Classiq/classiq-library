@@ -3,6 +3,8 @@ search:
     boost: 0.900
 ---
 
+<!-- cspell:ignore pittsburg -->
+
 # Execution on IBM Quantum Cloud
 
 The Classiq executor supports execution on IBM simulators and hardware.
@@ -52,3 +54,14 @@ The access token is the API token that appears at the top of the [IBM Quantum Cl
 === "IDE"
 
     ![Opening info tab](../../../resources/excution_ibm_hardware_login.png)
+
+## Supported Backends
+
+Included hardware:
+
+-   "ibm_kingston"
+-   "ibm_brisbane"
+-   "ibm_marrakesh"
+-   "ibm_torino"
+-   "ibm_fez"
+-   "ibm_pittsburg"

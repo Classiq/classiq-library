@@ -3,6 +3,8 @@ search:
     boost: 0.900
 ---
 
+<!-- cspell:ignore qsdk -->
+
 # Execution on Intel Backends
 
 The Classiq executor supports execution on Intel® simulators.
@@ -27,3 +29,9 @@ preferences = IntelBackendPreferences(
 
 To cite the Intel® Quantum SDK, please reference:
 Khalate, P., Wu, X.-C., Premaratne, S., Hogaboam, J., Holmes, A., Schmitz, A., Guerreschi, G. G., Zou, X. & Matsuura, A. Y., arXiv:2202.11142 (2022).
+
+## Supported Backends
+
+Included simulators:
+
+-   "intel_qsdk_simulator"

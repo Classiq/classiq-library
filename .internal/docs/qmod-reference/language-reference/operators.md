@@ -26,23 +26,25 @@ signature.
 
     Function type syntax has the following form -
 
-    **qfunc** **(** _function-type-parameters_ **)**
+    (**qfunc** | **qperm**) **(** _function-type-parameters_ **)**
 
     _function-type-parameters_ is a list of zero or more comma-separated declarations
     in the form - [ _name_ **:** ] _type_.
 
-    If **[]** follows the **qfunc** keyword, the parameter is interpreted as a function
+    If **[]** follows the **qfunc**/**qperm** keyword, the parameter is interpreted as a function
     array -
 
-    **qfunc** **[** **]** **(** _function-type-parameters_ **)**
+    (**qfunc** | **qperm**) **[** **]** **(** _function-type-parameters_ **)**
 
 === "Python"
 
     The `QCallable` type hint is used to specify a function type. `QCallable` itself is a
     generic class, taking as parameters a list of type hints that declare the parameters of
-    the function.
+    the function. The `QPerm` type hint is used to specify a _permutation_
+    function type.
 
-    The `QCallableList` type hint specifies a function array type.
+    The `QCallableList` type hint specifies a function array type, and
+    `QPermList` specifies a _permutation_ function array type.
 
     The name of a parameter in a function type can optionally be specified using the form -
     **Annotated** **[** _type_ **, "** _name_ **"]**.
@@ -57,6 +59,9 @@ signature.
     regular function, passing arguments as per the declared signature.
 -   An element of a function array type can be called with a subscript operator applied to
     the parameter, followed by the argument list.
+-   The `qperm` keyword specifies guarantees (and restrictions) on how the quantum state
+    may change within the function.
+    See [Uncomputation](uncomputation.md) for more details.
 
 ### Example
 

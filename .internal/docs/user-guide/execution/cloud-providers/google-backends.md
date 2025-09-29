@@ -3,6 +3,8 @@ search:
     boost: 0.900
 ---
 
+<!-- cspell:ignore cuquantum, statevector -->
+
 # Execution on Google Cloud Platform
 
 Classiq offers execution on a GPU based simulator that is located in the Google Cloud Platform.
@@ -28,3 +30,10 @@ Before first use, contact [Classiq support](mailto:support@classiq.io).
 === "IDE"
 
     ![Opening info tab](../../../resources/execution_google_nvidia_simulator.png)
+
+## Supported Backends
+
+Included simulators:
+
+-   "cuquantum"
+-   "cuquantum_statevector"
