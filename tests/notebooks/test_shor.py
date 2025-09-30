@@ -1,32 +1,23 @@
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
-    validate_quantum_model,
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("shor", timeout_seconds=300)
+@wrap_testbook("shor", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod_1"))
-    validate_quantum_model(tb.ref("qmod_2"))
-    # test quantum programs
+    # test quantum program
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog_1"),
-        expected_width=8,  # actual width: 8
-        expected_depth=350,  # actual depth: 296 or 328
-    )
-    validate_quantum_program_size(
-        tb.ref_pydantic("qprog_2"),
+        tb.ref_pydantic("qprog"),
         expected_width=22,  # actual width: 22
-        expected_depth=30000,  # actual depth: 26607
+        expected_depth=40000,  # actual depth: 30732
     )
 
     # test notebook content
-    parsed_counts = tb.ref(
-        "[res.dict() for res in result_2.parsed_counts_of_outputs('pow')]"
-    )
-    d = {item["state"]["pow"]: item["shots"] for item in parsed_counts}
-    for val in [0, 171, 341, 512, 683, 853]:
-        assert val in d and d[val] > 120, "Unexpected shor execution results"
+    positions = tb.ref("positions")
+    f1, f2 = tb.ref("factor1"), tb.ref("factor2")
+    assert f1 * f2 == 21
+
+    for p in positions:
+        assert (p * 6).is_integer()
