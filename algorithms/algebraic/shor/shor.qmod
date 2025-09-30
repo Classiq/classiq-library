@@ -4,9 +4,9 @@ qfunc period_finding(n: int, a: int, x: qbit[], phase_var: qnum) {
   }, phase_var);
 }
 
-qfunc main(output phase_var: qnum<12, UNSIGNED, 12>) {
+qfunc main(output phase_var: qnum<10, UNSIGNED, 10>) {
   x: qnum;
-  allocate(6, x);
+  allocate(5, x);
   allocate(phase_var);
   x ^= 1;
   period_finding(21, 11, x, phase_var);
