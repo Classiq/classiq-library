@@ -39,7 +39,7 @@ jobs:
 
       # Run Notebook Tests
       - name: Run Notebooks
-        run: python -m pytest -c tests/config_weekly.ini tests/notebooks
+        run: python -m pytest $(<tests/config_weekly) tests/notebooks
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"

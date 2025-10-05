@@ -33,7 +33,7 @@ jobs:
 
       # Run Notebook Tests
       - name: Run Notebooks
-        run: python -m pytest  -c tests/config_weekly.ini tests/notebooks/test__community_and_functions.py tests/notebooks/workshops tests/notebooks/classiq_paper
+        run: python -m pytest  $(<tests/config_weekly) tests/notebooks/test__community_and_functions.py tests/notebooks/workshops tests/notebooks/classiq_paper
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
