@@ -221,13 +221,13 @@ qfunc qsvt_step_expanded___0(phase1: real, phase2: real, qvar: qbit[7], aux: qbi
 qfunc qsvt_expanded___0(phase_seq: real[], qvar: qbit[7], aux: qbit) {
   H(aux);
   projector_controlled_phase_expanded___0(phase_seq[0], qvar, aux);
-  repeat (index: 29) {
+  repeat (index: 5) {
     qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
   }
   if (False) {
   } else {
     u_1_lambda___0_0_expanded___0(qvar);
-    projector_controlled_phase_expanded___0(phase_seq[59], qvar, aux);
+    projector_controlled_phase_expanded___0(phase_seq[11], qvar, aux);
   }
   H(aux);
 }
@@ -270,13 +270,13 @@ qfunc qsvt_step_expanded___1(phase1: real, phase2: real, qvar: qbit[7], aux: qbi
 qfunc qsvt_expanded___1(phase_seq: real[], qvar: qbit[7], aux: qbit) {
   H(aux);
   projector_controlled_phase_expanded___1(phase_seq[0], qvar, aux);
-  repeat (index: 29) {
+  repeat (index: 5) {
     qsvt_step_expanded___1(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
   }
   if (False) {
   } else {
     u_3_lambda___0_0_expanded___0(qvar);
-    projector_controlled_phase_expanded___1(phase_seq[59], qvar, aux);
+    projector_controlled_phase_expanded___1(phase_seq[11], qvar, aux);
   }
   H(aux);
 }
@@ -306,65 +306,17 @@ qfunc main(output qsvt_state: QsvtState) {
     (-0.0408),
     (-0.4079)
   ], [
-    4.7123,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1415,
-    3.1418,
-    3.1409,
-    3.1434,
-    3.1374,
-    3.1507,
-    3.1231,
-    3.177,
-    3.078,
-    3.2488,
-    2.9719,
-    3.393,
-    2.7956,
-    3.5781,
-    2.6451,
-    2.6451,
-    3.5781,
-    2.7956,
-    3.393,
-    2.9719,
-    3.2488,
-    3.078,
-    3.177,
-    3.1231,
-    3.1507,
-    3.1374,
-    3.1434,
-    3.1409,
-    3.1418,
-    3.1415,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    3.1416,
-    (-183.7832)
+    3.2032,
+    3.0106,
+    3.3825,
+    2.7651,
+    3.6502,
+    2.5525,
+    2.5525,
+    3.6502,
+    2.7651,
+    3.3825,
+    3.0106,
+    (-31.3543)
   ], qsvt_state);
 }

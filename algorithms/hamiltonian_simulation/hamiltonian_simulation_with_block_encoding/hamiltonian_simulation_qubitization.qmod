@@ -150,8 +150,7 @@ qfunc lcu_pauli_expanded___0(data: qbit[2], block: qnum<2, False, 0>) {
 
 @disable_perm_check
 @disable_const_checks(packed_vars)
-qperm reflect_about_zero_expanded___0(const packed_vars: qbit[2])
- {
+qperm reflect_about_zero_expanded___0(const packed_vars: qbit[2]) {
   msbs: qnum<1, False, 0>;
   lsb: qbit;
   packed_vars -> {msbs, lsb};
@@ -356,10 +355,10 @@ qfunc main(output data: qnum<2, False, 0>, output block: qnum<6, False, 0>) {
   allocate(4, exp_block);
   allocate(2, ham_block);
   prepare_amplitudes([
-    0.78459331804,
-    0.369340327132,
-    0.348505181407,
-    0.355731902666
+    0.586747436523,
+    0.184917331451,
+    0.785899284023,
+    0.062412672072
   ], 0.0, data);
   lcu_cheb_expanded___0(exp_block, data, ham_block);
   {ham_block, exp_block} -> block;

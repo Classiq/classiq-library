@@ -27,12 +27,12 @@ qfunc main(output state: qnum<4>, output ref: qnum<4>, output ind: qbit, output 
   allocate(qsvt_aux);
   hadamard_transform(qsvt_state.state);
   qsvt_sqrt_polynomial([
-    5.5521,
-    3.6212,
-    2.4498,
-    2.4498,
-    3.6212,
-    (-13.2975)
+    3.9725,
+    3.6138,
+    2.4656,
+    2.4656,
+    3.6138,
+    (-11.7355)
   ], qsvt_state, qsvt_aux);
   qsvt_state -> {state, ref, ind};
 }

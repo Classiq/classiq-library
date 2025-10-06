@@ -181,7 +181,7 @@ qfunc qsvt_step_expanded___0(phase1: real, phase2: real, qvar: qbit[4], aux: qbi
 qfunc qsvt_expanded___0(phase_seq: real[], qvar: qbit[4], aux: qbit) {
   H(aux);
   projector_controlled_phase_expanded___0(phase_seq[0], qvar, aux);
-  repeat (index: 6) {
+  repeat (index: 5) {
     qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
   }
   if (True) {
@@ -196,32 +196,30 @@ qfunc my_qsvt_expanded___0(phases: real[], qsvt_aux: qbit, state: BlockEncodedSt
 
 qfunc unitaries_0_lambda___0_0_expanded___0(qsvt_aux_captured__main__0: qbit, state_captured__main__0: BlockEncodedState) {
   my_qsvt_expanded___0([
-    4.706742805919,
-    3.183364187246,
-    2.955372229367,
-    3.513111260809,
-    3.124815932204,
-    2.902468305789,
-    2.861184311065,
-    2.902468305789,
-    3.124815932204,
-    3.513111260809,
-    2.955372229367,
-    3.183364187246,
-    (-36.133961690749)
+    3.23809938465,
+    2.713287378424,
+    3.936196300638,
+    3.167844628565,
+    2.644694462184,
+    2.540827230184,
+    2.644694462184,
+    3.167844628565,
+    3.936196300638,
+    2.713287378424,
+    (-28.177827151248)
   ], qsvt_aux_captured__main__0, state_captured__main__0);
 }
 
 qfunc qsvt_expanded___1(phase_seq: real[], qvar: qbit[4], aux: qbit) {
   H(aux);
   projector_controlled_phase_expanded___0(phase_seq[0], qvar, aux);
-  repeat (index: 6) {
+  repeat (index: 4) {
     qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
   }
   if (False) {
   } else {
     block_encode_hamiltonian_expanded___0(qvar);
-    projector_controlled_phase_expanded___0(phase_seq[13], qvar, aux);
+    projector_controlled_phase_expanded___0(phase_seq[9], qvar, aux);
   }
   H(aux);
 }
@@ -232,20 +230,16 @@ qfunc my_qsvt_expanded___1(phases: real[], qsvt_aux: qbit, state: BlockEncodedSt
 
 qfunc unitaries_1_lambda___0_0_expanded___0(qsvt_aux_captured__main__0: qbit, state_captured__main__0: BlockEncodedState) {
   my_qsvt_expanded___1([
-    4.710572127328,
-    3.157751559463,
-    3.04636307197,
-    3.441942229235,
-    2.850010365111,
-    2.868880288382,
-    2.998128354139,
-    2.998128354139,
-    2.868880288382,
-    2.850010365111,
-    3.441942229235,
-    3.04636307197,
-    3.157751559463,
-    (-39.271725022929)
+    2.919290374308,
+    3.811881094526,
+    2.560774403242,
+    2.521354166979,
+    2.842307892275,
+    2.842307892275,
+    2.521354166979,
+    2.560774403242,
+    3.811881094526,
+    (-25.355043508)
   ], qsvt_aux_captured__main__0, state_captured__main__0);
 }
 
@@ -280,10 +274,10 @@ qfunc main(output data: qnum<2, False, 0>, output block: qnum<4, False, 0>) {
   allocate(1, block_exp);
   allocate(4, state);
   inplace_prepare_amplitudes([
-    0.78459331804,
-    0.369340327132,
-    0.348505181407,
-    0.355731902666
+    0.586747436523,
+    0.184917331451,
+    0.785899284023,
+    0.062412672072
   ], 0.0, state.data);
   lcu_expanded___1(block_exp, qsvt_aux, state);
   {state, qsvt_aux, block_exp} -> {data, block};
