@@ -4,91 +4,58 @@ qstruct OracleVars {
   c: qnum<3>;
 }
 
-qfunc my_qsvt_step(phase1: real, phase2: real, proj_ctrl_phase_1: qfunc (real, qbit[], qbit), proj_ctrl_phase_2: qfunc (real, qbit[], qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
-  u(state);
-  proj_ctrl_phase_2(phase1, state, aux);
-  invert {
-    u(state);
-  }
-  proj_ctrl_phase_1(phase2, state, aux);
-}
-
-qfunc my_qsvt(phase_seq: real[], proj_ctrl_phase_1: qfunc (real, qbit[], qbit), proj_ctrl_phase_2: qfunc (real, qbit[], qbit), u: qfunc (qbit[]), state: qbit[], aux: qbit) {
-  H(aux);
-  proj_ctrl_phase_1(phase_seq[0], state, aux);
-  repeat (index: floor((phase_seq.len - 1) / 2)) {
-    my_qsvt_step(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], proj_ctrl_phase_1, proj_ctrl_phase_2, u, state, aux);
-  }
-  if ((phase_seq.len % 2) == 1) {
-    IDENTITY(state);
-  } else {
-    u(state);
-    proj_ctrl_phase_2(phase_seq[phase_seq.len - 1], state, aux);
-  }
-  H(aux);
-}
-
-qfunc initial_state_rot(phase: real, state: qnum, aux: qbit) {
+qfunc initial_state_projector(state: qnum, aux: qbit) {
   within {
     hadamard_transform(state);
+  } apply {
     aux ^= state == 0;
-  } apply {
-    RZ(phase, aux);
   }
 }
 
-qfunc target_state_rot(phase: real, arith_oracle: qfunc (qbit[], qbit), state: qbit[], aux: qbit) {
-  within {
-    arith_oracle(state, aux);
-  } apply {
-    RZ(phase, aux);
-  }
-}
-
-qfunc qsvt_fpaa(phase_seq: real[], arith_oracle: qfunc (const qbit[], qbit), state: qbit[], output aux: qbit) {
-  allocate(aux);
-  my_qsvt(phase_seq, lambda(phase, state, aux) {
-    initial_state_rot(phase, state, aux);
-  }, lambda(phase, state, aux) {
-    target_state_rot(phase, arith_oracle, state, aux);
-  }, lambda(state) {
-    IDENTITY(state);
-  }, state, aux);
+qfunc target_state_projector(arith_oracle: qfunc (qbit[], qbit), state: qbit[], aux: qbit) {
+  arith_oracle(state, aux);
 }
 
 qfunc arith_equation(state: OracleVars, res: qbit) {
   res ^= ((state.a + state.b) == 3) and ((state.c - state.a) == 2);
 }
 
+qfunc qsvt_fpaa(phase_seq: real[], arith_oracle: qfunc (const OracleVars, qbit), state: OracleVars, output aux: qbit) {
+  allocate(aux);
+  qsvt(phase_seq, initial_state_projector, lambda(_state, _aux) {
+    target_state_projector(arith_equation, _state, _aux);
+  }, IDENTITY, state, aux);
+}
+
 qfunc main(output state: OracleVars, output aux: qbit) {
   allocate(state);
   hadamard_transform(state);
   qsvt_fpaa([
-    4.6918,
-    3.1678,
-    3.1078,
-    3.1853,
-    3.0848,
-    3.2155,
-    3.045,
+    3.0045,
+    3.1996,
+    3.0708,
+    3.2276,
+    3.0372,
     3.2686,
-    2.9717,
-    3.3761,
-    2.7966,
-    3.7267,
-    1.654,
-    1.654,
-    3.7267,
-    2.7966,
-    3.3761,
-    2.9717,
+    2.986,
+    3.3348,
+    2.896,
+    3.4666,
+    2.6798,
+    3.8995,
+    1.3862,
+    1.3862,
+    3.8995,
+    2.6798,
+    3.4666,
+    2.896,
+    3.3348,
+    2.986,
     3.2686,
-    3.045,
-    3.2155,
-    3.0848,
-    3.1853,
-    3.1078,
-    3.1678,
-    (-76.9896)
+    3.0372,
+    3.2276,
+    3.0708,
+    3.1996,
+    (-75.5353)
   ], arith_equation, state, aux);
 }
