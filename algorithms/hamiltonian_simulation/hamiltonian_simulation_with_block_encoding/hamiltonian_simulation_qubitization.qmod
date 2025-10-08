@@ -355,10 +355,10 @@ qfunc main(output data: qnum<2, False, 0>, output block: qnum<6, False, 0>) {
   allocate(4, exp_block);
   allocate(2, ham_block);
   prepare_amplitudes([
-    0.586747436523,
-    0.184917331451,
-    0.785899284023,
-    0.062412672072
+    0.037950956486,
+    0.692664313472,
+    0.241332293059,
+    0.6786269948
   ], 0.0, data);
   lcu_cheb_expanded___0(exp_block, data, ham_block);
   {ham_block, exp_block} -> block;

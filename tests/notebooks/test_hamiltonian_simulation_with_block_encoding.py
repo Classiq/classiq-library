@@ -34,24 +34,16 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     state_result_2 = tb.ref_numpy("state_result_2")
     expected_state_2 = tb.ref_numpy("expected_state_2")
+    overlap_2 = tb.ref("overlap_qubitization")
     assert np.linalg.norm(state_result_2 - expected_state_2) < tb.ref("EPS")
-    overlap_2 = (
-        np.abs(np.vdot(state_result_2, expected_state_2))
-        * tb.ref("normalization_exp")
-        / np.linalg.norm(state_result_2)
-    )
     assert np.isclose(
         overlap_2, 0.999, atol=0.01
     )  # 0.9996884609316635  # should be atol=0.001
 
     state_result_3 = tb.ref_numpy("state_result_3")
     expected_state_3 = tb.ref_numpy("expected_state_3")
+    overlap_3 = tb.ref("overlap_qsvt")
     assert np.linalg.norm(state_result_3 - expected_state_3) < tb.ref("EPS")
-    overlap_3 = (
-        np.abs(np.vdot(state_result_3, expected_state_3))
-        * tb.ref("normalization_exp")
-        / np.linalg.norm(state_result_3)
-    )
     assert np.isclose(
         overlap_3, 0.999999, atol=0.01
     )  # 0.9999998243682983  # should be atol=0.000001  # in another run it was 1.0018339139233956
