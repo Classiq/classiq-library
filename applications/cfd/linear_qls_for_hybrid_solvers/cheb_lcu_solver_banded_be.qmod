@@ -1,7 +1,6 @@
 @disable_perm_check
 @disable_const_checks(packed_vars)
-qperm reflect_about_zero_expanded___0(const packed_vars: qbit[5])
- {
+qperm reflect_about_zero_expanded___0(const packed_vars: qbit[5]) {
   msbs: qnum<4, False, 0>;
   lsb: qbit;
   packed_vars -> {msbs, lsb};
@@ -18,11 +17,11 @@ qperm reflect_about_zero_expanded___0(const packed_vars: qbit[5])
 
 qfunc my_reflect_about_zero_expanded___0(qba: qbit[5]) {
   reflect_about_zero_expanded___0(qba);
-  RY(6.2832, qba[0]);
+  RY(6.28318531, qba[0]);
 }
 
 qfunc unitaries_0_lambda___0_0_expanded___0(data_captured__be_e3__6: qbit) {
-  RY(3.1416, data_captured__be_e3__6);
+  RY(3.14159265, data_captured__be_e3__6);
 }
 
 qperm unitaries_1_lambda___0_0_expanded___0(data_captured__be_e3__6: qbit) {
@@ -127,34 +126,39 @@ qfunc be_qfunc_expanded___0(block: qnum<5, False, 0>, data: qnum<4, False, 0>) {
     [
       0.0,
       (-1.0),
-      (-0.9291),
-      (-0.88),
-      (-0.8645),
-      (-0.8976),
-      (-0.9701),
+      (-0.92909487),
+      (-0.87995031),
+      (-0.8644966),
+      (-0.89756031),
+      (-0.97013879),
       0.0
     ],
     [
       1.0,
-      0.9336,
-      0.8755,
-      0.8443,
-      0.8528,
-      0.9039,
-      0.9886,
-      0.5146
+      0.93363266,
+      0.87553168,
+      0.84426777,
+      0.85279056,
+      0.90391868,
+      0.98857867,
+      0.51456003
     ],
     [
-      (-0.9324),
-      (-0.8663),
-      (-0.8205),
-      (-0.8061),
-      (-0.8369),
-      (-0.9046),
+      (-0.93241234),
+      (-0.86629952),
+      (-0.82047653),
+      (-0.8060673),
+      (-0.83689632),
+      (-0.90456938),
       (-1.0),
       0.0
     ]
-  ], [0.2416, 0.4992, 0.2591, 0], block, data);
+  ], [
+    0.24162109,
+    0.49924346,
+    0.25913545,
+    0
+  ], block, data);
 }
 
 qfunc walk_operator_expanded___0(block: qbit[5], data: qbit[4]) {
@@ -197,33 +201,33 @@ qfunc main(output matrix_block: qnum<5, False, 0>, output data: qnum<4, False, 0
     data -> data_array;
   } apply {
     inplace_prepare_amplitudes([
-      0.6193,
-      (-0.3565),
-      (-0.435),
-      (-0.2763),
-      0.1567,
-      0.4192,
-      0.1533,
+      0.61926271,
+      (-0.35648446),
+      (-0.43503441),
+      (-0.27634156),
+      0.15674781,
+      0.41921399,
+      0.15330585,
       0.0
     ], 0.0, data_array[0:3]);
     X(data_array[3]);
   }
   lcu_cheb_expanded___0([1, 2, 4, 8], [
-    0.066,
-    0.0655,
-    0.065,
-    0.0646,
-    0.0641,
-    0.0637,
-    0.0632,
-    0.0627,
-    0.0623,
-    0.0618,
-    0.0613,
-    0.0609,
-    0.0604,
-    0.06,
-    0.0595,
-    0.059
+    0.06597695,
+    0.06551256,
+    0.06504823,
+    0.06458399,
+    0.06411987,
+    0.06365591,
+    0.06319215,
+    0.06272862,
+    0.06226537,
+    0.06180241,
+    0.0613398,
+    0.06087756,
+    0.06041573,
+    0.05995435,
+    0.05949345,
+    0.05903306
   ], matrix_block, data, inv_block);
 }
