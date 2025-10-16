@@ -19,7 +19,6 @@ from classiq.interface.generator.quantum_program import QuantumProgram
 
 from testbook.client import TestbookNotebookClient
 
-QMOD_COMPARISON_FIRST_FLAG = "QMOD_COMPARISON_FIRST"
 _PATCHED = False
 
 
@@ -55,7 +54,6 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
         _patch_testbook()
 
         notebook_path = resolve_notebook_path(notebook_name)
-        qmod_comp_first = os.environ.get(QMOD_COMPARISON_FIRST_FLAG, "false") == "true"
 
         for decorator in [
             _build_patch_testbook_client_decorator(notebook_name),

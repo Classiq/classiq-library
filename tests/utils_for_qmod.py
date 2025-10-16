@@ -5,14 +5,24 @@ from typing import Any, Callable
 
 
 def qmod_compare_decorator(func: Callable) -> Any:
-    if os.environ.get("QMOD_COMPARISON_FIRST", "") != "true":
-        return func
-
     def inner(*args: Any, **kwargs: Any) -> Any:
         qmods_before = _read_qmod_files()
-        result = func(*args, **kwargs)
+
+        # collect the error of the test itself, in case of such error
+        all_errors = []
+        try:
+            result = func(*args, **kwargs)
+        except Exception as exc:
+            all_errors.append(str(exc))
+
         qmods_after = _read_qmod_files()
-        _compare_qmods(qmods_before, qmods_after)
+        # collect the errors of the qmod comparison, in case of such errors
+        #   prepend all the errors from `compare_qmods`, so that `actions/send_qmod_slack_notification` will have a simpler regex
+        all_errors = _compare_qmods(qmods_before, qmods_after) + all_errors
+
+        # raise all errors
+        assert not all_errors, "\n".join(all_errors)
+
         return result
 
     return inner
@@ -36,7 +46,7 @@ def _normalize_qmod_code(qmod_path: Path) -> str:
     return code
 
 
-def _compare_qmods(old_files: dict[str, str], new_files: dict[str, str]) -> None:
+def _compare_qmods(old_files: dict[str, str], new_files: dict[str, str]) -> list[str]:
     errors = []
     if len(new_files) > len(old_files):
         errors.append(
@@ -48,4 +58,4 @@ def _compare_qmods(old_files: dict[str, str], new_files: dict[str, str]) -> None
         if old_content != new_content:
             errors.append(f"Qmod file {os.path.basename(file_name)} is not up-to-date")
 
-    assert not errors, "\n".join(errors)
+    return errors
