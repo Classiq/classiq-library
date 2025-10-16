@@ -27,15 +27,31 @@ def strip_single_notebook(notebook_path: str) -> bool:
                 nb.cells[index]["metadata"].pop("tags")
                 did_nb_change = True
 
-            # remove pycharm metadata
-            if "pycharm" in cell.get("metadata", {}):
-                nb.cells[index]["metadata"].pop("pycharm")
-                did_nb_change = True
+            for key in [
+                "pycharm",
+                "id",
+                "scrolled",
+                "jp-MarkdownHeadingCollapsed",
+                "editable",
+            ]:
+                if key in cell.get("metadata", {}):
+                    nb.cells[index]["metadata"].pop(key)
+                    did_nb_change = True
 
-            # remove id metadata (`id` should be in `cell["id"]`, not in `cell["metadata"]["id"]`)
-            if "id" in cell.get("metadata", {}):
-                nb.cells[index]["metadata"].pop("id")
-                did_nb_change = True
+            for key, sub_key in [
+                ("jupyter", "outputs_hidden"),
+                ("slideshow", "slide_type"),
+            ]:
+                if (
+                    key in cell.get("metadata", {})
+                    and isinstance(key_value := cell["metadata"][key], dict)
+                    and sub_key in key_value
+                ):
+                    nb.cells[index]["metadata"][key].pop(sub_key)
+                    # check if the parent key is now empty
+                    if not nb.cells[index]["metadata"][key]:
+                        nb.cells[index]["metadata"].pop(key)
+                    did_nb_change = True
 
         if did_nb_change:
             result = False
