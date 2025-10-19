@@ -312,10 +312,10 @@ qfunc main(output data: qnum<2, False, 0>, output block: qnum<4, False, 0>) {
   state: QSVTState;
   allocate(6, state);
   inplace_prepare_amplitudes([
-    0.109456614246,
-    0.781627404975,
-    0.247220164651,
-    0.56210322858
+    0.17204567145,
+    0.660100248215,
+    0.209860177811,
+    0.700447467702
   ], 0.0, state.data);
   qsvt_hamiltonian_evolution_expanded___0(state);
   state -> {data, block};
