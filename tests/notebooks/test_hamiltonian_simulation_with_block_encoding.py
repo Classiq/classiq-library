@@ -32,13 +32,17 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-
     renormalized_verify_be = tb.ref_numpy("state_result_verify_be")
     expected_state_be = tb.ref_numpy("expected_state_be")
-    assert np.linalg.norm(renormalized_verify_be - expected_state_be) < 1e-4
+    overlap = np.abs(
+        np.vdot(renormalized_verify_be, expected_state_be)
+        / np.linalg.norm(renormalized_verify_be)
+        / np.linalg.norm(expected_state_be)
+    )
+    assert np.abs(1 - overlap) < 1e-5
 
     expected_state = tb.ref_numpy("expected_state")
-    EPS = tb.ref_numpy("eps")
+    EPS = tb.ref_numpy("EPS")
     renormalized_state_gqsp = tb.ref_numpy("renormalized_state_gqsp")
     renormalized_state_qsvt = tb.ref_numpy("renormalized_state_qsvt")
     renormalized_state_cheb_lcu = tb.ref_numpy("renormalized_state_cheb_lcu")
@@ -50,7 +54,8 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     ]
     for state in renormalized_states:
         overlap = np.abs(
-            np.vdot(renormalized_state_cheb_lcu, expected_state)
-            / np.linalg.norm(renormalized_state_cheb_lcu)
+            np.vdot(state, expected_state)
+            / np.linalg.norm(state)
+            / np.linalg.norm(expected_state)
         )
         assert np.abs(1 - overlap) < EPS
