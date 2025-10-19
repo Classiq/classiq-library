@@ -1,16 +1,25 @@
-qstruct QubitizationState {
+qstruct GQSPState {
   data: qnum<2>;
-  block: QubitizationBlock;
+  block: GQSPBlock;
 }
 
-qstruct QubitizationBlock {
+qstruct GQSPBlock {
   block_ham: qnum<2>;
-  block_exp: qbit[6];
+  block_gqsp: qbit;
 }
 
 qstruct BlockEncodedState {
   data: qnum<2>;
   block: qnum<2>;
+}
+
+qfunc _gqsp_r_gate_expanded___0(theta: real, phi: real, _lambda: real, q: qbit) {
+  within {
+    X(q);
+  } apply {
+    U(2 * theta, phi, _lambda, 0, q);
+  }
+  Z(q);
 }
 
 qperm cases_0_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__9: IndexedPauli[], i_captured__apply_pauli_term__9: int, const x_captured__apply_pauli_term__9: qbit[2]) {
@@ -190,190 +199,253 @@ qfunc walk_operator_expanded___0(state: BlockEncodedState) {
   phase (pi);
 }
 
-qfunc u_0_lambda___0_0_expanded___0(state___data_captured__lcu_cheb__1: qnum<2, False, 0>, state___block___block_ham_captured__lcu_cheb__1: qnum<2, False, 0>) {
-  walk_operator_expanded___0({state___data_captured__lcu_cheb__1, state___block___block_ham_captured__lcu_cheb__1});
+qfunc u_0_lambda___0_0_expanded___0(state___data_captured__gqsp_hamiltonian_evolution__1: qnum<2, False, 0>, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1: qnum<2, False, 0>) {
+  walk_operator_expanded___0({state___data_captured__gqsp_hamiltonian_evolution__1, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1});
 }
 
-qfunc select_powered_unitaries_expanded___0(const block: qbit[6], state___data_captured__lcu_cheb__1: qnum<2, False, 0>, state___block___block_ham_captured__lcu_cheb__1: qnum<2, False, 0>) {
-  repeat (i: 6) {
-    control (block[i]) {
-      power (2 ** i) {
-        u_0_lambda___0_0_expanded___0(state___data_captured__lcu_cheb__1, state___block___block_ham_captured__lcu_cheb__1);
+qfunc gqsp_expanded___0(aux: qbit, phases: real[][], negative_power: int, state___data_captured__gqsp_hamiltonian_evolution__1: qnum<2, False, 0>, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1: qnum<2, False, 0>) {
+  _gqsp_r_gate_expanded___0(phases[0][0], phases[1][0], phases[2][0], aux);
+  repeat (index: 76) {
+    if ((index + 1) <= (76 - negative_power)) {
+      control (aux == 0) {
+        u_0_lambda___0_0_expanded___0(state___data_captured__gqsp_hamiltonian_evolution__1, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1);
+      }
+    } else {
+      control (aux == 1) {
+        invert {
+          u_0_lambda___0_0_expanded___0(state___data_captured__gqsp_hamiltonian_evolution__1, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1);
+        }
       }
     }
+    _gqsp_r_gate_expanded___0(phases[0][index + 1], phases[1][index + 1], phases[2][index + 1], aux);
   }
 }
 
-qfunc apply_phase_table_expanded___1(target: qbit[6]) {
-  PHASE(-0.932660319034, target[0]);
-  CX(target[0], target[1]);
-  PHASE(0.147262155637, target[1]);
-  CX(target[0], target[1]);
-  PHASE(1.227184630309, target[1]);
-  CX(target[1], target[2]);
-  PHASE(-0.245436926062, target[2]);
-  CX(target[0], target[2]);
-  PHASE(0.049087385212, target[2]);
-  CX(target[1], target[2]);
-  PHASE(0.147262155637, target[2]);
-  CX(target[0], target[2]);
-  PHASE(0.049087385212, target[2]);
-  CX(target[2], target[3]);
-  PHASE(-0.147262155637, target[3]);
-  CX(target[0], target[3]);
-  PHASE(-0.049087385212, target[3]);
-  CX(target[1], target[3]);
-  PHASE(-0.147262155637, target[3]);
-  CX(target[0], target[3]);
-  PHASE(0.343611696486, target[3]);
-  CX(target[2], target[3]);
-  PHASE(0.245436926062, target[3]);
-  CX(target[0], target[3]);
-  PHASE(-0.049087385212, target[3]);
-  CX(target[1], target[3]);
-  PHASE(-0.343611696486, target[3]);
-  CX(target[0], target[3]);
-  PHASE(-0.63813600776, target[3]);
-  CX(target[3], target[4]);
-  PHASE(-0.63813600776, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.343611696486, target[4]);
-  CX(target[1], target[4]);
-  PHASE(-0.049087385212, target[4]);
-  CX(target[0], target[4]);
-  PHASE(0.245436926062, target[4]);
-  CX(target[2], target[4]);
-  PHASE(0.343611696486, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.147262155637, target[4]);
-  CX(target[1], target[4]);
-  PHASE(-0.049087385212, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.147262155637, target[4]);
-  CX(target[3], target[4]);
-  PHASE(0.049087385212, target[4]);
-  CX(target[0], target[4]);
-  PHASE(0.147262155637, target[4]);
-  CX(target[1], target[4]);
-  PHASE(0.049087385212, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.245436926062, target[4]);
-  CX(target[2], target[4]);
-  PHASE(-0.343611696486, target[4]);
-  CX(target[0], target[4]);
-  PHASE(0.147262155637, target[4]);
-  CX(target[1], target[4]);
-  PHASE(-0.147262155637, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.441786466911, target[4]);
-  CX(target[4], target[5]);
-  PHASE(-0.147262155637, target[5]);
-  CX(target[0], target[5]);
-  PHASE(0.343611696486, target[5]);
-  CX(target[1], target[5]);
-  PHASE(0.049087385212, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-1.030835089459, target[5]);
-  CX(target[2], target[5]);
-  PHASE(-0.343611696486, target[5]);
-  CX(target[0], target[5]);
-  PHASE(0.147262155637, target[5]);
-  CX(target[1], target[5]);
-  PHASE(0.049087385212, target[5]);
-  CX(target[0], target[5]);
-  PHASE(0.147262155637, target[5]);
-  CX(target[3], target[5]);
-  PHASE(-0.049087385212, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-0.147262155637, target[5]);
-  CX(target[1], target[5]);
-  PHASE(-0.049087385212, target[5]);
-  CX(target[0], target[5]);
-  PHASE(0.245436926062, target[5]);
-  CX(target[2], target[5]);
-  PHASE(-0.441786466911, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-0.147262155637, target[5]);
-  CX(target[1], target[5]);
-  PHASE(0.147262155637, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-0.343611696486, target[5]);
-  CX(target[4], target[5]);
-  PHASE(-0.343611696486, target[5]);
-  CX(target[0], target[5]);
-  PHASE(0.147262155637, target[5]);
-  CX(target[1], target[5]);
-  PHASE(-0.147262155637, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-0.441786466911, target[5]);
-  CX(target[2], target[5]);
-  PHASE(0.245436926062, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-0.049087385212, target[5]);
-  CX(target[1], target[5]);
-  PHASE(-0.147262155637, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-0.049087385212, target[5]);
-  CX(target[3], target[5]);
-  PHASE(0.147262155637, target[5]);
-  CX(target[0], target[5]);
-  PHASE(0.049087385212, target[5]);
-  CX(target[1], target[5]);
-  PHASE(0.147262155637, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-0.343611696486, target[5]);
-  CX(target[2], target[5]);
-  PHASE(0.539961237336, target[5]);
-  CX(target[0], target[5]);
-  PHASE(0.049087385212, target[5]);
-  CX(target[1], target[5]);
-  PHASE(-0.441786466911, target[5]);
-  CX(target[0], target[5]);
-  PHASE(-0.932660319034, target[5]);
+qfunc gqsp_hamiltonian_evolution_expanded___0(gqsp_expcos_phases: real[][], state: GQSPState) {
+  gqsp_expanded___0(state.block.block_gqsp, gqsp_expcos_phases, 38, state.data, state.block.block_ham);
 }
 
-qfunc lcu_cheb_expanded___0(state: QubitizationState) {
-  within {
-    inplace_prepare_state([
-      0.034902945722,
-      0.002048959459,
-      0.069557532723,
-      0.018911391634,
-      0.062680663038,
-      0.049302016137,
-      0.032800653258,
-      0.073157036688,
-      0.029271983932,
-      0.044772082572,
-      0.078114255829,
-      0.049911863887,
-      0.011565103979,
-      0.066733833311,
-      0.093591239421,
-      0.092087663887,
-      0.073840876738,
-      0.051118884938,
-      0.031495007377,
-      0.017597494793,
-      0.009032556389,
-      0.004299611604,
-      0.001911909512,
-      0.000798813761,
-      0.000315086428,
-      0.000117801302,
-      4.1887215e-05,
-      1.4206892e-05,
-      4.608067e-06,
-      1.432607e-06,
-      4.27763e-07,
-      1.22896e-07,
-      3.4029e-08,
-      9.095e-09,
-      2.349e-09,
-      5.87e-10,
-      1.42e-10,
-      3.3e-11,
-      8e-12,
+qfunc main(output data: qnum<2, False, 0>, output block: qnum<3, False, 0>) {
+  state: GQSPState;
+  allocate(5, state);
+  inplace_prepare_amplitudes([
+    0.109456614246,
+    0.781627404975,
+    0.247220164651,
+    0.56210322858
+  ], 0.0, state.data);
+  gqsp_hamiltonian_evolution_expanded___0([
+    [
+      1.2e-11,
+      5.2e-11,
+      2.32e-10,
+      9.56e-10,
+      3.815e-09,
+      1.477e-08,
+      5.5272e-08,
+      1.99613e-07,
+      6.94782e-07,
+      2.326875e-06,
+      7.484537e-06,
+      2.3075182e-05,
+      6.8034244e-05,
+      0.000191335772,
+      0.000511771058,
+      0.001297451769,
+      0.003105353129,
+      0.006983322417,
+      0.014668736582,
+      0.028564265504,
+      0.051034450158,
+      0.082395646755,
+      0.117396450957,
+      0.142046080109,
+      0.136021661998,
+      0.084775140535,
+      0.003920828906,
+      0.090434434369,
+      0.115485877131,
+      0.048022833562,
+      0.063608079827,
+      0.109138707566,
+      0.028167491223,
+      0.088864832334,
+      0.081567942292,
+      0.049685659221,
+      0.099457872331,
+      0.025768568526,
+      0.102548208039,
+      0.025768568525,
+      0.09945787233,
+      0.049685659223,
+      0.081567942295,
+      0.088864832331,
+      0.028167491219,
+      0.10913870757,
+      0.063608079823,
+      0.048022833559,
+      0.115485877131,
+      0.09043443437,
+      0.003920828903,
+      0.084775140532,
+      0.136021661999,
+      0.14204608011,
+      0.117396450954,
+      0.082395646757,
+      0.051034450158,
+      0.028564265502,
+      0.014668736584,
+      0.006983322417,
+      0.003105353127,
+      0.001297451771,
+      0.000511771057,
+      0.000191335769,
+      6.8034245e-05,
+      2.3075183e-05,
+      7.484535e-06,
+      2.326875e-06,
+      6.94784e-07,
+      1.99611e-07,
+      5.5271e-08,
+      1.4772e-08,
+      3.816e-09,
+      9.54e-10,
+      2.31e-10,
+      5.4e-11,
+      1.570796326783
+    ],
+    [
+      0.0,
+      0.0,
+      (-1.575391103554),
+      (-1.572487887453),
+      (-1.570464225703),
+      (-1.570699584815),
+      (-1.570825792499),
+      (-1.570801232088),
+      (-1.570793422869),
+      (-1.570796258609),
+      (-1.570796614077),
+      (-1.570796283359),
+      (-1.570796303097),
+      (-1.570796337838),
+      (-1.570796327054),
+      (-1.570796325018),
+      (-1.570796327386),
+      (-1.5707963269),
+      (-1.570796326613),
+      (-1.570796326866),
+      (-1.570796326807),
+      (-1.570796326759),
+      (-1.570796326822),
+      (-1.57079632679),
+      (-1.570796326769),
+      1.570796327359,
+      (-1.570796327399),
+      (-1.570796326776),
+      (-1.570796326771),
+      1.570796326806,
+      (-1.570796326857),
+      (-1.570796326669),
+      1.570796326722,
+      (-1.570796326846),
+      1.57079632679,
+      (-1.570796326757),
+      1.570796326809,
+      (-1.570796326822),
+      1.57079632679,
+      (-1.570796326786),
+      1.570796326795,
+      (-1.570796326796),
+      1.570796326795,
+      (-1.570796326795),
+      1.570796326795,
+      1.570796326795,
+      (-1.570796326795),
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      (-1.570796326795),
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      3.14159265359,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
       0.0,
       0.0,
       0.0,
@@ -399,22 +471,7 @@ qfunc lcu_cheb_expanded___0(state: QubitizationState) {
       0.0,
       0.0,
       0.0
-    ], 0.0, state.block.block_exp);
-  } apply {
-    select_powered_unitaries_expanded___0(state.block.block_exp, state.data, state.block.block_ham);
-    apply_phase_table_expanded___1(state.block.block_exp);
-  }
-}
-
-qfunc main(output data: qnum<2, False, 0>, output block: qnum<8, False, 0>) {
-  state: QubitizationState;
-  allocate(10, state);
-  inplace_prepare_amplitudes([
-    0.109456614246,
-    0.781627404975,
-    0.247220164651,
-    0.56210322858
-  ], 0.0, state.data);
-  lcu_cheb_expanded___0(state);
+    ]
+  ], state);
   state -> {data, block};
 }
