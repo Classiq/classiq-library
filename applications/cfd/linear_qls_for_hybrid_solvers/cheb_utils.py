@@ -1,83 +1,24 @@
 import cvxpy as cp
 import matplotlib.pyplot as plt
-import pyqsp
-from pyqsp.angle_sequence import QuantumSignalProcessingPhases
-from numpy.polynomial.chebyshev import Chebyshev
+from classiq.applications.qsp import qsp_approximate
 import numpy as np
 from scipy.special import eval_chebyt
-
-
-def get_qsvt_phases(poly, plot=False):
-    np.random.seed(1)  # set seed as pyqsp does not allow it, and not always converges
-    ang_seq = QuantumSignalProcessingPhases(
-        poly,
-        # chebyshev_basis=True,
-        signal_operator="Wx",
-        # method="sym_qsp",
-        measurement="x",
-        tolerance=0.001,  # relaxing the tolerance to get convergence
-    )
-    if plot:
-        pyqsp.response.PlotQSPResponse(
-            ang_seq, target=poly, signal_operator="Wx", measurement="x"
-        )
-    # change W(x) to R(x), as the phases are in the W(x) conventions
-    phases = np.array(ang_seq)
-    phases[1:-1] = phases[1:-1] - np.pi / 2
-    phases[0] = phases[0] - np.pi / 4
-    phases[-1] = phases[-1] + (2 * (len(phases) - 1) - 1) * np.pi / 4
-
-    # verify conventions. minus is due to exp(-i*phi*z) in qsvt in comparison to qsp
-    phases = -2 * phases
-
-    return phases.tolist()
+from numpy.polynomial.chebyshev import Chebyshev
 
 
 def optimize_inversion_polynomial(w_min, w_max, degree, scale):
-    M = max(1000, 10 * degree)
-    # Discretize [-1, 1] using M grid points (interpolants)
-    xj_full = np.cos(np.pi * np.arange(M) / (M - 1))  # Chebyshev nodes on [-1, 1]
-
-    # Select grid points for the objective in [w_min, w_max]
-    xj_obj = xj_full[(xj_full >= w_min) & (xj_full <= w_max)]
-
-    # Define the Chebyshev polynomials of odd degrees
-    k_max = (degree - 1) // 2
-    T_matrix_full = np.array(
-        [
-            [np.cos((2 * k + 1) * np.arccos(x)) for k in range(k_max + 1)]
-            for x in xj_full
-        ]
-    )
-    T_matrix_obj = np.array(
-        [[np.cos((2 * k + 1) * np.arccos(x)) for k in range(k_max + 1)] for x in xj_obj]
-    )
-
-    # Define optimization variables
-    c = cp.Variable(k_max + 1)  # Coefficients for Chebyshev polynomials
-    F_values_full = T_matrix_full @ c  # Values for constraints
-    F_values_obj = T_matrix_obj @ c  # Values for the objective function
-
-    # Relaxed constraint
-    # scale = 0.95
-    # up_boundary = 0.95
-    up_boundary = scale
 
     def target_function(x):
         return scale * (w_min) / x
 
-    # Define the optimization problem
-    objective = cp.Minimize(cp.max(cp.abs(F_values_obj - target_function(xj_obj))))
-    constraints = [cp.abs(F_values_full) <= up_boundary]
-    prob = cp.Problem(objective, constraints)
-
-    # Solve the optimization problem
-    prob.solve()
-    print(f"Max relative error value: {prob.value / scale}")
-
-    # Return coefficients, optimal value, and grid points
-    pcoefs = np.zeros(len(c.value) * 2)
-    pcoefs[1::2] = c.value
+    pcoefs, opt_res = qsp_approximate(
+        target_function,
+        degree=degree,
+        parity=1,
+        interval=[w_min, w_max],
+        plot=False,
+        bound=0.95,
+    )
 
     return pcoefs
 
