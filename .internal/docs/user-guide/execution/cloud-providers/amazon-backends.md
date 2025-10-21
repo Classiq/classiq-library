@@ -27,7 +27,8 @@ Execution on Amazon Braket requires an AWS account, and a role that Classiq can 
 
     preferences = AwsBackendPreferences(
         backend_name="Name of requested simulator or hardware",
-        aws_role_arn="ARN of the CrossAccountRoleForBraket role",
+        aws_access_key_id="Amazon access key ID for the user with Braket access",
+        aws_secret_access_key="Secret access key for the user's key ID",
         s3_bucket_name="S3 bucket name to save the results",
         s3_folder="The folder path within the S3 bucket, where the results will be saved",
         job_timeout="Timeout for execution (Optional)",
@@ -70,17 +71,17 @@ To learn more about IAM roles, refer to the [AWS documentation](https://docs.aws
 When executing via the Classiq platform using AWS Cloud, there are several
 required credentials:
 
-1. `aws_role_arn`
-    1. Make sure the [initial setup](../cloud-providers/amazon-backends.md#initial-account-setup)
-       step is completed.
-    2. Go to the AWS Identity and Access Management (IAM) service.
-    3. Under `Roles`, search for the `CrossAccountRoleForBraket` role.
-    4. Copy this role's `ARN` and use it as the `aws_role_arn`.
-2. `s3_bucket_name`
+1. `aws_access_key_id`
+    1. Create a user with Braket full access
+    2. Create AWS secret key for this user
+    3. Fill the access key id as you got in the earlier steps
+2. `aws_secret_access_key`
+    1. Fill the Secret access key from the steps above
+3. `s3_bucket_name`
     1. Create a new bucket. Its name must start with `amazon-braket-`.
     2. Use the bucket name as the `s3_bucket_name`.
        This is the bucket that saves the execution results.
-3. `s3_folder`
+4. `s3_folder`
     1. Enter the path to the folder in the `S3 bucket`.
        This is the path in the bucket where the execution results are
        saved.

@@ -112,7 +112,7 @@ The Classiq platform allows users to toggle quantum program debug information:
 
 -   `debug_mode` - When the flag is set to `True` (default), the quantum program
     will contain debug information for enhanced visualization (See [Quantum
-    Program Visualization Tool](../analysis/quantum-program-visualization-tool/index.md)).
+    Program Visualization Tool](../analysis/visualization-of-quantum-programs.md)).
 
 Setting this flag to `False` can potentially decrease the quantum program's size
 and increase synthesis speeds.

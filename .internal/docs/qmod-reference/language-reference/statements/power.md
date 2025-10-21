@@ -10,10 +10,6 @@ where the unitary is specified as a nested statement block.
 
 ## Syntax
 
-=== "Native"
-
-    **power** **(** _exponent_ **)** **{** _statements_ **}**
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -21,6 +17,10 @@ where the unitary is specified as a nested statement block.
     def power(exponent: CInt, stmt_block: QCallable) -> None:
         pass
     ```
+
+=== "Native"
+
+    **power** **(** _exponent_ **)** **{** _statements_ **}**
 
 ## Semantics
 
@@ -38,6 +38,25 @@ where the unitary is specified as a nested statement block.
 In the following example `power` is applied 3 times - to gate-level functions `H` and `RX`,
 and to a user-defined function `foo`. It demonstrates both special and general treatment
 of the _power_ operation.
+
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def foo(p: CInt, q: QBit) -> None:
+        power(p, lambda: H(q))
+        power(p, lambda: PHASE(pi / 8, q))
+
+
+    @qfunc
+    def main() -> None:
+        q = QBit()
+        allocate(q)
+        power(2, lambda: foo(5, q))
+    ```
 
 === "Native"
 
@@ -58,25 +77,6 @@ of the _power_ operation.
         foo(5, q);
       }
     }
-    ```
-
-=== "Python"
-
-    ```python
-    from classiq import PHASE, CInt, H, QArray, QBit, allocate, power, qfunc
-
-
-    @qfunc
-    def foo(p: CInt, q: QBit) -> None:
-        power(p, lambda: H(q))
-        power(p, lambda: PHASE(pi / 8, q))
-
-
-    @qfunc
-    def main() -> None:
-        q = QBit()
-        allocate(q)
-        power(2, lambda: foo(5, q))
     ```
 
 Synthesizing this model creates the quantum program shown below.

@@ -35,12 +35,6 @@ overall size in bits, whether it is signed, and the number of binary fraction di
 
 ### Syntax
 
-=== "Native"
-
-    **qbit**
-
-    **qnum** [ **<** _size-int-expr_ [ **,** _sign-bool-expr_ **,** _frac-digits-int-expr_ ] **>** ]
-
 === "Python"
 
     In Python the classes `QBit` and `QNum` are used as type hints in the declaration of arguments:
@@ -54,6 +48,12 @@ overall size in bits, whether it is signed, and the number of binary fraction di
     _name_ =  **QBit** **( "** _local_name_ **" )**
 
     _name_ = **QNum** **( "** _name_ **" ,** [ [ **size =** ] _size-int-expr_ **,** [ [ **is_signed =** ] _sign-bool-expr_ **,** [ [ **fraction_digits =** ] _frac-digits-int-expr_ ] **)**
+
+=== "Native"
+
+    **qbit**
+
+    **qnum** [ **<** _size-int-expr_ [ **,** _sign-bool-expr_ **,** _frac-digits-int-expr_ ] **>** ]
 
 It is recommended to use the `SIGNED` and `UNSIGNED` built-in constants instead
 of `True` and `False` respectively when specifying the _sign-bool-expr_ `qnum`
@@ -87,26 +87,10 @@ bit string `1101`. `x` is declared with no sign bit and no fraction digits, and 
 its state represents the number 13. `y` is declared to be signed and have one fraction-digit, and
 thus, the same bit-level state represents the number -1.5.
 
-=== "Native"
-
-    ```
-    qfunc prepare_1101(output qba: qbit[]) {
-      allocate(4, qba);
-      X(qba[0]);
-      X(qba[2]);
-      X(qba[3]);
-    }
-
-    qfunc main(output x: qnum<4>, output y: qnum<4, SIGNED, 1>) {
-      prepare_1101(x);
-      prepare_1101(y);
-    }
-    ```
-
 === "Python"
 
     ```python
-    from classiq import qfunc, Output, QNum, QArray, allocate, QBit, SIGNED, X
+    from classiq import *
 
 
     @qfunc
@@ -121,6 +105,22 @@ thus, the same bit-level state represents the number -1.5.
     def main(x: Output[QNum[4]], y: Output[QNum[4, SIGNED, 1]]):
         prepare_1101(x)
         prepare_1101(y)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc prepare_1101(output qba: qbit[]) {
+      allocate(4, qba);
+      X(qba[0]);
+      X(qba[2]);
+      X(qba[3]);
+    }
+
+    qfunc main(output x: qnum<4>, output y: qnum<4, SIGNED, 1>) {
+      prepare_1101(x);
+      prepare_1101(y);
+    }
     ```
 
 ## Numeric Inference Rules
@@ -157,17 +157,6 @@ fraction digit. This implies that its domain is [-1.0, -0.5, 0, 0.5] and its val
 is in a superposition of -1.0 and 0.5. `res` is accordingly uniformly distributed on the 8
 possible addition values.
 
-=== "Native"
-
-    ```
-    qfunc main(output a: qnum, output b: qnum<2, SIGNED, 1>, output res: qnum) {
-      allocate(2, a);
-      hadamard_transform(a);
-      prepare_state([0, 0.5, 0.5, 0], 0, b);
-      res = a + b;
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -182,6 +171,17 @@ possible addition values.
         res |= a + b
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output a: qnum, output b: qnum<2, SIGNED, 1>, output res: qnum) {
+      allocate(2, a);
+      hadamard_transform(a);
+      prepare_state([0, 0.5, 0.5, 0], 0, b);
+      res = a + b;
+    }
+    ```
+
 ## Rounding a `qnum` in Qmod
 
 QNum variables may occasionally be declared with too few qubits to represent their intended values. This can occur, for example, when a variable is the result of an arithmetic operation.
@@ -191,17 +191,6 @@ In such cases, Qmod automatically resolves the issue by adjusting the variableâ€
 
 The following example shows that when allocating a `qnum` and then performing some arithmetic operation,
 the values are rounded down:
-
-=== "Native"
-
-    ```
-    qfunc main(output x: qnum<3, False, 1>, output y: qnum<4, False, 2>) {
-        allocate(x);
-        allocate(y);
-        hadamard_transform(x);
-        y ^= 1.4 * x;
-    }
-    ```
 
 === "Python"
 
@@ -219,6 +208,17 @@ the values are rounded down:
         )  # Allocate y as a quantum number with 4 qubits, no sign and 1 fraction digit
         hadamard_transform(x)  # Create a superposition of all possible numbers of x
         y ^= 1.4 * x  # Evaluate y = 1.4 * x
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output x: qnum<3, False, 1>, output y: qnum<4, False, 2>) {
+        allocate(x);
+        allocate(y);
+        hadamard_transform(x);
+        y ^= 1.4 * x;
+    }
     ```
 
 Output measurements:
@@ -245,10 +245,6 @@ remains constant throughout its lifetime.
 
 ### Syntax
 
-=== "Native"
-
-    _element-type_ **[** [ _length-expr_ ] **]**
-
 === "Python"
 
     In Python the class `QArray` is used as type hints in the declaration of arguments:
@@ -259,6 +255,10 @@ remains constant throughout its lifetime.
 
 
     _name_ = **QArray** **( "** _name_ **"** [ **,** _element-type_ [ **,** _length-expr_ ] ] **)**
+
+=== "Native"
+
+    _element-type_ **[** [ _length-expr_ ] **]**
 
 ### Semantics
 
@@ -292,16 +292,6 @@ Note that bitwise operators are used in this case, but equivalent logical operat
 `and`, `or`, and `not` (and their respective Python counterparts in package `qmod.symbolic`)
 are also supported.
 
-=== "Native"
-
-    ```
-    qfunc main(output x: qbit[3], output res: qbit) {
-      allocate(x);
-      hadamard_transform(x);
-      res = (x[0] | ~x[1] | ~x[2]) & (~x[0] | x[1] | ~x[2]);
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -315,26 +305,22 @@ are also supported.
         res |= (x[0] | ~x[1] | ~x[2]) & (~x[0] | x[1] | ~x[2])
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output x: qbit[3], output res: qbit) {
+      allocate(x);
+      hadamard_transform(x);
+      res = (x[0] | ~x[1] | ~x[2]) & (~x[0] | x[1] | ~x[2]);
+    }
+    ```
+
 The next example demonstrates the initialization of a numeric array using the _bind_
 statement (`->`). Two numeric variables are declared and initialized separately and
 subsequently bound together to initialize the array. The declared type of these
 variables is an unsigned integer, but the declared element type of the array is signed. Hence,  
 the values 6 and 7 are interpreted as -2 and -1, respectively. When executing the resulting
 quantum program, `res` is sampled with the value -3 (with probability 1).
-
-=== "Native"
-
-    ```
-    qfunc main(output res: qnum) {
-      n0: qnum<3>;
-      n0 = 6;
-      n1: qnum<3>;
-      n1 = 7;
-      n_arr: qnum<3, SIGNED, 0>[];
-      {n0, n1} -> n_arr;
-      res = n_arr[0] + n_arr[1];
-    }
-    ```
 
 === "Python"
 
@@ -355,6 +341,20 @@ quantum program, `res` is sampled with the value -3 (with probability 1).
         res |= n_arr[0] + n_arr[1]
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output res: qnum) {
+      n0: qnum<3>;
+      n0 = 6;
+      n1: qnum<3>;
+      n1 = 7;
+      n_arr: qnum<3, SIGNED, 0>[];
+      {n0, n1} -> n_arr;
+      res = n_arr[0] + n_arr[1];
+    }
+    ```
+
 ## Quantum structs
 
 A quantum struct is an object that supports named access to parts of its state - its
@@ -370,17 +370,17 @@ in a problem-specific way (to capture expressions over fields).
 
 The following syntax is used to define a quantum struct type -
 
-=== "Native"
-
-    **qstruct** _name_ **{** _field_declarations_ **}**
-
-    _field-declarations_ is a list of one or more field declarations in the form - _name_ **:** _quantum-type_ **;**.
-
 === "Python"
 
     A quantum struct type in Python is defined using a Python class derived from the
     class `QStruct`. Fields are declared with type hints, similar to how member variables
     are declared in a Python `dataclass`.
+
+=== "Native"
+
+    **qstruct** _name_ **{** _field_declarations_ **}**
+
+    _field-declarations_ is a list of one or more field declarations in the form - _name_ **:** _quantum-type_ **;**.
 
 ### Semantics
 
@@ -405,37 +405,37 @@ retrieved using the `num_qubits` class attribute.
 In the following example, quantum struct `MyQStruct` is defined and subsequently initialized
 and prepared in a specific state in function `main`.
 
-=== "Native"
-
-    ```
-    qstruct MyQStruct {
-      a: qbit;
-      b: qnum;
-    }
-
-    qfunc main(output s: MyQStruct) {
-      allocate(s);
-      H(s.a);
-      inplace_prepare_int(6, s.b);
-    }
-    ```
-
 === "Python"
 
     ```python
-    from classiq import qfunc, Output, QBit, allocate, QStruct, QNum, inplace_prepare_int, H
+    from classiq import *
 
 
     class MyQStruct(QStruct):
         a: QBit
-        b: QNum
+        b: QNum[3]
 
 
     @qfunc
     def main(s: Output[MyQStruct]) -> None:
         allocate(s)
         H(s.a)
-        inplace_prepare_int(6, s.b)
+        s.b ^= 6
+    ```
+
+=== "Native"
+
+    ```
+    qstruct MyQStruct {
+      a: qbit;
+      b: qnum<3>;
+    }
+
+    qfunc main(output s: MyQStruct) {
+    allocate(s);
+    H(s.a);
+    s.b ^= 6;
+    }
     ```
 
 The example below demonstrates the common situation where an algorithm alternates between
@@ -445,26 +445,6 @@ two variables, `a` and `b`, of different numeric types. It uses Grover-search to
 solution. In the Grover-search algorithm, encapsulated by the function `grover_search`, the
 oracle application uses the structured view of the state to evaluate the constraint, while the
 diffuser is defined in a generic way and uses the qubit array view of the state.
-
-=== "Native"
-
-    ```
-    qstruct MyProblem {
-      a: qnum<2, UNSIGNED, 2>;
-      b: qnum<3, UNSIGNED, 3>;
-    }
-
-    qfunc my_problem_constraint(p: MyProblem, res: qbit) {
-      res ^= (p.a + p.b) == 0.625;
-    }
-
-    qfunc main(output p: MyProblem) {
-      allocate(p);
-      grover_search(2, lambda(p) {
-        phase_oracle(my_problem_constraint, p);
-      }, p);
-    }
-    ```
 
 === "Python"
 
@@ -478,7 +458,7 @@ diffuser is defined in a generic way and uses the qubit array view of the state.
 
 
     @qfunc
-    def my_problem_constraint(p: MyProblem, res: QBit) -> None:
+    def my_problem_constraint(p: Const[MyProblem], res: Permutable[QBit]) -> None:
         res ^= p.a + p.b == 0.625
 
 
@@ -486,6 +466,26 @@ diffuser is defined in a generic way and uses the qubit array view of the state.
     def main(p: Output[MyProblem]) -> None:
         allocate(p)
         grover_search(2, lambda p: phase_oracle(my_problem_constraint, p), p)
+    ```
+
+=== "Native"
+
+    ```
+    qstruct MyProblem {
+      a: qnum<2, UNSIGNED, 2>;
+      b: qnum<3, UNSIGNED, 3>;
+    }
+
+    qfunc my_problem_constraint(const p: MyProblem, permutable res: qbit) {
+      res ^= (p.a + p.b) == 0.625;
+    }
+
+    qfunc main(output p: MyProblem) {
+      allocate(p);
+      grover_search(2, lambda(p) {
+        phase_oracle(my_problem_constraint, p);
+      }, p);
+    }
     ```
 
 Executing this model will sample a state representing a solution to the problem in

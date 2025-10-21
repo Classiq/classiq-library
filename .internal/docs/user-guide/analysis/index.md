@@ -10,6 +10,5 @@ The Classiq analyzer comprises a web application plus analysis data and graphs t
 
 These sections describe how to use the web application, data, and graphs, and give a comprehensive walkthrough of the components:
 
--   [Quantum Program Visualization Tool](quantum-program-visualization-tool/index.md)
+-   [Quantum Program Visualization Tool](visualization-of-quantum-programs.md)
 -   [Data Analysis and Graphs](data-analysis-and-graphs.md)
--   [Automatic Register Resolution](automatic-registers.md)

@@ -93,17 +93,6 @@ automatically in the general case. However, you can suppress the fine-grained
 enforcement of function classification with the `disable_perm_check` and
 `disable_const_checks` specifiers using the following syntax:
 
-=== "Native"
-
-    Before a function definition you may specify the following decorators:
-
-    **@disable_perm_check**
-
-    **@disable_const_checks** [ **(** _parameters_ **)** ]
-
-    Where _parameters_ is an optional list of comma-separated parameter names (if
-    the list is omitted, the checks are disabled for all _const_ parameters).
-
 === "Python"
 
     The decorators `@qfunc` and `@qperm` have the optional parameters
@@ -115,6 +104,17 @@ enforcement of function classification with the `disable_perm_check` and
 
     `disable_const_checks` may contain a list of parameter names, or a boolean
     to disable the checks for all _const_ parameters.
+
+=== "Native"
+
+    Before a function definition you may specify the following decorators:
+
+    **@disable_perm_check**
+
+    **@disable_const_checks** [ **(** _parameters_ **)** ]
+
+    Where _parameters_ is an optional list of comma-separated parameter names (if
+    the list is omitted, the checks are disabled for all _const_ parameters).
 
 When `disable_perm_check` is used, the compiler does not enforce the usage of
 _non-permutation_ operations. When `disable_const_checks` is used, the compiler
@@ -130,17 +130,6 @@ parameter `param1` is declared `const`. The definition of `foo` is consistent
 with these declarations. Note that the restriction on `param1` is carried over
 to its use in the lambda expression passed to `apply_to_all`.
 
-=== "Native"
-
-    ```
-    qperm foo(const param1: qnum, output param2: qnum) {
-      param2 = param1 + 1;  // OK - assignment is a permutation and RHS is const
-      apply_to_all(lambda(qb) {
-        Z(qb);
-      }, param1);  // OK - the parameter of 'Z' is const
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -153,6 +142,17 @@ to its use in the lambda expression passed to `apply_to_all`.
         apply_to_all(lambda qb: Z(qb), param1)  # OK - the parameter of 'Z' is const
     ```
 
+=== "Native"
+
+    ```
+    qperm foo(const param1: qnum, output param2: qnum) {
+      param2 = param1 + 1;  // OK - assignment is a permutation and RHS is const
+      apply_to_all(lambda(qb) {
+        Z(qb);
+      }, param1);  // OK - the parameter of 'Z' is const
+    }
+    ```
+
 #### Example 2 - Incorrect use of permutation and const parameters
 
 The example below demonstrates violations of the restrictions on the use of
@@ -160,14 +160,6 @@ parameters and operations. As in the previous example, the function `foo` is
 declared `qperm` and its first parameter `param1` is declared `const`. However,
 the use of `param1` violates the restriction, and the function uses a
 _non-permutation_ operation as well.
-
-=== "Native"
-
-    ```
-    qperm foo(const param1: qnum, output param2: qnum) {
-      param1 += 2;  // Error - LHS is non-const
-      hadamard_transform(param2);  // Error - 'hadamard_transform' is non-permutation
-    ```
 
 === "Python"
 
@@ -181,23 +173,20 @@ _non-permutation_ operation as well.
         hadamard_transform(param2)  # Error - 'hadamard_transform' is non-permutation
     ```
 
+=== "Native"
+
+    ```
+    qperm foo(const param1: qnum, output param2: qnum) {
+      param1 += 2;  // Error - LHS is non-const
+      hadamard_transform(param2);  // Error - 'hadamard_transform' is non-permutation
+    ```
+
 #### Example 3 - Disabling permutation check
 
 In the example below, function `my_cx` implements the CX operation using a
 simple equivalence - applying phase flip in the Hadamard basis. The cumulative
 operation on the quantum state is a _permutation_, but individual calls to `H` are
 not. The `disable_perm_check` is used to suppress compiler errors in this case.
-
-=== "Native"
-
-    ```
-    @disable_perm_check
-    qperm my_cx(const ctrl: qbit, tgt: qbit) {
-      H(tgt);
-      CZ(ctrl, tgt);
-      H(tgt);
-    }
-    ```
 
 === "Python"
 
@@ -212,6 +201,17 @@ not. The `disable_perm_check` is used to suppress compiler errors in this case.
         H(tgt)
     ```
 
+=== "Native"
+
+    ```
+    @disable_perm_check
+    qperm my_cx(const ctrl: qbit, tgt: qbit) {
+      H(tgt);
+      CZ(ctrl, tgt);
+      H(tgt);
+    }
+    ```
+
 #### Example 4 - Disabling permutation check and const checks
 
 In the example below, function `my_z` implements the Z operation using a
@@ -221,18 +221,6 @@ not. Also, the cumulative operation on the `tgt` is _const_, but individual
 calls are not.
 The `disable_perm_check` and `disable_const_checks` are used to suppress
 compiler errors in this case.
-
-=== "Native"
-
-    ```
-    @disable_perm_check
-    @disable_const_checks
-    qperm my_z(const tgt: qbit) {
-      H(tgt);
-      X(tgt);
-      H(tgt);
-    }
-    ```
 
 === "Python"
 
@@ -245,6 +233,18 @@ compiler errors in this case.
         H(tgt)
         X(tgt)
         H(tgt)
+    ```
+
+=== "Native"
+
+    ```
+    @disable_perm_check
+    @disable_const_checks
+    qperm my_z(const tgt: qbit) {
+      H(tgt);
+      X(tgt);
+      H(tgt);
+    }
     ```
 
 ## Semantics of uncomputation
@@ -288,24 +288,6 @@ operation. In the _apply_ block, it is used as the condition of a _control_
 statement, which is a _const_ context. Both uses are valid, and the variable is
 uncomputed and freed correctly after the _within-apply_ statement.
 
-=== "Native"
-
-    ```
-    qfunc main(output qn: qnum, output res: qbit) {
-      allocate(2, qn);
-      hadamard_transform(qn);
-      allocate(1, res);
-      aux: qbit;
-      within {
-        aux = qn > 1;
-      } apply {
-        control (aux) {
-          X(res);
-        }
-      }
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -323,6 +305,24 @@ uncomputed and freed correctly after the _within-apply_ statement.
         )
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output qn: qnum, output res: qbit) {
+      allocate(2, qn);
+      hadamard_transform(qn);
+      allocate(1, res);
+      aux: qbit;
+      within {
+        aux = qn > 1;
+      } apply {
+        control (aux) {
+          X(res);
+        }
+      }
+    }
+    ```
+
 #### Example 2 - Illegal use of local variable in within-apply
 
 The code below is a modification of _Example 1_ above, with a couple of lines
@@ -334,26 +334,6 @@ superposition between computational-basis states). In addition, `aux` is used
 as the argument of function `X` in the _apply_ block, which is _non-const_
 context. Both uses are illegal, and both are reported as errors by the
 compiler.
-
-=== "Native"
-
-    ```
-    qfunc main(output qn: qnum, output res: qbit) {
-      allocate(2, qn);
-      hadamard_transform(qn);
-      allocate(1, res);
-      aux: qbit;
-      within {
-        aux = qn > 1;
-        H(aux);
-      } apply {
-        control (aux) {
-          X(res);
-        }
-        X(aux);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -379,6 +359,26 @@ compiler.
         )
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output qn: qnum, output res: qbit) {
+      allocate(2, qn);
+      hadamard_transform(qn);
+      allocate(1, res);
+      aux: qbit;
+      within {
+        aux = qn > 1;
+        H(aux);
+      } apply {
+        control (aux) {
+          X(res);
+        }
+        X(aux);
+      }
+    }
+    ```
+
 #### Example 3 - Illegal use of dependent variable in within-apply
 
 The following example demonstrates a violation of the rules for correct use of
@@ -388,22 +388,6 @@ which is not an uncomputation candidate. From that point, the same restrictions
 that hold for `aux` apply to `q1`. Therefore, using it as an argument to
 function `H` is illegal, and is reported as an error. Indeed, if `foo` would
 execute as specified, `aux` would not be uncomputed correctly.
-
-=== "Native"
-
-    ```
-    qfunc foo(q1: qbit, q2: qbit) {
-      aux: qbit;
-      within {
-        allocate(1, aux);
-        CX(q1, aux);
-        H(q1);
-      } apply {
-        CX(aux, q2);
-        Z(q1);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -424,6 +408,22 @@ execute as specified, `aux` would not be uncomputed correctly.
         )
     ```
 
+=== "Native"
+
+    ```
+    qfunc foo(q1: qbit, q2: qbit) {
+      aux: qbit;
+      within {
+        allocate(1, aux);
+        CX(q1, aux);
+        H(q1);
+      } apply {
+        CX(aux, q2);
+        Z(q1);
+      }
+    }
+    ```
+
 #### Example 4 - Illegal use of local variable in function
 
 The example below demonstrates incorrect use of a local variable inside a
@@ -434,16 +434,6 @@ local variable and therefore an uncomputation candidate. Passing it as argument
 to `prepare_state` is flagged as an error, because it is not a _permutation_.
 Note that if `rand_increment` would output `temp`
 instead of declaring it as a local variable, the function would be legal.
-
-=== "Native"
-
-    ```
-    qfunc rand_increment(qn: qnum) {
-      temp: qnum;
-      prepare_state([0, 0.8, 0.2, 0], 0, temp);
-      qn += temp;
-    }
-    ```
 
 === "Python"
 
@@ -456,4 +446,14 @@ instead of declaring it as a local variable, the function would be legal.
         temp = QNum()
         prepare_state([0, 0.8, 0.2, 0], 0, temp)
         qn += temp
+    ```
+
+=== "Native"
+
+    ```
+    qfunc rand_increment(qn: qnum) {
+      temp: qnum;
+      prepare_state([0, 0.8, 0.2, 0], 0, temp);
+      qn += temp;
+    }
     ```
