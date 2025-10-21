@@ -13,10 +13,6 @@ are subsequently uncomputed and released.
 
 ## Syntax
 
-=== "Native"
-
-    **within** **{** _within-statements_ **}** **apply** **{** _apply-statements_ **}**
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -24,6 +20,10 @@ are subsequently uncomputed and released.
     def within_apply(within: Callable, apply: Callable) -> None:
         pass
     ```
+
+=== "Native"
+
+    **within** **{** _within-statements_ **}** **apply** **{** _apply-statements_ **}**
 
 ## Semantics
 
@@ -52,12 +52,26 @@ The following example demonstrates how auxiliary qubits get used, uncomputed, an
 at different steps of a computation, when scoped inside a _within-apply_ statement.
 Actual reuse is a decision the synthesis engine takes to satisfy width constraints.
 
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def main(res: Output[QBit]):
+        allocate(res)
+        ctrl = QNum()
+        within_apply(lambda: assign(3, ctrl), lambda: CCX(ctrl, res))
+        within_apply(lambda: assign(2, ctrl), lambda: CCX(ctrl, res))
+    ```
+
 === "Native"
 
     ```
     qfunc main(output res: qbit) {
       allocate(res);
-      ctrl: qbit[];
+      ctrl: qnum;
       within {
         ctrl = 3;
       } apply {
@@ -69,20 +83,6 @@ Actual reuse is a decision the synthesis engine takes to satisfy width constrain
         CCX(ctrl, res);
       }
     }
-    ```
-
-=== "Python"
-
-    ```python
-    from classiq import *
-
-
-    @qfunc
-    def main(res: Output[QBit]):
-        allocate(res)
-        ctrl = QArray()
-        within_apply(lambda: assign(3, ctrl), lambda: CCX(ctrl, res))
-        within_apply(lambda: assign(2, ctrl), lambda: CCX(ctrl, res))
     ```
 
 Note how variable `ctrl` is initialized in the
@@ -106,6 +106,27 @@ on the states of interest. Since `aux` is subsequently uncomputed and released, 
 relative $\pi$ phase remains between the states of interest and all others in the
 superposition.
 
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qperm(disable_perm_check=True, disable_const_checks=True)
+    def my_cond_phase_flip(predicate: QPerm[QBit], target: Const[QBit]):
+        H(target)
+        predicate(target)
+        H(target)
+
+
+    @qperm
+    def my_phase_oracle(predicate: QPerm[QBit]):
+        aux = QBit()
+        within_apply(
+            lambda: (allocate(aux), X(aux)), lambda: my_cond_phase_flip(predicate, aux)
+        )
+    ```
+
 === "Native"
 
     ```
@@ -128,27 +149,6 @@ superposition.
     }
     ```
 
-=== "Python"
-
-    ```python
-    from classiq import *
-
-
-    @qperm(disable_perm_check=True, disable_const_checks=True)
-    def my_cond_phase_flip(predicate: QPerm[QBit], target: Const[QBit]):
-        H(target)
-        predicate(target)
-        H(target)
-
-
-    @qperm
-    def my_phase_oracle(predicate: QPerm[QBit]):
-        aux = QBit()
-        within_apply(
-            lambda: (allocate(aux), X(aux)), lambda: my_cond_phase_flip(predicate, aux)
-        )
-    ```
-
 Note that `my_cond_phase_flip` declares parameter `target` as `const` because, taken as
 a whole, the function only applies phase changes to it. But because the implementation
 uses non-cost operations, `target` is specified as `unchecked`. For more on enforcement
@@ -159,21 +159,6 @@ of parameter restrictions see [Uncomputation](../uncomputation.md).
 The code snippet below demonstrates the use of _within-apply_ to define the Grover operator,
 avoiding redundant control logic when called in higher-level contexts (for example, when
 used as the unitary operand in a phase-estimation flow):
-
-=== "Native"
-
-    ```
-    qfunc my_grover_operator(oracle: qfunc (qbit[]), space_transform: qfunc (qbit[]), target: qbit[]) {
-      oracle(target);
-      within {
-        invert {
-          space_transform(target);
-        }
-      } apply {
-        reflect_about_zero(target);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -192,4 +177,19 @@ used as the unitary operand in a phase-estimation flow):
             lambda: invert(lambda: space_transform(target)),
             lambda: reflect_about_zero(target),
         )
+    ```
+
+=== "Native"
+
+    ```
+    qfunc my_grover_operator(oracle: qfunc (qbit[]), space_transform: qfunc (qbit[]), target: qbit[]) {
+      oracle(target);
+      within {
+        invert {
+          space_transform(target);
+        }
+      } apply {
+        reflect_about_zero(target);
+      }
+    }
     ```

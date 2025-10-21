@@ -26,6 +26,20 @@ modifier, since the classical execution logic cannot pass quantum states as argu
 
 For example, consider the following model:
 
+=== "Python"
+
+    ```python
+    from classiq import qfunc, Output, QBit, QNum, UNSIGNED, allocate, H, control, X
+
+
+    @qfunc
+    def main(a: Output[QBit], b: Output[QNum[2, UNSIGNED, 2]]) -> None:
+        allocate(a)
+        H(a)
+        allocate(b)
+        control(a, lambda: apply_to_all(lambda target: X(target), b))
+    ```
+
 === "Native"
 
     ```
@@ -39,20 +53,6 @@ For example, consider the following model:
         }, b);
       }
     }
-    ```
-
-=== "Python"
-
-    ```python
-    from classiq import qfunc, Output, QBit, QNum, UNSIGNED, allocate, H, control, X
-
-
-    @qfunc
-    def main(a: Output[QBit], b: Output[QNum[2, UNSIGNED, 2]]) -> None:
-        allocate(a)
-        H(a)
-        allocate(b)
-        control(a, lambda: apply_to_all(lambda target: X(target), b))
     ```
 
 This model can be synthesized and executed in the SDK with the following code -

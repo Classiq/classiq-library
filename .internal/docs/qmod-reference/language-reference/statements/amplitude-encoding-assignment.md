@@ -12,10 +12,6 @@ including trigonometric functions and multiplicative invert ($x^{-1}$).
 
 ## Syntax
 
-=== "Native"
-
-    _target-var_ ***=** _quantum-expression_
-
 === "Python"
 
     _target-var_ **\*=** _quantum-expression_ <br/>
@@ -28,6 +24,10 @@ including trigonometric functions and multiplicative invert ($x^{-1}$).
       operator syntax is typically easier to read, but it cannot be used
       directly in lambda expressions, where the function call syntax should be
       used.
+
+=== "Native"
+
+    _target-var_ ***=** _quantum-expression_
 
 ## Semantics
 
@@ -51,17 +51,6 @@ f(x)|x\rangle |1\rangle$
 
 In the following example, the function $f(x) = x^2$ is computed over a quantum variable `x`:
 
-=== "Native"
-
-    ```
-    qfunc main(output x: qnum<5, UNSIGNED, 5>, output ind: qbit) {
-      allocate(x);
-      hadamard_transform(x);
-      allocate(ind);
-      ind *= x**2;
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -74,6 +63,17 @@ In the following example, the function $f(x) = x^2$ is computed over a quantum v
         hadamard_transform(x)
         allocate(ind)
         ind *= x**2
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output x: qnum<5, UNSIGNED, 5>, output ind: qbit) {
+      allocate(x);
+      hadamard_transform(x);
+      allocate(ind);
+      ind *= x**2;
+    }
     ```
 
 Synthesizing and executing this model results in the histogram shown below. States
@@ -89,17 +89,6 @@ In this example, we demonstrate amplitude-encoding assignment with a
 quantum subscript expression, i.e., a classical list indexed by a quantum
 numeric variable.
 
-=== "Native"
-
-    ```
-    qfunc main(output x: qnum<2>, output ind: qbit) {
-      allocate(x);
-      hadamard_transform(x);
-      allocate(ind);
-      ind *= [0.1, 0.2, 0.3, 0.4][x];
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -113,4 +102,15 @@ numeric variable.
         hadamard_transform(x)
         allocate(ind)
         ind *= subscript([0.1, 0.2, 0.3, 0.4], x)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output x: qnum<2>, output ind: qbit) {
+      allocate(x);
+      hadamard_transform(x);
+      allocate(ind);
+      ind *= [0.1, 0.2, 0.3, 0.4][x];
+    }
     ```

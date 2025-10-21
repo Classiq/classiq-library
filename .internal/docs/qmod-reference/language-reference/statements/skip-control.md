@@ -14,10 +14,6 @@ formulated using a simple conjunction (i.e., using the _within-apply_ statement)
 
 ## Syntax
 
-=== "Native"
-
-    **skip_control** **{** _statements_ **}**
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -25,6 +21,10 @@ formulated using a simple conjunction (i.e., using the _within-apply_ statement)
     def skip_control(stmt_block: QCallable) -> None:
         pass
     ```
+
+=== "Native"
+
+    **skip_control** **{** _statements_ **}**
 
 ## Semantics
 
@@ -49,29 +49,6 @@ for states where the whole function is under a negative control condition, as
 demonstrated by function `main`.
 Note that the computation of `qarr[0]` within `foo` cannot be encapsulated in an
 _apply_ block of a _within-apply_ statement.
-
-=== "Native"
-
-    ```
-    qfunc foo(qarr: qbit[5]) {
-      repeat (i: 4) {
-        CX(qarr[0], qarr[i+1]);
-        skip_control {
-          RX(pi/2, qarr[0]);
-        }
-      }
-    }
-
-    qfunc main(output ctrl: qbit, output qarr: qbit[5]) {
-      allocate(qarr);
-      hadamard_transform(qarr[0]);
-      allocate(ctrl);
-      hadamard_transform(ctrl);
-      control(ctrl) {
-        foo(qarr);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -98,4 +75,27 @@ _apply_ block of a _within-apply_ statement.
         allocate(ctrl)
         hadamard_transform(ctrl)
         control(ctrl, lambda: foo(qarr))
+    ```
+
+=== "Native"
+
+    ```
+    qfunc foo(qarr: qbit[5]) {
+      repeat (i: 4) {
+        CX(qarr[0], qarr[i+1]);
+        skip_control {
+          RX(pi/2, qarr[0]);
+        }
+      }
+    }
+
+    qfunc main(output ctrl: qbit, output qarr: qbit[5]) {
+      allocate(qarr);
+      hadamard_transform(qarr[0]);
+      allocate(ctrl);
+      hadamard_transform(ctrl);
+      control(ctrl) {
+        foo(qarr);
+      }
+    }
     ```

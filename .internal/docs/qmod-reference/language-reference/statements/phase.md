@@ -20,10 +20,6 @@ phase oracles and reflections.
 
 ## Syntax
 
-=== "Native"
-
-    **phase** **(** _phase-expression_ [ **,** _coefficient_ ] **)**
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -31,6 +27,10 @@ phase oracles and reflections.
     def phase(phase_expr: SymbolicExpr, coefficient: float = 1.0) -> None:
         pass
     ```
+
+=== "Native"
+
+    **phase** **(** _phase-expression_ [ **,** _coefficient_ ] **)**
 
 ## Semantics
 
@@ -81,20 +81,10 @@ statement, state 1 is in phase $\frac{\pi}{4}$ relative to state 0, state 2
 is rotated $\pi$ relative to state 0. State 3 is rotated $\frac{\pi}{4}$,
 which is a full $2\pi$ + $\frac{\pi}{4}$ rotation, that is, the same phase as state 1.
 
-=== "Native"
-
-    ```
-    qfunc main(output x: qnum) {
-      allocate(2, x);
-      hadamard_transform(x);
-      phase (x**2, pi/4);
-    }
-    ```
-
 === "Python"
 
     ```python
-    from classiq import qfunc, Output, QNum, allocate, hadamard_transform, phase
+    from classiq import *
     from classiq.qmod.symbolic import pi
 
 
@@ -103,6 +93,16 @@ which is a full $2\pi$ + $\frac{\pi}{4}$ rotation, that is, the same phase as st
         allocate(2, x)
         hadamard_transform(x)
         phase(x**2, pi / 4)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output x: qnum) {
+      allocate(2, x);
+      hadamard_transform(x);
+      phase (x**2, pi/4);
+    }
     ```
 
 Visualizing the synthesized quantum program, you can see how Z-rotations and controlled
@@ -123,25 +123,6 @@ array `v` represents the partition of the set of vertices in a graph into two, a
 the expression inside the _phase_ statement computes the number of edges that cross the
 partition. Executing this model with the right set of parameter values will yield with
 high probability an optimal solution.
-
-=== "Native"
-
-    ```
-    qfunc main(gammas: real[4], betas: real[4], output v: qbit[3]) {
-      allocate(v);
-      hadamard_transform(v);
-      repeat (i: 4) {
-        phase(
-          (v[0] * (1 - v[1]) + v[1] * (1 - v[0]))  // edge 0-1
-          + (v[0] * (1 - v[2]) + v[2] * (1 - v[0])),  // edge 0-2
-          gammas[i]
-        );
-        apply_to_all(lambda(q) {
-          RX(betas[i], q);
-        }, v);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -166,12 +147,46 @@ high probability an optimal solution.
             apply_to_all(lambda q: RX(betas[i], q), v)
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(gammas: real[4], betas: real[4], output v: qbit[3]) {
+      allocate(v);
+      hadamard_transform(v);
+      repeat (i: 4) {
+        phase(
+          (v[0] * (1 - v[1]) + v[1] * (1 - v[0]))  // edge 0-1
+          + (v[0] * (1 - v[2]) + v[2] * (1 - v[0])),  // edge 0-2
+          gammas[i]
+        );
+        apply_to_all(lambda(q) {
+          RX(betas[i], q);
+        }, v);
+      }
+    }
+    ```
+
 ### Example 3
 
 The following model applies `phase` with an angle specified as a classical
 expression, thus inserting a fixed phase under controlled contexts. In each
 case, the states that satisfy the control condition rotate by $\frac{\pi}{4}$
 relative to those that do not.
+
+=== "Python"
+
+    ```python
+    from classiq import *
+    from classiq.qmod.symbolic import pi
+
+
+    @qfunc
+    def main(qarr: Output[QArray[QBit, 2]]):
+        allocate(qarr)
+        hadamard_transform(qarr)
+        control(qarr[0], lambda: phase(pi / 4))
+        control(qarr, lambda: phase(pi / 4))
+    ```
 
 === "Native"
 
@@ -186,21 +201,6 @@ relative to those that do not.
         phase (pi / 4);
       }
     }
-    ```
-
-=== "Python"
-
-    ```python
-    from classiq import *
-    from classiq.qmod.symbolic import pi
-
-
-    @qfunc
-    def main(qarr: Output[QArray[2]]):
-        allocate(qarr)
-        hadamard_transform(qarr)
-        control(qarr[0], lambda: phase(pi / 4))
-        control(qarr, lambda: phase(pi / 4))
     ```
 
 The cumulative result of both statements revealed by running a state-vector

@@ -21,13 +21,6 @@ In Qmod, scalar types represent numeric values, Boolean values, and Pauli base e
 
 ### Syntax
 
-=== "Native"
-
-    - `int` represents integers
-    - `real` represents real numbers (using floating point encoding)
-    - `bool` represents the Boolean values `false` and `true`
-    - `Pauli` represents the Pauli base elements using the symbols `Pauli::I`, `Pauli::X`, `Pauli::Y`, and `Pauli::Z` (with the integer values 0, 1, 2, 3 respectively)
-
 === "Python"
 
     Python Classes are used to represent scalar types
@@ -37,21 +30,28 @@ In Qmod, scalar types represent numeric values, Boolean values, and Pauli base e
     - `CBool` represents the Boolean values `False` and `True`
     - `Pauli` represents the Pauli base elements using the symbols `Pauli.I`, `Pauli.X`, `Pauli.Y`, and `Pauli.Z` (with the integer values 0, 1, 2, 3 respectively)
 
+=== "Native"
+
+    - `int` represents integers
+    - `real` represents real numbers (using floating point encoding)
+    - `bool` represents the Boolean values `false` and `true`
+    - `Pauli` represents the Pauli base elements using the symbols `Pauli::I`, `Pauli::X`, `Pauli::Y`, and `Pauli::Z` (with the integer values 0, 1, 2, 3 respectively)
+
 ## Arrays
 
 Arrays are homogenous collections of scalars or structs with random access.
 
 ### Syntax
 
-=== "Native"
-
-    Array types have the form - _element-type_ **[** [ _length_expression_ ] **]**
-
 === "Python"
 
     Array types are represented with the generic class `CArray`. Arguments are declared with the type hint in the form:
 
     _name_ **:** **CArray** [ **[** _element-type_ [ **,** _length_expression_ ] **]** ]
+
+=== "Native"
+
+    Array types have the form - _element-type_ **[** [ _length_expression_ ] **]**
 
 ### Semantics
 
@@ -75,24 +75,6 @@ takes an array of reals, and uses the `.len` attribute and array subscripting to
 the elements of the array. Note that index -1 signifies the last element in an array
 (similar to Python).
 
-=== "Native"
-
-    ```
-    qfunc foo(arr: real[], qb: qbit) {
-      if (arr.len > 2) {
-        RX(arr[-1], qb);
-      } else {
-        RX(arr[0], qb);
-      }
-    }
-
-    qfunc main() {
-      q0: qbit;
-      allocate(q0);
-      foo([0.5, 1.0, 1.5], q0);
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -111,9 +93,35 @@ the elements of the array. Note that index -1 signifies the last element in an a
         foo([0.5, 1.0, 1.5], q0)
     ```
 
+=== "Native"
+
+    ```
+    qfunc foo(arr: real[], qb: qbit) {
+      if (arr.len > 2) {
+        RX(arr[-1], qb);
+      } else {
+        RX(arr[0], qb);
+      }
+    }
+
+    qfunc main() {
+      q0: qbit;
+      allocate(q0);
+      foo([0.5, 1.0, 1.5], q0);
+    }
+    ```
+
 ## Structs
 
 Structs are aggregates of variables, called _fields_, each with its own name and type.
+
+=== "Python"
+
+    A Qmod classical struct is defined with a Python data class: A class decorated with
+    `@dataclasses.dataclass`.
+
+    Fields need to be declared with type-hints like classical arguments of functions.
+    Fields are initialized and accessed like attributes of Python object.
 
 === "Native"
 
@@ -126,44 +134,11 @@ Structs are aggregates of variables, called _fields_, each with its own name and
     _field-value-list_ is a list of zero or more comma-separated field initializations in the form -
     _name_ **=** _expression_.
 
-=== "Python"
-
-    A Qmod classical struct is defined with a Python data class: A class decorated with
-    `@dataclasses.dataclass`.
-
-    Fields need to be declared with type-hints like classical arguments of functions.
-    Fields are initialized and accessed like attributes of Python object.
-
 ### Example
 
 In the following example a struct type called `MyStruct` is defined. Function `foo`
 takes an argument of this type and accesses its fields. Function `main` instantiates
 and populates `MyStruct` in its call to `foo`.
-
-=== "Native"
-
-    ```
-    struct MyStruct {
-      loop_counts: int[];
-      angle: real;
-    }
-
-    qfunc foo(ms: MyStruct, qv: qbit[2]) {
-      H(qv[0]);
-      repeat (index: ms.loop_counts[1]) {
-        PHASE(ms.angle + 0.5, qv[1]);
-      }
-    }
-
-    qfunc main() {
-      qba: qbit[];
-      allocate(2, qba);
-      foo(MyStruct {
-        loop_counts = [1, 2],
-        angle = 0.1
-      }, qba);
-    }
-    ```
 
 === "Python"
 
@@ -192,6 +167,31 @@ and populates `MyStruct` in its call to `foo`.
         qba = QArray()
         allocate(2, qba)
         foo(MyStruct(loop_counts=[1, 2], angle=0.1), qba)
+    ```
+
+=== "Native"
+
+    ```
+    struct MyStruct {
+      loop_counts: int[];
+      angle: real;
+    }
+
+    qfunc foo(ms: MyStruct, qv: qbit[2]) {
+      H(qv[0]);
+      repeat (index: ms.loop_counts[1]) {
+        PHASE(ms.angle + 0.5, qv[1]);
+      }
+    }
+
+    qfunc main() {
+      qba: qbit[];
+      allocate(2, qba);
+      foo(MyStruct {
+        loop_counts = [1, 2],
+        angle = 0.1
+      }, qba);
+    }
     ```
 
 ## Hamiltonians

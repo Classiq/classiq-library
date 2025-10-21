@@ -14,14 +14,6 @@ The following example demonstrates how to define a simple Qmod function. Functio
 declares and uses a classical real-number parameter `p` and a quantum single-qubit
 parameter `q`.
 
-=== "Native"
-
-    ```
-    qfunc rotate(p: real, q: qbit) {
-      PHASE(p * pi, q);
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -34,22 +26,19 @@ parameter `q`.
         PHASE(theta=p * pi, target=qv)
     ```
 
+=== "Native"
+
+    ```
+    qfunc rotate(p: real, q: qbit) {
+      PHASE(p * pi, q);
+    }
+    ```
+
 ## Syntax
 
 The signature of a function comprises the function's name and its parameters, that is,
 the arguments it expects when called. The function's body is the description of its
 implementation as a sequence of statements.
-
-=== "Native"
-
-    (**qfunc** | **qperm**) _name_ **(** _parameters_ **)** **{** _statements_ **}**
-
-    _parameters_ is a list of zero or more comma-separated declarations in one of the
-    three forms:
-
-    - \[ **output** | **input** \] \[ **const** \] _name_ **:** _quantum-type_
-    - _name_ **:** _classical-type_
-    - _name_ **:** (**qfunc** | **qperm**) [ **[** **]** ] **(** _parameters_ **)**
 
 === "Python"
 
@@ -64,6 +53,17 @@ implementation as a sequence of statements.
     Direction modifiers for quantum arguments are represented with the generic classes
     `Input` and `Output`. The _const_ modifier for quantum arguments
     is represented with the generic class `Const`.
+
+=== "Native"
+
+    (**qfunc** | **qperm**) _name_ **(** _parameters_ **)** **{** _statements_ **}**
+
+    _parameters_ is a list of zero or more comma-separated declarations in one of the
+    three forms:
+
+    - \[ **output** | **input** \] \[ **const** \] _name_ **:** _quantum-type_
+    - _name_ **:** _classical-type_
+    - _name_ **:** (**qfunc** | **qperm**) [ **[** **]** ] **(** _parameters_ **)**
 
 ## Semantics
 
@@ -104,18 +104,6 @@ Statements can do one of the following:
 
 The following example demonstrates function declarations:
 
-=== "Native"
-
-    ```
-    qfunc foo(n: int, qba: qbit[2*n]) {
-      // ...
-    }
-
-    qfunc bar(x: qnum, y: qnum, output res: qnum) {
-      // ...
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -132,6 +120,18 @@ The following example demonstrates function declarations:
         pass
     ```
 
+=== "Native"
+
+    ```
+    qfunc foo(n: int, qba: qbit[2*n]) {
+      // ...
+    }
+
+    qfunc bar(x: qnum, y: qnum, output res: qnum) {
+      // ...
+    }
+    ```
+
     Note that when classical arguments are used to specify subsequent arguments, as in the
     case where `qba` is a qubit array of size 2*n, the expression is specified as a string
     literal because the Python variable `n` is not in scope.
@@ -142,17 +142,6 @@ The following example demonstrates a simple function definition. In its body it 
 built-in function `H()` and then iteratively function `PHASE()` using the _repeat_
 statement (for more on `repeat` see
 [Classical Control Flow](statements/classical-control-flow.md)).
-
-=== "Native"
-
-    ```
-    qfunc foo(n: int, qv: qbit) {
-      H(qv);
-      repeat (index: n) {
-        PHASE((index / n) * pi, qv);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -169,4 +158,15 @@ statement (for more on `repeat` see
     def foo(n: CInt, qv: QBit) -> None:
         H(qv)
         repeat(n, lambda i: PHASE(theta=(i / n) * pi, target=qv))
+    ```
+
+=== "Native"
+
+    ```
+    qfunc foo(n: int, qv: qbit) {
+      H(qv);
+      repeat (index: n) {
+        PHASE((index / n) * pi, qv);
+      }
+    }
     ```

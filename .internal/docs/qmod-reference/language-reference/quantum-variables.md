@@ -19,17 +19,6 @@ is often done by passing it as the output argument of a function, such as `alloc
 Once initialized, the state of the object it references can be modified, but the variable's
 reference itself is immutable.
 
-=== "Native"
-
-    ```
-    qfunc main(output q1: qbit) {
-      q2: qbit;
-      allocate(q1);
-      allocate(q2);
-      CX(q1, q2);
-    }
-    ```
-
 === "Python"
 
     A quantum variable is declared as a function argument using a Python class as a
@@ -47,6 +36,17 @@ reference itself is immutable.
         allocate(q1)
         allocate(q2)
         CX(q1, q2)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output q1: qbit) {
+      q2: qbit;
+      allocate(q1);
+      allocate(q2);
+      CX(q1, q2);
+    }
     ```
 
 ## Managing Quantum Variables
@@ -91,17 +91,6 @@ on it, since it is declared as an output-only argument of function `main`. Simil
 variable `b` is uninitialized upon declaration, and subsequently initialized through
 the call to `prepare_state`, to which it is passed as an output-only argument.
 
-=== "Native"
-
-    ```
-    qfunc main(output a: qbit) {
-      allocate(a);
-      X(a);
-      b: qbit[];
-      prepare_state([0.25, 0.25, 0.25, 0.25], 0.01, b);
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -116,6 +105,17 @@ the call to `prepare_state`, to which it is passed as an output-only argument.
         prepare_state(probabilities=[0.25, 0.25, 0.25, 0.25], bound=0.01, out=b)
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output a: qbit) {
+      allocate(a);
+      X(a);
+      b: qbit[];
+      prepare_state([0.25, 0.25, 0.25, 0.25], 0.01, b);
+    }
+    ```
+
 ## Allocate
 
 The _allocate_ statement is used to initialize quantum variables, allocating a sequence
@@ -124,10 +124,6 @@ numeric type attributes in the case of a numeric variable, are either explicitly
 or derived from the variable's type.
 
 ### Syntax
-
-=== "Native"
-
-    **allocate** **(** [ _size-int-expr_  **,** [ _sign-bool-expr_ **,** _frac-digits-int-expr_ **,** ] ] _var_ **)**
 
 === "Python"
 
@@ -153,6 +149,10 @@ or derived from the variable's type.
         pass
     ```
 
+=== "Native"
+
+    **allocate** **(** [ _size-int-expr_  **,** [ _sign-bool-expr_ **,** _frac-digits-int-expr_ **,** ] ] _var_ **)**
+
 It is recommended to use the `SIGNED` and `UNSIGNED` built-in constants instead
 of `True` and `False` respectively when specifying the _sign-bool-expr_.
 
@@ -174,22 +174,6 @@ The following example demonstrates three uses of `allocate` on two local variabl
 output parameter of `main`. Note how the overall size of the quantum object is used in
 the inference of its type.
 
-=== "Native"
-
-    ```
-    qfunc main(output qnarr: qnum[2]) {
-      qb: qbit;
-      allocate(qb);  // allocates a single qubit
-
-      qn: qnum;  // declares a quantum number with unspecified size
-      allocate(3, SIGNED, 0, qn);  // allocates a 3 bit signed integer (ranging in [-4, 3])
-
-      allocate(6, qnarr);  // allocates an array of 3 elements, each with size 2
-
-      hadamard_transform({qb, qn, qnarr});
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -209,6 +193,22 @@ the inference of its type.
         hadamard_transform([qb, qn, qnarr])
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output qnarr: qnum[2]) {
+      qb: qbit;
+      allocate(qb);  // allocates a single qubit
+
+      qn: qnum;  // declares a quantum number with unspecified size
+      allocate(3, SIGNED, 0, qn);  // allocates a 3 bit signed integer (ranging in [-4, 3])
+
+      allocate(6, qnarr);  // allocates an array of 3 elements, each with size 2
+
+      hadamard_transform({qb, qn, qnarr});
+    }
+    ```
+
 ## Free
 
 The _free_ statement is used to declare that a quantum variable is back to its initial
@@ -217,10 +217,6 @@ and its qubits can are reclaimed by the compiler for subsequent use.
 
 ### Syntax
 
-=== "Native"
-
-    **free** **(** _var_ **)**
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -228,6 +224,10 @@ and its qubits can are reclaimed by the compiler for subsequent use.
     def free(out: Input[QVar]) -> None:
         pass
     ```
+
+=== "Native"
+
+    **free** **(** _var_ **)**
 
 ### Semantics
 
@@ -252,6 +252,23 @@ The following example demonstrates the use of `free` in a phase-kickback pattern
 used to release an auxiliary qubit that is known to be returned to state $|0\rangle$, despite
 having applied the Hadamard gate to it.
 
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def flip_phase(val: CInt, state: Const[QNum]):
+        aux = QBit()
+        allocate(aux)
+        within_apply(
+            lambda: (X(aux), H(aux)),
+            lambda: control(state == val, lambda: X(aux)),
+        )
+        free(aux)  # aux is known to be in the |0> state
+    ```
+
 === "Native"
 
     ```
@@ -270,23 +287,6 @@ having applied the Hadamard gate to it.
     }
     ```
 
-=== "Python"
-
-    ```python
-    from classiq import *
-
-
-    @qfunc
-    def flip_phase(val: CInt, state: Const[QNum]):
-        aux = QBit()
-        allocate(aux)
-        within_apply(
-            lambda: (X(aux), H(aux)),
-            lambda: control(state == val, lambda: X(aux)),
-        )
-        free(aux)  # aux is known to be in the |0> state
-    ```
-
 Note that an alternative approach to implementing a phase-kickback pattern, which does
 not require the use of `free`, is to encapsulate the calls to `H` in a function
 with an as unchecked _const_ parameter.
@@ -297,13 +297,6 @@ The _concatenation operator_ is used to combine a sequence of quantum objects
 (or their parts) into a
 [quantum array](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-types/#quantum-arrays).
 
-=== "Native"
-
-    **{** _path-expressions_ **}**
-
-    _path-expressions_ is a comma-separated sequence of one or more quantum
-    [path expressions](http://docs.classiq.io/latest/qmod-reference/language-reference/statements/numeric-assignment/?h=path+expression#path-operators).
-
 === "Python"
 
     A concatenation is a Python list containing quantum objects.
@@ -313,23 +306,16 @@ The _concatenation operator_ is used to combine a sequence of quantum objects
     _path-expressions_ is a comma-separated sequence of one or more quantum
     [path expressions](http://docs.classiq.io/latest/qmod-reference/language-reference/statements/numeric-assignment/?h=path+expression#path-operators).
 
+=== "Native"
+
+    **{** _path-expressions_ **}**
+
+    _path-expressions_ is a comma-separated sequence of one or more quantum
+    [path expressions](http://docs.classiq.io/latest/qmod-reference/language-reference/statements/numeric-assignment/?h=path+expression#path-operators).
+
 For example, the model below uses the concatenation operator to apply
 `hadamard_transform` to a specific set of qubits drawn from two quantum
 variables:
-
-=== "Native"
-
-    ```
-    qfunc main() {
-      v1: qbit[4];
-      allocate(v1);
-      v2: qbit[4];
-      allocate(v2);
-      v3: qbit;
-      allocate(v3);
-      hadamard_transform({v1[3], v3, v2[1:3], v1[0]});
-    }
-    ```
 
 === "Python"
 
@@ -346,6 +332,20 @@ variables:
         v3 = QBit()
         allocate(v3)
         hadamard_transform([v1[3], v3, v2[1:3], v1[0]])
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main() {
+      v1: qbit[4];
+      allocate(v1);
+      v2: qbit[4];
+      allocate(v2);
+      v3: qbit;
+      allocate(v3);
+      hadamard_transform({v1[3], v3, v2[1:3], v1[0]});
+    }
     ```
 
 This model allocates three quantum objects: quantum arrays `v1` and `v2` and

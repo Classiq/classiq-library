@@ -14,13 +14,6 @@ You can also use it to reinterpret a numeric object as a qubit array and vice ve
 
 ## Syntax
 
-=== "Native"
-
-    _source-var-list_ **->** _destination-var-list_
-
-    _source-var-list_ and _destination-var-list_ are either a single quantum variable or
-    a list of one or more comma-separated quantum variables enclosed in **{**  **}**
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -31,6 +24,13 @@ You can also use it to reinterpret a numeric object as a qubit array and vice ve
     ) -> None:
         pass
     ```
+
+=== "Native"
+
+    _source-var-list_ **->** _destination-var-list_
+
+    _source-var-list_ and _destination-var-list_ are either a single quantum variable or
+    a list of one or more comma-separated quantum variables enclosed in **{**  **}**
 
 ## Semantics
 
@@ -60,6 +60,21 @@ flipped. Accessing qubits cannot be performed directly on a `qnum` variable. The
 `x` is bound to a `qbit[]` variable to perform the operation and subsequently
 bound back.
 
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def main(x: Output[QNum]) -> None:
+        x |= 5
+        qba = QArray()
+        bind(x, qba)
+        repeat(qba.len, lambda i: X(qba[i]))
+        bind(qba, x)
+    ```
+
 === "Native"
 
     ```
@@ -74,21 +89,6 @@ bound back.
     }
     ```
 
-=== "Python"
-
-    ```python
-    from classiq import qfunc, Output, QNum, QArray, bind, repeat, X
-
-
-    @qfunc
-    def main(x: Output[QNum]) -> None:
-        x |= 5
-        qba = QArray()
-        bind(x, qba)
-        repeat(qba.len, lambda i: X(qba[i]))
-        bind(qba, x)
-    ```
-
 ### Example 2: Split and join
 
 The following example demonstrates how to apply an operation on a specific qubit
@@ -97,26 +97,6 @@ argument
 `x` is the target of a `CX` operation. This is done by splitting it from `x`
 while
 keeping the rest of the qubits in `msbs` and subsequently joining `x` back.
-
-=== "Native"
-
-    ```
-    qfunc xor_lsb(x: qnum, xor_bit: qbit) {
-      lsb: qnum<1, UNSIGNED, 1>;
-      msbs: qbit[x.size - 1];
-      x -> {lsb, msbs};
-      CX(xor_bit, lsb);
-      {lsb, msbs} -> x;
-    }
-
-    qfunc main(output x: qnum) {
-      x = 5;
-      xor_bit: qbit;
-      allocate(xor_bit);
-      H(xor_bit);
-      xor_lsb(x, xor_bit);
-    }
-    ```
 
 === "Python"
 
@@ -140,6 +120,26 @@ keeping the rest of the qubits in `msbs` and subsequently joining `x` back.
         allocate(xor_bit)
         H(xor_bit)
         xor_lsb(x, xor_bit)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc xor_lsb(x: qnum, xor_bit: qbit) {
+      lsb: qnum<1, UNSIGNED, 1>;
+      msbs: qbit[x.size - 1];
+      x -> {lsb, msbs};
+      CX(xor_bit, lsb);
+      {lsb, msbs} -> x;
+    }
+
+    qfunc main(output x: qnum) {
+      x = 5;
+      xor_bit: qbit;
+      allocate(xor_bit);
+      H(xor_bit);
+      xor_lsb(x, xor_bit);
+    }
     ```
 
 In the overall model, function `main` calls `xor_lsb` with the number 5. Its output

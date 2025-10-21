@@ -12,10 +12,6 @@ building blocks. Qmod has two basic forms - the _repeat_ statement and the _if_ 
 
 ### Syntax
 
-=== "Native"
-
-    **repeat** **(** _iteration_variable_ **:** _count_ **)** **{** _iteration-statements_ **}**
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -23,6 +19,10 @@ building blocks. Qmod has two basic forms - the _repeat_ statement and the _if_ 
     def repeat(count: CInt, iteration: QCallable[CInt]) -> None:
         pass
     ```
+
+=== "Native"
+
+    **repeat** **(** _iteration_variable_ **:** _count_ **)** **{** _iteration-statements_ **}**
 
 ### Semantics
 
@@ -36,16 +36,6 @@ building blocks. Qmod has two basic forms - the _repeat_ statement and the _if_ 
 The following example defines a useful function - applying the Hadamard function across
 all qubits in a qubit array - using _repeat_. Note that a similar function is available
 in the Classiq open-library.
-
-=== "Native"
-
-    ```
-    qfunc my_hadamard_transform(qba: qbit[]) {
-      repeat (index: qba.len) {
-        H(qba[index]);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -61,13 +51,19 @@ in the Classiq open-library.
         )
     ```
 
+=== "Native"
+
+    ```
+    qfunc my_hadamard_transform(qba: qbit[]) {
+      repeat (index: qba.len) {
+        H(qba[index]);
+      }
+    }
+    ```
+
 ## Classical If
 
 ### Syntax
-
-=== "Native"
-
-    **if** **(** condition **)** **{** _then-statements_ **}** else **{** _else-statements_ **}**
 
 === "Python"
 
@@ -80,6 +76,10 @@ in the Classiq open-library.
     Note that identifiers in Qmod that happen to conflict with Python keywords have `_`
     suffix. This is the case with `if_` and `else_` in the second function.
 
+=== "Native"
+
+    **if** **(** condition **)** **{** _then-statements_ **}** else **{** _else-statements_ **}**
+
 ### Semantics
 
 -   Invoke the _then_ block if _condition_ evaluates to `true` and otherwise invoke the _else_ block
@@ -87,18 +87,6 @@ in the Classiq open-library.
     to contexts where the variable is initialized and remains initialized (see [Quantum Variables](../quantum-variables.md))
 
 ### Example
-
-=== "Native"
-
-    ```
-    qfunc my_conditional_gate(cond: bool, qb: qbit) {
-      if (cond) {
-        X(qb);
-      } else {
-        Y(qb);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -113,4 +101,16 @@ in the Classiq open-library.
             then=lambda _: X(qb),
             else_=lambda _: Y(qb),
         )
+    ```
+
+=== "Native"
+
+    ```
+    qfunc my_conditional_gate(cond: bool, qb: qbit) {
+      if (cond) {
+        X(qb);
+      } else {
+        Y(qb);
+      }
+    }
     ```

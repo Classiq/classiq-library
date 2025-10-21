@@ -22,6 +22,19 @@ signature.
 
 ### Syntax
 
+=== "Python"
+
+    The `QCallable` type hint is used to specify a function type. `QCallable` itself is a
+    generic class, taking as parameters a list of type hints that declare the parameters of
+    the function. The `QPerm` type hint is used to specify a _permutation_
+    function type.
+
+    The `QCallableList` type hint specifies a function array type, and
+    `QPermList` specifies a _permutation_ function array type.
+
+    The name of a parameter in a function type can optionally be specified using the form -
+    **Annotated** **[** _type_ **, "** _name_ **"]**.
+
 === "Native"
 
     Function type syntax has the following form -
@@ -35,19 +48,6 @@ signature.
     array -
 
     (**qfunc** | **qperm**) **[** **]** **(** _function-type-parameters_ **)**
-
-=== "Python"
-
-    The `QCallable` type hint is used to specify a function type. `QCallable` itself is a
-    generic class, taking as parameters a list of type hints that declare the parameters of
-    the function. The `QPerm` type hint is used to specify a _permutation_
-    function type.
-
-    The `QCallableList` type hint specifies a function array type, and
-    `QPermList` specifies a _permutation_ function array type.
-
-    The name of a parameter in a function type can optionally be specified using the form -
-    **Annotated** **[** _type_ **, "** _name_ **"]**.
 
 ### Semantics
 
@@ -70,22 +70,6 @@ of a function type with one classical parameter and one quantum parameter. The f
 is called twice in its body, passing different argument values. In function
 `main`, `my_operator` is called twice, each time passing a different function as its
 argument.
-
-=== "Native"
-
-    ```
-    qfunc my_operator(my_operand: qfunc (theta: real, target: qbit), q: qbit) {
-      my_operand(pi / 2, q);
-      my_operand(pi / 4, q);
-    }
-
-    qfunc main() {
-      q: qbit;
-      allocate(q);
-      my_operator(RX, q);
-      my_operator(RY, q);
-    }
-    ```
 
 === "Python"
 
@@ -115,6 +99,22 @@ argument.
       translating Qmod Python description to native syntax, names `arg0`,
       `arg1`, etc. are associated with the arguments automatically.
 
+=== "Native"
+
+    ```
+    qfunc my_operator(my_operand: qfunc (theta: real, target: qbit), q: qbit) {
+      my_operand(pi / 2, q);
+      my_operand(pi / 4, q);
+    }
+
+    qfunc main() {
+      q: qbit;
+      allocate(q);
+      my_operator(RX, q);
+      my_operator(RY, q);
+    }
+    ```
+
 Synthesizing this model creates the quantum program shown below. You can see four
 rotations in the circuit with their respective angles.
 
@@ -128,6 +128,13 @@ Note that in Python only the lambda function form is supported.
 
 ### Syntax
 
+=== "Python"
+
+    A Python `Callable` object is used as a Qmod lambda function. This can take one of two forms -
+    a Python lambda expression, or a named _Python_ function (not decorated with `@qfunc`).
+    When a named function is used with type hints on its arguments, the names of the
+    operands will be reflected in the Qmod description.
+
 === "Native"
 
     Lambda function syntax is somewhat similar to a function definition. The
@@ -136,45 +143,16 @@ Note that in Python only the lambda function form is supported.
 
     **lambda** \[ **<** _classical-arg-names_ **>** \] **(** _quantum-arg-names_ **)** **{** _statements_ **}**
 
-=== "Python"
-
-    A Python `Callable` object is used as a Qmod lambda function. This can take one of two forms -
-    a Python lambda expression, or a named _Python_ function (not decorated with `@qfunc`).
-    When a named function is used with type hints on its arguments, the names of the
-    operands will be reflected in the Qmod description.
-
 ### Example 1
 
 Consider the following snippet, where `my_operator` is called twice from function `main`,
 once with a regular function and a second time with a lambda function. These two calls
 are equivalent.
 
-=== "Native"
-
-    ```
-    qfunc my_operator(my_operand: qfunc (angle: real, target: qbit), q: qbit) {
-      H(q);
-      my_operand(pi / 2, q);
-    }
-
-    qfunc my_operand(angle: real, target: qbit) {
-      RX(angle, target);
-    }
-
-    qfunc main() {
-      q: qbit;
-      allocate(q);
-      my_operator(my_operand, q);
-      my_operator(lambda (angle, target) {
-        RX(angle, target);
-      }, q);
-    }
-    ```
-
 === "Python"
 
     ```python
-    from classiq import CReal, H, QBit, QCallable, RX, allocate, qfunc
+    from classiq import *
     from classiq.qmod.symbolic import pi
 
 
@@ -199,32 +177,37 @@ are equivalent.
     Note that in the first call, the argument is a regular Python function, not decorated
     with `@qfunc`.
 
+=== "Native"
+
+    ```
+    qfunc my_operator(my_operand: qfunc (angle: real, target: qbit), q: qbit) {
+      H(q);
+      my_operand(pi / 2, q);
+    }
+
+    qfunc my_operand(angle: real, target: qbit) {
+      RX(angle, target);
+    }
+
+    qfunc main() {
+      q: qbit;
+      allocate(q);
+      my_operator(my_operand, q);
+      my_operator(lambda (angle, target) {
+        RX(angle, target);
+      }, q);
+    }
+    ```
+
 ### Example 2
 
 An operator may pass expressions involving its own arguments to its operand.
 The following example demonstrates this.
 
-=== "Native"
-
-    ```
-    qfunc foo_operator(n: int, my_operand: qfunc (angle: real, qb: qbit), qba: qbit[2]) {
-      H(qba[0]);
-      my_operand(pi / n, qba[1]);
-    }
-
-    qfunc main() {
-      qba: qbit[];
-      allocate(2, qba);
-      foo_operator(4, lambda(angle, qb) {
-        RX(angle, qb);
-      }, qba);
-    }
-    ```
-
 === "Python"
 
     ```python
-    from classiq import CInt, CReal, H, QArray, QBit, QCallable, RX, allocate, qfunc
+    from classiq import *
     from classiq.qmod.symbolic import pi
 
 
@@ -243,6 +226,23 @@ The following example demonstrates this.
         qba = QArray()
         allocate(2, qba)
         foo_operator(n=4, my_operand=lambda theta, target: RX(theta, target), qba=qba)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc foo_operator(n: int, my_operand: qfunc (angle: real, qb: qbit), qba: qbit[2]) {
+      H(qba[0]);
+      my_operand(pi / n, qba[1]);
+    }
+
+    qfunc main() {
+      qba: qbit[];
+      allocate(2, qba);
+      foo_operator(4, lambda(angle, qb) {
+        RX(angle, qb);
+      }, qba);
+    }
     ```
 
 Synthesizing this model creates the quantum program shown below. You can see that the call to
@@ -270,25 +270,6 @@ case, the quantum variable used inside the lambda function is captured directly 
 scope rather than being passed to it indirectly through the operator. The resulting quantum program
 in this case is identical to that of the previous version in _Example 2_ above.
 
-=== "Native"
-
-    ```
-    qfunc foo_operator(n: int, my_operand: qfunc (angle: real), qb: qbit) {
-      H(qb);
-      my_operand(pi / n);
-    }
-
-    qfunc main() {
-      qb1: qbit;
-      qb2: qbit;
-      allocate(qb1);
-      allocate(qb2);
-      foo_operator(4, lambda(t) {
-        RX(t, qb1);
-      }, qb2);
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -313,4 +294,23 @@ in this case is identical to that of the previous version in _Example 2_ above.
         allocate(qb1)
         allocate(qb2)
         foo_operator(n=4, my_operand=lambda t: RX(theta=t, target=qb1), qb=qb2)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc foo_operator(n: int, my_operand: qfunc (angle: real), qb: qbit) {
+      H(qb);
+      my_operand(pi / n);
+    }
+
+    qfunc main() {
+      qb1: qbit;
+      qb2: qbit;
+      allocate(qb1);
+      allocate(qb2);
+      foo_operator(4, lambda(t) {
+        RX(t, qb1);
+      }, qb2);
+    }
     ```
