@@ -1,10 +1,10 @@
 qstruct PhaseSpaceStruct {
-  g_x: qnum<3, UNSIGNED, 0>;
-  g_y: qnum<3, UNSIGNED, 0>;
+  g_x: qnum<3>;
+  g_y: qnum<3>;
   v_dir_x: qbit;
   v_dir_y: qbit;
-  u_x: qnum<2, UNSIGNED, 0>;
-  u_y: qnum<2, UNSIGNED, 0>;
+  u_x: qnum<2>;
+  u_y: qnum<2>;
 }
 
 qfunc init_state2D_expanded___0(qs: PhaseSpaceStruct, g_dist_x: real[], g_dist_y: real[], u_dist: real[]) {
