@@ -11,7 +11,7 @@ import numpy as np
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog_verify_be"),
+        tb.ref_pydantic("qprog_be"),
         expected_width=4,  # actual width: 4
         expected_depth=100,  # actual depth: 60
     )
@@ -23,39 +23,20 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_qsvt"),
         expected_width=8,  # actual width: 8
-        expected_depth=6500,  # actual depth: 3435
+        expected_depth=6500,  # actual depth: 2458
     )
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_cheb_lcu"),
         expected_width=12,  # actual width: 12
-        expected_depth=20000,  # actual depth: 12757
+        expected_depth=20000,  # actual depth: 14961
     )
 
     # test notebook content
-    renormalized_verify_be = tb.ref_numpy("state_result_verify_be")
-    expected_state_be = tb.ref_numpy("expected_state_be")
-    overlap = np.abs(
-        np.vdot(renormalized_verify_be, expected_state_be)
-        / np.linalg.norm(renormalized_verify_be)
-        / np.linalg.norm(expected_state_be)
-    )
-    assert np.abs(1 - overlap) < 1e-5
-
-    expected_state = tb.ref_numpy("expected_state")
-    EPS = tb.ref_numpy("EPS")
-    renormalized_state_gqsp = tb.ref_numpy("renormalized_state_gqsp")
-    renormalized_state_qsvt = tb.ref_numpy("renormalized_state_qsvt")
-    renormalized_state_cheb_lcu = tb.ref_numpy("renormalized_state_cheb_lcu")
-
-    renormalized_states = [
-        renormalized_state_gqsp,
-        renormalized_state_qsvt,
-        renormalized_state_cheb_lcu,
-    ]
-    for state in renormalized_states:
-        overlap = np.abs(
-            np.vdot(state, expected_state)
-            / np.linalg.norm(state)
-            / np.linalg.norm(expected_state)
-        )
+    for overlap in [
+        tb.ref_numpy("overlap_be"),
+        tb.ref_numpy("overlap_gqsp"),
+        tb.ref_numpy("overlap_qsvt"),
+        tb.ref_numpy("overlap_cheb_lcu"),
+    ]:
+        EPS = tb.ref_numpy("EPS")
         assert np.abs(1 - overlap) < EPS
