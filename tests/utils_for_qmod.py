@@ -40,7 +40,7 @@ def _normalize_qmod_code(qmod_path: Path) -> str:
     code = code.strip()
     float_pattern = r"[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?"
     code = re.sub(rf"\({float_pattern}\)", "<NUMBER>", code)
-    code = re.sub(rf"(?<=\W){float_pattern}", "<NUMBER>", code)
+    code = re.sub(rf"(?<=[^a-zA-Z0-9_+\-]){float_pattern}", "<NUMBER>", code)
     code = re.sub(r"\s+", "", code)
     code = re.sub(r"Pauli::[IXYZ]", "<PAULI>", code)
     return code
