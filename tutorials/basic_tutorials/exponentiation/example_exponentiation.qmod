@@ -1,5 +1,4 @@
-qfunc main() {
-  state: qbit[];
+qfunc main(output state: qbit[]) {
   allocate(12, state);
   suzuki_trotter(SparsePauliOp {
     terms=[
