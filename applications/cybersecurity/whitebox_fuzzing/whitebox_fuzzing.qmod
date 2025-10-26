@@ -8,20 +8,20 @@ qfunc my_grover_operator(oracle_operand: qfunc (), diffuser_operand: qfunc ()) {
   diffuser_operand();
 }
 
-qfunc prep_minus(output out: qbit)
- {
-  allocate(out);
+qfunc prep_minus(out: qbit) {
   X(out);
   H(out);
 }
 
 qfunc my_oracle(predicate: qfunc (qbit)) {
   aux: qbit;
+  allocate(aux);
   within {
     prep_minus(aux);
   } apply {
     predicate(aux);
   }
+  free(aux);
 }
 
 qperm my_predicate(const x: qnum, const y: qnum, res: qbit) {
