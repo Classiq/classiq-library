@@ -1,5 +1,4 @@
-qfunc simon_qfunc(f_qfunc: qfunc (qnum, output qnum), x: qnum) {
-  res: qnum;
+qfunc simon_qfunc(f_qfunc: qfunc (qnum, output qnum), x: qnum, output res: qnum) {
   within {
     hadamard_transform(x);
   } apply {
@@ -11,9 +10,9 @@ qperm simon_qfunc_simple(s: int, const x: qnum, output res: qnum) {
   res = min(x, x ^ s);
 }
 
-qfunc main(output x: qnum<5>) {
+qfunc main(output x: qnum<5>, output res: qnum) {
   allocate(x);
   simon_qfunc(lambda(x, res) {
     simon_qfunc_simple(6, x, res);
-  }, x);
+  }, x, res);
 }
