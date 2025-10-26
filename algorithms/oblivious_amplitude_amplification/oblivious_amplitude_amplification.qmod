@@ -127,8 +127,7 @@ qperm predicate_1_lambda___0_0_expanded___0(x: qbit, const target_captured__phas
 
 @disable_perm_check
 @disable_const_checks(target)
-qperm _cond_phase_flip_expanded___0(const target: qbit, const target_captured__phase_oracle__4: qbit[2])
- {
+qperm _cond_phase_flip_expanded___0(const target: qbit, const target_captured__phase_oracle__4: qbit[2]) {
   within {
     H(target);
   } apply {
@@ -156,8 +155,7 @@ qfunc space_transform_0_lambda___0_0_expanded___0(b: qbit[2], data_captured__obl
 
 @disable_perm_check
 @disable_const_checks(packed_vars)
-qperm reflect_about_zero_expanded___0(const packed_vars: qbit[2])
- {
+qperm reflect_about_zero_expanded___0(const packed_vars: qbit[2]) {
   msbs: qnum<1, False, 0>;
   lsb: qbit;
   packed_vars -> {msbs, lsb};
