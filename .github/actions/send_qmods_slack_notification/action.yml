@@ -23,7 +23,7 @@ runs:
               '  ./pytest-results/test-results.xml | \
               jq -r -s '
                 sort_by(.name) | .[] |
-                "• " + .name + ": " + (.message | @html | split("\n") | .[0]) + "\n"
+                "• " + .name + ": " + (.message | @html | split("\n") | .[0]) + "\n\n"
                 '
         ) >> $GITHUB_ENV
 
