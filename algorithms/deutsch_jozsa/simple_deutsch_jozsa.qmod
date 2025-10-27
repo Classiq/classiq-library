@@ -1,54 +1,20 @@
-qfunc hadamard_transform_expanded___0(target: qbit[4]) {
-  repeat (index: 4) {
-    H(target[index]);
+qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
+  within {
+    hadamard_transform(x);
+  } apply {
+    phase_oracle(lambda(x, y) {
+      predicate(x, y);
+    }, x);
   }
 }
 
-qperm simple_predicate_expanded___0(const x: qnum<4, False, 0>, res: qbit) {
+qperm simple_predicate(const x: qnum, res: qbit) {
   res ^= x > 7;
 }
 
-qperm predicate_0_lambda___0_0_expanded___0(const x: qnum<4, False, 0>, y: qbit) {
-  simple_predicate_expanded___0(x, y);
-}
-
-qperm predicate_1_lambda___0_0_expanded___0(const x: qbit[4], y: qbit) {
-  predicate_0_lambda___0_0_expanded___0(x, y);
-}
-
-qperm predicate_2_lambda___0_0_expanded___0(x: qbit, const target_captured__phase_oracle__2: qbit[4]) {
-  predicate_1_lambda___0_0_expanded___0(target_captured__phase_oracle__2, x);
-}
-
-@disable_perm_check
-@disable_const_checks(target)
-qperm _cond_phase_flip_expanded___0(const target: qbit, const target_captured__phase_oracle__2: qbit[4]) {
-  within {
-    H(target);
-  } apply {
-    predicate_2_lambda___0_0_expanded___0(target, target_captured__phase_oracle__2);
-  }
-}
-
-qperm phase_oracle_expanded___0(const target: qbit[4]) {
-  aux: qbit;
-  within {
-    allocate(1, aux);
-    X(aux);
-  } apply {
-    _cond_phase_flip_expanded___0(aux, target);
-  }
-}
-
-qfunc deutsch_jozsa_expanded___0(x: qnum<4, False, 0>) {
-  within {
-    hadamard_transform_expanded___0(x);
-  } apply {
-    phase_oracle_expanded___0(x);
-  }
-}
-
-qfunc main(output x: qnum<4, False, 0>) {
-  allocate(4, x);
-  deutsch_jozsa_expanded___0(x);
+qfunc main(output x: qnum<4>) {
+  allocate(x);
+  deutsch_jozsa(lambda(x, y) {
+    simple_predicate(x, y);
+  }, x);
 }
