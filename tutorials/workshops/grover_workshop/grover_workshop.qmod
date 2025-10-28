@@ -19,6 +19,7 @@ qperm oracle_black_box(res: qnum, const a: qnum, const b: qnum, const c: qnum) {
   res ^= c == ((2 * a) + b);
 }
 
+@disable_perm_check
 qperm oracle_function(const a: qnum, const b: qnum, const c: qnum) {
   aux: qbit;
   allocate(aux);
