@@ -10,4 +10,5 @@ qfunc main(output phase_var: qnum<10, UNSIGNED, 10>) {
   allocate(5, x);
   allocate(phase_var);
   period_finding(21, 11, x, phase_var);
+  drop(x);
 }
