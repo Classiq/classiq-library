@@ -18,9 +18,8 @@ qfunc single_step_walk(coin: qbit, x: qnum) {
   }
 }
 
-qfunc main(output x: qnum<6, UNSIGNED, 0>) {
+qfunc main(output x: qnum<6, UNSIGNED, 0>, output coin: qbit) {
   allocate(x);
-  coin: qbit;
   allocate(coin);
   single_step_walk(coin, x);
 }

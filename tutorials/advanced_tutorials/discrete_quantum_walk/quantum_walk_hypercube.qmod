@@ -13,9 +13,8 @@ qperm moving_one_hamming_dist(pos: int, x: qbit[]) {
   X(x[pos]);
 }
 
-qfunc main(t: int, output x: qbit[4]) {
+qfunc main(t: int, output x: qbit[4], output coin: qbit[]) {
   allocate(x);
-  coin: qbit[];
   allocate(2, coin);
   prepare_uniform_trimmed_state(4, coin);
   discrete_quantum_walk(t, lambda(coin) {
