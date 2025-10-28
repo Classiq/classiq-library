@@ -1,4 +1,4 @@
-qfunc prepare_basis_state_expanded___0(output arr: qbit[1]) {
+qperm prepare_basis_state_expanded___0(output arr: qbit[1]) {
   allocate(1, arr);
   X(arr[0]);
 }
@@ -55,4 +55,5 @@ qfunc main(output readout: qbit, delta_e: real) {
   }
   PHASE(delta_e * 1.0, readout);
   H(readout);
+  drop(state);
 }
