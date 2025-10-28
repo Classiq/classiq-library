@@ -4,6 +4,8 @@ import numpy as np
 from classiq.open_library.functions.state_preparation import apply_phase_table
 from classiq.qmod.symbolic import subscript
 
+ANGLE_THRESHOLD = 1e-13
+
 
 def get_graycode(size, i) -> int:
     if i == 2**size:
@@ -36,12 +38,13 @@ def multiplex_ra(a_y: float, a_z: float, angles: list[float], qba: QArray, ind: 
     controllers = get_graycode_ctrls(size)
 
     for k in range(2**size):
-        if a_z == 0.0:
-            RY(transformed_angles[k], ind)
-        else:
-            RZ(transformed_angles[k], ind)
+        if np.abs(transformed_angles[k]) > ANGLE_THRESHOLD:
+            if a_z == 0.0:
+                RY(transformed_angles[k], ind)
+            else:
+                RZ(transformed_angles[k], ind)
 
-        CX(qba[controllers[k]], ind),
+        skip_control(lambda: CX(qba[controllers[k]], ind))
 
 
 @qfunc
