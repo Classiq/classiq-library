@@ -13,8 +13,7 @@ qperm quantum_step_clockwise(x: qnum) {
   x += 1;
 }
 
-qfunc main(t: int, output x: qnum<floor(log(128, 2)), SIGNED, 0>) {
-  coin: qbit;
+qfunc main(t: int, output x: qnum<floor(log(128, 2)), SIGNED, 0>, output coin: qbit) {
   allocate(x);
   allocate(coin);
   H(coin);
