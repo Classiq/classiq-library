@@ -19,4 +19,5 @@ qfunc main(output phase_reg: qnum<5, UNSIGNED, 5>) {
   qpe(lambda() {
     grover_operator(arith_oracle, hadamard_transform, state_reg);
   }, phase_reg);
+  drop(state_reg);
 }
