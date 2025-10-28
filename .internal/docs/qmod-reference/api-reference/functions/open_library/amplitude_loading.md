@@ -1,16 +1,14 @@
 ---
 search:
-    boost: 2.584
+    boost: 2.476
 ---
 
 <!-- spell-checker: disable -->
 <!-- prettier-ignore-start -->
-::: classiq.open_library.functions.lcu
+::: classiq.open_library.functions.amplitude_loading
     options:
         show_if_no_docstrings: false
         members:
-            - lcu
-            - lcu_pauli
-            - prepare_select
+            - assign_amplitude_table
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->
