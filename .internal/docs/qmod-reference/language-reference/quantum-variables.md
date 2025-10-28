@@ -291,6 +291,73 @@ Note that an alternative approach to implementing a phase-kickback pattern, whic
 not require the use of `free`, is to encapsulate the calls to `H` in a function
 with an as unchecked _const_ parameter.
 
+## Drop
+
+The _drop_ statement is used to declare that a quantum variable is no longer
+used and should be exluded from any future uncomputation. Subsequently, the
+variable becomes uninitialized, while its qubits retain their current
+state &mdash; which may be dirty and entangled with functional qubits &mdash; and cannot be reused.
+
+### Syntax
+
+=== "Python"
+
+    [comment]: DO_NOT_TEST
+    ```python
+    def drop(var: Input[QVar]) -> None:
+        pass
+    ```
+
+=== "Native"
+
+    **drop** **(** _var_ **)**
+
+### Semantics
+
+-   Prior to a _drop_ statement _var_ must be initialized, and subsequently it
+    becomes uninitialized.
+-   Local variables that are explicitly dropped are not considered uncomputation candidates,
+    and are not restricted to permutable use contexts. See more under
+    [Uncomputation](https://docs.classiq.io/latest/qmod-reference/language-reference/uncomputation/).
+
+### Example
+
+Explicitly dropping a variable is typically not needed and is only used for specific purposes.
+The following example demonstrates the use of `drop` in a swap test algorithm,
+where the two quantum states cannot be uncomputed, yet we do not wish to measure
+them.
+
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def main(test: Output[QBit]):
+        state1 = QArray("state1")
+        state2 = QArray("state2")
+        prepare_state([0.1, 0.5, 0.3, 0.1], 0.0, state1)
+        prepare_state([0.2, 0.1, 0.4, 0.3], 0.0, state2)
+        swap_test(state1, state2, test)
+        drop(state1)
+        drop(state2)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output test: qbit) {
+      state1: qbit[];
+      state2: qbit[];
+      prepare_state([0.1, 0.5, 0.3, 0.1], 0.0, state1);
+      prepare_state([0.2, 0.1, 0.4, 0.3], 0.0, state2);
+      swap_test(state1, state2, test);
+      drop(state1);
+      drop(state2);
+    }
+    ```
+
 ## Concatenation Operator
 
 The _concatenation operator_ is used to combine a sequence of quantum objects
