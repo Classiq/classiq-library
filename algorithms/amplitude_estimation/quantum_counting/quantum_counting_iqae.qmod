@@ -3,7 +3,7 @@ qstruct OracleVars {
   b: qnum<2>;
 }
 
-qfunc oracle(est_reg: qbit[]) {
+qperm oracle(const est_reg: qbit[]) {
   Z(est_reg[est_reg.len - 1]);
 }
 
@@ -30,4 +30,5 @@ qfunc main(k: int, output indicator: qbit) {
   } apply {
     amplitude_amplification(k, oracle, space_transform, est_reg);
   }
+  drop(problem_vars);
 }
