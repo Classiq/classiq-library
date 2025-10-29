@@ -1,0 +1,27 @@
+qperm bv_predicate(a: int, const x: qbit[], res: qbit) {
+  repeat (i: x.len) {
+    if ((floor(a / (2 ** i)) % 2) == 1) {
+      CX(x[i], res);
+    }
+  }
+}
+
+qfunc bv_function(a: int, x: qbit[]) {
+  aux: qbit;
+  within {
+    hadamard_transform(x);
+  } apply {
+    within {
+      allocate(aux);
+      X(aux);
+      H(aux);
+    } apply {
+      bv_predicate(a, x, aux);
+    }
+  }
+}
+
+qfunc main(output x: qnum<5>) {
+  allocate(x);
+  bv_function(13, x);
+}
