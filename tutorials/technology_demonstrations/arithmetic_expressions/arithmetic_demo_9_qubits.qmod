@@ -4,4 +4,6 @@ qfunc main(output z: qnum) {
   x = 2;
   y = 1;
   z = (((2 * x) + y) + max(3 * y, 2)) > 4;
+  drop(x);
+  drop(y);
 }
