@@ -69,12 +69,9 @@ Using Classiq's SDK, it would look like this:
 ```python
 from classiq import *
 
-NUM_QUBITS = 1
-
-
 @qfunc
 def main(res: Output[QBit]):
-    allocate(NUM_QUBITS, res)
+    allocate(res)
     X(res)
 
 
@@ -103,7 +100,7 @@ The function above had 4 lines:
 ```python
 @qfunc
 def main(res: Output[QBit]):
-    allocate(NUM_QUBITS, res)
+    allocate(res)
     X(res)
 ```
 
@@ -122,7 +119,7 @@ Initializing $\ket{-}$ state:
 ```python
 @qfunc
 def prep_minus(out: Output[QBit]) -> None:
-    allocate(1, out)
+    allocate(out)
     X(out)
     H(out)
 ```
@@ -141,7 +138,7 @@ A part of a QML encoder (see the full algorithm [here](/algorithms/qml/quantum_a
 
 ```python
 @qfunc
-def angle_encoding(exe_params: CArray[CReal], qbv: Output[QArray[QBit]]) -> None:
+def angle_encoding(exe_params: CArray[CReal], qbv: Output[QArray]) -> None:
     allocate(exe_params.len, qbv)
     repeat(
         count=exe_params.len,
@@ -229,8 +226,8 @@ def prepare_5(var: Output[QArray]) -> None:
 
 @qfunc
 def main(res: Output[QNum]) -> None:
-    a = QNum("a")
-    b = QNum("b")
+    a = QNum()
+    b = QNum()
 
     prepare_3(a)
     prepare_5(b)
