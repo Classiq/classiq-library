@@ -18,4 +18,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    assert int(tb.ref("secret_integer_q")) == tb.ref("SECRET_INT")
+    assert int(tb.ref_numpy("secret_integer_q")) == tb.ref("SECRET_INT")
