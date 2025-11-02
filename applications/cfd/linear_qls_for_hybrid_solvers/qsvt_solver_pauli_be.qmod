@@ -16,498 +16,823 @@ qfunc projector_controlled_phase_expanded___0(phase: real, qvar: qbit[8], aux: q
 }
 
 qfunc multiplex_ra_expanded___0(qba: qbit[5], ind: qbit) {
-  RZ(-1.1781, ind);
-  CX(qba[0], ind);
-  RZ(-0.1963, ind);
-  CX(qba[1], ind);
-  RZ(-0.1963, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0.1963, ind);
-  CX(qba[1], ind);
-  RZ(-0.1963, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[3], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(-0.1963, ind);
-  CX(qba[1], ind);
-  RZ(0.1963, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(-0.1963, ind);
-  CX(qba[1], ind);
-  RZ(0.589, ind);
-  CX(qba[0], ind);
-  RZ(-0.3927, ind);
-  CX(qba[4], ind);
+  RZ(-0.9817, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
   RZ(0.3927, ind);
-  CX(qba[0], ind);
-  RZ(0.9817, ind);
-  CX(qba[1], ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
   RZ(0.1963, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
   RZ(-0.1963, ind);
-  CX(qba[1], ind);
-  RZ(0.1963, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[3], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0.1963, ind);
-  CX(qba[1], ind);
-  RZ(-0.1963, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0.1963, ind);
-  CX(qba[1], ind);
-  RZ(0.1963, ind);
-  CX(qba[0], ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
   RZ(-0.3927, ind);
-  CX(qba[4], ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.3927, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.589, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
 }
 
 qfunc multiplex_ra_expanded___1(qba: qbit[5], ind: qbit) {
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(1.1781, ind);
-  CX(qba[1], ind);
-  RY(0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[2], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(-0.3927, ind);
-  CX(qba[1], ind);
-  RY(0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[3], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0.3927, ind);
-  CX(qba[1], ind);
-  RY(-0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[2], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0.3927, ind);
-  CX(qba[1], ind);
-  RY(-0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[4], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(-1.1781, ind);
-  CX(qba[1], ind);
-  RY(-0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[2], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0.3927, ind);
-  CX(qba[1], ind);
-  RY(-0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[3], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(-0.3927, ind);
-  CX(qba[1], ind);
-  RY(0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[2], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(-0.3927, ind);
-  CX(qba[1], ind);
-  RY(0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[4], ind);
+  RY(-0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.2945, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.2945, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.4909, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.4909, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.0982, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RY(-0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.6872, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.0982, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.6872, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.2945, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
+  RY(0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.0982, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.0982, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(-0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.6872, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.6872, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.2945, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RY(0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.4909, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.2945, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(-0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.4909, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.0982, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
 }
 
 qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
-  RZ(-1.1781, ind);
-  CX(qba[0], ind);
-  RZ(-0.3927, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0.7854, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[3], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(-0.3927, ind);
-  CX(qba[0], ind);
-  RZ(-0.3927, ind);
-  CX(qba[4], ind);
-  RZ(0.3927, ind);
-  CX(qba[0], ind);
-  RZ(0.3927, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[3], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
-  RZ(0.7854, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0.3927, ind);
-  CX(qba[0], ind);
-  RZ(-0.3927, ind);
-  CX(qba[4], ind);
+  RZ(-0.8836, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.2945, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.4909, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.2945, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.0982, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.2945, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RZ(-0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.0982, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.0982, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.2945, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.0982, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
+  RZ(0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.0982, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.2945, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.0982, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.0982, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RZ(0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.2945, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.0982, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.2945, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.4909, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.0982, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.4909, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
 }
 
 qfunc multiplex_ra_expanded___3(qba: qbit[5], ind: qbit) {
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0.7854, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[2], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[3], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[2], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0.7854, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[4], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(-0.7854, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[2], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[3], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[2], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(-0.7854, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[4], ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.589, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[3], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.589, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[4], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.589, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[3], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.589, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[4], ind);
+  }
 }
 
 qfunc multiplex_ra_expanded___4(qba: qbit[5], ind: qbit) {
-  RZ(-1.1781, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
+  RZ(-0.7854, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.3927, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.3927, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
   RZ(0.3927, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0.7854, ind);
-  CX(qba[3], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0.3927, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RZ(0.589, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.589, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
   RZ(-0.3927, ind);
-  CX(qba[4], ind);
-  RZ(0.3927, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[2], ind);
-  RZ(-0.3927, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[3], ind);
-  RZ(0.7854, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(-0.3927, ind);
-  CX(qba[2], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(0, ind);
-  CX(qba[1], ind);
-  RZ(0, ind);
-  CX(qba[0], ind);
-  RZ(-0.3927, ind);
-  CX(qba[4], ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
 }
 
 qfunc multiplex_ra_expanded___5(qba: qbit[5], ind: qbit) {
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
   RY(0.3927, ind);
-  CX(qba[2], ind);
-  RY(-0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[3], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(-0.3927, ind);
-  CX(qba[2], ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
   RY(0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[4], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(-0.3927, ind);
-  CX(qba[2], ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[3], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
   RY(0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[3], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
   RY(0.3927, ind);
-  CX(qba[2], ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[4], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
   RY(-0.3927, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[1], ind);
-  RY(0, ind);
-  CX(qba[0], ind);
-  RY(0, ind);
-  CX(qba[4], ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[3], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[4], ind);
+  }
 }
 
-qfunc apply_phase_table_expanded___0(target: qbit[5]) {
-  PHASE(-0.9817, target[0]);
+qperm apply_phase_table_expanded___0(target: qbit[5]) {
+  PHASE(0.2945, target[0]);
   CX(target[0], target[1]);
-  PHASE(-0.1963, target[1]);
+  PHASE(-0.8836, target[1]);
   CX(target[0], target[1]);
-  PHASE(-1.1781, target[1]);
+  PHASE(0.6872, target[1]);
   CX(target[1], target[2]);
-  PHASE(0, target[2]);
+  PHASE(-0.0982, target[2]);
   CX(target[0], target[2]);
-  PHASE(-0.589, target[2]);
+  PHASE(0.2945, target[2]);
   CX(target[1], target[2]);
-  PHASE(0.1963, target[2]);
+  PHASE(-0.0982, target[2]);
   CX(target[0], target[2]);
-  PHASE(-0.7854, target[2]);
+  PHASE(0.2945, target[2]);
   CX(target[2], target[3]);
-  PHASE(0.3927, target[3]);
+  PHASE(0.6872, target[3]);
   CX(target[0], target[3]);
-  PHASE(0.589, target[3]);
+  PHASE(-1.2763, target[3]);
   CX(target[1], target[3]);
-  PHASE(-0.1963, target[3]);
+  PHASE(-0.4909, target[3]);
   CX(target[0], target[3]);
-  PHASE(-1.1781, target[3]);
+  PHASE(0.6872, target[3]);
   CX(target[2], target[3]);
-  PHASE(0, target[3]);
+  PHASE(-0.4909, target[3]);
   CX(target[0], target[3]);
-  PHASE(0.1963, target[3]);
+  PHASE(-0.4909, target[3]);
   CX(target[1], target[3]);
-  PHASE(0.1963, target[3]);
+  PHASE(0.2945, target[3]);
   CX(target[0], target[3]);
-  PHASE(0.7854, target[3]);
+  PHASE(0.2945, target[3]);
   CX(target[3], target[4]);
-  PHASE(-1.5708, target[4]);
+  PHASE(-0.8836, target[4]);
   CX(target[0], target[4]);
-  PHASE(0.589, target[4]);
+  PHASE(0.6872, target[4]);
   CX(target[1], target[4]);
-  PHASE(0.589, target[4]);
+  PHASE(-0.0982, target[4]);
   CX(target[0], target[4]);
-  PHASE(0.7854, target[4]);
+  PHASE(-0.8836, target[4]);
   CX(target[2], target[4]);
-  PHASE(0.3927, target[4]);
+  PHASE(0.2945, target[4]);
   CX(target[0], target[4]);
-  PHASE(-0.589, target[4]);
+  PHASE(-0.0982, target[4]);
   CX(target[1], target[4]);
-  PHASE(0.1963, target[4]);
+  PHASE(-0.8836, target[4]);
   CX(target[0], target[4]);
-  PHASE(0.3927, target[4]);
+  PHASE(-0.4909, target[4]);
   CX(target[3], target[4]);
-  PHASE(-0.7854, target[4]);
+  PHASE(-0.8836, target[4]);
   CX(target[0], target[4]);
-  PHASE(-0.1963, target[4]);
+  PHASE(0.2945, target[4]);
   CX(target[1], target[4]);
-  PHASE(-0.9817, target[4]);
+  PHASE(0.6872, target[4]);
   CX(target[0], target[4]);
-  PHASE(1.5708, target[4]);
+  PHASE(-0.4909, target[4]);
   CX(target[2], target[4]);
-  PHASE(-0.3927, target[4]);
+  PHASE(0.2945, target[4]);
   CX(target[0], target[4]);
-  PHASE(0.1963, target[4]);
+  PHASE(-0.4909, target[4]);
   CX(target[1], target[4]);
-  PHASE(-0.589, target[4]);
+  PHASE(0.6872, target[4]);
   CX(target[0], target[4]);
-  PHASE(0.3927, target[4]);
+  PHASE(0.6872, target[4]);
 }
 
 qfunc lcu_paulis_graycode_expanded___0(data: qbit[3], block: qbit[5]) {
   within {
     inplace_prepare_state([
-      0.2976,
-      0.0224,
-      0.0201,
-      0.0211,
-      0.0169,
-      0.014,
-      0.0017,
-      0.0241,
-      0.1381,
-      0.0223,
-      0.0201,
-      0.0223,
-      0.0186,
-      0.0223,
-      0.0101,
-      0.0223,
-      0.0791,
-      0.0791,
-      0.0017,
-      0.0017,
-      0.036,
-      0.036,
-      0.036,
-      0.036,
+      0.3022,
+      0.0228,
+      0.0204,
+      0.0214,
+      0.0172,
+      0.0142,
+      0.0245,
+      0.1402,
+      0.0227,
+      0.0204,
+      0.0227,
+      0.0189,
+      0.0227,
+      0.0227,
+      0.0804,
+      0.0804,
+      0.0366,
+      0.0366,
+      0.0366,
+      0.0366,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
       0.0,
       0.0,
       0.0,
@@ -583,108 +908,108 @@ qfunc main(output qsvt_aux: qbit, output data: qnum<3, False, 0>, output block: 
     {data, block} -> be_state;
   } apply {
     qsvt_inversion_expanded___0([
-      2.8216,
-      2.4622,
-      2.6443,
-      3.2555,
-      3.3967,
-      3.0674,
-      2.9776,
-      3.2456,
-      3.2351,
-      3.0483,
-      3.0899,
-      3.2455,
-      3.1288,
-      3.0642,
-      3.1689,
-      3.2108,
-      3.0773,
+      2.8367,
+      2.486,
+      2.6235,
+      3.2067,
+      3.4074,
+      3.1163,
+      2.9597,
+      3.1987,
+      3.2638,
+      3.0884,
+      3.051,
+      3.2225,
+      3.1795,
+      3.0694,
+      3.1129,
+      3.2241,
+      3.1253,
+      3.0922,
+      3.1596,
+      3.1957,
+      3.0886,
+      3.1302,
+      3.1776,
+      3.1594,
+      3.0822,
+      3.1648,
+      3.1633,
+      3.1335,
+      3.1046,
+      3.1874,
+      3.1331,
       3.1257,
-      3.1929,
-      3.1463,
-      3.0771,
-      3.1858,
-      3.1641,
-      3.1055,
-      3.1169,
-      3.204,
-      3.1157,
-      3.1187,
-      3.1581,
-      3.1746,
-      3.0865,
-      3.1625,
-      3.1619,
-      3.1343,
-      3.0995,
-      3.1946,
-      3.1286,
-      3.1245,
-      3.1362,
-      3.1889,
-      3.0933,
-      3.1511,
-      3.1536,
-      3.1563,
-      3.0907,
-      3.1868,
-      3.1339,
-      3.1332,
-      3.1178,
-      3.199,
-      3.1098,
-      3.1098,
-      3.199,
-      3.1178,
-      3.1332,
-      3.1339,
-      3.1868,
-      3.0907,
-      3.1563,
-      3.1536,
-      3.1511,
-      3.0933,
-      3.1889,
-      3.1362,
-      3.1245,
-      3.1286,
-      3.1946,
-      3.0995,
-      3.1343,
-      3.1619,
-      3.1625,
-      3.0865,
-      3.1746,
-      3.1581,
-      3.1187,
-      3.1157,
-      3.204,
-      3.1169,
-      3.1055,
-      3.1641,
-      3.1858,
-      3.0771,
-      3.1463,
-      3.1929,
+      3.1315,
+      3.1882,
+      3.1067,
+      3.1388,
+      3.1466,
+      3.1706,
+      3.095,
+      3.1634,
+      3.146,
+      3.1509,
+      3.1006,
+      3.1833,
+      3.1293,
+      3.141,
+      3.1192,
+      3.1899,
+      3.104,
+      3.1459,
+      3.1473,
+      3.1473,
+      3.1459,
+      3.104,
+      3.1899,
+      3.1192,
+      3.141,
+      3.1293,
+      3.1833,
+      3.1006,
+      3.1509,
+      3.146,
+      3.1634,
+      3.095,
+      3.1706,
+      3.1466,
+      3.1388,
+      3.1067,
+      3.1882,
+      3.1315,
       3.1257,
-      3.0773,
-      3.2108,
-      3.1689,
-      3.0642,
-      3.1288,
-      3.2455,
-      3.0899,
-      3.0483,
-      3.2351,
-      3.2456,
-      2.9776,
-      3.0674,
-      3.3967,
-      3.2555,
-      2.6443,
-      2.4622,
-      (-314.4793)
+      3.1331,
+      3.1874,
+      3.1046,
+      3.1335,
+      3.1633,
+      3.1648,
+      3.0822,
+      3.1594,
+      3.1776,
+      3.1302,
+      3.0886,
+      3.1957,
+      3.1596,
+      3.0922,
+      3.1253,
+      3.2241,
+      3.1129,
+      3.0694,
+      3.1795,
+      3.2225,
+      3.051,
+      3.0884,
+      3.2638,
+      3.1987,
+      2.9597,
+      3.1163,
+      3.4074,
+      3.2067,
+      2.6235,
+      2.486,
+      (-314.4642)
     ], be_state, qsvt_aux);
   }
 }
