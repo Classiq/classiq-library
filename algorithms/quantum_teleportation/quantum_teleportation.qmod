@@ -23,8 +23,8 @@ qfunc main(output bob_qubit: qbit) {
   alice_qubit: qbit;
   bell_pair_qubit: qbit;
   allocate(1, alice_qubit);
-  allocate(1, bob_qubit);
   allocate(1, bell_pair_qubit);
+  allocate(1, bob_qubit);
   prepare_test_state(alice_qubit);
   quantum_teleportation(alice_qubit, bob_qubit, bell_pair_qubit);
 }
