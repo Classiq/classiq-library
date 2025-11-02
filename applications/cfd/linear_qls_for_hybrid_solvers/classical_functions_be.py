@@ -1,6 +1,7 @@
 from openfermion import QubitOperator
 import numpy as np
 from scipy.sparse import csr_matrix
+from classiq import SparsePauliOp
 
 
 def get_projected_state_vector(  # type: ignore[no-untyped-def]
@@ -119,6 +120,82 @@ def eval_pauli_op(
             if abs(coe) >= precision
         ]
     )
+
+
+def trim_hamiltonian(hamiltonian, relative_threshold, jump_threshold=1.1):
+    """
+    Trim a Hamiltonian by keeping only Pauli terms with magnitude ≥ a data-driven cutoff.
+
+    The coefficients are sorted (descending), “big jumps” are detected via
+    ratio ≥ `jump_threshold`, and contiguous value-intervals are formed. A
+    cutoff is chosen as the right edge of the interval that contains
+    `relative_threshold * second_largest_coeff` (or the interval immediately
+    to its left if the value lies between intervals). Terms with |coeff| >
+    this cutoff are retained.
+
+    Parameters
+    ----------
+    hamiltonian : SparsePauliOp
+        The Hamiltonian to trim.
+    relative_threshold : float
+        Multiplier applied to the 2nd largest coefficient to form the probe value.
+    jump_threshold : float, optional
+        Consecutive-coefficient ratio that defines a “big jump” (default 1.1).
+
+    Returns
+    -------
+    SparsePauliOp
+        New Hamiltonian containing only the retained terms.
+    """
+
+    # sort pauli terms
+    pauli_coe = np.array(
+        [np.abs(term.coefficient) for term in hamiltonian.terms], dtype=float
+    )
+    sort_ind = np.argsort(pauli_coe)[::-1]
+    pauli_coe_sorted = pauli_coe[sort_ind]
+
+    # relative error is w.r.t. the 2nd term (skip the 1st if it has a big jump)
+    relative_error = relative_threshold * pauli_coe_sorted[1]
+
+    # jumps and their indices
+    jumps = pauli_coe_sorted[:-1] / pauli_coe_sorted[1:]
+    cut_idx = np.flatnonzero(jumps >= jump_threshold)  # cut is between i and i+1
+
+    # left/right boundary values at the jump locations
+    left_points = pauli_coe_sorted[:-1][cut_idx]
+    right_points = pauli_coe_sorted[1:][cut_idx]
+
+    # Build value-intervals from the cuts (inclusive)
+    # indices [0..cut0], [cut0+1..cut1], ..., [last_cut+1..N-1]
+    starts = np.r_[0, cut_idx + 1]
+    ends = np.r_[cut_idx, len(pauli_coe_sorted) - 1]
+    L = pauli_coe_sorted[starts]  # interval left (larger)
+    R = pauli_coe_sorted[ends]  # interval right (smaller)
+
+    # Choose the right point according to the following rule:
+    # - if relative_error inside an interval [R[i], L[i]] -> pick R[i]
+    # - else (between intervals) -> pick R of the interval to its left
+    within = (relative_error <= L) & (relative_error >= R)
+    if np.any(within):
+        chosen_right = R[np.argmax(within)]
+        print("within")
+    else:
+        # find largest i with L[i] >= relative_error (L is descending)
+        i_left = np.searchsorted(-L, -relative_error, side="left") - 1
+        i_left = max(i_left, 0)  # clamp to first interval if before all
+        chosen_right = R[i_left]
+
+    trimmed_hamiltonian = SparsePauliOp(
+        terms=[
+            term
+            for term in hamiltonian.terms
+            if np.abs(term.coefficient) >= chosen_right
+        ],
+        num_qubits=hamiltonian.num_qubits,
+    )
+
+    return trimmed_hamiltonian
 
 
 """
