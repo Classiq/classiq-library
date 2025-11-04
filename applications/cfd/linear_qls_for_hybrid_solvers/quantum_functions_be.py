@@ -2,6 +2,7 @@ from sympy import fwht
 from classiq import *
 import numpy as np
 from classiq.open_library.functions.state_preparation import apply_phase_table
+from classiq.qmod.symbolic import subscript
 
 ANGLE_THRESHOLD = 1e-13
 
@@ -89,25 +90,27 @@ def lcu_paulis_graycode(terms: list[SparsePauliTerm], data: QArray, block: QArra
 
 
 @qfunc
-def load_diagonal(offset: int, diag: list[float], ind: QBit, x: QNum) -> None:
-
-    if offset != 0:
-        inplace_add(offset, x)
-    assign_amplitude_table(diag, x, ind)
+def load_diagonal(offset: CInt, diag: CArray[CReal], ind: QBit, x: QNum) -> None:
+    if_(offset != 0, lambda: inplace_add(offset, x))
+    ind *= subscript(diag, x)
 
 
 @qfunc
 def load_banded_diagonals(
-    offsets: list[int], diags: list[list[float]], ind: QBit, x: QNum, s: QNum
+    offsets: CArray[CInt], diags: CArray[CArray[CReal]], ind: QBit, x: QNum, s: QNum
 ) -> None:
-    for i in range(len(offsets)):
-        control(s == i, lambda: load_diagonal(-offsets[i], diags[i], ind, x))
+    repeat(
+        offsets.len,
+        lambda i: (
+            control(s == i, lambda: load_diagonal(-offsets[i], diags[i], ind, x))
+        ),
+    )
 
 
 @qfunc
 def block_encode_banded(
-    offsets: list[int],
-    diags: list[list[float]],
+    offsets: CArray[CInt],
+    diags: CArray[CArray[CReal]],
     prep_diag: CArray[CReal],
     block: QNum,
     data: QNum,
@@ -127,8 +130,8 @@ def block_encode_banded(
 @qfunc
 def block_encode_banded_controlled(
     ctrl_state: CInt,
-    offsets: list[int],
-    diags: list[list[float]],
+    offsets: CArray[CInt],
+    diags: CArray[CArray[CReal]],
     prep_diag: CArray[CReal],
     block: QNum,
     data: QNum,
@@ -169,8 +172,8 @@ def be_e3(data: QBit, block: QBit):
 
 @qfunc
 def block_encode_banded_sym(
-    offsets: list[int],
-    diags: list[list[float]],
+    offsets: CArray[CInt],
+    diags: CArray[CArray[CReal]],
     prep_diag: CArray[CReal],
     block: QArray,
     data: QArray,
