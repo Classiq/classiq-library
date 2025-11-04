@@ -8,7 +8,8 @@ search:
 <!-- cspell:ignore Toffoli -->
 
 Uncomputation is the process of reversing the effects of quantum operations,
-restoring the state of qubits to their initial $|0\rangle$ state. Failing to
+restoring the state of qubits to their initial $|0\rangle$ state and
+disentangling them from other qubits. Failing to
 properly uncompute intermediate results can lead to incorrect final measurement
 results and wasted resources. In Qmod, intermediate results are typically
 stored in local variables, which are scoped inside a function and are
@@ -16,7 +17,18 @@ inaccessible outside of it. Hence, local variables must be used in a way that
 enables subsequent uncomputation. Specifically, their interactions with other
 objects must be restrictive to be subsequently disentangled from them.
 
-To enforce the restrictions, quantum operations are classified into arbitrary
+In Qmod, local variables are **automatically uncomputed**, lifting the burden
+of manually uncomputing intermediate results. When finer-grained control is
+required, allocate the variable inside the _within_ block of a
+[_within-apply_](statements/within-apply.md) statement. Such variables are
+subject to strict rules that guarantee their correct uncomputation.
+In this way, Qmod abstracts away the implementation details of efficient quantum
+storage management and prevents a class of functional bugs that are very
+difficult to detect.
+A fully manual uncomputation can be achieved by using [free](quantum-variables.md#free),
+as variables which are explicitly freed are not subject to these rules.
+
+To enable these capabilities, quantum operations are classified into arbitrary
 functions and _permutation_-only functions. In addition, each of an operation's
 parameters is classified as either _const_ or _non-const_.
 
@@ -249,37 +261,217 @@ compiler errors in this case.
 
 ## Semantics of uncomputation
 
-When a variable is initialized inside the _within_ block of a _within-apply_
+When a variable is initialized inside the _within_ block of a [_within-apply_](statements/within-apply.md)
 statement, it is returned to its uninitialized state after the statement
 completes. The newly allocated quantum object is uncomputed, and its qubits are
 reclaimed by the compiler for subsequent use. Likewise, a variable declared locally
 within a function is only accessible inside the function's scope. The quantum object
 allocated inside the function may be uncomputed at some later point and its
-qubits reclaimed. Uncomputation is forced when a function with a local variable
-is called (directly or indirectly) from the _within_ block of a _within-apply_
-statement. For more details on _within-apply_ see
-[Within-apply](statements/within-apply.md).
+qubits reclaimed.
 
 Local variables are considered _uncomputation candidates_ if they remain initialized at the
 end of the function scope in which they were declared. Variables initialized inside a
 _within_ block of a _within-apply_ statement are also considered uncomputation candidates
 in the scope of the statement.
-following rules guarantee that uncomputation candidates can be handled
+The following rules guarantee that uncomputation candidates can be handled
 correctly:
 
 -   An uncomputation candidate must not be used in a _non-permutation_ operation.
--   A variable initialized inside a _within_ block of a _within-apply_ statement can
-    only be used in _const_ contexts inside the _apply_ block.
 -   A variable becomes a _dependency_ of an uncomputation candidate when used
     in an operation together with the candidate variable, and the latter is used in
-    a non-_const_ context. From that point, the dependency variable is subject to
+    a _non-const_ context. From that point, the dependency variable is subject to
     the same rules as the candidate variable, while the latter is in scope.
+-   An auto-uncomputation candidate must not be used in an operation together
+    with a non-local variable if both use contexts are _non-const_.
+-   An auto-uncomputation candidate must not become a _dependency_
+    of any variable that already (directly or indirectly) depends on it &mdash;
+    that is, circular dependencies are not allowed.
+-   A variable initialized inside a _within_ block of a _within-apply_ statement can
+    only be used in _const_ contexts inside the _apply_ block.
 
 Violating these rules will result in a compilation error.
 
+!!! Note
+
+    The operations [`free`](../quantum-variables/#free) and
+    [`drop`](../quantum-variables/#drop) return the variable to its
+    uninitialized state, so it is consequently not considered an uncomputation
+    candidate and therefore does not undergo automatic uncomputation or any
+    uncomputation validation.
+
 ### Examples
 
-#### Example 1 - Correct uncomputation in within-apply
+#### Example 1 - Automatic uncomputation
+
+The example below demonstrates the use of a local variable and its automatic uncomputation.
+Variable `aux` is initialized as the left-value expression of an assignment statement, which is a _permutation_
+operation. Subsequently, it is used as the condition of a _control_
+statement, which is a _const_ context. Both uses are valid, and the variable is
+automatically uncomputed and freed correctly at the end of the function.
+
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qperm
+    def foo(qn: QNum, res: QBit):
+        aux = QBit()
+        aux |= qn > 1
+        control(aux, lambda: X(res))
+
+
+    @qfunc
+    def main(qn: Output[QNum], res: Output[QBit]):
+        allocate(2, qn)
+        hadamard_transform(qn)
+        allocate(res)
+        foo(qn, res)
+        foo(qn, res)
+    ```
+
+=== "Native"
+
+    ```
+    qperm foo(qn: qnum, res: qbit) {
+      aux: qbit;
+      aux = qn > 1;
+      control(aux) {
+        X(res);
+      }
+    }
+
+    qfunc main(output qn: qnum, output res: qbit) {
+      allocate(2, qn);
+      hadamard_transform(qn);
+      allocate(1, res);
+      foo(qn, res);
+      foo(qn, res);
+    }
+    ```
+
+In the synthesized quantum program, variable `aux` is uncomputed and reused across the multiple calls to `foo`,
+as can be seen in the visualization:
+
+![auto_uncomputation](../resources/auto_uncomputation.png)
+
+#### Example 2 - Illegal use of local variable
+
+The example below demonstrates illegal use of a local variable in a function
+which outputs only one qubit of a Bell pair, making it impossible to uncompute
+the other qubit. Specifically, the local variable `q2` undergoes a _non-permutation_
+operation, which is flagged as an error.
+
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def main(q1: Output[QBit]):
+        q2 = QBit()
+        allocate(q1)
+        allocate(q2)
+        H(
+            q2
+        )  # Error - The computation sequence of the local variable 'q2' includes a non-permutation operation
+        CX(q2, q1)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output q1: qbit) {
+      q2: qbit;
+      allocate(q1);
+      allocate(q2);
+      H(q2); // Error - The computation sequence of the local variable 'q2' includes a non-permutation operation
+      CX(q2, q1);
+    }
+    ```
+
+#### Example 3 - Illegal use of local variable due to parameter mutation
+
+The example below demonstrates an illegal use of a local variable `aux`, as it is used as an argument
+in a call to function `x_transform` together with the variable `p`, where both parameters
+of `x_transform` are declared _non-const_.
+
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qperm
+    def x_transform(q1: QBit, q2: QBit):
+        X(q1)
+        X(q2)
+
+
+    @qfunc
+    def main(p: Output[QBit]):
+        aux = QBit()
+        allocate(p)
+        allocate(aux)
+        x_transform(
+            p, aux
+        )  # Error - The computation sequence of the local variable 'aux' includes an operation which mutates the parameter 'p'
+    ```
+
+=== "Native"
+
+    ```
+    qperm x_transform(q1: qbit, q2: qbit) {
+      X(q1);
+      X(q2);
+    }
+
+    qfunc main(output p: qbit) {
+      aux: qbit;
+      allocate(p);
+      allocate(aux);
+      x_transform(p, aux); // Error - The computation sequence of the local variable 'aux' includes an operation which mutates the parameter 'p'
+    }
+    ```
+
+#### Example 4 - Illegal use of local variable due to circular dependency
+
+The example below demonstrates an illegal use of the local variable `aux`, as
+the two calls to the function `CX` create a circular dependency between it and
+the variable `p`.
+
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def main(p: Output[QBit]) -> None:
+        aux = QBit()
+        allocate(p)
+        allocate(aux)
+        CX(
+            p, aux
+        )  # Error - The computation sequence of the local variable 'aux' includes a circular dependency with the variable 'p'
+        CX(aux, p)
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output p: qbit) {
+      aux: qbit;
+      allocate(p);
+      allocate(aux);
+      CX(p, aux); // Error - The computation sequence of the local variable 'aux' includes a circular dependency with the variable 'p'
+      CX(aux, p);
+    }
+    ```
+
+#### Example 5 - Correct uncomputation in within-apply
 
 The example below demonstrates the use of a local variable initialized inside a
 _within_ block of a _within-apply_ statement. Variable `aux` is initialized as
@@ -323,7 +515,7 @@ uncomputed and freed correctly after the _within-apply_ statement.
     }
     ```
 
-#### Example 2 - Illegal use of local variable in within-apply
+#### Example 6 - Illegal use of local variable in within-apply
 
 The code below is a modification of _Example 1_ above, with a couple of lines
 added to demonstrate violations of the rules for correct use of a variable
@@ -379,7 +571,7 @@ compiler.
     }
     ```
 
-#### Example 3 - Illegal use of dependent variable in within-apply
+#### Example 7 - Illegal use of dependent variable in within-apply
 
 The following example demonstrates a violation of the rules for correct use of
 a dependent variable inside a _within-apply_ statement. Here, variable `aux` is
@@ -421,39 +613,5 @@ execute as specified, `aux` would not be uncomputed correctly.
         CX(aux, q2);
         Z(q1);
       }
-    }
-    ```
-
-#### Example 4 - Illegal use of local variable in function
-
-The example below demonstrates incorrect use of a local variable inside a
-function. Function `rand_increment` initializes a local variable `temp` in a
-superposition state, using `prepare_state`, and is subsequently entangled with
-the parameter `qn`. This makes it impossible to uncompute `temp`. `temp` is a
-local variable and therefore an uncomputation candidate. Passing it as argument
-to `prepare_state` is flagged as an error, because it is not a _permutation_.
-Note that if `rand_increment` would output `temp`
-instead of declaring it as a local variable, the function would be legal.
-
-=== "Python"
-
-    ```python
-    from classiq import *
-
-
-    @qfunc
-    def rand_increment(qn: QNum):
-        temp = QNum()
-        prepare_state([0, 0.8, 0.2, 0], 0, temp)
-        qn += temp
-    ```
-
-=== "Native"
-
-    ```
-    qfunc rand_increment(qn: qnum) {
-      temp: qnum;
-      prepare_state([0, 0.8, 0.2, 0], 0, temp);
-      qn += temp;
     }
     ```
