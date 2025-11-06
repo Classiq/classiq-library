@@ -52,11 +52,8 @@ qfunc rainbow_direct(qvars: EstimationVars, ind: qbit) {
     0.0656
   ], 0, qvars.x2);
   max_out: qnum;
-  within {
-    affine_max(qvars.x1, qvars.x2, max_out);
-  } apply {
-    direct_payoff(max_out, qvars.aux, ind);
-  }
+  affine_max(qvars.x1, qvars.x2, max_out);
+  direct_payoff(max_out, qvars.aux, ind);
 }
 
 qfunc space_transform(est_reg: qbit[]) {

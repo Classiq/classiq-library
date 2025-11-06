@@ -32,11 +32,8 @@ qfunc rainbow_brute_force(qvars: EstimationVars, ind: qbit) {
     0.0656
   ], 0, qvars.x2);
   max_out: qnum;
-  within {
-    affine_max(qvars.x1, qvars.x2, max_out);
-  } apply {
-    brute_force_payoff(max_out, ind);
-  }
+  affine_max(qvars.x1, qvars.x2, max_out);
+  brute_force_payoff(max_out, ind);
 }
 
 qfunc space_transform(est_reg: qbit[]) {
