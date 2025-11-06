@@ -31,4 +31,5 @@ qfunc main(w: real[10], input_data: real[4], output coded: qbit[2], output trash
   angle_encoding(input_data, {coded, trash});
   encoder_ansatz(w, coded, trash);
   swap_test(trash, psi2, test);
+  drop(psi2);
 }
