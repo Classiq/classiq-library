@@ -29,4 +29,5 @@ qfunc main(w: real[10], input_data: real[4], output trash: qbit[2]) {
   allocate(trash);
   angle_encoding(input_data, {coded, trash});
   encoder_ansatz(w, coded, trash);
+  drop(coded);
 }
