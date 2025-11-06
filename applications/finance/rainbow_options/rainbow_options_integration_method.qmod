@@ -39,11 +39,8 @@ qfunc rainbow_integration(qvars: EstimationVars, ind: qbit) {
     0.0656
   ], 0, qvars.x2);
   max_out: qnum;
-  within {
-    affine_max(qvars.x1, qvars.x2, max_out);
-  } apply {
-    integration_payoff(max_out, qvars.integrator, ind);
-  }
+  affine_max(qvars.x1, qvars.x2, max_out);
+  integration_payoff(max_out, qvars.integrator, ind);
 }
 
 qfunc space_transform(est_reg: qbit[]) {

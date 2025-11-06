@@ -4,7 +4,7 @@ qfunc hadamard_transform_expanded___0(target: qbit[6]) {
   }
 }
 
-qfunc apply_phase_table_expanded___0(target: qbit[2]) {
+qperm apply_phase_table_expanded___0(target: qbit[2]) {
   PHASE(-1.5708, target[0]);
   CX(target[0], target[1]);
   PHASE(-1.5708, target[1]);
@@ -17,7 +17,7 @@ qfunc inplace_prepare_complex_amplitudes_expanded___0(magnitudes: real[], target
   apply_phase_table_expanded___0(target);
 }
 
-qfunc apply_phase_table_expanded___1(target: qbit[2]) {
+qperm apply_phase_table_expanded___1(target: qbit[2]) {
   PHASE(-1.5708, target[0]);
   CX(target[0], target[1]);
   PHASE(1.5708, target[1]);
@@ -30,7 +30,7 @@ qfunc inplace_prepare_complex_amplitudes_expanded___1(magnitudes: real[], target
   apply_phase_table_expanded___1(target);
 }
 
-qfunc apply_phase_table_expanded___2(target: qbit[2]) {
+qperm apply_phase_table_expanded___2(target: qbit[2]) {
   PHASE(1.5708, target[0]);
   CX(target[0], target[1]);
   PHASE(-1.5708, target[1]);
@@ -43,7 +43,8 @@ qfunc inplace_prepare_complex_amplitudes_expanded___2(magnitudes: real[], target
   apply_phase_table_expanded___2(target);
 }
 
-qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
+@disable_perm_check
+qperm dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
   dummy_data: qbit;
   full_qae: qbit[2];
   allocate(1, dummy_data);
@@ -553,7 +554,7 @@ qfunc dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
   full_qae -> {qae_phase, dummy_data};
 }
 
-qfunc phase_application_expanded___0(qae_phase: qbit[1], gamma: real) {
+qfunc phase_application_expanded___0(const qae_phase: qbit[1], gamma: real) {
   phase (0.049 - (0.049 * qae_phase[0]), gamma);
 }
 
