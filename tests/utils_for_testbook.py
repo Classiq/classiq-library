@@ -1,4 +1,5 @@
 import json
+from nbclient.exceptions import CellExecutionError
 import warnings
 import itertools
 import base64
@@ -58,6 +59,7 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
         for decorator in [
             _build_patch_testbook_client_decorator(notebook_name),
             testbook(notebook_path, execute=True, timeout=timeout_seconds),
+            maybe_truncate_notebook_errors,
             qmod_compare_decorator,
             _build_cd_decorator(notebook_path),
             _build_skip_decorator(notebook_path),
@@ -80,6 +82,28 @@ def _build_patch_testbook_client_decorator(notebook_name: str) -> Callable:
         return inner
 
     return patch_testbook_client_decorator
+
+
+class ShortCellError(Exception):
+    def __init__(self, exc: CellExecutionError):
+        self.ename = exc.ename
+        self.evalue = exc.evalue
+
+    def __str__(self) -> str:
+        return f'A cell raised: {self.ename}("{self.evalue}")'
+
+
+def maybe_truncate_notebook_errors(func: Callable) -> Any:
+    def inner(*args: Any, **kwargs: Any) -> Any:
+        try:
+            return func(*args, **kwargs)
+        except CellExecutionError as exc:
+            if os.environ.get("SHOULD_TRUNCATE_SHORT_CELL_ERROR", "") == "true":
+                raise ShortCellError(exc)
+            else:
+                raise
+
+    return inner
 
 
 # The purpose of the `cd_decorator` is to execute the test in the same folder as the `ipynb` file
