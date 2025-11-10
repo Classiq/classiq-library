@@ -11,10 +11,6 @@ $U$, _invert_ applies $U^{\dagger}$.
 
 ## Syntax
 
-=== "Native"
-
-    **invert** **{** _statements_ **}**
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -22,6 +18,10 @@ $U$, _invert_ applies $U^{\dagger}$.
     def invert(stmt_block: QCallable) -> None:
         pass
     ```
+
+=== "Native"
+
+    **invert** **{** _statements_ **}**
 
 ## Semantics
 
@@ -36,6 +36,27 @@ $U$, _invert_ applies $U^{\dagger}$.
 
 The following example demonstrates the use of `invert` applied to a single gate-level
 function call, and to a statement block in which a user-defined function `foo` is called twice.
+
+=== "Python"
+
+    ```python
+    from classiq.qmod.symbolic import pi
+    from classiq import *
+
+
+    @qfunc
+    def foo(target: QBit) -> None:
+        H(target)
+        X(target)
+
+
+    @qfunc
+    def main() -> None:
+        qba = QArray()
+        allocate(2, qba)
+        invert(lambda: RX(pi / 2, qba[0]))
+        invert(lambda: [foo(qba[0]), foo(qba[1])])
+    ```
 
 === "Native"
 
@@ -56,27 +77,6 @@ function call, and to a statement block in which a user-defined function `foo` i
         foo(qba[1]);
       }
     }
-    ```
-
-=== "Python"
-
-    ```python
-    from sympy import pi
-    from classiq import QBit, QArray, allocate, invert, qfunc, X, RX, H
-
-
-    @qfunc
-    def foo(target: QBit) -> None:
-        H(target)
-        X(target)
-
-
-    @qfunc
-    def main() -> None:
-        qba = QArray()
-        allocate(2, qba)
-        invert(lambda: RX(pi / 2, qba[0]))
-        invert(lambda: [foo(qba[0]), foo(qba[1])])
     ```
 
 Synthesizing this model creates the quantum program shown below. The inversion of

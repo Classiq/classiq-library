@@ -8,7 +8,7 @@ qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
   }
 }
 
-qfunc simple_predicate(const x: qnum, permutable res: qbit) {
+qperm simple_predicate(const x: qnum, res: qbit) {
   res ^= x > 7;
 }
 

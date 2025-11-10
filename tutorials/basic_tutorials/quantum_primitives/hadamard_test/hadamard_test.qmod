@@ -17,4 +17,5 @@ qfunc main(output expectation_value: qbit) {
   allocate(1, expectation_value);
   allocate(4, psi);
   preparation_and_application(expectation_value, psi);
+  drop(psi);
 }

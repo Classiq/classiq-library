@@ -1,7 +1,5 @@
-qfunc main() {
-  q_target: qbit;
+qfunc main(output q_target: qbit, output q_control: qbit) {
   allocate(q_target);
-  q_control: qbit;
   allocate(q_control);
   CX(q_control, q_target);
 }

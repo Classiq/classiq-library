@@ -1,0 +1,30 @@
+qfunc prepare_test_state(q: qbit) {
+  H(q);
+}
+
+qfunc quantum_teleportation(alice_qubit: qbit, bob_qubit: qbit, bell_pair_qubit: qbit) {
+  H(bell_pair_qubit);
+  CX(bell_pair_qubit, bob_qubit);
+  CX(alice_qubit, bell_pair_qubit);
+  H(alice_qubit);
+  alice_bit1: bool;
+  alice_bit1 = measure(alice_qubit);
+  alice_bit2: bool;
+  alice_bit2 = measure(bell_pair_qubit);
+  if (alice_bit2) {
+    X(bob_qubit);
+  }
+  if (alice_bit1) {
+    Z(bob_qubit);
+  }
+}
+
+qfunc main(output bob_qubit: qbit) {
+  alice_qubit: qbit;
+  bell_pair_qubit: qbit;
+  allocate(1, alice_qubit);
+  allocate(1, bell_pair_qubit);
+  allocate(1, bob_qubit);
+  prepare_test_state(alice_qubit);
+  quantum_teleportation(alice_qubit, bob_qubit, bell_pair_qubit);
+}

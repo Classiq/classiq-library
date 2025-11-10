@@ -5,12 +5,7 @@ search:
 
 # Quantum Program Constraints
 
-When synthesizing a quantum program, you can pass in constraints to the generation; for example, requiring that no more than 53 qubits are used.
-The Classiq engine allows the following constraints, each of which can pass to the synthesis engine:
-
--   Depth: the maximum depth of the quantum program
--   Width: the maximum number of qubits in the quantum program
--   Gate count: the maximum number of times a gate appears
+When synthesizing a quantum program, you can pass a maximum depth constraint to the generation; for example, requiring that no more than 53 qubits are used.
 
 Pass constraints as follows:
 
@@ -28,14 +23,7 @@ Pass constraints as follows:
         synthesize,
     )
 
-    constraints = Constraints(
-        max_width=20,
-        max_depth=100,
-        max_gate_count={
-            TranspilerBasisGates.CX: 10,
-            TranspilerBasisGates.T: 20,
-        },
-    )
+    constraints = Constraints(max_width=20)
 
 
     @qfunc
@@ -71,12 +59,8 @@ as the optimization parameter.
     )
 
     constraints = Constraints(
-        max_depth=100,
-        max_gate_count={
-            TranspilerBasisGates.CX: 10,
-            TranspilerBasisGates.T: 20,
-        },
-        optimization_parameter=OptimizationParameter.WIDTH,
+        max_width=20,
+        optimization_parameter=OptimizationParameter.DEPTH,
     )
 
 

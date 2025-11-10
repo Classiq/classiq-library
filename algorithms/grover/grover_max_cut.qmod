@@ -1,4 +1,4 @@
-qfunc cut_oracle(cut_size: int, const nodes: qbit[], permutable res: qbit) {
+qperm cut_oracle(cut_size: int, const nodes: qbit[], res: qbit) {
   res ^= cut_size <= ((((((0 + ((nodes[0] * (1 - nodes[1])) + (nodes[1] * (1 - nodes[0])))) + ((nodes[0] * (1 - nodes[2])) + (nodes[2] * (1 - nodes[0])))) + ((nodes[1] * (1 - nodes[2])) + (nodes[2] * (1 - nodes[1])))) + ((nodes[1] * (1 - nodes[3])) + (nodes[3] * (1 - nodes[1])))) + ((nodes[2] * (1 - nodes[4])) + (nodes[4] * (1 - nodes[2])))) + ((nodes[3] * (1 - nodes[4])) + (nodes[4] * (1 - nodes[3]))));
 }
 

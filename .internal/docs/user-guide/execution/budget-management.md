@@ -61,7 +61,7 @@ You can also define a custom spending limit to stay within a desired budget (low
 from classiq import *
 
 budget = set_budget_limit(
-    provider_vendor="Amazon Braket",
+    provider=ProviderVendor.AMAZON_BRAKET,
     limit=90,  # Set a custom limit below the provider's remaining budget
 )
 ```

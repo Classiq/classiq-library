@@ -30,8 +30,14 @@ Execution on IonQ requires a valid IonQ API key.
 
 ### Supported Backends
 
--   "simulator"
--   "qpu.harmony"
+Included hardware:
+
 -   "qpu.aria-1"
 -   "qpu.aria-2"
 -   "qpu.forte-1"
+-   "qpu.forte-enterprise-1"
+-   "qpu.forte-enterprise-2"
+
+Included simulators:
+
+-   "simulator"

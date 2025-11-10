@@ -1,0 +1,147 @@
+qstruct PhaseSpaceStruct {
+  g_x: qnum<3>;
+  g_y: qnum<3>;
+  v_dir_x: qbit;
+  v_dir_y: qbit;
+  u_x: qnum<2>;
+  u_y: qnum<2>;
+}
+
+qfunc init_state2D_expanded___0(qs: PhaseSpaceStruct, g_dist_x: real[], g_dist_y: real[], u_dist: real[]) {
+  inplace_prepare_amplitudes(g_dist_x, 0, qs.g_x);
+  inplace_prepare_amplitudes(g_dist_y, 0, qs.g_y);
+  inplace_prepare_amplitudes(u_dist, 0, qs.u_x);
+  inplace_prepare_amplitudes(u_dist, 0, qs.u_y);
+  X(qs.v_dir_x);
+  H(qs.v_dir_y);
+}
+
+qfunc stream_expanded___0(qs: PhaseSpaceStruct) {
+  control (qs.u_x == 3) {
+    control (qs.v_dir_x) {
+      qs.g_x += 1;
+    } else {
+      qs.g_x += -1;
+    }
+  }
+  control (qs.u_y == 3) {
+    control (qs.v_dir_y) {
+      qs.g_y += 1;
+    } else {
+      qs.g_y += -1;
+    }
+  }
+}
+
+qfunc flip_velocity_expanded___0(change_pos: qnum<3, False, 0>, fixed_pos: qnum<3, False, 0>, change_u: qnum<2, False, 0>, change_v_dir: qbit, arr: real[]) {
+  control (((((change_pos == arr[0]) | (change_pos == arr[1])) & (fixed_pos >= arr[2])) & (fixed_pos <= arr[3])) & (change_u == 3)) {
+    X(change_v_dir);
+  }
+}
+
+qfunc reflection_expanded___0(qs: PhaseSpaceStruct, limits: real[]) {
+  flip_velocity_expanded___0(qs.g_y, qs.g_x, qs.u_y, qs.v_dir_y, [
+    limits[2],
+    limits[3],
+    limits[0],
+    limits[1]
+  ]);
+  flip_velocity_expanded___0(qs.g_x, qs.g_y, qs.u_x, qs.v_dir_x, limits);
+}
+
+qfunc stream_expanded___1(qs: PhaseSpaceStruct) {
+  control (qs.u_x == 2) {
+    control (qs.v_dir_x) {
+      qs.g_x += 1;
+    } else {
+      qs.g_x += -1;
+    }
+  }
+  control (qs.u_y == 2) {
+    control (qs.v_dir_y) {
+      qs.g_y += 1;
+    } else {
+      qs.g_y += -1;
+    }
+  }
+}
+
+qfunc flip_velocity_expanded___1(change_pos: qnum<3, False, 0>, fixed_pos: qnum<3, False, 0>, change_u: qnum<2, False, 0>, change_v_dir: qbit, arr: real[]) {
+  control (((((change_pos == arr[0]) | (change_pos == arr[1])) & (fixed_pos >= arr[2])) & (fixed_pos <= arr[3])) & (change_u == 2)) {
+    X(change_v_dir);
+  }
+}
+
+qfunc reflection_expanded___1(qs: PhaseSpaceStruct, limits: real[]) {
+  flip_velocity_expanded___1(qs.g_y, qs.g_x, qs.u_y, qs.v_dir_y, [
+    limits[2],
+    limits[3],
+    limits[0],
+    limits[1]
+  ]);
+  flip_velocity_expanded___1(qs.g_x, qs.g_y, qs.u_x, qs.v_dir_x, limits);
+}
+
+qfunc stream_expanded___2(qs: PhaseSpaceStruct) {
+  control (qs.u_x == 1) {
+    control (qs.v_dir_x) {
+      qs.g_x += 1;
+    } else {
+      qs.g_x += -1;
+    }
+  }
+  control (qs.u_y == 1) {
+    control (qs.v_dir_y) {
+      qs.g_y += 1;
+    } else {
+      qs.g_y += -1;
+    }
+  }
+}
+
+qfunc flip_velocity_expanded___2(change_pos: qnum<3, False, 0>, fixed_pos: qnum<3, False, 0>, change_u: qnum<2, False, 0>, change_v_dir: qbit, arr: real[]) {
+  control (((((change_pos == arr[0]) | (change_pos == arr[1])) & (fixed_pos >= arr[2])) & (fixed_pos <= arr[3])) & (change_u == 1)) {
+    X(change_v_dir);
+  }
+}
+
+qfunc reflection_expanded___2(qs: PhaseSpaceStruct, limits: real[]) {
+  flip_velocity_expanded___2(qs.g_y, qs.g_x, qs.u_y, qs.v_dir_y, [
+    limits[2],
+    limits[3],
+    limits[0],
+    limits[1]
+  ]);
+  flip_velocity_expanded___2(qs.g_x, qs.g_y, qs.u_x, qs.v_dir_x, limits);
+}
+
+qfunc main(output qs: PhaseSpaceStruct) {
+  allocate(12, qs);
+  init_state2D_expanded___0(qs, [0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0], [0.25, 0.25, 0.25, 0.25]);
+  stream_expanded___0(qs);
+  reflection_expanded___0(qs, [2, 5, 1, 5]);
+  stream_expanded___1(qs);
+  reflection_expanded___1(qs, [2, 5, 1, 5]);
+  stream_expanded___0(qs);
+  reflection_expanded___0(qs, [2, 5, 1, 5]);
+  stream_expanded___2(qs);
+  reflection_expanded___2(qs, [2, 5, 1, 5]);
+  stream_expanded___1(qs);
+  reflection_expanded___1(qs, [2, 5, 1, 5]);
+  stream_expanded___0(qs);
+  reflection_expanded___0(qs, [2, 5, 1, 5]);
+  stream_expanded___0(qs);
+  reflection_expanded___0(qs, [2, 5, 1, 5]);
+  stream_expanded___1(qs);
+  reflection_expanded___1(qs, [2, 5, 1, 5]);
+  stream_expanded___0(qs);
+  reflection_expanded___0(qs, [2, 5, 1, 5]);
+  stream_expanded___2(qs);
+  reflection_expanded___2(qs, [2, 5, 1, 5]);
+  stream_expanded___1(qs);
+  reflection_expanded___1(qs, [2, 5, 1, 5]);
+  stream_expanded___0(qs);
+  reflection_expanded___0(qs, [2, 5, 1, 5]);
+  stream_expanded___0(qs);
+  reflection_expanded___0(qs, [2, 5, 1, 5]);
+}

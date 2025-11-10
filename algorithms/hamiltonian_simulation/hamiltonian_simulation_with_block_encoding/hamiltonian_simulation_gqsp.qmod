@@ -1,0 +1,478 @@
+qstruct GQSPState {
+  data: qnum<2>;
+  block: GQSPBlock;
+}
+
+qstruct GQSPBlock {
+  block_ham: qnum<2>;
+  block_gqsp: qbit;
+}
+
+qstruct BlockEncodedState {
+  data: qnum<2>;
+  block: qnum<2>;
+}
+
+qfunc _gqsp_r_gate_expanded___0(theta: real, phi: real, _lambda: real, q: qbit) {
+  within {
+    X(q);
+  } apply {
+    U(2 * theta, phi, _lambda, 0, q);
+  }
+  Z(q);
+}
+
+qperm cases_0_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, const x_captured__apply_pauli_term__11: qbit[2]) {
+  IDENTITY(x_captured__apply_pauli_term__11[pauli_string_captured__apply_pauli_term__11[i_captured__apply_pauli_term__11].index]);
+}
+
+qperm cases_1_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, x_captured__apply_pauli_term__11: qbit[2]) {
+  X(x_captured__apply_pauli_term__11[pauli_string_captured__apply_pauli_term__11[i_captured__apply_pauli_term__11].index]);
+}
+
+qperm cases_2_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, x_captured__apply_pauli_term__11: qbit[2]) {
+  Y(x_captured__apply_pauli_term__11[pauli_string_captured__apply_pauli_term__11[i_captured__apply_pauli_term__11].index]);
+}
+
+qperm cases_3_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, const x_captured__apply_pauli_term__11: qbit[2]) {
+  Z(x_captured__apply_pauli_term__11[pauli_string_captured__apply_pauli_term__11[i_captured__apply_pauli_term__11].index]);
+}
+
+qperm switch_expanded___0(selector: int, pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, x_captured__apply_pauli_term__11: qbit[2]) {
+  if (selector == 0) {
+    cases_0_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11, i_captured__apply_pauli_term__11, x_captured__apply_pauli_term__11);
+  } else {
+    if (selector == 1) {
+      cases_1_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11, i_captured__apply_pauli_term__11, x_captured__apply_pauli_term__11);
+    } else {
+      if (selector == 2) {
+        cases_2_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11, i_captured__apply_pauli_term__11, x_captured__apply_pauli_term__11);
+      } else {
+        if (selector == 3) {
+          cases_3_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11, i_captured__apply_pauli_term__11, x_captured__apply_pauli_term__11);
+        }
+      }
+    }
+  }
+}
+
+qfunc apply_pauli_term_expanded___0(pauli_string: IndexedPauli[], x: qbit[2]) {
+  repeat (i: 1) {
+    switch_expanded___0(pauli_string[i].pauli, pauli_string, i, x);
+  }
+}
+
+qfunc unitaries_0_lambda___0_0_expanded___0(data_captured__lcu_pauli__6: qbit[2]) {
+  apply_pauli_term_expanded___0([
+    IndexedPauli {pauli=0, index=0}
+  ], data_captured__lcu_pauli__6);
+}
+
+qfunc unitaries_1_lambda___0_0_expanded___0(data_captured__lcu_pauli__6: qbit[2]) {
+  apply_pauli_term_expanded___0([
+    IndexedPauli {pauli=3, index=1}
+  ], data_captured__lcu_pauli__6);
+}
+
+qperm cases_4_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, const x_captured__apply_pauli_term__11: qbit[2]) {
+  IDENTITY(x_captured__apply_pauli_term__11[pauli_string_captured__apply_pauli_term__11[i_captured__apply_pauli_term__11].index]);
+}
+
+qperm cases_5_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, x_captured__apply_pauli_term__11: qbit[2]) {
+  X(x_captured__apply_pauli_term__11[pauli_string_captured__apply_pauli_term__11[i_captured__apply_pauli_term__11].index]);
+}
+
+qperm cases_6_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, x_captured__apply_pauli_term__11: qbit[2]) {
+  Y(x_captured__apply_pauli_term__11[pauli_string_captured__apply_pauli_term__11[i_captured__apply_pauli_term__11].index]);
+}
+
+qperm cases_7_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, const x_captured__apply_pauli_term__11: qbit[2]) {
+  Z(x_captured__apply_pauli_term__11[pauli_string_captured__apply_pauli_term__11[i_captured__apply_pauli_term__11].index]);
+}
+
+qperm switch_expanded___1(selector: int, pauli_string_captured__apply_pauli_term__11: IndexedPauli[], i_captured__apply_pauli_term__11: int, x_captured__apply_pauli_term__11: qbit[2]) {
+  if (selector == 0) {
+    cases_4_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11, i_captured__apply_pauli_term__11, x_captured__apply_pauli_term__11);
+  } else {
+    if (selector == 1) {
+      cases_5_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11, i_captured__apply_pauli_term__11, x_captured__apply_pauli_term__11);
+    } else {
+      if (selector == 2) {
+        cases_6_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11, i_captured__apply_pauli_term__11, x_captured__apply_pauli_term__11);
+      } else {
+        if (selector == 3) {
+          cases_7_lambda___0_0_expanded___0(pauli_string_captured__apply_pauli_term__11, i_captured__apply_pauli_term__11, x_captured__apply_pauli_term__11);
+        }
+      }
+    }
+  }
+}
+
+qfunc apply_pauli_term_expanded___1(pauli_string: IndexedPauli[], x: qbit[2]) {
+  repeat (i: 2) {
+    switch_expanded___1(pauli_string[i].pauli, pauli_string, i, x);
+  }
+}
+
+qfunc unitaries_2_lambda___0_0_expanded___0(data_captured__lcu_pauli__6: qbit[2]) {
+  apply_pauli_term_expanded___1([
+    IndexedPauli {pauli=1, index=0},
+    IndexedPauli {pauli=1, index=1}
+  ], data_captured__lcu_pauli__6);
+}
+
+qfunc unitaries_3_lambda___0_0_expanded___0(data_captured__lcu_pauli__6: qbit[2]) {
+  apply_pauli_term_expanded___1([
+    IndexedPauli {pauli=3, index=0},
+    IndexedPauli {pauli=3, index=1}
+  ], data_captured__lcu_pauli__6);
+}
+
+qfunc select_0_lambda___0_0_expanded___0(const _block: qnum<2, False, 0>, data_captured__lcu_pauli__6: qbit[2]) {
+  repeat (i: 4) {
+    control (_block == i) {
+      if (i == 0) {
+        unitaries_0_lambda___0_0_expanded___0(data_captured__lcu_pauli__6);
+      } else {
+        if (i == 1) {
+          unitaries_1_lambda___0_0_expanded___0(data_captured__lcu_pauli__6);
+        } else {
+          if (i == 2) {
+            unitaries_2_lambda___0_0_expanded___0(data_captured__lcu_pauli__6);
+          } else {
+            if (i == 3) {
+              unitaries_3_lambda___0_0_expanded___0(data_captured__lcu_pauli__6);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+qfunc prepare_select_expanded___0(block: qnum<2, False, 0>, data_captured__lcu_pauli__6: qbit[2]) {
+  within {
+    inplace_prepare_state([
+      0.533333333333,
+      0.133333333333,
+      0.066666666667,
+      0.266666666667
+    ], 0, block);
+  } apply {
+    select_0_lambda___0_0_expanded___0(block, data_captured__lcu_pauli__6);
+    if (False) {
+    }
+  }
+}
+
+qfunc lcu_expanded___0(block: qnum<2, False, 0>, data_captured__lcu_pauli__6: qbit[2]) {
+  prepare_select_expanded___0(block, data_captured__lcu_pauli__6);
+}
+
+qfunc lcu_pauli_expanded___0(data: qbit[2], block: qnum<2, False, 0>) {
+  lcu_expanded___0(block, data);
+}
+
+qfunc be_hamiltonian_expanded___0(state: BlockEncodedState) {
+  lcu_pauli_expanded___0(state.data, state.block);
+}
+
+@disable_perm_check
+@disable_const_checks(packed_vars)
+qperm reflect_about_zero_expanded___0(const packed_vars: qbit[2]) {
+  msbs: qnum<1, False, 0>;
+  lsb: qbit;
+  packed_vars -> {msbs, lsb};
+  within {
+    X(lsb);
+    H(lsb);
+  } apply {
+    control (msbs == 0) {
+      X(lsb);
+    }
+  }
+  {msbs, lsb} -> packed_vars;
+}
+
+qfunc walk_operator_expanded___0(state: BlockEncodedState) {
+  be_hamiltonian_expanded___0(state);
+  reflect_about_zero_expanded___0(state.block);
+  phase (pi);
+}
+
+qfunc u_0_lambda___0_0_expanded___0(state___data_captured__gqsp_hamiltonian_evolution__1: qnum<2, False, 0>, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1: qnum<2, False, 0>) {
+  walk_operator_expanded___0({state___data_captured__gqsp_hamiltonian_evolution__1, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1});
+}
+
+qfunc gqsp_expanded___0(aux: qbit, phases: real[][], negative_power: int, state___data_captured__gqsp_hamiltonian_evolution__1: qnum<2, False, 0>, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1: qnum<2, False, 0>) {
+  _gqsp_r_gate_expanded___0(phases[0][0], phases[1][0], phases[2][0], aux);
+  repeat (index: 76) {
+    if ((index + 1) <= (76 - negative_power)) {
+      control (aux == 0) {
+        u_0_lambda___0_0_expanded___0(state___data_captured__gqsp_hamiltonian_evolution__1, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1);
+      }
+    } else {
+      control (aux == 1) {
+        invert {
+          u_0_lambda___0_0_expanded___0(state___data_captured__gqsp_hamiltonian_evolution__1, state___block___block_ham_captured__gqsp_hamiltonian_evolution__1);
+        }
+      }
+    }
+    _gqsp_r_gate_expanded___0(phases[0][index + 1], phases[1][index + 1], phases[2][index + 1], aux);
+  }
+}
+
+qfunc gqsp_hamiltonian_evolution_expanded___0(gqsp_expcos_phases: real[][], state: GQSPState) {
+  gqsp_expanded___0(state.block.block_gqsp, gqsp_expcos_phases, 38, state.data, state.block.block_ham);
+}
+
+qfunc main(output data: qnum<2, False, 0>, output block: qnum<3, False, 0>) {
+  state: GQSPState;
+  allocate(5, state);
+  inplace_prepare_amplitudes([
+    0.327820753326,
+    0.360992565118,
+    0.693632111283,
+    0.530181493278
+  ], 0.0, state.data);
+  gqsp_hamiltonian_evolution_expanded___0([
+    [
+      1.31e-10,
+      5.71e-10,
+      2.847e-09,
+      1.1687e-08,
+      4.6331e-08,
+      1.79471e-07,
+      6.7191e-07,
+      2.426417e-06,
+      8.445276e-06,
+      2.8284081e-05,
+      9.0977633e-05,
+      0.000280488045,
+      0.000826983168,
+      0.002325756881,
+      0.006220658727,
+      0.015768926631,
+      0.037715936476,
+      0.084508490727,
+      0.174561046196,
+      0.318678739773,
+      0.470726764046,
+      0.504364441163,
+      0.348134306184,
+      0.069827381644,
+      0.232108967884,
+      0.422710728991,
+      0.339488844381,
+      0.006897727664,
+      0.331288510401,
+      0.362899177306,
+      0.018068919075,
+      0.34750078434,
+      0.282026863044,
+      0.166244265258,
+      0.370690742651,
+      0.00408197399,
+      0.371979641022,
+      0.077845999689,
+      0.363797464879,
+      0.07784599961,
+      0.371979641091,
+      0.004081973867,
+      0.370690742509,
+      0.166244265437,
+      0.28202686323,
+      0.347500784169,
+      0.018068918948,
+      0.362899177353,
+      0.331288510443,
+      0.006897727785,
+      0.339488844239,
+      0.422710729094,
+      0.232108967867,
+      0.06982738173,
+      0.348134306057,
+      0.504364441249,
+      0.470726764046,
+      0.318678739679,
+      0.174561046315,
+      0.084508490694,
+      0.037715936389,
+      0.015768926744,
+      0.006220658716,
+      0.002325756779,
+      0.000826983254,
+      0.000280488087,
+      9.0977522e-05,
+      2.82841e-05,
+      8.445375e-06,
+      2.426355e-06,
+      6.71836e-07,
+      1.79554e-07,
+      4.6382e-08,
+      1.1595e-08,
+      2.808e-09,
+      6.6e-10,
+      1.570796326644
+    ],
+    [
+      (-1.163020372817),
+      (-1.437499200202),
+      (-1.588604506584),
+      (-1.577399218336),
+      (-1.569493136525),
+      (-1.570416998624),
+      (-1.570911844973),
+      (-1.570815558515),
+      (-1.570784941014),
+      (-1.570796058803),
+      (-1.570797452825),
+      (-1.570796156475),
+      (-1.570796233883),
+      (-1.570796370083),
+      (-1.570796327808),
+      (-1.570796319826),
+      (-1.570796329115),
+      (-1.570796327208),
+      (-1.570796326066),
+      (-1.570796327113),
+      (-1.570796326835),
+      (-1.570796326436),
+      (-1.570796328259),
+      1.570796327946,
+      (-1.57079632689),
+      (-1.570796326359),
+      (-1.5707963418),
+      1.570796341355,
+      (-1.570796326679),
+      (-1.570796322516),
+      1.570796322878,
+      (-1.570796327598),
+      1.570796326473,
+      (-1.570796325702),
+      1.570796348975,
+      (-1.570796349446),
+      (-1.570796326021),
+      1.570796326274,
+      (-1.57079632712),
+      1.57079632701,
+      1.57079632525,
+      (-1.570796325211),
+      1.570796326796,
+      (-1.570796326809),
+      1.570796326797,
+      (-1.57079632678),
+      1.570796326782,
+      1.570796326795,
+      (-1.570796326798),
+      1.570796326798,
+      1.570796326795,
+      1.570796326795,
+      (-1.570796326795),
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      1.570796326795,
+      (-3.14159265359),
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ], state);
+  state -> {data, block};
+}

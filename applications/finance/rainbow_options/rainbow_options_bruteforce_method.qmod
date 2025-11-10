@@ -3,11 +3,11 @@ qstruct EstimationVars {
   x2: qnum<2>;
 }
 
-qfunc oracle(est_reg: qbit[]) {
+qperm oracle(const est_reg: qbit[]) {
   Z(est_reg[est_reg.len - 1]);
 }
 
-qfunc affine_max(const x1: qnum, const x2: qnum, permutable output res: qnum) {
+qperm affine_max(const x1: qnum, const x2: qnum, output res: qnum) {
   res = max(x1 * 1.0, ((x1 * 0.5) + (x2 * 0.5)) + (-1.5));
 }
 
@@ -32,11 +32,8 @@ qfunc rainbow_brute_force(qvars: EstimationVars, ind: qbit) {
     0.0656
   ], 0, qvars.x2);
   max_out: qnum;
-  within {
-    affine_max(qvars.x1, qvars.x2, max_out);
-  } apply {
-    brute_force_payoff(max_out, ind);
-  }
+  affine_max(qvars.x1, qvars.x2, max_out);
+  brute_force_payoff(max_out, ind);
 }
 
 qfunc space_transform(est_reg: qbit[]) {
@@ -53,4 +50,5 @@ qfunc main(k: int, output indicator: qbit) {
   } apply {
     amplitude_amplification(k, oracle, space_transform, est_reg);
   }
+  drop(problem_vars);
 }

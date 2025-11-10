@@ -9,7 +9,7 @@ qfunc hadamard_transform_expanded___0(target: qbit[3]) {
   }
 }
 
-qfunc modular_in_place_add_constant_expanded___0(permutable x: qnum<3, False, 0>) {
+qperm modular_in_place_add_constant_expanded___0(x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
   temp: qnum<4, True, 0>;
@@ -26,7 +26,7 @@ qfunc modular_in_place_add_constant_expanded___0(permutable x: qnum<3, False, 0>
   free(carry);
 }
 
-qfunc modular_in_place_add_constant_expanded___1(permutable x: qnum<3, False, 0>) {
+qperm modular_in_place_add_constant_expanded___1(x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
   temp: qnum<4, True, 0>;
@@ -43,31 +43,31 @@ qfunc modular_in_place_add_constant_expanded___1(permutable x: qnum<3, False, 0>
   free(carry);
 }
 
-qfunc set_value_expanded___0(permutable reg: qnum<3, False, 0>) {
+qperm set_value_expanded___0(reg: qnum<3, False, 0>) {
   reg ^= 1;
 }
 
-qfunc set_value_expanded___1(permutable reg: qnum<3, False, 0>) {
+qperm set_value_expanded___1(reg: qnum<3, False, 0>) {
   reg ^= 4;
 }
 
-qfunc set_value_expanded___2(permutable reg: qnum<3, False, 0>) {
+qperm set_value_expanded___2(reg: qnum<3, False, 0>) {
   reg ^= 5;
 }
 
-qfunc set_value_expanded___3(permutable reg: qnum<3, False, 0>) {
+qperm set_value_expanded___3(reg: qnum<3, False, 0>) {
   reg ^= 2;
 }
 
-qfunc set_value_expanded___4(permutable reg: qnum<3, False, 0>) {
+qperm set_value_expanded___4(reg: qnum<3, False, 0>) {
   reg ^= 3;
 }
 
-qfunc set_value_expanded___5(permutable reg: qnum<3, False, 0>) {
+qperm set_value_expanded___5(reg: qnum<3, False, 0>) {
   reg ^= 6;
 }
 
-qfunc mock_inverse_modulus_expanded___0(const x: qnum<3, False, 0>, permutable result: qnum<3, False, 0>) {
+qperm mock_inverse_modulus_expanded___0(const x: qnum<3, False, 0>, result: qnum<3, False, 0>) {
   control (x == 1) {
     set_value_expanded___0(result);
   }
@@ -88,7 +88,7 @@ qfunc mock_inverse_modulus_expanded___0(const x: qnum<3, False, 0>, permutable r
   }
 }
 
-qfunc modular_in_place_add_expanded___0(const x: qnum<3, False, 0>, permutable y: qnum<3, False, 0>) {
+qperm modular_in_place_add_expanded___0(const x: qnum<3, False, 0>, y: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
   res_and_carry: qnum<4, True, 0>;
@@ -105,13 +105,13 @@ qfunc modular_in_place_add_expanded___0(const x: qnum<3, False, 0>, permutable y
   free(carry);
 }
 
-qfunc shift_left_expanded___0(permutable reg: qbit[4]) {
+qperm shift_left_expanded___0(reg: qbit[4]) {
   SWAP(reg[3], reg[2]);
   SWAP(reg[2], reg[1]);
   SWAP(reg[1], reg[0]);
 }
 
-qfunc modular_in_place_double_expanded___0(permutable x: qnum<3, False, 0>) {
+qperm modular_in_place_double_expanded___0(x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
   res_and_carry: qnum<4, True, 0>;
@@ -136,7 +136,7 @@ qfunc modular_in_place_double_expanded___0(permutable x: qnum<3, False, 0>) {
   free(carry);
 }
 
-qfunc modular_out_of_place_multiply_expanded___0(const x: qbit[3], const y: qbit[3], permutable z: qbit[3]) {
+qperm modular_out_of_place_multiply_expanded___0(const x: qbit[3], const y: qbit[3], z: qbit[3]) {
   control (x[2]) {
     modular_in_place_add_expanded___0(y, z);
   }
@@ -150,7 +150,7 @@ qfunc modular_out_of_place_multiply_expanded___0(const x: qbit[3], const y: qbit
   }
 }
 
-qfunc modular_out_of_place_square_expanded___0(const x: qbit[3], permutable z: qbit[3]) {
+qperm modular_out_of_place_square_expanded___0(const x: qbit[3], z: qbit[3]) {
   anc: qbit;
   control (x[2]) {
     modular_in_place_add_expanded___0(x, z);
@@ -165,17 +165,17 @@ qfunc modular_out_of_place_square_expanded___0(const x: qbit[3], permutable z: q
   }
 }
 
-qfunc apply_to_all_expanded___0(permutable target: qbit[3]) {
+qperm apply_to_all_expanded___0(target: qbit[3]) {
   repeat (index: 3) {
     X(target[index]);
   }
 }
 
-qfunc bitwise_negation_expanded___0(permutable arr: qbit[3]) {
+qperm bitwise_negation_expanded___0(arr: qbit[3]) {
   apply_to_all_expanded___0(arr);
 }
 
-qfunc modular_in_place_negate_expanded___0(permutable x: qnum<3, False, 0>) {
+qperm modular_in_place_negate_expanded___0(x: qnum<3, False, 0>) {
   is_all_zeros: qbit;
   allocate(1, is_all_zeros);
   is_all_zeros ^= x == 0;
@@ -188,16 +188,16 @@ qfunc modular_in_place_negate_expanded___0(permutable x: qnum<3, False, 0>) {
   free(is_all_zeros);
 }
 
-qfunc modular_in_place_subtract_expanded___0(const x: qnum<3, False, 0>, permutable y: qnum<3, False, 0>) {
+qperm modular_in_place_subtract_expanded___0(const x: qnum<3, False, 0>, y: qnum<3, False, 0>) {
   modular_in_place_negate_expanded___0(y);
   modular_in_place_add_expanded___0(x, y);
 }
 
-qfunc set_value_expanded___6(permutable reg: qnum<3, False, 0>) {
+qperm set_value_expanded___6(reg: qnum<3, False, 0>) {
   reg ^= 1;
 }
 
-qfunc mock_inverse_modulus_expanded___1(const x: qnum<3, False, 0>, permutable result: qnum<3, False, 0>) {
+qperm mock_inverse_modulus_expanded___1(const x: qnum<3, False, 0>, result: qnum<3, False, 0>) {
   control (x == 1) {
     set_value_expanded___6(result);
   }
@@ -218,7 +218,7 @@ qfunc mock_inverse_modulus_expanded___1(const x: qnum<3, False, 0>, permutable r
   }
 }
 
-qfunc ec_point_add_expanded___0(permutable ecp: EllipticCurvePoint) {
+qperm ec_point_add_expanded___0(ecp: EllipticCurvePoint) {
   slope: qnum<3, False, 0>;
   allocate(3, slope);
   t0: qnum<3, False, 0>;
@@ -261,7 +261,7 @@ qfunc ec_point_add_expanded___0(permutable ecp: EllipticCurvePoint) {
   free(t0);
 }
 
-qfunc modular_in_place_add_constant_expanded___2(permutable x: qnum<3, False, 0>) {
+qperm modular_in_place_add_constant_expanded___2(x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
   temp: qnum<4, True, 0>;
@@ -278,7 +278,7 @@ qfunc modular_in_place_add_constant_expanded___2(permutable x: qnum<3, False, 0>
   free(carry);
 }
 
-qfunc modular_in_place_add_constant_expanded___3(permutable x: qnum<3, False, 0>) {
+qperm modular_in_place_add_constant_expanded___3(x: qnum<3, False, 0>) {
   carry: qbit;
   allocate(1, carry);
   temp: qnum<4, True, 0>;
@@ -295,7 +295,7 @@ qfunc modular_in_place_add_constant_expanded___3(permutable x: qnum<3, False, 0>
   free(carry);
 }
 
-qfunc ec_point_add_expanded___1(permutable ecp: EllipticCurvePoint) {
+qperm ec_point_add_expanded___1(ecp: EllipticCurvePoint) {
   slope: qnum<3, False, 0>;
   allocate(3, slope);
   t0: qnum<3, False, 0>;
@@ -338,7 +338,7 @@ qfunc ec_point_add_expanded___1(permutable ecp: EllipticCurvePoint) {
   free(t0);
 }
 
-qfunc ec_point_add_expanded___2(permutable ecp: EllipticCurvePoint) {
+qperm ec_point_add_expanded___2(ecp: EllipticCurvePoint) {
   slope: qnum<3, False, 0>;
   allocate(3, slope);
   t0: qnum<3, False, 0>;
@@ -381,7 +381,7 @@ qfunc ec_point_add_expanded___2(permutable ecp: EllipticCurvePoint) {
   free(t0);
 }
 
-qfunc ec_scalar_mult_add_expanded___0(permutable ecp: EllipticCurvePoint, permutable k: qbit[3]) {
+qperm ec_scalar_mult_add_expanded___0(ecp: EllipticCurvePoint, k: qbit[3]) {
   control (k[0]) {
     ec_point_add_expanded___0(ecp);
   }
@@ -409,7 +409,7 @@ qfunc qft_expanded___0(target: qbit[3]) {
   qft_no_swap_expanded___0(target);
 }
 
-qfunc shor_ecdlp_expanded___0(output x1: qnum<3, False, 3>, output x2: qnum<3, False, 3>, permutable output ecp: EllipticCurvePoint) {
+qfunc shor_ecdlp_expanded___0(output x1: qnum<3, False, 3>, output x2: qnum<3, False, 3>, output ecp: EllipticCurvePoint) {
   allocate(3, False, 3, x1);
   allocate(3, False, 3, x2);
   allocate(6, ecp);
@@ -427,6 +427,6 @@ qfunc shor_ecdlp_expanded___0(output x1: qnum<3, False, 3>, output x2: qnum<3, F
   }
 }
 
-qfunc main(output x1: qnum<3, False, 3>, output x2: qnum<3, False, 3>, permutable output ecp: EllipticCurvePoint) {
+qfunc main(output x1: qnum<3, False, 3>, output x2: qnum<3, False, 3>, output ecp: EllipticCurvePoint) {
   shor_ecdlp_expanded___0(x1, x2, ecp);
 }

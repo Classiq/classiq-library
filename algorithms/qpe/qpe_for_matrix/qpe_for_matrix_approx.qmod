@@ -144,4 +144,5 @@ qfunc main(output phase_result: qnum<7, SIGNED, 7>) {
       num_qubits=2
     }, (-6.283185307179586) * pw, 2, ceiling(2 * (1.5 ** log(pw, 2))), state);
   }, phase_result);
+  drop(state);
 }

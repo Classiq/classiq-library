@@ -11,5 +11,6 @@ search:
         members:
             - lcu
             - lcu_pauli
+            - prepare_select
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->

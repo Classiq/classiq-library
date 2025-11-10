@@ -15,7 +15,7 @@ Classiq synthesis includes transpilation. However, the transformations
 applied to the quantum program affect the hierarchical nature of the quantum program. For
 example, the gates representing functions are decomposed to basis gates, and
 thus do not appear in the transpiled quantum program. To visualize the
-hierarchical quantum program in a meaningful way, the [analyzer web application](../analysis/quantum-program-visualization-tool/index.md)
+hierarchical quantum program in a meaningful way, the [analyzer web application](../analysis/visualization-of-quantum-programs.md)
 uses the non-transpiled quantum program. On the other hand, when executing a quantum program,
 it is preferable to use the transpiled quantum program, because it is already optimized
 for the given hardware. Thus, the [Executor](../execution/index.md) uses the

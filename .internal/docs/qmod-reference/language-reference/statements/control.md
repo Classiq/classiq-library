@@ -18,12 +18,6 @@ a quantum logical expression.
 
 ## Syntax
 
-=== "Native"
-
-    **control** **(** _ctrl-var_ **)** **{** _statements_ **}** [**else** **{** _else-statements_ **}**]
-
-    **control** **(** _ctrl-expression_ **)** **{** _statements_ **}** [**else** **{** _else-statements_ **}**]
-
 === "Python"
 
     [comment]: DO_NOT_TEST
@@ -35,6 +29,12 @@ a quantum logical expression.
     ) -> None:
         pass
     ```
+
+=== "Native"
+
+    **control** **(** _ctrl-var_ **)** **{** _statements_ **}** [**else** **{** _else-statements_ **}**]
+
+    **control** **(** _ctrl-expression_ **)** **{** _statements_ **}** [**else** **{** _else-statements_ **}**]
 
 ## Semantics
 
@@ -64,6 +64,21 @@ In the following example, `control` statement applies function `X` on the variab
 conditioned on a single qubit variable `qb`. Note that this is equivalent to using the
 built-in gate-level function `CX`.
 
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def main(target: Output[QBit]) -> None:
+        qb = QBit()
+        allocate(qb)
+        H(qb)
+        allocate(target)
+        control(qb, lambda: X(target))
+    ```
+
 === "Native"
 
     ```
@@ -78,21 +93,6 @@ built-in gate-level function `CX`.
     }
     ```
 
-=== "Python"
-
-    ```python
-    from classiq import H, Output, QBit, X, allocate, control, qfunc
-
-
-    @qfunc
-    def main(target: Output[QBit]) -> None:
-        qb = QBit()
-        allocate(qb)
-        H(qb)
-        allocate(target)
-        control(qb, lambda: X(target))
-    ```
-
 Synthesizing this model creates the quantum program shown below.
 
 ![control_single_qubit.png](resources/control_single_qubit.png)
@@ -101,20 +101,6 @@ Synthesizing this model creates the quantum program shown below.
 
 The next example shows how `control` can be similarly used with multi-qubit control
 variable. In this case `target` is rotated when the state of `qba` is the bit string 111.
-
-=== "Native"
-
-    ```
-    qfunc main(output target: qbit) {
-      qba: qbit[];
-      allocate(3, qba);
-      hadamard_transform(qba);
-      allocate(target);
-      control (qba) {
-        RX(pi / 2, target);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -132,6 +118,20 @@ variable. In this case `target` is rotated when the state of `qba` is the bit st
         control(qba, lambda: RX(pi / 2, target))
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output target: qbit) {
+      qba: qbit[];
+      allocate(3, qba);
+      hadamard_transform(qba);
+      allocate(target);
+      control (qba) {
+        RX(pi / 2, target);
+      }
+    }
+    ```
+
 Synthesizing this model creates the quantum program shown below.
 
 ![control_multi_qubit.png](resources/control_multi_qubit.png)
@@ -141,25 +141,6 @@ Synthesizing this model creates the quantum program shown below.
 The following example demonstrates the use of `control` to rotate the state of a qubit
 by an angle determined by another quantum variable. In this case the condition compares
 the quantum variable with the repeat index.
-
-=== "Native"
-
-    ```
-    qfunc switch_rx(x: qnum, target: qbit) {
-      repeat (i: 4) {
-        control (x == i) {
-          RX(pi / (2 ** i), target);
-        }
-      }
-    }
-
-    qfunc main(output res: qbit) {
-      allocate(res);
-      x: qnum;
-      x = 2;
-      switch_rx(x, res);
-    }
-    ```
 
 === "Python"
 
@@ -181,37 +162,35 @@ the quantum variable with the repeat index.
         switch_rx(x, res)
     ```
 
+=== "Native"
+
+    ```
+    qfunc switch_rx(x: qnum, target: qbit) {
+      repeat (i: 4) {
+        control (x == i) {
+          RX(pi / (2 ** i), target);
+        }
+      }
+    }
+
+    qfunc main(output res: qbit) {
+      allocate(res);
+      x: qnum;
+      x = 2;
+      switch_rx(x, res);
+    }
+    ```
+
 Synthesizing this model creates the following quantum program. Note how `control`
 is implemented as positive and negative controls in the respective numeric qubits.
 
-![control_value.jpg](resources/control_value.jpg)
+![control_value.png](resources/control_value.png)
 
 ### Example 4: Arithmetic condition
 
 The following example demonstrates the use of `control` to rotate the state of a qubit
 according to a condition imposed by another two quantum variables, `x` and `y`. Here, the condition
 filters quantum states such that `y <= x[0] + x[1] + x[2]`.
-
-=== "Native"
-
-    ```
-    qfunc switch_rx(x: qbit[], y: qnum, target: qbit) {
-        control (y <= x[0] + x[1] + x[2]) {
-          RX(pi / 3, target);
-        }
-    }
-
-    qfunc main(output res: qbit) {
-        allocate(res);
-        x: qbit[3];
-        y: qnum<3, UNSIGNED, 0>;
-        allocate(x);
-        allocate(y);
-        hadamard_transform(x);
-        hadamard_transform(y);
-        switch_rx(x, y, res);
-    }
-    ```
 
 === "Python"
 
@@ -237,11 +216,32 @@ filters quantum states such that `y <= x[0] + x[1] + x[2]`.
         switch_rx(x, y, res)
     ```
 
+=== "Native"
+
+    ```
+    qfunc switch_rx(x: qbit[], y: qnum, target: qbit) {
+        control (y <= x[0] + x[1] + x[2]) {
+          RX(pi / 3, target);
+        }
+    }
+
+    qfunc main(output res: qbit) {
+        allocate(res);
+        x: qbit[3];
+        y: qnum<3, UNSIGNED, 0>;
+        allocate(x);
+        allocate(y);
+        hadamard_transform(x);
+        hadamard_transform(y);
+        switch_rx(x, y, res);
+    }
+    ```
+
 Synthesizing this model creates the following quantum program. Note how `control`
 is implemented as a result of an arithmetic computation. After applying the `control` operation,
 the arithmetic operation is uncomputed.
 
-![control_arithmetic.jpg](resources/control_arithmetic.jpg)
+![control_arithmetic.png](resources/control_arithmetic.png)
 
 ### Example 5: Control else
 
@@ -250,6 +250,20 @@ In this case, the `else` block applies an 'H' gate on the target qubit when the 
 condition is not met, instead of the 'X' gate,
 so when each qubit of the control variable is in state $|1\rangle$, the bit is flipped,
 otherwise, the Hadamard gate is applied.
+
+=== "Python"
+
+    ```python
+    from classiq import *
+
+
+    @qfunc
+    def main(x: Output[QBit], ctrl: Output[QArray[QBit]]):
+        allocate(2, ctrl)
+        hadamard_transform(ctrl)
+        allocate(x)
+        control(ctrl, lambda: X(x), lambda: H(x))
+    ```
 
 === "Native"
 
@@ -266,22 +280,8 @@ otherwise, the Hadamard gate is applied.
     }
     ```
 
-=== "Python"
-
-    ```python
-    from classiq import *
-
-
-    @qfunc
-    def main(x: Output[QBit], ctrl: Output[QArray[QBit]]):
-        allocate(2, ctrl)
-        hadamard_transform(ctrl)
-        allocate(x)
-        control(ctrl, lambda: X(x), lambda: H(x))
-    ```
-
 Synthesizing this model creates the following quantum program. Note how the `else` block
 is implemented as a negation of the control condition, and the negation is uncomputed after
 the `control` operation of the else block.
 
-![control_else.jpg](resources/control_else.png)
+![control_else.png](resources/control_else.png)

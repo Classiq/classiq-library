@@ -6,11 +6,11 @@ qfunc hidden_shift_no_dual(oracle: qfunc (qbit[], qbit), oracle_shifted: qfunc (
   hadamard_transform(target);
 }
 
-qfunc f_qfunc(s: qbit[], res: qbit) {
+qperm f_qfunc(const s: qbit[], res: qbit) {
   res ^= ((((((((s[0:8][0] & s[8:s.len][3]) ^ (s[0:8][1] & s[8:s.len][6])) ^ (s[0:8][2] & s[8:s.len][1])) ^ (s[0:8][3] & s[8:s.len][5])) ^ (s[0:8][4] & s[8:s.len][7])) ^ (s[0:8][5] & s[8:s.len][0])) ^ (s[0:8][6] & s[8:s.len][4])) ^ (s[0:8][7] & s[8:s.len][2])) ^ (((((((s[8:s.len][0] & s[8:s.len][1]) & s[8:s.len][2]) & s[8:s.len][3]) & s[8:s.len][4]) & s[8:s.len][5]) & s[8:s.len][6]) & s[8:s.len][7]);
 }
 
-qfunc g_qfunc(s: qbit[], res: qbit) {
+qperm g_qfunc(const s: qbit[], res: qbit) {
   res ^= ((((((((s[0:8][0] & s[8:s.len][3]) ^ ((s[0:8][1] ^ 1) & s[8:s.len][6])) ^ (s[0:8][2] & (s[8:s.len][1] ^ 1))) ^ ((s[0:8][3] ^ 1) & s[8:s.len][5])) ^ (s[0:8][4] & s[8:s.len][7])) ^ (s[0:8][5] & s[8:s.len][0])) ^ (s[0:8][6] & s[8:s.len][4])) ^ (s[0:8][7] & s[8:s.len][2])) ^ (((((((s[8:s.len][0] & (s[8:s.len][1] ^ 1)) & s[8:s.len][2]) & s[8:s.len][3]) & s[8:s.len][4]) & s[8:s.len][5]) & s[8:s.len][6]) & s[8:s.len][7]);
 }
 

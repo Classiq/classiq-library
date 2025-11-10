@@ -54,6 +54,22 @@ Make sure you are within the appropriate Python environment.
 
 </details>
 
+## Authentication
+
+<details markdown>
+<summary>SDK Configuration for Organizations</summary>
+
+Check your user profile page on the platform (when logged in, click your avatar
+on the top-right, then "Profile Settings"). Look for the "SDK Configuration"
+section. If it's not there, simply ignore this step.
+
+Otherwise, download the file from the profile and copy it to:
+
+-   Mac & Linux: `~/.config/classiq/config.env`
+-   Windows: `%APPDATA%\classiq\config.env`
+
+</details>
+
 Authenticate the device with your Classiq account. **In Python**, run these lines:
 
 ```Python

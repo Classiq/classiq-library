@@ -3,7 +3,7 @@ qstruct GroverVars {
   y: qnum<2>;
 }
 
-qfunc my_predicate(const vars: GroverVars, permutable res: qbit) {
+qperm my_predicate(const vars: GroverVars, res: qbit) {
   res ^= ((vars.x + vars.y) < 9) and (((vars.x * vars.y) % 4) == 1);
 }
 

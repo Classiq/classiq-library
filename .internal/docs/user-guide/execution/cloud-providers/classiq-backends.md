@@ -3,6 +3,8 @@ search:
     boost: 0.900
 ---
 
+<!-- cspell:ignore statevector -->
+
 # Execution on Classiq simulators
 
 Classiq offers execution on simulators that are located at the Classiq backend.
@@ -76,3 +78,16 @@ above `simulator_statevector`).
     If you encounter any problem, contact
     [Classiq support](mailto:support@classiq.io).
 <!-- prettier-ignore-end -->
+
+## Supported Backends
+
+Included simulators:
+
+-   "nvidia_simulator_statevector"
+-   "simulator"
+-   "simulator_statevector"
+-   "simulator_density_matrix"
+-   "nvidia_simulator"
+-   "braket_nvidia_simulator"
+-   "simulator_matrix_product_state"
+-   "braket_nvidia_simulator_statevector"

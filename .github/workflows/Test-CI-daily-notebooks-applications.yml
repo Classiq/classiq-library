@@ -39,7 +39,7 @@ jobs:
 
       # Run Notebook Tests
       - name: Run Notebooks
-        run: python -m pytest -c tests/config_weekly.ini tests/notebooks
+        run: python -m pytest $(<tests/config_weekly) tests/notebooks
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
@@ -50,12 +50,9 @@ jobs:
           # Passing environment information
           CLASSIQ_IDE: "https://nightly.platform.classiq.io"
           CLASSIQ_HOST: "https://nightly.platform.classiq.io"
-          # Altering test behavior
-          QMOD_COMPARISON_FIRST: "true"
 
       - name: Send Qmods Slack notification
         if: failure()
         uses: ./.github/actions/send_qmods_slack_notification
         with:
           slack_bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-          pytest_output: ./pytest-results/test-results-applications.xml

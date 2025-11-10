@@ -14,6 +14,9 @@ search:
             - c_modular_multiply
             - multiswap
             - inplace_c_modular_multiply
+            - modular_add_qft_space
+            - modular_multiply
+            - inplace_modular_multiply
             - modular_exp
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->

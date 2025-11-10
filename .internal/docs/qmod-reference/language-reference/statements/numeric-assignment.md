@@ -16,14 +16,6 @@ of the operation is stored back in the target variable.
 
 ## Syntax
 
-=== "Native"
-
-    _target-var_ **=** _quantum-expression_
-
-    _target-var_ **^=** _quantum-expression_
-
-    _target-var_ **+=** _quantum-expression_
-
 === "Python"
 
     <!-- cspell:ignore inplace_xor,inplace_add -->
@@ -48,6 +40,14 @@ of the operation is stored back in the target variable.
       operator syntax is typically easier to read, but it cannot be used
       directly in lambda expressions, where the function call syntax should be
       used.
+
+=== "Native"
+
+    _target-var_ **=** _quantum-expression_
+
+    _target-var_ **^=** _quantum-expression_
+
+    _target-var_ **+=** _quantum-expression_
 
 ## Semantics
 
@@ -143,18 +143,6 @@ The following is a model that computes the result of the expression `a + 2 * b +
 with `a` initialized to 3 and `b` initialized to a superposition of 1 and 2.
 The output is a superposition of 8 and 10.
 
-=== "Native"
-
-    ```
-    qfunc main(output res: qnum) {
-      a: qnum;
-      b: qnum;
-      a = 3;
-      prepare_state([0, 0.5, 0.5, 0], 0, b); // 'b' is in superposition of 1 and 2
-      res = a + 2 * b + 3;  // 'res' is in superposition of 8 and 10
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -170,6 +158,18 @@ The output is a superposition of 8 and 10.
         res |= a + 2 * b + 3  # 'res' is in superposition of 8 and 10
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output res: qnum) {
+      a: qnum;
+      b: qnum;
+      a = 3;
+      prepare_state([0, 0.5, 0.5, 0], 0, b); // 'b' is in superposition of 1 and 2
+      res = a + 2 * b + 3;  // 'res' is in superposition of 8 and 10
+    }
+    ```
+
 Note that the output size is 4 qubits, since the maximum value of this expression
 is 15, given that `a` and `b` are two-qubit variables. Any other size declared for `res`
 will result in an error.
@@ -179,18 +179,6 @@ will result in an error.
 In the next example, the relational expression `a + 2 * b + 3 == 8` is computed, with
 `a` initialized to 3 and `b` initialized to 1. Calling function `foo` will flip the
 single variable `res`, because the expression evaluates to 1, that is, true.
-
-=== "Native"
-
-    ```
-    qfunc foo(res: qbit) {
-      a: qnum;
-      b: qnum;
-      a = 3;
-      b = 1;
-      res ^= (a + 2 * b + 3 == 8);  // expression is true so 'res' is flipped
-    }
-    ```
 
 === "Python"
 
@@ -207,25 +195,22 @@ single variable `res`, because the expression evaluates to 1, that is, true.
         res ^= a + 2 * b + 3 == 8  # expression is true so 'res' is flipped
     ```
 
+=== "Native"
+
+    ```
+    qfunc foo(res: qbit) {
+      a: qnum;
+      b: qnum;
+      a = 3;
+      b = 1;
+      res ^= (a + 2 * b + 3 == 8);  // expression is true so 'res' is flipped
+    }
+    ```
+
 ### Example 3: In-place assignment of a logical expression
 
 In the example below, function `my_oracle` serves as a quantum oracle that marks all states
 satisfying the logical expression `(x0 and x1) or (x2 and x3)` with a minus phase.
-
-=== "Native"
-
-    ```
-    qfunc my_oracle(x0: qbit, x1: qbit, x2: qbit, x3: qbit) {
-      aux: qbit;
-      allocate(aux);
-      within {
-        X(aux);
-        H(aux);
-      } apply {
-        aux ^= (x0 and x1) or (x2 and x3);
-      }
-    }
-    ```
 
 === "Python"
 
@@ -248,20 +233,24 @@ satisfying the logical expression `(x0 and x1) or (x2 and x3)` with a minus phas
     Note that in Python, assignment statements are not allowed directly as lambda expressions.
     Therefore, in this example the `^=` is factored out to an inner Python function.
 
-### Example 4: In-place add assignment
-
-The following model initializes two quantum numeric variables `n` and `m`.
-
 === "Native"
 
     ```
-    qfunc main(output m: qnum<3, SIGNED, 2>, output n: qnum<3, SIGNED, 1>) {
-      allocate(m);
-      apply_to_all(X, m);
-      allocate(n);
-      n += m;
+    qfunc my_oracle(x0: qbit, x1: qbit, x2: qbit, x3: qbit) {
+      aux: qbit;
+      allocate(aux);
+      within {
+        X(aux);
+        H(aux);
+      } apply {
+        aux ^= (x0 and x1) or (x2 and x3);
+      }
     }
     ```
+
+### Example 4: In-place add assignment
+
+The following model initializes two quantum numeric variables `n` and `m`.
 
 === "Python"
 
@@ -275,6 +264,17 @@ The following model initializes two quantum numeric variables `n` and `m`.
         apply_to_all(X, m)
         allocate(n)
         n += m
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output m: qnum<3, SIGNED, 2>, output n: qnum<3, SIGNED, 1>) {
+      allocate(m);
+      apply_to_all(X, m);
+      allocate(n);
+      n += m;
+    }
     ```
 
 Variable `m` has three qubits, of which one is a sign qubit and two are fraction
@@ -311,19 +311,6 @@ the numeric value `-0.5`.
 The following model demonstrates what happens to the target variable when its
 value overflows, i.e., extends beyond the variable domain.
 
-=== "Native"
-
-    ```
-    qfunc main(output n: qnum<3, UNSIGNED, 1>, output m: qnum<3, SIGNED, 1>) {
-      allocate(n);  // n = 0
-      n += 3.5;  // n = 3.5
-      n += 1;  // n = 0.5, n still has 3 qubits
-      allocate(m);  // m = 0
-      m += 1.5;  // m = 1.5
-      m += 1;  // m = -1.5, m still has 3 qubits
-    }
-    ```
-
 === "Python"
 
     ```python
@@ -340,6 +327,19 @@ value overflows, i.e., extends beyond the variable domain.
         m += 1  # m = -1.5, m still has 3 qubits
     ```
 
+=== "Native"
+
+    ```
+    qfunc main(output n: qnum<3, UNSIGNED, 1>, output m: qnum<3, SIGNED, 1>) {
+      allocate(n);  // n = 0
+      n += 3.5;  // n = 3.5
+      n += 1;  // n = 0.5, n still has 3 qubits
+      allocate(m);  // m = 0
+      m += 1.5;  // m = 1.5
+      m += 1;  // m = -1.5, m still has 3 qubits
+    }
+    ```
+
 ### Example 6: Quantum subscript expression
 
 The following model demonstrate quantum subscript expression over a classical
@@ -350,16 +350,6 @@ The quantum subscript expression `[7, 3, 6, 2][index]` is in superposition over 
 items `[7, 3, 6, 2]` entangled to `index`.
 Overall, the output variable `n` evaluates to 7 (10%), 3 (20%), 6 (30%), or 2
 (40%).
-
-=== "Native"
-
-    ```
-    qfunc main(output n: qnum) {
-      index: qnum;
-      prepare_state([0.1, 0.2, 0.3, 0.4], 0, index);
-      n = [7, 3, 6, 2][index];  // n is 7, 3, 6, or 2 with increasing probability
-    }
-    ```
 
 === "Python"
 
@@ -375,4 +365,14 @@ Overall, the output variable `n` evaluates to 7 (10%), 3 (20%), 6 (30%), or 2
         n |= subscript(
             [7, 3, 6, 2], index
         )  # n is 7, 3, 6, or 2 with increasing probability
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output n: qnum) {
+      index: qnum;
+      prepare_state([0.1, 0.2, 0.3, 0.4], 0, index);
+      n = [7, 3, 6, 2][index];  // n is 7, 3, 6, or 2 with increasing probability
+    }
     ```

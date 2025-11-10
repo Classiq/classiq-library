@@ -21,21 +21,66 @@ def strip_single_notebook(notebook_path: str) -> bool:
         did_nb_change = False
 
         for index, cell in enumerate(nb.cells):
-            # remove empty tags
-            tags = cell.get("metadata", {}).get("tags", None)
-            if tags == []:
-                nb.cells[index]["metadata"].pop("tags")
-                did_nb_change = True
+            for key in [
+                "id",
+                # collapse/scroll
+                "scrolled",
+                "jp-MarkdownHeadingCollapsed",
+                # kept from a notebook that was abruptly closed
+                "editable",
+                "is_executing",
+                # other
+                "pycharm",
+                "vscode",
+                # I think these are not actually used
+                "lines_to_next_cell",
+                # metadata we don't need
+                "executionInfo",
+            ]:
+                if key in cell.get("metadata", {}):
+                    nb.cells[index]["metadata"].pop(key)
+                    did_nb_change = True
 
-            # remove pycharm metadata
-            if "pycharm" in cell.get("metadata", {}):
-                nb.cells[index]["metadata"].pop("pycharm")
-                did_nb_change = True
+            for key, value in [
+                # remove empty tags
+                ("tags", [])
+            ]:
+                if cell.get("metadata", {}).get(key, None) == value:
+                    nb.cells[index]["metadata"].pop(key)
+                    did_nb_change = True
 
-            # remove id metadata (`id` should be in `cell["id"]`, not in `cell["metadata"]["id"]`)
-            if "id" in cell.get("metadata", {}):
-                nb.cells[index]["metadata"].pop("id")
-                did_nb_change = True
+            for key, sub_key in [
+                ("jupyter", "outputs_hidden"),
+                ("slideshow", "slide_type"),
+            ]:
+                if (
+                    key in cell.get("metadata", {})
+                    and isinstance(key_value := cell["metadata"][key], dict)
+                    and sub_key in key_value
+                ):
+                    nb.cells[index]["metadata"][key].pop(sub_key)
+                    did_nb_change = True
+                    # check if the parent key is now empty
+                    if not nb.cells[index]["metadata"][key]:
+                        nb.cells[index]["metadata"].pop(key)
+
+            for key, sub_key, value in [
+                ("jupyter", "source_hidden", False),
+            ]:
+                if (
+                    key in cell.get("metadata", {})
+                    and isinstance(key_value := cell["metadata"][key], dict)
+                    and sub_key in key_value
+                    and key_value.get(sub_key, None) == value
+                ):
+                    nb.cells[index]["metadata"][key].pop(sub_key)
+                    did_nb_change = True
+                    # check if the parent key is now empty
+                    if not nb.cells[index]["metadata"][key]:
+                        nb.cells[index]["metadata"].pop(key)
+
+            # keys that were intentionally kept:
+            # - colab
 
         if did_nb_change:
             result = False
