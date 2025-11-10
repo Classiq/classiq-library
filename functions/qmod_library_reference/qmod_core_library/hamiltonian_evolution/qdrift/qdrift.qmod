@@ -1,13 +1,30 @@
 qfunc main(output qba: qbit[]) {
   allocate(2, qba);
-  qdrift([
-    PauliTerm {
-      pauli=[Pauli::X, Pauli::Y],
-      coefficient=1.0
-    },
-    PauliTerm {
-      pauli=[Pauli::Z, Pauli::I],
-      coefficient=0.5
-    }
-  ], 2.0, 5, qba);
+  qdrift(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=1
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          }
+        ],
+        coefficient=0.5
+      }
+    ],
+    num_qubits=2
+  }, 2.0, 5, qba);
 }
