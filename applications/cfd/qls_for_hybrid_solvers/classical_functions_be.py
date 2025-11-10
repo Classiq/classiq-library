@@ -179,7 +179,6 @@ def trim_hamiltonian(hamiltonian, relative_threshold, jump_threshold=1.1):
     within = (relative_error <= L) & (relative_error >= R)
     if np.any(within):
         chosen_right = R[np.argmax(within)]
-        print("within")
     else:
         # find largest i with L[i] >= relative_error (L is descending)
         i_left = np.searchsorted(-L, -relative_error, side="left") - 1
