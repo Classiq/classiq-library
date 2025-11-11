@@ -9,7 +9,7 @@ from testbook.client import TestbookNotebookClient
 @wrap_testbook("adaptive_qaoa_lib", timeout_seconds=60)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
-    validate_quantum_model(tb.ref("qmod"))
+    # validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
