@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.450
+    boost: 3.683
 ---
 
 ::: classiq.interface.backend.backend_preferences.ClassiqBackendPreferences

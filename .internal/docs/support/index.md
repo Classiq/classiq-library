@@ -1,3 +1,8 @@
+---
+search:
+    boost: 3.135
+---
+
 # Support
 
 Welcome to the Classiq Support Center. This page is designed to help you quickly resolve common issues and get additional support if needed.
@@ -29,6 +34,16 @@ Welcome to the Classiq Support Center. This page is designed to help you quickly
 
 ??? note "My Classiq Studio cannot reconnect"
     If you’re experiencing failed attempts to reconnect to Classiq Studio or long loading times, please try closing and reopening your web browser.
+
+??? note "I'm having authentication problems in Classiq Studio"
+    Try authenticating again using:
+    [comment]: DO_NOT_TEST
+    ```python
+    import classiq
+
+    classiq.authenticate()
+    ```
+    To prevent such problems in the future, it is a good practice to begin code files in Studio with `authenticate()`.
 
 ??? note "Example notebooks in Classiq Studio aren’t working"
     Some example notebooks (e.g., chemistry) require additional packages in Classiq Studio. First, try:

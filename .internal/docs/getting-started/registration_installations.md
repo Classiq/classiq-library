@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.540
+    boost: 2.336
 ---
 
 # Registration and Installation

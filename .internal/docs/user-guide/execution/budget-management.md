@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.775
+---
+
 # Managing Execution Budget
 
 Enrolled users can run quantum programs on multiple backends without needing to provide their own credentials, by using `run_through_classiq`.

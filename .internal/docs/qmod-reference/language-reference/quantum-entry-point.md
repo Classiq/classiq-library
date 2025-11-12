@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.191
+    boost: 3.307
 ---
 
 # Quantum Entry Point

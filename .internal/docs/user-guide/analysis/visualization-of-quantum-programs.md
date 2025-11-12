@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.048
+    boost: 3.146
 ---
 
 <!-- cspell:ignore Chuang -->

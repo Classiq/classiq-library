@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.053
+    boost: 2.317
 ---
 
 # Applications

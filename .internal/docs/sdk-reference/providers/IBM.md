@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.172
+    boost: 2.867
 ---
 
 ::: classiq.interface.backend.backend_preferences.IBMBackendPreferences

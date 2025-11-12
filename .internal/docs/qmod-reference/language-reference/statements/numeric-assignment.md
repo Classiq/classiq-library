@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.230
+    boost: 2.361
 ---
 
 # Numeric Assignment

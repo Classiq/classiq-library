@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.697
+    boost: 3.047
 ---
 
 # Control

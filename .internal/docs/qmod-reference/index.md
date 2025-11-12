@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.716
+    boost: 2.962
 ---
 
 # Qmod - the Quantum Modeling Language

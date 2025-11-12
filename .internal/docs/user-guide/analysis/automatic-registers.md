@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.434
+    boost: 2.605
 ---
 
 # Automatic Registers Resolution

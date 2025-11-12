@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.906
+    boost: 2.828
 ---
 
 # **Getting started with git**

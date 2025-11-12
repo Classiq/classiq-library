@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.334
+    boost: 3.314
 ---
 
 # Data Analysis and Graphs

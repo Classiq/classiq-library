@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.668
+    boost: 2.365
 ---
 
 ::: classiq.applications.iqae.iqae

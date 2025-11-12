@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.983
+    boost: 2.773
 ---
 
 # Providers

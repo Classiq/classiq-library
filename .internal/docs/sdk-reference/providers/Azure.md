@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.104
+    boost: 3.192
 ---
 
 ::: classiq.interface.backend.backend_preferences.AzureBackendPreferences

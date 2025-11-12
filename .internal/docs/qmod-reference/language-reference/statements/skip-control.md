@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.365
+    boost: 2.683
 ---
 
 # Skip Control
@@ -10,7 +10,7 @@ unconditionally, even when the enclosing function is subject directly or
 indirectly to a [quantum control operator](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/control/).
 This construct is typically applied when the enclosing function involves
 intermediate computation and uncomputation blocks in ways that cannot be
-formulated using a simple conjunction (i.e., using the _within-apply_ statement).
+formulated using a simple conjugation (i.e., using the _within-apply_ statement).
 
 ## Syntax
 

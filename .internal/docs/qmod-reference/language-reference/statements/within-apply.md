@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.541
+    boost: 2.296
 ---
 
 # Within-apply

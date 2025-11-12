@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.610
+    boost: 2.408
 ---
 
 # State Vector Filtering

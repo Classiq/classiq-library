@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.774
+    boost: 2.873
 ---
 
 # Tutorials

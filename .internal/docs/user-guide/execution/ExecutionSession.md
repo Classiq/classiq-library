@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.130
+    boost: 2.915
 ---
 
 # Execution Session

@@ -1,3 +1,8 @@
+---
+search:
+    boost: 2.142
+---
+
 # Use AI with Classiq
 
 ## Overview

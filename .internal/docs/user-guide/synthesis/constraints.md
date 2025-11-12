@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.836
+    boost: 3.062
 ---
 
 # Quantum Program Constraints

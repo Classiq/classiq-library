@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.972
+    boost: 2.977
 ---
 
 # Supported Modeling
