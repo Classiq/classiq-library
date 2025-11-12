@@ -1,59 +1,167 @@
-qfunc load_b(amplitudes: real[], output state: qbit[]) {
+qfunc load_b_expanded___0(amplitudes: real[], output state: qbit[2]) {
   prepare_amplitudes(amplitudes, 0.0, state);
 }
 
-qfunc hhl(rhs_vector: real[], precision: int, hamiltonian_evolution_with_power: qfunc (int, qbit[]), output state: qbit[], output phase: qnum, output indicator: qbit) {
-  allocate(precision, UNSIGNED, precision, phase);
-  load_b([
+qfunc apply_to_all_expanded___0(target: qbit[4]) {
+  repeat (index: 4) {
+    H(target[index]);
+  }
+}
+
+qfunc hamiltonian_evolution_with_power_0_lambda___0_0_expanded___0(pw: int, target: qbit[2]) {
+  power (pw) {
+    unitary([
+      [
+        ((-0.09406240950199844) + 0.8149069223122054j),
+        (0.03521871946675125 - 0.029763534641642615j),
+        ((-0.018800717000078303) - 0.16142879795007103j),
+        (0.43769245930764733 + 0.32705554908759304j)
+      ],
+      [
+        (0.03521871946675126 - 0.029763534641642626j),
+        ((-0.15347248298890337) - 0.1727528247294824j),
+        (0.23117644455908545 + 0.8872069971297386j),
+        (0.2397182575488357 + 0.21548267921288922j)
+      ],
+      [
+        ((-0.018800717000078272) - 0.16142879795007106j),
+        (0.23117644455908531 + 0.8872069971297386j),
+        ((-0.12191317205164587) + 0.1320013812642838j),
+        (0.2958406910149558 + 0.11488938733473114j)
+      ],
+      [
+        (0.43769245930764744 + 0.3270555490875932j),
+        (0.23971825754883574 + 0.21548267921288933j),
+        (0.29584069101495586 + 0.11488938733473113j),
+        ((-0.6563827949579104) + 0.2569098899110467j)
+      ]
+    ], target);
+  }
+}
+
+qfunc unitary_with_power_0_lambda___0_0_expanded___0(k: int, state_captured__hhl__1: qbit[2]) {
+  hamiltonian_evolution_with_power_0_lambda___0_0_expanded___0(k, state_captured__hhl__1);
+}
+
+qfunc qft_no_swap_expanded___0(qbv: qbit[4]) {
+  repeat (i: 4) {
+    H(qbv[i]);
+    repeat (j: (4 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
+    }
+  }
+}
+
+qfunc qft_expanded___0(target: qbit[4]) {
+  repeat (index: 2.0) {
+    SWAP(target[index], target[3 - index]);
+  }
+  qft_no_swap_expanded___0(target);
+}
+
+qfunc qpe_flexible_expanded___0(phase: qbit[4], state_captured__hhl__1: qbit[2]) {
+  apply_to_all_expanded___0(phase);
+  repeat (index: 4) {
+    control (phase[index]) {
+      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, state_captured__hhl__1);
+    }
+  }
+  invert {
+    qft_expanded___0(phase);
+  }
+}
+
+qfunc assign_amplitude_table_expanded___0(index: qnum<4, False, 4>, indicator: qbit) {
+  qba: qbit[4];
+  index -> qba;
+  RY(0.49069646327199606, indicator);
+  skip_control {
+    CX(qba[0], indicator);
+  }
+  RY(-0.159660988575539, indicator);
+  skip_control {
+    CX(qba[1], indicator);
+  }
+  RY(-0.215103068840025, indicator);
+  skip_control {
+    CX(qba[0], indicator);
+  }
+  RY(0.114786680603947, indicator);
+  skip_control {
+    CX(qba[2], indicator);
+  }
+  RY(0.0734201414091853, indicator);
+  skip_control {
+    CX(qba[0], indicator);
+  }
+  RY(-0.222322935969005, indicator);
+  skip_control {
+    CX(qba[1], indicator);
+  }
+  RY(-0.181317761599329, indicator);
+  skip_control {
+    CX(qba[0], indicator);
+  }
+  RY(0.22482930086683403, indicator);
+  skip_control {
+    CX(qba[3], indicator);
+  }
+  RY(0.192520246080629, indicator);
+  skip_control {
+    CX(qba[0], indicator);
+  }
+  RY(-0.184296564729869, indicator);
+  skip_control {
+    CX(qba[1], indicator);
+  }
+  RY(-0.22312206827512002, indicator);
+  skip_control {
+    CX(qba[0], indicator);
+  }
+  RY(0.0676093870745949, indicator);
+  skip_control {
+    CX(qba[2], indicator);
+  }
+  RY(0.0978641117835104, indicator);
+  skip_control {
+    CX(qba[0], indicator);
+  }
+  RY(-0.216731023385388, indicator);
+  skip_control {
+    CX(qba[1], indicator);
+  }
+  RY(-0.168241915420623, indicator);
+  skip_control {
+    CX(qba[0], indicator);
+  }
+  RY(0.309069995704199, indicator);
+  skip_control {
+    CX(qba[3], indicator);
+  }
+  qba -> index;
+}
+
+qfunc hhl_expanded___0(rhs_vector: real[], output state: qbit[2], output phase: qnum<4, False, 4>, output indicator: qbit) {
+  allocate(4, False, 4, phase);
+  load_b_expanded___0([
     0.18257418583505536,
     0.3651483716701107,
     0.7302967433402214,
     0.5477225575051661
   ], state);
-  allocate(indicator);
+  allocate(1, indicator);
   within {
-    qpe_flexible(lambda(k) {
-      hamiltonian_evolution_with_power(k, state);
-    }, phase);
+    qpe_flexible_expanded___0(phase, state);
   } apply {
-    indicator *= (1 / (2 ** phase.size)) / phase;
+    assign_amplitude_table_expanded___0(phase, indicator);
   }
 }
 
-qfunc main(output res: qnum, output phase_var: qnum, output indicator: qbit) {
-  hhl([
+qfunc main(output res: qnum<2, False, 0>, output phase_var: qnum<4, False, 4>, output indicator: qbit) {
+  hhl_expanded___0([
     0.18257418583505536,
     0.3651483716701107,
     0.7302967433402214,
     0.5477225575051661
-  ], 4, lambda(pw, target) {
-    power (pw) {
-      unitary([
-        [
-          ((-0.09406240950199855) + 0.8149069223122056j),
-          (0.03521871946675126 - 0.029763534641642615j),
-          ((-0.0188007170000783) - 0.16142879795007106j),
-          (0.4376924593076474 + 0.32705554908759304j)
-        ],
-        [
-          (0.03521871946675128 - 0.02976353464164264j),
-          ((-0.15347248298890323) - 0.1727528247294823j),
-          (0.23117644455908531 + 0.8872069971297388j),
-          (0.23971825754883572 + 0.21548267921288933j)
-        ],
-        [
-          ((-0.01880071700007826) - 0.16142879795007103j),
-          (0.23117644455908523 + 0.8872069971297388j),
-          ((-0.12191317205164612) + 0.1320013812642837j),
-          (0.29584069101495575 + 0.11488938733473114j)
-        ],
-        [
-          (0.43769245930764744 + 0.32705554908759327j),
-          (0.23971825754883572 + 0.21548267921288938j),
-          (0.29584069101495586 + 0.11488938733473113j),
-          ((-0.6563827949579103) + 0.25690988991104674j)
-        ]
-      ], target);
-    }
-  }, res, phase_var, indicator);
+  ], res, phase_var, indicator);
 }
