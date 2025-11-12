@@ -1,24 +1,487 @@
-qfunc qsct_2d(xy_variable: qnum[2]) {
-  qst_type2(xy_variable[0]);
-  qct_type2(xy_variable[1]);
-}
-
-qfunc matrix_inversion_HHL(prefactor: real, my_unitary: qfunc (int, qbit[]), state: qbit[], phase: qnum, output indicator: qbit) {
-  allocate(indicator);
-  within {
-    qpe_flexible(lambda(power) {
-      my_unitary(power, state);
-    }, phase);
-  } apply {
-    indicator *= prefactor / phase;
+qperm apply_to_all_expanded___0(target: qbit[3]) {
+  repeat (index: 3) {
+    X(target[index]);
   }
 }
 
-qfunc powered_hamiltonian_evolution(hamiltonian: PauliTerm[], scaling: real, p: int, qba: qbit[]) {
+qfunc qft_no_swap_expanded___0(qbv: qbit[4]) {
+  repeat (i: 4) {
+    H(qbv[i]);
+    repeat (j: (4 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
+    }
+  }
+}
+
+qfunc qft_expanded___0(target: qbit[4]) {
+  repeat (index: 2.0) {
+    SWAP(target[index], target[3 - index]);
+  }
+  qft_no_swap_expanded___0(target);
+}
+
+qperm _qct_pi_operator_expanded___0(x: qnum<3, False, 0>, const q: qbit) {
+  control (q == 1) {
+    apply_to_all_expanded___0(x);
+    x += 1;
+  }
+}
+
+@disable_const_checks(q)
+qfunc qct_qst_type2_expanded___0(x: qbit[3], const q: qbit) {
+  extended_state: qbit[4];
+  H(q);
+  control (q == 1) {
+    apply_to_all_expanded___0(x);
+  }
+  {x, q} -> extended_state;
+  qft_expanded___0(extended_state);
+  extended_state -> {x, q};
+  control (q == 0) {
+    repeat (k: 3) {
+      PHASE((pi / 16) * (2 ** k), x[k]);
+    }
+  }
+  control (q == 1) {
+    repeat (k: 3) {
+      within {
+        X(x[k]);
+      } apply {
+        PHASE(((-pi) / 16) * (2 ** k), x[k]);
+      }
+    }
+  }
+  PHASE((-pi) / 16, q);
+  invert {
+    _qct_pi_operator_expanded___0(x, q);
+  }
+  x_num: qnum<3, False, 0>;
+  within {
+    x -> x_num;
+  } apply {
+    H(q);
+    S(q);
+    control (x_num == 0) {
+      within {
+        Z(q);
+      } apply {
+        S(q);
+        H(q);
+        S(q);
+      }
+    }
+    invert {
+      control (q == 1) {
+        x_num += 1;
+      }
+    }
+  }
+}
+
+qfunc qst_type2_expanded___0(x: qbit[3]) {
+  q: qbit;
+  within {
+    allocate(1, q);
+    X(q);
+  } apply {
+    qct_qst_type2_expanded___0(x, q);
+  }
+}
+
+qfunc qct_type2_expanded___0(x: qbit[3]) {
+  q: qbit;
+  within {
+    allocate(1, q);
+  } apply {
+    qct_qst_type2_expanded___0(x, q);
+  }
+}
+
+qfunc qsct_2d_expanded___0(xy_variable: qnum<3, False, 0>[2]) {
+  qst_type2_expanded___0(xy_variable[0]);
+  qct_type2_expanded___0(xy_variable[1]);
+}
+
+qfunc apply_to_all_expanded___1(target: qbit[6]) {
+  repeat (index: 6) {
+    H(target[index]);
+  }
+}
+
+qfunc powered_hamiltonian_evolution_expanded___0(hamiltonian: PauliTerm[], scaling: real, p: int, qba: qbit[6]) {
   suzuki_trotter(hamiltonian, p * ((-6.28318530718) * scaling), 1, 1, qba);
 }
 
-qfunc main(output xy_variable: qnum<3>[2], output phase_var: qnum<6>, output indicator: qbit) {
+qfunc my_unitary_0_lambda___0_0_expanded___0(p: int, target: qbit[6]) {
+  powered_hamiltonian_evolution_expanded___0([
+    PauliTerm {
+      pauli=[0, 0, 0, 0, 0, 0],
+      coefficient=2.25
+    },
+    PauliTerm {
+      pauli=[0, 0, 0, 0, 0, 3],
+      coefficient=-0.25
+    },
+    PauliTerm {
+      pauli=[0, 0, 0, 0, 3, 0],
+      coefficient=-0.520598050073
+    },
+    PauliTerm {
+      pauli=[0, 0, 0, 0, 3, 3],
+      coefficient=-0.020598050073
+    },
+    PauliTerm {
+      pauli=[0, 0, 0, 3, 0, 0],
+      coefficient=-1.256834873031
+    },
+    PauliTerm {
+      pauli=[0, 0, 0, 3, 0, 3],
+      coefficient=-0.049728091845
+    },
+    PauliTerm {
+      pauli=[0, 0, 0, 3, 3, 0],
+      coefficient=-0.103553390593
+    },
+    PauliTerm {
+      pauli=[0, 0, 0, 3, 3, 3],
+      coefficient=0.103553390593
+    },
+    PauliTerm {
+      pauli=[0, 0, 0, 0, 0, 0],
+      coefficient=1.75
+    },
+    PauliTerm {
+      pauli=[0, 0, 3, 0, 0, 0],
+      coefficient=-0.25
+    },
+    PauliTerm {
+      pauli=[0, 3, 0, 0, 0, 0],
+      coefficient=-0.520598050073
+    },
+    PauliTerm {
+      pauli=[0, 3, 3, 0, 0, 0],
+      coefficient=0.020598050073
+    },
+    PauliTerm {
+      pauli=[3, 0, 0, 0, 0, 0],
+      coefficient=-1.256834873031
+    },
+    PauliTerm {
+      pauli=[3, 0, 3, 0, 0, 0],
+      coefficient=0.049728091845
+    },
+    PauliTerm {
+      pauli=[3, 3, 0, 0, 0, 0],
+      coefficient=0.103553390593
+    },
+    PauliTerm {
+      pauli=[3, 3, 3, 0, 0, 0],
+      coefficient=0.103553390593
+    }
+  ], 0.101321183642, p, target);
+}
+
+qfunc unitary_with_power_0_lambda___0_0_expanded___0(power: int, state_captured__matrix_inversion_HHL__1: qbit[6]) {
+  my_unitary_0_lambda___0_0_expanded___0(power, state_captured__matrix_inversion_HHL__1);
+}
+
+qfunc qft_no_swap_expanded___1(qbv: qbit[6]) {
+  repeat (i: 6) {
+    H(qbv[i]);
+    repeat (j: (6 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
+    }
+  }
+}
+
+qfunc qft_expanded___1(target: qbit[6]) {
+  repeat (index: 3.0) {
+    SWAP(target[index], target[5 - index]);
+  }
+  qft_no_swap_expanded___1(target);
+}
+
+qfunc qpe_flexible_expanded___0(phase: qbit[6], state_captured__matrix_inversion_HHL__1: qbit[6]) {
+  apply_to_all_expanded___1(phase);
+  repeat (index: 6) {
+    control (phase[index]) {
+      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, state_captured__matrix_inversion_HHL__1);
+    }
+  }
+  invert {
+    qft_expanded___1(phase);
+  }
+}
+
+qfunc assign_amplitude_table_expanded___0(index: qbit[6], indicator: qbit) {
+  RY(0.002308747468, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000342313182, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000552802581, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.000206598785, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(2.7723688e-05, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000580695014, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000435348331, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.000634133064, indicator);
+  skip_control {
+    CX(index[3], indicator);
+  }
+  RY(0.000474889673, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000447911012, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.0005838717, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(3.166179e-06, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(0.000123918885, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000559620547, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000384125455, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.001002692462, indicator);
+  skip_control {
+    CX(index[4], indicator);
+  }
+  RY(0.000861966344, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000389928037, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000560381907, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.000112383355, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(2.65204e-07, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.00058413043, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000449376199, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.000452328195, indicator);
+  skip_control {
+    CX(index[3], indicator);
+  }
+  RY(0.000560973577, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.00043849446, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000581129049, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(2.1473387e-05, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(0.000169590069, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000554416847, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000360874974, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.001332850659, indicator);
+  skip_control {
+    CX(index[5], indicator);
+  }
+  RY(0.001215256332, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000363504124, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000554596301, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.000164340108, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(2.0765107e-05, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000581161724, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000438849558, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.000550538734, indicator);
+  skip_control {
+    CX(index[3], indicator);
+  }
+  RY(0.000449629648, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000449497682, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000584144196, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(2.3189e-08, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(0.000111020392, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000560443591, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000390611287, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.00084157341, indicator);
+  skip_control {
+    CX(index[4], indicator);
+  }
+  RY(0.000941294294, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000385555036, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000559723039, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.000121064753, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(2.762276e-06, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000583891364, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000448113574, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.000469220555, indicator);
+  skip_control {
+    CX(index[3], indicator);
+  }
+  RY(0.000603034771, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000436082436, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000580748623, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(2.6258169e-05, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(0.000190996202, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.000553172312, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.000350121282, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.001624156918, indicator);
+  skip_control {
+    CX(index[5], indicator);
+  }
+}
+
+qfunc matrix_inversion_HHL_expanded___0(state: qbit[6], phase: qnum<6, False, 0>, output indicator: qbit) {
+  allocate(1, indicator);
+  within {
+    qpe_flexible_expanded___0(phase, state);
+  } apply {
+    assign_amplitude_table_expanded___0(phase, indicator);
+  }
+}
+
+qfunc main(output xy_variable: qnum<3, False, 0>[2], output phase_var: qnum<6, False, 0>, output indicator: qbit) {
   prepare_amplitudes([
     0.000929993206,
     0.006286469531,
@@ -85,189 +548,10 @@ qfunc main(output xy_variable: qnum<3>[2], output phase_var: qnum<6>, output ind
     0.006286469531,
     0.000929993206
   ], 0.0, xy_variable);
-  allocate(phase_var);
+  allocate(6, phase_var);
   within {
-    qsct_2d(xy_variable);
+    qsct_2d_expanded___0(xy_variable);
   } apply {
-    matrix_inversion_HHL(0.015625, lambda(p, target) {
-      powered_hamiltonian_evolution([
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=2.25
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::Z
-          ],
-          coefficient=-0.25
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::Z,
-            Pauli::I
-          ],
-          coefficient=-0.520598050073
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::Z,
-            Pauli::Z
-          ],
-          coefficient=-0.020598050073
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::Z,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=-1.256834873031
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::Z,
-            Pauli::I,
-            Pauli::Z
-          ],
-          coefficient=-0.049728091845
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::Z,
-            Pauli::Z,
-            Pauli::I
-          ],
-          coefficient=-0.103553390593
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::Z,
-            Pauli::Z,
-            Pauli::Z
-          ],
-          coefficient=0.103553390593
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=1.75
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::I,
-            Pauli::Z,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=-0.25
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::Z,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=-0.520598050073
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::I,
-            Pauli::Z,
-            Pauli::Z,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=0.020598050073
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::Z,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=-1.256834873031
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::Z,
-            Pauli::I,
-            Pauli::Z,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=0.049728091845
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::Z,
-            Pauli::Z,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=0.103553390593
-        },
-        PauliTerm {
-          pauli=[
-            Pauli::Z,
-            Pauli::Z,
-            Pauli::Z,
-            Pauli::I,
-            Pauli::I,
-            Pauli::I
-          ],
-          coefficient=0.103553390593
-        }
-      ], 0.101321183642, p, target);
-    }, xy_variable, phase_var, indicator);
+    matrix_inversion_HHL_expanded___0(xy_variable, phase_var, indicator);
   }
 }
