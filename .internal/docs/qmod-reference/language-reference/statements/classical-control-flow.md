@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.471
+    boost: 3.166
 ---
 
 # Classical Control Flow

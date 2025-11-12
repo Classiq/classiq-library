@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.098
+    boost: 2.834
 ---
 
 # Execution Primitives

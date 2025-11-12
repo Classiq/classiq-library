@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.809
+    boost: 2.226
 ---
 
 # Quantum Variables

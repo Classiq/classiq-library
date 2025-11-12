@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.680
+    boost: 2.815
 ---
 
 # Classiq Library

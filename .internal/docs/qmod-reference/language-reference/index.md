@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.358
+    boost: 3.288
 ---
 
 # Qmod Language Reference

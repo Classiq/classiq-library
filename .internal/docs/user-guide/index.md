@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.002
+    boost: 2.912
 ---
 
 # User Guide

@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.266
+    boost: 3.165
 ---
 
 # Execution

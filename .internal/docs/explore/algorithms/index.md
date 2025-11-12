@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.607
+    boost: 2.798
 ---
 
 # Algorithms

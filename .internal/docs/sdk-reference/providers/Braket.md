@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.380
+    boost: 2.440
 ---
 
 ::: classiq.interface.backend.backend_preferences.AmazonBraketBackendNames

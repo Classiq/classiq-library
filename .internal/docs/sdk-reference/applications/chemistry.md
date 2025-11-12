@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.605
+    boost: 2.513
 ---
 
 ::: classiq.applications.chemistry.problems

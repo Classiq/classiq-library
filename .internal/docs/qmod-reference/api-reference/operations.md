@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.848
+    boost: 3.830
 ---
 
 This is a list of the operations that are built-in in `Qmod`.

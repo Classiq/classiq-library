@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.200
+    boost: 3.280
 ---
 
 # Combinatorial Optimization

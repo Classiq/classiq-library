@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.776
+    boost: 2.854
 ---
 
 # Generative Descriptions

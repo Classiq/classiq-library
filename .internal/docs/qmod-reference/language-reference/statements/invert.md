@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.365
+    boost: 3.185
 ---
 
 # Invert

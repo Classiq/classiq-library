@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.163
+    boost: 2.308
 ---
 
 # Uncomputation

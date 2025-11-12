@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.156
+    boost: 3.213
 ---
 
 ::: classiq.interface.backend.backend_preferences.IonqBackendPreferences
