@@ -79,13 +79,13 @@ qfunc u_f(reg: MyQStruct) {
       3.1414,
       3.1416,
       (-81.6814)
-    ], lambda(_reg, aux) {
-      projector_cnot(_reg[0], aux);
-    }, lambda(_reg, aux) {
-      projector_cnot(_reg[0], aux);
-    }, lambda(_reg) {
-      u_sin(_reg[1:_reg.len], _reg[0]);
-    }, {reg.a1, reg.x}, reg.a2, reg.a3);
+    ], lambda(aux) {
+      projector_cnot(reg.a1, aux);
+    }, lambda(aux) {
+      projector_cnot(reg.a1, aux);
+    }, lambda() {
+      u_sin(reg.x, reg.a1);
+    }, reg.a2, reg.a3);
   }
   H(reg.a3);
 }
