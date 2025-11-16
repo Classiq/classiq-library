@@ -7,9 +7,13 @@ qfunc projector_expanded___0(be: BlockEncodedState, res: qbit) {
   res ^= be.block == 0;
 }
 
-qfunc projector_controlled_phase_expanded___0(phase: real, qvar: qbit[8], aux: qbit) {
+qfunc block_encoding_cnot_0_lambda___0_0_expanded___0(aux: qbit, be_state_captured__main__0: BlockEncodedState) {
+  projector_expanded___0(be_state_captured__main__0, aux);
+}
+
+qfunc projector_controlled_phase_expanded___0(phase: real, aux: qbit, be_state_captured__main__0: BlockEncodedState) {
   within {
-    projector_expanded___0(qvar, aux);
+    block_encoding_cnot_0_lambda___0_0_expanded___0(aux, be_state_captured__main__0);
   } apply {
     RZ(phase, aux);
   }
@@ -857,37 +861,41 @@ qfunc be_qfunc_expanded___0(be: BlockEncodedState) {
   lcu_paulis_graycode_expanded___0(be.data, be.block);
 }
 
-qfunc u_0_lambda___0_0_expanded___0(x: qbit[8]) {
+qfunc u_0_lambda___0_0_expanded___0(be_state_captured__main__0: BlockEncodedState) {
+  be_qfunc_expanded___0(be_state_captured__main__0);
+}
+
+qfunc u_1_lambda___0_0_expanded___0(be_state_captured__main__0: BlockEncodedState) {
   invert {
-    be_qfunc_expanded___0(x);
+    u_0_lambda___0_0_expanded___0(be_state_captured__main__0);
   }
 }
 
-qfunc qsvt_step_expanded___0(phase1: real, phase2: real, qvar: qbit[8], aux: qbit) {
-  u_0_lambda___0_0_expanded___0(qvar);
-  projector_controlled_phase_expanded___0(phase1, qvar, aux);
+qfunc qsvt_step_expanded___0(phase1: real, phase2: real, aux: qbit, be_state_captured__main__0: BlockEncodedState) {
+  u_1_lambda___0_0_expanded___0(be_state_captured__main__0);
+  projector_controlled_phase_expanded___0(phase1, aux, be_state_captured__main__0);
   invert {
-    u_0_lambda___0_0_expanded___0(qvar);
+    u_1_lambda___0_0_expanded___0(be_state_captured__main__0);
   }
-  projector_controlled_phase_expanded___0(phase2, qvar, aux);
+  projector_controlled_phase_expanded___0(phase2, aux, be_state_captured__main__0);
 }
 
-qfunc qsvt_expanded___0(phase_seq: real[], qvar: qbit[8], aux: qbit) {
+qfunc qsvt_expanded___0(phase_seq: real[], aux: qbit, be_state_captured__main__0: BlockEncodedState) {
   H(aux);
-  projector_controlled_phase_expanded___0(phase_seq[0], qvar, aux);
+  projector_controlled_phase_expanded___0(phase_seq[0], aux, be_state_captured__main__0);
   repeat (index: 50) {
-    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
+    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], aux, be_state_captured__main__0);
   }
   if (False) {
   } else {
-    u_0_lambda___0_0_expanded___0(qvar);
-    projector_controlled_phase_expanded___0(phase_seq[101], qvar, aux);
+    u_1_lambda___0_0_expanded___0(be_state_captured__main__0);
+    projector_controlled_phase_expanded___0(phase_seq[101], aux, be_state_captured__main__0);
   }
   H(aux);
 }
 
-qfunc qsvt_inversion_expanded___0(phase_seq: real[], qvar: qbit[8], aux: qbit) {
-  qsvt_expanded___0(phase_seq, qvar, aux);
+qfunc qsvt_inversion_expanded___0(phase_seq: real[], aux: qbit, be_state_captured__main__0: BlockEncodedState) {
+  qsvt_expanded___0(phase_seq, aux, be_state_captured__main__0);
 }
 
 qfunc main(output qsvt_aux: qbit, output data: qnum<3, False, 0>, output block: qnum<5, False, 0>) {
@@ -1010,6 +1018,6 @@ qfunc main(output qsvt_aux: qbit, output data: qnum<3, False, 0>, output block: 
       2.6235,
       2.486,
       (-314.4642)
-    ], be_state, qsvt_aux);
+    ], qsvt_aux, be_state);
   }
 }

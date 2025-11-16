@@ -29,13 +29,13 @@ qfunc identify_block_expanded___0(const state: BlockEncodedState, block_zero_qbi
   {block_qubits, data} -> state;
 }
 
-qfunc block_encoding_cnot_0_lambda___0_0_expanded___0(const qvar: qbit[7], block_zero_qbit: qbit) {
-  identify_block_expanded___0(qvar, block_zero_qbit);
+qfunc block_encoding_cnot_0_lambda___0_0_expanded___0(block_zero_qbit: qbit, const qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
+  identify_block_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1, block_zero_qbit);
 }
 
-qfunc projector_controlled_phase_expanded___0(phase: real, const qvar: qbit[7], aux: qbit) {
+qfunc projector_controlled_phase_expanded___0(phase: real, aux: qbit, const qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
   within {
-    block_encoding_cnot_0_lambda___0_0_expanded___0(qvar, aux);
+    block_encoding_cnot_0_lambda___0_0_expanded___0(aux, qsvt_state___state_captured__qsvt_solve_system__1);
   } apply {
     RZ(phase, aux);
   }
@@ -209,100 +209,100 @@ qfunc block_encoding_0_lambda___0_0_expanded___0(q_var: qbit[7]) {
   ], q_var);
 }
 
-qfunc u_0_lambda___0_0_expanded___0(qvar: qbit[7]) {
-  block_encoding_0_lambda___0_0_expanded___0(qvar);
+qfunc u_0_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
+  block_encoding_0_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
 }
 
-qfunc u_1_lambda___0_0_expanded___0(x: qbit[7]) {
+qfunc u_1_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
   invert {
-    u_0_lambda___0_0_expanded___0(x);
+    u_0_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
   }
 }
 
-qfunc qsvt_step_expanded___0(phase1: real, phase2: real, qvar: qbit[7], aux: qbit) {
-  u_1_lambda___0_0_expanded___0(qvar);
-  projector_controlled_phase_expanded___0(phase1, qvar, aux);
+qfunc qsvt_step_expanded___0(phase1: real, phase2: real, aux: qbit, qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
+  u_1_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
+  projector_controlled_phase_expanded___0(phase1, aux, qsvt_state___state_captured__qsvt_solve_system__1);
   invert {
-    u_1_lambda___0_0_expanded___0(qvar);
+    u_1_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
   }
-  projector_controlled_phase_expanded___0(phase2, qvar, aux);
+  projector_controlled_phase_expanded___0(phase2, aux, qsvt_state___state_captured__qsvt_solve_system__1);
 }
 
-qfunc qsvt_expanded___0(phase_seq: real[], qvar: qbit[7], aux: qbit) {
+qfunc qsvt_expanded___0(phase_seq: real[], aux: qbit, qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
   H(aux);
-  projector_controlled_phase_expanded___0(phase_seq[0], qvar, aux);
+  projector_controlled_phase_expanded___0(phase_seq[0], aux, qsvt_state___state_captured__qsvt_solve_system__1);
   repeat (index: 5) {
-    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
+    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], aux, qsvt_state___state_captured__qsvt_solve_system__1);
   }
   if (False) {
   } else {
-    u_1_lambda___0_0_expanded___0(qvar);
-    projector_controlled_phase_expanded___0(phase_seq[11], qvar, aux);
+    u_1_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
+    projector_controlled_phase_expanded___0(phase_seq[11], aux, qsvt_state___state_captured__qsvt_solve_system__1);
   }
   H(aux);
 }
 
-qfunc qsvt_inversion_expanded___0(phase_seq: real[], qvar: qbit[7], aux: qbit) {
-  qsvt_expanded___0(phase_seq, qvar, aux);
+qfunc qsvt_inversion_expanded___0(phase_seq: real[], aux: qbit, qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
+  qsvt_expanded___0(phase_seq, aux, qsvt_state___state_captured__qsvt_solve_system__1);
 }
 
-qfunc block_encoding_cnot_1_lambda___0_0_expanded___0(const qvar: qbit[7], block_zero_qbit: qbit) {
-  identify_block_expanded___0(qvar, block_zero_qbit);
+qfunc block_encoding_cnot_1_lambda___0_0_expanded___0(block_zero_qbit: qbit, const qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
+  identify_block_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1, block_zero_qbit);
 }
 
-qfunc projector_controlled_phase_expanded___1(phase: real, const qvar: qbit[7], aux: qbit) {
+qfunc projector_controlled_phase_expanded___1(phase: real, aux: qbit, const qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
   within {
-    block_encoding_cnot_1_lambda___0_0_expanded___0(qvar, aux);
+    block_encoding_cnot_1_lambda___0_0_expanded___0(aux, qsvt_state___state_captured__qsvt_solve_system__1);
   } apply {
     RZ(phase, aux);
   }
 }
 
-qfunc u_2_lambda___0_0_expanded___0(qvar: qbit[7]) {
-  block_encoding_0_lambda___0_0_expanded___0(qvar);
+qfunc u_2_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
+  block_encoding_0_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
 }
 
-qfunc u_3_lambda___0_0_expanded___0(x: qbit[7]) {
+qfunc u_3_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
   invert {
-    u_2_lambda___0_0_expanded___0(x);
+    u_2_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
   }
 }
 
-qfunc qsvt_step_expanded___1(phase1: real, phase2: real, qvar: qbit[7], aux: qbit) {
-  u_3_lambda___0_0_expanded___0(qvar);
-  projector_controlled_phase_expanded___1(phase1, qvar, aux);
+qfunc qsvt_step_expanded___1(phase1: real, phase2: real, aux: qbit, qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
+  u_3_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
+  projector_controlled_phase_expanded___1(phase1, aux, qsvt_state___state_captured__qsvt_solve_system__1);
   invert {
-    u_3_lambda___0_0_expanded___0(qvar);
+    u_3_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
   }
-  projector_controlled_phase_expanded___1(phase2, qvar, aux);
+  projector_controlled_phase_expanded___1(phase2, aux, qsvt_state___state_captured__qsvt_solve_system__1);
 }
 
-qfunc qsvt_expanded___1(phase_seq: real[], qvar: qbit[7], aux: qbit) {
+qfunc qsvt_expanded___1(phase_seq: real[], aux: qbit, qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
   H(aux);
-  projector_controlled_phase_expanded___1(phase_seq[0], qvar, aux);
+  projector_controlled_phase_expanded___1(phase_seq[0], aux, qsvt_state___state_captured__qsvt_solve_system__1);
   repeat (index: 5) {
-    qsvt_step_expanded___1(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
+    qsvt_step_expanded___1(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], aux, qsvt_state___state_captured__qsvt_solve_system__1);
   }
   if (False) {
   } else {
-    u_3_lambda___0_0_expanded___0(qvar);
-    projector_controlled_phase_expanded___1(phase_seq[11], qvar, aux);
+    u_3_lambda___0_0_expanded___0(qsvt_state___state_captured__qsvt_solve_system__1);
+    projector_controlled_phase_expanded___1(phase_seq[11], aux, qsvt_state___state_captured__qsvt_solve_system__1);
   }
   H(aux);
 }
 
-qfunc qsvt_inversion_expanded___1(phase_seq: real[], qvar: qbit[7], aux: qbit) {
-  qsvt_expanded___1(phase_seq, qvar, aux);
+qfunc qsvt_inversion_expanded___1(phase_seq: real[], aux: qbit, qsvt_state___state_captured__qsvt_solve_system__1: BlockEncodedState) {
+  qsvt_expanded___1(phase_seq, aux, qsvt_state___state_captured__qsvt_solve_system__1);
 }
 
 qfunc qsvt_solve_system_expanded___0(b_amps: real[], phases: real[], qsvt_state: QsvtState) {
   inplace_prepare_amplitudes(b_amps, 0, qsvt_state.state.data);
   hadamard_transform_expanded___0(qsvt_state.qsvt_real_aux);
   control (qsvt_state.qsvt_real_aux == 0) {
-    qsvt_inversion_expanded___0(phases, qsvt_state.state, qsvt_state.qsvt_aux);
+    qsvt_inversion_expanded___0(phases, qsvt_state.qsvt_aux, qsvt_state.state);
   } else {
     invert {
-      qsvt_inversion_expanded___1(phases, qsvt_state.state, qsvt_state.qsvt_aux);
+      qsvt_inversion_expanded___1(phases, qsvt_state.qsvt_aux, qsvt_state.state);
     }
   }
   hadamard_transform_expanded___0(qsvt_state.qsvt_real_aux);

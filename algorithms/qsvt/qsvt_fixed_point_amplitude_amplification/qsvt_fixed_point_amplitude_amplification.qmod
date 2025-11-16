@@ -16,15 +16,19 @@ qfunc target_state_projector(arith_oracle: qfunc (qbit[], qbit), state: qbit[], 
   arith_oracle(state, aux);
 }
 
-qfunc arith_equation(state: OracleVars, res: qbit) {
+qperm arith_equation(state: OracleVars, res: qbit) {
   res ^= ((state.a + state.b) == 3) and ((state.c - state.a) == 2);
 }
 
 qfunc qsvt_fpaa(phase_seq: real[], arith_oracle: qfunc (const OracleVars, qbit), state: OracleVars, output aux: qbit) {
   allocate(aux);
-  qsvt(phase_seq, initial_state_projector, lambda(_state, _aux) {
-    target_state_projector(arith_equation, _state, _aux);
-  }, IDENTITY, state, aux);
+  qsvt(phase_seq, lambda(_aux) {
+    initial_state_projector(state, _aux);
+  }, lambda(_aux) {
+    target_state_projector(arith_equation, state, _aux);
+  }, lambda() {
+    IDENTITY(state);
+  }, aux);
 }
 
 qfunc main(output state: OracleVars, output aux: qbit) {
