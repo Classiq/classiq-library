@@ -44,42 +44,39 @@ qperm apply_to_all_expanded___0(target: qbit[2]) {
   }
 }
 
-qfunc assign_amplitude_table_expanded___0(index: qnum<3, False, 0>, indicator: qbit) {
-  qba: qbit[3];
-  index -> qba;
+qfunc assign_amplitude_table_expanded___0(index: qbit[3], indicator: qbit) {
   RY(-1.8307, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.0497, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(0.7707, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.0339, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
   RY(0.3824, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.0728, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(0.6776, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.0886, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
-  qba -> index;
 }
 
 qfunc load_diagonal_expanded___0(ind: qbit, x: qnum<3, False, 0>) {
@@ -87,84 +84,78 @@ qfunc load_diagonal_expanded___0(ind: qbit, x: qnum<3, False, 0>) {
   assign_amplitude_table_expanded___0(x, ind);
 }
 
-qfunc assign_amplitude_table_expanded___1(index: qnum<3, False, 0>, indicator: qbit) {
-  qba: qbit[3];
-  index -> qba;
+qfunc assign_amplitude_table_expanded___1(index: qbit[3], indicator: qbit) {
   RY(2.2393, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.2998, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(-0.1704, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.2234, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
   RY(0.1283, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.3229, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(-0.0859, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.1842, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
-  qba -> index;
 }
 
 qfunc load_diagonal_expanded___1(ind: qbit, x: qnum<3, False, 0>) {
   assign_amplitude_table_expanded___1(x, ind);
 }
 
-qfunc assign_amplitude_table_expanded___2(index: qnum<3, False, 0>, indicator: qbit) {
-  qba: qbit[3];
-  index -> qba;
+qfunc assign_amplitude_table_expanded___2(index: qbit[3], indicator: qbit) {
   RY(-1.9603, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.4025, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(0.3953, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.2251, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
   RY(0.0505, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.4595, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(0.3135, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.1139, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
-  qba -> index;
 }
 
 qfunc load_diagonal_expanded___2(ind: qbit, x: qnum<3, False, 0>) {
