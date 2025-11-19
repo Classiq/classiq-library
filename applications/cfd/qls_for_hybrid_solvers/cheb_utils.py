@@ -4,10 +4,13 @@ from classiq.applications.qsp import qsp_approximate
 import numpy as np
 from scipy.special import eval_chebyt
 from numpy.polynomial.chebyshev import Chebyshev
+from classiq.applications.qsp.qsp import poly_inversion
+from typing import Tuple
 
 
 def optimize_inversion_polynomial(w_min, w_max, degree, scale):
-    # Calls Classiq built-in Chebyshev optimization
+    # Calls Classiq built-in Chebyshev optimization, taking into account the upper boundary w_max,
+    # and making sure the polynomial is bounded between [-1,1].
 
     def target_function(x):
         return scale * (w_min) / x
@@ -60,9 +63,19 @@ def get_numpy_cheb_trimmed(w_min, B, scale, degree, full_degree):
     return poly.coef[: degree + 1]
 
 
-def get_cheb_coeff(
-    w_min, degree, w_max=1, scale=1, method="interpolated_in_range", epsilon=0.01
-):
+ALLOWED_CHEB_APPROX = [
+    "optimized",
+    "interpolated_in_range",
+    "numpy_interpolated",
+    "numpy_trimmed",
+]
+
+
+def get_cheb_coeff(w_min, degree, w_max=1, scale=1, method="optimized", epsilon=0.01):
+
+    assert (
+        method in ALLOWED_CHEB_APPROX
+    ), f"Chebyshev interpolation method cannot by {method}, must be one of {ALLOWED_CHEB_APPROX}."
 
     kappa = 1 / w_min
     B = int(kappa**2 * np.log(kappa / epsilon))
@@ -76,21 +89,30 @@ def get_cheb_coeff(
         print(
             f"Performing convex optimization for the Chebyshev interpolation, with degree {degree}"
         )
-        return optimize_inversion_polynomial(w_min, w_max, degree, scale)
+        return optimize_inversion_polynomial(w_min, w_max, degree, scale), scale * w_min
 
     if method == "numpy_interpolated":
         print(f"Performing numpy Chebyshev interpolation, with degree {degree}")
-        return get_numpy_cheb_interpolate(w_min, B, scale, degree)
+        return get_numpy_cheb_interpolate(w_min, B, scale, degree), scale * w_min
 
     if method == "numpy_trimmed":
         print(
             f"Performing numpy Chebyshev interpolation, with degree {theoretical_degree} and trimming to degree {degree}"
         )
-        return get_numpy_cheb_trimmed(w_min, B, scale, degree, theoretical_degree)
+        return (
+            get_numpy_cheb_trimmed(w_min, B, scale, degree, theoretical_degree),
+            scale * w_min,
+        )
+
+    if method == "optimized":
+        print(f"Taking optimized expansion from literature, with degree {degree}")
+        coeffs, max_value = poly_inversion(degree, kappa)
+
+        return scale * coeffs / max_value, scale / max_value
 
 
 def plot_cheb_inv_approx(pcoefs, w_min, w_max=1, scale=1, half_space=True):
-    if isinstance(pcoefs, np.ndarray):
+    if isinstance(pcoefs, Tuple):
         pcoefs = {"approximated": pcoefs}
 
     def eval_odd_cheb_poly(coef, x):
@@ -113,7 +135,7 @@ def plot_cheb_inv_approx(pcoefs, w_min, w_max=1, scale=1, half_space=True):
     for label, coeffs in pcoefs.items():
         axes[0].plot(
             x_vals,
-            eval_odd_cheb_poly(coeffs[1::2], x_vals),
+            (scale * w_min / coeffs[1]) * eval_odd_cheb_poly(coeffs[0][1::2], x_vals),
             label=label,
             linestyle="--",
         )
@@ -123,22 +145,3 @@ def plot_cheb_inv_approx(pcoefs, w_min, w_max=1, scale=1, half_space=True):
     axes[0].set_title("Target Function vs. Approximated Polynomial")
     axes[0].legend()
     axes[0].grid(True)
-
-    # # Plot the results
-    # fig, axes = plt.subplots(len(pcoefs), 1, figsize=(12, 12))
-    # axes = np.atleast_1d(axes)
-    # axes = axes.flatten()
-    # for i, (label, coeffs) in enumerate(pcoefs.items()):
-    #     axes[i].plot(xj_obj, target_vals, "-k", label="Target Function", linewidth=2)
-    #     axes[i].plot(
-    #         x_vals,
-    #         eval_odd_cheb_poly(coeffs[1::2], x_vals),
-    #         label=label,
-    #         linestyle="--",
-    #     )
-
-    #     axes[i].set_xlabel("x")
-    #     axes[i].set_ylabel(rf"{scale}$\lambda_{{\min}}/x$")
-    #     axes[i].set_title("Target Function vs. Approximated Polynomial")
-    #     axes[i].legend()
-    #     axes[i].grid(True)
