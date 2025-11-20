@@ -99,7 +99,7 @@ def maybe_truncate_notebook_errors(func: Callable) -> Any:
             return func(*args, **kwargs)
         except CellExecutionError as exc:
             if os.environ.get("SHOULD_TRUNCATE_SHORT_CELL_ERROR", "") == "true":
-                raise ShortCellError(exc)
+                raise ShortCellError(exc) from exc
             else:
                 raise
 
