@@ -1,0 +1,71 @@
+qfunc eq_sup(s: qnum) {
+  inplace_prepare_amplitudes([0.5774, 0.5774, 0, 0.5774], 0, s);
+}
+
+qfunc oracle_d(s: qnum, data: qnum, TM: real[]) {
+  repeat (i: TM::len) {
+    control (s == i) {
+      RX(2 * acos(TM[i]), data);
+    }
+  }
+}
+
+qfunc main(output s: qnum, output j: qnum, output data: qnum) {
+  allocate(2, s);
+  allocate(4, j);
+  allocate(1, data);
+  apply_to_all(H, j);
+  eq_sup(s);
+  d: qnum<5, False, 0>;
+  s0: qnum<1, False, 0>;
+  s1: qnum<1, False, 0>;
+  s -> {s0, s1};
+  control (s0 == 1) {
+    control (s1 == 0) {
+      j += -1;
+    }
+  }
+  {s0, j} -> d;
+  oracle_d(d, data, [
+    0.8015,
+    (-0.8087),
+    0.6652,
+    (-0.1181),
+    (-0.2983),
+    0.6675,
+    0.8014,
+    0.6437,
+    0.7776,
+    0.3898,
+    (-0.7502),
+    (-0.2429),
+    0.683,
+    0.2305,
+    0.1147,
+    0.6802,
+    0.7784,
+    0.3091,
+    (-0.2962),
+    (-0.2641),
+    0.7889,
+    0.3176,
+    0.1564,
+    (-0.4584),
+    (-0.3464),
+    0.5023,
+    (-0.1425),
+    (-0.8012),
+    0.811,
+    0.0217,
+    0.465,
+    0
+  ]);
+  d -> {s0, j};
+  control (s1 == 1) {
+    j += 1;
+  }
+  {s0, s1} -> s;
+  invert {
+    eq_sup(s);
+  }
+}

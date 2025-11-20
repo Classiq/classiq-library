@@ -1,0 +1,45 @@
+qfunc array_swap(j: qnum, k: qnum) {
+  z1: qbit[];
+  z2: qbit[];
+  j -> z1;
+  k -> z2;
+  repeat (i: z1.len) {
+    SWAP(z1[i], z2[i]);
+  }
+  z1 -> j;
+  z2 -> k;
+}
+
+qfunc oracle_d(s: qnum, data: qnum, TM: real[]) {
+  repeat (i: TM::len) {
+    control (s == i) {
+      RX(2 * acos(TM[i]), data);
+    }
+  }
+}
+
+qfunc checkerboard_BE(data: qnum, s: qnum, j: qnum) {
+  s0: qnum<1, False, 0>;
+  s1: qnum<2, False, 0>;
+  j0: qnum<2, False, 0>;
+  j1: qnum<1, False, 0>;
+  s -> {s0, s1};
+  j -> {j0, j1};
+  array_swap(s1, j0);
+  CX(s0, j1);
+  oracle_d(s0, data, [(-0.69), (-0.34)]);
+  {s0, s1} -> s;
+  {j0, j1} -> j;
+}
+
+qfunc main(output data: qnum, output s: qnum, output j: qnum) {
+  allocate(3, s);
+  allocate(3, j);
+  allocate(1, data);
+  apply_to_all(H, j);
+  within {
+    apply_to_all(H, s);
+  } apply {
+    checkerboard_BE(data, s, j);
+  }
+}
