@@ -1,0 +1,42 @@
+qfunc oracle_d(s: qnum, data: qnum, TM: real[]) {
+  repeat (i: TM::len) {
+    control (s == i) {
+      RX(2 * acos(TM[i]), data);
+    }
+  }
+}
+
+qfunc oracle_r(j: qnum, s: qnum, k: int) {
+  j += s - k;
+}
+
+qfunc Toep_BE(data: qnum, s: qnum, j: qnum, dlt: qbit) {
+  oracle_d(s, data, [
+    0.6406,
+    0.6246,
+    (-0.3873),
+    0.952
+  ]);
+  tmp: qnum;
+  tmp = (s - 1) + j;
+  oracle_r(j, s, 1);
+  control (tmp < 0) {
+    X(dlt);
+  }
+  control (tmp >= 16) {
+    X(dlt);
+  }
+}
+
+qfunc main(output data: qnum, output s: qnum, output j: qnum, output dlt: qbit) {
+  allocate(2, s);
+  allocate(4, j);
+  allocate(1, data);
+  allocate(1, dlt);
+  apply_to_all(H, j);
+  within {
+    apply_to_all(H, s);
+  } apply {
+    Toep_BE(data, s, j, dlt);
+  }
+}
