@@ -2,28 +2,29 @@ import re
 import os
 from pathlib import Path
 from typing import Any, Callable
+import sys
 
 
 def qmod_compare_decorator(func: Callable) -> Any:
     def inner(*args: Any, **kwargs: Any) -> Any:
         qmods_before = _read_qmod_files()
 
-        # collect the error of the test itself, in case of such error
-        all_errors = []
         try:
             result = func(*args, **kwargs)
-        except Exception as exc:
-            all_errors.append(str(exc))
+        finally:
+            qmods_after = _read_qmod_files()
 
-        qmods_after = _read_qmod_files()
-        # collect the errors of the qmod comparison, in case of such errors
-        #   prepend all the errors from `compare_qmods`, so that `actions/send_qmod_slack_notification` will have a simpler regex
-        all_errors = _compare_qmods(qmods_before, qmods_after) + all_errors
+            all_errors = _compare_qmods(qmods_before, qmods_after)
 
-        # raise all errors
-        assert not all_errors, "\n".join(all_errors)
+            # intentionally not collection the exception in an `except` block
+            #   this way, in case `_compare_qmods` raised errors, we will print all the errors
+            #       plus have the full traceback of the error from `func`
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            if exc_type is not None:
+                # prepend all the errors from `compare_qmods`, so that `actions/send_qmod_slack_notification` will have a simpler regex
+                all_errors += [f"{exc_type.__name__}({exc_value})"]
 
-        return result
+            assert not all_errors, "\n".join(all_errors)
 
     return inner
 
