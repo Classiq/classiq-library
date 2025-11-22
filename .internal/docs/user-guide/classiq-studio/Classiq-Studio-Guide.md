@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.095
+    boost: 3.116
 ---
 
 # **Getting started with Classiq Studio**

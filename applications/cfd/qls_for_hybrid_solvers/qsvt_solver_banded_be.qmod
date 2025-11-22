@@ -1,0 +1,329 @@
+qstruct BlockEncodedState {
+  data: qnum<3>;
+  block: qnum<3>;
+}
+
+qfunc projector_expanded___0(be: BlockEncodedState, res: qbit) {
+  res ^= be.block == 0;
+}
+
+qfunc block_encoding_cnot_0_lambda___0_0_expanded___0(aux: qbit, be_state_captured__main__0: BlockEncodedState) {
+  projector_expanded___0(be_state_captured__main__0, aux);
+}
+
+qfunc projector_controlled_phase_expanded___0(phase: real, aux: qbit, be_state_captured__main__0: BlockEncodedState) {
+  within {
+    block_encoding_cnot_0_lambda___0_0_expanded___0(aux, be_state_captured__main__0);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qfunc assign_amplitude_table_expanded___0(index: qbit[3], indicator: qbit) {
+  RY(-1.8307, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.0497, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(0.7707, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.0339, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(0.3824, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.0728, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(0.6776, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.0886, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+}
+
+qfunc load_diagonal_expanded___0(ind: qbit, x: qnum<3, False, 0>) {
+  x += 1;
+  assign_amplitude_table_expanded___0(x, ind);
+}
+
+qfunc assign_amplitude_table_expanded___1(index: qbit[3], indicator: qbit) {
+  RY(2.2393, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.2998, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.1704, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.2234, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(0.1283, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.3229, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-0.0859, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.1842, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+}
+
+qfunc load_diagonal_expanded___1(ind: qbit, x: qnum<3, False, 0>) {
+  assign_amplitude_table_expanded___1(x, ind);
+}
+
+qfunc assign_amplitude_table_expanded___2(index: qbit[3], indicator: qbit) {
+  RY(-1.9603, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.4025, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(0.3953, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.2251, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(0.0505, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.4595, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(0.3135, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.1139, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+}
+
+qfunc load_diagonal_expanded___2(ind: qbit, x: qnum<3, False, 0>) {
+  x += -1;
+  assign_amplitude_table_expanded___2(x, ind);
+}
+
+qfunc load_banded_diagonals_expanded___0(ind: qbit, x: qnum<3, False, 0>, s: qnum<2, False, 0>) {
+  control (s == 0) {
+    load_diagonal_expanded___0(ind, x);
+  }
+  control (s == 1) {
+    load_diagonal_expanded___1(ind, x);
+  }
+  control (s == 2) {
+    load_diagonal_expanded___2(ind, x);
+  }
+}
+
+qfunc block_encode_banded_expanded___0(prep_diag: real[], block: qnum<3, False, 0>, data: qnum<3, False, 0>) {
+  s: qnum<2, False, 0>;
+  ind: qbit;
+  block -> {s, ind};
+  within {
+    inplace_prepare_state(prep_diag, 0.0, s);
+  } apply {
+    load_banded_diagonals_expanded___0(ind, data, s);
+  }
+  X(ind);
+  {s, ind} -> block;
+}
+
+qfunc be_qfunc_expanded___0(be: BlockEncodedState) {
+  block_encode_banded_expanded___0([0.2416, 0.4992, 0.2591, 0], be.block, be.data);
+}
+
+qfunc u_0_lambda___0_0_expanded___0(be_state_captured__main__0: BlockEncodedState) {
+  be_qfunc_expanded___0(be_state_captured__main__0);
+}
+
+qfunc u_1_lambda___0_0_expanded___0(be_state_captured__main__0: BlockEncodedState) {
+  invert {
+    u_0_lambda___0_0_expanded___0(be_state_captured__main__0);
+  }
+}
+
+qfunc qsvt_step_expanded___0(phase1: real, phase2: real, aux: qbit, be_state_captured__main__0: BlockEncodedState) {
+  u_1_lambda___0_0_expanded___0(be_state_captured__main__0);
+  projector_controlled_phase_expanded___0(phase1, aux, be_state_captured__main__0);
+  invert {
+    u_1_lambda___0_0_expanded___0(be_state_captured__main__0);
+  }
+  projector_controlled_phase_expanded___0(phase2, aux, be_state_captured__main__0);
+}
+
+qfunc qsvt_expanded___0(phase_seq: real[], aux: qbit, be_state_captured__main__0: BlockEncodedState) {
+  H(aux);
+  projector_controlled_phase_expanded___0(phase_seq[0], aux, be_state_captured__main__0);
+  repeat (index: 50) {
+    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], aux, be_state_captured__main__0);
+  }
+  if (False) {
+  } else {
+    u_1_lambda___0_0_expanded___0(be_state_captured__main__0);
+    projector_controlled_phase_expanded___0(phase_seq[101], aux, be_state_captured__main__0);
+  }
+  H(aux);
+}
+
+qfunc qsvt_inversion_expanded___0(phase_seq: real[], aux: qbit, be_state_captured__main__0: BlockEncodedState) {
+  qsvt_expanded___0(phase_seq, aux, be_state_captured__main__0);
+}
+
+qfunc main(output qsvt_aux: qbit, output data: qnum<3, False, 0>, output block: qnum<3, False, 0>) {
+  allocate(1, qsvt_aux);
+  allocate(3, block);
+  prepare_amplitudes([
+    0.6193,
+    (-0.3565),
+    (-0.435),
+    (-0.2763),
+    0.1567,
+    0.4192,
+    0.1533,
+    0.0
+  ], 0, data);
+  be_state: BlockEncodedState;
+  within {
+    {data, block} -> be_state;
+  } apply {
+    qsvt_inversion_expanded___0([
+      3.1279,
+      3.1446,
+      3.1383,
+      3.1452,
+      3.1377,
+      3.1459,
+      3.1369,
+      3.1467,
+      3.1361,
+      3.1475,
+      3.1352,
+      3.1484,
+      3.1343,
+      3.1494,
+      3.1332,
+      3.1505,
+      3.1321,
+      3.1516,
+      3.131,
+      3.1529,
+      3.1297,
+      3.1541,
+      3.1284,
+      3.1555,
+      3.127,
+      3.1569,
+      3.1255,
+      3.1584,
+      3.124,
+      3.1599,
+      3.1225,
+      3.1615,
+      3.1209,
+      3.1631,
+      3.1192,
+      3.1648,
+      3.1176,
+      3.1665,
+      3.1159,
+      3.1681,
+      3.1142,
+      3.1698,
+      3.1125,
+      3.1715,
+      3.1109,
+      3.1731,
+      3.1093,
+      3.1747,
+      3.1077,
+      3.1762,
+      3.1062,
+      3.1062,
+      3.1762,
+      3.1077,
+      3.1747,
+      3.1093,
+      3.1731,
+      3.1109,
+      3.1715,
+      3.1125,
+      3.1698,
+      3.1142,
+      3.1681,
+      3.1159,
+      3.1665,
+      3.1176,
+      3.1648,
+      3.1192,
+      3.1631,
+      3.1209,
+      3.1615,
+      3.1225,
+      3.1599,
+      3.124,
+      3.1584,
+      3.1255,
+      3.1569,
+      3.127,
+      3.1555,
+      3.1284,
+      3.1541,
+      3.1297,
+      3.1529,
+      3.131,
+      3.1516,
+      3.1321,
+      3.1505,
+      3.1332,
+      3.1494,
+      3.1343,
+      3.1484,
+      3.1352,
+      3.1475,
+      3.1361,
+      3.1467,
+      3.1369,
+      3.1459,
+      3.1377,
+      3.1452,
+      3.1383,
+      3.1446,
+      (-314.1729)
+    ], qsvt_aux, be_state);
+  }
+}

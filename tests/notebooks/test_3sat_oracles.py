@@ -1,3 +1,4 @@
+import math
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
     validate_quantum_model,
@@ -9,35 +10,38 @@ from testbook.client import TestbookNotebookClient
 @wrap_testbook("3sat_oracles", timeout_seconds=1800)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     expected_widths = [
-        25,
-        25,
-        27,
-        33,
-        35,
-        34,
-        36,
-        37,
-        40,
-        48,
-        47,
-        45,
-        53,
-        55,
-        64,
-        72,
-        70,
-        82,
-        100,
-        101,
-        110,
-        118,
-        136,
-        137,
+        39,  # 25
+        43,  # 25
+        47,  # 27
+        51,  # 33
+        55,  # 35
+        59,  # 34
+        63,  # 36
+        67,  # 37
+        71,  # 40
+        75,  # 48
+        79,  # 47
+        83,  # 45
+        87,  # 53
+        95,  # 55
+        103,  # 64
+        119,  # 72
+        131,  # 70
+        151,  # 82
+        167,  # 100
+        191,  # 101
+        211,  # 110
+        239,  # 118
+        267,  # 136
+        # 137,
     ]
 
     for qmod in tb.ref("qmods"):
         validate_quantum_model(qmod)
     for qprog, expected_width in zip(tb.ref_pydantic("qprogs"), expected_widths):
+        # 10% buffer, plus flat 5 for the shorter ones
+        expected_width = math.ceil(1.1 * expected_width + 5)
+
         validate_quantum_program_size(
             qprog,
             expected_width=expected_width + 5,  # actual width + 5

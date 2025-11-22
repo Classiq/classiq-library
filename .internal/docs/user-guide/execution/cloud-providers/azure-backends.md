@@ -97,3 +97,5 @@ Included simulators:
 
 -   "ionq.simulator"
 -   "rigetti.sim.qvm"
+-   "quantinuum.sim.h2-1sc"
+-   "quantinuum.sim.h2-1e"

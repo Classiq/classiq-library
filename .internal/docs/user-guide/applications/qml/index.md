@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 1.688
+    boost: 2.172
 ---
 
 # Quantum Machine Learning

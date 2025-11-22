@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.936
+    boost: 2.709
 ---
 
 # functions

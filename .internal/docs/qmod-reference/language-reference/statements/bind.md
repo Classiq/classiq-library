@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.183
+    boost: 3.007
 ---
 
 # Bind

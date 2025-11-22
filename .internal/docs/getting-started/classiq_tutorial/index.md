@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.463
+    boost: 3.200
 ---
 
 # The Classiq Tutorial

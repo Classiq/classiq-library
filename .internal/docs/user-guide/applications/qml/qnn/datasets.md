@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.204
+    boost: 3.298
 ---
 
 # Datasets

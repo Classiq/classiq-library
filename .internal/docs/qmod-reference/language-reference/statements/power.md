@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.109
+    boost: 3.013
 ---
 
 # Power

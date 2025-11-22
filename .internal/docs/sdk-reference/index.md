@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 4.338
+    boost: 4.469
 ---
 
 # Classiq SDK Reference

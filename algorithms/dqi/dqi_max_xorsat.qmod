@@ -154,11 +154,7 @@ qfunc prepare_dick_state_unary_input_expanded___5(qvar: qbit[6]) {
 }
 
 qfunc vector_product_phase_expanded___0(v: int[], y: qbit[6]) {
-  repeat (i: 6) {
-    if (v[i] > 0) {
-      Z(y[i]);
-    }
-  }
+  phase (pi * ((((((v[0] * y[0]) + (v[5] * y[5])) + (v[1] * y[1])) + (v[2] * y[2])) + (v[3] * y[3])) + (v[4] * y[4])));
 }
 
 qfunc matrix_vector_product_expanded___0(y: qbit[6], output out: qbit[6]) {
@@ -250,8 +246,8 @@ qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) 
   k_num_errors: qnum<2, False, 0>;
   prepare_amplitudes([
     0.4330127018922193,
-    0.7071067811865475,
-    0.5590169943749476,
+    0.7071067811865476,
+    0.5590169943749473,
     0.0
   ], 0, k_num_errors);
   k_unary: qbit[3];

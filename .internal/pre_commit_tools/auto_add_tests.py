@@ -93,6 +93,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         tb.ref_pydantic("qprog"),
         expected_width=None,
         expected_depth=None,
+        expected_cx_count=None,
     )
 
     # test notebook content

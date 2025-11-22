@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.944
+    boost: 2.728
 ---
 
 # Quantum Layer

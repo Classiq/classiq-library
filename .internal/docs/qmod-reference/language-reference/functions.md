@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.376
+    boost: 3.238
 ---
 
 # Quantum Functions

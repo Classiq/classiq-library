@@ -236,6 +236,8 @@ def main(res: Output[QNum]) -> None:
     prepare_5(b)
 
     res |= a + b  # 3+5 should be 8
+    drop(a)
+    drop(b)
 
 
 quantum_program = synthesize(main)
@@ -283,6 +285,9 @@ qfunc main(output res: qnum){
  get_3(a);
  get_5(b);
  res = a + b;
+ drop(a);
+ drop(b);
+
 }
 ```
 

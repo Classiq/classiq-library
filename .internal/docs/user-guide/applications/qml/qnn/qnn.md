@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.545
+    boost: 2.620
 ---
 
 # Quantum Neural Networks (QNN)

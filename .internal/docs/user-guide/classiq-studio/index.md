@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.420
+    boost: 2.513
 ---
 
 # **Classiq Studio - Web-based IDE with Classiq inside**

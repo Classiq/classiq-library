@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.252
+    boost: 2.436
 ---
 
 # Quantum Program Transpilation

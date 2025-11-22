@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.148
+    boost: 2.239
 ---
 
 # Hardware-Aware Synthesis
@@ -76,8 +76,9 @@ These are the allowed gates:
     `cry`, `crz`, `csx`, `cu1`, `cu`, `cp`, `ch`
 -   Three-qubit gates: `ccx`, `cswap`
 
-If you do not specify gates, the default set consists of all single-qubit gates and the basic
-two-qubit gates.
+If you do not specify gates in the IDE, the field remains empty. During synthesis, default
+basis gates are applied automatically based on connectivity. To override, select one or
+more gates in this field.
 
 ### Connectivity Map
 

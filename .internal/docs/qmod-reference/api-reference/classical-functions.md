@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.961
+    boost: 2.804
 ---
 
 Classical functions and execution primitives are used in `cfunc`'s to define the classical execution logic of a quantum program.

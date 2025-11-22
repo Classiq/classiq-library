@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.233
+    boost: 3.519
 ---
 
 # Getting Started

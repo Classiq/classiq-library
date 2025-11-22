@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.026
+    boost: 2.780
 ---
 
 # Operators

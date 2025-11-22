@@ -1,4 +1,4 @@
 ---
 search:
-    boost: 1.451
+    boost: 1.899
 ---

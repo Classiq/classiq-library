@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.872
+    boost: 2.896
 ---
 
 # Getting Started with Quantum Program Synthesis

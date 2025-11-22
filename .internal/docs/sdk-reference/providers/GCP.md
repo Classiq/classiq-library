@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.236
+    boost: 2.709
 ---
 
 ::: classiq.interface.backend.backend_preferences.GCPBackendPreferences

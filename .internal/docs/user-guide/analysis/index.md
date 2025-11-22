@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.594
+    boost: 3.446
 ---
 
 # Analysis

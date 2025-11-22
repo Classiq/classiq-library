@@ -1,18 +1,23 @@
-qstruct BlockEncodedState {
-  data: qnum<3>;
-  block: qnum<5>;
-}
-
-qfunc projector_expanded___0(be: BlockEncodedState, res: qbit) {
-  res ^= be.block == 0;
-}
-
-qfunc projector_controlled_phase_expanded___0(phase: real, qvar: qbit[8], aux: qbit) {
+@disable_perm_check
+@disable_const_checks(packed_vars)
+qperm reflect_about_zero_expanded___0(const packed_vars: qbit[5]) {
+  msbs: qnum<4, False, 0>;
+  lsb: qbit;
+  packed_vars -> {msbs, lsb};
   within {
-    projector_expanded___0(qvar, aux);
+    X(lsb);
+    H(lsb);
   } apply {
-    RZ(phase, aux);
+    control (msbs == 0) {
+      X(lsb);
+    }
   }
+  {msbs, lsb} -> packed_vars;
+}
+
+qfunc my_reflect_about_zero_expanded___0(qba: qbit[5]) {
+  reflect_about_zero_expanded___0(qba);
+  RY(6.2832, qba[0]);
 }
 
 qfunc multiplex_ra_expanded___0(qba: qbit[5], ind: qbit) {
@@ -742,71 +747,316 @@ qfunc multiplex_ra_expanded___5(qba: qbit[5], ind: qbit) {
   }
 }
 
+qfunc multiplex_ra_expanded___6(qba: qbit[5], ind: qbit) {
+  RZ(-1.5708, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.3927, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RZ(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.7854, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.7854, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
+}
+
+qfunc multiplex_ra_expanded___7(qba: qbit[5], ind: qbit) {
+  RY(1.1781, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(1.1781, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RY(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.3927, ind);
+  skip_control {
+    CX(qba[4], ind);
+  }
+}
+
 qperm apply_phase_table_expanded___0(target: qbit[5]) {
-  PHASE(0.2945, target[0]);
+  PHASE(0.4909, target[0]);
   CX(target[0], target[1]);
   PHASE(-0.8836, target[1]);
   CX(target[0], target[1]);
-  PHASE(0.6872, target[1]);
+  PHASE(0.0982, target[1]);
   CX(target[1], target[2]);
-  PHASE(-0.0982, target[2]);
+  PHASE(-0.2945, target[2]);
   CX(target[0], target[2]);
-  PHASE(0.2945, target[2]);
+  PHASE(-0.4909, target[2]);
   CX(target[1], target[2]);
-  PHASE(-0.0982, target[2]);
+  PHASE(-0.6872, target[2]);
   CX(target[0], target[2]);
-  PHASE(0.2945, target[2]);
+  PHASE(0.6872, target[2]);
   CX(target[2], target[3]);
-  PHASE(0.6872, target[3]);
+  PHASE(1.0799, target[3]);
   CX(target[0], target[3]);
-  PHASE(-1.2763, target[3]);
-  CX(target[1], target[3]);
-  PHASE(-0.4909, target[3]);
-  CX(target[0], target[3]);
-  PHASE(0.6872, target[3]);
-  CX(target[2], target[3]);
-  PHASE(-0.4909, target[3]);
-  CX(target[0], target[3]);
-  PHASE(-0.4909, target[3]);
+  PHASE(-0.6872, target[3]);
   CX(target[1], target[3]);
   PHASE(0.2945, target[3]);
   CX(target[0], target[3]);
-  PHASE(0.2945, target[3]);
+  PHASE(0.8836, target[3]);
+  CX(target[2], target[3]);
+  PHASE(0.0982, target[3]);
+  CX(target[0], target[3]);
+  PHASE(-0.4909, target[3]);
+  CX(target[1], target[3]);
+  PHASE(0.0982, target[3]);
+  CX(target[0], target[3]);
+  PHASE(1.0799, target[3]);
   CX(target[3], target[4]);
   PHASE(-0.8836, target[4]);
   CX(target[0], target[4]);
+  PHASE(0.4909, target[4]);
+  CX(target[1], target[4]);
+  PHASE(-0.0982, target[4]);
+  CX(target[0], target[4]);
+  PHASE(-0.2945, target[4]);
+  CX(target[2], target[4]);
+  PHASE(0.4909, target[4]);
+  CX(target[0], target[4]);
   PHASE(0.6872, target[4]);
   CX(target[1], target[4]);
-  PHASE(-0.0982, target[4]);
+  PHASE(-0.2945, target[4]);
   CX(target[0], target[4]);
   PHASE(-0.8836, target[4]);
-  CX(target[2], target[4]);
-  PHASE(0.2945, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.0982, target[4]);
-  CX(target[1], target[4]);
-  PHASE(-0.8836, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.4909, target[4]);
   CX(target[3], target[4]);
-  PHASE(-0.8836, target[4]);
+  PHASE(-1.2763, target[4]);
   CX(target[0], target[4]);
-  PHASE(0.2945, target[4]);
+  PHASE(-0.2945, target[4]);
   CX(target[1], target[4]);
-  PHASE(0.6872, target[4]);
+  PHASE(-0.0982, target[4]);
   CX(target[0], target[4]);
-  PHASE(-0.4909, target[4]);
+  PHASE(-0.6872, target[4]);
   CX(target[2], target[4]);
-  PHASE(0.2945, target[4]);
+  PHASE(-0.2945, target[4]);
   CX(target[0], target[4]);
   PHASE(-0.4909, target[4]);
   CX(target[1], target[4]);
-  PHASE(0.6872, target[4]);
+  PHASE(0.8836, target[4]);
   CX(target[0], target[4]);
-  PHASE(0.6872, target[4]);
+  PHASE(1.4726, target[4]);
 }
 
-qfunc lcu_paulis_graycode_expanded___0(data: qbit[3], block: qbit[5]) {
+qfunc lcu_paulis_graycode_expanded___0(data: qbit[4], block: qbit[5]) {
   within {
     inplace_prepare_state([
       0.3022,
@@ -849,167 +1099,83 @@ qfunc lcu_paulis_graycode_expanded___0(data: qbit[3], block: qbit[5]) {
     multiplex_ra_expanded___3(block, data[1]);
     multiplex_ra_expanded___4(block, data[2]);
     multiplex_ra_expanded___5(block, data[2]);
+    multiplex_ra_expanded___6(block, data[3]);
+    multiplex_ra_expanded___7(block, data[3]);
     apply_phase_table_expanded___0(block);
   }
 }
 
-qfunc be_qfunc_expanded___0(be: BlockEncodedState) {
-  lcu_paulis_graycode_expanded___0(be.data, be.block);
+qfunc be_qfunc_expanded___0(block: qnum<5, False, 0>, data: qnum<4, False, 0>) {
+  lcu_paulis_graycode_expanded___0(data, block);
 }
 
-qfunc u_0_lambda___0_0_expanded___0(x: qbit[8]) {
-  invert {
-    be_qfunc_expanded___0(x);
-  }
+qfunc walk_operator_expanded___0(block: qbit[5], data: qbit[4]) {
+  be_qfunc_expanded___0(block, data);
+  my_reflect_about_zero_expanded___0(block);
 }
 
-qfunc qsvt_step_expanded___0(phase1: real, phase2: real, qvar: qbit[8], aux: qbit) {
-  u_0_lambda___0_0_expanded___0(qvar);
-  projector_controlled_phase_expanded___0(phase1, qvar, aux);
-  invert {
-    u_0_lambda___0_0_expanded___0(qvar);
-  }
-  projector_controlled_phase_expanded___0(phase2, qvar, aux);
-}
-
-qfunc qsvt_expanded___0(phase_seq: real[], qvar: qbit[8], aux: qbit) {
-  H(aux);
-  projector_controlled_phase_expanded___0(phase_seq[0], qvar, aux);
-  repeat (index: 50) {
-    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], qvar, aux);
-  }
-  if (False) {
-  } else {
-    u_0_lambda___0_0_expanded___0(qvar);
-    projector_controlled_phase_expanded___0(phase_seq[101], qvar, aux);
-  }
-  H(aux);
-}
-
-qfunc qsvt_inversion_expanded___0(phase_seq: real[], qvar: qbit[8], aux: qbit) {
-  qsvt_expanded___0(phase_seq, qvar, aux);
-}
-
-qfunc main(output qsvt_aux: qbit, output data: qnum<3, False, 0>, output block: qnum<5, False, 0>) {
-  allocate(1, qsvt_aux);
-  allocate(5, block);
-  prepare_amplitudes([
-    0.6193,
-    (-0.3565),
-    (-0.435),
-    (-0.2763),
-    0.1567,
-    0.4192,
-    0.1533,
-    0.0
-  ], 0, data);
-  be_state: BlockEncodedState;
+qfunc symmetrize_walk_operator_expanded___0(block: qnum<5, False, 0>, data: qbit[4]) {
+  my_reflect_about_zero_expanded___0(block);
   within {
-    {data, block} -> be_state;
+    walk_operator_expanded___0(block, data);
   } apply {
-    qsvt_inversion_expanded___0([
-      2.8367,
-      2.486,
-      2.6235,
-      3.2067,
-      3.4074,
-      3.1163,
-      2.9597,
-      3.1987,
-      3.2638,
-      3.0884,
-      3.051,
-      3.2225,
-      3.1795,
-      3.0694,
-      3.1129,
-      3.2241,
-      3.1253,
-      3.0922,
-      3.1596,
-      3.1957,
-      3.0886,
-      3.1302,
-      3.1776,
-      3.1594,
-      3.0822,
-      3.1648,
-      3.1633,
-      3.1335,
-      3.1046,
-      3.1874,
-      3.1331,
-      3.1257,
-      3.1315,
-      3.1882,
-      3.1067,
-      3.1388,
-      3.1466,
-      3.1706,
-      3.095,
-      3.1634,
-      3.146,
-      3.1509,
-      3.1006,
-      3.1833,
-      3.1293,
-      3.141,
-      3.1192,
-      3.1899,
-      3.104,
-      3.1459,
-      3.1473,
-      3.1473,
-      3.1459,
-      3.104,
-      3.1899,
-      3.1192,
-      3.141,
-      3.1293,
-      3.1833,
-      3.1006,
-      3.1509,
-      3.146,
-      3.1634,
-      3.095,
-      3.1706,
-      3.1466,
-      3.1388,
-      3.1067,
-      3.1882,
-      3.1315,
-      3.1257,
-      3.1331,
-      3.1874,
-      3.1046,
-      3.1335,
-      3.1633,
-      3.1648,
-      3.0822,
-      3.1594,
-      3.1776,
-      3.1302,
-      3.0886,
-      3.1957,
-      3.1596,
-      3.0922,
-      3.1253,
-      3.2241,
-      3.1129,
-      3.0694,
-      3.1795,
-      3.2225,
-      3.051,
-      3.0884,
-      3.2638,
-      3.1987,
-      2.9597,
-      3.1163,
-      3.4074,
-      3.2067,
-      2.6235,
-      2.486,
-      (-314.4642)
-    ], be_state, qsvt_aux);
+    my_reflect_about_zero_expanded___0(block);
   }
+}
+
+qfunc lcu_cheb_expanded___0(powers: int[], inv_coeffs: real[], mat_block: qnum<5, False, 0>, data: qbit[4], cheb_block: qbit[4]) {
+  within {
+    inplace_prepare_state(inv_coeffs, 0.0, cheb_block);
+  } apply {
+    Z(cheb_block[0]);
+    repeat (i: 4) {
+      control (cheb_block[i]) {
+        power (powers[i]) {
+          symmetrize_walk_operator_expanded___0(mat_block, data);
+        }
+      }
+    }
+    my_reflect_about_zero_expanded___0(mat_block);
+    walk_operator_expanded___0(mat_block, data);
+  }
+}
+
+qfunc main(output matrix_block: qnum<5, False, 0>, output data: qnum<4, False, 0>, output inv_block: qnum<4, False, 0>) {
+  allocate(4, inv_block);
+  allocate(5, matrix_block);
+  allocate(4, data);
+  data_array: qbit[4];
+  within {
+    data -> data_array;
+  } apply {
+    inplace_prepare_amplitudes([
+      0.6193,
+      (-0.3565),
+      (-0.435),
+      (-0.2763),
+      0.1567,
+      0.4192,
+      0.1533,
+      0.0
+    ], 0.0, data_array[0:3]);
+    X(data_array[3]);
+  }
+  lcu_cheb_expanded___0([1, 2, 4, 8], [
+    0.0763,
+    0.0745,
+    0.0726,
+    0.0707,
+    0.0689,
+    0.067,
+    0.0652,
+    0.0633,
+    0.0615,
+    0.0597,
+    0.0579,
+    0.0561,
+    0.0543,
+    0.0525,
+    0.0507,
+    0.049
+  ], matrix_block, data, inv_block);
 }

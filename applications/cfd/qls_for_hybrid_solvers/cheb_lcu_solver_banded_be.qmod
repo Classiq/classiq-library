@@ -66,42 +66,39 @@ qperm apply_to_all_expanded___0(target: qbit[2]) {
   }
 }
 
-qfunc assign_amplitude_table_expanded___0(index: qnum<3, False, 0>, indicator: qbit) {
-  qba: qbit[3];
-  index -> qba;
+qfunc assign_amplitude_table_expanded___0(index: qbit[3], indicator: qbit) {
   RY(-1.8307, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.0497, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(0.7707, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.0339, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
   RY(0.3824, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.0728, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(0.6776, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.0886, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
-  qba -> index;
 }
 
 qfunc load_diagonal_expanded___0(ind: qbit, x: qnum<3, False, 0>) {
@@ -109,84 +106,78 @@ qfunc load_diagonal_expanded___0(ind: qbit, x: qnum<3, False, 0>) {
   assign_amplitude_table_expanded___0(x, ind);
 }
 
-qfunc assign_amplitude_table_expanded___1(index: qnum<3, False, 0>, indicator: qbit) {
-  qba: qbit[3];
-  index -> qba;
+qfunc assign_amplitude_table_expanded___1(index: qbit[3], indicator: qbit) {
   RY(2.2393, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.2998, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(-0.1704, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.2234, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
   RY(0.1283, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.3229, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(-0.0859, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(0.1842, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
-  qba -> index;
 }
 
 qfunc load_diagonal_expanded___1(ind: qbit, x: qnum<3, False, 0>) {
   assign_amplitude_table_expanded___1(x, ind);
 }
 
-qfunc assign_amplitude_table_expanded___2(index: qnum<3, False, 0>, indicator: qbit) {
-  qba: qbit[3];
-  index -> qba;
+qfunc assign_amplitude_table_expanded___2(index: qbit[3], indicator: qbit) {
   RY(-1.9603, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.4025, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(0.3953, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.2251, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
   RY(0.0505, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.4595, indicator);
   skip_control {
-    CX(qba[1], indicator);
+    CX(index[1], indicator);
   }
   RY(0.3135, indicator);
   skip_control {
-    CX(qba[0], indicator);
+    CX(index[0], indicator);
   }
   RY(-0.1139, indicator);
   skip_control {
-    CX(qba[2], indicator);
+    CX(index[2], indicator);
   }
-  qba -> index;
 }
 
 qfunc load_diagonal_expanded___2(ind: qbit, x: qnum<3, False, 0>) {
@@ -307,21 +298,21 @@ qfunc main(output matrix_block: qnum<5, False, 0>, output data: qnum<4, False, 0
     X(data_array[3]);
   }
   lcu_cheb_expanded___0([1, 2, 4, 8], [
-    0.1176,
-    0.1103,
-    0.1029,
-    0.0956,
-    0.0882,
-    0.0809,
-    0.0735,
-    0.0662,
-    0.0588,
-    0.0515,
-    0.0441,
-    0.0368,
-    0.0294,
-    0.0221,
-    0.0147,
-    0.0074
+    0.0721,
+    0.0708,
+    0.0695,
+    0.0682,
+    0.0669,
+    0.0657,
+    0.0644,
+    0.0631,
+    0.0618,
+    0.0606,
+    0.0593,
+    0.058,
+    0.0568,
+    0.0555,
+    0.0543,
+    0.053
   ], matrix_block, data, inv_block);
 }

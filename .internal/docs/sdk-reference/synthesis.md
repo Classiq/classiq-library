@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.365
+    boost: 2.966
 ---
 
 ::: classiq.synthesize

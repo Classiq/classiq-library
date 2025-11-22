@@ -64,9 +64,13 @@ qfunc short_time_magnus(a: real, b: real, qbe_st: MagnusBE) {
       3.1383,
       3.1416,
       (-18.8496)
-    ], time_dependent_projector, time_dependent_projector, lambda(x) {
-      short_time_summation(a, b, x);
-    }, qbe_st.time_dependent, qbe_st.qsvt_exp_aux, qbe_st.qsvt_exp_lcu);
+    ], lambda(_aux) {
+      time_dependent_projector(qbe_st.time_dependent, _aux);
+    }, lambda(_aux) {
+      time_dependent_projector(qbe_st.time_dependent, _aux);
+    }, lambda() {
+      short_time_summation(a, b, qbe_st.time_dependent);
+    }, qbe_st.qsvt_exp_aux, qbe_st.qsvt_exp_lcu);
   }
 }
 
@@ -80,9 +84,13 @@ qfunc long_slice_evolution(a: real, b: real, qbe: LongSliceBE) {
     4.3458,
     3.4812,
     (-18.8685)
-  ], magnus_projector, magnus_projector, lambda(x) {
-    short_time_magnus(a, b, x);
-  }, qbe.magnus, qbe.qsvt_amplification_aux);
+  ], lambda(_aux) {
+    magnus_projector(qbe.magnus, _aux);
+  }, lambda(_aux) {
+    magnus_projector(qbe.magnus, _aux);
+  }, lambda() {
+    short_time_magnus(a, b, qbe.magnus);
+  }, qbe.qsvt_amplification_aux);
 }
 
 qfunc long_time_integrator_step(a: real, b: real, qbe_full: FullBE) {

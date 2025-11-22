@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.848
+    boost: 3.069
 ---
 
 ::: classiq.create_model

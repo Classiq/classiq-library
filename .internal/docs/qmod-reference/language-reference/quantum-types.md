@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.650
+    boost: 3.395
 ---
 
 # Quantum Types

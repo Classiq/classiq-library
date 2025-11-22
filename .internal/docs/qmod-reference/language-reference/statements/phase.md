@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 2.927
+    boost: 2.843
 ---
 
 # Phase

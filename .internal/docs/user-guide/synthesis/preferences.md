@@ -1,6 +1,6 @@
 ---
 search:
-    boost: 3.084
+    boost: 2.265
 ---
 
 # Synthesis Preferences
