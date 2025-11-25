@@ -457,8 +457,8 @@ diffuser is defined in a generic way and uses the qubit array view of the state.
         b: QNum[3, UNSIGNED, 3]
 
 
-    @qfunc
-    def my_problem_constraint(p: Const[MyProblem], res: Permutable[QBit]) -> None:
+    @qperm
+    def my_problem_constraint(p: Const[MyProblem], res: QBit) -> None:
         res ^= p.a + p.b == 0.625
 
 
@@ -476,7 +476,7 @@ diffuser is defined in a generic way and uses the qubit array view of the state.
       b: qnum<3, UNSIGNED, 3>;
     }
 
-    qfunc my_problem_constraint(const p: MyProblem, permutable res: qbit) {
+    qperm my_problem_constraint(const p: MyProblem, res: qbit) {
       res ^= (p.a + p.b) == 0.625;
     }
 
