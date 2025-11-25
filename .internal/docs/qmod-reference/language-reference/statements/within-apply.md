@@ -151,7 +151,7 @@ superposition.
 
 Note that `my_cond_phase_flip` declares parameter `target` as `const` because, taken as
 a whole, the function only applies phase changes to it. But because the implementation
-uses non-cost operations, `target` is specified as `unchecked`. For more on enforcement
+uses non-cost operations, we disable const checks. For more on enforcement
 of parameter restrictions see [Uncomputation](../uncomputation.md).
 
 ### Example 3
