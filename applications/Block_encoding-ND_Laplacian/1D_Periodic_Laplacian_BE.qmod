@@ -1,0 +1,25 @@
+qfunc subtractor_mod(a: qnum) {
+  a += -1;
+}
+
+qfunc adder_mod(a: qnum) {
+  a += 1;
+}
+
+qfunc main(output j: qnum, output l: qnum) {
+  allocate(5, j);
+  allocate(2, l);
+  apply_to_all(H, l);
+  apply_to_all(Z, l);
+  l_arr: qbit[];
+  l -> l_arr;
+  control (l_arr[0] == 0) {
+    subtractor_mod(j);
+  }
+  control (l_arr[1] == 1) {
+    adder_mod(j);
+  }
+  l_arr -> l;
+  apply_to_all(H, l);
+  apply_to_all(Z, l);
+}
