@@ -35,7 +35,7 @@ class StrippedExceptionGroup(ExceptionGroup):
 
 
 def qmod_compare_decorator(func: Callable) -> Any:
-    def inner(*args: Any, **kwargs: Any) -> Any:
+    def inner_qmod(*args: Any, **kwargs: Any) -> Any:
         qmods_before = _read_qmod_files()
 
         # collect the error of the test itself, in case of such error
@@ -61,7 +61,7 @@ def qmod_compare_decorator(func: Callable) -> Any:
 
         return result
 
-    return inner
+    return inner_qmod
 
 
 def _read_qmod_files(file_path: str = ".") -> dict[str, str]:
