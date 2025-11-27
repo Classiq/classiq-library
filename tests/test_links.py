@@ -133,8 +133,15 @@ def _test_single_url(
             return _test_single_url(
                 url, retry - 1, use_head=use_head, follow_redirects=False
             )
-        # Some flaky error with "doi.org" links
+
         if response.status_code == 403:
+            # Unsure why, but wikipedia now gives 403 for requests when sent from the CI,
+            #   but 200ok for the same requests from my personal computer
+            #   so we don't fully test it, and count on wikipedia pages to not change so frequently
+            if url.startswith("https://en.wikipedia.org/"):
+                return True
+
+            # Some flaky error with "doi.org" links
             return _test_single_url(url, retry - 1, use_head=use_head)
 
         return response.is_success
