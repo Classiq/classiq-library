@@ -29,7 +29,13 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_depth=10000,  # actual depth: 8662
     )
     for i in range(2, len(qprogs)):
-        _logger.info(f"{i=} ; width={qprogs[i].data.width} ; depth={qprogs[i].transpiled_circuit.depth} ; expected_width={tb.ref("NUM_QUBITS")} ; expected_depth={depths[i - 1]}")
+        _logger.info(
+            f"{i=}"
+            f" ; width={qprogs[i].data.width}"
+            f" ; depth={qprogs[i].transpiled_circuit.depth}"
+            f" ; expected_width={tb.ref('NUM_QUBITS')}"
+            f" ; expected_depth={depths[i - 1]}"
+        )
         validate_quantum_program_size(
             qprogs[i],
             expected_width=tb.ref("NUM_QUBITS"),
