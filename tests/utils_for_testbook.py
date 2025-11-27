@@ -91,7 +91,10 @@ def _build_cd_decorator(file_path: str) -> Callable:
             os.chdir(ROOT_DIRECTORY)
             os.chdir(os.path.dirname(file_path))
 
-            result = func(*args, **kwargs)
+            try:
+                result = func(*args, **kwargs)
+            except:
+                raise
 
             os.chdir(previous_dir)
             return result
