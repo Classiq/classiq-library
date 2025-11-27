@@ -45,5 +45,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test notebook content
     cx_counts = tb.ref("cx_counts")
+    _logger.info(f"{cx_counts=}")
     for i in range(2, len(cx_counts)):
+        _logger.info(f"Asserting {cx_counts[i]} < {cx_counts[i - 1]}")
         assert cx_counts[i] < cx_counts[i - 1]
