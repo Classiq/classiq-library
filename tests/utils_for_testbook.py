@@ -70,14 +70,14 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
 
 def _build_patch_testbook_client_decorator(notebook_name: str) -> Callable:
     def patch_testbook_client_decorator(func: Callable) -> Any:
-        def inner(*args: Any, **kwargs: Any) -> Any:
+        def inner_patch(*args: Any, **kwargs: Any) -> Any:
             for arg in itertools.chain(args, kwargs.values()):
                 if isinstance(arg, TestbookNotebookClient):
                     arg._notebook_name = notebook_name
 
             return func(*args, *kwargs)
 
-        return inner
+        return inner_patch
 
     return patch_testbook_client_decorator
 
@@ -86,7 +86,7 @@ def _build_patch_testbook_client_decorator(notebook_name: str) -> Callable:
 #   so that relative files (images, csv, etc.) will be available
 def _build_cd_decorator(file_path: str) -> Callable:
     def cd_decorator(func: Callable) -> Any:
-        def inner(*args: Any, **kwargs: Any) -> Any:
+        def inner_cd(*args: Any, **kwargs: Any) -> Any:
             previous_dir = os.getcwd()
             os.chdir(ROOT_DIRECTORY)
             os.chdir(os.path.dirname(file_path))
@@ -96,7 +96,7 @@ def _build_cd_decorator(file_path: str) -> Callable:
             os.chdir(previous_dir)
             return result
 
-        return inner
+        return inner_cd
 
     return cd_decorator
 
