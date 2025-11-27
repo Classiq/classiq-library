@@ -50,14 +50,19 @@ def qmod_compare_decorator(func: Callable) -> Any:
         #   prepend all the errors from `compare_qmods`, so that `actions/send_qmod_slack_notification` will have a simpler regex
         comparison_errors = _compare_qmods(qmods_before, qmods_after)
 
-        if comparison_errors:
-            if error:
-                comparison_errors.insert(0, error)
-            raise StrippedExceptionGroup(
-                "Main test + qmod compare errors", comparison_errors
-            )
-        elif error:
-            raise strip_inners_from_exception(error)
+        if comparison_errors or error:
+            all_errors = []
+            if error is not None:
+                # put error from `func` first
+                all_errors.append(error)
+            all_errors.extend(comparison_errors)
+
+            if len(all_errors) == 1:
+                raise strip_inners_from_exception(all_errors[0])
+            else:
+                raise StrippedExceptionGroup(
+                    "Main test + qmod compare errors", all_errors
+                )
 
         return result
 
