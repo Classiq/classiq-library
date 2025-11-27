@@ -47,15 +47,15 @@ jobs:
             echo "Handling pull_request_target event"
             echo "SHOULD_TEST_ALL_FILES=false" >> $GITHUB_ENV
 
-            if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+            if [ "$REPO_NAME" != "${{ github.repository }}" ]; then
               echo "PR from a fork detected. Checking out the fork's branch."
-              git remote add fork 'https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git'
-              git fetch fork '${{ github.event.pull_request.head.ref }}'
+              git remote add fork "https://github.com/$REPO_NAME.git"
+              git fetch fork "$BRANCH_NAME"
               git checkout -B ci-testing-branch FETCH_HEAD # Tested code is comming from this branch (contributer's)
             else
               echo "PR from the same repository detected. Checking out the branch."
-              git fetch origin '${{ github.event.pull_request.head.ref }}'
-              git checkout '${{ github.event.pull_request.head.ref }}'
+              git fetch origin "$BRANCH_NAME"
+              git checkout "$BRANCH_NAME"
             fi
 
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
@@ -74,6 +74,9 @@ jobs:
           # Debugging: final git status
           echo "==== Git status after checkout ===="
           git status
+        env:
+          REPO_NAME: "${{ github.event.pull_request.head.repo.full_name }}"
+          BRANCH_NAME: "${{ github.event.pull_request.head.ref }}"
 
       #
       # Setup Python
