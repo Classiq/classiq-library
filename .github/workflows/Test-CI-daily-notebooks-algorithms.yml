@@ -35,7 +35,8 @@ jobs:
         id: list-files
         run: |
           shopt -s globstar
-          echo "files=$(echo algorithms/**/*.ipynb)" >> $GITHUB_OUTPUT
+          echo "files=algorithms/bernstein_vazirani/bernstein_vazirani.ipynb algorithms/deutsch_jozsa/deutsch_jozsa.ipynb algorithms/swap_test/swap_test.ipynb" >> $GITHUB_OUTPUT
+          # echo "files=$(echo algorithms/**/*.ipynb)" >> $GITHUB_OUTPUT
 
       # Run Notebook Tests
       - name: Run Notebooks

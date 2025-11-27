@@ -7,6 +7,7 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook("bernstein_vazirani", timeout_seconds=30)
 def test_notebook(tb: TestbookNotebookClient) -> None:
+    x = y
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
