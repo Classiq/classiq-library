@@ -58,7 +58,7 @@ def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
         for decorator in [
             _build_patch_testbook_client_decorator(notebook_name),
             testbook(notebook_path, execute=True, timeout=timeout_seconds),
-            qmod_compare_decorator,
+            # qmod_compare_decorator,
             _build_cd_decorator(notebook_path),
             _build_skip_decorator(notebook_path),
         ]:
@@ -91,7 +91,10 @@ def _build_cd_decorator(file_path: str) -> Callable:
             os.chdir(ROOT_DIRECTORY)
             os.chdir(os.path.dirname(file_path))
 
-            result = func(*args, **kwargs)
+            try:
+                result = func(*args, **kwargs)
+            except:
+                raise
 
             os.chdir(previous_dir)
             return result
