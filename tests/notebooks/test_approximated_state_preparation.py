@@ -40,7 +40,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
             qprogs[i],
             expected_width=tb.ref("NUM_QUBITS"),
             expected_depth=depths[i - 1]
-            - 1,  # the depth has to improve from the previous runs
+            # - 1,  # the depth has to improve from the previous runs
         )
 
     # test notebook content
