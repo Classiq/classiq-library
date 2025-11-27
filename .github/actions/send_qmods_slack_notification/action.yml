@@ -14,17 +14,25 @@ runs:
       run: |
         echo FAILING_TESTS=$(
           yq -o json -I 0 -p xml '
-                .testsuites[].testcase[] | select(.failure // .error) |
-                select((.failure // .error)["+@message"] | test("^((AssertionError: Qmod file)|(AssertionError: Found uncommitted Qmod)).*")) |
-                {
-                  "name": (.["+@classname"] + "::" + .["+@name"]),
-                  "message": (.failure // .error)["+@message"]
-                }
-              '  ./pytest-results/test-results.xml | \
-              jq -r -s '
-                sort_by(.name) | .[] |
-                "• " + .name + ": " + (.message | @html | split("\n") | .[0]) + "\n\n"
-                '
+            .testsuites[].testcase[]
+            | select(.failure // .error)
+            | select(
+              (.failure // .error)["+content"]
+              | test("(?:^|\n)E?(?:\s*)?(?:\|\s*)?(?:ValueError: (?:Qmod file)|(?:Found uncommitted Qmod))")
+            )
+            | {
+              "name": (.["+@classname"] + "::" + .["+@name"]),
+              "message": (
+                (.failure // .error)["+content"]
+                | match("(?:^|\n)E?(?:\s*)?(?:\|\s*)?((?:ValueError: (?:Qmod file)|(?:Found uncommitted Qmod))[^\n$]+)")
+                .captures[0].string
+              )
+            }
+          ' ./pytest-results/test-results.xml | \
+          jq -r -s '
+            sort_by(.name) | .[] |
+            "• " + .name + ": " + (.message | @html | split("\n") | .[0]) + "\n\n"
+          '
         ) >> $GITHUB_ENV
 
     - name: Send JSON to slack workflow
