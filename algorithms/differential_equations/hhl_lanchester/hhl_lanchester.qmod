@@ -1140,7 +1140,7 @@ qfunc qpe_expanded___0(phase: qnum<6, False, 6>, time_index_and_group_captured__
   qpe_flexible_expanded___0(phase, time_index_and_group_captured__main__0);
 }
 
-qfunc assign_amplitude_table_expanded___0(index: qbit[6], indicator: qbit) {
+qfunc assign_amplitude_table_expanded___0(const index: qbit[6], indicator: qbit) {
   RY(0.0, indicator);
   skip_control {
     CX(index[0], indicator);

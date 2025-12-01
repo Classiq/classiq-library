@@ -35,7 +35,7 @@ qfunc load_distribution_expanded___0(asset: qnum<5, False, 0>) {
   ], 0, asset);
 }
 
-qfunc assign_amplitude_table_expanded___0(index: qbit[5], indicator: qbit) {
+qfunc assign_amplitude_table_expanded___0(const index: qbit[5], indicator: qbit) {
   RY(1.4690320501, indicator);
   skip_control {
     CX(index[0], indicator);

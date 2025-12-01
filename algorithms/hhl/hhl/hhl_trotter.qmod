@@ -118,7 +118,7 @@ qfunc qpe_flexible_expanded___0(phase: qbit[4], memory_captured__hhl__1: qbit[2]
   }
 }
 
-qfunc assign_amplitude_table_expanded___0(index: qbit[4], indicator: qbit) {
+qfunc assign_amplitude_table_expanded___0(const index: qbit[4], indicator: qbit) {
   RY(0.4906964633, indicator);
   skip_control {
     CX(index[0], indicator);
