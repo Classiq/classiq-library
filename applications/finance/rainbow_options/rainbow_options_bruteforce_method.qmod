@@ -7,7 +7,7 @@ qperm affine_max_expanded___0(const x1: qnum<2, False, 0>, const x2: qnum<2, Fal
   res = max(1.0 * x1, ((0.5 * x1) + (0.5 * x2)) - 1.5);
 }
 
-qfunc assign_amplitude_table_expanded___0(index: qbit[3], indicator: qbit) {
+qfunc assign_amplitude_table_expanded___0(const index: qbit[3], indicator: qbit) {
   RY(1.8416, indicator);
   skip_control {
     CX(index[0], indicator);
