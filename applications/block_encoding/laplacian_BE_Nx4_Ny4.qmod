@@ -1,0 +1,101 @@
+qfunc eq_sup_lap(s: qnum) {
+  inplace_prepare_state([0.2, 0, 0.2, 0.2, 0.2, 0.2, 0, 0], 0, s);
+}
+
+qfunc oracle_org(s: qbit[], j: qnum, dlt: qbit) {
+  j1: qnum<2.0, False, 0>;
+  j2: qnum<2.0, False, 0>;
+  s0: qnum<1, False, 0>;
+  s1: qnum<1, False, 0>;
+  s2: qnum<1, False, 0>;
+  s -> {s0, s1, s2};
+  j -> {j1, j2};
+  control (s0 == 1) {
+    control (s1 == 0) {
+      control (s2 == 0) {
+        X(dlt);
+      }
+    }
+  }
+  control (s1 == 1) {
+    control (j1 == 0) {
+      X(dlt);
+    }
+  }
+  control (s2 == 1) {
+    control (j2 == 0) {
+      X(dlt);
+    }
+  }
+  {j1, j2} -> j;
+  {s0, s1, s2} -> s;
+}
+
+qfunc oracle_d(s: qnum, data: qnum, TM: real[]) {
+  repeat (i: TM::len) {
+    control (s == i) {
+      RX(2 * acos(TM[i]), data);
+    }
+  }
+}
+
+qfunc laplacian_BE(s: qnum, j: qnum, data: qnum, dlt: qnum) {
+  j1: qnum<2, False, 0>;
+  j2: qnum<2, False, 0>;
+  s0: qnum<1, False, 0>;
+  s1: qnum<1, False, 0>;
+  s2: qnum<1, False, 0>;
+  s -> {s0, s1, s2};
+  j -> {j1, j2};
+  control (s0 == 0) {
+    control (s2 == 1) {
+      j2 += 1;
+    }
+  }
+  {j1, j2} -> j;
+  control (s1 == 1) {
+    control (s0 == 0) {
+      j += 1;
+    }
+  }
+  {s0, s1, s2} -> s;
+  oracle_org(s, j, dlt);
+  s -> {s0, s1, s2};
+  d: qnum<2, False, 0>;
+  {s1, s2} -> d;
+  Z(data);
+  oracle_d(d, data, [(-1.0), 0.25, 0.25]);
+  d -> {s1, s2};
+  control (s1 == 1) {
+    X(s0);
+  }
+  control (s2 == 1) {
+    X(s0);
+  }
+  control (s1 == 1) {
+    control (s0 == 0) {
+      j += -1;
+    }
+  }
+  j -> {j1, j2};
+  control (s2 == 1) {
+    control (s0 == 0) {
+      j2 += -1;
+    }
+  }
+  {j1, j2} -> j;
+  {s0, s1, s2} -> s;
+}
+
+qfunc main(output s: qnum, output j: qnum, output data: qnum, output dlt: qbit) {
+  allocate(3, s);
+  allocate(1, dlt);
+  allocate(1, data);
+  allocate(4, j);
+  apply_to_all(H, j);
+  within {
+    eq_sup_lap(s);
+  } apply {
+    laplacian_BE(s, j, data, dlt);
+  }
+}
