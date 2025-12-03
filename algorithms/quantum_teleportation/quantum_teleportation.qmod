@@ -27,4 +27,6 @@ qfunc main(output bob_qubit: qbit) {
   allocate(1, bob_qubit);
   prepare_test_state(alice_qubit);
   quantum_teleportation(alice_qubit, bob_qubit, bell_pair_qubit);
+  drop(alice_qubit);
+  drop(bell_pair_qubit);
 }

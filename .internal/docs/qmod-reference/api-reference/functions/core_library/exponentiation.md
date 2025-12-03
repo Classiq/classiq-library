@@ -15,6 +15,6 @@ search:
             - multi_suzuki_trotter
             - unscheduled_suzuki_trotter
             - qdrift
-            - exponentiation_with_depth_constraint
+            - exponentiate
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->

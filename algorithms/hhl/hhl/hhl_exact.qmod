@@ -1,5 +1,5 @@
-qfunc load_b_expanded___0(amplitudes: real[], output state: qbit[2]) {
-  prepare_amplitudes(amplitudes, 0.0, state);
+qfunc load_b_expanded___0(amplitudes: real[], output memory: qbit[2]) {
+  prepare_amplitudes(amplitudes, 0.0, memory);
 }
 
 qfunc apply_to_all_expanded___0(target: qbit[4]) {
@@ -12,35 +12,35 @@ qfunc hamiltonian_evolution_with_power_0_lambda___0_0_expanded___0(pw: int, targ
   power (pw) {
     unitary([
       [
-        ((-0.09406240950199844) + 0.8149069223122054j),
-        (0.03521871946675125 - 0.029763534641642615j),
-        ((-0.018800717000078303) - 0.16142879795007103j),
+        ((-0.09406240950199857) + 0.8149069223122054j),
+        (0.03521871946675126 - 0.029763534641642615j),
+        ((-0.018800717000078293) - 0.16142879795007106j),
         (0.43769245930764733 + 0.32705554908759304j)
       ],
       [
-        (0.03521871946675126 - 0.029763534641642626j),
-        ((-0.15347248298890337) - 0.1727528247294824j),
-        (0.23117644455908545 + 0.8872069971297386j),
-        (0.2397182575488357 + 0.21548267921288922j)
+        (0.03521871946675127 - 0.029763534641642633j),
+        ((-0.15347248298890326) - 0.17275282472948233j),
+        (0.23117644455908531 + 0.8872069971297389j),
+        (0.23971825754883572 + 0.21548267921288933j)
       ],
       [
-        ((-0.018800717000078272) - 0.16142879795007106j),
-        (0.23117644455908531 + 0.8872069971297386j),
-        ((-0.12191317205164587) + 0.1320013812642838j),
-        (0.2958406910149558 + 0.11488938733473114j)
+        ((-0.01880071700007826) - 0.16142879795007103j),
+        (0.23117644455908523 + 0.8872069971297386j),
+        ((-0.1219131720516462) + 0.13200138126428373j),
+        (0.29584069101495575 + 0.11488938733473114j)
       ],
       [
-        (0.43769245930764744 + 0.3270555490875932j),
-        (0.23971825754883574 + 0.21548267921288933j),
-        (0.29584069101495586 + 0.11488938733473113j),
-        ((-0.6563827949579104) + 0.2569098899110467j)
+        (0.43769245930764744 + 0.32705554908759327j),
+        (0.2397182575488357 + 0.21548267921288933j),
+        (0.29584069101495586 + 0.1148893873347311j),
+        ((-0.6563827949579104) + 0.25690988991104674j)
       ]
     ], target);
   }
 }
 
-qfunc unitary_with_power_0_lambda___0_0_expanded___0(k: int, state_captured__hhl__1: qbit[2]) {
-  hamiltonian_evolution_with_power_0_lambda___0_0_expanded___0(k, state_captured__hhl__1);
+qfunc unitary_with_power_0_lambda___0_0_expanded___0(k: int, memory_captured__hhl__1: qbit[2]) {
+  hamiltonian_evolution_with_power_0_lambda___0_0_expanded___0(k, memory_captured__hhl__1);
 }
 
 qfunc qft_no_swap_expanded___0(qbv: qbit[4]) {
@@ -59,11 +59,11 @@ qfunc qft_expanded___0(target: qbit[4]) {
   qft_no_swap_expanded___0(target);
 }
 
-qfunc qpe_flexible_expanded___0(phase: qbit[4], state_captured__hhl__1: qbit[2]) {
+qfunc qpe_flexible_expanded___0(phase: qbit[4], memory_captured__hhl__1: qbit[2]) {
   apply_to_all_expanded___0(phase);
   repeat (index: 4) {
     control (phase[index]) {
-      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, state_captured__hhl__1);
+      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, memory_captured__hhl__1);
     }
   }
   invert {
@@ -71,7 +71,7 @@ qfunc qpe_flexible_expanded___0(phase: qbit[4], state_captured__hhl__1: qbit[2])
   }
 }
 
-qfunc assign_amplitude_table_expanded___0(index: qbit[4], indicator: qbit) {
+qfunc assign_amplitude_table_expanded___0(const index: qbit[4], indicator: qbit) {
   RY(0.49069646327199606, indicator);
   skip_control {
     CX(index[0], indicator);
@@ -138,27 +138,27 @@ qfunc assign_amplitude_table_expanded___0(index: qbit[4], indicator: qbit) {
   }
 }
 
-qfunc hhl_expanded___0(rhs_vector: real[], output state: qbit[2], output phase: qnum<4, False, 4>, output indicator: qbit) {
-  allocate(4, False, 4, phase);
+qfunc hhl_expanded___0(rhs_vector: real[], output memory: qbit[2], output estimator: qnum<4, False, 4>, output indicator: qbit) {
+  allocate(4, False, 4, estimator);
   load_b_expanded___0([
     0.18257418583505536,
     0.3651483716701107,
     0.7302967433402214,
     0.5477225575051661
-  ], state);
+  ], memory);
   allocate(1, indicator);
   within {
-    qpe_flexible_expanded___0(phase, state);
+    qpe_flexible_expanded___0(estimator, memory);
   } apply {
-    assign_amplitude_table_expanded___0(phase, indicator);
+    assign_amplitude_table_expanded___0(estimator, indicator);
   }
 }
 
-qfunc main(output res: qnum<2, False, 0>, output phase_var: qnum<4, False, 4>, output indicator: qbit) {
+qfunc main(output res: qnum<2, False, 0>, output estimator_var: qnum<4, False, 4>, output indicator: qbit) {
   hhl_expanded___0([
     0.18257418583505536,
     0.3651483716701107,
     0.7302967433402214,
     0.5477225575051661
-  ], res, phase_var, indicator);
+  ], res, estimator_var, indicator);
 }

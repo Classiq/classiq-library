@@ -44,8 +44,7 @@ qfunc inplace_prepare_complex_amplitudes_expanded___2(magnitudes: real[], target
 }
 
 @disable_perm_check
-qperm dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
-  dummy_data: qbit;
+qperm dummy_qae_expanded___0(qae_phase: qbit[1], const reg: qnum<6, False, 0>, output dummy_data: qbit) {
   full_qae: qbit[2];
   allocate(1, dummy_data);
   {qae_phase, dummy_data} -> full_qae;
@@ -554,13 +553,14 @@ qperm dummy_qae_expanded___0(qae_phase: qbit[1], reg: qnum<6, False, 0>) {
   full_qae -> {qae_phase, dummy_data};
 }
 
-qfunc phase_application_expanded___0(const qae_phase: qbit[1], gamma: real) {
+qperm phase_application_expanded___0(const qae_phase: qbit[1], gamma: real) {
   phase (0.049 - (0.049 * qae_phase[0]), gamma);
 }
 
 qfunc dummy_cost_layer_expanded___0(qae_phase: qbit[1], reg: qbit[6], gamma: real) {
+  dummy_data: qbit;
   within {
-    dummy_qae_expanded___0(qae_phase, reg);
+    dummy_qae_expanded___0(qae_phase, reg, dummy_data);
   } apply {
     phase_application_expanded___0(qae_phase, gamma);
   }
@@ -582,6 +582,7 @@ qfunc qaoa_circuit_expanded___0(gammas: real[1], betas: real[1], reg: qbit[6]) {
   allocate(1, qae_phase);
   hadamard_transform_expanded___0(reg);
   qaoa_layer_expanded___0(qae_phase, reg, gammas[0], betas[0]);
+  drop(qae_phase);
 }
 
 qfunc main(gammas: real[1], betas: real[1], output reg: qbit[6]) {

@@ -1,8 +1,16 @@
+qfunc modular_exponentiation(n: int, a: int, x: qbit[], pw: qbit[]) {
+  repeat (index: pw.len) {
+    control (pw[index]) {
+      inplace_modular_multiply(n, (a ** (2 ** index)) % n, x);
+    }
+  }
+}
+
 qfunc discrete_log_oracle(g_generator: int, x_element: int, N_modulus: int, x1: qbit[], x2: qbit[], output func_res: qnum) {
   allocate(ceiling(log(N_modulus, 2)), func_res);
   func_res ^= 1;
-  modular_exp(N_modulus, x_element, func_res, x1);
-  modular_exp(N_modulus, g_generator, func_res, x2);
+  modular_exponentiation(N_modulus, x_element, func_res, x1);
+  modular_exponentiation(N_modulus, g_generator, func_res, x2);
 }
 
 qfunc discrete_log(g: int, x: int, N: int, order: int, output x1: qbit[], output x2: qbit[], output func_res: qbit[]) {

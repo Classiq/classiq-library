@@ -1,5 +1,5 @@
-qfunc load_b_expanded___0(amplitudes: real[], output state: qbit[2]) {
-  prepare_amplitudes(amplitudes, 0.0, state);
+qfunc load_b_expanded___0(amplitudes: real[], output memory: qbit[2]) {
+  prepare_amplitudes(amplitudes, 0.0, memory);
 }
 
 qfunc apply_to_all_expanded___0(target: qbit[4]) {
@@ -86,8 +86,8 @@ qfunc hamiltonian_evolution_with_power_0_lambda___0_0_expanded___0(pw: int, targ
   }, (-6.2831853072) * pw, 1, 4 * ceiling(1.8 ** log(pw, 2)), target);
 }
 
-qfunc unitary_with_power_0_lambda___0_0_expanded___0(k: int, state_captured__hhl__1: qbit[2]) {
-  hamiltonian_evolution_with_power_0_lambda___0_0_expanded___0(k, state_captured__hhl__1);
+qfunc unitary_with_power_0_lambda___0_0_expanded___0(k: int, memory_captured__hhl__1: qbit[2]) {
+  hamiltonian_evolution_with_power_0_lambda___0_0_expanded___0(k, memory_captured__hhl__1);
 }
 
 qfunc qft_no_swap_expanded___0(qbv: qbit[4]) {
@@ -106,11 +106,11 @@ qfunc qft_expanded___0(target: qbit[4]) {
   qft_no_swap_expanded___0(target);
 }
 
-qfunc qpe_flexible_expanded___0(phase: qbit[4], state_captured__hhl__1: qbit[2]) {
+qfunc qpe_flexible_expanded___0(phase: qbit[4], memory_captured__hhl__1: qbit[2]) {
   apply_to_all_expanded___0(phase);
   repeat (index: 4) {
     control (phase[index]) {
-      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, state_captured__hhl__1);
+      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, memory_captured__hhl__1);
     }
   }
   invert {
@@ -118,7 +118,7 @@ qfunc qpe_flexible_expanded___0(phase: qbit[4], state_captured__hhl__1: qbit[2])
   }
 }
 
-qfunc assign_amplitude_table_expanded___0(index: qbit[4], indicator: qbit) {
+qfunc assign_amplitude_table_expanded___0(const index: qbit[4], indicator: qbit) {
   RY(0.4906964633, indicator);
   skip_control {
     CX(index[0], indicator);
@@ -185,27 +185,27 @@ qfunc assign_amplitude_table_expanded___0(index: qbit[4], indicator: qbit) {
   }
 }
 
-qfunc hhl_expanded___0(rhs_vector: real[], output state: qbit[2], output phase: qnum<4, False, 4>, output indicator: qbit) {
-  allocate(4, False, 4, phase);
+qfunc hhl_expanded___0(rhs_vector: real[], output memory: qbit[2], output estimator: qnum<4, False, 4>, output indicator: qbit) {
+  allocate(4, False, 4, estimator);
   load_b_expanded___0([
     0.1825741858,
     0.3651483717,
     0.7302967433,
     0.5477225575
-  ], state);
+  ], memory);
   allocate(1, indicator);
   within {
-    qpe_flexible_expanded___0(phase, state);
+    qpe_flexible_expanded___0(estimator, memory);
   } apply {
-    assign_amplitude_table_expanded___0(phase, indicator);
+    assign_amplitude_table_expanded___0(estimator, indicator);
   }
 }
 
-qfunc main(output res: qnum<2, False, 0>, output phase_var: qnum<4, False, 4>, output indicator: qbit) {
+qfunc main(output res: qnum<2, False, 0>, output estimator_var: qnum<4, False, 4>, output indicator: qbit) {
   hhl_expanded___0([
     0.1825741858,
     0.3651483717,
     0.7302967433,
     0.5477225575
-  ], res, phase_var, indicator);
+  ], res, estimator_var, indicator);
 }
