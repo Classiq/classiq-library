@@ -25,7 +25,35 @@ qfunc multiplex_ra_expanded___0(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(-0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
   skip_control {
     CX(qba[1], ind);
   }
@@ -33,36 +61,6 @@ qfunc multiplex_ra_expanded___0(qba: qbit[5], ind: qbit) {
     CX(qba[0], ind);
   }
   RZ(0.1963, ind);
-  skip_control {
-    CX(qba[2], ind);
-  }
-  RZ(-0.1963, ind);
-  skip_control {
-    CX(qba[0], ind);
-  }
-  RZ(-0.3927, ind);
-  skip_control {
-    CX(qba[1], ind);
-  }
-  RZ(0.3927, ind);
-  skip_control {
-    CX(qba[0], ind);
-  }
-  RZ(-0.1963, ind);
-  skip_control {
-    CX(qba[3], ind);
-  }
-  skip_control {
-    CX(qba[0], ind);
-  }
-  RZ(-0.1963, ind);
-  skip_control {
-    CX(qba[1], ind);
-  }
-  RZ(-0.1963, ind);
-  skip_control {
-    CX(qba[0], ind);
-  }
   skip_control {
     CX(qba[2], ind);
   }
@@ -88,40 +86,40 @@ qfunc multiplex_ra_expanded___0(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(0.1963, ind);
-  skip_control {
-    CX(qba[0], ind);
-  }
-  skip_control {
-    CX(qba[2], ind);
-  }
-  skip_control {
-    CX(qba[0], ind);
-  }
-  RZ(0.1963, ind);
-  skip_control {
-    CX(qba[1], ind);
-  }
   RZ(-0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
   RZ(0.3927, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(0.589, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  skip_control {
+    CX(qba[1], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.589, ind);
   skip_control {
     CX(qba[3], ind);
   }
-  RZ(0.1963, ind);
+  RZ(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.3927, ind);
+  RZ(0.1963, ind);
   skip_control {
     CX(qba[1], ind);
   }
+  RZ(-0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(-0.1963, ind);
   skip_control {
     CX(qba[2], ind);
   }
@@ -129,11 +127,9 @@ qfunc multiplex_ra_expanded___0(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -148,27 +144,27 @@ qfunc multiplex_ra_expanded___1(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.2945, ind);
+  RY(0.0982, ind);
   skip_control {
     CX(qba[1], ind);
   }
-  RY(0.2945, ind);
-  skip_control {
-    CX(qba[0], ind);
-  }
-  RY(-0.2945, ind);
-  skip_control {
-    CX(qba[2], ind);
-  }
-  RY(0.2945, ind);
+  RY(-0.0982, ind);
   skip_control {
     CX(qba[0], ind);
   }
   RY(0.4909, ind);
   skip_control {
+    CX(qba[2], ind);
+  }
+  RY(1.0799, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(0.0982, ind);
+  skip_control {
     CX(qba[1], ind);
   }
-  RY(-0.4909, ind);
+  RY(-0.0982, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -180,11 +176,11 @@ qfunc multiplex_ra_expanded___1(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.6872, ind);
+  RY(0.2945, ind);
   skip_control {
     CX(qba[1], ind);
   }
-  RY(0.0982, ind);
+  RY(-0.2945, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -196,11 +192,11 @@ qfunc multiplex_ra_expanded___1(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.6872, ind);
+  RY(0.2945, ind);
   skip_control {
     CX(qba[1], ind);
   }
-  RY(0.0982, ind);
+  RY(-0.2945, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -212,27 +208,27 @@ qfunc multiplex_ra_expanded___1(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.0982, ind);
+  RY(-0.2945, ind);
   skip_control {
     CX(qba[1], ind);
   }
-  RY(-0.0982, ind);
-  skip_control {
-    CX(qba[0], ind);
-  }
-  RY(0.0982, ind);
-  skip_control {
-    CX(qba[2], ind);
-  }
-  RY(-0.0982, ind);
+  RY(0.2945, ind);
   skip_control {
     CX(qba[0], ind);
   }
   RY(-0.6872, ind);
   skip_control {
+    CX(qba[2], ind);
+  }
+  RY(-0.8836, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RY(-0.2945, ind);
+  skip_control {
     CX(qba[1], ind);
   }
-  RY(0.6872, ind);
+  RY(0.2945, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -244,11 +240,11 @@ qfunc multiplex_ra_expanded___1(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.4909, ind);
+  RY(-0.0982, ind);
   skip_control {
     CX(qba[1], ind);
   }
-  RY(-0.2945, ind);
+  RY(0.0982, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -260,11 +256,11 @@ qfunc multiplex_ra_expanded___1(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.4909, ind);
+  RY(-0.0982, ind);
   skip_control {
     CX(qba[1], ind);
   }
-  RY(-0.2945, ind);
+  RY(0.0982, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -287,7 +283,7 @@ qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.2945, ind);
+  RZ(-0.0982, ind);
   skip_control {
     CX(qba[2], ind);
   }
@@ -303,7 +299,7 @@ qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(-0.2945, ind);
+  RZ(0.0982, ind);
   skip_control {
     CX(qba[3], ind);
   }
@@ -311,7 +307,7 @@ qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(-0.0982, ind);
+  RZ(-0.4909, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -327,7 +323,7 @@ qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(-0.2945, ind);
+  RZ(0.0982, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -347,7 +343,7 @@ qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(-0.2945, ind);
+  RZ(0.0982, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -363,7 +359,7 @@ qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(0.2945, ind);
+  RZ(-0.0982, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -371,7 +367,7 @@ qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[3], ind);
   }
-  RZ(0.0982, ind);
+  RZ(0.4909, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -387,7 +383,7 @@ qfunc multiplex_ra_expanded___2(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[2], ind);
   }
-  RZ(0.2945, ind);
+  RZ(-0.0982, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -528,18 +524,18 @@ qfunc multiplex_ra_expanded___4(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
-  skip_control {
-    CX(qba[0], ind);
-  }
-  RZ(-0.3927, ind);
-  skip_control {
-    CX(qba[2], ind);
-  }
-  RZ(0.1963, ind);
+  RZ(-0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
   RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(-0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -547,28 +543,28 @@ qfunc multiplex_ra_expanded___4(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.1963, ind);
+  RZ(-0.1963, ind);
   skip_control {
     CX(qba[3], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
+  RZ(0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
+  RZ(0.1963, ind);
   skip_control {
     CX(qba[0], ind);
-  }
-  RZ(-0.3927, ind);
-  skip_control {
-    CX(qba[2], ind);
   }
   RZ(-0.1963, ind);
   skip_control {
+    CX(qba[2], ind);
+  }
+  skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.1963, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -588,34 +584,12 @@ qfunc multiplex_ra_expanded___4(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(0.1963, ind);
-  skip_control {
-    CX(qba[0], ind);
-  }
-  RZ(0.1963, ind);
-  skip_control {
-    CX(qba[2], ind);
-  }
-  skip_control {
-    CX(qba[0], ind);
-  }
-  skip_control {
-    CX(qba[1], ind);
-  }
-  skip_control {
-    CX(qba[0], ind);
-  }
   RZ(0.3927, ind);
   skip_control {
-    CX(qba[3], ind);
-  }
-  RZ(0.589, ind);
-  skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.1963, ind);
   skip_control {
-    CX(qba[1], ind);
+    CX(qba[2], ind);
   }
   RZ(-0.1963, ind);
   skip_control {
@@ -623,11 +597,35 @@ qfunc multiplex_ra_expanded___4(qba: qbit[5], ind: qbit) {
   }
   RZ(0.589, ind);
   skip_control {
-    CX(qba[2], ind);
+    CX(qba[1], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.3927, ind);
+  skip_control {
+    CX(qba[3], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
+  skip_control {
+    CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
+  skip_control {
+    CX(qba[2], ind);
+  }
+  RZ(-0.1963, ind);
+  skip_control {
+    CX(qba[0], ind);
+  }
+  RZ(0.1963, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -647,17 +645,17 @@ qfunc multiplex_ra_expanded___5(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
+  RY(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
+  RY(0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -673,17 +671,17 @@ qfunc multiplex_ra_expanded___5(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
+  RY(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
+  RY(0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -699,17 +697,17 @@ qfunc multiplex_ra_expanded___5(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
+  RY(-0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
+  RY(-0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -725,17 +723,17 @@ qfunc multiplex_ra_expanded___5(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[1], ind);
   }
+  RY(-0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
+  RY(-0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
@@ -752,25 +750,22 @@ qfunc multiplex_ra_expanded___6(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.1963, ind);
   skip_control {
     CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.1963, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RZ(-0.1963, ind);
+  RZ(-0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -782,25 +777,22 @@ qfunc multiplex_ra_expanded___6(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(-0.1963, ind);
   skip_control {
     CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.1963, ind);
+  RZ(0.3927, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RZ(-0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(-0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -811,25 +803,22 @@ qfunc multiplex_ra_expanded___6(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(-0.1963, ind);
   skip_control {
     CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(-0.1963, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RZ(0.1963, ind);
+  RZ(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(-0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -841,25 +830,22 @@ qfunc multiplex_ra_expanded___6(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(0.1963, ind);
   skip_control {
     CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
-  RZ(-0.1963, ind);
+  RZ(-0.3927, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RZ(0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
   skip_control {
     CX(qba[1], ind);
   }
-  RZ(0.1963, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -874,25 +860,22 @@ qfunc multiplex_ra_expanded___7(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RY(0.3927, ind);
+  RY(0.7854, ind);
   skip_control {
     CX(qba[0], ind);
   }
   skip_control {
     CX(qba[1], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -904,25 +887,22 @@ qfunc multiplex_ra_expanded___7(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.3927, ind);
+  RY(-0.7854, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
   skip_control {
     CX(qba[1], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -934,25 +914,22 @@ qfunc multiplex_ra_expanded___7(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RY(-0.3927, ind);
+  RY(-0.7854, ind);
   skip_control {
     CX(qba[0], ind);
   }
   skip_control {
     CX(qba[1], ind);
   }
-  RY(0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -964,25 +941,22 @@ qfunc multiplex_ra_expanded___7(qba: qbit[5], ind: qbit) {
   skip_control {
     CX(qba[0], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[1], ind);
   }
   skip_control {
     CX(qba[0], ind);
   }
-  RY(0.3927, ind);
+  RY(0.7854, ind);
   skip_control {
     CX(qba[2], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
   skip_control {
     CX(qba[1], ind);
   }
-  RY(-0.3927, ind);
   skip_control {
     CX(qba[0], ind);
   }
@@ -993,65 +967,65 @@ qfunc multiplex_ra_expanded___7(qba: qbit[5], ind: qbit) {
 }
 
 qperm apply_phase_table_expanded___0(target: qbit[5]) {
-  PHASE(0.4909, target[0]);
-  CX(target[0], target[1]);
-  PHASE(-0.8836, target[1]);
+  PHASE(-0.0982, target[0]);
   CX(target[0], target[1]);
   PHASE(0.0982, target[1]);
+  CX(target[0], target[1]);
+  PHASE(-0.2945, target[1]);
   CX(target[1], target[2]);
-  PHASE(-0.2945, target[2]);
-  CX(target[0], target[2]);
   PHASE(-0.4909, target[2]);
-  CX(target[1], target[2]);
-  PHASE(-0.6872, target[2]);
   CX(target[0], target[2]);
   PHASE(0.6872, target[2]);
+  CX(target[1], target[2]);
+  PHASE(-1.0799, target[2]);
+  CX(target[0], target[2]);
+  PHASE(0.8836, target[2]);
   CX(target[2], target[3]);
-  PHASE(1.0799, target[3]);
+  PHASE(1.2763, target[3]);
+  CX(target[0], target[3]);
+  PHASE(-0.2945, target[3]);
+  CX(target[1], target[3]);
+  PHASE(0.2945, target[3]);
+  CX(target[0], target[3]);
+  PHASE(0.2945, target[3]);
+  CX(target[2], target[3]);
+  PHASE(-0.6872, target[3]);
   CX(target[0], target[3]);
   PHASE(-0.6872, target[3]);
   CX(target[1], target[3]);
   PHASE(0.2945, target[3]);
   CX(target[0], target[3]);
-  PHASE(0.8836, target[3]);
-  CX(target[2], target[3]);
-  PHASE(0.0982, target[3]);
-  CX(target[0], target[3]);
-  PHASE(-0.4909, target[3]);
-  CX(target[1], target[3]);
-  PHASE(0.0982, target[3]);
-  CX(target[0], target[3]);
   PHASE(1.0799, target[3]);
   CX(target[3], target[4]);
   PHASE(-0.8836, target[4]);
   CX(target[0], target[4]);
-  PHASE(0.4909, target[4]);
-  CX(target[1], target[4]);
-  PHASE(-0.0982, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.2945, target[4]);
-  CX(target[2], target[4]);
-  PHASE(0.4909, target[4]);
-  CX(target[0], target[4]);
   PHASE(0.6872, target[4]);
   CX(target[1], target[4]);
-  PHASE(-0.2945, target[4]);
-  CX(target[0], target[4]);
-  PHASE(-0.8836, target[4]);
-  CX(target[3], target[4]);
-  PHASE(-1.2763, target[4]);
+  PHASE(-1.0799, target[4]);
   CX(target[0], target[4]);
   PHASE(-0.2945, target[4]);
-  CX(target[1], target[4]);
+  CX(target[2], target[4]);
+  PHASE(0.6872, target[4]);
+  CX(target[0], target[4]);
   PHASE(-0.0982, target[4]);
+  CX(target[1], target[4]);
+  PHASE(0.0982, target[4]);
   CX(target[0], target[4]);
   PHASE(-0.6872, target[4]);
-  CX(target[2], target[4]);
-  PHASE(-0.2945, target[4]);
+  CX(target[3], target[4]);
+  PHASE(-1.0799, target[4]);
   CX(target[0], target[4]);
-  PHASE(-0.4909, target[4]);
+  PHASE(-0.6872, target[4]);
   CX(target[1], target[4]);
-  PHASE(0.8836, target[4]);
+  PHASE(0.2945, target[4]);
+  CX(target[0], target[4]);
+  PHASE(-0.0982, target[4]);
+  CX(target[2], target[4]);
+  PHASE(0.0982, target[4]);
+  CX(target[0], target[4]);
+  PHASE(-0.2945, target[4]);
+  CX(target[1], target[4]);
+  PHASE(0.2945, target[4]);
   CX(target[0], target[4]);
   PHASE(1.4726, target[4]);
 }
@@ -1060,17 +1034,17 @@ qfunc lcu_paulis_graycode_expanded___0(data: qbit[4], block: qbit[5]) {
   within {
     inplace_prepare_state([
       0.3022,
-      0.0228,
-      0.0204,
-      0.0214,
       0.0172,
+      0.0204,
+      0.0228,
       0.0142,
+      0.0214,
       0.0245,
       0.1402,
-      0.0227,
+      0.0189,
       0.0204,
       0.0227,
-      0.0189,
+      0.0227,
       0.0227,
       0.0227,
       0.0804,
