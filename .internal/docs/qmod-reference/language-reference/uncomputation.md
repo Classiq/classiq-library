@@ -376,7 +376,7 @@ operation, which is flagged as an error.
         allocate(q2)
         H(
             q2
-        )  # Error - The computation sequence of the local variable 'q2' includes a non-permutation operation
+        )  # Error - The local variable 'q2' cannot be automatically uncomputed because it is mutated by a non-permutation operation.
         CX(q2, q1)
     ```
 
@@ -387,7 +387,7 @@ operation, which is flagged as an error.
       q2: qbit;
       allocate(q1);
       allocate(q2);
-      H(q2); // Error - The computation sequence of the local variable 'q2' includes a non-permutation operation
+      H(q2); // Error - The local variable 'q2' cannot be automatically uncomputed because it is mutated by a non-permutation operation.
       CX(q2, q1);
     }
     ```
@@ -417,7 +417,7 @@ of `x_transform` are declared _non-const_.
         allocate(aux)
         x_transform(
             p, aux
-        )  # Error - The computation sequence of the local variable 'aux' includes an operation which mutates the parameter 'p'
+        )  # Error - The local variable 'aux' cannot be automatically uncomputed because it is mutated by an operation which also mutates the parameter 'p'.
     ```
 
 === "Native"
@@ -432,7 +432,7 @@ of `x_transform` are declared _non-const_.
       aux: qbit;
       allocate(p);
       allocate(aux);
-      x_transform(p, aux); // Error - The computation sequence of the local variable 'aux' includes an operation which mutates the parameter 'p'
+      x_transform(p, aux); // Error - The local variable 'aux' cannot be automatically uncomputed because it is mutated by an operation which also mutates the parameter 'p'.
     }
     ```
 
@@ -455,7 +455,7 @@ the variable `p`.
         allocate(aux)
         CX(
             p, aux
-        )  # Error - The computation sequence of the local variable 'aux' includes a circular dependency with the variable 'p'
+        )  # Error - The local variable 'aux' cannot be automatically uncomputed because it forms a circular dependency with the variable 'p'.
         CX(aux, p)
     ```
 
@@ -466,7 +466,7 @@ the variable `p`.
       aux: qbit;
       allocate(p);
       allocate(aux);
-      CX(p, aux); // Error - The computation sequence of the local variable 'aux' includes a circular dependency with the variable 'p'
+      CX(p, aux); // Error - The local variable 'aux' cannot be automatically uncomputed because it forms a circular dependency with the variable 'p'.
       CX(aux, p);
     }
     ```
