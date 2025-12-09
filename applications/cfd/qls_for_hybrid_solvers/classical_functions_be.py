@@ -1,7 +1,31 @@
 from openfermion import QubitOperator
 import numpy as np
 from scipy.sparse import csr_matrix
-from classiq import SparsePauliOp
+from classiq import SparsePauliOp, SparsePauliTerm, IndexedPauli, Pauli
+
+from typing import cast
+from openfermion.utils.operator_utils import count_qubits
+
+
+# TODO: remove after bug fix
+def of_op_to_cl_op(qubit_op: QubitOperator) -> SparsePauliOp:
+    n_qubits = cast(int, count_qubits(qubit_op))
+    return SparsePauliOp(
+        terms=[
+            SparsePauliTerm(
+                paulis=[  # type:ignore[arg-type]
+                    IndexedPauli(
+                        pauli=getattr(Pauli, pauli),
+                        index=qubit,
+                    )
+                    for qubit, pauli in term
+                ],
+                coefficient=coeff,
+            )
+            for term, coeff in qubit_op.terms.items()
+        ],
+        num_qubits=n_qubits,
+    )
 
 
 def get_projected_state_vector(  # type: ignore[no-untyped-def]
