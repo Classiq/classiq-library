@@ -85,8 +85,8 @@ def initialize_paulis_from_csr(
     for i in range(len(rowstt) - 1):
         for j in range(rowstt[i], rowstt[i + 1]):
 
-            b1 = np.binary_repr(i, width=nq)
-            b2 = np.binary_repr(col[j], width=nq)
+            b1 = np.binary_repr(i, width=nq)[::-1]
+            b2 = np.binary_repr(col[j], width=nq)[::-1]
             diffarray = binary_diff_to_elementary(
                 b1, b2
             )  # this is an array of size N, contains 0,1,2, or 3. Each corresponds to elementry matrix
@@ -116,14 +116,10 @@ def initialize_paulis_from_csr(
         transform_matrix_sym = list()
         for term, coe in zip(terms_list, transform_matrix):
             if [p[1] for p in term].count("Y") % 2 == 0:
-                paulis_sym_list.append(
-                    ((0, "X"),) + tuple((p[0] + 1, p[1]) for p in term)
-                )
+                paulis_sym_list.append(((nq, "X"),) + tuple((p[0], p[1]) for p in term))
                 transform_matrix_sym.append((np.real(coe)).tolist())
             else:
-                paulis_sym_list.append(
-                    ((0, "Y"),) + tuple((p[0] + 1, p[1]) for p in term)
-                )
+                paulis_sym_list.append(((nq, "Y"),) + tuple((p[0], p[1]) for p in term))
                 transform_matrix_sym.append((np.imag(coe)).tolist())
 
         return paulis_sym_list.copy(), transform_matrix_sym.copy()
