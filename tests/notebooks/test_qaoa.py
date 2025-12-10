@@ -12,11 +12,18 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog"),
-        expected_width=9,  # actual width: 7
-        expected_depth=1250,  # actual depth: 1072
+        tb.ref_pydantic("qprog_maxcut"),
+        expected_width=5,
+        expected_depth=55,
+    )
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog_knapsack"),
+        expected_width=18,  # actual width: 18
+        expected_depth=2500,  # actual depth: 2323
     )
 
     # test notebook content
-    assert tb.ref("depth_classiq") < tb.ref("depth_qiskit")
-    assert tb.ref("cx_counts_classiq") < tb.ref("cx_counts_qiskit")
+    maxcut_cost = tb.ref("maxcut_cost")
+    for i, pc in enumerate(tb.ref_numpy("best_outcomes")):
+        cost_value = maxcut_cost(pc.state["v"])
+        assert np.isclose(cost_value, -5 / 6)
