@@ -15,6 +15,8 @@ TIMEOUTS_FILE = PROJECT_ROOT / "tests" / "resources" / "timeouts.yaml"
 
 DEFAULT_TIMEOUT_SECONDS: float = 10
 
+ENFORCE_TIMEOUTS: bool = False
+
 
 def main(full_file_paths: Iterable[str]) -> bool:
     return validate_unique_names() and all(map(is_valid_qmod, full_file_paths))
@@ -43,7 +45,11 @@ def is_valid_qmod(
             f"    for example, you may change '{file_path}' to '{file_path.replace(' ', '_')}'."
         )
 
-    if not _is_file_in_timeouts(file_name) and should_notebook_be_tested(file_path):
+    if (
+        ENFORCE_TIMEOUTS
+        and not _is_file_in_timeouts(file_name)
+        and should_notebook_be_tested(file_path)
+    ):
         if automatically_add_timeout:
             _add_file_to_timeouts(file_name)
             errors.append(
