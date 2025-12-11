@@ -51,6 +51,33 @@ EMPTY_METADATA = {
     "level": [],
 }
 
+
+def _auto_gen_description(file: str) -> str:
+    with open(file) as f:
+        data = json.load(f)
+
+    if data["cells"][0]["cell_type"] == "markdown":
+        return data["cells"][0]["source"][0].lstrip("#").strip()
+    else:  # default
+        return EMPTY_METADATA["description"]
+
+
+def _auto_gen_friendly_name(file: str) -> str:
+    try:
+        name = os.path.basename(notebook)
+        name = name[: -len(".ipynb")]
+        name = name.replace("_", " ")
+        name = name.title()
+        return name
+    except:
+        return EMPTY_METADATA["friendly_name"]
+
+
+EMPTY_METADATA_GENERATION = {
+    "friendly_name": _auto_gen_friendly_name,
+    "description": _auto_gen_description,
+}
+
 MetadataField_VerticalTag = [
     "automotive",
     "retail",
@@ -185,7 +212,10 @@ def _validate_metadata_fields(metadata: dict, auto_fix: bool, file: str) -> str:
         if auto_fix:
             missing_keys = EMPTY_METADATA.keys() - metadata.keys()
             for key in missing_keys:
-                metadata[key] = EMPTY_METADATA[key]
+                if key in EMPTY_METADATA_GENERATION:
+                    metadata[key] = EMPTY_METADATA_GENERATION[key](file)
+                else:
+                    metadata[key] = EMPTY_METADATA[key]
 
             extra_keys = metadata.keys() - EMPTY_METADATA.keys()
             for key in extra_keys:
@@ -239,8 +269,12 @@ def generate_empty_metadata_file(file_path: str) -> str:
     if os.path.exists(file_path):
         return f"Metadata file already exists ({file_path})"
     try:
+        metadata = EMPTY_METADATA.copy()
+        for key, func in EMPTY_METADATA_GENERATION.items():
+            metadata[key] = func(file_path)
+
         with open(file_path, "w") as f:
-            json.dump(EMPTY_METADATA, f, indent=2)
+            json.dump(metadata, f, indent=2)
         return ""  # empty string means no errors
     except Exception as exc:
         return str(exc)
