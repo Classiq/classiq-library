@@ -30,14 +30,14 @@ def is_valid_notebook(file_path: str, automatically_add_timeout: bool = True) ->
     if _does_contain_dash_in_file_name(file_name):
         errors.append(
             "File naming format error:\n"
-            "    Dash (-) is not allowed in file named. please use underscore (_)\n"
+            "    Dash (-) is not allowed in file name. please use underscore (_)\n"
             f"    for example, you may change '{file_path}' to '{file_path.replace('-', '_')}'."
         )
 
     if _does_contain_space_in_file_name(file_name):
         errors.append(
             "File naming format error:\n"
-            "    Space is not allowed in file named. please use underscore (_)\n"
+            "    Space is not allowed in file name. please use underscore (_)\n"
             f"    for example, you may change '{file_path}' to '{file_path.replace(' ', '_')}'."
         )
 
