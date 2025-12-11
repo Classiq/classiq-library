@@ -86,6 +86,13 @@ repos:
       #   additional_dependencies:
       #     - "pyyaml==6.0"
       #   require_serial: true
+      - id: validate-metadata-file
+        name: Validate Metadata file
+        description: Add file if non existant and validate value otherwise
+        entry: .internal/pre_commit_tools/validate_metadata.py
+        language: python
+        files: ^\S+\.(qmod|ipynb)$
+        require_serial: true
       - id: auto-add-tests
         name: Auto add test
         description: Automatically adding a test to new notebooks
