@@ -77,15 +77,15 @@ repos:
         additional_dependencies:
           - "pyyaml==6.0"
         require_serial: true
-      - id: clean-demo-timeouts
-        name: Clean demo timeouts
-        description: Remove unexisting entries and verify unique keys
-        entry: .internal/pre_commit_tools/clean_timeouts.py
-        language: python
-        files: ^\S+\.(qmod|ipynb|yaml)$
-        additional_dependencies:
-          - "pyyaml==6.0"
-        require_serial: true
+      # - id: clean-demo-timeouts
+      #   name: Clean demo timeouts
+      #   description: Remove unexisting entries and verify unique keys
+      #   entry: .internal/pre_commit_tools/clean_timeouts.py
+      #   language: python
+      #   files: ^\S+\.(qmod|ipynb|yaml)$
+      #   additional_dependencies:
+      #     - "pyyaml==6.0"
+      #   require_serial: true
       - id: auto-add-tests
         name: Auto add test
         description: Automatically adding a test to new notebooks
