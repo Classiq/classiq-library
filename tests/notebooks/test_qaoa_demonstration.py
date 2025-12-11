@@ -4,20 +4,19 @@ from tests.utils_for_testbook import (
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
-import numpy as np
 
 
-@wrap_testbook("qaoa_max_cut", timeout_seconds=300)
+@wrap_testbook("qaoa_demonstration", timeout_seconds=450)
 def test_notebook(tb: TestbookNotebookClient) -> None:
+    # test models
+    validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
-        expected_width=5,
-        expected_depth=55,
+        expected_width=9,  # actual width: 7
+        expected_depth=1250,  # actual depth: 1072
     )
 
     # test notebook content
-    maxcut_cost = tb.ref("maxcut_cost")
-    for i, pc in enumerate(tb.ref_numpy("best_outcomes")):
-        cost_value = maxcut_cost(pc.state["v"])
-        assert np.isclose(cost_value, -5 / 6)
+    assert tb.ref("depth_classiq") < tb.ref("depth_qiskit")
+    assert tb.ref("cx_counts_classiq") < tb.ref("cx_counts_qiskit")
