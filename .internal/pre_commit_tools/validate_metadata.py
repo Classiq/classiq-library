@@ -16,14 +16,24 @@ NO_ERROR = ""  # return types are str, so we treat an emtpy string as no error t
 #
 # Configuration
 #
+# if `DISABLED` is True, then nothing runs, and all the other flags are ignored.
 IS_DISABLED: bool = True
-
+# if `AUTO_FIX` is True, then the script
+#   will automatically generate missing metadata files,
+#   and will automatically delete un-needed metadata files
 SHOULD_AUTO_FIX: bool = True
-
+# if `VALIDATE_CONTENT` is False, then the only check will be "does a file exist"
+#   and no content validation will happen
 SHOULD_VALIDATE_METADATA_CONTENT: bool = True
-
+# if `SKIP_MISSING` is True, then only existing fields will be validated
+SHOULD_SKIP_MISSING_FIELDS: bool = True
+# if `VALIDATE_SAME_NAME` is True, then, in the case where a folder has
+#   a single `ipynb` file and a single `.qmod` file
+#   then this pre-commit will enforce that they will have the same file name
 SHOULD_VALIDATE_SAME_NAME: bool = True
-
+# if `CLEAN_LEFTOVER` is True, then we will automatically delete un-needed metadata files
+#   (and, if after deleting them, they will have an empty directory, it will also be deleted)
+#   note that if `AUTO_FIX` is False, then we will not delete, we will only raise an error
 SHOULD_CLEAN_LEFTOVER_METADATA: bool = True
 
 #
@@ -112,8 +122,12 @@ def validate_file(file: str, auto_fix: bool) -> str:
 
     metadata = _load_metadata(file)
 
-    if error := _validate_metadata_fields(metadata):
+    if not SHOULD_SKIP_MISSING_FIELDS and (
+        error := _validate_metadata_fields(metadata, auto_fix, file)
+    ):
         errors.append(error)
+        if auto_fix:
+            metadata = _load_metadata(file)  # reload
 
     for field_name in ["friendly_name", "description"]:
         if error := _validate_metadata_field_str(metadata, field_name):
@@ -158,16 +172,39 @@ def _load_metadata(file: str) -> dict:
         return json.load(f)
 
 
-def _validate_metadata_fields(metadata: dict) -> str:
+def _dump_metadata(file: str, metadata: dict) -> None:
+    filename, extension = os.path.splitext(file)
+    metadata_file = filename + METADATA_FILE_JSON
+
+    with open(metadata_file, "w") as f:
+        return json.dump(metadata, f)
+
+
+def _validate_metadata_fields(metadata: dict, auto_fix: bool, file: str) -> str:
     if sorted(EMPTY_METADATA) != sorted(metadata):
-        return f"There are extra/missing fields. Expecting to have exactly {list(EMPTY_METADATA)}"
+        if auto_fix:
+            missing_keys = EMPTY_METADATA.keys() - metadata.keys()
+            for key in missing_keys:
+                metadata[key] = EMPTY_METADATA[key]
+
+            extra_keys = metadata.keys() - EMPTY_METADATA.keys()
+            for key in extra_keys:
+                del metadata[key]
+
+            _dump_metadata(file, metadata)
+            return f"Wrote new metadata. Added missing keys ({missing_keys}), and removed extra keys ({extra_keys})"
+        else:
+            return f"There are extra/missing fields. Expecting to have exactly {list(EMPTY_METADATA)}"
     else:
         return NO_ERROR
 
 
 def _validate_metadata_field_str(metadata: dict, field_name: str) -> str:
     if field_name not in metadata:
-        error = f"The field {field_name} is missing"
+        if SHOULD_SKIP_MISSING_FIELDS:
+            error = NO_ERROR
+        else:
+            error = f"The field {field_name} is missing"
     elif type(metadata[field_name]) is not str:
         error = f"Field {field_name} should be `str`"
     elif not metadata[field_name]:
@@ -182,7 +219,10 @@ def _validate_metadata_field_list(
     metadata: dict, field_name: str, field_options: list[str]
 ) -> str:
     if field_name not in metadata:
-        error = f"The field {field_name} is missing"
+        if SHOULD_SKIP_MISSING_FIELDS:
+            error = NO_ERROR
+        else:
+            error = f"The field {field_name} is missing"
     elif type(metadata[field_name]) is not list:
         error = f"Field {field_name} should be `list`"
     elif not all(type(value) == str for value in metadata[field_name]):
