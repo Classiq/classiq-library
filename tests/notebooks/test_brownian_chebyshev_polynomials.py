@@ -17,6 +17,3 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_depth=None,
         expected_cx_count=None,
     )
-
-    # test notebook content
-    pass  # Todo
