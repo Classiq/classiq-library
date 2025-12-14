@@ -6,10 +6,10 @@ qfunc multiplex(qfuncs: qfunc[] (), select: qnum) {
   }
 }
 
-qfunc my_be(input: qnum<3, UNSIGNED, 0>, block: qbit[4.0]) {
+qfunc my_be(input: qnum<3, UNSIGNED, 0>, block: qbit[4]) {
   rotating_qubit: qbit;
   del_qubit: qbit;
-  select: qbit[2.0];
+  select: qbit[2];
   packed: qnum<input.size + del_qubit.size, UNSIGNED, 0>;
   within {
     block -> {select, rotating_qubit, del_qubit};
@@ -40,7 +40,7 @@ qfunc my_be(input: qnum<3, UNSIGNED, 0>, block: qbit[4.0]) {
 }
 
 qfunc main(angles: real[3], output block: qnum, output data: qnum) {
-  allocate(4.0, block);
+  allocate(4, block);
   encode_in_angle(angles, data);
   my_be(data, block);
 }
