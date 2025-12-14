@@ -1,0 +1,58 @@
+qfunc initial_state(psi: qnum, phi: qnum) {
+  H(psi);
+  H(phi);
+}
+
+qfunc coin_operator(C: qnum, M: qnum, psi: qnum, phi: qnum) {
+  X(C);
+  H(M);
+  control ((phi == 0) & (M == 0)) {
+    RY(0.0, C);
+  }
+  temp1: qnum;
+  control ((psi == 0) & (M == 1)) {
+    RY(1.3722, C);
+  }
+  X(C);
+}
+
+qfunc shift(C: qnum, M: qnum, psi: qnum, phi: qnum) {
+  control ((C == 1) & (M == 1)) {
+    X(psi);
+  }
+  control ((C == 1) & (M == 0)) {
+    X(phi);
+  }
+}
+
+qfunc oracle(C: qnum, M: qnum) {
+  X(C);
+  X(M);
+  CZ(C, M);
+  X(C);
+  X(M);
+}
+
+qfunc walk_operator(C: qnum, M: qnum, psi: qnum, phi: qnum) {
+  within {
+    coin_operator(C, M, psi, phi);
+  } apply {
+    shift(C, M, psi, phi);
+  }
+  oracle(C, M);
+}
+
+qfunc main(output phi: qnum, output psi: qnum) {
+  C: qnum;
+  M: qnum;
+  allocate(1, C);
+  allocate(1, M);
+  allocate(1, phi);
+  allocate(1, psi);
+  initial_state(psi, phi);
+  power (1) {
+    walk_operator(C, M, psi, phi);
+  }
+  drop(C);
+  drop(M);
+}
