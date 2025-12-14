@@ -16409,6 +16409,8 @@ qfunc quantum_edge_detection_scalable(output edge_aux: qbit, output position: qn
     }
   }
   edge_aux = horizontal_edge or vertical_edge;
+  drop(horizontal_edge);
+  drop(vertical_edge);
 }
 
 qfunc main(output pos: qnum, output edge_aux: qnum) {
