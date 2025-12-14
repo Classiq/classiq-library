@@ -1,5 +1,5 @@
 qperm two_cos_pi_x(const x: qnum, output out: qnum) {
-  out = (-6.2832) * (x - 0.5);
+  out = (-6.283185307179586) * (x - 0.5);
 }
 
 qperm uk(const two_x: qnum, const uk_1: qnum, const uk_2: qnum, output uk: qnum) {
@@ -31,7 +31,7 @@ qfunc truncated_wiener_series(t: qnum, output out: qnum) {
   uk(two_cos_pi_t, U1, U0, U2);
   uk(two_cos_pi_t, U2, U1, U3);
   sin_pi_x(t, sin_pi_t);
-  out = (a0 * t) + ((0.4502 * sin_pi_t) * (((0 + (a1 * U1)) + (a2 * U2)) + (a3 * U3)));
+  out = (a0 * t) + ((0.450158158078553 * sin_pi_t) * (((0 + (a1 * U1)) + (a2 * U2)) + (a3 * U3)));
   drop(a0);
   drop(a1);
   drop(a2);
