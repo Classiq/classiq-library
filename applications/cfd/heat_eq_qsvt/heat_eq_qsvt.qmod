@@ -1,22 +1,3 @@
-qfunc my_projector_controlled_phase(phase: real, block: qnum, aux: qbit) {
-  control (block == 0) {
-    X(aux);
-  }
-  RZ(phase, aux);
-  control (block == 0) {
-    X(aux);
-  }
-}
-
-qfunc my_qsvt_step(phase1: real, phase2: real, u: qfunc (qbit[], qbit[]), data: qbit[], block: qbit[], qsvt_aux: qbit) {
-  u(data, block);
-  my_projector_controlled_phase(phase1, block, qsvt_aux);
-  invert {
-    u(data, block);
-  }
-  my_projector_controlled_phase(phase2, block, qsvt_aux);
-}
-
 qfunc multiplex(qfuncs: qfunc[] (), select: qnum) {
   repeat (i: qfuncs.len) {
     control (select == i) {
@@ -41,11 +22,11 @@ qfunc my_be(input: qnum<3, UNSIGNED, 0>, block: qbit[4.0]) {
     ], 0, select);
   } apply {
     multiplex([lambda() {
-      RY(3.252761000151628, rotating_qubit);
+      RY(3.200424667205658, rotating_qubit);
     }, lambda() {
       RY(0.0, rotating_qubit);
     }, lambda() {
-      RY(3.252761000151628, rotating_qubit);
+      RY(3.200424667205658, rotating_qubit);
     }], select);
     multiplex([lambda() {
       packed += 0;
@@ -58,34 +39,8 @@ qfunc my_be(input: qnum<3, UNSIGNED, 0>, block: qbit[4.0]) {
   }
 }
 
-qfunc qsvt_inversion_my(qsvt_phases: real[4], block: qnum, data: qnum, qsvt_aux: qbit) {
-  H(qsvt_aux);
-  my_projector_controlled_phase(qsvt_phases[0], block, qsvt_aux);
-  repeat (i: floor((qsvt_phases.len - 1) / 2)) {
-    my_qsvt_step(qsvt_phases[(2 * i) + 1], qsvt_phases[(2 * i) + 2], lambda(d, b) {
-      my_be(d, b);
-    }, data, block, qsvt_aux);
-  }
-  H(qsvt_aux);
-}
-
-qfunc main(output block: qnum, output data: qnum, output qsvt_aux: qbit) {
-  allocate(1, qsvt_aux);
+qfunc main(angles: real[3], output block: qnum, output data: qnum) {
   allocate(4.0, block);
-  prepare_amplitudes([
-    (-0.339147147319457),
-    (-0.386968281993898),
-    (-0.427678908477843),
-    (-0.351480211381021),
-    (-0.524765014388022),
-    (-0.330770960901707),
-    (-0.189555329861393),
-    (-0.089823167758433)
-  ], 0, data);
-  qsvt_inversion_my([
-    (-1.738078501179465),
-    0.654311402219197,
-    0.654311402219197,
-    (-0.167282174384569)
-  ], block, data, qsvt_aux);
+  encode_in_angle(angles, data);
+  my_be(data, block);
 }
