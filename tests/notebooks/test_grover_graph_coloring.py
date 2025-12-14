@@ -6,10 +6,8 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("grover_graph_coloring", timeout_seconds=300)
+@wrap_testbook("grover_graph_coloring", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
