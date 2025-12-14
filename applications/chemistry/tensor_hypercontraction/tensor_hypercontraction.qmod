@@ -1,0 +1,3301 @@
+qstruct ELL {
+  mu: qnum<5>;
+  nu: qnum<5>;
+  m1: qbit;
+  succ: qbit;
+  r_br: qbit;
+  theta: qbit;
+  s: qnum<9>;
+  theta_alt: qbit;
+  mu_alt: qnum<5>;
+  nu_alt: qnum<5>;
+  keep: qnum<18>;
+  sigma: qnum<18>;
+  aux: qbit;
+}
+
+qstruct PSI {
+  down: qbit[3];
+  up: qbit[3];
+  plus1: qbit;
+  plus2: qbit;
+}
+
+qfunc prepare_xi(x: qbit[]) {
+  inplace_prepare_amplitudes([
+    0.06302556465232,
+    0.123904869291238,
+    0.180564742213955,
+    0.231075699404113,
+    0.273717650795818,
+    0.307038475877809,
+    0.329903473915844,
+    0.34153400482528,
+    0.34153400482528,
+    0.329903473915844,
+    0.307038475877809,
+    0.273717650795818,
+    0.231075699404113,
+    0.180564742213955,
+    0.123904869291239,
+    0.06302556465232
+  ], 0, x);
+}
+
+qfunc init_psi(psi: PSI) {
+  H(psi.plus1);
+  H(psi.plus2);
+}
+
+qperm assign_aux(mu: qnum<5>, nu: qnum<5>, output aux1: qbit, output aux2: qbit, output aux3: qbit, output aux4: qbit) {
+  aux1 = nu <= 31;
+  aux2 = mu <= nu;
+  aux3 = mu > 2.5;
+  aux4 = 1;
+}
+
+qfunc create_equal_superposition(ell: ELL) {
+  aux1: qbit;
+  aux2: qbit;
+  aux3: qbit;
+  aux4: qbit;
+  apply_to_all(H, ell.mu);
+  apply_to_all(H, ell.nu);
+  within {
+    RY(3.339149823691062, ell.r_br);
+    ell.m1 ^= ell.nu == 32;
+    assign_aux(ell.mu, ell.nu, aux1, aux2, aux3, aux4);
+    CCX({ell.m1, aux3}, aux4);
+  } apply {
+    control ([aux1, aux2, aux4]) {
+      Z(ell.r_br);
+    }
+  }
+  within {
+    apply_to_all(H, ell.mu);
+    apply_to_all(H, ell.nu);
+  } apply {
+    control ([ell.mu, ell.nu]) {
+      Z(ell.r_br);
+    }
+  }
+  ell.m1 ^= ell.nu == 32;
+  within {
+    assign_aux(ell.mu, ell.nu, aux1, aux2, aux3, aux4);
+    CCX({ell.m1, aux3}, aux4);
+  } apply {
+    control ([aux1, aux2, aux4]) {
+      X(ell.succ);
+    }
+  }
+}
+
+qperm shift_right(const x: qnum, output y: qnum) {
+  lsb: qbit;
+  msbs: qnum<x.size - 1, False, 0>;
+  within {
+    x -> {msbs, lsb};
+  } apply {
+    y = msbs;
+  }
+}
+
+qperm s_arithmetic(const nu: qnum, const mu: qnum, s: qnum) {
+  half_nu: qnum;
+  within {
+    shift_right(nu, half_nu);
+  } apply {
+    s ^= (nu * (half_nu + 1)) + mu;
+  }
+}
+
+qfunc array_cast(qvar: qbit[], action: qfunc (qbit[])) {
+  action(qvar);
+}
+
+qperm single_qrom_access(const ctrl: qbit, target: qbit[], data: bool[]) {
+  repeat (i: data.len) {
+    if (data[i]) {
+      CX(ctrl, target[i]);
+    }
+  }
+}
+
+qperm in_s(ell: ELL) {
+  array_cast(ell.s, lambda(s) {
+    within {
+      X(s[0]);
+    } apply {
+      aux192: qbit;
+      allocate(aux192);
+      within {
+        X(s[1]);
+      } apply {
+        CCX({s[0], s[1]}, aux192);
+      }
+      aux193: qbit;
+      allocate(aux193);
+      within {
+        X(s[2]);
+      } apply {
+        CCX({aux192, s[2]}, aux193);
+      }
+      aux194: qbit;
+      allocate(aux194);
+      within {
+        X(s[3]);
+      } apply {
+        CCX({aux193, s[3]}, aux194);
+      }
+      aux195: qbit;
+      allocate(aux195);
+      within {
+        X(s[4]);
+      } apply {
+        CCX({aux194, s[4]}, aux195);
+      }
+      single_qrom_access(aux195, ell.mu_alt, [
+        False,
+        False,
+        True,
+        True,
+        True
+      ]);
+      single_qrom_access(aux195, ell.nu_alt, [
+        True,
+        False,
+        True,
+        True,
+        True
+      ]);
+      single_qrom_access(aux195, ell.keep, [
+        False,
+        False,
+        True,
+        True,
+        True,
+        False,
+        True,
+        False,
+        False,
+        False,
+        False,
+        True,
+        False,
+        False,
+        True,
+        True,
+        False,
+        True
+      ]);
+      single_qrom_access(aux195, ell.theta, [False]);
+      CX(aux194, aux195);
+      single_qrom_access(aux195, ell.mu_alt, [
+        False,
+        False,
+        False,
+        False,
+        True
+      ]);
+      single_qrom_access(aux195, ell.nu_alt, [
+        False,
+        True,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux195, ell.keep, [
+        True,
+        False,
+        True,
+        False,
+        True,
+        True,
+        True,
+        False,
+        False,
+        True,
+        False,
+        True,
+        False,
+        False,
+        False,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux195, ell.theta, [True]);
+      CCX({aux194, s[4]}, aux195);
+      free(aux195);
+      CX(aux193, aux194);
+      aux196: qbit;
+      allocate(aux196);
+      within {
+        X(s[4]);
+      } apply {
+        CCX({aux194, s[4]}, aux196);
+      }
+      single_qrom_access(aux196, ell.mu_alt, [
+        True,
+        True,
+        False,
+        False,
+        True
+      ]);
+      single_qrom_access(aux196, ell.nu_alt, [
+        False,
+        False,
+        True,
+        True,
+        False
+      ]);
+      single_qrom_access(aux196, ell.keep, [
+        False,
+        True,
+        True,
+        True,
+        True,
+        False,
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+        False,
+        False,
+        False,
+        False,
+        False,
+        True
+      ]);
+      single_qrom_access(aux196, ell.theta, [True]);
+      CX(aux194, aux196);
+      single_qrom_access(aux196, ell.mu_alt, [
+        True,
+        False,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux196, ell.nu_alt, [
+        True,
+        False,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux196, ell.keep, [
+        False,
+        False,
+        True,
+        True,
+        True,
+        False,
+        False,
+        True,
+        True,
+        False,
+        True,
+        True,
+        False,
+        True,
+        True,
+        False,
+        False,
+        True
+      ]);
+      single_qrom_access(aux196, ell.theta, [True]);
+      CCX({aux194, s[4]}, aux196);
+      free(aux196);
+      CCX({aux193, s[3]}, aux194);
+      free(aux194);
+      CX(aux192, aux193);
+      aux197: qbit;
+      allocate(aux197);
+      within {
+        X(s[3]);
+      } apply {
+        CCX({aux193, s[3]}, aux197);
+      }
+      aux198: qbit;
+      allocate(aux198);
+      within {
+        X(s[4]);
+      } apply {
+        CCX({aux197, s[4]}, aux198);
+      }
+      single_qrom_access(aux198, ell.mu_alt, [
+        True,
+        True,
+        True,
+        True,
+        True
+      ]);
+      single_qrom_access(aux198, ell.nu_alt, [
+        False,
+        False,
+        False,
+        True,
+        True
+      ]);
+      single_qrom_access(aux198, ell.keep, [
+        False,
+        True,
+        False,
+        False,
+        False,
+        False,
+        True,
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+        False,
+        False,
+        True,
+        True,
+        True
+      ]);
+      single_qrom_access(aux198, ell.theta, [True]);
+      CX(aux197, aux198);
+      single_qrom_access(aux198, ell.mu_alt, [
+        False,
+        False,
+        True,
+        False,
+        False
+      ]);
+      single_qrom_access(aux198, ell.nu_alt, [
+        True,
+        False,
+        False,
+        True,
+        True
+      ]);
+      single_qrom_access(aux198, ell.keep, [
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        False,
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+        True,
+        True
+      ]);
+      single_qrom_access(aux198, ell.theta, [True]);
+      CCX({aux197, s[4]}, aux198);
+      free(aux198);
+      CX(aux193, aux197);
+      aux199: qbit;
+      allocate(aux199);
+      within {
+        X(s[4]);
+      } apply {
+        CCX({aux197, s[4]}, aux199);
+      }
+      single_qrom_access(aux199, ell.mu_alt, [
+        True,
+        True,
+        False,
+        True,
+        True
+      ]);
+      single_qrom_access(aux199, ell.nu_alt, [
+        True,
+        True,
+        True,
+        True,
+        False
+      ]);
+      single_qrom_access(aux199, ell.keep, [
+        True,
+        False,
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+        False,
+        False,
+        True,
+        False,
+        False,
+        True,
+        True,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux199, ell.theta, [False]);
+      CX(aux197, aux199);
+      single_qrom_access(aux199, ell.mu_alt, [
+        False,
+        True,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux199, ell.nu_alt, [
+        True,
+        True,
+        True,
+        True,
+        True
+      ]);
+      single_qrom_access(aux199, ell.keep, [
+        True,
+        False,
+        True,
+        False,
+        True,
+        True,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        True,
+        True,
+        True,
+        False,
+        True
+      ]);
+      single_qrom_access(aux199, ell.theta, [True]);
+      CCX({aux197, s[4]}, aux199);
+      free(aux199);
+      CCX({aux193, s[3]}, aux197);
+      free(aux197);
+      CCX({aux192, s[2]}, aux193);
+      free(aux193);
+      CX(s[0], aux192);
+      aux200: qbit;
+      allocate(aux200);
+      within {
+        X(s[2]);
+      } apply {
+        CCX({aux192, s[2]}, aux200);
+      }
+      aux201: qbit;
+      allocate(aux201);
+      within {
+        X(s[3]);
+      } apply {
+        CCX({aux200, s[3]}, aux201);
+      }
+      aux202: qbit;
+      allocate(aux202);
+      within {
+        X(s[4]);
+      } apply {
+        CCX({aux201, s[4]}, aux202);
+      }
+      single_qrom_access(aux202, ell.mu_alt, [
+        False,
+        False,
+        False,
+        True,
+        True
+      ]);
+      single_qrom_access(aux202, ell.nu_alt, [
+        True,
+        False,
+        False,
+        False,
+        True
+      ]);
+      single_qrom_access(aux202, ell.keep, [
+        False,
+        True,
+        True,
+        True,
+        True,
+        True,
+        False,
+        True,
+        True,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux202, ell.theta, [False]);
+      CX(aux201, aux202);
+      single_qrom_access(aux202, ell.mu_alt, [
+        True,
+        True,
+        True,
+        False,
+        True
+      ]);
+      single_qrom_access(aux202, ell.nu_alt, [
+        False,
+        True,
+        True,
+        True,
+        False
+      ]);
+      single_qrom_access(aux202, ell.keep, [
+        False,
+        True,
+        False,
+        False,
+        True,
+        True,
+        True,
+        True,
+        False,
+        True,
+        False,
+        True,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False
+      ]);
+      single_qrom_access(aux202, ell.theta, [False]);
+      CCX({aux201, s[4]}, aux202);
+      free(aux202);
+      CX(aux200, aux201);
+      aux203: qbit;
+      allocate(aux203);
+      within {
+        X(s[4]);
+      } apply {
+        CCX({aux201, s[4]}, aux203);
+      }
+      single_qrom_access(aux203, ell.mu_alt, [
+        False,
+        True,
+        False,
+        True,
+        False
+      ]);
+      single_qrom_access(aux203, ell.nu_alt, [
+        False,
+        False,
+        False,
+        True,
+        True
+      ]);
+      single_qrom_access(aux203, ell.keep, [
+        False,
+        False,
+        False,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+        False,
+        True,
+        True,
+        False,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux203, ell.theta, [True]);
+      CX(aux201, aux203);
+      single_qrom_access(aux203, ell.mu_alt, [
+        True,
+        True,
+        False,
+        False,
+        True
+      ]);
+      single_qrom_access(aux203, ell.nu_alt, [
+        False,
+        True,
+        True,
+        False,
+        False
+      ]);
+      single_qrom_access(aux203, ell.keep, [
+        True,
+        True,
+        True,
+        False,
+        True,
+        True,
+        False,
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        True
+      ]);
+      single_qrom_access(aux203, ell.theta, [False]);
+      CCX({aux201, s[4]}, aux203);
+      free(aux203);
+      CCX({aux200, s[3]}, aux201);
+      free(aux201);
+      CX(aux192, aux200);
+      aux204: qbit;
+      allocate(aux204);
+      within {
+        X(s[3]);
+      } apply {
+        CCX({aux200, s[3]}, aux204);
+      }
+      aux205: qbit;
+      allocate(aux205);
+      within {
+        X(s[4]);
+      } apply {
+        CCX({aux204, s[4]}, aux205);
+      }
+      single_qrom_access(aux205, ell.mu_alt, [
+        True,
+        False,
+        True,
+        False,
+        False
+      ]);
+      single_qrom_access(aux205, ell.nu_alt, [
+        True,
+        False,
+        False,
+        False,
+        True
+      ]);
+      single_qrom_access(aux205, ell.keep, [
+        True,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        False,
+        False,
+        False,
+        True,
+        False,
+        True,
+        True,
+        True
+      ]);
+      single_qrom_access(aux205, ell.theta, [False]);
+      CX(aux204, aux205);
+      single_qrom_access(aux205, ell.mu_alt, [
+        False,
+        True,
+        False,
+        False,
+        False
+      ]);
+      single_qrom_access(aux205, ell.nu_alt, [
+        True,
+        False,
+        False,
+        True,
+        True
+      ]);
+      single_qrom_access(aux205, ell.keep, [
+        True,
+        False,
+        False,
+        True,
+        False,
+        True,
+        True,
+        True,
+        True,
+        False,
+        True,
+        True,
+        True,
+        False,
+        False,
+        True,
+        False,
+        True
+      ]);
+      single_qrom_access(aux205, ell.theta, [False]);
+      CCX({aux204, s[4]}, aux205);
+      free(aux205);
+      CX(aux200, aux204);
+      aux206: qbit;
+      allocate(aux206);
+      within {
+        X(s[4]);
+      } apply {
+        CCX({aux204, s[4]}, aux206);
+      }
+      single_qrom_access(aux206, ell.mu_alt, [
+        False,
+        False,
+        True,
+        False,
+        False
+      ]);
+      single_qrom_access(aux206, ell.nu_alt, [
+        True,
+        False,
+        True,
+        False,
+        False
+      ]);
+      single_qrom_access(aux206, ell.keep, [
+        True,
+        True,
+        True,
+        False,
+        True,
+        True,
+        True,
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        False,
+        True
+      ]);
+      single_qrom_access(aux206, ell.theta, [False]);
+      CX(aux204, aux206);
+      single_qrom_access(aux206, ell.mu_alt, [
+        False,
+        False,
+        True,
+        False,
+        False
+      ]);
+      single_qrom_access(aux206, ell.nu_alt, [
+        True,
+        True,
+        True,
+        False,
+        False
+      ]);
+      single_qrom_access(aux206, ell.keep, [
+        True,
+        True,
+        True,
+        True,
+        False,
+        True,
+        True,
+        True,
+        True,
+        True,
+        True,
+        False,
+        False,
+        True,
+        True,
+        False,
+        True,
+        False
+      ]);
+      single_qrom_access(aux206, ell.theta, [False]);
+      CCX({aux204, s[4]}, aux206);
+      free(aux206);
+      CCX({aux200, s[3]}, aux204);
+      free(aux204);
+      CCX({aux192, s[2]}, aux200);
+      free(aux200);
+      CCX({s[0], s[1]}, aux192);
+      free(aux192);
+    }
+    aux207: qbit;
+    allocate(aux207);
+    within {
+      X(s[1]);
+    } apply {
+      CCX({s[0], s[1]}, aux207);
+    }
+    aux208: qbit;
+    allocate(aux208);
+    within {
+      X(s[2]);
+    } apply {
+      CCX({aux207, s[2]}, aux208);
+    }
+    aux209: qbit;
+    allocate(aux209);
+    within {
+      X(s[3]);
+    } apply {
+      CCX({aux208, s[3]}, aux209);
+    }
+    aux210: qbit;
+    allocate(aux210);
+    within {
+      X(s[4]);
+    } apply {
+      CCX({aux209, s[4]}, aux210);
+    }
+    single_qrom_access(aux210, ell.mu_alt, [
+      True,
+      False,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux210, ell.nu_alt, [
+      False,
+      False,
+      False,
+      True,
+      False
+    ]);
+    single_qrom_access(aux210, ell.keep, [
+      False,
+      False,
+      False,
+      True,
+      True,
+      False,
+      False,
+      False,
+      True,
+      False,
+      True,
+      True,
+      False,
+      True,
+      False,
+      False,
+      True,
+      False
+    ]);
+    single_qrom_access(aux210, ell.theta, [False]);
+    CX(aux209, aux210);
+    single_qrom_access(aux210, ell.mu_alt, [
+      False,
+      True,
+      True,
+      True,
+      False
+    ]);
+    single_qrom_access(aux210, ell.nu_alt, [
+      True,
+      True,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux210, ell.keep, [
+      True,
+      False,
+      True,
+      True,
+      True,
+      False,
+      True,
+      True,
+      True,
+      False,
+      True,
+      False,
+      False,
+      True,
+      True,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux210, ell.theta, [True]);
+    CCX({aux209, s[4]}, aux210);
+    free(aux210);
+    CX(aux208, aux209);
+    aux211: qbit;
+    allocate(aux211);
+    within {
+      X(s[4]);
+    } apply {
+      CCX({aux209, s[4]}, aux211);
+    }
+    single_qrom_access(aux211, ell.mu_alt, [
+      False,
+      False,
+      True,
+      True,
+      True
+    ]);
+    single_qrom_access(aux211, ell.nu_alt, [
+      True,
+      False,
+      False,
+      False,
+      False
+    ]);
+    single_qrom_access(aux211, ell.keep, [
+      True,
+      False,
+      False,
+      False,
+      True,
+      False,
+      False,
+      False,
+      True,
+      False,
+      True,
+      False,
+      False,
+      False,
+      True,
+      False,
+      False,
+      True
+    ]);
+    single_qrom_access(aux211, ell.theta, [True]);
+    CX(aux209, aux211);
+    single_qrom_access(aux211, ell.mu_alt, [
+      False,
+      False,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux211, ell.nu_alt, [
+      True,
+      False,
+      True,
+      True,
+      False
+    ]);
+    single_qrom_access(aux211, ell.keep, [
+      True,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      False,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      False,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux211, ell.theta, [True]);
+    CCX({aux209, s[4]}, aux211);
+    free(aux211);
+    CCX({aux208, s[3]}, aux209);
+    free(aux209);
+    CX(aux207, aux208);
+    aux212: qbit;
+    allocate(aux212);
+    within {
+      X(s[3]);
+    } apply {
+      CCX({aux208, s[3]}, aux212);
+    }
+    aux213: qbit;
+    allocate(aux213);
+    within {
+      X(s[4]);
+    } apply {
+      CCX({aux212, s[4]}, aux213);
+    }
+    single_qrom_access(aux213, ell.mu_alt, [
+      False,
+      True,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux213, ell.nu_alt, [
+      False,
+      False,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux213, ell.keep, [
+      False,
+      True,
+      False,
+      True,
+      True,
+      True,
+      False,
+      False,
+      True,
+      False,
+      True,
+      False,
+      False,
+      True,
+      False,
+      False,
+      True,
+      False
+    ]);
+    single_qrom_access(aux213, ell.theta, [False]);
+    CX(aux212, aux213);
+    single_qrom_access(aux213, ell.mu_alt, [
+      False,
+      True,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux213, ell.nu_alt, [
+      False,
+      True,
+      False,
+      False,
+      False
+    ]);
+    single_qrom_access(aux213, ell.keep, [
+      False,
+      True,
+      False,
+      False,
+      True,
+      True,
+      True,
+      False,
+      False,
+      False,
+      True,
+      True,
+      True,
+      False,
+      True,
+      False,
+      False,
+      False
+    ]);
+    single_qrom_access(aux213, ell.theta, [True]);
+    CCX({aux212, s[4]}, aux213);
+    free(aux213);
+    CX(aux208, aux212);
+    aux214: qbit;
+    allocate(aux214);
+    within {
+      X(s[4]);
+    } apply {
+      CCX({aux212, s[4]}, aux214);
+    }
+    single_qrom_access(aux214, ell.mu_alt, [
+      False,
+      False,
+      True,
+      False,
+      True
+    ]);
+    single_qrom_access(aux214, ell.nu_alt, [
+      False,
+      False,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux214, ell.keep, [
+      True,
+      False,
+      False,
+      True,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      False,
+      False,
+      True,
+      False,
+      True,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux214, ell.theta, [False]);
+    CX(aux212, aux214);
+    single_qrom_access(aux214, ell.mu_alt, [
+      True,
+      False,
+      False,
+      False,
+      False
+    ]);
+    single_qrom_access(aux214, ell.nu_alt, [
+      True,
+      True,
+      False,
+      False,
+      True
+    ]);
+    single_qrom_access(aux214, ell.keep, [
+      True,
+      True,
+      False,
+      False,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      False,
+      False,
+      True
+    ]);
+    single_qrom_access(aux214, ell.theta, [True]);
+    CCX({aux212, s[4]}, aux214);
+    free(aux214);
+    CCX({aux208, s[3]}, aux212);
+    free(aux212);
+    CCX({aux207, s[2]}, aux208);
+    free(aux208);
+    CX(s[0], aux207);
+    aux215: qbit;
+    allocate(aux215);
+    within {
+      X(s[2]);
+    } apply {
+      CCX({aux207, s[2]}, aux215);
+    }
+    aux216: qbit;
+    allocate(aux216);
+    within {
+      X(s[3]);
+    } apply {
+      CCX({aux215, s[3]}, aux216);
+    }
+    aux217: qbit;
+    allocate(aux217);
+    within {
+      X(s[4]);
+    } apply {
+      CCX({aux216, s[4]}, aux217);
+    }
+    single_qrom_access(aux217, ell.mu_alt, [
+      False,
+      False,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux217, ell.nu_alt, [
+      True,
+      False,
+      True,
+      False,
+      True
+    ]);
+    single_qrom_access(aux217, ell.keep, [
+      True,
+      True,
+      True,
+      True,
+      True,
+      False,
+      True,
+      True,
+      True,
+      False,
+      True,
+      False,
+      True,
+      False,
+      False,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux217, ell.theta, [False]);
+    CX(aux216, aux217);
+    single_qrom_access(aux217, ell.mu_alt, [
+      False,
+      True,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux217, ell.nu_alt, [
+      False,
+      True,
+      True,
+      False,
+      False
+    ]);
+    single_qrom_access(aux217, ell.keep, [
+      False,
+      True,
+      True,
+      True,
+      False,
+      True,
+      True,
+      True,
+      True,
+      False,
+      False,
+      True,
+      False,
+      False,
+      True,
+      True,
+      True,
+      False
+    ]);
+    single_qrom_access(aux217, ell.theta, [True]);
+    CCX({aux216, s[4]}, aux217);
+    free(aux217);
+    CX(aux215, aux216);
+    aux218: qbit;
+    allocate(aux218);
+    within {
+      X(s[4]);
+    } apply {
+      CCX({aux216, s[4]}, aux218);
+    }
+    single_qrom_access(aux218, ell.mu_alt, [
+      True,
+      True,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux218, ell.nu_alt, [
+      True,
+      True,
+      True,
+      True,
+      True
+    ]);
+    single_qrom_access(aux218, ell.keep, [
+      False,
+      True,
+      True,
+      False,
+      False,
+      True,
+      True,
+      True,
+      True,
+      False,
+      True,
+      False,
+      True,
+      False,
+      False,
+      True,
+      True,
+      True
+    ]);
+    single_qrom_access(aux218, ell.theta, [True]);
+    CX(aux216, aux218);
+    single_qrom_access(aux218, ell.mu_alt, [
+      False,
+      False,
+      False,
+      True,
+      False
+    ]);
+    single_qrom_access(aux218, ell.nu_alt, [
+      True,
+      True,
+      True,
+      True,
+      False
+    ]);
+    single_qrom_access(aux218, ell.keep, [
+      True,
+      True,
+      False,
+      True,
+      False,
+      True,
+      False,
+      False,
+      True,
+      False,
+      True,
+      True,
+      False,
+      True,
+      False,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux218, ell.theta, [False]);
+    CCX({aux216, s[4]}, aux218);
+    free(aux218);
+    CCX({aux215, s[3]}, aux216);
+    free(aux216);
+    CX(aux207, aux215);
+    aux219: qbit;
+    allocate(aux219);
+    within {
+      X(s[3]);
+    } apply {
+      CCX({aux215, s[3]}, aux219);
+    }
+    aux220: qbit;
+    allocate(aux220);
+    within {
+      X(s[4]);
+    } apply {
+      CCX({aux219, s[4]}, aux220);
+    }
+    single_qrom_access(aux220, ell.mu_alt, [
+      True,
+      True,
+      False,
+      False,
+      False
+    ]);
+    single_qrom_access(aux220, ell.nu_alt, [
+      False,
+      False,
+      True,
+      True,
+      False
+    ]);
+    single_qrom_access(aux220, ell.keep, [
+      True,
+      False,
+      True,
+      False,
+      True,
+      False,
+      False,
+      False,
+      True,
+      True,
+      True,
+      True,
+      True,
+      True,
+      False,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux220, ell.theta, [False]);
+    CX(aux219, aux220);
+    single_qrom_access(aux220, ell.mu_alt, [
+      True,
+      True,
+      False,
+      False,
+      True
+    ]);
+    single_qrom_access(aux220, ell.nu_alt, [
+      True,
+      True,
+      False,
+      True,
+      False
+    ]);
+    single_qrom_access(aux220, ell.keep, [
+      True,
+      True,
+      True,
+      True,
+      True,
+      True,
+      True,
+      True,
+      True,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False
+    ]);
+    single_qrom_access(aux220, ell.theta, [False]);
+    CCX({aux219, s[4]}, aux220);
+    free(aux220);
+    CX(aux215, aux219);
+    single_qrom_access(aux219, ell.mu_alt, [
+      True,
+      True,
+      False,
+      False,
+      True
+    ]);
+    single_qrom_access(aux219, ell.nu_alt, [
+      True,
+      True,
+      False,
+      True,
+      True
+    ]);
+    single_qrom_access(aux219, ell.keep, [
+      True,
+      True,
+      False,
+      True,
+      True,
+      True,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      True,
+      True,
+      True,
+      False,
+      True,
+      False
+    ]);
+    single_qrom_access(aux219, ell.theta, [False]);
+    CCX({aux215, s[3]}, aux219);
+    free(aux219);
+    CCX({aux207, s[2]}, aux215);
+    free(aux215);
+    CCX({s[0], s[1]}, aux207);
+    free(aux207);
+  });
+}
+
+qperm _swap(state1: qbit[], state2: qbit[]) {
+  repeat (i: state1.len) {
+    SWAP(state1[i], state2[i]);
+  }
+}
+
+qfunc prepare_after_equal_superposition(ell: ELL) {
+  aux: qbit;
+  s_arithmetic(ell.nu, ell.mu, ell.s);
+  apply_to_all(H, ell.sigma);
+  in_s(ell);
+  within {
+    aux = ell.keep < ell.sigma;
+  } apply {
+    CZ(ell.theta_alt, aux);
+    within {
+      X(aux);
+    } apply {
+      CZ(ell.theta, aux);
+    }
+    control (aux) {
+      _swap(ell.mu, ell.mu_alt);
+    }
+    control (aux) {
+      _swap(ell.nu, ell.nu_alt);
+    }
+  }
+  H(ell.aux);
+  within {
+    X(ell.m1);
+  } apply {
+    control ([ell.aux, ell.m1]) {
+      _swap(ell.mu, ell.nu);
+    }
+  }
+}
+
+qfunc prepare(ell: ELL) {
+  create_equal_superposition(ell);
+  prepare_after_equal_superposition(ell);
+}
+
+qfunc controlled_reflect(ctrl: qbit, ell: ELL) {
+  within {
+    invert {
+      prepare(ell);
+    }
+  } apply {
+    within {
+      X(ctrl);
+      apply_to_all(X, ell);
+    } apply {
+      array_cast(ell, lambda(_ell) {
+        control (_ell) {
+          Z(ctrl);
+        }
+      });
+    }
+  }
+}
+
+qperm in_mu(mu: qbit[], m1: qbit, rot: qnum[]) {
+  aux221: qbit;
+  allocate(aux221);
+  within {
+    X(mu[0]);
+  } apply {
+    CCX({m1, mu[0]}, aux221);
+  }
+  aux222: qbit;
+  allocate(aux222);
+  within {
+    X(mu[1]);
+  } apply {
+    CCX({aux221, mu[1]}, aux222);
+  }
+  aux223: qbit;
+  allocate(aux223);
+  within {
+    X(mu[2]);
+  } apply {
+    CCX({aux222, mu[2]}, aux223);
+  }
+  aux224: qbit;
+  allocate(aux224);
+  within {
+    X(mu[3]);
+  } apply {
+    CCX({aux223, mu[3]}, aux224);
+  }
+  aux225: qbit;
+  allocate(aux225);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux224, mu[4]}, aux225);
+  }
+  single_qrom_access(aux225, rot, [
+    True,
+    False,
+    False,
+    False,
+    True,
+    False,
+    True,
+    False,
+    False,
+    True,
+    False,
+    True
+  ]);
+  CX(aux224, aux225);
+  single_qrom_access(aux225, rot, [
+    False,
+    False,
+    True,
+    False,
+    True,
+    False,
+    False,
+    False,
+    False,
+    False,
+    False,
+    True
+  ]);
+  CCX({aux224, mu[4]}, aux225);
+  free(aux225);
+  CX(aux223, aux224);
+  aux226: qbit;
+  allocate(aux226);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux224, mu[4]}, aux226);
+  }
+  single_qrom_access(aux226, rot, [
+    True,
+    True,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    False,
+    True,
+    False,
+    False
+  ]);
+  CX(aux224, aux226);
+  single_qrom_access(aux226, rot, [
+    True,
+    False,
+    False,
+    True,
+    True,
+    True,
+    False,
+    True,
+    False,
+    True,
+    False,
+    False
+  ]);
+  CCX({aux224, mu[4]}, aux226);
+  free(aux226);
+  CCX({aux223, mu[3]}, aux224);
+  free(aux224);
+  CX(aux222, aux223);
+  aux227: qbit;
+  allocate(aux227);
+  within {
+    X(mu[3]);
+  } apply {
+    CCX({aux223, mu[3]}, aux227);
+  }
+  aux228: qbit;
+  allocate(aux228);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux227, mu[4]}, aux228);
+  }
+  single_qrom_access(aux228, rot, [
+    False,
+    False,
+    False,
+    False,
+    False,
+    False,
+    True,
+    False,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CX(aux227, aux228);
+  single_qrom_access(aux228, rot, [
+    False,
+    False,
+    False,
+    False,
+    True,
+    True,
+    True,
+    False,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CCX({aux227, mu[4]}, aux228);
+  free(aux228);
+  CX(aux223, aux227);
+  aux229: qbit;
+  allocate(aux229);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux227, mu[4]}, aux229);
+  }
+  single_qrom_access(aux229, rot, [
+    False,
+    False,
+    True,
+    False,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    False,
+    False
+  ]);
+  CX(aux227, aux229);
+  single_qrom_access(aux229, rot, [
+    True,
+    False,
+    True,
+    True,
+    False,
+    True,
+    False,
+    True,
+    True,
+    False,
+    True,
+    True
+  ]);
+  CCX({aux227, mu[4]}, aux229);
+  free(aux229);
+  CCX({aux223, mu[3]}, aux227);
+  free(aux227);
+  CCX({aux222, mu[2]}, aux223);
+  free(aux223);
+  CX(aux221, aux222);
+  aux230: qbit;
+  allocate(aux230);
+  within {
+    X(mu[2]);
+  } apply {
+    CCX({aux222, mu[2]}, aux230);
+  }
+  aux231: qbit;
+  allocate(aux231);
+  within {
+    X(mu[3]);
+  } apply {
+    CCX({aux230, mu[3]}, aux231);
+  }
+  aux232: qbit;
+  allocate(aux232);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux231, mu[4]}, aux232);
+  }
+  single_qrom_access(aux232, rot, [
+    False,
+    True,
+    False,
+    True,
+    False,
+    True,
+    False,
+    True,
+    True,
+    True,
+    False,
+    False
+  ]);
+  CX(aux231, aux232);
+  single_qrom_access(aux232, rot, [
+    True,
+    False,
+    False,
+    False,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    True,
+    True
+  ]);
+  CCX({aux231, mu[4]}, aux232);
+  free(aux232);
+  CX(aux230, aux231);
+  aux233: qbit;
+  allocate(aux233);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux231, mu[4]}, aux233);
+  }
+  single_qrom_access(aux233, rot, [
+    False,
+    False,
+    False,
+    False,
+    True,
+    False,
+    False,
+    True,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CX(aux231, aux233);
+  single_qrom_access(aux233, rot, [
+    False,
+    False,
+    False,
+    False,
+    False,
+    False,
+    False,
+    False,
+    False,
+    True,
+    True,
+    True
+  ]);
+  CCX({aux231, mu[4]}, aux233);
+  free(aux233);
+  CCX({aux230, mu[3]}, aux231);
+  free(aux231);
+  CX(aux222, aux230);
+  aux234: qbit;
+  allocate(aux234);
+  within {
+    X(mu[3]);
+  } apply {
+    CCX({aux230, mu[3]}, aux234);
+  }
+  aux235: qbit;
+  allocate(aux235);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux234, mu[4]}, aux235);
+  }
+  single_qrom_access(aux235, rot, [
+    True,
+    False,
+    True,
+    True,
+    True,
+    True,
+    False,
+    False,
+    False,
+    True,
+    False,
+    False
+  ]);
+  CX(aux234, aux235);
+  single_qrom_access(aux235, rot, [
+    False,
+    False,
+    False,
+    False,
+    True,
+    False,
+    False,
+    True,
+    True,
+    False,
+    False,
+    False
+  ]);
+  CCX({aux234, mu[4]}, aux235);
+  free(aux235);
+  CX(aux230, aux234);
+  aux236: qbit;
+  allocate(aux236);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux234, mu[4]}, aux236);
+  }
+  single_qrom_access(aux236, rot, [
+    False,
+    True,
+    False,
+    True,
+    False,
+    False,
+    False,
+    False,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CX(aux234, aux236);
+  single_qrom_access(aux236, rot, [
+    True,
+    True,
+    True,
+    True,
+    True,
+    False,
+    True,
+    True,
+    True,
+    True,
+    True,
+    False
+  ]);
+  CCX({aux234, mu[4]}, aux236);
+  free(aux236);
+  CCX({aux230, mu[3]}, aux234);
+  free(aux234);
+  CCX({aux222, mu[2]}, aux230);
+  free(aux230);
+  CCX({aux221, mu[1]}, aux222);
+  free(aux222);
+  CX(m1, aux221);
+  aux237: qbit;
+  allocate(aux237);
+  within {
+    X(mu[1]);
+  } apply {
+    CCX({aux221, mu[1]}, aux237);
+  }
+  aux238: qbit;
+  allocate(aux238);
+  within {
+    X(mu[2]);
+  } apply {
+    CCX({aux237, mu[2]}, aux238);
+  }
+  aux239: qbit;
+  allocate(aux239);
+  within {
+    X(mu[3]);
+  } apply {
+    CCX({aux238, mu[3]}, aux239);
+  }
+  aux240: qbit;
+  allocate(aux240);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux239, mu[4]}, aux240);
+  }
+  single_qrom_access(aux240, rot, [
+    False,
+    False,
+    True,
+    False,
+    False,
+    True,
+    False,
+    False,
+    True,
+    False,
+    False,
+    False
+  ]);
+  CX(aux239, aux240);
+  single_qrom_access(aux240, rot, [
+    False,
+    False,
+    True,
+    False,
+    False,
+    True,
+    True,
+    True,
+    False,
+    False,
+    False,
+    False
+  ]);
+  CCX({aux239, mu[4]}, aux240);
+  free(aux240);
+  CX(aux238, aux239);
+  aux241: qbit;
+  allocate(aux241);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux239, mu[4]}, aux241);
+  }
+  single_qrom_access(aux241, rot, [
+    True,
+    False,
+    True,
+    False,
+    True,
+    True,
+    True,
+    False,
+    False,
+    False,
+    True,
+    True
+  ]);
+  CX(aux239, aux241);
+  single_qrom_access(aux241, rot, [
+    False,
+    True,
+    True,
+    False,
+    False,
+    True,
+    True,
+    True,
+    False,
+    True,
+    False,
+    True
+  ]);
+  CCX({aux239, mu[4]}, aux241);
+  free(aux241);
+  CCX({aux238, mu[3]}, aux239);
+  free(aux239);
+  CX(aux237, aux238);
+  aux242: qbit;
+  allocate(aux242);
+  within {
+    X(mu[3]);
+  } apply {
+    CCX({aux238, mu[3]}, aux242);
+  }
+  aux243: qbit;
+  allocate(aux243);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux242, mu[4]}, aux243);
+  }
+  single_qrom_access(aux243, rot, [
+    True,
+    True,
+    False,
+    False,
+    True,
+    False,
+    False,
+    True,
+    False,
+    False,
+    False,
+    False
+  ]);
+  CX(aux242, aux243);
+  single_qrom_access(aux243, rot, [
+    False,
+    True,
+    False,
+    False,
+    True,
+    True,
+    False,
+    False,
+    False,
+    False,
+    True,
+    False
+  ]);
+  CCX({aux242, mu[4]}, aux243);
+  free(aux243);
+  CX(aux238, aux242);
+  aux244: qbit;
+  allocate(aux244);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux242, mu[4]}, aux244);
+  }
+  single_qrom_access(aux244, rot, [
+    False,
+    False,
+    False,
+    True,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    False,
+    True
+  ]);
+  CX(aux242, aux244);
+  single_qrom_access(aux244, rot, [
+    True,
+    True,
+    True,
+    True,
+    True,
+    True,
+    False,
+    False,
+    False,
+    True,
+    False,
+    False
+  ]);
+  CCX({aux242, mu[4]}, aux244);
+  free(aux244);
+  CCX({aux238, mu[3]}, aux242);
+  free(aux242);
+  CCX({aux237, mu[2]}, aux238);
+  free(aux238);
+  CX(aux221, aux237);
+  aux245: qbit;
+  allocate(aux245);
+  within {
+    X(mu[2]);
+  } apply {
+    CCX({aux237, mu[2]}, aux245);
+  }
+  aux246: qbit;
+  allocate(aux246);
+  within {
+    X(mu[3]);
+  } apply {
+    CCX({aux245, mu[3]}, aux246);
+  }
+  aux247: qbit;
+  allocate(aux247);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux246, mu[4]}, aux247);
+  }
+  single_qrom_access(aux247, rot, [
+    False,
+    False,
+    True,
+    True,
+    True,
+    False,
+    False,
+    False,
+    False,
+    True,
+    True,
+    False
+  ]);
+  CX(aux246, aux247);
+  single_qrom_access(aux247, rot, [
+    False,
+    True,
+    True,
+    True,
+    False,
+    False,
+    False,
+    False,
+    True,
+    True,
+    False,
+    False
+  ]);
+  CCX({aux246, mu[4]}, aux247);
+  free(aux247);
+  CX(aux245, aux246);
+  aux248: qbit;
+  allocate(aux248);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux246, mu[4]}, aux248);
+  }
+  single_qrom_access(aux248, rot, [
+    False,
+    True,
+    True,
+    True,
+    False,
+    False,
+    True,
+    False,
+    True,
+    False,
+    True,
+    True
+  ]);
+  CX(aux246, aux248);
+  single_qrom_access(aux248, rot, [
+    False,
+    True,
+    False,
+    True,
+    True,
+    True,
+    False,
+    True,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CCX({aux246, mu[4]}, aux248);
+  free(aux248);
+  CCX({aux245, mu[3]}, aux246);
+  free(aux246);
+  CX(aux237, aux245);
+  aux249: qbit;
+  allocate(aux249);
+  within {
+    X(mu[3]);
+  } apply {
+    CCX({aux245, mu[3]}, aux249);
+  }
+  aux250: qbit;
+  allocate(aux250);
+  within {
+    X(mu[4]);
+  } apply {
+    CCX({aux249, mu[4]}, aux250);
+  }
+  single_qrom_access(aux250, rot, [
+    True,
+    False,
+    True,
+    True,
+    True,
+    False,
+    True,
+    False,
+    False,
+    False,
+    True,
+    False
+  ]);
+  CX(aux249, aux250);
+  single_qrom_access(aux250, rot, [
+    False,
+    False,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    True,
+    True,
+    False,
+    False
+  ]);
+  CCX({aux249, mu[4]}, aux250);
+  free(aux250);
+  CX(aux245, aux249);
+  single_qrom_access(aux249, rot, [
+    False,
+    True,
+    True,
+    False,
+    False,
+    True,
+    False,
+    False,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CCX({aux245, mu[3]}, aux249);
+  free(aux249);
+  CCX({aux237, mu[2]}, aux245);
+  free(aux245);
+  CCX({aux221, mu[1]}, aux237);
+  free(aux237);
+  CCX({m1, mu[0]}, aux221);
+  free(aux221);
+}
+
+qfunc pauli_x_basis(q: qbit) {
+  H(q);
+}
+
+qfunc pauli_y_basis(q: qbit) {
+  SDG(q);
+  H(q);
+}
+
+qperm _crzz(theta: real, const ctrl: qbit, const target: qbit[2]) {
+  within {
+    CX(target[0], target[1]);
+  } apply {
+    CRZ(theta, ctrl, target[1]);
+  }
+}
+
+qperm digital_rotation(const rot: qbit[], const qs: qbit[2]) {
+  repeat (i: rot.len) {
+    _crzz(((2 ** (-i)) * pi) / (2 ** rot.len), rot[i], qs);
+  }
+}
+
+qfunc controlled_basis_change(const rot: qnum[], state: qbit[]) {
+  repeat (i: rot.len - 1) {
+    within {
+      pauli_x_basis(state[i]);
+      pauli_y_basis(state[i + 1]);
+    } apply {
+      digital_rotation(rot[i], {state[i], state[i + 1]});
+    }
+    within {
+      pauli_x_basis(state[i + 1]);
+      pauli_y_basis(state[i]);
+    } apply {
+      invert {
+        digital_rotation(rot[i], {state[i], state[i + 1]});
+      }
+    }
+  }
+}
+
+qperm _ciz(const ctrl: qbit, const target: qbit) {
+  S(ctrl);
+  CZ(ctrl, target);
+}
+
+qperm in_nu(nu: qbit[], rot: qnum[]) {
+  within {
+    X(nu[0]);
+  } apply {
+    aux251: qbit;
+    allocate(aux251);
+    within {
+      X(nu[1]);
+    } apply {
+      CCX({nu[0], nu[1]}, aux251);
+    }
+    aux252: qbit;
+    allocate(aux252);
+    within {
+      X(nu[2]);
+    } apply {
+      CCX({aux251, nu[2]}, aux252);
+    }
+    aux253: qbit;
+    allocate(aux253);
+    within {
+      X(nu[3]);
+    } apply {
+      CCX({aux252, nu[3]}, aux253);
+    }
+    aux254: qbit;
+    allocate(aux254);
+    within {
+      X(nu[4]);
+    } apply {
+      CCX({aux253, nu[4]}, aux254);
+    }
+    single_qrom_access(aux254, rot, [
+      True,
+      True,
+      False,
+      False,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      False,
+      False
+    ]);
+    CX(aux253, aux254);
+    single_qrom_access(aux254, rot, [
+      False,
+      False,
+      True,
+      False,
+      False,
+      True,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False
+    ]);
+    CCX({aux253, nu[4]}, aux254);
+    free(aux254);
+    CX(aux252, aux253);
+    aux255: qbit;
+    allocate(aux255);
+    within {
+      X(nu[4]);
+    } apply {
+      CCX({aux253, nu[4]}, aux255);
+    }
+    single_qrom_access(aux255, rot, [
+      True,
+      True,
+      True,
+      False,
+      True,
+      False,
+      True,
+      True,
+      True,
+      True,
+      True,
+      True
+    ]);
+    CX(aux253, aux255);
+    single_qrom_access(aux255, rot, [
+      False,
+      True,
+      False,
+      False,
+      True,
+      True,
+      True,
+      False,
+      False,
+      True,
+      True,
+      True
+    ]);
+    CCX({aux253, nu[4]}, aux255);
+    free(aux255);
+    CCX({aux252, nu[3]}, aux253);
+    free(aux253);
+    CX(aux251, aux252);
+    aux256: qbit;
+    allocate(aux256);
+    within {
+      X(nu[3]);
+    } apply {
+      CCX({aux252, nu[3]}, aux256);
+    }
+    aux257: qbit;
+    allocate(aux257);
+    within {
+      X(nu[4]);
+    } apply {
+      CCX({aux256, nu[4]}, aux257);
+    }
+    single_qrom_access(aux257, rot, [
+      False,
+      True,
+      True,
+      True,
+      True,
+      False,
+      False,
+      True,
+      True,
+      False,
+      False,
+      True
+    ]);
+    CX(aux256, aux257);
+    single_qrom_access(aux257, rot, [
+      True,
+      True,
+      False,
+      True,
+      True,
+      True,
+      False,
+      True,
+      False,
+      True,
+      False,
+      True
+    ]);
+    CCX({aux256, nu[4]}, aux257);
+    free(aux257);
+    CX(aux252, aux256);
+    aux258: qbit;
+    allocate(aux258);
+    within {
+      X(nu[4]);
+    } apply {
+      CCX({aux256, nu[4]}, aux258);
+    }
+    single_qrom_access(aux258, rot, [
+      True,
+      True,
+      False,
+      True,
+      False,
+      True,
+      True,
+      True,
+      True,
+      False,
+      False,
+      False
+    ]);
+    CX(aux256, aux258);
+    single_qrom_access(aux258, rot, [
+      True,
+      False,
+      True,
+      True,
+      True,
+      False,
+      True,
+      False,
+      True,
+      True,
+      False,
+      False
+    ]);
+    CCX({aux256, nu[4]}, aux258);
+    free(aux258);
+    CCX({aux252, nu[3]}, aux256);
+    free(aux256);
+    CCX({aux251, nu[2]}, aux252);
+    free(aux252);
+    CX(nu[0], aux251);
+    aux259: qbit;
+    allocate(aux259);
+    within {
+      X(nu[2]);
+    } apply {
+      CCX({aux251, nu[2]}, aux259);
+    }
+    aux260: qbit;
+    allocate(aux260);
+    within {
+      X(nu[3]);
+    } apply {
+      CCX({aux259, nu[3]}, aux260);
+    }
+    aux261: qbit;
+    allocate(aux261);
+    within {
+      X(nu[4]);
+    } apply {
+      CCX({aux260, nu[4]}, aux261);
+    }
+    single_qrom_access(aux261, rot, [
+      False,
+      True,
+      True,
+      True,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False,
+      False,
+      True
+    ]);
+    CX(aux260, aux261);
+    single_qrom_access(aux261, rot, [
+      False,
+      True,
+      True,
+      False,
+      False,
+      False,
+      True,
+      False,
+      False,
+      True,
+      False,
+      True
+    ]);
+    CCX({aux260, nu[4]}, aux261);
+    free(aux261);
+    CX(aux259, aux260);
+    aux262: qbit;
+    allocate(aux262);
+    within {
+      X(nu[4]);
+    } apply {
+      CCX({aux260, nu[4]}, aux262);
+    }
+    single_qrom_access(aux262, rot, [
+      True,
+      True,
+      True,
+      False,
+      True,
+      True,
+      False,
+      True,
+      True,
+      True,
+      False,
+      True
+    ]);
+    CX(aux260, aux262);
+    single_qrom_access(aux262, rot, [
+      True,
+      False,
+      True,
+      True,
+      False,
+      False,
+      True,
+      True,
+      False,
+      True,
+      True,
+      False
+    ]);
+    CCX({aux260, nu[4]}, aux262);
+    free(aux262);
+    CCX({aux259, nu[3]}, aux260);
+    free(aux260);
+    CX(aux251, aux259);
+    aux263: qbit;
+    allocate(aux263);
+    within {
+      X(nu[3]);
+    } apply {
+      CCX({aux259, nu[3]}, aux263);
+    }
+    aux264: qbit;
+    allocate(aux264);
+    within {
+      X(nu[4]);
+    } apply {
+      CCX({aux263, nu[4]}, aux264);
+    }
+    single_qrom_access(aux264, rot, [
+      False,
+      True,
+      True,
+      False,
+      False,
+      True,
+      False,
+      False,
+      True,
+      False,
+      False,
+      True
+    ]);
+    CX(aux263, aux264);
+    single_qrom_access(aux264, rot, [
+      False,
+      True,
+      False,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      True,
+      False,
+      True
+    ]);
+    CCX({aux263, nu[4]}, aux264);
+    free(aux264);
+    CX(aux259, aux263);
+    aux265: qbit;
+    allocate(aux265);
+    within {
+      X(nu[4]);
+    } apply {
+      CCX({aux263, nu[4]}, aux265);
+    }
+    single_qrom_access(aux265, rot, [
+      True,
+      False,
+      True,
+      True,
+      False,
+      True,
+      False,
+      False,
+      True,
+      True,
+      False,
+      True
+    ]);
+    CX(aux263, aux265);
+    single_qrom_access(aux265, rot, [
+      False,
+      False,
+      True,
+      False,
+      False,
+      False,
+      False,
+      True,
+      True,
+      True,
+      False,
+      True
+    ]);
+    CCX({aux263, nu[4]}, aux265);
+    free(aux265);
+    CCX({aux259, nu[3]}, aux263);
+    free(aux263);
+    CCX({aux251, nu[2]}, aux259);
+    free(aux259);
+    CCX({nu[0], nu[1]}, aux251);
+    free(aux251);
+  }
+  aux266: qbit;
+  allocate(aux266);
+  within {
+    X(nu[1]);
+  } apply {
+    CCX({nu[0], nu[1]}, aux266);
+  }
+  aux267: qbit;
+  allocate(aux267);
+  within {
+    X(nu[2]);
+  } apply {
+    CCX({aux266, nu[2]}, aux267);
+  }
+  aux268: qbit;
+  allocate(aux268);
+  within {
+    X(nu[3]);
+  } apply {
+    CCX({aux267, nu[3]}, aux268);
+  }
+  aux269: qbit;
+  allocate(aux269);
+  within {
+    X(nu[4]);
+  } apply {
+    CCX({aux268, nu[4]}, aux269);
+  }
+  single_qrom_access(aux269, rot, [
+    True,
+    False,
+    False,
+    True,
+    False,
+    True,
+    False,
+    True,
+    False,
+    False,
+    True,
+    True
+  ]);
+  CX(aux268, aux269);
+  single_qrom_access(aux269, rot, [
+    False,
+    False,
+    False,
+    True,
+    False,
+    True,
+    True,
+    False,
+    False,
+    True,
+    False,
+    True
+  ]);
+  CCX({aux268, nu[4]}, aux269);
+  free(aux269);
+  CX(aux267, aux268);
+  aux270: qbit;
+  allocate(aux270);
+  within {
+    X(nu[4]);
+  } apply {
+    CCX({aux268, nu[4]}, aux270);
+  }
+  single_qrom_access(aux270, rot, [
+    True,
+    False,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    False,
+    False,
+    True,
+    True
+  ]);
+  CX(aux268, aux270);
+  single_qrom_access(aux270, rot, [
+    True,
+    True,
+    True,
+    False,
+    False,
+    True,
+    False,
+    True,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CCX({aux268, nu[4]}, aux270);
+  free(aux270);
+  CCX({aux267, nu[3]}, aux268);
+  free(aux268);
+  CX(aux266, aux267);
+  aux271: qbit;
+  allocate(aux271);
+  within {
+    X(nu[3]);
+  } apply {
+    CCX({aux267, nu[3]}, aux271);
+  }
+  aux272: qbit;
+  allocate(aux272);
+  within {
+    X(nu[4]);
+  } apply {
+    CCX({aux271, nu[4]}, aux272);
+  }
+  single_qrom_access(aux272, rot, [
+    True,
+    False,
+    True,
+    True,
+    True,
+    True,
+    True,
+    False,
+    True,
+    True,
+    False,
+    False
+  ]);
+  CX(aux271, aux272);
+  single_qrom_access(aux272, rot, [
+    False,
+    True,
+    False,
+    False,
+    True,
+    False,
+    False,
+    False,
+    False,
+    True,
+    False,
+    True
+  ]);
+  CCX({aux271, nu[4]}, aux272);
+  free(aux272);
+  CX(aux267, aux271);
+  aux273: qbit;
+  allocate(aux273);
+  within {
+    X(nu[4]);
+  } apply {
+    CCX({aux271, nu[4]}, aux273);
+  }
+  single_qrom_access(aux273, rot, [
+    False,
+    True,
+    False,
+    True,
+    True,
+    True,
+    False,
+    True,
+    True,
+    False,
+    True,
+    True
+  ]);
+  CX(aux271, aux273);
+  single_qrom_access(aux273, rot, [
+    True,
+    True,
+    False,
+    True,
+    False,
+    False,
+    True,
+    True,
+    True,
+    False,
+    True,
+    True
+  ]);
+  CCX({aux271, nu[4]}, aux273);
+  free(aux273);
+  CCX({aux267, nu[3]}, aux271);
+  free(aux271);
+  CCX({aux266, nu[2]}, aux267);
+  free(aux267);
+  CX(nu[0], aux266);
+  aux274: qbit;
+  allocate(aux274);
+  within {
+    X(nu[2]);
+  } apply {
+    CCX({aux266, nu[2]}, aux274);
+  }
+  aux275: qbit;
+  allocate(aux275);
+  within {
+    X(nu[3]);
+  } apply {
+    CCX({aux274, nu[3]}, aux275);
+  }
+  aux276: qbit;
+  allocate(aux276);
+  within {
+    X(nu[4]);
+  } apply {
+    CCX({aux275, nu[4]}, aux276);
+  }
+  single_qrom_access(aux276, rot, [
+    True,
+    False,
+    True,
+    False,
+    False,
+    False,
+    False,
+    True,
+    False,
+    True,
+    True,
+    False
+  ]);
+  CX(aux275, aux276);
+  single_qrom_access(aux276, rot, [
+    True,
+    True,
+    False,
+    True,
+    False,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    True
+  ]);
+  CCX({aux275, nu[4]}, aux276);
+  free(aux276);
+  CX(aux274, aux275);
+  aux277: qbit;
+  allocate(aux277);
+  within {
+    X(nu[4]);
+  } apply {
+    CCX({aux275, nu[4]}, aux277);
+  }
+  single_qrom_access(aux277, rot, [
+    True,
+    False,
+    True,
+    True,
+    False,
+    True,
+    True,
+    True,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CX(aux275, aux277);
+  single_qrom_access(aux277, rot, [
+    False,
+    True,
+    False,
+    True,
+    True,
+    True,
+    True,
+    False,
+    False,
+    True,
+    False,
+    True
+  ]);
+  CCX({aux275, nu[4]}, aux277);
+  free(aux277);
+  CCX({aux274, nu[3]}, aux275);
+  free(aux275);
+  CX(aux266, aux274);
+  aux278: qbit;
+  allocate(aux278);
+  within {
+    X(nu[3]);
+  } apply {
+    CCX({aux274, nu[3]}, aux278);
+  }
+  aux279: qbit;
+  allocate(aux279);
+  within {
+    X(nu[4]);
+  } apply {
+    CCX({aux278, nu[4]}, aux279);
+  }
+  single_qrom_access(aux279, rot, [
+    True,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    False,
+    True,
+    True,
+    True,
+    True
+  ]);
+  CX(aux278, aux279);
+  single_qrom_access(aux279, rot, [
+    False,
+    True,
+    True,
+    False,
+    False,
+    False,
+    False,
+    False,
+    False,
+    False,
+    True,
+    True
+  ]);
+  CCX({aux278, nu[4]}, aux279);
+  free(aux279);
+  CX(aux274, aux278);
+  single_qrom_access(aux278, rot, [
+    False,
+    False,
+    True,
+    False,
+    False,
+    False,
+    True,
+    True,
+    False,
+    True,
+    False,
+    True
+  ]);
+  CCX({aux274, nu[3]}, aux278);
+  free(aux278);
+  CCX({aux266, nu[2]}, aux274);
+  free(aux274);
+  CCX({nu[0], nu[1]}, aux266);
+  free(aux266);
+}
+
+qperm _cciz(const ctrl1: qbit, const ctrl2: qbit, const target: qbit) {
+  control (ctrl1) {
+    S(ctrl2);
+  }
+  control ([ctrl1, ctrl2]) {
+    Z(target);
+  }
+}
+
+qfunc select(ell: ELL, psi: PSI) {
+  rot: qnum<4>[3];
+  within {
+    allocate(rot);
+    in_mu(ell.mu, ell.m1, rot);
+    control (psi.plus1) {
+      _swap(psi.down, psi.up);
+    }
+    invert {
+      controlled_basis_change(rot, psi.down);
+    }
+  } apply {
+    _ciz(ell.succ, psi.down[0]);
+  }
+  within {
+    allocate(rot);
+    in_nu(ell.nu, rot);
+    control (psi.plus2) {
+      _swap(psi.down, psi.up);
+    }
+    invert {
+      controlled_basis_change(rot, psi.down);
+    }
+  } apply {
+    within {
+      X(ell.m1);
+    } apply {
+      _cciz(ell.succ, ell.m1, psi.down[0]);
+    }
+  }
+}
+
+qfunc in_t(t: qbit[], ell: ELL, psi: PSI) {
+  within {
+    X(t[0]);
+  } apply {
+    aux189: qbit;
+    allocate(aux189);
+    within {
+      X(t[1]);
+    } apply {
+      CCX({t[0], t[1]}, aux189);
+    }
+    aux190: qbit;
+    allocate(aux190);
+    within {
+      X(t[2]);
+    } apply {
+      CCX({aux189, t[2]}, aux190);
+    }
+    aux191: qbit;
+    allocate(aux191);
+    within {
+      X(t[3]);
+    } apply {
+      CCX({aux190, t[3]}, aux191);
+    }
+    controlled_reflect(aux191, ell);
+    CX(aux190, aux191);
+    select(ell, psi);
+    controlled_reflect(aux191, ell);
+    CCX({aux190, t[3]}, aux191);
+    free(aux191);
+    CX(aux189, aux190);
+    aux280: qbit;
+    allocate(aux280);
+    within {
+      X(t[3]);
+    } apply {
+      CCX({aux190, t[3]}, aux280);
+    }
+    select(ell, psi);
+    controlled_reflect(aux280, ell);
+    CX(aux190, aux280);
+    select(ell, psi);
+    controlled_reflect(aux280, ell);
+    CCX({aux190, t[3]}, aux280);
+    free(aux280);
+    CCX({aux189, t[2]}, aux190);
+    free(aux190);
+    CX(t[0], aux189);
+    aux281: qbit;
+    allocate(aux281);
+    within {
+      X(t[2]);
+    } apply {
+      CCX({aux189, t[2]}, aux281);
+    }
+    aux282: qbit;
+    allocate(aux282);
+    within {
+      X(t[3]);
+    } apply {
+      CCX({aux281, t[3]}, aux282);
+    }
+    select(ell, psi);
+    controlled_reflect(aux282, ell);
+    CX(aux281, aux282);
+    select(ell, psi);
+    controlled_reflect(aux282, ell);
+    CCX({aux281, t[3]}, aux282);
+    free(aux282);
+    CX(aux189, aux281);
+    aux283: qbit;
+    allocate(aux283);
+    within {
+      X(t[3]);
+    } apply {
+      CCX({aux281, t[3]}, aux283);
+    }
+    select(ell, psi);
+    controlled_reflect(aux283, ell);
+    CX(aux281, aux283);
+    select(ell, psi);
+    controlled_reflect(aux283, ell);
+    CCX({aux281, t[3]}, aux283);
+    free(aux283);
+    CCX({aux189, t[2]}, aux281);
+    free(aux281);
+    CCX({t[0], t[1]}, aux189);
+    free(aux189);
+  }
+  aux284: qbit;
+  allocate(aux284);
+  within {
+    X(t[1]);
+  } apply {
+    CCX({t[0], t[1]}, aux284);
+  }
+  aux285: qbit;
+  allocate(aux285);
+  within {
+    X(t[2]);
+  } apply {
+    CCX({aux284, t[2]}, aux285);
+  }
+  aux286: qbit;
+  allocate(aux286);
+  within {
+    X(t[3]);
+  } apply {
+    CCX({aux285, t[3]}, aux286);
+  }
+  select(ell, psi);
+  controlled_reflect(aux286, ell);
+  CX(aux285, aux286);
+  select(ell, psi);
+  controlled_reflect(aux286, ell);
+  CCX({aux285, t[3]}, aux286);
+  free(aux286);
+  CX(aux284, aux285);
+  aux287: qbit;
+  allocate(aux287);
+  within {
+    X(t[3]);
+  } apply {
+    CCX({aux285, t[3]}, aux287);
+  }
+  select(ell, psi);
+  controlled_reflect(aux287, ell);
+  CX(aux285, aux287);
+  select(ell, psi);
+  controlled_reflect(aux287, ell);
+  CCX({aux285, t[3]}, aux287);
+  free(aux287);
+  CCX({aux284, t[2]}, aux285);
+  free(aux285);
+  CX(t[0], aux284);
+  aux288: qbit;
+  allocate(aux288);
+  within {
+    X(t[2]);
+  } apply {
+    CCX({aux284, t[2]}, aux288);
+  }
+  aux289: qbit;
+  allocate(aux289);
+  within {
+    X(t[3]);
+  } apply {
+    CCX({aux288, t[3]}, aux289);
+  }
+  select(ell, psi);
+  controlled_reflect(aux289, ell);
+  CX(aux288, aux289);
+  select(ell, psi);
+  controlled_reflect(aux289, ell);
+  CCX({aux288, t[3]}, aux289);
+  free(aux289);
+  CX(aux284, aux288);
+  select(ell, psi);
+  controlled_reflect(aux288, ell);
+  CCX({aux284, t[2]}, aux288);
+  free(aux288);
+  CCX({t[0], t[1]}, aux284);
+  free(aux284);
+}
+
+qfunc main(output t: qbit[4], output ell: ELL, output psi: PSI) {
+  allocate(ell);
+  allocate(t);
+  allocate(psi);
+  prepare_xi(t);
+  init_psi(psi);
+  in_t(t, ell, psi);
+  invert {
+    qft(t);
+  }
+}
