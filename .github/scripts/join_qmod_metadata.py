@@ -1,20 +1,27 @@
-#!/usr/bin/env python3
+#! /usr/bin/env python3
 import json
+import logging
 import re
 import sys
 from pathlib import Path
 from typing import List
 
+PYTHON_DIALECT = "python"
+NATIVE_DIALECT = "native"
 
-def _get_qmod_path_for_metadata(metadata_path: Path) -> Path:
+
+def _get_qmod_path_for_metadata(metadata_path: Path) -> tuple[Path, str] | None:
     # Each metadata file has the same name as the qmod file, but with a .json extension,
     # so we replace the extension with qmod
-    qmod_path = metadata_path.parent / (Path(metadata_path.stem).stem + ".qmod")
-    if not qmod_path.exists():
-        raise RuntimeError(
-            f"Could not find qmod file for metadata file {metadata_path} at {qmod_path}"
-        )
-    return qmod_path
+    native_qmod_path = metadata_path.parent / (Path(metadata_path.stem).stem + ".qmod")
+    if native_qmod_path.exists():
+        return native_qmod_path, NATIVE_DIALECT
+    python_qmod_path = metadata_path.parent / (Path(metadata_path.stem).stem + ".ipynb")
+    if python_qmod_path.exists():
+        return python_qmod_path, PYTHON_DIALECT
+
+    # it is the libraries responsibility to ensure that each metadata file has a corresponding qmod file
+    return None
 
 
 def _is_json(data: str) -> bool:
@@ -29,33 +36,23 @@ def _is_json(data: str) -> bool:
     return True
 
 
-def _get_qmod_type(qmod_path: Path) -> str:
-    data = qmod_path.read_text()
-    if _is_json(data):
-        return "json"
-    else:
-        return "standalone"
-
-
 def join_metadata_files(directory: Path, exclude_file: Path) -> List[dict]:
     metadata = []
-    for metadata_path in directory.rglob("*.metadata.json"):
+    for metadata_path in sorted(directory.rglob("*.metadata.json")):
         if metadata_path == exclude_file:
             continue
         if metadata_path.suffixes == [".synthesis_options", ".json"]:
             continue
         with metadata_path.open() as fobj:
             single_metadata = json.load(fobj)
-        qmod_path = _get_qmod_path_for_metadata(metadata_path)
+
+        qmod_data = _get_qmod_path_for_metadata(metadata_path)
+        if qmod_data is None:
+            continue
+
+        qmod_path, dialect = qmod_data
         single_metadata["path"] = str(qmod_path.relative_to(directory))
-        if single_metadata.get("qmod_dialect") is None:
-            try:
-                qmod_type = _get_qmod_type(qmod_path)
-            except Exception as exc:
-                raise RuntimeError(
-                    f"Qmod {qmod_path} is not a valid qmod file"
-                ) from exc
-            single_metadata["qmod_dialect"] = qmod_type
+        single_metadata["qmod_dialect"] = dialect
         metadata.append(single_metadata)
     return metadata
 
@@ -69,6 +66,9 @@ def generate_unified_metadata_file(qmod_directory: str, metadata_filename: str) 
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
     qmod_dir_path = sys.argv[1]
     metadata_file = sys.argv[2]
     generate_unified_metadata_file(
