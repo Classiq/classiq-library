@@ -1,0 +1,50 @@
+qfunc super_position(C: qnum) {
+  H(C);
+  S(C);
+}
+
+qfunc initial_state(x: qnum, C: qnum) {
+  x ^= 32;
+  super_position(C);
+}
+
+qfunc coin_opeator(C: qnum) {
+  hadamard_transform(C);
+}
+
+qfunc shift_right(x: qnum) {
+  x += 1;
+}
+
+qfunc shift_left(x: qnum) {
+  x += -1;
+}
+
+qfunc shift_opeartor(x: qnum, C: qnum) {
+  control (C == 1) {
+    shift_right(x);
+  }
+  control (C == 0) {
+    shift_left(x);
+  }
+}
+
+qfunc quantum_walk(x: qnum, C: qnum) {
+  coin_opeator(C);
+  shift_opeartor(x, C);
+}
+
+qfunc coin_walk(t: int, x: qnum, C: qnum) {
+  power (t) {
+    quantum_walk(x, C);
+  }
+}
+
+qfunc main(t: int, output x: qnum) {
+  C: qnum;
+  allocate(6, x);
+  allocate(1, C);
+  initial_state(x, C);
+  coin_walk(t, x, C);
+  drop(C);
+}
