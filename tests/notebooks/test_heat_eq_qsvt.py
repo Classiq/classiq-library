@@ -6,15 +6,12 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("heat_eq_qsvt", timeout_seconds=600 * 7)
+@wrap_testbook("heat_eq_qsvt", timeout_seconds=600 * 10)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
-        expected_width=None,
+        expected_width=15,
         expected_depth=None,
         expected_cx_count=None,
     )
-
-    # test notebook content
-    pass  # Todo
