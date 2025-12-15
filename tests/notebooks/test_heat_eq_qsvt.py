@@ -6,15 +6,18 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("heat_eq_qsvt", timeout_seconds=600 * 7)
+@wrap_testbook("heat_eq_qsvt", timeout_seconds=600 * 10)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
-        expected_width=None,
+        expected_width=13,
         expected_depth=None,
         expected_cx_count=None,
     )
 
+    norm_factor = tb.ref("norm_factor")
+    results = tb.ref("results")
     # test notebook content
-    pass  # Todo
+    assert 0.8 < norm_factor * results[0][3].transpose() < 1.2
+    assert 0.01 < norm_factor * results[1][3].transpose() < 0.3

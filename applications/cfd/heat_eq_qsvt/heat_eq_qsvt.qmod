@@ -41,11 +41,11 @@ qfunc my_be(data: qnum<3, UNSIGNED, 0>, block: qbit[4]) {
     ], 0, select);
   } apply {
     multiplex([lambda() {
-      RY(3.252761000151628, rotating_qubit);
+      RY(3.171896843449038, rotating_qubit);
     }, lambda() {
       RY(0.0, rotating_qubit);
     }, lambda() {
-      RY(3.252761000151628, rotating_qubit);
+      RY(3.171896843449038, rotating_qubit);
     }], select);
     multiplex([lambda() {
       packed += 0;
@@ -73,19 +73,19 @@ qfunc main(output block: qnum, output data: qnum, output qsvt_aux: qbit) {
   allocate(1, qsvt_aux);
   allocate(4.0, block);
   prepare_amplitudes([
-    (-0.240746626240615),
-    (-0.336737859255334),
-    (-0.330108402561768),
-    (-0.347888362107992),
-    (-0.559992716867353),
-    (-0.482868801572984),
-    (-0.218588012434707),
-    (-0.064155783127223)
+    0.256450683633314,
+    0.325492271358915,
+    0.427213899555001,
+    0.440204804277636,
+    0.449940046073772,
+    0.367728859016004,
+    0.295689251798971,
+    0.163991310818599
   ], 0, data);
   qsvt_inversion_my([
-    (-1.738078501179466),
-    0.654311402219199,
-    0.654311402219198,
-    (-0.16728217438457)
+    (-1.738078501179465),
+    0.654311402219197,
+    0.654311402219197,
+    (-0.167282174384569)
   ], block, data, qsvt_aux);
 }
