@@ -1,7 +1,7 @@
 qfunc modular_exponentiation(N: int, a: int, x: qbit[], pw: qbit[]) {
   repeat (index: pw.len) {
     control (pw[index]) {
-      inplace_modular_multiply(N, (a ** (2 ** index)) % N, x);
+      modular_multiply_constant_inplace(N, a ** (2 ** index), x);
     }
   }
 }
