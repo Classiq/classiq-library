@@ -1,0 +1,26 @@
+qfunc q0_rotate(theta: real[], q0: qbit) {
+  RZ(theta[2], q0);
+  RY(theta[1], q0);
+  RX(theta[0], q0);
+}
+
+qfunc q1_rotate(theta: real[], q1: qbit) {
+  RZ(theta[5], q1);
+  RY(theta[4], q1);
+  RX(theta[3], q1);
+}
+
+qfunc pauli_Y_measure(q: qbit[]) {
+  S(q[0]);
+  H(q[0]);
+  S(q[1]);
+  H(q[1]);
+}
+
+qfunc main(theta: real[6], output q: qbit[2]) {
+  allocate(q);
+  q0_rotate(theta, q[0]);
+  q1_rotate(theta, q[1]);
+  q0_rotate(theta, q[1]);
+  pauli_Y_measure(q);
+}

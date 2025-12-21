@@ -1,32 +1,32 @@
-qfunc modular_exponentiation(n: int, a: int, x: qbit[], pw: qbit[]) {
+qfunc modular_exponentiation(N: int, a: int, x: qbit[], pw: qbit[]) {
   repeat (index: pw.len) {
     control (pw[index]) {
-      inplace_modular_multiply(n, (a ** (2 ** index)) % n, x);
+      modular_multiply_constant_inplace(N, a ** (2 ** index), x);
     }
   }
 }
 
-qfunc discrete_log_oracle(g_generator: int, x_element: int, N_modulus: int, x1: qbit[], x2: qbit[], output func_res: qnum) {
+qfunc discrete_log_oracle(g_generator: int, x_element: int, N_modulus: int, alpha: qbit[], beta: qbit[], output func_res: qnum) {
   allocate(ceiling(log(N_modulus, 2)), func_res);
   func_res ^= 1;
-  modular_exponentiation(N_modulus, x_element, func_res, x1);
-  modular_exponentiation(N_modulus, g_generator, func_res, x2);
+  modular_exponentiation(N_modulus, x_element, func_res, alpha);
+  modular_exponentiation(N_modulus, g_generator, func_res, beta);
 }
 
-qfunc discrete_log(g: int, x: int, N: int, order: int, output x1: qbit[], output x2: qbit[], output func_res: qbit[]) {
-  allocate(ceiling(log(order, 2)), x1);
-  allocate(ceiling(log(order, 2)), x2);
-  hadamard_transform(x1);
-  hadamard_transform(x2);
-  discrete_log_oracle(g, x, N, x1, x2, func_res);
+qfunc discrete_log(g: int, x: int, N: int, order: int, output alpha: qbit[], output beta: qbit[], output func_res: qbit[]) {
+  allocate(ceiling(log(order, 2)), alpha);
+  allocate(ceiling(log(order, 2)), beta);
+  hadamard_transform(alpha);
+  hadamard_transform(beta);
+  discrete_log_oracle(g, x, N, alpha, beta, func_res);
   invert {
-    qft(x1);
+    qft(alpha);
   }
   invert {
-    qft(x2);
+    qft(beta);
   }
 }
 
-qfunc main(output x1: qnum, output x2: qnum, output func_res: qnum) {
-  discrete_log(3, 2, 5, 4, x1, x2, func_res);
+qfunc main(output alpha: qnum, output beta: qnum, output func_res: qnum) {
+  discrete_log(3, 2, 5, 4, alpha, beta, func_res);
 }

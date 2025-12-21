@@ -1,0 +1,18 @@
+qfunc cost_layer(gamma: real, qba: qbit[]) {
+  phase (((((((((((((((((0 + (0.025 * qba[0])) + (0.025 * qba[1])) + (0.025 * qba[2])) + (0.025 * qba[3])) + (0.025 * qba[4])) + (0.025 * qba[5])) + (0.05 * qba[6])) + (0.025 * qba[12])) + (0.025 * qba[13])) + (0.025 * qba[14])) + (0.025 * qba[15])) + (0.025 * qba[16])) + (0.025 * qba[17])) + (0.05 * qba[18])) + ((((0 + ((0.25 * qba[7]) * qba[19])) + ((0.25 * qba[8]) * qba[20])) + ((0.25 * qba[9]) * qba[21])) + ((0.25 * qba[11]) * qba[23]))) + ((0 + ((1 * qba[1]) * qba[14])) + ((1 * qba[2]) * qba[13]))) + (0.125 * (((((((((((0 + ((((1 - (2 * qba[7])) + qba[0]) + qba[1]) ** 2)) + ((((0 - (2 * qba[19])) + qba[12]) + qba[13]) ** 2)) + ((((0 - (2 * qba[8])) + qba[3]) + qba[5]) ** 2)) + ((((1 - (2 * qba[20])) + qba[15]) + qba[17]) ** 2)) + ((((((0 - (2 * qba[9])) + qba[0]) + qba[2]) + qba[3]) + qba[4]) ** 2)) + ((((((0 - (2 * qba[21])) + qba[12]) + qba[14]) + qba[15]) + qba[16]) ** 2)) + (((((1 - (2 * qba[10])) + qba[1]) + qba[2]) + qba[6]) ** 2)) + (((((1 - (2 * qba[22])) + qba[13]) + qba[14]) + qba[18]) ** 2)) + (((((0 - (2 * qba[11])) + qba[4]) + qba[5]) + qba[6]) ** 2)) + (((((0 - (2 * qba[23])) + qba[16]) + qba[17]) + qba[18]) ** 2)) + ((((0 + (1 - qba[10])) + (1 - qba[7])) + (1 - qba[22])) + (1 - qba[20])))), gamma);
+}
+
+qfunc mixer_layer(beta: real, qba: qbit[]) {
+  apply_to_all(lambda(q) {
+    RX(1 * beta, q);
+  }, qba);
+}
+
+qfunc main(params: real[40], output z: qbit[24]) {
+  allocate(z);
+  hadamard_transform(z);
+  repeat (i: 20) {
+    cost_layer(params[2 * i], z);
+    mixer_layer(params[(2 * i) + 1], z);
+  }
+}

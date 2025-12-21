@@ -1,0 +1,485 @@
+qstruct BlockEncodedState {
+  block: qnum<6>;
+  data: E_Field;
+}
+
+qstruct E_Field {
+  y: qbit[4];
+  x: qbit[4];
+}
+
+qperm _inplace_xor_expanded___0(target: qnum<8, False, 0>) {
+  target ^= 130;
+}
+
+qperm _inplace_xor_expanded___1(target: qnum<7, False, 0>) {
+  target ^= 112;
+}
+
+qperm permute_block_expanded___0(data: qbit[8]) {
+  _inplace_xor_expanded___0(data);
+  control (data[7]) {
+    _inplace_xor_expanded___1(data[0:7]);
+  }
+  SWAP(data[0], data[7]);
+}
+
+qfunc inplace_prepare_init_expanded___0(data: qbit[8]) {
+  inplace_prepare_amplitudes([0.7071, 0.7071], 0.0, data[0]);
+  invert {
+    permute_block_expanded___0(data);
+  }
+}
+
+qperm equals_expanded___0(const qvar1: qnum<6, False, 0>, target: qbit) {
+  target ^= qvar1 == 0;
+}
+
+qperm block_encoding_cnot_0_lambda___0_0_expanded___0(_aux: qbit, const state___block_captured__main__0: qnum<6, False, 0>) {
+  equals_expanded___0(state___block_captured__main__0, _aux);
+}
+
+qperm projector_controlled_phase_expanded___0(phase: real, const aux: qbit, const state___block_captured__main__0: qnum<6, False, 0>) {
+  within {
+    block_encoding_cnot_0_lambda___0_0_expanded___0(aux, state___block_captured__main__0);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qperm equals_expanded___1(const qvar1: qnum<3, False, 0>, target: qbit) {
+  target ^= qvar1 == 2;
+}
+
+qperm equals_expanded___2(const qvar1: qnum<3, False, 0>, target: qbit) {
+  target ^= qvar1 == 5;
+}
+
+qperm equals_expanded___3(const qvar1: qnum<4, False, 0>, target: qbit) {
+  target ^= qvar1 == 7;
+}
+
+qperm remove_scatterer_expanded___0(e_field: E_Field, block: qbit) {
+  temp_x: qbit;
+  within {
+    allocate(1, temp_x);
+    X(temp_x);
+    equals_expanded___1(e_field.x[1:4], temp_x);
+    equals_expanded___2(e_field.x[1:4], temp_x);
+  } apply {
+    equals_expanded___3({temp_x, e_field.y[1:4]}, block);
+  }
+}
+
+qfunc demi_semi_laplacian_expanded___0(r: qnum<4, False, 0>, block: qbit) {
+  within {
+    H(block);
+  } apply {
+    control (block == 1) {
+      r += -1;
+    }
+    control (block == 0) {
+      r += 1;
+    }
+  }
+}
+
+qfunc semi_laplacian_expanded___0(e_field: E_Field, block: qbit[2]) {
+  within {
+    H(block[1]);
+  } apply {
+    control (block[1] == 0) {
+      demi_semi_laplacian_expanded___0(e_field.x, block[0]);
+    }
+    control (block[1] == 1) {
+      demi_semi_laplacian_expanded___0(e_field.y, block[0]);
+    }
+  }
+}
+
+qperm equals_expanded___4(const qvar1: qnum<4, False, 0>, target: qbit) {
+  target ^= qvar1 == 0;
+}
+
+qperm equals_expanded___5(const qvar1: qnum<4, False, 0>, target: qbit) {
+  target ^= qvar1 == 15;
+}
+
+qperm boundary_flag_expanded___0(const r: qbit[4], flag: qbit) {
+  equals_expanded___4(r, flag);
+  equals_expanded___5(r, flag);
+}
+
+qperm equals_expanded___6(const qvar1: qnum<3, False, 0>, target: qbit) {
+  target ^= qvar1 == 0;
+}
+
+qfunc semi_laplacian_removed_expanded___0(e_field: E_Field, block: qbit[4]) {
+  remove_scatterer_expanded___0(e_field, block[2]);
+  semi_laplacian_expanded___0(e_field, block[0:2]);
+  flag_scatterer: qbit;
+  flag_x: qbit;
+  flag_y: qbit;
+  within {
+    allocate(1, flag_scatterer);
+    remove_scatterer_expanded___0(e_field, flag_scatterer);
+    allocate(1, flag_x);
+    boundary_flag_expanded___0(e_field.x, flag_x);
+    allocate(1, flag_y);
+    boundary_flag_expanded___0(e_field.y, flag_y);
+  } apply {
+    equals_expanded___6({flag_scatterer, flag_x, flag_y}, block[3]);
+    X(block[3]);
+  }
+}
+
+qperm demi_semi_abc_expanded___0(r: qbit[4], block: qbit) {
+  X(r[0]);
+  boundary_flag_expanded___0(r, block);
+  X(block);
+}
+
+qfunc semi_abc_expanded___0(e_field: E_Field, block: qbit[3]) {
+  within {
+    H(block[1]);
+  } apply {
+    control (block[1] == 0) {
+      demi_semi_abc_expanded___0(e_field.x, block[0]);
+    }
+    control (block[1] == 1) {
+      demi_semi_abc_expanded___0(e_field.y, block[0]);
+    }
+  }
+  boundary_flag_expanded___0(e_field.x, block[2]);
+  boundary_flag_expanded___0(e_field.y, block[2]);
+  X(block[2]);
+}
+
+qfunc hamiltonian_expanded___0(e_field: E_Field, block: qbit[6]) {
+  block1: qbit[4];
+  block2: qnum<2, False, 0>;
+  within {
+    block -> {block1, block2};
+    inplace_prepare_amplitudes([
+      0.5813,
+      0.6644,
+      0.4698,
+      0.0
+    ], 0.0, block2);
+  } apply {
+    control (block2 == 0) {
+      semi_laplacian_removed_expanded___0(e_field, block1);
+    }
+    control (block2 == 1) {
+      semi_abc_expanded___0(e_field, block1[0:3]);
+      U(0, 0, 0, 1.0647, block1[0]);
+    }
+    control (block2 == 2) {
+      U(0, 0, 0, pi, block1[0]);
+    }
+  }
+}
+
+qfunc u_0_lambda___0_0_expanded___0(state___data_captured__main__0: E_Field, state___block_captured__main__0: qnum<6, False, 0>) {
+  hamiltonian_expanded___0(state___data_captured__main__0, state___block_captured__main__0);
+}
+
+qfunc u_1_lambda___0_0_expanded___0(state___data_captured__main__0: E_Field, state___block_captured__main__0: qnum<6, False, 0>) {
+  invert {
+    u_0_lambda___0_0_expanded___0(state___data_captured__main__0, state___block_captured__main__0);
+  }
+}
+
+qfunc qsvt_step_expanded___0(phase1: real, phase2: real, const aux: qbit, state___data_captured__main__0: E_Field, state___block_captured__main__0: qnum<6, False, 0>) {
+  u_1_lambda___0_0_expanded___0(state___data_captured__main__0, state___block_captured__main__0);
+  projector_controlled_phase_expanded___0(phase1, aux, state___block_captured__main__0);
+  invert {
+    u_1_lambda___0_0_expanded___0(state___data_captured__main__0, state___block_captured__main__0);
+  }
+  projector_controlled_phase_expanded___0(phase2, aux, state___block_captured__main__0);
+}
+
+qfunc qsvt_expanded___0(phase_seq: real[], aux: qbit, state___data_captured__main__0: E_Field, state___block_captured__main__0: qnum<6, False, 0>) {
+  H(aux);
+  projector_controlled_phase_expanded___0(phase_seq[0], aux, state___block_captured__main__0);
+  repeat (index: 127) {
+    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], aux, state___data_captured__main__0, state___block_captured__main__0);
+  }
+  if (False) {
+  } else {
+    u_1_lambda___0_0_expanded___0(state___data_captured__main__0, state___block_captured__main__0);
+    projector_controlled_phase_expanded___0(phase_seq[255], aux, state___block_captured__main__0);
+  }
+  H(aux);
+}
+
+qfunc qsvt_inversion_expanded___0(phase_seq: real[], aux: qbit, state___data_captured__main__0: E_Field, state___block_captured__main__0: qnum<6, False, 0>) {
+  qsvt_expanded___0(phase_seq, aux, state___data_captured__main__0, state___block_captured__main__0);
+}
+
+qfunc main(output res: qnum<8, False, 0>, output block: qnum<7, False, 0>) {
+  state: BlockEncodedState;
+  allocate(14, state);
+  inplace_prepare_init_expanded___0(state.data);
+  aux: qbit;
+  allocate(1, aux);
+  qsvt_inversion_expanded___0([
+    4.7141,
+    3.1398,
+    3.1435,
+    3.1396,
+    3.1436,
+    3.1395,
+    3.1438,
+    3.1393,
+    3.144,
+    3.1391,
+    3.1441,
+    3.139,
+    3.1443,
+    3.1388,
+    3.1445,
+    3.1386,
+    3.1447,
+    3.1384,
+    3.1449,
+    3.1382,
+    3.1451,
+    3.138,
+    3.1453,
+    3.1378,
+    3.1455,
+    3.1376,
+    3.1457,
+    3.1374,
+    3.1459,
+    3.1371,
+    3.1462,
+    3.1369,
+    3.1464,
+    3.1367,
+    3.1466,
+    3.1364,
+    3.1469,
+    3.1362,
+    3.1471,
+    3.136,
+    3.1474,
+    3.1357,
+    3.1476,
+    3.1354,
+    3.1479,
+    3.1352,
+    3.1481,
+    3.1349,
+    3.1484,
+    3.1346,
+    3.1487,
+    3.1344,
+    3.1489,
+    3.1341,
+    3.1492,
+    3.1338,
+    3.1495,
+    3.1335,
+    3.1498,
+    3.1332,
+    3.1501,
+    3.133,
+    3.1504,
+    3.1327,
+    3.1507,
+    3.1324,
+    3.151,
+    3.1321,
+    3.1513,
+    3.1318,
+    3.1516,
+    3.1315,
+    3.1519,
+    3.1312,
+    3.1522,
+    3.1309,
+    3.1525,
+    3.1305,
+    3.1528,
+    3.1302,
+    3.1531,
+    3.1299,
+    3.1534,
+    3.1296,
+    3.1537,
+    3.1293,
+    3.154,
+    3.129,
+    3.1543,
+    3.1287,
+    3.1546,
+    3.1284,
+    3.1549,
+    3.1281,
+    3.1552,
+    3.1278,
+    3.1555,
+    3.1275,
+    3.1558,
+    3.1272,
+    3.1561,
+    3.127,
+    3.1564,
+    3.1267,
+    3.1566,
+    3.1264,
+    3.1569,
+    3.1261,
+    3.1572,
+    3.1259,
+    3.1574,
+    3.1256,
+    3.1577,
+    3.1254,
+    3.1579,
+    3.1251,
+    3.1582,
+    3.1249,
+    3.1584,
+    3.1247,
+    3.1586,
+    3.1244,
+    3.1588,
+    3.1242,
+    3.159,
+    3.124,
+    3.1592,
+    3.1239,
+    3.1239,
+    3.1592,
+    3.124,
+    3.159,
+    3.1242,
+    3.1588,
+    3.1244,
+    3.1586,
+    3.1247,
+    3.1584,
+    3.1249,
+    3.1582,
+    3.1251,
+    3.1579,
+    3.1254,
+    3.1577,
+    3.1256,
+    3.1574,
+    3.1259,
+    3.1572,
+    3.1261,
+    3.1569,
+    3.1264,
+    3.1566,
+    3.1267,
+    3.1564,
+    3.127,
+    3.1561,
+    3.1272,
+    3.1558,
+    3.1275,
+    3.1555,
+    3.1278,
+    3.1552,
+    3.1281,
+    3.1549,
+    3.1284,
+    3.1546,
+    3.1287,
+    3.1543,
+    3.129,
+    3.154,
+    3.1293,
+    3.1537,
+    3.1296,
+    3.1534,
+    3.1299,
+    3.1531,
+    3.1302,
+    3.1528,
+    3.1305,
+    3.1525,
+    3.1309,
+    3.1522,
+    3.1312,
+    3.1519,
+    3.1315,
+    3.1516,
+    3.1318,
+    3.1513,
+    3.1321,
+    3.151,
+    3.1324,
+    3.1507,
+    3.1327,
+    3.1504,
+    3.133,
+    3.1501,
+    3.1332,
+    3.1498,
+    3.1335,
+    3.1495,
+    3.1338,
+    3.1492,
+    3.1341,
+    3.1489,
+    3.1344,
+    3.1487,
+    3.1346,
+    3.1484,
+    3.1349,
+    3.1481,
+    3.1352,
+    3.1479,
+    3.1354,
+    3.1476,
+    3.1357,
+    3.1474,
+    3.136,
+    3.1471,
+    3.1362,
+    3.1469,
+    3.1364,
+    3.1466,
+    3.1367,
+    3.1464,
+    3.1369,
+    3.1462,
+    3.1371,
+    3.1459,
+    3.1374,
+    3.1457,
+    3.1376,
+    3.1455,
+    3.1378,
+    3.1453,
+    3.138,
+    3.1451,
+    3.1382,
+    3.1449,
+    3.1384,
+    3.1447,
+    3.1386,
+    3.1445,
+    3.1388,
+    3.1443,
+    3.139,
+    3.1441,
+    3.1391,
+    3.144,
+    3.1393,
+    3.1438,
+    3.1395,
+    3.1436,
+    3.1396,
+    3.1435,
+    3.1398,
+    (-799.5336)
+  ], aux, state.data, state.block);
+  {aux, state} -> {block, res};
+}

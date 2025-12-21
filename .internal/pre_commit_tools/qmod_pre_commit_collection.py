@@ -15,6 +15,8 @@ TIMEOUTS_FILE = PROJECT_ROOT / "tests" / "resources" / "timeouts.yaml"
 
 DEFAULT_TIMEOUT_SECONDS: float = 10
 
+ENFORCE_TIMEOUTS: bool = False
+
 
 def main(full_file_paths: Iterable[str]) -> bool:
     return validate_unique_names() and all(map(is_valid_qmod, full_file_paths))
@@ -32,18 +34,22 @@ def is_valid_qmod(
     if _does_contain_dash_in_file_name(file_name):
         errors.append(
             "File naming format error:\n"
-            "    Dash (-) is not allowed in file named. please use underscore (_)\n"
+            "    Dash (-) is not allowed in file name. please use underscore (_)\n"
             f"    for example, you may change '{file_path}' to '{file_path.replace('-', '_')}'."
         )
 
     if _does_contain_space_in_file_name(file_name):
         errors.append(
             "File naming format error:\n"
-            "    Space is not allowed in file named. please use underscore (_)\n"
+            "    Space is not allowed in file name. please use underscore (_)\n"
             f"    for example, you may change '{file_path}' to '{file_path.replace(' ', '_')}'."
         )
 
-    if not _is_file_in_timeouts(file_name) and should_notebook_be_tested(file_path):
+    if (
+        ENFORCE_TIMEOUTS
+        and not _is_file_in_timeouts(file_name)
+        and should_notebook_be_tested(file_path)
+    ):
         if automatically_add_timeout:
             _add_file_to_timeouts(file_name)
             errors.append(

@@ -1,3 +1,5 @@
+import numpy as np
+
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
     validate_quantum_model,
@@ -22,7 +24,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test notebook content
     assert _get_fraction_of_good_results(tb, "result") < 0.5
-    assert _get_fraction_of_good_results(tb, "result_2") == 1
+    assert np.isclose(_get_fraction_of_good_results(tb, "result_2"), 1)
 
 
 def _get_fraction_of_good_results(

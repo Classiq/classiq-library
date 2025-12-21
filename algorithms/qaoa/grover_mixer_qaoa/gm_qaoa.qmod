@@ -1,0 +1,91 @@
+qperm apply_to_all_expanded___0(target: qbit[1]) {
+  repeat (index: 1) {
+    X(target[index]);
+  }
+}
+
+qfunc _dicke_split_cycle_shift_expanded___0(qvar: qbit[4]) {
+  within {
+    CX(qvar[1], qvar[0]);
+  } apply {
+    control (qvar[0]) {
+      RY(2.094395102393, qvar[1]);
+    }
+  }
+}
+
+qfunc _dicke_split_cycle_shift_expanded___1(qvar: qbit[3]) {
+  within {
+    CX(qvar[1], qvar[0]);
+  } apply {
+    control (qvar[0]) {
+      RY(1.910633236249, qvar[1]);
+    }
+  }
+}
+
+qfunc _dicke_split_cycle_shift_expanded___2(qvar: qbit[2]) {
+  within {
+    CX(qvar[1], qvar[0]);
+  } apply {
+    control (qvar[0]) {
+      RY(1.570796326795, qvar[1]);
+    }
+  }
+}
+
+qfunc prepare_dicke_state_unary_input_expanded___0(qvar: qbit[2]) {
+  _dicke_split_cycle_shift_expanded___2(qvar);
+}
+
+qfunc prepare_dicke_state_unary_input_expanded___1(qvar: qbit[3]) {
+  _dicke_split_cycle_shift_expanded___1(qvar);
+  prepare_dicke_state_unary_input_expanded___0(qvar[1:3]);
+}
+
+qfunc prepare_dicke_state_unary_input_expanded___2(qvar: qbit[4]) {
+  _dicke_split_cycle_shift_expanded___0(qvar);
+  prepare_dicke_state_unary_input_expanded___1(qvar[1:4]);
+}
+
+qfunc prepare_dicke_state_expanded___0(qvar: qbit[4]) {
+  apply_to_all_expanded___0(qvar[0:1]);
+  prepare_dicke_state_unary_input_expanded___2(qvar);
+}
+
+qfunc initial_state_expanded___0(x: qbit[4]) {
+  prepare_dicke_state_expanded___0(x[0:4]);
+}
+
+qfunc cost_layer_expanded___0(gamma: real, x: qbit[4]) {
+  phase (((x[0] + (2 * x[1])) - x[2]) + (12 * x[3]), gamma);
+}
+
+qfunc mixer_layer_expanded___0(beta: real, x: qbit[4]) {
+  x_lsbs: qnum<3, False, 0>;
+  x_msb: qbit;
+  within {
+    invert {
+      initial_state_expanded___0(x);
+    }
+    x -> {x_lsbs, x_msb};
+    X(x_msb);
+  } apply {
+    control (x_lsbs == 0) {
+      RZ((-0.318309886184) * beta, x_msb);
+    }
+  }
+}
+
+qfunc qaoa_ansatz_expanded___0(gammas: real[3], betas: real[3], qba: qbit[4]) {
+  repeat (i: 3) {
+    cost_layer_expanded___0(gammas[i], qba);
+    mixer_layer_expanded___0(betas[i], qba);
+  }
+}
+
+qfunc main(params: real[6], output x: qbit[4]) {
+  allocate(4, x);
+  initial_state_expanded___0(x);
+  qaoa_ansatz_expanded___0(params[0:3], params[3:6], x);
+}

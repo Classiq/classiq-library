@@ -1,0 +1,38 @@
+qfunc hadamard_transform_expanded___0(target: qbit[8]) {
+  repeat (index: 8) {
+    H(target[index]);
+  }
+}
+
+qfunc cost_layer_expanded___0(gamma: real, v: qbit[8]) {
+  phase (((((((((((((((((((((((((1.12355 * v[0]) + (2.47625 * v[1])) + (2.2629 * v[2])) + (1.42755 * v[4])) + (1.9589 * v[5])) + (1.3627 * v[3])) + (2.29005 * v[6])) + (1.5489 * v[7])) + ((0.053575 - (0.10715 * v[1])) * (1.0 - (2 * v[7])))) + ((0.22955 - (0.4591 * v[2])) * (1.0 - (2 * v[5])))) + ((0.23455 - (0.4691 * v[1])) * (1.0 - (2 * v[6])))) + ((0.5 - (1.0 * v[0])) * (1.0 - (2 * v[1])))) + ((0.5 - (1.0 * v[0])) * (1.0 - (2 * v[2])))) + ((0.5 - (1.0 * v[1])) * (1.0 - (2 * v[3])))) + ((0.5 - (1.0 * v[2])) * (1.0 - (2 * v[3])))) + ((0.5 - (1.0 * v[4])) * (1.0 - (2 * v[5])))) + ((0.5 - (1.0 * v[4])) * (1.0 - (2 * v[6])))) + ((0.5 - (1.0 * v[5])) * (1.0 - (2 * v[7])))) + ((0.5 - (1.0 * v[6])) * (1.0 - (2 * v[7])))) + ((1.0 - (2 * v[4])) * ((0.37625 * v[0]) - 0.188125))) + ((1.0 - (2 * v[4])) * ((0.0962 * v[2]) - 0.0481))) + ((1.0 - (2 * v[5])) * ((0.4002 * v[0]) - 0.2001))) + ((1.0 - (2 * v[6])) * ((0.07905 * v[3]) - 0.039525))) + ((1.0 - (2 * v[7])) * ((0.45825 * v[3]) - 0.229125))) - 7.2254, gamma);
+}
+
+qfunc gate_operand_0_lambda___0_0_expanded___0(q: qbit, beta_captured__mixer_layer__2: real) {
+  RX(2 * beta_captured__mixer_layer__2, q);
+}
+
+qfunc apply_to_all_expanded___0(target: qbit[8], beta_captured__mixer_layer__2: real) {
+  repeat (index: 8) {
+    gate_operand_0_lambda___0_0_expanded___0(target[index], beta_captured__mixer_layer__2);
+  }
+}
+
+qfunc mixer_layer_expanded___0(beta: real, qba: qbit[8]) {
+  apply_to_all_expanded___0(qba, beta);
+}
+
+qfunc qaoa_ansatz_expanded___0(gammas: real[3], betas: real[3], qba: qbit[8]) {
+  cost_layer_expanded___0(gammas[0], qba);
+  mixer_layer_expanded___0(betas[0], qba);
+  cost_layer_expanded___0(gammas[1], qba);
+  mixer_layer_expanded___0(betas[1], qba);
+  cost_layer_expanded___0(gammas[2], qba);
+  mixer_layer_expanded___0(betas[2], qba);
+}
+
+qfunc main(params: real[6], output v: qbit[8]) {
+  allocate(8, v);
+  hadamard_transform_expanded___0(v);
+  qaoa_ansatz_expanded___0(params[0:3], params[3:6], v);
+}

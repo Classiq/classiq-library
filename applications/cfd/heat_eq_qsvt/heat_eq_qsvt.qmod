@@ -1,0 +1,91 @@
+qfunc my_projector_controlled_phase(phase: real, block: qnum, aux: qbit) {
+  control (block == 0) {
+    X(aux);
+  }
+  RZ(phase, aux);
+  control (block == 0) {
+    X(aux);
+  }
+}
+
+qfunc my_qsvt_step(phase1: real, phase2: real, u: qfunc (qbit[], qbit[]), data: qbit[], block: qbit[], qsvt_aux: qbit) {
+  u(data, block);
+  my_projector_controlled_phase(phase1, block, qsvt_aux);
+  invert {
+    u(data, block);
+  }
+  my_projector_controlled_phase(phase2, block, qsvt_aux);
+}
+
+qfunc multiplex(qfuncs: qfunc[] (), select: qnum) {
+  repeat (i: qfuncs.len) {
+    control (select == i) {
+      qfuncs[i]();
+    }
+  }
+}
+
+qfunc my_be(data: qnum<3, UNSIGNED, 0>, block: qbit[4]) {
+  rotating_qubit: qbit;
+  del_qubit: qbit;
+  select: qbit[2.0];
+  packed: qnum<data.size + del_qubit.size, UNSIGNED, 0>;
+  within {
+    block -> {select, rotating_qubit, del_qubit};
+    {data, del_qubit} -> packed;
+    inplace_prepare_state([
+      0.333333333333333,
+      0.333333333333333,
+      0.333333333333333,
+      0
+    ], 0, select);
+  } apply {
+    multiplex([lambda() {
+      RY(3.252761000151628, rotating_qubit);
+    }, lambda() {
+      RY(0.0, rotating_qubit);
+    }, lambda() {
+      RY(3.252761000151628, rotating_qubit);
+    }], select);
+    multiplex([lambda() {
+      packed += 0;
+    }, lambda() {
+      packed += 1;
+    }, lambda() {
+      packed += 2;
+    }], select);
+    packed += -1;
+  }
+}
+
+qfunc qsvt_inversion_my(qsvt_phases: real[4], block: qnum, data: qnum, qsvt_aux: qbit) {
+  H(qsvt_aux);
+  my_projector_controlled_phase(qsvt_phases[0], block, qsvt_aux);
+  repeat (i: floor((qsvt_phases.len - 1) / 2)) {
+    my_qsvt_step(qsvt_phases[(2 * i) + 1], qsvt_phases[(2 * i) + 2], lambda(d, b) {
+      my_be(d, b);
+    }, data, block, qsvt_aux);
+  }
+  H(qsvt_aux);
+}
+
+qfunc main(output block: qnum, output data: qnum, output qsvt_aux: qbit) {
+  allocate(1, qsvt_aux);
+  allocate(4.0, block);
+  prepare_amplitudes([
+    (-0.240746626240615),
+    (-0.336737859255334),
+    (-0.330108402561768),
+    (-0.347888362107992),
+    (-0.559992716867353),
+    (-0.482868801572984),
+    (-0.218588012434707),
+    (-0.064155783127223)
+  ], 0, data);
+  qsvt_inversion_my([
+    (-1.738078501179466),
+    0.654311402219199,
+    0.654311402219198,
+    (-0.16728217438457)
+  ], block, data, qsvt_aux);
+}

@@ -32,7 +32,7 @@ repos:
         name: Upgrade notebooks nbformat
         entry: .internal/pre_commit_tools/set_nbformat.py
         language: python
-        files: ^\S+\.ipynb$
+        files: \.ipynb$
         additional_dependencies:
           - "nbformat"
         require_serial: true
@@ -40,7 +40,7 @@ repos:
         name: Strip further stuff from notebooks
         entry: .internal/pre_commit_tools/extra_nbstripout.py
         language: python
-        files: ^\S+\.ipynb$
+        files: \.ipynb$
         additional_dependencies:
           - "nbformat"
         require_serial: true
@@ -64,7 +64,7 @@ repos:
         description: Ensure notebooks conventions
         entry: .internal/pre_commit_tools/notebook_pre_commit_collection.py
         language: python
-        files: ^\S+\.ipynb$
+        files: \.ipynb$
         additional_dependencies:
           - "pyyaml==6.0"
         require_serial: true
@@ -73,23 +73,30 @@ repos:
         description: Ensure qmods conventions
         entry: .internal/pre_commit_tools/qmod_pre_commit_collection.py
         language: python
-        files: ^\S+\.qmod$
+        files: \.qmod$
         additional_dependencies:
           - "pyyaml==6.0"
         require_serial: true
-      - id: clean-demo-timeouts
-        name: Clean demo timeouts
-        description: Remove unexisting entries and verify unique keys
-        entry: .internal/pre_commit_tools/clean_timeouts.py
+      # - id: clean-demo-timeouts
+      #   name: Clean demo timeouts
+      #   description: Remove unexisting entries and verify unique keys
+      #   entry: .internal/pre_commit_tools/clean_timeouts.py
+      #   language: python
+      #   files: \.(qmod|ipynb|yaml)$
+      #   additional_dependencies:
+      #     - "pyyaml==6.0"
+      #   require_serial: true
+      - id: validate-metadata-file
+        name: Validate Metadata file
+        description: Add file if non existant and validate value otherwise
+        entry: .internal/pre_commit_tools/validate_metadata.py
         language: python
-        files: ^\S+\.(qmod|ipynb|yaml)$
-        additional_dependencies:
-          - "pyyaml==6.0"
+        files: \.(qmod|ipynb)$
         require_serial: true
       - id: auto-add-tests
         name: Auto add test
         description: Automatically adding a test to new notebooks
         entry: .internal/pre_commit_tools/auto_add_tests.py
         language: python
-        files: ^\S+\.ipynb$
+        files: \.ipynb$
         require_serial: true

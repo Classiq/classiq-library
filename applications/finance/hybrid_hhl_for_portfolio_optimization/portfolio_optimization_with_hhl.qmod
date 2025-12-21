@@ -1,0 +1,183 @@
+qfunc apply_to_all_expanded___0(target: qbit[4]) {
+  repeat (index: 4) {
+    H(target[index]);
+  }
+}
+
+qfunc unitary_0_lambda___0_0_expanded___0(state_captured__main__0: qbit[2]) {
+  unitary([
+    [
+      ((-0.45633357409892) + 0.21284628523468j),
+      (0.493133073165794 + 0.031381731719265j),
+      ((-0.012911665624786) + 0.371572237749342j),
+      (0.094774358640956 - 0.595882764514296j)
+    ],
+    [
+      (0.493133073165794 + 0.031381731719265j),
+      (0.653173910066555 + 0.143679323956497j),
+      ((-0.039048362047549) - 0.528832972892331j),
+      (0.100733993390439 - 0.131219773353752j)
+    ],
+    [
+      ((-0.012911665624786) + 0.371572237749342j),
+      ((-0.039048362047549) - 0.528832972892331j),
+      (0.077903637938049 - 0.083209676220826j),
+      (0.739019102976557 + 0.146411104916847j)
+    ],
+    [
+      (0.094774358640956 - 0.595882764514296j),
+      (0.10073399339044 - 0.131219773353752j),
+      (0.739019102976556 + 0.146411104916847j),
+      (0.172321068471336 - 0.106280707135642j)
+    ]
+  ], state_captured__main__0);
+}
+
+qfunc unitary_with_power_0_lambda___0_0_expanded___0(k: int, state_captured__main__0: qbit[2]) {
+  power (k) {
+    unitary_0_lambda___0_0_expanded___0(state_captured__main__0);
+  }
+}
+
+qfunc qft_no_swap_expanded___0(qbv: qbit[4]) {
+  repeat (i: 4) {
+    H(qbv[i]);
+    repeat (j: (4 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
+    }
+  }
+}
+
+qfunc qft_expanded___0(target: qbit[4]) {
+  repeat (index: 2.0) {
+    SWAP(target[index], target[3 - index]);
+  }
+  qft_no_swap_expanded___0(target);
+}
+
+qfunc qpe_flexible_expanded___0(phase: qbit[4], state_captured__main__0: qbit[2]) {
+  apply_to_all_expanded___0(phase);
+  repeat (index: 4) {
+    control (phase[index]) {
+      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, state_captured__main__0);
+    }
+  }
+  invert {
+    qft_expanded___0(phase);
+  }
+}
+
+qfunc qpe_expanded___0(phase: qnum<4, False, 4>, state_captured__main__0: qbit[2]) {
+  qpe_flexible_expanded___0(phase, state_captured__main__0);
+}
+
+qfunc assign_amplitude_table_expanded___0(const index: qbit[4], indicator: qbit) {
+  RY(-7.902534e-09, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.329889741541438, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-7.902534e-09, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.406147054563629, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(-7.902534e-09, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.290731447447181, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(-7.902534e-09, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(0.477311903222288, indicator);
+  skip_control {
+    CX(index[3], indicator);
+  }
+  RY(7.902534e-09, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.314595127266364, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(7.902534e-09, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.376816802907964, indicator);
+  skip_control {
+    CX(index[2], indicator);
+  }
+  RY(7.902534e-09, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.295743069475656, indicator);
+  skip_control {
+    CX(index[1], indicator);
+  }
+  RY(7.902534e-09, indicator);
+  skip_control {
+    CX(index[0], indicator);
+  }
+  RY(-0.650357443945002, indicator);
+  skip_control {
+    CX(index[3], indicator);
+  }
+}
+
+qfunc simple_eig_inv_expanded___0(phase: qnum<4, False, 4>, output indicator: qbit) {
+  allocate(1, indicator);
+  assign_amplitude_table_expanded___0(phase, indicator);
+}
+
+qfunc swap_test_expanded___0(state1: qbit[2], state2: qbit[2], output test: qbit) {
+  allocate(1, test);
+  H(test);
+  control (test) {
+    repeat (i: 2) {
+      SWAP(state1[i], state2[i]);
+    }
+  }
+  H(test);
+}
+
+qfunc main(output indicator: qbit, output test: qbit) {
+  state: qbit[2];
+  compared_state: qbit[2];
+  phase_var: qnum<4, False, 4>;
+  allocate(4, False, 4, phase_var);
+  prepare_amplitudes([
+    0.923076923076923,
+    0.384615384615385,
+    0.0,
+    0.0
+  ], 0.0, state);
+  within {
+    qpe_expanded___0(phase_var, state);
+  } apply {
+    simple_eig_inv_expanded___0(phase_var, indicator);
+  }
+  prepare_amplitudes([
+    (-0.529316249715818),
+    0.072055950337019,
+    (-0.403036042363453),
+    0.743097703107617
+  ], 0.0, compared_state);
+  swap_test_expanded___0(state, compared_state, test);
+  drop(state);
+  drop(compared_state);
+  drop(phase_var);
+}

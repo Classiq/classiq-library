@@ -1,20 +1,39 @@
-#!/usr/bin/env python3
+#! /usr/bin/env python3
 import json
+import logging
 import re
 import sys
 from pathlib import Path
 from typing import List
 
+# Order matters: higher-priority suffixes first
+QMOD_DICT = {".qmod": "native", ".ipynb": "python"}
 
-def _get_qmod_path_for_metadata(metadata_path: Path) -> Path:
-    # Each metadata file has the same name as the qmod file, but with a .json extension,
-    # so we replace the extension with qmod
-    qmod_path = metadata_path.parent / (Path(metadata_path.stem).stem + ".qmod")
-    if not qmod_path.exists():
-        raise RuntimeError(
-            f"Could not find qmod file for metadata file {metadata_path} at {qmod_path}"
-        )
-    return qmod_path
+
+def _get_qmod_path_for_metadata(metadata_path: Path) -> tuple[Path, str] | None:
+    """
+    Locate a .qmod or .ipynb file corresponding to the given metadata file.
+
+    The metadata file is expected to have a .metadata.json suffix (e.g.,
+    "example.metadata.json"). This function strips the .metadata.json suffix
+    to get the base name, then looks for a matching .qmod or .ipynb file in
+    the same directory (e.g., "example.qmod" or "example.ipynb").
+
+    Files are checked in QMOD_DICT order:
+    (.qmod, native),
+    then (.ipynb, python).
+
+    Returns the matched file path and its dialect, or `None` if no match exists.
+    """
+    meta_data_base_name = f"{metadata_path.parent / Path(metadata_path.stem).stem}"
+
+    for suffix, dialect in QMOD_DICT.items():
+        print(f"base name: {meta_data_base_name}{suffix}")
+        if Path(f"{meta_data_base_name}{suffix}").exists():
+            return Path(f"{meta_data_base_name}{suffix}"), dialect
+
+    # it is the libraries responsibility to ensure that each metadata file has a corresponding qmod/ipynb file
+    return None
 
 
 def _is_json(data: str) -> bool:
@@ -29,12 +48,12 @@ def _is_json(data: str) -> bool:
     return True
 
 
-def _get_qmod_type(qmod_path: Path) -> str:
-    data = qmod_path.read_text()
-    if _is_json(data):
-        return "json"
-    else:
-        return "standalone"
+def _enrich_metadata_with_qmod_info(
+    single_metadata: dict, qmod_data: tuple[Path, str], directory: Path
+) -> None:
+    qmod_path, dialect = qmod_data
+    single_metadata["path"] = str(qmod_path.relative_to(directory))
+    single_metadata["qmod_dialect"] = dialect
 
 
 def join_metadata_files(directory: Path, exclude_file: Path) -> List[dict]:
@@ -46,16 +65,12 @@ def join_metadata_files(directory: Path, exclude_file: Path) -> List[dict]:
             continue
         with metadata_path.open() as fobj:
             single_metadata = json.load(fobj)
-        qmod_path = _get_qmod_path_for_metadata(metadata_path)
-        single_metadata["path"] = str(qmod_path.relative_to(directory))
-        if single_metadata.get("qmod_dialect") is None:
-            try:
-                qmod_type = _get_qmod_type(qmod_path)
-            except Exception as exc:
-                raise RuntimeError(
-                    f"Qmod {qmod_path} is not a valid qmod file"
-                ) from exc
-            single_metadata["qmod_dialect"] = qmod_type
+
+        qmod_data = _get_qmod_path_for_metadata(metadata_path)
+        if qmod_data is None:
+            continue
+
+        _enrich_metadata_with_qmod_info(single_metadata, qmod_data, directory)
         metadata.append(single_metadata)
     return metadata
 
@@ -69,6 +84,9 @@ def generate_unified_metadata_file(qmod_directory: str, metadata_filename: str) 
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
     qmod_dir_path = sys.argv[1]
     metadata_file = sys.argv[2]
     generate_unified_metadata_file(
