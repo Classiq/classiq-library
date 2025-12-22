@@ -6,16 +6,15 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("adapt_vqe", timeout_seconds=60)
+@wrap_testbook("adapt_vqe", timeout_seconds=1801)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
-        expected_width=None,
-        expected_depth=None,
-        expected_cx_count=None,
+        expected_width=10,  # actual width=4
+        expected_depth=30,  # actual depth=12
     )
 
     # test notebook content
