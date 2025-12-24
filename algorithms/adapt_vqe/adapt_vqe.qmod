@@ -45,7 +45,7 @@ qfunc adapt_layer_expanded___3(theta: real, qba: qbit[4]) {
     terms=[
       SparsePauliTerm {
         paulis=[
-          IndexedPauli {pauli=2, index=3}
+          IndexedPauli {pauli=1, index=3}
         ],
         coefficient=1.0
       }
@@ -54,25 +54,21 @@ qfunc adapt_layer_expanded___3(theta: real, qba: qbit[4]) {
   }, theta, 1, 1, qba);
 }
 
-qfunc adapt_vqe_ansatz_expanded___0(thetas: real[15], qba: qbit[4]) {
+qfunc adapt_vqe_ansatz_expanded___0(thetas: real[11], qba: qbit[4]) {
   adapt_layer_expanded___0(thetas[0], qba);
   adapt_layer_expanded___1(thetas[1], qba);
   adapt_layer_expanded___2(thetas[2], qba);
-  adapt_layer_expanded___1(thetas[3], qba);
+  adapt_layer_expanded___2(thetas[3], qba);
   adapt_layer_expanded___3(thetas[4], qba);
-  adapt_layer_expanded___1(thetas[5], qba);
+  adapt_layer_expanded___0(thetas[5], qba);
   adapt_layer_expanded___2(thetas[6], qba);
-  adapt_layer_expanded___2(thetas[7], qba);
-  adapt_layer_expanded___3(thetas[8], qba);
-  adapt_layer_expanded___2(thetas[9], qba);
-  adapt_layer_expanded___3(thetas[10], qba);
-  adapt_layer_expanded___0(thetas[11], qba);
-  adapt_layer_expanded___1(thetas[12], qba);
-  adapt_layer_expanded___1(thetas[13], qba);
-  adapt_layer_expanded___2(thetas[14], qba);
+  adapt_layer_expanded___3(thetas[7], qba);
+  adapt_layer_expanded___1(thetas[8], qba);
+  adapt_layer_expanded___1(thetas[9], qba);
+  adapt_layer_expanded___1(thetas[10], qba);
 }
 
-qfunc main(params: real[15], output v: qbit[4]) {
+qfunc main(params: real[11], output v: qbit[4]) {
   allocate(4, v);
   adapt_vqe_ansatz_expanded___0(params, v);
 }
