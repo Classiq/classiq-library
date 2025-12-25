@@ -421,10 +421,10 @@ qfunc main(output data: qnum<2, False, 0>, output block: qnum<8, False, 0>) {
   state: QubitizationState;
   allocate(10, state);
   inplace_prepare_amplitudes([
-    0.358295949618,
-    0.503660489834,
-    0.314957841815,
-    0.720244181751
+    0.426851405009,
+    0.671469708575,
+    0.589869691636,
+    0.137768121848
   ], 0.0, state.data);
   lcu_cheb_expanded___0(state);
   state -> {data, block};
