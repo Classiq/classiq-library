@@ -1,0 +1,22 @@
+qfunc adapt_layer_expanded___0(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=1, index=0}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=1
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_vqe_ansatz_expanded___0(thetas: real[1], qba: qbit[4]) {
+  adapt_layer_expanded___0(thetas[0], qba);
+}
+
+qfunc main(params: real[1], output v: qbit[4]) {
+  allocate(4, v);
+  adapt_vqe_ansatz_expanded___0(params, v);
+}
