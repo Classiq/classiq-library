@@ -1,88 +1,93 @@
-from sympy import fwht
+from scipy.sparse import csr_matrix
 from classiq import *
 import numpy as np
-from classiq.open_library.functions.state_preparation import apply_phase_table
 
 ANGLE_THRESHOLD = 1e-13
 
-
-def get_graycode(size, i) -> int:
-    if i == 2**size:
-        return get_graycode(size, 0)
-    return i ^ (i >> 1)
+"""
+Functions for treating banded block encoding
+"""
 
 
-def get_graycode_angles_wh(size, angles):
-    transformed_angles = fwht(np.array(angles) / 2**size)
-    return [transformed_angles[get_graycode(size, j)] for j in range(2**size)]
+def nonzero_diagonals(sparse_mat: csr_matrix) -> list[int]:
+    """
+    Return a sorted list of diagonal offsets (k) for which the
+    diagonal of the sparse matrix is non-zero (i.e., has at least one nonzero element).
+
+    k = 0 -> main diagonal
+    k > 0 -> superdiagonals
+    k < 0 -> subdiagonals
+    """
+    if not isinstance(sparse_mat, csr_matrix):
+        raise TypeError("Input must be a scipy.sparse.csr_matrix")
+
+    rows, cols = sparse_mat.shape
+    diagonals = []
+
+    for k in range(-rows + 1, cols):  # all possible diagonals
+        diag = sparse_mat.diagonal(k)
+        if np.any(diag != 0):
+            diagonals.append(k)
+
+    return diagonals
 
 
-def get_graycode_ctrls(size):
-    return [
-        (get_graycode(size, i) ^ get_graycode(size, i + 1)).bit_length() - 1
-        for i in range(2**size)
-    ]
+def extract_diagonals(csr_mat: csr_matrix, offsets: list[int]) -> list[np.ndarray]:
+    """extracts the diagonals of a csr matrix given a list with the offsets - minus sign means lower diagonal"""
+    return [csr_mat.diagonal(offset) for offset in offsets]
 
 
-@qfunc
-def multiplex_ra(a_y: float, a_z: float, angles: list[float], qba: QArray, ind: QBit):
-    assert a_y**2 + a_z**2 == 1
-    # TODO support general (0,a_y,a_z) rotation
-    assert (
-        a_z == 1.0 or a_y == 1.0
-    ), "currently only strict y or z rotations are supported"
-    size = max(1, (len(angles) - 1).bit_length())
-    extended_angles = angles + [0] * (2**size - len(angles))
-    transformed_angles = get_graycode_angles_wh(size, extended_angles)
-    controllers = get_graycode_ctrls(size)
+def pad_arrays(
+    arrays: list[np.ndarray], offsets: list[int], pad_value: int = 0
+) -> list[np.ndarray]:
+    """
+    Pads all NumPy arrays in a list to match the length of the longest one.
+    For negative offsets, padding is added to the beginning of the array.
 
-    for k in range(2**size):
-        if np.abs(transformed_angles[k]) > ANGLE_THRESHOLD:
-            if a_z == 0.0:
-                RY(transformed_angles[k], ind)
-            else:
-                RZ(transformed_angles[k], ind)
+    Parameters:
+    - arrays (list of np.ndarray): List of NumPy arrays with different lengths.
+    - offsets (list of int): List of diagonal offsets, same order as arrays.
+    - pad_value (int, optional): The value to pad with (default is 0).
 
-        skip_control(lambda: CX(qba[controllers[k]], ind))
+    Returns:
+    - list of np.ndarray: Padded NumPy arrays.
+    """
+    if not arrays:  # Handle case where list is empty
+        return []
+
+    max_length = max(len(arr) for arr in arrays)  # Find max length
+
+    padded_arrays = []
+    for arr, offset in zip(arrays, offsets):
+        padding_length = max_length - len(arr)
+        if offset < 0:
+            # Pad at the beginning
+            pad_width = (padding_length, 0)
+        else:
+            # Pad at the end
+            pad_width = (0, padding_length)
+
+        padded_arr = np.pad(arr, pad_width, constant_values=pad_value)
+        padded_arrays.append(padded_arr)
+
+    return padded_arrays
 
 
-@qfunc
-def lcu_paulis_graycode(terms: list[SparsePauliTerm], data: QArray, block: QArray):
-    n_qubits = data.len
-    n_terms = len(terms)
-    table_z = np.zeros([n_qubits, n_terms])
-    table_y = np.zeros([n_qubits, n_terms])
-    probs = [abs(term.coefficient) for term in terms] + [0.0] * (2**block.len - n_terms)
-    hamiltonian_coeffs = np.angle([term.coefficient for term in terms]).tolist() + [
-        0.0
-    ] * (2**block.len - n_terms)
-    accumulated_phase = np.zeros(2**block.len).tolist()
-
-    for k in range(n_terms):
-        for pauli in terms[k].paulis:
-            if pauli.pauli == Pauli.Z:
-                table_z[pauli.index, k] = -np.pi
-                accumulated_phase[k] += np.pi / 2
-            elif pauli.pauli == Pauli.Y:
-                table_y[pauli.index, k] = -np.pi
-                accumulated_phase[k] += np.pi / 2
-            elif pauli.pauli == Pauli.X:
-                table_z[pauli.index, k] = -np.pi
-                table_y[pauli.index, k] = np.pi
-                accumulated_phase[k] += np.pi / 2
-
-    def select_graycode(block: QArray, data: QArray):
-        for i in range(n_qubits):
-            multiplex_ra(0, 1, table_z[i, :], block, data[i])
-            multiplex_ra(1, 0, table_y[i, :], block, data[i])
-        apply_phase_table(
-            [p1 - p2 for p1, p2 in zip(hamiltonian_coeffs, accumulated_phase)], block
-        )
-
-    within_apply(
-        lambda: inplace_prepare_state(probs, 0.0, block),
-        lambda: select_graycode(block, data),
+def get_be_banded_data(
+    sparse_mat: csr_matrix,
+) -> tuple[list[int], list[list[float]], list[float], float]:
+    offsets = nonzero_diagonals(sparse_mat)
+    num_q_diag = int(np.ceil(np.log2(len(offsets))))
+    diags = extract_diagonals(sparse_mat, offsets)
+    diags = pad_arrays(diags, offsets, 0)
+    diags_maxima = [np.max(np.abs(d)) for d in diags]
+    normalized_diags = [(d / d_max).tolist() for d, d_max in zip(diags, diags_maxima)]
+    prepare_norm = sum(diags_maxima)
+    normalized_diags_maxima = [d_max / prepare_norm for d_max in diags_maxima] + [0] * (
+        2**num_q_diag - len(offsets)
     )
+
+    return offsets, normalized_diags, normalized_diags_maxima, prepare_norm
 
 
 """ Loading of a single diagonal with a given offset"""
