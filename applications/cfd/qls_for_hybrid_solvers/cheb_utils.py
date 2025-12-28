@@ -41,7 +41,7 @@ def reciprocal_approx(x, w_min, B, scale):
 def get_numpy_cheb_interpolate(w_min, B, scale, degree):
 
     # Numpy interpolation
-    degree = (degree // 2) * 2
+    degree = (degree // 2) * 2 + 2
     poly = Chebyshev.interpolate(
         lambda x: reciprocal_approx(x, w_min, B, scale), degree, domain=[-1, 1]
     )
