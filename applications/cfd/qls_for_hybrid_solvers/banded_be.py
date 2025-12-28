@@ -223,3 +223,47 @@ def block_encode_banded_sym(
             ),
         ),
     )
+
+
+def get_banded_diags_be(mat_raw_scr):
+    """
+    Get relevant block-encoding properties for `block_encode_banded` block encoding,
+
+    Parameters
+    ----------
+    mat_raw_scr : scipy.sparse.spmatrix
+        Square sparse matrix of shape (N, N), real or complex, to be block-encoded.
+
+    Returns
+    -------
+    data_size : int
+       Size of the data variable.
+    block_size : int
+        Size of the block variable.
+    be_scaling_factor : float
+        The scaling factor of the block-encoding unitary
+    BlockEncodedState : QStruct
+        QSVT-compatible QStruct holding the quantum variables, with fields:
+          - data  : QNum[data_size]
+          - block : QNum[block_size]
+    be_qfunc : qfunc
+        Quantum function that implements the block encoding. Signature:
+        be_qfunc(be: BlockEncodedState) → None
+    """
+    raw_size = mat_raw_scr.shape[0]
+    data_size = max(1, (raw_size - 1).bit_length())
+    offsets, diags, diags_maxima, prepare_norm = get_be_banded_data(mat_raw_scr)
+    block_size = int(np.ceil(np.log2(len(offsets)))) + 1
+    be_scaling_factor = prepare_norm
+
+    @qfunc
+    def be_qfunc(block: QNum, data: QNum):
+        block_encode_banded(
+            offsets=offsets,
+            diags=diags,
+            prep_diag=diags_maxima,
+            block=block,
+            data=data,
+        )
+
+    return data_size, block_size, be_scaling_factor, be_qfunc
