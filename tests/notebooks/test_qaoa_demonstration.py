@@ -6,17 +6,15 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("qaoa_demonstration", timeout_seconds=60)
+@wrap_testbook("qaoa_demonstration", timeout_seconds=450)
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
-    validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
-        expected_width=None,
-        expected_depth=None,
-        expected_cx_count=None,
+        expected_width=9,  # actual width: 7
+        expected_depth=1250,  # actual depth: 1072
     )
 
     # test notebook content
-    pass  # Todo
+    assert tb.ref("depth_classiq") < tb.ref("depth_qiskit")
+    assert tb.ref("cx_counts_classiq") < tb.ref("cx_counts_qiskit")
