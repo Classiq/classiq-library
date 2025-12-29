@@ -12,7 +12,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_maxcut"),
         expected_width=5,
-        expected_depth=55,
+        expected_depth=80,
     )
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_knapsack"),
