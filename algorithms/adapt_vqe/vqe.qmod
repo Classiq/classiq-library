@@ -1,0 +1,150 @@
+qfunc adapt_layer_expanded___0(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=1, index=0},
+          IndexedPauli {pauli=1, index=3}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=4
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_layer_expanded___1(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=1, index=2}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=3
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_layer_expanded___2(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=2, index=0}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=1
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_layer_expanded___3(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=2, index=2},
+          IndexedPauli {pauli=1, index=0}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=3
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_layer_expanded___4(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=3, index=3},
+          IndexedPauli {pauli=1, index=1}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=4
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_layer_expanded___5(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=2, index=0},
+          IndexedPauli {pauli=1, index=2}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=3
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_layer_expanded___6(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=3, index=2},
+          IndexedPauli {pauli=1, index=1}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=3
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_layer_expanded___7(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=2, index=0},
+          IndexedPauli {pauli=2, index=2}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=3
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_layer_expanded___8(theta: real, qba: qbit[4]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {pauli=2, index=2},
+          IndexedPauli {pauli=1, index=1}
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=3
+  }, theta, 1, 1, qba);
+}
+
+qfunc adapt_vqe_ansatz_expanded___0(thetas: real[10], qba: qbit[4]) {
+  adapt_layer_expanded___0(thetas[0], qba);
+  adapt_layer_expanded___1(thetas[1], qba);
+  adapt_layer_expanded___2(thetas[2], qba);
+  adapt_layer_expanded___3(thetas[3], qba);
+  adapt_layer_expanded___4(thetas[4], qba);
+  adapt_layer_expanded___5(thetas[5], qba);
+  adapt_layer_expanded___6(thetas[6], qba);
+  adapt_layer_expanded___7(thetas[7], qba);
+  adapt_layer_expanded___8(thetas[8], qba);
+  adapt_layer_expanded___2(thetas[9], qba);
+}
+
+qfunc main(params: real[10], output v: qbit[4]) {
+  allocate(4, v);
+  adapt_vqe_ansatz_expanded___0(params, v);
+}
