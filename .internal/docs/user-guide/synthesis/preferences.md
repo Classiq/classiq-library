@@ -55,7 +55,7 @@ print(qprog.qsharp)
 
 ## Output Formats
 
-The Classiq platform provides different ways to format the output of
+The platform provides different ways to format the output of
 synthesized quantum programs. You can choose multiple output formats.
 
 -   In the SDK, you can print or save the desired output format after synthesizing.
@@ -64,7 +64,7 @@ synthesized quantum programs. You can choose multiple output formats.
 The output options:
 
 -   `"qasm"` - OpenQASM. The qasm circuit is in `qprog.qasm`.
--   By default, the Classiq platform uses OpenQASM 2.0. To use OpenQASM 3.0 instead, set the
+-   By default, the platform uses OpenQASM 2.0. To use OpenQASM 3.0 instead, set the
     `qasm3` field of the preferences to `True`.
 -   `"qsharp"` - Q#. The qsharp circuit is in `qprog.qsharp`.
 -   `"qir"` - Microsoft's QIR. The QIR circuit is in `qprog.qir`.
@@ -95,7 +95,7 @@ Notes:
 
 ## Timeouts
 
-The Classiq platform offers two timeouts:
+The platform offers two timeouts:
 
 -   `timeout_seconds` – A timeout value for the end-to-end synthesis process.
 
@@ -108,7 +108,7 @@ smaller than the generation timeout. Both timeouts are specified in a whole numb
 
 ## Toggling Quantum Program Debug Information
 
-The Classiq platform allows users to toggle quantum program debug information:
+The platform allows users to toggle quantum program debug information:
 
 -   `debug_mode` - When the flag is set to `True` (default), the quantum program
     will contain debug information for enhanced visualization (See [Quantum

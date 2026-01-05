@@ -10,7 +10,7 @@ This feature completes the [manual](./quantum-program-visualization-tool/basic-v
 
 ## Introduction
 
-Each function contains information on its registers, which is mainly provided by the Classiq synthesis engine.
+Each function contains information on its registers, which is mainly provided by the synthesis engine.
 The information includes the register type (input, output, zero, auxiliary), the name, and the qubits it contains.
 
 You can get information about the function's registers by clicking the function and looking in the **Information**
@@ -29,7 +29,7 @@ Two or more wires can be merged only if:
 
 ## Input Registers
 
-Currently, the Classiq platform only supports input registers. To see if a register is an input register, look in the **Information** tab.
+Currently, the platform only supports input registers. To see if a register is an input register, look in the **Information** tab.
 
 ![Register info](../../resources/single_register_info.png)
 

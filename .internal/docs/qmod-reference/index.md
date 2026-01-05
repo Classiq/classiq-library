@@ -24,7 +24,7 @@ Qmod description in Python can be translated to an equivalent in the native
 syntax and vice versa. Each of these may appeal to different users in different situations.
 
 The Qmod native syntax is designed to express the concepts of the language in a pure
-and concise form. In addition, the Classiq platform features smart editor support
+and concise form. In addition, the platform features smart editor support
 for Qmod, which is tuned for the language syntax and semantics.
 
 Users who feel comfortable programming in the Python language and environment, may

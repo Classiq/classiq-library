@@ -3,9 +3,9 @@ search:
     boost: 2.513
 ---
 
-# **Classiq Studio - Web-based IDE with Classiq inside**
+# **Studio - Web-based IDE with Classiq inside**
 
-Classiq Studio is a VSCode environment part of the Classiq platform.
+The Studio is a VSCode environment part of the platform.
 It bypasses the need to install the Python SDK package and its dependencies,
 and includes the complete and updated Classiq Library git repository of quantum functions, algorithms, applications, and tutorials.
 
@@ -22,7 +22,7 @@ Using your favorite code editing tools - vscode or jupyterlab
 
 ## **Getting started**
 
-**Access the Classiq Studio** – Open the Classiq Studio from the [Classiq platform](https://platform.classiq.io/) (after registration) and follow the instructions [here](Classiq-Studio-Guide.md)
+**Access the Studio** – Open the Studio from the [platform](https://platform.classiq.io/) (after registration) and follow the instructions [here](Studio-Guide.md)
 
 **Write Your First Program** – Use the editor to create your first quantum program or load an example of our applications from the build in Classiq library.
 

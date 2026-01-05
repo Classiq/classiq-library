@@ -17,9 +17,9 @@ Welcome to the Classiq Support Center. This page is designed to help you quickly
 ??? note "What is Classiq?"
     Classiq is quantum-computing software that enables the design, optimization, analysis, and execution of quantum algorithms. Check out how to get started [here](/latest/getting-started/).
 
-??? note "I'm new to the Classiq Platform—what are my first steps?"
-    - Start with [Registration and Installation](/latest/getting-started/registration_installations/) to get access to the Classiq Platform.
-    - [The Classiq Tutorial](/latest/getting-started/classiq_tutorial/) will help with your first steps in coding.
+??? note "I'm new to the platform—what are my first steps?"
+    - Start with [Registration and Installation](/latest/getting-started/registration_installations/) to get access to the platform.
+    - [The Onboarding Tutorial](/latest/getting-started/classiq_tutorial/) will help with your first steps in coding.
     - When you feel confident, try some of our [real-world applications](/latest/explore/applications/).
 
 ??? note "Can I execute algorithms on quantum computers using Classiq?"
@@ -32,10 +32,10 @@ Welcome to the Classiq Support Center. This page is designed to help you quickly
 ??? note "How can I fix `ClassiqAuthenticationError: Request to Auth0 failed with error code 403`?"
     This error arises when your authentication credentials are denied. Try overriding your authentication credentials by executing `authenticate(overwrite=True)`.
 
-??? note "My Classiq Studio cannot reconnect"
-    If you’re experiencing failed attempts to reconnect to Classiq Studio or long loading times, please try closing and reopening your web browser.
+??? note "My Studio cannot reconnect"
+    If you’re experiencing failed attempts to reconnect to the Studio or long loading times, please try closing and reopening your web browser.
 
-??? note "I'm having authentication problems in Classiq Studio"
+??? note "I'm having authentication problems in the Studio"
     Try authenticating again using:
     [comment]: DO_NOT_TEST
     ```python
@@ -43,10 +43,10 @@ Welcome to the Classiq Support Center. This page is designed to help you quickly
 
     classiq.authenticate()
     ```
-    To prevent such problems in the future, it is a good practice to begin code files in Studio with `authenticate()`.
+    To prevent such problems in the future, it is a good practice to begin code files in the Studio with `authenticate()`.
 
-??? note "Example notebooks in Classiq Studio aren’t working"
-    Some example notebooks (e.g., chemistry) require additional packages in Classiq Studio. First, try:
+??? note "Example notebooks in the Studio aren’t working"
+    Some example notebooks (e.g., chemistry) require additional packages in the Studio. First, try:
 
     ```bash
     pip install "classiq[chemistry]"

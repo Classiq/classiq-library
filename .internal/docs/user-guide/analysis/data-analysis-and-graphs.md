@@ -45,7 +45,7 @@ The hardware analysis supplies two main insights.
 
 To perform hardware-aware analysis, you may want to know which devices are
 available using the
-Classiq Platform. You can get a list of the devices that are both available and
+platform. You can get a list of the devices that are both available and
 suit the quantum program (i.e., have a sufficient number of qubits).
 
 [comment]: DO_NOT_TEST
