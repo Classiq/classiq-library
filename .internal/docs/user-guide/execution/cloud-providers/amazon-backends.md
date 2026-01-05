@@ -41,7 +41,7 @@ Execution on Amazon Braket requires an AWS account, and a role that Classiq can 
 
 ### Initial Account Setup
 
-Before first use, the Classiq platform needs your permission to connect to your
+Before first use, the platform needs your permission to connect to your
 AWS account. This is done by creating a cross-account role.
 
 Classiq provides with the attached CloudFormation `AssumeRole.cf.yaml` file. It only has the permissions needed for Braket.
@@ -68,7 +68,7 @@ To learn more about IAM roles, refer to the [AWS documentation](https://docs.aws
 
 ### Required Credentials
 
-When executing via the Classiq platform using AWS Cloud, there are several
+When executing via the platform using AWS Cloud, there are several
 required credentials:
 
 1. `aws_access_key_id`

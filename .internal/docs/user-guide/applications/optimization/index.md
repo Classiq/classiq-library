@@ -22,14 +22,14 @@ Read in-depth reviews of the language’s capabilities in
 The basics of problem modelling in PYOMO and
 a complete example are in the [problem formulation](problem-formulation.md) section.
 
-The Classiq platform supports an extensive set of modeling configurations for your use ([supported modeling](supported-modeling.md)).
+The platform supports an extensive set of modeling configurations for your use ([supported modeling](supported-modeling.md)).
 
 ## Solving Optimization Problems
 
 The core Classiq capabilities are generation of a designated quantum solution,
 and execution of the generated algorithm on a quantum backend.
 
-The Classiq platform relies on the QAOA penalty algorithm to solve optimization problems.
+The platform relies on the QAOA penalty algorithm to solve optimization problems.
 
 ## References
 

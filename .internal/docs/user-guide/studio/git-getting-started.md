@@ -5,7 +5,7 @@ search:
 
 # **Getting started with git**
 
-This page contains a practical guide on how to get started with git and GitHub, so you can get the most out of working with Classiq Studio and writing code in general
+This page contains a practical guide on how to get started with git and GitHub, so you can get the most out of working with the Studio and writing code in general
 
 ## **what is git?**
 
@@ -26,7 +26,7 @@ We highly recommend to push your code to a remote repository. It will promise yo
 
 ## **Common commands and quick setup**
 
-Classiq Studio comes with Git pre-installed, so you can start using it right away.
+The Studio comes with Git pre-installed, so you can start using it right away.
 
 ### **Initialize a Git Repository**
 
@@ -128,9 +128,9 @@ git checkout -b feature-branch
 -   Use `.gitignore` – avoid committing unnecessary files.
 -   Create pull requests – review changes before merging into main.
 
-## **How to use git in the Classiq Studio**
+## **How to use git in the Studio**
 
--   Open the terminal in the Classiq Studio.
+-   Open the terminal in the Studio.
 -   We have already installed git inside the studio, so you can start using it right away.
 
 ## **Read more**

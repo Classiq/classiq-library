@@ -3,16 +3,16 @@ search:
     boost: 3.116
 ---
 
-# **Getting started with Classiq Studio**
+# **Getting started with Studio**
 
-This page contains a detailed guide on how to use the Classiq Studio.
+This page contains a detailed guide on how to use the Studio.
 
 ## **Setup and get started**
 
-To get started with the Classiq Studio, follow these steps:
+To get started with the Studio, follow these steps:
 
-1. Sign up to the Classiq platform: At https://platform.classiq.io/, click Sign Up. Approve the terms of use and register with your Google/Microsoft account or any other email (if needed fill in the registration form and you will be redirected to the home page).
-2. Access the Classiq Studio from the Classiq Platform home page or site pane.
+1. Sign up to the platform: At https://platform.classiq.io/, click Sign Up. Approve the terms of use and register with your Google/Microsoft account or any other email (if needed fill in the registration form and you will be redirected to the home page).
+2. Access the Studio from the platform home page or site pane.
    ![platform home page](resources/StudioClickHere.png).
 
 3. Your environment is loaded in a new browser tab (initial setup could take a couple of minutes). ![loading-page](resources/loading-page.png)
@@ -37,7 +37,7 @@ Your workspace consist of two sections:
 
 ## **Best practices**
 
-In Classiq Studio each user has its own dedicated persistence storage (2 GB).
+In the Studio each user has its own dedicated persistence storage (2 GB).
 What does this even means? It means that every time you reload you can keep working right where you left off, same as working locally on your computer :)
 
 There are several considerations and best practices it's better to keep in mind:

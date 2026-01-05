@@ -5,7 +5,7 @@ search:
 
 # Registration and Installation
 
-To use [Classiq platform](https://platform.classiq.io/) for free for non-commercial purposes, you must register. Then you can optionally use our coding studio (web-based IDE) or install the Python SDK package and authenticate your account. This page guides you through the steps.
+To use the [platform](https://platform.classiq.io/) for free for non-commercial purposes, you must register. Then you can optionally use our coding studio (web-based IDE) or install the Python SDK package and authenticate your account. This page guides you through the steps.
 
 ## Registration
 
@@ -21,7 +21,7 @@ Fill in the requested information:
     <img src="https://docs.classiq.io/resources/signup_further_info.png" style="width:70%;" />
 </div>
 
-Upon completion, you will be directed to the Classiq platform home page.
+Upon completion, you will be directed to the platform's home page.
 
 ## Slack Registration
 
@@ -31,14 +31,14 @@ Classiq has a vibrant and active [Slack community](https://short.classiq.io/join
     <img src="https://docs.classiq.io/resources/signup_slack.png" style="width:70%;" />
 </div>
 
-## Classiq Studio
+## Studio
 
-The Classiq platform has a web-based code editor, that allows you to create and run Python code with a pre-set environment. You can access it through the [Classiq Platform](https://platform.classiq.io/).
-For more information check out our [Classiq Studio user guide](../user-guide/classiq-studio/index.md)
+The platform has a web-based code editor, that allows you to create and run Python code with a pre-set environment. You can access it through the [platform](https://platform.classiq.io/).
+For more information check out our [Studio user guide](../user-guide/studio/index.md)
 
 ## Python SDK Installation
 
-The Classiq platform has an accompanying Python SDK package that is integrated with the Classiq platform. **After registering to the platform**, install the SDK package using `pip`:
+The platform has an accompanying Python SDK package that is integrated with the platform. **After registering to the platform**, install the SDK package using `pip`:
 
 **NOTE** - The SDK is currently supported for Python versions `3.8` to `3.12`.
 
@@ -89,7 +89,7 @@ If you encounter an issue, look for a solution in the [troubleshooting section](
 
 ## Platform Version Updates
 
-Every few weeks a new version of the Classiq platform launches. The web-based IDE at [platform.classiq.io](https://platform.classiq.io/) automatically updates.
+Every few weeks a new version of the platform launches. The web-based IDE at [platform.classiq.io](https://platform.classiq.io/) automatically updates.
 
 Update the Python SDK package manually with this command:
 

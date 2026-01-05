@@ -18,7 +18,7 @@ There are 3 ways to view a quantum program using the visualization tool:
 
 -   Direct access via the Classiq IDE
 
--   Direct access via the Classiq Studio
+-   Direct access via the Studio
 
 ### Classiq Python SDK
 
@@ -46,7 +46,7 @@ show(qprog)
 
 ![upload_qp](../resources/upload_qp.gif)
 
-### Visualization in the Classiq Studio
+### Visualization in the Studio
 
 -   Follow the same steps as in Classiq Python SDK. The visualization tool can be directly rendered in the notebook:
 
@@ -125,7 +125,7 @@ In the example below, the Variables View shows a simplified implementation of th
 
 ### Sharing your Quantum Program Visualization
 
-You can easily share your Quantum Program visualization with anyone, even those who haven’t signed up for the Classiq platform. It’s simple:
+You can easily share your Quantum Program visualization with anyone, even those who haven’t signed up for the platform. It’s simple:
 
 -   Copy the Quantum Program URL directly from your browser and share it.
 -   Alternatively, click the "Share" button on the Quantum Program page, choose a social media to share in or copy the generated link, and share it with anyone.

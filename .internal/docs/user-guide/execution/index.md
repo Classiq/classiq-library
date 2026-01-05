@@ -5,7 +5,7 @@ search:
 
 # Execution
 
-The Classiq Platform allows you to execute quantum programs on quantum hardware or simulators of your choice.
+The platform allows you to execute quantum programs on quantum hardware or simulators of your choice.
 
 ## Usage
 

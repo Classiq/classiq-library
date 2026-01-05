@@ -39,7 +39,7 @@ See [execution preferences](../execution/index.md#execution-preferences').
 -   `light` - a heavier transpilation method to better optimize the quantum programs. Best suited for fully connected hardware.
 -   `medium` - another heavy transpilation method that optimizes the quantum program even further but takes more time.
     This method is optimal for optimization of hardware with more complex connectivity.
--   `auto optimize` - allows the Classiq platform to choose the transpilation automatically, based on the chosen backend.
+-   `auto optimize` - allows the platform to choose the transpilation automatically, based on the chosen backend.
 -   `intensive` - designed for maximum optimization of quantum programs and is particularly well-suited for quantum hardware with complex connectivity.
 -   `custom` - offers a personalized approach to optimizing quantum circuits while considering various factors that contribute to the circuit's performance. The internal decision-making process takes specific optimization criteria into account, ensuring that quantum programs are transpiled in a way that maximizes efficiency and resource utilization for the chosen backend. This option's primary focus is on delivering the best possible circuit performance.
 

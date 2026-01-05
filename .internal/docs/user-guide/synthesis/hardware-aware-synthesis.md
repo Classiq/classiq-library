@@ -10,14 +10,14 @@ gates, connectivity, and error rates. The device specifications determine the
 possibility of executing the quantum program, and logically equivalent programs might
 require different implementations to optimize the probability of success.
 
-The Classiq platform allows you to provide information about the hardware you want to use
+The platform allows you to provide information about the hardware you want to use
 to run your quantum program. The synthesis engine takes the parameters of this hardware into
 account. For example, the engine could choose the implementation of a function that
 requires the least number of swaps, given the connectivity of the hardware.
 
 If the hardware device's basis gate set contains the Clifford gates `X`, `Z`,
 `H`, `T`, and `CX` but does not contain arbitrary-angle rotation gates such as `RX`,
-the Classiq platform uses the Solovay-Kitaev algorithm to approximate
+the platform uses the Solovay-Kitaev algorithm to approximate
 single-qubit gates when necessary. You can set the maximum iterations of the
 Solovay-Kitaev algorithm in the preferences, thus tuning the algorithm target
 accuracy. (Larger values usually result in better and longer approximations,
@@ -27,7 +27,7 @@ at the expense of longer running times.)
 
 To synthesize your quantum program for a specific backend, specify the backend provider and the name of the backend.
 
-The Classiq platform supports these backend providers:
+The platform supports these backend providers:
 
 -   Amazon Braket: All gate-based backends in [Amazon Braket](https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html) including all Rigetti devices, `Lucy`, and `IonQ Device`.
 -   Azure Quantum: `ionq` and `quantinuum`.
@@ -61,7 +61,7 @@ The Classiq platform supports these backend providers:
 ## Customizing Hardware Settings
 
 To synthesize the quantum program for hardware that is not available in
-the Classiq platform, you can specify the custom settings of the hardware.
+the platform, you can specify the custom settings of the hardware.
 This includes the basis gate set and the connectivity map of the hardware.
 
 Note that all hardware parameters are optional.
