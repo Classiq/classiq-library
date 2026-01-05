@@ -1,0 +1,16 @@
+qfunc bloch_feature_map_expanded___0(data: real[2], qba: qbit[1]) {
+  repeat (i: 1) {
+    RX(data[2 * i] / 2, qba[i]);
+  }
+  repeat (i: 1) {
+    RZ(data[(2 * i) + 1], qba[i]);
+  }
+}
+
+qfunc main(data1: real[2], data2: real[2], output qba: qnum<1, False, 0>) {
+  allocate(1, qba);
+  bloch_feature_map_expanded___0(data1, qba);
+  invert {
+    bloch_feature_map_expanded___0(data2, qba);
+  }
+}
