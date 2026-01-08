@@ -35,7 +35,7 @@ SHOULD_AUTO_FIX: bool = True
 #   and no content validation will happen
 SHOULD_VALIDATE_METADATA_CONTENT: bool = True
 # if `SKIP_MISSING` is True, then only existing fields will be validated
-SHOULD_SKIP_MISSING_FIELDS: bool = True
+SHOULD_SKIP_MISSING_FIELDS: bool = False
 # if `VALIDATE_SAME_NAME` is True, then, in the case where a folder has
 #   a single `ipynb` file and a single `.qmod` file
 #   then this pre-commit will enforce that they will have the same file name

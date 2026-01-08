@@ -106,8 +106,13 @@ def dump_metadata(file: str, metadata: dict) -> None:
     filename, extension = os.path.splitext(file)
     metadata_file = filename + METADATA_FILE_JSON_SUFFIX
 
+    priority = {"friendly_name": 0, "description": 1}
+    sorted_metadata = dict(
+        sorted(metadata.items(), key=lambda item: (priority.get(item[0], 100), item[0]))
+    )
+
     with open(metadata_file, "w") as f:
-        return json.dump(metadata, f)
+        return json.dump(sorted_metadata, f, indent=2)
 
 
 def generate_empty_metadata_file(file_path: str, original_file_path: str) -> str:
