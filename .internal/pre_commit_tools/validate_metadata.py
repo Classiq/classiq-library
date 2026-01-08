@@ -45,6 +45,18 @@ SHOULD_VALIDATE_SAME_NAME: bool = True
 #   note that if `AUTO_FIX` is False, then we will not delete, we will only raise an error
 SHOULD_CLEAN_LEFTOVER_METADATA: bool = True
 
+FILES_TO_NOT_GENERATE_METADATA = [
+    "pennylane_cat_qsvt_example.ipynb",
+    "qiskit_qsvt.ipynb",
+    "tket_qsvt_example.ipynb",
+    "pennylane_catalyst_discrete_quantum_walk.ipynb",
+    "qiskit_discrete_quantum_walk.ipynb",
+    "tket_discrete_quantum_walk.ipynb",
+]
+FILES_TO_IGNORE_SAME_NAME = [
+    "qaoa.ipynb",
+]
+
 
 def main(full_file_paths: Iterable[str], auto_fix: bool) -> bool:
     if IS_DISABLED:
@@ -183,12 +195,18 @@ def _validate_metadata_field_list(
 
 
 def should_exclude_file(file_path: str) -> bool:
-    return bool(
-        re.search("(?:^|/)(?:functions|community|\\.ipynb_checkpoints)/", file_path)
+    return (
+        bool(
+            re.search("(?:^|/)(?:functions|community|\\.ipynb_checkpoints)/", file_path)
+        )
+        or os.path.basename(file_path) in FILES_TO_NOT_GENERATE_METADATA
     )
 
 
 def validate_same_name(file_path_ipynb: str) -> str:
+    if os.path.basename(file_path_ipynb) in FILES_TO_IGNORE_SAME_NAME:
+        return NO_ERROR
+
     notebook_path = Path(file_path_ipynb)
     folder = notebook_path.parent
     qmods = list(folder.rglob("*.qmod"))
