@@ -54,7 +54,7 @@ EMPTY_METADATA_GENERATION = {
 }
 
 MetadataField_VerticalTag = [
-    "automotive",
+    "finance",
     "retail",
     "pharma",
     "cyber",
@@ -63,7 +63,6 @@ MetadataField_VerticalTag = [
 
 MetadataField_QmodType = [
     "function",
-    "gate",
     "application",
     "algorithms",
 ]
@@ -77,10 +76,13 @@ MetadataField_Level = [
 MetadataField_ProblemDomainTag = [
     "optimization",
     "chemistry",
-    "ml",
+    "machine learning",
     "linear equation",
     "search",
     "risk analysis",
+    # extras, may be ignores
+    "adiabatic",
+    "cfd",
 ]
 
 METADATA_FIELD_STR: list[str] = ["friendly_name", "description"]
