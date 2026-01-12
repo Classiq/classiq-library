@@ -1,7 +1,7 @@
 qfunc period_finding(n: int, a: int, x: qnum, phase_var: qnum) {
   x ^= 1;
   qpe_flexible(lambda(p) {
-    inplace_modular_multiply(n, a ** p, x);
+    modular_multiply_constant_inplace(n, a ** p, x);
   }, phase_var);
 }
 
