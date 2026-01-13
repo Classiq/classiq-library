@@ -10,5 +10,9 @@ search:
         show_if_no_docstrings: false
         members:
             - unitary
+            - multiply
+            - multiply_constant
+            - canonical_multiply
+            - canonical_multiply_constant
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->

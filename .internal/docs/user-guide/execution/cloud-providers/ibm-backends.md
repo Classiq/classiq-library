@@ -60,7 +60,7 @@ The access token is the API token that appears at the top of the [IBM Quantum Cl
 Included hardware:
 
 -   "ibm_kingston"
--   "ibm_brisbane"
+-   "ibm_boston"
 -   "ibm_marrakesh"
 -   "ibm_torino"
 -   "ibm_fez"
