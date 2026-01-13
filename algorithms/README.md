@@ -72,7 +72,7 @@ in the table or to add new ones.
     <tr>
         <td><a href="https://arxiv.org/abs/1806.01838" target="_blank">Quantum singular value transformation and beyond: exponential improvements for quantum matrix arithmetics</a></td>
         <td>
-          <a href="quantum_linear_solvers/qsvt/qsvt_matrix_inversion/qsvt_matrix_inversion.ipynb
+          <a href="quantum_linear_solvers/qsvt_matrix_inversion/qsvt_matrix_inversion.ipynb
 ">QSVT matrix inversion</a><br>
           <a href="amplitude_amplification_and_estimation/qsvt_fixed_point_amplitude_amplification/qsvt_fixed_point_amplitude_amplification.ipynb">QSVT fixed point amplitude amplification</a><br>
         </td>
