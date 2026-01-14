@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("HHL_portfolio", timeout_seconds=1801)
+@wrap_testbook("new_HHL_portfolio", timeout_seconds=1801)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     # test quantum programs
