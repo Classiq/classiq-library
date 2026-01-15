@@ -1,23 +1,26 @@
-import json
-import warnings
-import itertools
 import base64
-import pickle
+import itertools
+import json
 import os
+import pickle
+import re
+import shutil
+import warnings
+from dataclasses import dataclass
 from typing import Any, Callable
-import pytest
 
+import pytest
 from testbook import testbook
+from testbook.client import TestbookNotebookClient
+
+from tests.utils_for_qmod import qmod_compare_decorator
 from tests.utils_for_tests import (
+    ROOT_DIRECTORY,
     resolve_notebook_path,
     should_skip_notebook,
-    ROOT_DIRECTORY,
 )
-from tests.utils_for_qmod import qmod_compare_decorator
 
 from classiq.interface.generator.quantum_program import QuantumProgram
-
-from testbook.client import TestbookNotebookClient
 
 _PATCHED = False
 
@@ -34,6 +37,7 @@ this has to come before testbook, since it changes the working directory in whic
 3 - qmod comparison
 this has to come before testbook, and after cd,
     since it collects the qmod files before testbook, and collects again after it
+this is disabled (replaced by a dummy decorador: lambda x: x) in we have `replacements`
 
 4 - testbook
 that's the main decorator
@@ -46,24 +50,33 @@ and add a property - `self._notebook_name`
 adding this property must come after the testbook decorator
 since before the decorator, the function takes 0 arguments
 and after the decorator, it takes 1 - `tb`.
+
+Other - replacements
+We allow running "regex replace" on the ipynb file, in order to ease the load on the tests.
+    Note: adding replacements will disable the "qmod comparison" test.
 """
 
 
-def wrap_testbook(notebook_name: str, timeout_seconds: float = 10) -> Callable:
+def wrap_testbook(
+    notebook_name: str,
+    timeout_seconds: float = 10,
+    replacements: list[tuple[str, str]] | None = None,
+) -> Callable:
     def inner_decorator(func: Callable) -> Any:
         _patch_testbook()
 
         notebook_path = resolve_notebook_path(notebook_name)
 
-        for decorator in [
-            _build_patch_testbook_client_decorator(notebook_name),
-            testbook(notebook_path, execute=True, timeout=timeout_seconds),
-            qmod_compare_decorator,
-            _build_cd_decorator(notebook_path),
-            _build_skip_decorator(notebook_path),
-        ]:
-            func = decorator(func)
-        return func
+        with NotebookReplace(notebook_path, replacements):
+            for decorator in [
+                _build_patch_testbook_client_decorator(notebook_name),
+                testbook(notebook_path, execute=True, timeout=timeout_seconds),
+                (lambda x: x) if replacements else qmod_compare_decorator,
+                _build_cd_decorator(notebook_path),
+                _build_skip_decorator(notebook_path),
+            ]:
+                func = decorator(func)
+            return func
 
     return inner_decorator
 
@@ -80,6 +93,82 @@ def _build_patch_testbook_client_decorator(notebook_name: str) -> Callable:
         return inner
 
     return patch_testbook_client_decorator
+
+
+FILE_COPY_SUFFIX = ".pre_test_backup"
+
+
+@dataclass
+class NotebookReplace:
+    file_path: str
+    replacements: list[tuple[str, str]] | None
+
+    def __post_init__(self):
+        self.was_file_copied = False
+
+    @property
+    def file_path_copied(self):
+        return self.file_path + FILE_COPY_SUFFIX
+
+    def __enter__(self):
+        if not self.replacements:
+            return
+
+        self._backup_notebook()
+        self.was_file_copied = True
+
+        used_replacements = self._replace_notebook_content()
+
+        # verify all replacements were used
+        assert (
+            self.replacements == used_replacements
+        ), f"Not all replacements given were used. The onces used are: {used_replacements}. The unused are {[r for r in replacements if r not in used_replacements]}"
+
+    def __exit__(self, *args, **kwargs):
+        if not self.replacements:
+            return
+        if not self.was_file_copied:
+            return  # maybe raise?
+
+        self._restore_notebook_from_backup()
+
+    def _backup_notebook(self) -> None:
+        assert os.path.isfile(
+            self.file_path
+        ), f"This should not happen. '{self.file_path=}' was supposed to be a file. Aborting backup."
+
+        assert not os.path.exists(
+            self.file_path_copied
+        ), f"notebook copy (for tests) was not cleaned properly. ({self.file_path_copied}). Aborting backup"
+        shutil.copy(self.file_path, self.file_path_copied)
+        assert os.path.exists(self.file_path_copied)
+
+    def _replace_notebook_content(self) -> list[tuple[str, str]]:
+        with open(self.file_path, "r") as f:
+            content = f.read()
+
+        used_replacements = []
+
+        for pattern, replace in self.replacements:
+            new_content = re.sub(pattern, replace, content)
+            if new_content != content:
+                used_replacements.append((pattern, replace))
+            content = new_content
+
+        # write edited content
+        with open(self.file_path, "w") as f:
+            f.write(content)
+
+        return used_replacements
+
+    def _restore_notebook_from_backup(self) -> None:
+        assert os.path.isfile(
+            self.file_path_copied
+        ), f"This should not happen. '{self.file_path_copied=}' was supposed to be a file. Aborting restore."
+        shutil.move(self.file_path_copied, self.file_path)
+        assert not os.path.exists(
+            self.file_path_copied
+        ), f"notebook copy (for tests) was not cleaned properly. ({self.file_path_copied}). Aborting restore."
 
 
 # The purpose of the `cd_decorator` is to execute the test in the same folder as the `ipynb` file
