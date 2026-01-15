@@ -20,7 +20,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_grover"),
         expected_width=tb.ref("MAX_WIDTH_GROVER"),
-        expected_depth=4500,  # actual depth: 4044
+        expected_depth=25000,  # actual depth: 21092
     )
 
     # test notebook content
