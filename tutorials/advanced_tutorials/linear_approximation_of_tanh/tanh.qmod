@@ -1,8 +1,10 @@
+// Linear Approximation of Hyperbolic Tangent Function
 
-qperm inplace_compute_linear(A: real, B: real, const x: qnum, y: qnum) {
-  y ^= A*x + B;
-}
+// This example demonstrates the computation of the function tanh(x) using
+// piecewise linear approximation.
 
+
+// This function outputs the segment label of a given x value
 qperm map_label(num_segs: int, const v: qbit[], output label: qbit[]) {
   allocate(num_segs, label);
   repeat (i: num_segs) {  // duplicate MSBs of v
@@ -16,7 +18,7 @@ qfunc compute_piecewise_linear(As: real[], Bs: real[], x: qnum, y: qnum) {
 
   repeat (i: As.len) {
     control (label==i) {
-      inplace_compute_linear(As[i], Bs[i], x, y);
+      y ^= As[i]*x + Bs[i];  // the linear function for segment i
     }
   }
 }
