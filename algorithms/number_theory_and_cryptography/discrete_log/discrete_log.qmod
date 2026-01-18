@@ -1,3 +1,8 @@
+// Discrete logarithmic problem using Shor's Algorithm
+
+// Implements the quantum part of a discrete logarithm solver
+// over a finite group using modular exponentiation, QFT, and phase estimation structure.
+
 qfunc modular_exponentiation(N: int, a: int, x: qbit[], pw: qbit[]) {
   repeat (index: pw.len) {
     control (pw[index]) {
@@ -13,12 +18,13 @@ qfunc discrete_log_oracle(g_generator: int, x_element: int, N_modulus: int, alph
   modular_exponentiation(N_modulus, g_generator, func_res, beta);
 }
 
-qfunc discrete_log(g: int, x: int, N: int, order: int, output alpha: qnum, output beta: qnum, output func_res: qnum) {
-  allocate(ceiling(log(order, 2)) + 1, False, ceiling(log(order, 2)) + 1, alpha);
-  allocate(ceiling(log(order, 2)) + 1, False, ceiling(log(order, 2)) + 1, beta);
+// Compute `discrete_log_oracle` on the `func_res` variable. `func_res` is of size log(N)
+qfunc discrete_log(generator: int, target: int, modulus: int, order: int, output alpha: qnum, output beta: qnum, output func_res: qnum) {
+  allocate(reg_len, False, reg_len, alpha);
+  allocate(reg_len, False, reg_len, beta);
   hadamard_transform(alpha);
   hadamard_transform(beta);
-  discrete_log_oracle(g, x, N, alpha, beta, func_res);
+  discrete_log_oracle(generator, target, modulus, alpha, beta, func_res);
   invert {
     qft(alpha);
   }
@@ -27,6 +33,13 @@ qfunc discrete_log(g: int, x: int, N: int, order: int, output alpha: qnum, outpu
   }
 }
 
+// problem parameters
+generator: int = 7;
+target: int = 3;
+modulus: int = 13;
+order: int = 12;
+reg_len: int = ceiling(log(order, 2)) + 1;
+
 qfunc main(output alpha: qnum, output beta: qnum, output func_res: qnum) {
-  discrete_log(7, 3, 13, 12, alpha, beta, func_res);
+  discrete_log(generator, target, modulus, order, alpha, beta, func_res);
 }
