@@ -1,24 +1,35 @@
-qfunc hidden_shift(oracle: qfunc (qbit[]), oracle_shifted: qfunc (qbit[]), target: qbit[]) {
+// Hidden shift (bent Boolean functions) — simple demo instance
+
+// This problem describes how to find the hidden shift s, given two functions:
+// a bent function f(x) and its shifted version g(x) = f(x xor s).
+// The functions are represented as quantum oracles that apply a phase flip
+// A bent function is a special kind of Boolean function with maximum distance from all linear functions
+
+num_variables: int = 4;
+
+// define both functions:
+// f(x) = (x0 & x1) xor (x2 & x3)
+qperm bent_function(const vars: qbit[num_variables], res: qbit) {
+  res ^= (vars[0] & vars[1]) ^ (vars[2] & vars[3]);
+}
+// g(x) = f(x^s): we bit flip the first input
+qperm shifted_bent_function(const vars: qbit[num_variables], res: qbit) {
+  res ^= ((vars[0] ^ 1) & vars[1]) ^ (vars[2] & vars[3]);
+}
+
+qfunc hidden_shift(oracle: qfunc (qbit[]), shifted_oracle: qfunc (qbit[]), target: qbit[]) {
   hadamard_transform(target);
-  oracle_shifted(target);
+  shifted_oracle(target);
   hadamard_transform(target);
   oracle(target);
   hadamard_transform(target);
 }
 
-qperm arith_func(const vars: qbit[4], res: qbit) {
-  res ^= (vars[0] & vars[1]) ^ (vars[2] & vars[3]);
-}
-
-qperm arith_func_shifted(const vars: qbit[4], res: qbit) {
-  res ^= ((vars[0] ^ 1) & vars[1]) ^ (vars[2] & vars[3]);
-}
-
 qfunc main(output s: qbit[]) {
-  allocate(4, s);
+  allocate(num_variables, s);
   hidden_shift(lambda(y) {
-    phase_oracle(arith_func, y);
+    phase_oracle(bent_function, y);
   }, lambda(y) {
-    phase_oracle(arith_func_shifted, y);
+    phase_oracle(shifted_bent_function, y);
   }, s);
 }
