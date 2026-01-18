@@ -1,21 +1,35 @@
+// Hadamard Test
+
+// Implements a minimal version of the Hadamard test,
+// where an ancilla qubit controls the application of a Quantum
+// Fourier Transform (QFT) on a target register. Measuring the ancilla
+// allows extracting information about the real part of an expectation
+// value associated with the controlled unitary.
+
+// Utility function, applying a controlled QFT
 qfunc controlled_qft(expectation_value: qbit, psi: qbit[]) {
   control (expectation_value) {
     qft(psi);
   }
 }
 
+
+// Performs the Hadamard test utilizing the within applied function implementing
+// V^{\dagger} U V, where V is the Hadamard gate and U is the controlled_qft function.
 qfunc preparation_and_application(expectation_value: qbit, psi: qbit[]) {
   within {
-    H(expectation_value);
+    H(expectation_value);  // Creates a superposition of |0> and |1> states
   } apply {
     controlled_qft(expectation_value, psi);
   }
 }
 
+TARGET_SIZE = 4  // Size of the target quantum variable
+
 qfunc main(output expectation_value: qbit) {
-  psi: qbit[];
-  allocate(1, expectation_value);
-  allocate(4, psi);
+  psi: qbit[]; //
+  allocate(1, expectation_value); // Ancilla qubit used for the Hadamard test
+  allocate(TARGET_SIZE, psi);    // Initializes the target state
   preparation_and_application(expectation_value, psi);
-  drop(psi);
+  drop(psi);        // Indicates that the quantum state is not being measured
 }
