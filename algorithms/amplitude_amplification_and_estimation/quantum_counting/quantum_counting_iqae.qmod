@@ -1,34 +1,72 @@
+// Quantum Counting Using Iterative Quantum Amplitude Estimation
+
+// Prepares the IQAE input state over the problem variables (a,b) and an indicator qubit.
+// The quantum variables are transformed into uniform superposition, and the indicator is computed as:
+//   ind = 1  iff  (a + b) <= THRESHOLD.
+// In the IQAE workflow, the indicator qubit defines the “good” subspace; a phase flip (Z) on
+// this qubit implements the marking oracle used inside amplitude amplification iterations.
+
+
+// Defining the QStruct, containing the quantum variables a and b
 qstruct OracleVars {
   a: qnum<2>;
   b: qnum<2>;
 }
 
-qperm oracle(const est_reg: qbit[]) {
-  Z(est_reg[est_reg.len - 1]);
+
+// Configuration constants
+A_BITS: int = 2;
+B_BITS: int = 2;
+
+PROBLEM_QUBITS: int = A_BITS + B_BITS;   // 4 qubits: a[2] || b[2]
+THRESHOLD: int = 2;                      // predicate: (a + b) <= THRESHOLD
+
+
+
+// Phase oracle: flips the phase of a marked states.
+// Here we mark states by applying Z on the indicator qubit (assumed last qubit in est_var).
+qperm oracle(const est_var: qbit[]) {
+  Z(est_var[est_var.len - 1]);
 }
 
+
+// Computes the boolean predicate into `res` via XOR assignment.
+// `res` becomes 1 iff (a + b) <= THRESHOLD (assuming it starts at |0⟩).
 qperm arith_equation(const state: OracleVars, res: qbit) {
-  res ^= (state.a + state.b) <= 2;
+  res ^= (state.a + state.b) <= THRESHOLD;
 }
 
+// State preparation for amplitude amplification:
 qfunc iqae_state_preparation(vars: OracleVars, ind: qbit) {
-  hadamard_transform(vars);
-  arith_equation(vars, ind);
+  hadamard_transform(vars);  // Uniform superposition over all possible states
+  arith_equation(vars, ind);  // Compute predicate into indicator
 }
 
-qfunc space_transform(est_reg: qbit[]) {
-  iqae_state_preparation(est_reg[0:est_reg.len - 1], est_reg[est_reg.len - 1]);
+// Constructs the state expected by `amplitude_amplification`:
+// interprets the first PROBLEM_QUBITS as OracleVars and the last qubit as an indicator.
+qfunc space_transform(est_var: qbit[]) {
+  // est_var = [problem_vars..., indicator]
+  iqae_state_preparation(
+    est_var[0:est_var.len - 1],      // OracleVars view of the problem qubits
+    est_var[est_var.len - 1]         // Indicator qubit
+  );
 }
+
 
 qfunc main(k: int, output indicator: qbit) {
-  est_reg: qbit[];
-  problem_vars: qbit[4];
-  allocate(problem_vars);
-  allocate(indicator);
+  est_var: qbit[];
+  problem_vars: qbit[PROBLEM_QUBITS];
+
+  allocate(problem_vars);  // Initiating the indicator qubit
+  allocate(indicator);  // Solution space qubits
+
+  // Create a quantum variable for amplitude amplification.
   within {
-    {problem_vars, indicator} -> est_reg;
+    {problem_vars, indicator} -> est_var;
   } apply {
-    amplitude_amplification(k, oracle, space_transform, est_reg);
+    // Apply k iterations of amplitude amplification using the oracle and space transform.
+    amplitude_amplification(k, oracle, space_transform, est_var);
   }
-  drop(problem_vars);
+
+  drop(problem_vars);   // Indicates that the quantum state should not be measured
 }
