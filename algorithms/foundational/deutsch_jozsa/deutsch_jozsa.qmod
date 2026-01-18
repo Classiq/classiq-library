@@ -1,20 +1,50 @@
+// Deutsch–Jozsa Algorithm
+
+// This program demonstrates the Deutsch–Jozsa algorithm for distinguishing
+// between constant and balanced Boolean predicates using a single oracle call.
+//
+// The algorithm works as follows:
+// 1) Prepare a uniform superposition over all inputs x.
+// 2) Apply a phase oracle implementing (-1)^{f(x)} for a predicate f.
+// 3) Interfere the amplitudes using Hadamard gates.
+// 4) Measure: the all-zero outcome occurs with certainty iff f is constant.
+//
+// Any non-zero outcome indicates that the predicate is balanced.
+
 qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
+  // Create a uniform superposition and apply the phase oracle
   within {
     hadamard_transform(x);
   } apply {
-    phase_oracle(lambda(x, y) {
-      predicate(x, y);
-    }, x);
+    phase_oracle(
+      lambda(x, y) {
+        predicate(x, y);
+      },
+      x
+    );
   }
 }
 
 qperm complex_predicate(const x: qnum, res: qbit) {
+  // A non-trivial Boolean predicate on x ∈ {0,…,7}.
+  //
+  // The expression mixes bitwise (XOR, AND) and arithmetic operations:
+  //   f(x) = 1  iff  max(x ⊕ 4, x ∧ 3) ≥ 4.
+  //
+  // For 3-bit inputs, this predicate evaluates to 1 on exactly half
+  // of the inputs and to 0 on the other half, and is therefore balanced.
   res ^= max(x ^ 4, x & 3) >= 4;
 }
 
 qfunc main(output x: qnum<3>) {
   allocate(x);
-  deutsch_jozsa(lambda(x, y) {
-    complex_predicate(x, y);
-  }, x);
+
+  // Run Deutsch–Jozsa with the balanced predicate.
+  // The final state will be orthogonal to |000⟩.
+  deutsch_jozsa(
+    lambda(x, y) {
+      complex_predicate(x, y);
+    },
+    x
+  );
 }
