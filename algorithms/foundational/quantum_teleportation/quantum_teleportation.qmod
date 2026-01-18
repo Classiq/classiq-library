@@ -1,32 +1,69 @@
+// Quantum Teleportation
+
+// This program demonstrates the quantum teleportation protocol.
+
+// Protocol overview:
+// 1) Alice entangles the unknown state with her half of the Bell pair.
+// 2) Alice measures her two qubits, producing two classical bits.
+// 3) Alice sends these two classical bits to Bob over a classical channel.
+// 4) Bob applies classically controlled Pauli corrections,
+//    reconstructing the original quantum state on his qubit.
+
+// Prerequisite:
+// Alice and Bob share an entangled Bell pair created in advance.
+// One qubit of the pair is held by Alice, and the other by Bob.
+
 qfunc prepare_test_state(q: qbit) {
+  // Prepare a simple test state to be teleported.
   H(q);
 }
 
-qfunc quantum_teleportation(alice_qubit: qbit, bob_qubit: qbit, bell_pair_qubit: qbit) {
-  H(bell_pair_qubit);
-  CX(bell_pair_qubit, bob_qubit);
-  CX(alice_qubit, bell_pair_qubit);
+qfunc quantum_teleportation(
+  alice_qubit: qbit,
+  alice_bell: qbit,
+  bob_qubit: qbit
+) {
+  // Alice entangles the input state with her half of the Bell pair.
+  CX(alice_qubit, alice_bell);
   H(alice_qubit);
-  alice_bit1: bool;
-  alice_bit1 = measure(alice_qubit);
-  alice_bit2: bool;
-  alice_bit2 = measure(bell_pair_qubit);
-  if (alice_bit2) {
+
+  // Alice measures her qubits, collapsing the joint state.
+  // The outcomes are two classical bits.
+  m1: bool;
+  m2: bool;
+
+  m1 = measure(alice_qubit);
+  m2 = measure(alice_bell);
+
+  // These two classical bits are sent to Bob.
+  // In the circuit, this is modeled by classically controlled operations.
+  if (m2) {
     X(bob_qubit);
   }
-  if (alice_bit1) {
+  if (m1) {
     Z(bob_qubit);
   }
 }
 
 qfunc main(output bob_qubit: qbit) {
   alice_qubit: qbit;
-  bell_pair_qubit: qbit;
-  allocate(1, alice_qubit);
-  allocate(1, bell_pair_qubit);
-  allocate(1, bob_qubit);
+  alice_bell: qbit;
+
+  allocate(alice_qubit);
+  allocate(alice_bell);
+  allocate(bob_qubit);
+
+  // Prepare the state to be teleported on Alice's qubit.
   prepare_test_state(alice_qubit);
-  quantum_teleportation(alice_qubit, bob_qubit, bell_pair_qubit);
+
+  // Assume alice_bell and bob_qubit are already entangled
+  // in the state 1/sqrt(2)(|00>+|11>)
+  H(alice_bell);
+  CX(alice_bell, bob_qubit);
+
+  // Teleport Alice's state to Bob using classical communication.
+  quantum_teleportation(alice_qubit, alice_bell, bob_qubit);
+
   drop(alice_qubit);
-  drop(bell_pair_qubit);
+  drop(alice_bell);
 }
