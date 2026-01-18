@@ -27,10 +27,6 @@ qfunc deutsch_jozsa(predicate: qfunc (qnum, qbit), x: qnum) {
 
 qperm complex_predicate(const x: qnum, res: qbit) {
   // A non-trivial Boolean predicate on x ∈ {0,…,7}.
-  //
-  // The expression mixes bitwise (XOR, AND) and arithmetic operations:
-  //   f(x) = 1  iff  max(x ⊕ 4, x ∧ 3) ≥ 4.
-  //
   // For 3-bit inputs, this predicate evaluates to 1 on exactly half
   // of the inputs and to 0 on the other half, and is therefore balanced.
   res ^= max(x ^ 4, x & 3) >= 4;

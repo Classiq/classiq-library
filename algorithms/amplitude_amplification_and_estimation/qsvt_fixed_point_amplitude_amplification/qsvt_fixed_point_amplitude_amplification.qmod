@@ -34,7 +34,6 @@ qfunc initial_state_projector(state: qnum, aux: qbit) {
 
 qperm arith_equation(state: OracleVars, res: qbit) {
   // Mark assignments satisfying:
-  //   (a + b = 3) ∧ (c − a = 2)
   res ^= ((state.a + state.b) == 3)
       and ((state.c - state.a) == 2);
 }
