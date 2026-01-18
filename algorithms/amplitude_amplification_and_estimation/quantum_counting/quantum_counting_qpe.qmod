@@ -1,23 +1,58 @@
+// Quantum Counting via Quantum Phase Estimation (QPE)
+
+// Demonstrates quantum counting, which efficiently estimates the number
+// of valid (marked) solutions to a search problem, based on the amplitude estimation algorithm.
+// It demonstrates a quadratic improvement with regard
+// to a classical algorithm with black box oracle access to the function.
+//
+// We encode two 2-bit unsigned integers (a, b) and mark states satisfying
+// (a + b) <= THRESHOLD.
+// The Grover operator induced by this oracle has eigenphases that encode
+// the solution ratio; QPE extracts an estimate of that phase.
+
+
+// Problem sizes (in qubits)
+A_BITS: int = 2;
+B_BITS: int = 2;
+
+// Mark states for which (a + b) <= THRESHOLD
+THRESHOLD: int = 2;
+
+// Number of qubits used by the phase quantum variable in the QPE.
+// Larger values provide finer phase resolution.
+PHASE_QUBITS: int = 5;
+
+// Defining the qstruct, containing the quantum variables a and b
 qstruct OracleVars {
   a: qnum<2>;
   b: qnum<2>;
 }
 
+// Predicate: flips `res` iff the input (a, b) is a "good" solution.
 qperm arith_equation(const state: OracleVars, res: qbit) {
   res ^= (state.a + state.b) <= 2;
 }
 
+// Convert the predicate into a phase oracle via phase kickback.
 qfunc arith_oracle(state: OracleVars) {
   phase_oracle(arith_equation, state);
 }
 
-qfunc main(output phase_reg: qnum<5, UNSIGNED, 5>) {
-  state_reg: OracleVars;
-  allocate(state_reg);
-  allocate(phase_reg);
-  hadamard_transform(state_reg);
+
+
+qfunc main(output phase_var: qnum<PHASE_QUBITS, UNSIGNED, PHASE_QUBITS>) {
+  state_var: OracleVars;
+
+  allocate(state_var);  // Initiates the ancilla QStruct
+  allocate(phase_var);  // Initiates the phase quantum variable
+
+  // Prepare a uniform superposition over all (a, b) inputs.
+  hadamard_transform(state_var);
+
+  // Estimate the eigenphase of the Grover operator induced by the oracle.
   qpe(lambda() {
-    grover_operator(arith_oracle, hadamard_transform, state_reg);
-  }, phase_reg);
-  drop(state_reg);
+    grover_operator(arith_oracle, hadamard_transform, state_var);
+  }, phase_var);
+
+  drop(state_var); // Indicates that the quantum state should not be measured
 }
