@@ -1,10 +1,30 @@
+// Fixed-Point Amplitude Amplification with QSVT
+
+// This program demonstrates QSVT-based fixed-point amplitude amplification:
+// 1) We prepare a uniform superposition over all assignments (a, b, c).
+// 2) An arithmetic oracle marks assignments satisfying two constraints.
+// 3) qsvt applies a fixed-point amplification sequence that boosts the marked
+//    subspace without the oscillatory overshoot of standard Grover iterations.
+
 qstruct OracleVars {
   a: qnum<2>;
   b: qnum<1>;
   c: qnum<3>;
 }
 
+// Phase sequence implementing a fixed-point amplitude amplification profile: a step function
+phase_seq: real[] = [
+  3.0045, 3.1996, 3.0708, 3.2276,
+  3.0372, 3.2686, 2.9860, 3.3348,
+  2.8960, 3.4666, 2.6798, 3.8995,
+  1.3862, 1.3862, 3.8995, 2.6798,
+  3.4666, 2.8960, 3.3348, 2.9860,
+  3.2686, 3.0372, 3.2276, 3.0708,
+  3.1996, -75.5353
+];
+
 qfunc initial_state_projector(state: qnum, aux: qbit) {
+  // Marks the uniform superposition
   within {
     hadamard_transform(state);
   } apply {
@@ -12,54 +32,31 @@ qfunc initial_state_projector(state: qnum, aux: qbit) {
   }
 }
 
-qfunc target_state_projector(arith_oracle: qfunc (qbit[], qbit), state: qbit[], aux: qbit) {
-  arith_oracle(state, aux);
-}
-
 qperm arith_equation(state: OracleVars, res: qbit) {
-  res ^= ((state.a + state.b) == 3) and ((state.c - state.a) == 2);
-}
-
-qfunc qsvt_fpaa(phase_seq: real[], arith_oracle: qfunc (const OracleVars, qbit), state: OracleVars, output aux: qbit) {
-  allocate(aux);
-  qsvt(phase_seq, lambda(_aux) {
-    initial_state_projector(state, _aux);
-  }, lambda(_aux) {
-    target_state_projector(arith_equation, state, _aux);
-  }, lambda() {
-    IDENTITY(state);
-  }, aux);
+  // Mark assignments satisfying:
+  //   (a + b = 3) ∧ (c − a = 2)
+  res ^= ((state.a + state.b) == 3)
+      and ((state.c - state.a) == 2);
 }
 
 qfunc main(output state: OracleVars, output aux: qbit) {
   allocate(state);
+  allocate(aux);
+
+  // Prepare uniform superposition over all (a, b, c).
   hadamard_transform(state);
-  qsvt_fpaa([
-    3.0045,
-    3.1996,
-    3.0708,
-    3.2276,
-    3.0372,
-    3.2686,
-    2.986,
-    3.3348,
-    2.896,
-    3.4666,
-    2.6798,
-    3.8995,
-    1.3862,
-    1.3862,
-    3.8995,
-    2.6798,
-    3.4666,
-    2.896,
-    3.3348,
-    2.986,
-    3.2686,
-    3.0372,
-    3.2276,
-    3.0708,
-    3.1996,
-    (-75.5353)
-  ], arith_equation, state, aux);
+
+  qsvt(
+    phase_seq,
+    lambda(_aux) {
+      initial_state_projector(state, _aux);
+    },
+    lambda(_aux) {
+      arith_equation(state, _aux);
+    },
+    lambda() {
+      IDENTITY(state);
+    },
+    aux
+  );
 }
