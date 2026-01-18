@@ -1,8 +1,10 @@
 // Discrete logarithmic problem using Shor's Algorithm
 
-// Implements the quantum part of a discrete logarithm solver
-// over a finite group using modular exponentiation, QFT, and phase estimation structure.
+// This example implements the quantum part of a discrete logarithm solver
+// We start by preparing a uniform superposition over `alpha` and `beta`,
+// then evaluating the oracle and applying inverse QFT to extract phase information
 
+// the exponent is encoded in the power of `pw`.
 qfunc modular_exponentiation(N: int, a: int, x: qbit[], pw: qbit[]) {
   repeat (index: pw.len) {
     control (pw[index]) {
