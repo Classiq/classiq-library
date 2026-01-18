@@ -1,3 +1,14 @@
+// Bernstein–Vazirani Algorithm for Hidden Bitstring Discovery
+//
+// This example demonstrates the Bernstein–Vazirani (BV) algorithm, a fundamental
+// quantum algorithm that addresses a special case of the hidden-shift problem.
+// The algorithm finds a hidden bitstring `a` encoded in an oracle that implements
+// the function:
+//   f_a(x) = a · x (mod 2)
+// where `a · x` is the bitwise inner product modulo 2, using only a single oracle
+// query. The example below implements the BV algorithm on 5 qubits, where the
+// secret string corresponds to the number 13.
+
 qperm bv_predicate(a: int, const x: qbit[], res: qbit) {
   repeat (i: x.len) {
     if ((floor(a / (2 ** i)) % 2) == 1) {
