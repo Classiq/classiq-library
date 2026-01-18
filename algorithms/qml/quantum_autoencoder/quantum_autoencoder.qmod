@@ -1,9 +1,20 @@
+// Quantum Autoencoder (QAE) for Quantum Data Compression
+
+// This example demonstrates the encoder part of a Quantum Autoencoder.
+// The goal is to train a parameterized quantum circuit that compresses
+// information into a smaller subsystem (`coded`) while pushing redundant
+// information into zero-state `trash` qubits.
+
+
+// Define a quantum function that embeds classical data into a quantum state
+// using angle encoding.
 qfunc angle_encoding(exe_params: real[], qbv: qbit[]) {
   repeat (index: exe_params.len) {
     RY(pi * exe_params[index], qbv[index]);
   }
 }
 
+// Define a parameterized (variational) encoder.
 qfunc encoder_ansatz(exe_params: real[], coded: qbit[], trash: qbit[]) {
   x: qbit[];
   within {
@@ -23,6 +34,10 @@ qfunc encoder_ansatz(exe_params: real[], coded: qbit[], trash: qbit[]) {
   }
 }
 
+// The execution parameters are the `input_data` that encodes the classical data
+// and the weights `w` that define the encoder. The model should be trained on a
+// batch of `input_data`, while optimizing the weights such that the `trash`
+// qubits are pushed toward the zero state.
 qfunc main(w: real[10], input_data: real[4], output trash: qbit[2]) {
   coded: qbit[];
   allocate(2, coded);
