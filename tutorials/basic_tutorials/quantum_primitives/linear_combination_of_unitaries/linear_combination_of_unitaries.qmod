@@ -1,10 +1,34 @@
+// Linear Combination of Unitaries (LCU)
+
+// The Linear Combination of Unitaries (LCU) technique implements a block encoding
+// proportional to a weighted sum of unitaries,
+//
+//   A = Σ_j α_j U_j ,
+//
+// by coherently selecting between the unitaries U_j using an ancilla variable.
+// The ancilla is prepared in a superposition whose amplitudes encode the
+// coefficients α_j, and a controlled SELECT operation applies U_j conditioned
+// on the ancilla state.
+// By uncomputing the ancilla and post-selecting the zero state |0…0⟩, the action of the
+// circuit on the data variable becomes proportional to the desired linear
+// combination. LCU is a central primitive in quantum algorithms for Hamiltonian
+// simulation, quantum signal processing, and quantum linear algebra.
+
+// In this concrete example, the controller encodes three unitaries acting on
+// the state psi: the identity, the quantum Fourier transform (QFT), and the
+// inverse QFT. The resulting transformation is proportional to
+//   0.5 · I  +  0.25 · QFT  +  0.25 · QFT⁻¹ ,
+
+lcu_amplitudes: real[] = [ 0.5, 0.25, 0.25, 0.0 ];
+
 qfunc prepare(controller: qnum) {
-  inplace_prepare_state([0.5, 0.25, 0.25, 0], 0.01, controller);
+  inplace_prepare_state(lcu_amplitudes, 0, controller);
 }
 
 qfunc select(controller: qnum, psi: qnum) {
+  // Coherently apply U_j conditioned on the controller value j.
   control (controller == 0) {
-    apply_to_all(IDENTITY, psi);
+    IDENTITY(psi);
   }
   control (controller == 1) {
     qft(psi);
@@ -14,11 +38,13 @@ qfunc select(controller: qnum, psi: qnum) {
       qft(psi);
     }
   }
+  // The controller = 3 branch has zero weight and is omitted.
 }
 
 qfunc main(output controller: qnum, output psi: qnum) {
   allocate(2, psi);
   allocate(2, controller);
+
   within {
     prepare(controller);
   } apply {
