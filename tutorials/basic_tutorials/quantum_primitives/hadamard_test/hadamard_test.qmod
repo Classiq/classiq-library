@@ -31,5 +31,5 @@ qfunc main(output expectation_value: qbit) {
   allocate(1, expectation_value); // Ancilla qubit used for the Hadamard test
   allocate(TARGET_SIZE, psi);    // Initializes the target state
   preparation_and_application(expectation_value, psi);
-  drop(psi);        // Indicates that the quantum state is not being measured
+  drop(psi);        // Indicates that the quantum state should not be measured
 }
