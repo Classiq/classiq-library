@@ -1,0 +1,31 @@
+// Solving a Knapsack Problem using the QAOA Algorithm
+
+// We construct a QAOA ansatz for the Knapsack problem. The QAOA structure is
+// alternating between a cost unitary and a mixing unitary, both of which
+// parameterized by rotation angles. The Knapsack cost function is evaluated
+// conditionally based on the weight constraint of the knapsack.
+
+
+// Encapsulate the knapsack variables in a struct
+qstruct KnapsackVars {
+  a: qnum<3>;  // 0..7 items of type a
+  b: qnum<2>;  // 0..3 items of type b
+
+}
+
+qfunc apply_cost(gamma: real, v: KnapsackVars) {
+  control (v.a * 2 + v.b * 3 <= 12) {  // weight constraint - a weighs 2, b weighs 3, max weight 12
+    phase (-(v.a * 3 + v.b * 5), gamma);  // value function - a worths 3, b worths 5
+  }
+}
+
+qfunc main(params: real[6], output v: KnapsackVars) {
+  allocate(v);
+  hadamard_transform(v);
+  repeat (i: 3) {
+    apply_cost(params[0:3][i], v);
+    apply_to_all(lambda(q) {
+      RX(params[3:6][i], q);
+    }, v);
+  }
+}
