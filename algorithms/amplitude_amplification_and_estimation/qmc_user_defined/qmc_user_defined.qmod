@@ -1,5 +1,16 @@
-qfunc load_probabilities(state: qbit[]) {
-  inplace_prepare_state([
+// Integral Evaluation using Amplitude Estimation
+
+// We demonstrate Quantum Monte Carlo Integration by estimating the expectation
+// value of a given function, illustrating how quantum amplitude estimation can
+// achieve a quadratic speedup over classical Monte Carlo methods.
+
+// We define a probability distribution over the integers
+//   i ∈ {0, ..., 2^3 − 1},
+// where the probability of each integer i is
+//   p_i = i / N,
+// and N is a normalization constant ensuring the probabilities sum to 1.
+
+probabilities: real[] = [
     0.0,
     0.0357142857,
     0.0714285714,
@@ -8,20 +19,61 @@ qfunc load_probabilities(state: qbit[]) {
     0.1785714286,
     0.2142857143,
     0.25
-  ], 0, state);
-}
+];
+
+// Our goal is to evaluate the expectation value of the function
+//   f(x) = sin^2(0.25 * x + 0.2)
+// with respect to this distribution.
+
+slope: real = 0.25;
+offset: real = 0.2;
+
 
 qfunc amplitude_loading(x: qbit[], ind: qbit) {
-  linear_pauli_rotations([2], [0.5], [0.4], x, ind);
+  linear_pauli_rotations([Pauli.Y], [2*slope], [2*offset], x, ind);
 }
 
 qfunc state_loading(x: qbit[], ind: qbit) {
-  load_probabilities(x);
+  inplace_prepare_state(probabilities, 0, x);
   amplitude_loading(x, ind);
 }
 
-qfunc main(output res: qbit[3], output ind: qbit) {
-  allocate(res);
-  allocate(ind);
-  state_loading(res, ind);
+qfunc good_state_oracle(ind: qbit) {
+  Z(ind);
+}
+
+qfunc prepare_minus(q: qbit) {
+  X(q);
+  H(q);
+}
+
+qfunc zero_oracle(x: qnum, ind: qbit) {
+  within {
+    prepare_minus(ind);
+  } apply {
+    ind ^= x == 0;
+  }
+}
+
+qfunc my_grover_operator(state: qbit[]) {
+  good_state_oracle(state[0]);
+  within {
+    invert {
+      state_loading(state[1:state.len], state[0]);
+    }
+  } apply {
+    zero_oracle(state[1:state.len], state[0]);
+  }
+  phase (pi);
+}
+
+qfunc main(output phase: qnum<3, SIGNED, 3>) {
+  state: qbit[];
+  allocate(4, state);
+  state_loading(state[1:state.len], state[0]);
+  allocate(phase);
+  qpe(lambda() {
+    my_grover_operator(state);
+  }, phase);
+  drop(state);
 }

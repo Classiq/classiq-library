@@ -1,0 +1,33 @@
+// Solving 3-SAT Problem using Grover's Algorithm
+
+// We demonstrate Grover’s search algorithm by applying it to a simple instance
+// of the 3-SAT problem, showing how quantum amplitude amplification can be
+// used to find a satisfying assignment.
+
+qperm sat3_oracle(const x: qbit[], res: qbit) {
+    res ^=
+        (   x[1] |   x[2] |   x[3]) &
+        (  ~x[0] |   x[1] |   x[2]) &
+        (  ~x[0] |   x[1] |  ~x[2]) &
+        (  ~x[0] |  ~x[1] |   x[2]) &
+        (   x[0] |  ~x[1] |  ~x[2]) &
+        (   x[0] |  ~x[1] |   x[2]) &
+        (  ~x[0] |  ~x[1] |  ~x[3]) &
+        (  ~x[0] |  ~x[1] |   x[3]) &
+        (  ~x[1] |  ~x[2] |  ~x[3]) &
+        (   x[1] |  ~x[2] |   x[3]) &
+        (   x[0] |  ~x[2] |   x[3]) &
+        (   x[0] |  ~x[1] |  ~x[3]) &
+        (  ~x[0] |  ~x[1] |  ~x[2]);
+}
+
+
+qfunc main(r: int, output x: qbit[4]) {
+  allocate(x);
+  hadamard_transform(x);
+  power (r) {
+    grover_operator(lambda(vars) {
+      phase_oracle(sat3_oracle, vars);
+    }, hadamard_transform, x);
+  }
+}

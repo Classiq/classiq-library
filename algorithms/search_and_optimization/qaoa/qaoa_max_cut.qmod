@@ -1,3 +1,25 @@
+// Solving the Max-Cut Problem using the QAOA Algorithm
+
+// We construct a QAOA ansatz for the Max-Cut problem by alternating between a
+// cost unitary derived from the Max-Cut Hamiltonian and a mixing unitary,
+// parameterized by rotation angles. This variational circuit prepares a family
+// of states whose parameters are optimized to maximize the expected cut value.
+
+qfunc maxcut_cost_layer(gamma: real, v: qbit[5]) {  // a graph of 5 vertices
+    phase(
+        (
+            0
+            + (v[0] * (1 - v[1]) + v[1] * (1 - v[0]))  // edge (0, 1)
+            + (v[0] * (1 - v[2]) + v[2] * (1 - v[0]))  // edge (0, 2)
+            + (v[1] * (1 - v[2]) + v[2] * (1 - v[1]))  // edge (1, 2)
+            + (v[1] * (1 - v[3]) + v[3] * (1 - v[1]))  // edge (1, 3)
+            + (v[2] * (1 - v[4]) + v[4] * (1 - v[2]))  // edge (2, 4)
+            + (v[3] * (1 - v[4]) + v[4] * (1 - v[3]))  // edge (3, 4)
+        ) / 6,
+        gamma
+    );
+}
+
 qfunc mixer_layer(beta: real, qba: qbit[]) {
   apply_to_all(lambda(q) {
     RX(beta, q);
@@ -10,11 +32,6 @@ qfunc qaoa_ansatz(cost_layer: qfunc (real, qbit[]), gammas: real[], betas: real[
     mixer_layer(betas[i], qba);
   }
 }
-
-qfunc maxcut_cost_layer(gamma: real, v: qbit[]) {
-  phase (-((-((((((0 + ((v[0] * (1 - v[1])) + (v[1] * (1 - v[0])))) + ((v[0] * (1 - v[2])) + (v[2] * (1 - v[0])))) + ((v[1] * (1 - v[2])) + (v[2] * (1 - v[1])))) + ((v[1] * (1 - v[3])) + (v[3] * (1 - v[1])))) + ((v[2] * (1 - v[4])) + (v[4] * (1 - v[2])))) + ((v[3] * (1 - v[4])) + (v[4] * (1 - v[3]))))) / 6), gamma);
-}
-
 qfunc main(params: real[8], output v: qbit[5]) {
   allocate(v);
   hadamard_transform(v);
