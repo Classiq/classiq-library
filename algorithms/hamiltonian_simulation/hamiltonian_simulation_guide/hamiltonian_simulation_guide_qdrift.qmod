@@ -1,39 +1,46 @@
+// Hamiltonian Simulation using qDRIFT
+
+// This example demonstrates Hamiltonian time evolution using the qDRIFT
+// algorithm, a randomized Hamiltonian simulation method.
+// Given a Hamiltonian H expressed as a sum of Pauli strings, qDRIFT
+// approximates exp(-i * H * t) by randomly sampling terms according to
+// their weights and applying them sequentially.
+// Here, t denotes the total evolution time of the system.
+// The accuracy of the simulation is controlled by the total number of
+// samples applied during the evolution.
+
+// The Hamiltonian to be evolved
+hamiltonian: SparsePauliOp = SparsePauliOp {
+  terms=[
+    SparsePauliTerm {
+      paulis=[
+        IndexedPauli { pauli=Pauli::Z, index=0 },
+        IndexedPauli { pauli=Pauli::Z, index=1 }
+      ],
+      coefficient=0.3
+    },
+    SparsePauliTerm {
+      paulis=[
+        IndexedPauli { pauli=Pauli::X, index=0 }
+      ],
+      coefficient=0.7
+    },
+    SparsePauliTerm {
+      paulis=[
+        IndexedPauli { pauli=Pauli::X, index=1 }
+      ],
+      coefficient=0.2
+    }
+  ],
+  num_qubits=2
+};
+
 qfunc main(output qba: qbit[]) {
   allocate(2, qba);
-  qdrift(SparsePauliOp {
-    terms=[
-      SparsePauliTerm {
-        paulis=[
-          IndexedPauli {
-            pauli=Pauli::Z,
-            index=0
-          },
-          IndexedPauli {
-            pauli=Pauli::Z,
-            index=1
-          }
-        ],
-        coefficient=0.3
-      },
-      SparsePauliTerm {
-        paulis=[
-          IndexedPauli {
-            pauli=Pauli::X,
-            index=0
-          }
-        ],
-        coefficient=0.7
-      },
-      SparsePauliTerm {
-        paulis=[
-          IndexedPauli {
-            pauli=Pauli::X,
-            index=1
-          }
-        ],
-        coefficient=0.2
-      }
-    ],
-    num_qubits=2
-  }, 1, 288, qba);
+  qdrift(
+    hamiltonian,
+    1.0,   // evolution time t
+    288,   // number of samples
+    qba    // quantum variable
+  );
 }
