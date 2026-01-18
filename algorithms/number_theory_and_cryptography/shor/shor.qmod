@@ -1,3 +1,10 @@
+// Shor's Factoring Algorithm
+
+// Performs `Shor's factorization algorithm on a given integer N.
+// The core part of Shor's algorithm, is the period finding of the function f(x) = a^x mod N
+// This can be done using Quantum phase estimation (QPE) algorithm.
+// We work with the `qpe_flexible` function, that allows to pass a unitary with a specified powered operation
+
 qfunc period_finding(n: int, a: int, x: qnum, phase_var: qnum) {
   x ^= 1;
   qpe_flexible(lambda(p) {
@@ -5,10 +12,17 @@ qfunc period_finding(n: int, a: int, x: qnum, phase_var: qnum) {
   }, phase_var);
 }
 
-qfunc main(output phase_var: qnum<10, UNSIGNED, 10>) {
+// example parameters
+modulo_num: int = 21;
+a_number: int = 11;
+bit_len_modulo_num: int = 5;
+phase_len: int = 10; // bit_len_modulo_num * 2
+
+qfunc main(output phase_var: qnum<phase_len, UNSIGNED, phase_len>) {
   x: qnum;
-  allocate(5, x);
+  allocate(bit_len_modulo_num, x);
   allocate(phase_var);
-  period_finding(21, 11, x, phase_var);
+  period_finding(modulo_num, a_number, x, phase_var);
   drop(x);
 }
+
