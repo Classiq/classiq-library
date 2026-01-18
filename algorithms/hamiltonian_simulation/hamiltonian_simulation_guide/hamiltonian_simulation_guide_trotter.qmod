@@ -1,39 +1,44 @@
+// Hamiltonian Simulation using Suzuki–Trotter Product Formula
+
+// This example demonstrates Hamiltonian time evolution, exp(-i * H * t), using the
+// Suzuki–Trotter (ST) product formula, where the Hamiltonian H is given as a sum of
+// Pauli strings, and t is the evolution time.
+// The ST approximation is characterized by the product-formula order and the number
+// of repetitions (Trotter steps).
+
+// The Hamiltonian to be evolved
+hamiltonian: SparsePauliOp = SparsePauliOp {
+  terms=[
+    SparsePauliTerm {
+      paulis=[
+        IndexedPauli { pauli=Pauli::Z, index=0 },
+        IndexedPauli { pauli=Pauli::Z, index=1 }
+      ],
+      coefficient=0.3
+    },
+    SparsePauliTerm {
+      paulis=[
+        IndexedPauli { pauli=Pauli::X, index=0 }
+      ],
+      coefficient=0.7
+    },
+    SparsePauliTerm {
+      paulis=[
+        IndexedPauli { pauli=Pauli::X, index=1 }
+      ],
+      coefficient=0.2
+    }
+  ],
+  num_qubits=2
+};
+
 qfunc main(output qba: qbit[]) {
   allocate(2, qba);
-  suzuki_trotter(SparsePauliOp {
-    terms=[
-      SparsePauliTerm {
-        paulis=[
-          IndexedPauli {
-            pauli=Pauli::Z,
-            index=0
-          },
-          IndexedPauli {
-            pauli=Pauli::Z,
-            index=1
-          }
-        ],
-        coefficient=0.3
-      },
-      SparsePauliTerm {
-        paulis=[
-          IndexedPauli {
-            pauli=Pauli::X,
-            index=0
-          }
-        ],
-        coefficient=0.7
-      },
-      SparsePauliTerm {
-        paulis=[
-          IndexedPauli {
-            pauli=Pauli::X,
-            index=1
-          }
-        ],
-        coefficient=0.2
-      }
-    ],
-    num_qubits=2
-  }, 1.0, 1, 10, qba);
+  suzuki_trotter(
+    hamiltonian,
+    1.0,  // evolution time t
+    1,    // product-formula order
+    10,   // number of repetitions (Trotter steps)
+    qba   // quantum register
+  );
 }
