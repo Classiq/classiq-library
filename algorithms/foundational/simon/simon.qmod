@@ -1,7 +1,7 @@
 // Simon algorithm with a minimal oracle example
 
-// We prepares an input superposition and applies a simple Simon-style function.
-// We focus only on the quantum wrapper and a very simple oracle
+// This program prepare an input superposition and applies a Simon function.
+// We focus only on the quantum wrapper and a very simple oracle,
 // without classical postprocessing or full secret recovery.
 
 // The oracle is a 2-to-1 function of the form f(x) = f(x xor s),
@@ -18,13 +18,13 @@ qfunc simon(f_qfunc: qfunc (qnum, output qnum), x: qnum, output res: qnum) {
   }
 }
 
-qperm simon_simple(s: int, const x: qnum, output res: qnum) {
+qperm simon_oracle(s: int, const x: qnum, output res: qnum) {
   res = min(x, x ^ s);
 }
 
 qfunc main(output x: qnum<num_qubits>, output res: qnum) {
   allocate(x);
   simon(lambda(x, res) {
-    simon_simple(s_secret, x, res);
+    simon_oracle(s_secret, x, res);
   }, x, res);
 }
