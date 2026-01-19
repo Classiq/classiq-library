@@ -1,9 +1,9 @@
 // Add Bell states
 
-// Prepares two Bell states a and b and adds them
+// Prepares two Bell states A and B and adds them
 
-qfunc main(output a: qnum, output b: qnum, output sum: qnum){
-  prepare_state([1/2, 0, 0, 1/2], 0, a); // a is in an equal superposition of 0 and 3
-  prepare_state([0, 1/2, 1/2, 0], 0, b); // b is in an equal superposition of 1 and 2
-  sum = a + b;
+qfunc main(output A: qnum, output B: qnum, output sum: qnum){
+  prepare_state([1/2, 0, 0, 1/2], 0, A); // a is in an equal superposition of 0 and 3
+  prepare_state([0, 1/2, 1/2, 0], 0, B); // b is in an equal superposition of 1 and 2
+  sum = A + B;
 }
