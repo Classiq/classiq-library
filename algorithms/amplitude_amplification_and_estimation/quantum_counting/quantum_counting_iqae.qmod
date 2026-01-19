@@ -7,19 +7,16 @@
 // this qubit implements the marking oracle used inside amplitude amplification iterations.
 
 
-// Defining the QStruct, containing the quantum variables a and b
+// Defining the qstruct, containing the quantum variables a and b, each with two qubits
 qstruct OracleVars {
   a: qnum<2>;
   b: qnum<2>;
 }
 
 
-// Configuration constants
-A_BITS: int = 2;
-B_BITS: int = 2;
 
-PROBLEM_QUBITS: int = A_BITS + B_BITS;   // 4 qubits: a[2] || b[2]
-THRESHOLD: int = 2;                      // predicate: (a + b) <= THRESHOLD
+PROBLEM_QUBITS: int = 4;   // 4 qubits
+THRESHOLD: int = 2;        // predicate: (a + b) <= THRESHOLD
 
 
 
