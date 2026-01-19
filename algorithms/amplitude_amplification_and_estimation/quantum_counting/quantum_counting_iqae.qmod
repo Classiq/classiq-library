@@ -15,7 +15,6 @@ qstruct OracleVars {
 
 
 
-PROBLEM_QUBITS: int = 4;   // 4 qubits
 THRESHOLD: int = 2;        // predicate: (a + b) <= THRESHOLD
 
 
@@ -40,7 +39,7 @@ qfunc iqae_state_preparation(vars: OracleVars, ind: qbit) {
 }
 
 // Constructs the state expected by `amplitude_amplification`:
-// interprets the first PROBLEM_QUBITS as OracleVars and the last qubit as an indicator.
+// interprets the first 4 qubits as OracleVars and the last qubit as an indicator.
 qfunc space_transform(est_var: qbit[]) {
   // est_var = [problem_vars..., indicator]
   iqae_state_preparation(
@@ -52,7 +51,7 @@ qfunc space_transform(est_var: qbit[]) {
 
 qfunc main(k: int, output indicator: qbit) {
   est_var: qbit[];
-  problem_vars: qbit[PROBLEM_QUBITS];
+  problem_vars: OracleVars;
 
   allocate(problem_vars);  // Initiating the indicator qubit
   allocate(indicator);  // Solution space qubits
