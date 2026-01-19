@@ -1,5 +1,9 @@
-qfunc main(output io: qbit[]) {
-  prepare_state([
+// State preparation of a quantum variable according to given probabilities
+
+// This example show how to take a probabilities vector and prepare a quantum variable according to it
+// The state is approximate, and differs from the vector up to a bound
+
+probabilities: real[] = [
     0,
     0.002,
     0.004,
@@ -32,5 +36,10 @@ qfunc main(output io: qbit[]) {
     0.0585,
     0.0605,
     0.0625
-  ], 0.01, io);
+  ];
+
+bound: real = 0.01;
+
+qfunc main(output io: qbit[]) {
+  prepare_state(probabilities, bound, io);
 }
