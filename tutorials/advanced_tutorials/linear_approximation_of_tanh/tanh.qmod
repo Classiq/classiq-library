@@ -6,10 +6,7 @@
 
 // This function outputs the segment label of a given x value
 qperm map_label(num_segs: int, const v: qbit[], output label: qbit[]) {
-  allocate(num_segs, label);
-  repeat (i: num_segs) {  // duplicate MSBs of v
-    CX(v[v.len-num_segs+i], label[i]);
-  }
+  label = v[v.len-num_segs:v.len];  // copy MSBs of v
 }
 
 qfunc compute_piecewise_linear(As: real[], Bs: real[], x: qnum, y: qnum) {
@@ -21,6 +18,8 @@ qfunc compute_piecewise_linear(As: real[], Bs: real[], x: qnum, y: qnum) {
       y ^= As[i]*x + Bs[i];  // the linear function for segment i
     }
   }
+
+  // Note: Automatic uncomputation of 'label' happens here
 }
 
 qfunc main(output x: qnum, output y: qnum) {
