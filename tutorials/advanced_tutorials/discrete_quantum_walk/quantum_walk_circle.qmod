@@ -1,3 +1,13 @@
+// Discrete quantum walk on a circle
+
+// Perform a discrete quantum walk on a circle (regular 2**N polygon), for t steps
+
+N: int = 7;
+circle_size: int = 2 ** N;
+
+
+// the coin is represented by a qubit and a "flip" is defined by some unitary operation on it.
+// Choosing the Hadamard gate, which sends the |0> state into an equal superposition of |0> and |1>.
 qfunc quantum_coin_flip(coin: qbit) {
   H(coin);
 }
@@ -12,6 +22,7 @@ qfunc discrete_quantum_walk_circle(time: int, coin: qbit, x: qbit[]) {
     control (coin == 0) {
       quantum_step_clockwise(x);
     } else {
+      // Step counter clock wise (equivalent to x += -1)
       invert {
         quantum_step_clockwise(x);
       }
@@ -19,7 +30,7 @@ qfunc discrete_quantum_walk_circle(time: int, coin: qbit, x: qbit[]) {
   }
 }
 
-qfunc main(t: int, output x: qnum<floor(log(128, 2)), SIGNED, 0>, output coin: qbit) {
+qfunc main(t: int,output x: qnum<floor(log(circle_size, 2)), SIGNED, 0>, output coin: qbit) {
   allocate(x);
   allocate(coin);
   discrete_quantum_walk_circle(t, coin, x);

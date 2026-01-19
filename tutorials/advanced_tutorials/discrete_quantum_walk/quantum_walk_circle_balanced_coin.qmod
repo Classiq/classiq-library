@@ -1,3 +1,11 @@
+// Discrete quantum walk on a circle with a balanced coin
+
+// Perform a discrete quantum walk on a circle (regular 2**N polygon), with a balanced coin, for t steps
+
+N: int = 7;
+circle_size: int = 2 ** N;
+
+// A generic function for a quantum walk
 qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfuncs: qfunc[] (), coin_state: qnum) {
   power (time) {
     coin_flip_qfunc(coin_state);
@@ -10,21 +18,34 @@ qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfun
 }
 
 qperm quantum_step_clockwise(x: qnum) {
-  x += 1;
+    x += 1;
 }
 
-qfunc main(t: int, output x: qnum<floor(log(128, 2)), SIGNED, 0>, output coin: qbit) {
+qfunc main(t: int, output x: qnum<floor(log(circle_size, 2)), SIGNED, 0>, output coin: qbit) {
   allocate(x);
   allocate(coin);
+  // Apply H and then S for a balanced initial condition for the coin
   H(coin);
   S(coin);
-  discrete_quantum_walk(t, lambda(coin) {
-    H(coin);
-  }, [lambda() {
-    quantum_step_clockwise(x);
-  }, lambda() {
-    invert {
-      quantum_step_clockwise(x);
-    }
-  }], coin);
+
+  discrete_quantum_walk(
+    t,
+    // the coin is represented by a qubit and a "flip" is defined by some unitary operation on it.
+    // Choosing the Hadamard gate, which sends the |0> state into an equal superposition of |0> and |1>.
+    lambda(coin) {
+      H(coin);
+    },
+    // Step clockwise or counter clockwise according the the coin's state
+    [
+      lambda() {
+        quantum_step_clockwise(x);
+      },
+      lambda() {
+        invert {
+          quantum_step_clockwise(x);
+        }
+      }
+    ],
+    coin
+  );
 }
