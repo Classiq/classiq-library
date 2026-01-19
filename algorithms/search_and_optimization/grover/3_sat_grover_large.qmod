@@ -4,8 +4,8 @@
 // of the 3-SAT problem, showing how quantum amplitude amplification can be
 // used to find a satisfying assignment.
 
-qperm sat3_oracle(const x: qbit[], res: qbit) {
-    res ^=
+qperm sat3_oracle(const x: qbit[]) {
+    control (
         (   x[1] |   x[2] |   x[3]) &
         (  ~x[0] |   x[1] |   x[2]) &
         (  ~x[0] |   x[1] |  ~x[2]) &
@@ -18,16 +18,18 @@ qperm sat3_oracle(const x: qbit[], res: qbit) {
         (   x[1] |  ~x[2] |   x[3]) &
         (   x[0] |  ~x[2] |   x[3]) &
         (   x[0] |  ~x[1] |  ~x[3]) &
-        (  ~x[0] |  ~x[1] |  ~x[2]);
+        (  ~x[0] |  ~x[1] |  ~x[2])
+    ) {
+       phase(pi);  // flip the sign on states that satisfy the 3-SAT clauses
+    }
 }
-
 
 qfunc main(r: int, output x: qbit[4]) {
   allocate(x);
   hadamard_transform(x);
   power (r) {
     grover_operator(lambda(vars) {
-      phase_oracle(sat3_oracle, vars);
+      sat3_oracle(vars);
     }, hadamard_transform, x);
   }
 }
