@@ -1,3 +1,15 @@
+// Discrete quantum walk on a hypercube
+
+// Perform a discrete quantum walk on a 4-dimensional hypercube, for t steps.
+// the coin is represented by a qubit and a "flip" is defined by some unitary operation on it.
+
+// Two nodes in the hypercube are connected to each other if their Hamming distance is 1.
+// Thus, a step along a hypercube is given by moving "1 Hamming distance away".
+// For a d-dimensional hypercube, at each node there are d possible directions to move.
+// Each of them is given by applying a bit flip on one of the bits.
+// This is obtained by applying an X gate on one of the d qubits.
+
+
 qfunc discrete_quantum_walk(time: int, coin_flip_qfunc: qfunc (qnum), walks_qfuncs: qfunc[] (), coin_state: qnum) {
   power (time) {
     coin_flip_qfunc(coin_state);
@@ -17,17 +29,30 @@ qfunc main(t: int, output x: qbit[4], output coin: qbit[]) {
   allocate(x);
   allocate(2, coin);
   prepare_uniform_trimmed_state(4, coin);
-  discrete_quantum_walk(t, lambda(coin) {
-    grover_diffuser(lambda(coin) {
-      prepare_uniform_trimmed_state(4, coin);
-    }, coin);
-  }, [lambda() {
-    moving_one_hamming_dist(0, x);
-  }, lambda() {
-    moving_one_hamming_dist(1, x);
-  }, lambda() {
-    moving_one_hamming_dist(2, x);
-  }, lambda() {
-    moving_one_hamming_dist(3, x);
-  }], coin);
+  discrete_quantum_walk(
+    t,
+    lambda(coin) {
+      // the coin is represented by a qubit and a "flip" is defined by some unitary operation on it.
+      // Choosing the "Grover diffuser" function refers to a symmetric quantum walk.
+      // The Grover diffuser operator is a reflection around a given state |psi>.
+      grover_diffuser(lambda(coin) {
+        prepare_uniform_trimmed_state(4, coin);
+      }, coin);
+    },
+    [
+      lambda() {
+        moving_one_hamming_dist(0, x);
+      },
+      lambda() {
+        moving_one_hamming_dist(1, x);
+      },
+      lambda() {
+        moving_one_hamming_dist(2, x);
+      },
+      lambda() {
+        moving_one_hamming_dist(3, x);
+      }
+    ],
+    coin
+  );
 }
