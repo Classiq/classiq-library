@@ -15,7 +15,7 @@ qfunc controlled_qft(expectation_value: qbit, psi: qbit[]) {
 
 
 // Performs the Hadamard test utilizing the within-applied function implementing
-// V^dagger U V, where V is the Hadamard gate and U is the controlled_qft function.
+// U-dagger V U, where U is the Hadamard gate and V is the controlled_qft function.
 qfunc preparation_and_application(expectation_value: qbit, psi: qbit[]) {
   within {
     H(expectation_value);  // Creates a superposition of |0> and |1> states
@@ -24,12 +24,11 @@ qfunc preparation_and_application(expectation_value: qbit, psi: qbit[]) {
   }
 }
 
-TARGET_SIZE: int = 4;  // Size of the target quantum variable
 
 qfunc main(output expectation_value: qbit) {
-  psi: qbit[]; //
-  allocate(1, expectation_value); // Ancilla qubit used for the Hadamard test
-  allocate(TARGET_SIZE, psi);    // Initializes the target state
+  psi: qbit[4]; // Target quantum variable, of size 4
+  allocate(expectation_value); // Ancilla qubit used for the Hadamard test
+  allocate(4, psi);    // Initializes the target state
 
   preparation_and_application(expectation_value, psi);
   drop(psi);        // Indicates that the quantum state should not be measured
