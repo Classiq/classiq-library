@@ -1,15 +1,32 @@
-qperm cut_oracle(cut_size: int, const nodes: qbit[], res: qbit) {
-  res ^= cut_size <= ((((((0 + ((nodes[0] * (1 - nodes[1])) + (nodes[1] * (1 - nodes[0])))) + ((nodes[0] * (1 - nodes[2])) + (nodes[2] * (1 - nodes[0])))) + ((nodes[1] * (1 - nodes[2])) + (nodes[2] * (1 - nodes[1])))) + ((nodes[1] * (1 - nodes[3])) + (nodes[3] * (1 - nodes[1])))) + ((nodes[2] * (1 - nodes[4])) + (nodes[4] * (1 - nodes[2])))) + ((nodes[3] * (1 - nodes[4])) + (nodes[4] * (1 - nodes[3]))));
+// Solving 3-SAT Problem using Grover's Algorithm
+
+// We demonstrate the use of Grover’s search algorithm for an optimization
+// problem, specifically the Max-Cut problem on a small graph. The oracle
+// marks solutions relative to a specified cut size threshold, which can be
+// dynamically explored.
+
+qperm cut_oracle(cut_size: int, const v: qbit[5]) { // a graph of 5 vertices
+    control (
+          (v[0] * (1 - v[1]) + v[1] * (1 - v[0]))  // edge (0, 1)
+        + (v[0] * (1 - v[2]) + v[2] * (1 - v[0]))  // edge (0, 2)
+        + (v[1] * (1 - v[2]) + v[2] * (1 - v[1]))  // edge (1, 2)
+        + (v[1] * (1 - v[3]) + v[3] * (1 - v[1]))  // edge (1, 3)
+        + (v[2] * (1 - v[4]) + v[4] * (1 - v[2]))  // edge (2, 4)
+        + (v[3] * (1 - v[4]) + v[4] * (1 - v[3]))  // edge (3, 4)
+        <= cut_size
+    ) {
+       phase(pi);  // flip the sign on states that satisfy the cut size condition
+    }
 }
 
-qfunc main(r: int, output nodes: qbit[5]) {
-  allocate(nodes);
-  hadamard_transform(nodes);
+CUT_SIZE: int = 4;
+
+qfunc main(r: int, output v: qbit[5]) {
+  allocate(v);
+  hadamard_transform(v);
   power (r) {
     grover_operator(lambda(vars) {
-      phase_oracle(lambda(vars, res) {
-        cut_oracle(4, vars, res);
-      }, vars);
-    }, hadamard_transform, nodes);
+      cut_oracle(CUT_SIZE, vars);
+    }, hadamard_transform, v);
   }
 }
