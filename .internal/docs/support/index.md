@@ -87,7 +87,7 @@ Welcome to the Classiq Support Center. This page is designed to help you quickly
     Using `control`, you can define multi-qubit controls and gates. You can also use `if_` for classical control of quantum gates. See [Classical Control Flow](/latest/qmod-reference/language-reference/statements/classical-control-flow/).
 
 ??? note "How do I use controlled operations on multiple qubits instead of QArrays?"
-    There are two ways to work around this: either bind the qubits you want to a QArray (see [bind](/latest/qmod-reference/language-reference/statements/bind/)) or slice the QArrays (see [Path Operators](/latest/qmod-reference/language-reference/statements/numeric-assignment/#relational-operators)).
+    There are two ways to work around this: either bind the qubits you want to a QArray (see [bind](/latest/qmod-reference/language-reference/statements/bind/)) or slice the QArrays (see [Path Operators](/latest/qmod-reference/language-reference/expressions/#relational-operators)).
 
 ??? note "How do I apply a single-qubit gate to multiple qubits?"
     Use the `apply_to_all` function. See [Utility functions](/latest/qmod-reference/api-reference/functions/open_library/utility_functions/).

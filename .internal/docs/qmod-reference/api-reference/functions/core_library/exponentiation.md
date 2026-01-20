@@ -13,7 +13,7 @@ search:
             - commuting_paulis_exponent
             - suzuki_trotter
             - multi_suzuki_trotter
-            - unscheduled_suzuki_trotter
+            - sequential_suzuki_trotter
             - qdrift
             - exponentiate
 <!-- prettier-ignore-end -->

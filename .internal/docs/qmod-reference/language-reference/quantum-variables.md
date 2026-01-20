@@ -371,14 +371,14 @@ The _concatenation operator_ is used to combine a sequence of quantum objects
     **[** _path-expressions_ **]**
 
     _path-expressions_ is a comma-separated sequence of one or more quantum
-    [path expressions](http://docs.classiq.io/latest/qmod-reference/language-reference/statements/numeric-assignment/?h=path+expression#path-operators).
+    [path expressions](http://docs.classiq.io/latest/qmod-reference/language-reference/expressions).
 
 === "Native"
 
     **{** _path-expressions_ **}**
 
     _path-expressions_ is a comma-separated sequence of one or more quantum
-    [path expressions](http://docs.classiq.io/latest/qmod-reference/language-reference/statements/numeric-assignment/?h=path+expression#path-operators).
+    [path expressions](http://docs.classiq.io/latest/qmod-reference/language-reference/expressions).
 
 For example, the model below uses the concatenation operator to apply
 `hadamard_transform` to a specific set of qubits drawn from two quantum

@@ -12,6 +12,7 @@ search:
             - unitary
             - multiply
             - multiply_constant
+            - canonical_add
             - canonical_multiply
             - canonical_multiply_constant
 <!-- prettier-ignore-end -->

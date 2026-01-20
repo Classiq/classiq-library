@@ -3,10 +3,13 @@ search:
     boost: 2.361
 ---
 
-# Numeric Assignment
+# Assignment
+
+## Numeric Assignment
 
 Scalar quantum variables (`qnum` and `qbit`) can be assigned the result of arithmetic/logical
-expressions over other scalar variables using computational basis arithmetic. Expressions
+[expressions](https://docs.classiq.io/latest/qmod-reference/language-reference/expressions)
+over other scalar variables using computational basis arithmetic. Expressions
 comprise conventional arithmetic operators, numeric constants, and quantum scalar variables.
 
 Numeric assignment statements in the computational basis take two forms - out-of-place
@@ -14,7 +17,7 @@ and in-place. When assigning the result of an expression out-of-place, a new qua
 object is allocated to store the result. For in-place assignment, the result
 of the operation is stored back in the target variable.
 
-## Syntax
+### Syntax
 
 === "Python"
 
@@ -49,7 +52,7 @@ of the operation is stored back in the target variable.
 
     _target-var_ **+=** _quantum-expression_
 
-## Semantics
+### Semantics
 
 -   _quantum-expression_ consists of quantum scalar variables, numeric constant
     literals, and classical scalar variables, composed using arithmetic operators.
@@ -57,7 +60,7 @@ of the operation is stored back in the target variable.
 -   The quantum variables occurring in the expression can subsequently be used, with their
     states unmodified.
 
-### Out-of-place assignment (`=`/`|=`)
+#### Out-of-place assignment (`=`/`|=`)
 
 -   _target-var_ must be uninitialized prior to the assignment and is
     subsequently initialized.
@@ -68,7 +71,7 @@ of the operation is stored back in the target variable.
     otherwise be compatible with the computed numeric attributes of _quantum-expression_,
     that is, fit the entire range of possible expression values.
 
-### In-place XOR (`^=`)
+#### In-place XOR (`^=`)
 
 -   _target-var_ must be initialized prior to the assignment.
 -   Each bit in _target-var_ is xor-ed with the
@@ -76,7 +79,7 @@ of the operation is stored back in the target variable.
     unchanged.
 -   Bits in the result of _quantum-expression_ with no counterpart in _target-var_ are ignored.
 
-### In-place add (`+=`)
+#### In-place add (`+=`)
 
 <!-- cspell:ignore underflows -->
 
@@ -91,49 +94,63 @@ of the operation is stored back in the target variable.
     integer part (including the sign bit) without incurring additional qubits,
     following the two's complement method.
 
-### Supported arithmetic operators
+## Aggregate Type Assignment
 
-#### Arithmetic operators
+A struct or array quantum variable can be assigned to another variable of the
+same type.
+In addition, an array literal can be assigned to a `QArray[QBit]` variable.
 
--   Add: +
--   Subtract: - (binary)
--   Negate: - (unary)
--   Multiply: \*
--   Power \*\* (quantum base, positive classical integer exponent)
--   Modulo: % limited for power of 2
--   Max: max (n>=2 arguments)
--   Min: min (n>=2 arguments)
+### Syntax
 
-#### Bitwise operators
+=== "Python"
 
--   Bitwise Or: |
--   Bitwise And: &
--   Bitwise Xor: ^
--   Bitwise Invert: ~
+    <!-- cspell:ignore inplace_xor -->
 
-#### Relational operators
+    _target-var_ **|=** _assigned-var_ <br/>
+    OR <br/>
+    **assign(**_assigned-var_**,** _target-var_**)**
 
--   Equal: ==
--   Not Equal: !=
--   Greater Than: >
--   Greater Or Equal: >=
--   Less Than: <
--   Less Or Equal: <=
+    _target-var_ **^=** _assigned-var_ <br/>
+    OR <br/>
+    **inplace_xor(**_assigned-var_**,** _target-var_**)**
 
-#### Logic operators
+    _array-var_ **|=** _array-literal_ <br/>
+    OR <br/>
+    **assign(**_array-literal_**,** _array-var_**)**
 
--   Logical And: and (in Python `logical_and()`)
--   Logical Or: or (in Python `logical_or()`)
--   Logical Not: not (in Python `logical_not()`)
+    _target-var_ **^=** _array-literal_ <br/>
+    OR <br/>
+    **inplace_xor(**_array-literal_**,** _array-var_**)**
 
-#### Path operators
+    #### Notes
 
--   Field Access: _struct_ **.** _field-name_
--   Array Slice: _array_ **[** _start-index_ **:** _stop-index_ **]**
--   Array Subscript: _array_ **[** _index_ **]**
-    -   The index of a quantum subscript expression must be an [unsigned quantum integer](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-types/#quantum-scalar-types) variable.
-    -   In Python, if _array_ is a Python list and _index_ is a quantum variable, use the alternative syntax: **subscript(** _array_ **,** _index_ **)**
-    -   Currently, quantum subscript expressions are not supported in [phase statements](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/phase/).
+    * The operator `|=` is used to represent the native `=` since the operator
+      `=` cannot be overloaded in Python.
+    * The operator syntax and the function call syntax are equivalent. The
+      operator syntax is typically easier to read, but it cannot be used
+      directly in lambda expressions, where the function call syntax should be
+      used.
+
+=== "Native"
+
+    _target-var_ **=** _assigned-var_
+
+    _target-var_ **^=** _assigned-var_
+
+    _array-var_ **=** _array-literal_
+
+    _array-var_ **^=** _array-literal_
+
+### Semantics
+
+-   As with numeric assignments, _target-var_ must be uninitialized in
+    out-of-place assignments and initialized in in-place assignments.
+    _assigned-var_ must be initialized in both cases.
+-   _target-var_ and _assigned-var_ must have the same type. For example,
+    variable of type `QArray[QBit]` can be assigned into a `QArray[QBit]`
+    variable, but a `QArray[QNum]` variable cannot.
+-   _array-literal_ is a classical array of 0-s and 1-s. _array-var_ must be
+    a quantum variable of type `QArray[QBit]`.
 
 ## Examples
 
@@ -374,5 +391,37 @@ Overall, the output variable `n` evaluates to 7 (10%), 3 (20%), 6 (30%), or 2
       index: qnum;
       prepare_state([0.1, 0.2, 0.3, 0.4], 0, index);
       n = [7, 3, 6, 2][index];  // n is 7, 3, 6, or 2 with increasing probability
+    }
+    ```
+
+### Example 7: Aggregate type assignments
+
+The following model demonstrate different kinds of quantum array assignments.
+First, you assign the array literal `[0, 1, 1, 0]` into variable `qarr1` of type
+`QArray[QBit]`.
+This applies `X` to the second and third bits of the array.
+Next, you initialize `qarr2` by assigning `qarr1` to it.
+This applies `CX` to the qubits of `qarr1` and `qarr2` sequentially.
+
+=== "Python"
+
+    ```python
+    from classiq import qfunc, Output, QArray, QBit, allocate
+
+
+    @qfunc
+    def main(qarr1: Output[QArray], qarr2: Output[QArray]) -> None:
+        allocate(4, qarr1)
+        qarr1 ^= [0, 1, 1, 0]
+        qarr2 |= qarr1
+    ```
+
+=== "Native"
+
+    ```
+    qfunc main(output qarr1: qbit[], output qarr2: qbit[]) {
+      allocate(4, qarr1);
+      qarr1 ^= [0, 1, 1, 0];
+      qarr2 = qarr1;
     }
     ```
