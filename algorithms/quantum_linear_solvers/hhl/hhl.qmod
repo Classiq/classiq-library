@@ -53,47 +53,50 @@ rhs_vector: real[] = [sqrt(1/6), sqrt(1/6), sqrt(1/6), sqrt(1/2)];
 // In our example the matrix A is a sum of commuting Pauli strings.
 // We define how to take powers of the Hamiltonian evolution exp(2π A), which is applied
 // within the Quantum Phase Estimation. We simply multiply the evolution time by the power value,
-// keeping the number of Trotter repetition being 1, as suitable for commuting terms.
+// keeping the number of repetitions at 1, since the terms commute.
 qfunc powered_suzuki_trotter_commuting_terms(k: int, hamiltonian: SparsePauliOp, qba: qbit[]) {
   suzuki_trotter(hamiltonian, -2*pi* k, 1, 1, qba);
 }
 
-// We define a quantum function that assigns eigenvalue inversion to the amplitudes for a signed qnum of
-// size 4 with 4 fraction places index. The desired amplitudes are conditioned by an additional
-// indicator qubit being at state 1, and are normalized by the smallest possible value of 1/2^index.size.
-qfunc assign_inversion_size4(const index: qbit[4], indicator: qbit) {
+// We define a quantum function that assigns eigenvalue inversion to the amplitudes,
+// conditioned on an additional indicator qubit being in the |1⟩ state:
+// |value⟩|0⟩ -> (C / value)|value⟩|1⟩ + sqrt(1 − (C / value)^2)|value⟩|0⟩.
+// The variable `value` is a signed qnum of size 4 with 4 fractional bits,
+// and the inversion amplitudes are normalized using the smallest possible value,
+// C = 2^(−value.size).
+qfunc assign_inversion_size4(const value: qbit[4], indicator: qbit) {
   RY(-0.0157, indicator);
-  skip_control { CX(index[0], indicator); }
+  skip_control { CX(value[0], indicator); }
   RY(-0.0157, indicator);
-  skip_control { CX(index[1], indicator); }
+  skip_control { CX(value[1], indicator); }
   RY(-0.3379, indicator);
-  skip_control { CX(index[0], indicator); }
+  skip_control { CX(value[0], indicator); }
   RY(0.3066, indicator);
-  skip_control { CX(index[2], indicator); }
+  skip_control { CX(value[2], indicator); }
   RY(-0.1047, indicator);
-  skip_control { CX(index[0], indicator); }
+  skip_control { CX(value[0], indicator); }
   RY(-0.1047, indicator);
-  skip_control { CX(index[1], indicator); }
+  skip_control { CX(value[1], indicator); }
   RY(-0.3181, indicator);
-  skip_control { CX(index[0], indicator); }
+  skip_control { CX(value[0], indicator); }
   RY(0.4649, indicator);
-  skip_control { CX(index[3], indicator); }
+  skip_control { CX(value[3], indicator); }
   RY(-0.0475, indicator);
-  skip_control { CX(index[0], indicator); }
+  skip_control { CX(value[0], indicator); }
   RY(-0.0475, indicator);
-  skip_control { CX(index[1], indicator); }
+  skip_control { CX(value[1], indicator); }
   RY(-0.3407, indicator);
-  skip_control { CX(index[0], indicator); }
+  skip_control { CX(value[0], indicator); }
   RY(0.2457, indicator);
-  skip_control { CX(index[2], indicator); }
+  skip_control { CX(value[2], indicator); }
   RY(-0.0939, indicator);
-  skip_control { CX(index[0], indicator); }
+  skip_control { CX(value[0], indicator); }
   RY(-0.0939, indicator);
-  skip_control { CX(index[1], indicator); }
+  skip_control { CX(value[1], indicator); }
   RY(-0.3122, indicator);
-  skip_control { CX(index[0], indicator); }
+  skip_control { CX(value[0], indicator); }
   RY(0.8154, indicator);
-  skip_control { CX(index[3], indicator); }
+  skip_control { CX(value[3], indicator); }
 }
 
 qfunc main(output solution: qnum<2, False, 0>, output phase_var: qnum<4, True, 4>, output indicator: qbit) {
