@@ -60,18 +60,21 @@ We allow running "regex replace" on the ipynb file, in order to ease the load on
 def wrap_testbook(
     notebook_name: str,
     timeout_seconds: float = 10,
-    replacements: list[tuple[str, str]] | None = None,
+    replacements_regex: list[tuple[str, str]] | None = None,
+    replacements_variables: list[tuple[str, str]] | None = None,
 ) -> Callable:
     def inner_decorator(func: Callable) -> Any:
         _patch_testbook()
 
         notebook_path = resolve_notebook_path(notebook_name)
 
-        with NotebookReplace(notebook_path, replacements):
+        with NotebookReplace(
+            notebook_path, replacements_regex, replacements_variables
+        ) as nr:
             for decorator in [
                 _build_patch_testbook_client_decorator(notebook_name),
                 testbook(notebook_path, execute=True, timeout=timeout_seconds),
-                (lambda x: x) if replacements else qmod_compare_decorator,
+                (lambda x: x) if nr.replacements else qmod_compare_decorator,
                 _build_cd_decorator(notebook_path),
                 _build_skip_decorator(notebook_path),
             ]:
@@ -101,28 +104,45 @@ FILE_COPY_SUFFIX = ".pre_test_backup"
 @dataclass
 class NotebookReplace:
     file_path: str
-    replacements: list[tuple[str, str]] | None
+    replacements_regex: list[tuple[str, str]] | None
+    replacements_variables: list[tuple[str, str]] | None
 
     def __post_init__(self):
         self.was_file_copied = False
+
+        self.replacements = self._group_replacements()
 
     @property
     def file_path_copied(self):
         return self.file_path + FILE_COPY_SUFFIX
 
+    def _group_replacements(self) -> list[tuple[str, str]]:
+        replacements = []
+
+        if self.replacements_regex:
+            replacements.extend(self.replacements_regex)
+
+        if self.replacements_variables:
+            replacements.extend(
+                [
+                    (f"({variable}\\s*=\\s*)", f"\\1 {new_value}  # ")
+                    for variable, new_value in self.replacements_variables
+                ]
+            )
+
+        return replacements
+
     def __enter__(self):
-        if not self.replacements:
-            return
+        if self.replacements:
+            self._backup_notebook()
+            self.was_file_copied = True
 
-        self._backup_notebook()
-        self.was_file_copied = True
+            used_replacements = self._replace_notebook_content()
+            assert (
+                self.replacements == used_replacements
+            ), f"Not all replacements given were used. The onces used are: {used_replacements}. The unused are {[r for r in self.replacements if r not in used_replacements]}"
 
-        used_replacements = self._replace_notebook_content()
-
-        # verify all replacements were used
-        assert (
-            self.replacements == used_replacements
-        ), f"Not all replacements given were used. The onces used are: {used_replacements}. The unused are {[r for r in replacements if r not in used_replacements]}"
+        return self
 
     def __exit__(self, *args, **kwargs):
         if not self.replacements:
