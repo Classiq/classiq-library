@@ -41,12 +41,16 @@ and demonstrating query complexity advantages.
 - **Deutsch Jozsa** - Widely regarded as the first quantum algorithm, it demonstrates an exponential advantage in query
   complexity over classical approaches. Given oracle access to a Boolean function promised to be either
   constant or balanced, the algorithm deterministically identifies which case holds using a single query to
-  the function.
+  the function. We define a general quantum algorithm that accepts a quantum predicate as an input parameter
+  and explore multiple concrete examples. By using Classiq’s quantum arithmetic capabilities, the compilation
+  of both simple and highly complex functions becomes straightforward.
 - **Quantum Teleportation** - A foundational quantum communication protocol, employing quantum entanglement and
   classical communication to transfer ("teleport") an arbitrary qubit state from one place to another.
 - **Simon** - Given an oracle binary function, satisfying $f(x)=f(y)$ if and only if $y=x\oplus s$ for some secret key $s$, the
   algorithm recovers $s$. It does so using a number of oracle queries linear in the input size, yielding an exponential
-  improvement in query complexity compared to the best classical approaches.
+  improvement in query complexity compared to the best classical approaches. After defining the quantum and classical parts
+  of the algorithm, it is run on two examples of Simon’s function: one definable with simple arithmetic, and another with
+  a shallow low-level implementation.
 
 # Hamiltonian Simulation
 
@@ -58,25 +62,39 @@ and demonstrating query complexity advantages.
 - **Discrete log**
 - **Elliptic curves**
 - **Hidden shift problem**
-- **Shor's algorithm**
+- **Shor's algorithm** - A factoring, foundational to the development of the field, providing
+  an exponential speedup over currently known classical algorithms. The quantum component
+  is naturally structured as a Quantum Phase Estimation (QPE) routine, utilizing
+  Classiq’s built-in `flexible_qpe` and modular arithmetic.
 
 # QML
 
 - **Hybrid Quantum Neural Networks (QNN)**
 - **Quantum Generative Adversarial Networks (GANs)**
 - **Quantum Support Vector Machine (QSVM)**
-- **Quantum autoencoder**
+- **Quantum autoencoder** - A quantum program is trained to reduce the memory required to encode data
+  with a given structure. The example demonstrates how to use the encoder for anomaly detection.
+  Two training approaches for the quantum autoencoder are presented, leveraging Classiq’s integration with PyTorch.
 
 # Quantum Differential Equation Solvers
 
-- **Discrete Poisson solver**
+- **Discrete Poisson solver** - Quantum solver for the discrete Poisson equation, a partial differential equation
+  (PDE) widely used in physics and engineering. The equation models the distribution of a potential field due
+  to a prescribed source term. The problem is reformulated as a system of linear equations and solved using
+  the HHL algorithm. Leveraging quantum cosine and sine transforms from the open library enables a concise
+  implementation that can be generalized to higher dimensions.
+
 - **Time marching**
 
 # Quantum Linear Solvers
 
 - **Adiabatic linear solvers** -
 - **HHL** -
-- **Quantum Singular Value Transformation (QSVT) matrix inversion**
+- **Quantum Singular Value Transformation (QSVT) matrix inversion** - A general framework for solving linear
+  systems is implemented, using the Quantum Singular Value Transform (QSVT). Given an efficient procedure for embedding a classical matrix
+  as a quantum function via block-encoding, the framework provides a clean approach to matrix inversion.
+  When a block-encoding of the matrix and its condition number are available, the algorithm admits a concise implementation
+  by invoking the `qsvt_inversion` routine together with classical auxiliary functions from the `qsp` module.
 - **Variational Quantum Linear Solver (VQLS) with Linear Combination of Unitaries (LCU)**
 
 # Quantum Phase Estimation (QPE)
@@ -101,9 +119,24 @@ and demonstrating query complexity advantages.
 
 # Quantum Walks/Glued trees
 
+- **Quantum Walks** Demonstrates the encoding of a quantum random walk. The example includes a one-to-one
+  comparison between classical random walks and quantum walks through a specific case: a walk on a circle.
+  In addition, it illustrates how to implement a generic discrete quantum walk routine, specialized for a
+  walk on a hypercube. The implementation makes use of built-in arithmetic and defines quantum functions that
+  take a list of quantum callables as a parameter.
+
 # Search and Optimization
 
 - **Decoded Quantum Interferometry**
-- **Grover**
+- **Grover** - A canonical quantum algorithms, providing the solution of an unstructured search problem.
+  A general routine is defined and then applied to generic use cases, including the 3-SAT problem and the Max-Cut problem on a graph.
+  The use of the phase_oracle quantum function from the Classiq open library, together with the Qmod language for high-level
+  arithmetic operations, helps avoid the low-level implementation details typically required on other platforms.
+
 - **Grover Mixers for QAOA**
 - **Quantum Approximate Optimization Algorithm (QAOA)**
+
+This tutorial demonstrates how coding with Qmod is simple and intuitive, closely resembling classical programming. The example includes a one-to-one comparison between classical random walks and quantum walks through a specific case: a walk on a circle. In addition, it illustrates how to implement a generic discrete quantum walk routine, specialized for a walk on a hypercube. The implementation makes use of built-in arithmetic and defines quantum functions that take a list of quantum callables as a parameter.
+
+Exploration of how quantum algorithms can be applied to solve a linearized kinetic model of plasma, focusing on a simplified Vlasov–Ampère system in one spatial dimension with an external electric field. The problem is reformulated as a linear system and solved using QSVT. The core of this example is the block-encoding of a classical matrix that represents operations in the spatial and velocity phase space. The implementation employs several block-encoding techniques, including controlled operations and quantum arithmetic. The Qmod language enables a well-structured implementation, clearly linking the classical matrix to its quantum block-encoding.
+Implementation of the Variational Quantum Eigensolver (VQE) for approximating the ground state of a molecule. Two ansätze are demonstrated: the Unitary Coupled Cluster (UCC) and the Hardware-Efficient Ansatz. The former utilizes Classiq’s built-in Suzuki–Trotter product formulas, resulting in shallower programs compared to naive implementations. The design of both the classical and quantum components of the model is simplified through Classiq’s Chemistry application and the `minimize` method of the Execution Session.
