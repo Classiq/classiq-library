@@ -1,9 +1,9 @@
-// Discrete logarithmic problem using Shor's Algorithm
+// Discrete Logarithmic Problem Using Shor's Algorithm
 
-// This example implements the quantum part of a discrete logarithm solver
-// We start by preparing a uniform superposition over `alpha` and `beta`
-// then evaluating the oracle and applying inverse QFT to extract phase information
-// where the exponent is encoded in the power of `pw`
+// This example implements the quantum part of a discrete logarithm solver.
+// We start by preparing a uniform superposition over `alpha` and `beta`,
+// then evaluating the oracle and applying inverse QFT to extract phase information,
+// where the exponent is encoded in the power of `pw`.
 
 qfunc modular_exponentiation(N: int, a: int, x: qbit[], pw: qbit[]) {
   repeat (index: pw.len) {
@@ -20,12 +20,6 @@ qfunc discrete_log_oracle(g_generator: int, x_element: int, N_modulus: int, alph
   modular_exponentiation(N_modulus, g_generator, func_res, beta);
 }
 
-// problem parameters
-generator: int = 7;
-target: int = 3;
-modulus: int = 13;
-order: int = 12;
-reg_len: int = ceiling(log(order, 2)) + 1;
 
 // Compute `discrete_log_oracle` on the `func_res` variable. `func_res` is of size log(N)
 qfunc discrete_log(generator: int, target: int, modulus: int, order: int, output alpha: qnum, output beta: qnum, output func_res: qnum) {
@@ -41,6 +35,13 @@ qfunc discrete_log(generator: int, target: int, modulus: int, order: int, output
     qft(beta);
   }
 }
+
+// problem parameters
+generator: int = 7;
+target: int = 3;
+modulus: int = 13;
+order: int = 12;
+reg_len: int = ceiling(log(order, 2)) + 1;
 
 qfunc main(output alpha: qnum, output beta: qnum, output func_res: qnum) {
   discrete_log(generator, target, modulus, order, alpha, beta, func_res);
