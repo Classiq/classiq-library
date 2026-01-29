@@ -137,6 +137,12 @@ def _validate_metadata_file_exists(file: str, auto_fix: bool) -> str:
 
 
 def _validate_metadata_fields(metadata: dict, auto_fix: bool, file: str) -> str:
+    # Allow having the "thumbnail" key for the duration of this function
+    #   it will be ignored.
+    if "thumbnail" in metadata:
+        metadata = metadata.copy()
+        metadata.pop("thumbnail")
+
     if sorted(EMPTY_METADATA) != sorted(metadata):
         if auto_fix:
             missing_keys = EMPTY_METADATA.keys() - metadata.keys()
