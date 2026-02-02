@@ -1,0 +1,7 @@
+qfunc main(output power: qnum, output x: qnum) {
+  allocate(ceiling(log(5, 2)), x);
+  x ^= 1;
+  allocate(3, power);
+  hadamard_transform(power);
+  modular_exp(5, 4, x, power);
+}

@@ -1,0 +1,41 @@
+qfunc main(output qba: qbit[]) {
+  allocate(4, qba);
+  exponentiation_with_depth_constraint([
+    PauliTerm {
+      pauli=[
+        Pauli::X,
+        Pauli::X,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=0.1
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::Y,
+        Pauli::Y,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=0.2
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::Z,
+        Pauli::Z,
+        Pauli::Y,
+        Pauli::X
+      ],
+      coefficient=0.4
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::X
+      ],
+      coefficient=0.4
+    }
+  ], 0.05, 50, qba);
+}

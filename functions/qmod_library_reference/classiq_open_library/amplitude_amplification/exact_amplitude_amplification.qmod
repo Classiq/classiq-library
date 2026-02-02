@@ -1,0 +1,8 @@
+qfunc prepare_initial_state(x: qbit) {
+  inplace_prepare_state([0.93, 0.07], 0, x);
+}
+
+qfunc main(output x: qbit) {
+  allocate(x);
+  exact_amplitude_amplification(0.2646, Z, prepare_initial_state, x);
+}
