@@ -21,3 +21,4 @@ execution of quantum programs on multiple backends.
 -   [IonQ](ionq-backends.md)
 -   [Azure Quantum](azure-backends.md)
 -   [Alice & Bob](alice-and-bob-backends.md)
+-   [C12](c12.md)
