@@ -1,0 +1,9 @@
+qfunc main(output state: qbit[], output phase: qnum<2, UNSIGNED, 2>) {
+  allocate(phase);
+  allocate(2, state);
+  X(state[0]);
+  X(state[1]);
+  qpe(lambda() {
+    CRZ(pi, state[0], state[1]);
+  }, phase);
+}
