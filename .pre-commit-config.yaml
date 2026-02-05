@@ -89,7 +89,7 @@ repos:
       - id: validate-metadata-file
         name: Validate Metadata file
         description: Add file if non existant and validate value otherwise
-        entry: .internal/pre_commit_tools/validate_metadata.py
+        entry: .internal/pre_commit_tools/metadata_validate.py
         language: python
         files: \.(qmod|ipynb)$
         require_serial: true
