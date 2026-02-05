@@ -64,7 +64,7 @@ class FieldList(Field):
         return type(data) is list and all(type(i) is str for i in data)
 
     def verify_value(self, data: list[str]) -> bool:
-        if allowed_values is None:
+        if self.allowed_values is None:
             return True
         else:
             return all(value in self.allowed_values for value in data)
