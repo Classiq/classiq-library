@@ -51,6 +51,7 @@ if [[ "$is_links_only" == true ]]; then
 	cp "$notebook_path" "$notebook_copy_path"
 else
 	notebook_copy_path="$notebook_path"
+	notebook_copy_name="$notebook_name"
 fi
 
 # hook edit notebook
