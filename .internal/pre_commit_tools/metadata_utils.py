@@ -94,9 +94,9 @@ def _auto_gen_title(file: str) -> str:
 # Order matters - that will be the order of the metadata file
 ALL_FIELDS = [
     FieldStr("title", _auto_gen_title),
-    FieldStr("friendly_name", _auto_gen_title),
     FieldStr("subtitle", _auto_gen_subtitle),
     FieldStr("description", _auto_gen_subtitle),
+    FieldStr("friendly_name", _auto_gen_title),
     FieldList(
         "vertical_tags", list, ["finance", "retail", "pharma", "cyber", "telecom"]
     ),
@@ -138,6 +138,7 @@ ALL_FIELDS = [
 ]
 
 ALL_FIELDS_BY_NAME = {field.name: field for field in ALL_FIELDS}
+ORDERED_FIELDS = [field.name for field in ALL_FIELDS]
 
 
 def generate_empty_metadata_file(file: str) -> None:
@@ -151,11 +152,20 @@ def load_metadata(file: str) -> dict:
         return json.load(f)
 
 
+def _get_order(item: tuple[str, Any]) -> tuple[int, str]:
+    key, value = item
+
+    if key in ORDERED_FIELDS:
+        index = ORDERED_FIELDS.index(key)
+    else:
+        index = 10_000
+
+    return (index, key)
+
+
 def dump_metadata(file: str, metadata: dict) -> None:
     priority = {"friendly_name": 0, "description": 1}
-    sorted_metadata = dict(
-        sorted(metadata.items(), key=lambda item: (priority.get(item[0], 100), item[0]))
-    )
+    sorted_metadata = dict(sorted(metadata.items(), key=_get_order))
 
     metadata_file = file_name_to_metadata_file_name(file)
     with open(metadata_file, "w") as f:
