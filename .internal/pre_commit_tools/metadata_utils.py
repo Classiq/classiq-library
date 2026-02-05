@@ -70,7 +70,7 @@ class FieldList(Field):
             return all(value in self.allowed_values for value in data)
 
 
-def _auto_gen_description(file: str) -> str:
+def _auto_gen_subtitle(file: str) -> str:
     with open(file) as f:
         data = json.load(f)
 
@@ -80,7 +80,7 @@ def _auto_gen_description(file: str) -> str:
         return ""
 
 
-def _auto_gen_friendly_name(file: str) -> str:
+def _auto_gen_title(file: str) -> str:
     try:
         name = os.path.basename(file)
         name = name[: -len(".ipynb")]
@@ -93,10 +93,10 @@ def _auto_gen_friendly_name(file: str) -> str:
 
 # Order matters - that will be the order of the metadata file
 ALL_FIELDS = [
-    FieldStr("title", _auto_gen_friendly_name),
-    FieldStr("friendly_name", _auto_gen_friendly_name),
-    FieldStr("subtitle", _auto_gen_description),
-    FieldStr("description", _auto_gen_description),
+    FieldStr("title", _auto_gen_title),
+    FieldStr("friendly_name", _auto_gen_title),
+    FieldStr("subtitle", _auto_gen_subtitle),
+    FieldStr("description", _auto_gen_subtitle),
     FieldList(
         "vertical_tags", list, ["finance", "retail", "pharma", "cyber", "telecom"]
     ),
