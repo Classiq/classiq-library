@@ -64,6 +64,22 @@ repos:
 
   - repo: local
     hooks:
+      - id: verify-platform-links-nightly
+        name: Forbid links to nightly.platform
+        language: pygrep
+        files: \.ipynb$
+        entry: https://nightly\.platform\.classiq\.io
+      - id: verify-platform-links-dev
+        name: Forbid links with dev version
+        language: pygrep
+        files: \.ipynb$
+        entry: '[?&]version=[^ \t\n]*\.dev'
+      - id: verify-platform-links-old
+        name: Forbid old generated links
+        language: pygrep
+        files: \.ipynb$
+        entry: '"Opening:\s+https://'
+
       - id: notebook-pre-commit
         name: Notebook pre commit collection
         description: Ensure notebooks conventions
