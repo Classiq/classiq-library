@@ -15,7 +15,7 @@ class Config:
     SHOULD_VALIDATE_METADATA_CONTENT: bool = True
 
     # if `SKIP_MISSING` is True, then only existing fields will be validated
-    SHOULD_SKIP_MISSING_FIELDS: bool = False
+    SHOULD_SKIP_MISSING_FIELDS: bool = True
 
     # if `ALLOW_EXTRA_FIELDS` is False, then extra fields will be treated as errors
     SHOULD_ALLOW_EXTRA_FIELDS: bool = False

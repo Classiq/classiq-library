@@ -38,10 +38,15 @@ class Field:
 
 
 class FieldStr(Field):
+    allow_empty: bool = False
+
     _expected_type = str
 
     def verify_type(self, data: Any) -> bool:
-        return type(data) is str
+        if self.allow_empty:
+            return True
+        else:
+            return type(data) is str
 
     def verify_value(self, data: str) -> bool:
         # verify data is not empty
@@ -50,7 +55,7 @@ class FieldStr(Field):
 
 @dataclass
 class FieldList(Field):
-    allowed_values: list[str]
+    allowed_values: list[str] | None = None
 
     _expected_type = list[str]
 
@@ -59,7 +64,10 @@ class FieldList(Field):
         return type(data) is list and all(type(i) is str for i in data)
 
     def verify_value(self, data: list[str]) -> bool:
-        return all(value in self.allowed_values for value in data)
+        if allowed_values is None:
+            return True
+        else:
+            return all(value in self.allowed_values for value in data)
 
 
 def _auto_gen_description(file: str) -> str:
@@ -85,7 +93,9 @@ def _auto_gen_friendly_name(file: str) -> str:
 
 # Order matters - that will be the order of the metadata file
 ALL_FIELDS = [
+    FieldStr("title", _auto_gen_friendly_name),
     FieldStr("friendly_name", _auto_gen_friendly_name),
+    FieldStr("subtitle", _auto_gen_description),
     FieldStr("description", _auto_gen_description),
     FieldList(
         "vertical_tags", list, ["finance", "retail", "pharma", "cyber", "telecom"]
@@ -107,6 +117,24 @@ ALL_FIELDS = [
     ),
     FieldList("qmod_type", list, ["function", "application", "algorithms"]),
     FieldList("level", list, ["basic", "advanced", "demos"]),
+    # New fields: str
+    FieldStr("id", str),  # todo: change generate_default_value
+    FieldStr(
+        "quantum_program", str
+    ),  # todo: change generate_default_value (also maybe add `validate file exists`)
+    FieldStr(
+        "thumbnail", str
+    ),  # todo: change generate_default_value (also maybe add `validate file exists`)
+    FieldStr(
+        "preview-file/code", str
+    ),  # todo: change generate_default_value (also maybe add `validate file exists`)
+    # New fields: lists
+    FieldList(
+        "quantum-program", list
+    ),  # todo: change generate_default_value (also maybe add `validate file exists`)
+    FieldList(
+        "type", list, ["function", "application", "algorithms"]
+    ),  # todo: make sure `allowed_values` is correct
 ]
 
 ALL_FIELDS_BY_NAME = {field.name: field for field in ALL_FIELDS}
