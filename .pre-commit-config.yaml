@@ -44,6 +44,11 @@ repos:
         additional_dependencies:
           - "nbformat"
         require_serial: true
+      - id: verify-notebook-format-execution-count
+        name: Verify that execution-count >= 0
+        language: pygrep
+        files: \.ipynb$
+        entry: '"execution_count": -'
 
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1
