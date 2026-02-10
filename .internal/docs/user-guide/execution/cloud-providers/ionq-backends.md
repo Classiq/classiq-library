@@ -11,6 +11,14 @@ The Classiq executor supports execution on IonQ hardware and simulator.
 
 Execution on IonQ requires a valid IonQ API key.
 
+IonQ Backend Preferences configuration options:
+
+-   Error mitigation: `bool`
+    -   Valid only for IonQ hardware
+-   noise model: `str`
+    -   Valid only for IonQ Simulator
+    -   Options: `ideal`, `aria-1`, `aria-2`, `forte-1`, `forte-enterprise-1`
+
 === "SDK"
 
     [comment]: DO_NOT_TEST
@@ -21,6 +29,8 @@ Execution on IonQ requires a valid IonQ API key.
     preferences = IonqBackendPreferences(
         backend_name="Name of requested simulator or hardware",
         api_key="A Valid IonQ API key",
+        error_mitigation=True,
+        noise_model="aria-1",
     )
     ```
 
