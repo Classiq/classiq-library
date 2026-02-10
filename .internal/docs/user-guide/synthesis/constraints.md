@@ -5,30 +5,21 @@ search:
 
 # Quantum Program Constraints
 
-When synthesizing a quantum program, you can pass a maximum depth constraint to the generation; for example, requiring that no more than 53 qubits are used.
+When synthesizing a quantum program, you can pass a maximum width constraint to the generation; for example, requiring that no more than 20 qubits are used.
 
 Pass constraints as follows:
 
 === "SDK"
 
     ```python
-    from classiq import (
-        qfunc,
-        Constraints,
-        Output,
-        QBit,
-        TranspilerBasisGates,
-        allocate,
-        set_constraints,
-        synthesize,
-    )
+    from classiq import *
 
     constraints = Constraints(max_width=20)
 
 
     @qfunc
     def main(res: Output[QBit]) -> None:
-        allocate(1, res)
+        allocate(res)
 
 
     synthesize(main, constraints=constraints)

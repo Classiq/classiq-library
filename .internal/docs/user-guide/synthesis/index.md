@@ -10,7 +10,7 @@ approach of designing at the gate level are not scalable. Likewise, solutions ba
 combining existing building blocks are very limited in their scope. The platform allows a high level
 description of quantum algorithms at the functional level and automatically synthesizes a
 corresponding quantum program. The synthesis process refines the functional requirements, then allocates and optimizes
-available resources such as the number of qubits available and the quantum program depth.
+available resources such as the number of qubits available.
 
 The basic description of quantum algorithms in the platform is through quantum functions. A
 quantum function can be implemented in multiple ways, each with different properties

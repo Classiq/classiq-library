@@ -16,5 +16,6 @@ search:
             - canonical_add_constant
             - canonical_multiply
             - canonical_multiply_constant
+            - canonical_square
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->
