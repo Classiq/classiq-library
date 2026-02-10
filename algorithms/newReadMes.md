@@ -114,7 +114,11 @@ and demonstrating query complexity advantages.
 # Quantum Linear Solvers
 
 - **Adiabatic linear solvers** -
-- **HHL** - A fundamental quantum algorithm, designed to solve a set of linear equations $A \boldsymbol{x} = \boldsymbol{b}$.
+  - **HHL** - A fundamental quantum algorithm, designed to solve a set of linear equations, encoded in terms
+    of a quantum operation on quantum states: $A |\boldsymbol{x}\rangle = |\boldsymbol{b}\rangle$. Under a restricted number of
+    conditions the state $|x\rangle$ can be prepared, in a running time which scales polynomially with the number of qubits required
+    to encode the state. This enables an exponential speed up relative to classical algorithms in the evaluation of observables of the form
+    $\langle \boldsymbol{x}| M| \boldsymbol{x}\rangle$, where $M$ is a quantum operator.
 - **Quantum Singular Value Transformation (QSVT) matrix inversion** - A general framework for solving linear
   systems is implemented, using the Quantum Singular Value Transform (QSVT). Given an efficient procedure for embedding a classical matrix
   as a quantum function via block-encoding, the framework provides a clean approach to matrix inversion.
