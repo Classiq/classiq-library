@@ -19,7 +19,7 @@ The directory contains the following methods
 - **Quantum Monte Carlo Integration** - Employs Quantum Amplitude Estimation (QAE) to evaluate a definite integral. Obtains a
   quadratic improvement of the analogous classical method, exhibiting an error which scales as $O(1/M)$, where $M$ is the
   number of controlled applications of the Grover operator within the QAE.
-- **Quantum Singular Value Transformation (QSVT) fixed point amplitude amplification** - solves unstructured
+- **Quantum Singular Value Transformation (QSVT) fixed point amplitude amplification** - Solves unstructured
   search problems without requiring prior knowledge of the fraction of marked solutions.
   By leveraging QSVT together with an efficiently block-encoded operator, it implements amplitude amplification
   in a fixed-point manner, guaranteeing monotonic convergence toward the marked subspace and eliminating
@@ -54,24 +54,49 @@ and demonstrating query complexity advantages.
 
 # Hamiltonian Simulation
 
-- **Hamiltonian simulation guide**
-- **Hamiltonian simulation with block encoding**
+- **Hamiltonian simulation guide** - Provides an introduction and overview to standard Hamiltonian simulation methods.
+  The methods are described and implemented utilizing Classiq's built-in functions. First, the product formula
+  based methods, Suzuki-Trotter decomposition and qDrift are introduced and implemented. Following,
+  more advanced block-encoding, as qubitization and quantum singular value decomposition, are presented.
+  - **Hamiltonian simulation with block encoding** - The notebook demonstrates how to implement Hamiltonian simulation with
+    three block-encoding methods: Generalized Quantum Signal Processing (QSP), Qubitization, and Quantum Singular Value Transformation (QSVT).
+    Each method is explained and defined independently and finally compared.
 
 # Number Theory and Cryptography
 
-- **Discrete log**
-- **Elliptic curves**
-- **Hidden shift problem**
-- **Shor's algorithm** - A factoring, foundational to the development of the field, providing
-  an exponential speedup over currently known classical algorithms. The quantum component
+- **Discrete log** - Solves the Discrete logarithm problem, i.e., given an element, $x$, of a cyclic group
+  with generator $g$, finds the least positive integer $s$, such that $g^s = x$. The algorithm provides an exponential
+  speedup relative to the best known classical algorithm. The hardness of the problem, provides the basis for the
+  Diffie-Hellman key exchange protocol. Similarly to order-finding and elliptic curve, the problem
+  constitutes an instance of the Abelian Hidden Subgroup Problem (HSP).
+- **Elliptic curves** - A quantum algorithm solving the elliptic curve discrete logarithm problem in polynomial running time. The
+  hardness of the problem constitutes the basis of elliptic curve cryptography, which is widely used for key-exchange, cryptocurrency
+  and high-security communications.
+  - **Hidden shift problem** - Implementation of an algorithm to find the hidden-shift for the family of Boolean bent functions, which
+    are characterized by high non-linearity and a perfectly flat Fourier transform. Given access to queries of a functions $f$,
+    the algorithm finds the shift, a boolean string, which satisfies $f(x) = f(x \oplus s)$. The quantum algorithm provides
+    an exponential separation in query complexity relative to any (even the best) classical algorithm.
+- **Shor's algorithm** - Evaluates the prime factors of a large integer. The algorithm played a foundational role in
+  the development of the field, providing an exponential speedup over currently known classical algorithms. The quantum component
   is naturally structured as a Quantum Phase Estimation (QPE) routine, utilizing
   Classiq’s built-in `flexible_qpe` and modular arithmetic.
 
 # QML
 
-- **Hybrid Quantum Neural Networks (QNN)**
-- **Quantum Generative Adversarial Networks (GANs)**
-- **Quantum Support Vector Machine (QSVM)**
+- **Hybrid Quantum Neural Networks (QNN)** A hybrid quantum-classical algorithm, incorporating quantum layers into the structure of
+  a classical neural network. A state preparation maps classical states in the quantum Hilbert state, following quantum layers are
+  implemented by parameterized quantum circuits, providing different expressibility relative to the classical networks.
+  Considering a specific example function we construct, train, and verify the hybrid classical-quantum neural network, building
+  upon the deep-learning PyTorch module.
+- **Quantum Generative Adversarial Networks (GANs)** - A quantum analogue of a classical learning algorithm that generates new
+  data which mimics the training set data. The original model is trained by an adversarial optimization in a two-player minmax game,
+  utilizing a gradient-based learning. In the quantum algorithm, the classical neural networks are replaced by quantum neural networks.
+- **Quantum Support Vector Machine (QSVM)** - Quantum version of the classical machine learning algorithm, classifying
+  data points between into two distinct categories. Employing the dual problem formulation, the classification is dictated by a
+  defined feature map and the
+  kernel matrix. In the quantum algorithm, the feature map is implemented by a quantum circuit and the elements of the
+  kernel matrix are evaluated by quantum measurements. The performance of various quantum feature maps are analyzed,
+  for both a simplex and complex data sets.
 - **Quantum autoencoder** - A quantum program is trained to reduce the memory required to encode data
   with a given structure. The example demonstrates how to use the encoder for anomaly detection.
   Two training approaches for the quantum autoencoder are presented, leveraging Classiq’s integration with PyTorch.
@@ -89,7 +114,7 @@ and demonstrating query complexity advantages.
 # Quantum Linear Solvers
 
 - **Adiabatic linear solvers** -
-- **HHL** -
+- **HHL** - A fundamental quantum algorithm, designed to solve a set of linear equations $A \boldsymbol{x} = \boldsymbol{b}$.
 - **Quantum Singular Value Transformation (QSVT) matrix inversion** - A general framework for solving linear
   systems is implemented, using the Quantum Singular Value Transform (QSVT). Given an efficient procedure for embedding a classical matrix
   as a quantum function via block-encoding, the framework provides a clean approach to matrix inversion.
