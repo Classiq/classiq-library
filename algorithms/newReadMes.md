@@ -113,7 +113,9 @@ and demonstrating query complexity advantages.
 
 # Quantum Linear Solvers
 
-- **Adiabatic linear solvers** -
+- **Adiabatic linear solvers** - Demonstrates the mapping of the solution of a quantum linear system problem, $A |\boldsymbol{x}\rangle = |\boldsymbol{b}\rangle$,
+  to a ground state of a corresponding Hamiltonian. An approximate solution is then achieved, employing a quantum
+  adiabatic protocol, within the framework of quantum adiabatic computing.
   - **HHL** - A fundamental quantum algorithm, designed to solve a set of linear equations, encoded in terms
     of a quantum operation on quantum states: $A |\boldsymbol{x}\rangle = |\boldsymbol{b}\rangle$. Under a restricted number of
     conditions the state $|x\rangle$ can be prepared, in a running time which scales polynomially with the number of qubits required
@@ -124,7 +126,10 @@ and demonstrating query complexity advantages.
   as a quantum function via block-encoding, the framework provides a clean approach to matrix inversion.
   When a block-encoding of the matrix and its condition number are available, the algorithm admits a concise implementation
   by invoking the `qsvt_inversion` routine together with classical auxiliary functions from the `qsp` module.
-- **Variational Quantum Linear Solver (VQLS) with Linear Combination of Unitaries (LCU)**
+- **Variational Quantum Linear Solver (VQLS) with Linear Combination of Unitaries (LCU)** A hybrid algorithm, employs
+  a linear combination of unitaries to block-encode a matrix $A$ within a unitary. The operation of $A$ on a variational
+  quantum state then enables performing classical optimization, to reach an approximate solution. As many variational algorithms
+  The algorithm hardware requirements are limited, and is well suited for the contemporary NISQ devices.
 
 # Quantum Phase Estimation (QPE)
 
