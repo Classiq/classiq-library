@@ -13,7 +13,6 @@ import pytest
 from testbook import testbook
 from testbook.client import TestbookNotebookClient
 
-from tests.utils_for_qmod import qmod_compare_decorator
 from tests.utils_for_tests import (
     ROOT_DIRECTORY,
     resolve_notebook_path,
@@ -34,15 +33,10 @@ this has to be the first, since the pytest decision of whether to skip this test
 2 - cd decorator
 this has to come before testbook, since it changes the working directory in which testbook will run the notebook
 
-3 - qmod comparison
-this has to come before testbook, and after cd,
-    since it collects the qmod files before testbook, and collects again after it
-this is disabled (replaced by a dummy decorador: lambda x: x) in we have `replacements`
-
-4 - testbook
+3 - testbook
 that's the main decorator
 
-5 - patch client
+4 - patch client
 this one aims to set `tb.__repr__`
 but since `__repr__` is always called from the class's __dict__, rather than the instance's
 than we have to use `_path_testbook` (which exists for `ref_numpy`. So it's handy that it's already here)
@@ -53,7 +47,6 @@ and after the decorator, it takes 1 - `tb`.
 
 Other - replacements
 We allow running "regex replace" on the ipynb file, in order to ease the load on the tests.
-    Note: adding replacements will disable the "qmod comparison" test.
 """
 
 
@@ -74,7 +67,6 @@ def wrap_testbook(
             for decorator in [
                 _build_patch_testbook_client_decorator(notebook_name),
                 testbook(notebook_path, execute=True, timeout=timeout_seconds),
-                (lambda x: x) if nr.replacements else qmod_compare_decorator,
                 _build_cd_decorator(notebook_path),
                 _build_skip_decorator(notebook_path),
             ]:
