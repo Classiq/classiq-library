@@ -91,6 +91,14 @@ def _auto_gen_title(file: str) -> str:
         return ""
 
 
+def _generate_empty_list(*args, **kwargs) -> list:
+    return []
+
+
+def _generate_empty_str(*args, **kwargs) -> str:
+    return ""
+
+
 # Order matters - that will be the order of the metadata file
 ALL_FIELDS = [
     FieldStr("title", _auto_gen_title),
@@ -98,11 +106,13 @@ ALL_FIELDS = [
     FieldStr("description", _auto_gen_subtitle),
     FieldStr("friendly_name", _auto_gen_title),
     FieldList(
-        "vertical_tags", list, ["finance", "retail", "pharma", "cyber", "telecom"]
+        "vertical_tags",
+        _generate_empty_list,
+        ["finance", "retail", "pharma", "cyber", "telecom"],
     ),
     FieldList(
         "problem_domain_tags",
-        list,
+        _generate_empty_list,
         [
             "optimization",
             "chemistry",
@@ -115,25 +125,22 @@ ALL_FIELDS = [
             "cfd",
         ],
     ),
-    FieldList("qmod_type", list, ["function", "application", "algorithms"]),
-    FieldList("level", list, ["basic", "advanced", "demos"]),
+    FieldList(
+        "qmod_type", _generate_empty_list, ["function", "application", "algorithms"]
+    ),
+    FieldList("level", _generate_empty_list, ["basic", "advanced", "demos"]),
     # New fields: str
-    FieldStr("id", str),  # todo: change generate_default_value
+    FieldStr("id", _generate_empty_str),  # todo: change generate_default_value
+    FieldStr("thumbnail", _generate_empty_str),  # todo: add `validate file exists`
     FieldStr(
-        "quantum_program", str
-    ),  # todo: change generate_default_value (also maybe add `validate file exists`)
-    FieldStr(
-        "thumbnail", str
-    ),  # todo: change generate_default_value (also maybe add `validate file exists`)
-    FieldStr(
-        "preview-file/code", str
-    ),  # todo: change generate_default_value (also maybe add `validate file exists`)
+        "preview-file/code", _generate_empty_str
+    ),  # todo: add `validate file exists`
     # New fields: lists
     FieldList(
-        "quantum-program", list
-    ),  # todo: change generate_default_value (also maybe add `validate file exists`)
+        "quantum-program", _generate_empty_list
+    ),  # todo: add `validate file exists`
     FieldList(
-        "type", list, ["function", "application", "algorithms"]
+        "type", _generate_empty_list, ["function", "application", "algorithms"]
     ),  # todo: make sure `allowed_values` is correct
 ]
 
