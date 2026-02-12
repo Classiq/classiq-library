@@ -1,8 +1,12 @@
 {
   "friendly_name": "Elliptic Curve Discrete Logarithm",
-  "description": "This notebook introduces the Elliptic Curve Discrete Logarithm Problem (ECDLP) and its relevance to elliptic‑curve cryptography (ECC). It reviews the geometry and algebra of elliptic curves, first over the reals and then over finite fields, explaining point addition, point doubling, and scalar multiplication. The discrete logarithm problem is then specialized to the elliptic‑curve setting: given a base point G and a target point P on the curve, the task is to recover the integer ℓ such that P = ℓ · G.\\n\\nTo make the ideas concrete, the notebook works with a small elliptic curve over a finite field, enumerates its points, and visualizes or tabulates the group law. It then outlines how Shor’s quantum algorithm can be adapted to ECDLP by encoding elliptic‑curve arithmetic into quantum operations: preparing superpositions over scalars, performing controlled point additions, and arranging the computation so that the hidden period in ℓ can be extracted by quantum phase‑estimation–style techniques. Throughout, classical helper functions are used to implement finite‑field arithmetic and elliptic‑curve operations that support the quantum subroutines.\\n\\nKey points:\\n- Explains elliptic curves, the group law, and scalar multiplication over finite fields.\\n- Defines the ECDLP and connects it to the general discrete logarithm problem.\\n- Uses a worked small‑field example to illustrate point enumeration and group structure.\\n- Describes how to map elliptic‑curve arithmetic into quantum circuits suitable for Shor‑type algorithms.",
-  "level": ["advanced"],
+  "description": "Implementation of Elliptic Curve Discrete Logarithm Problem (ECDLP) is a fundamental cryptographic challenge that underlies the security of elliptic curve cryptography (ECC). While classical algorithms require exponential time to solve ECDLP, Shor's quantum algorithm can solve it efficiently in polynomial time. An elliptic curve is a special type of mathematical curve defined by a cubic equation. For our purposes, we can think of it as the set of points that satisfy the Weierstrass equation:",
+  "level": [
+    "advanced"
+  ],
   "problem_domain_tags": [],
-  "qmod_type": ["algorithms"],
+  "qmod_type": [
+    "algorithms"
+  ],
   "vertical_tags": []
 }

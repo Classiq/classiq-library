@@ -1,8 +1,14 @@
 {
   "friendly_name": "Quantum Phase Estimation",
-  "description": "This notebook presents a generic use of Quantum Phase Estimation (QPE) to approximate eigenvalues of a small Hermitian matrix. It starts from a 4×4 real symmetric example matrix, constructs a Pauli‑operator representation of the corresponding Hamiltonian, and explains why rescaling is required so that eigenvalues fall into the phase range [−1/2, 1/2). Utility functions estimate an overall normalization factor, normalize the Hamiltonian, and compute how many phase‑register qubits are needed to achieve a user‑specified energy resolution.\\n\\nAn initial state is prepared either as a random vector or an eigenvector, and QPE is built using Classiq’s `qpe_flexible` routine with two alternative powered‑unitary implementations: an exact exponentiation via `unitary(elements=exp(i 2π M_new))` and an approximate Suzuki–Trotter product formula with power‑dependent repetition counts. The notebook executes both quantum programs, converts sampled phases back to energy estimates using the stored normalization, and compares them to the true eigenvalues of the original matrix. It also visualizes the resulting energy histograms with overlays showing classical eigenvalues and resolution bands.\\n\\nKey points:\\n- Describes normalization and precision budgeting for QPE on generic Hermitian matrices.\\n- Implements QPE with an exact unitary and with a first‑order Suzuki–Trotter approximation.\\n- Shows how to translate measured phases into approximate eigenvalues and account for resolution error.\\n- Plots quantum energy distributions against classical eigenvalues for side‑by‑side comparison.",
-  "level": ["demos"],
-  "problem_domain_tags": ["chemistry"],
-  "qmod_type": ["algorithms"],
+  "description": "Implementation of quantum phase estimation (qpe) is a key algorithm in quantum computing, allowing you to estimate the eigenphase of a unitary matirx (or the eigenvalue of a hermitian matrix). the algorithm is designed such that given the inputs of a hermitian matrix and an eigenvector , the output obtained is , where by measuring the accumulated phase, the qpe algorithm calculates the eigenvalues relating to the chosen input vector.",
+  "level": [
+    "demos"
+  ],
+  "problem_domain_tags": [
+    "chemistry"
+  ],
+  "qmod_type": [
+    "algorithms"
+  ],
   "vertical_tags": []
 }
