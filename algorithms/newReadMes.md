@@ -109,7 +109,9 @@ and demonstrating query complexity advantages.
   the HHL algorithm. Leveraging quantum cosine and sine transforms from the open library enables a concise
   implementation that can be generalized to higher dimensions.
 
-- **Time marching**
+- **Time marching** - A method for solving linear differential equations, by integrating the dynamics in small discrete steps.
+  Given an equation of the form $\frac{d|\psi(t)\rangle}{dt} = A(t) |\psi(t)\rangle$, the algorithm utilizes a block-encoding
+  of the time-dependent matrix $A(t)$ to solve for $|\psi(t)\rangle$.
 
 # Quantum Linear Solvers
 
