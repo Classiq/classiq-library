@@ -82,15 +82,6 @@ repos:
         additional_dependencies:
           - "pyyaml==6.0"
         require_serial: true
-      # - id: clean-demo-timeouts
-      #   name: Clean demo timeouts
-      #   description: Remove unexisting entries and verify unique keys
-      #   entry: .internal/pre_commit_tools/clean_timeouts.py
-      #   language: python
-      #   files: \.(qmod|ipynb|yaml)$
-      #   additional_dependencies:
-      #     - "pyyaml==6.0"
-      #   require_serial: true
       - id: validate-metadata-file
         name: Validate Metadata file
         description: Add file if non existant and validate value otherwise
