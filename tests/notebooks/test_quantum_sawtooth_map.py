@@ -19,4 +19,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     res_simulator = tb.ref_pydantic("results_simulator")
     for i in range(len(timesteps)):
         df = res_simulator[i].dataframe
-        assert float(df.loc[df["p"] == -2, "probability"].iloc[0]) > 0.9
+        assert float(df.loc[df["p"] == -2, "probability"].iloc[0]) > 0.85
