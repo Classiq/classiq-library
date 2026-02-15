@@ -58,9 +58,9 @@ and demonstrating query complexity advantages.
   The methods are described and implemented utilizing Classiq's built-in functions. First, the product formula
   based methods, Suzuki-Trotter decomposition and qDrift are introduced and implemented. Following,
   more advanced block-encoding, as qubitization and quantum singular value decomposition, are presented.
-  - **Hamiltonian simulation with block encoding** - The notebook demonstrates how to implement Hamiltonian simulation with
-    three block-encoding methods: Generalized Quantum Signal Processing (QSP), Qubitization, and Quantum Singular Value Transformation (QSVT).
-    Each method is explained and defined independently and finally compared.
+- **Hamiltonian simulation with block encoding** - The notebook demonstrates how to implement Hamiltonian simulation with
+  three block-encoding methods: Generalized Quantum Signal Processing (QSP), Qubitization, and Quantum Singular Value Transformation (QSVT).
+  Each method is explained and defined independently and finally compared.
 
 # Number Theory and Cryptography
 
@@ -72,10 +72,10 @@ and demonstrating query complexity advantages.
 - **Elliptic curves** - A quantum algorithm solving the elliptic curve discrete logarithm problem in polynomial running time. The
   hardness of the problem constitutes the basis of elliptic curve cryptography, which is widely used for key-exchange, cryptocurrency
   and high-security communications.
-  - **Hidden shift problem** - Implementation of an algorithm to find the hidden-shift for the family of Boolean bent functions, which
-    are characterized by high non-linearity and a perfectly flat Fourier transform. Given access to queries of a functions $f$,
-    the algorithm finds the shift, a boolean string, which satisfies $f(x) = f(x \oplus s)$. The quantum algorithm provides
-    an exponential separation in query complexity relative to any (even the best) classical algorithm.
+- **Hidden shift problem** - Implementation of an algorithm to find the hidden-shift for the family of Boolean bent functions, which
+  are characterized by high non-linearity and a perfectly flat Fourier transform. Given access to queries of a functions $f$,
+  the algorithm finds the shift, a boolean string, which satisfies $f(x) = f(x \oplus s)$. The quantum algorithm provides
+  an exponential separation in query complexity relative to any (even the best) classical algorithm.
 - **Shor's algorithm** - Evaluates the prime factors of a large integer. The algorithm played a foundational role in
   the development of the field, providing an exponential speedup over currently known classical algorithms. The quantum component
   is naturally structured as a Quantum Phase Estimation (QPE) routine, utilizing
@@ -115,14 +115,14 @@ and demonstrating query complexity advantages.
 
 # Quantum Linear Solvers
 
-- **Adiabatic linear solvers** - Demonstrates the mapping of the solution of a quantum linear system problem, $A |\boldsymbol{x}\rangle = |\boldsymbol{b}\rangle$,
+- **Adiabatic linear solvers** - Demonstrates the mapping of the solution of a quantum linear system problem, $A |\mathbf{x}\rangle = |\mathbf{b}\rangle$,
   to a ground state of a corresponding Hamiltonian. An approximate solution is then achieved, employing a quantum
   adiabatic protocol, within the framework of quantum adiabatic computing.
-  - **HHL** - A fundamental quantum algorithm, designed to solve a set of linear equations, encoded in terms
-    of a quantum operation on quantum states: $A |\boldsymbol{x}\rangle = |\boldsymbol{b}\rangle$. Under a restricted number of
-    conditions the state $|x\rangle$ can be prepared, in a running time which scales polynomially with the number of qubits required
-    to encode the state. This enables an exponential speed up relative to classical algorithms in the evaluation of observables of the form
-    $\langle \boldsymbol{x}| M| \boldsymbol{x}\rangle$, where $M$ is a quantum operator.
+- **HHL** - A fundamental quantum algorithm, designed to solve a set of linear equations, encoded in terms
+  of a quantum operation on quantum states: $A |\mathbf{x}\rangle = |\mathbf{b}\rangle$. Under a restricted number of
+  conditions the state $|x\rangle$ can be prepared, in a running time which scales polynomially with the number of qubits required
+  to encode the state. This enables an exponential speed up relative to classical algorithms in the evaluation of observables of the form
+  $\langle \mathbf{x}| M| \mathbf{x}\rangle$, where $M$ is a quantum operator.
 - **Quantum Singular Value Transformation (QSVT) matrix inversion** - A general framework for solving linear
   systems is implemented, using the Quantum Singular Value Transform (QSVT). Given an efficient procedure for embedding a classical matrix
   as a quantum function via block-encoding, the framework provides a clean approach to matrix inversion.
@@ -152,10 +152,10 @@ and demonstrating query complexity advantages.
   Utilizing, Classiq's built-in module `gqsp_phases`, the generalized version removes restrictions that appear in QSP,
   providing a direct and flexible method for state preparation,
   phase function transformations and Hamiltonian simulation.
-  - **Swap test** - A quantum function that checks the overlap between two quantum states.
-    Given two quantum registers of the same size, the function returns as output a single test qubit whose state encodes
-    the overlap between the two inputs. The swap test is commonly employed as a subroutine in quantum
-    variational and machine learning algorithms, such as quantum kernel method and neural networks.
+- **Swap test** - A quantum function that checks the overlap between two quantum states.
+  Given two quantum registers of the same size, the function returns as output a single test qubit whose state encodes
+  the overlap between the two inputs. The swap test is commonly employed as a subroutine in quantum
+  variational and machine learning algorithms, such as quantum kernel method and neural networks.
 
 # Quantum State Preparation
 
@@ -165,7 +165,14 @@ and demonstrating query complexity advantages.
   constructing problem-specific solution in an adaptive manner. By increasing the number of measurements the algorithms
   produces shallower circuit relative to the standard VQE algorithm.
 
-- **Gibbs state preparation** - # TODO
+- **Gibbs state preparation** - An important quantum primitive employed as a subroutine in higher-level algorithms,
+  including quantum methods for solving semidefinite programs, Boltzmann sampling, and Metropolis-type algorithms.
+  The procedure prepares a quantum thermal (Gibbs)
+  state by implementing a block-encoding of the Lindbladian superoperator, which generates the open-system
+  dynamics of a quantum system coupled to a thermal bath. Applying this block-encoding effectively drives
+  the initial state toward thermal equilibrium, thereby producing the corresponding Gibbs state.
+  The implementation relies on an operator Fourier transform combined with mid-circuit weak measurements,
+  leveraging the quantum Zeno effect to enhance runtime performance and improve overall algorithmic efficiency.
 
 # Quantum Walks/Glued trees
 
@@ -177,7 +184,10 @@ and demonstrating query complexity advantages.
 
 # Search and Optimization
 
-- **Decoded Quantum Interferometry** - #TODO
+- **Decoded Quantum Interferometry** - A quantum algorithm for combinatorial optimization problems. Given a matrix, $B$, with indicies
+  belonging to a finite field $\mathbb{F}$, and an optimization function, $f(x)$, depending on $B$ and an input vector $x\in \mathbb{F}^n$,
+  the algorithm produces optimal input, maximizing $f$. Shown to give a quantum advantage in Optimal Polynomial Intersection problem.
+  In the present notebook, a simplified version of the problem called max-XORSAT, is utilized to demonstrate the key algorithmic steps.
 - **Grover** - A canonical quantum algorithms, providing the solution of an unstructured search problem.
   A general routine is defined and then applied to generic use cases, including the 3-SAT problem and the Max-Cut problem on a graph.
   The use of the phase_oracle quantum function from the Classiq open library, together with the Qmod language for high-level
