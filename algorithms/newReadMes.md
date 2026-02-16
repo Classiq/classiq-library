@@ -54,6 +54,11 @@ and demonstrating query complexity advantages.
 
 # Hamiltonian Simulation
 
+This folder explores standard and advanced Hamiltonian simulation methods,
+including product-formula decompositions and block-encoding–based techniques such as QSP,
+qubitization, and QSVT. The examples illustrate how quantum time evolution can be implemented
+efficiently within modern algorithmic frameworks.
+
 - **Hamiltonian simulation guide** - Provides an introduction and overview to standard Hamiltonian simulation methods.
   The methods are described and implemented utilizing Classiq's built-in functions. First, the product formula
   based methods, Suzuki-Trotter decomposition and qDrift are introduced and implemented. Following,
@@ -63,6 +68,13 @@ and demonstrating query complexity advantages.
   Each method is explained and defined independently and finally compared.
 
 # Number Theory and Cryptography
+
+Quantum algorithms for number-theoretic problems offer the most striking
+speedups over their best known classical counterparts. Because many widely deployed
+cryptographic schemes rely on one-way functions whose security is grounded in the computational
+hardness of number-theoretic tasks, these polynomial-time quantum algorithms pose a
+well-established threat to modern secure communication and key exchange protocols,
+including RSA, elliptic-curve cryptography, and the Diffie–Hellman key exchange.
 
 - **Discrete log** - Solves the Discrete logarithm problem, i.e., given an element, $x$, of a cyclic group
   with generator $g$, finds the least positive integer $s$, such that $g^s = x$. The algorithm provides an exponential
@@ -82,6 +94,13 @@ and demonstrating query complexity advantages.
   Classiq’s built-in `flexible_qpe` and modular arithmetic.
 
 # QML
+
+This folder presents a collection of Quantum Machine Learning (QML) algorithms
+implemented within hybrid quantum–classical frameworks. The examples demonstrate how
+parameterized quantum circuits can be integrated with classical optimization and
+deep-learning tools to perform classification, generative modeling, and data compression tasks.
+Each implementation highlights both the algorithmic principles and the practical workflow,
+including state preparation, circuit design, training procedures, and performance evaluation.
 
 - **Hybrid Quantum Neural Networks (QNN)** A hybrid quantum-classical algorithm, incorporating quantum layers into the structure of
   a classical neural network. A state preparation maps classical states in the quantum Hilbert state, following quantum layers are
@@ -103,6 +122,13 @@ and demonstrating query complexity advantages.
 
 # Quantum Differential Equation Solvers
 
+The folder presents quantum algorithms for solving differential equations,
+demonstrating how linear systems and dynamical evolution problems can be mapped to quantum circuits.
+The examples highlight both stationary and time-dependent formulations, leveraging block-encoding
+techniques and well-known quantum linear system methods to construct efficient implementations.
+Together, they illustrate the potential of quantum computation for scientific and engineering
+applications involving partial and ordinary differential equations.
+
 - **Discrete Poisson solver** - Quantum solver for the discrete Poisson equation, a partial differential equation
   (PDE) widely used in physics and engineering. The equation models the distribution of a potential field due
   to a prescribed source term. The problem is reformulated as a system of linear equations and solved using
@@ -114,6 +140,13 @@ and demonstrating query complexity advantages.
   of the time-dependent matrix $A(t)$ to solve for $|\psi(t)\rangle$.
 
 # Quantum Linear Solvers
+
+The present folder collects core quantum linear system algorithms,
+including adiabatic methods, the HHL algorithm, QSVT-based matrix inversion,
+and variational solvers. The examples illustrate different computational models—adiabatic
+evolution, block-encoding with singular value transformation, and hybrid quantum–classical
+optimization—providing a unified view of how linear algebraic problems can be addressed within
+quantum computing frameworks.
 
 - **Adiabatic linear solvers** - Demonstrates the mapping of the solution of a quantum linear system problem, $A |\mathbf{x}\rangle = |\mathbf{b}\rangle$,
   to a ground state of a corresponding Hamiltonian. An approximate solution is then achieved, employing a quantum
@@ -135,6 +168,12 @@ and demonstrating query complexity advantages.
 
 # Quantum Phase Estimation (QPE)
 
+The present folder explores Quantum Phase Estimation as a spectral analysis tool for Hermitian matrices.
+The implementations include Trotterized Hamiltonian simulation and qubitization-based block-encoding
+techniques, highlighting how eigenvalues can be extracted from controlled unitary dynamics.
+These examples demonstrate core primitives underlying quantum chemistry, Hamiltonian simulation,
+and advanced linear-algebraic quantum algorithms.
+
 - **QPE for a matrix** - Quantum Phase Estimation (QPE) is a fundamental quantum algorithm and a common primitive in many algorithms,
   allowing one to estimate the eigenphase of a unitary matrix, $e^{i M t}$, where $M$ is a Hermitian matrix.
   By initializing the system in a random initial
@@ -147,6 +186,14 @@ and demonstrating query complexity advantages.
 
 # Quantum Primitives
 
+The folder contains foundational quantum algorithmic primitives that serve as building blocks for higher-level applications.
+The examples include Generalized Quantum Signal Processing (GQSP), enabling flexible polynomial
+transformations of block-encoded unitaries, as well as the Swap Test, a standard subroutine for estimating
+quantum state overlaps and the Hadamard test. Together, these primitives underpin a wide range of algorithms in
+Hamiltonian simulation, matrix functions, variational optimization, and quantum machine learning.
+
+- **Hadamard test** - A basic quantum primitive, utilized to extract the real part of an expectation value of
+  a unitary matrix.
 - **Generalized Quantum Signal Processing (GQSP)** - A quantum algorithmic primitive that extends standard QSP,
   allowing one to block-encode arbitrary polynomials of unitary operations.
   Utilizing, Classiq's built-in module `gqsp_phases`, the generalized version removes restrictions that appear in QSP,
@@ -158,6 +205,11 @@ and demonstrating query complexity advantages.
   variational and machine learning algorithms, such as quantum kernel method and neural networks.
 
 # Quantum State Preparation
+
+This folder explores advanced quantum state preparation techniques, including adaptive
+variational eigensolvers and block-encoding–based Gibbs state generation. The examples emphasize
+both practical hybrid workflows and algorithmic primitives central to quantum simulation and
+optimization.
 
 - **ADAPT VQE** -
   The Adaptive Derivative-Assembled Pseudo-Trotter Variational Quantum Eigensolver (ADAPT-VQE)
@@ -183,6 +235,14 @@ and demonstrating query complexity advantages.
   take a list of quantum callables as a parameter.
 
 # Search and Optimization
+
+The folder presents quantum algorithms for search and combinatorial optimization,
+illustrating both exact and approximate solution strategies. The implementations range from
+Grover’s amplitude amplification for unstructured search to structured optimization methods such
+as Decoded Quantum Interferometry and hybrid variational approaches like QAOA and its Grover-based
+mixer variants. Together, these examples demonstrate how quantum interference, amplitude
+amplification, and parameterized circuit optimization can be applied to SAT variants, Max-Cut,
+Knapsack, XORSAT, and other discrete optimization problems.
 
 - **Decoded Quantum Interferometry** - A quantum algorithm for combinatorial optimization problems. Given a matrix, $B$, with indicies
   belonging to a finite field $\mathbb{F}$, and an optimization function, $f(x)$, depending on $B$ and an input vector $x\in \mathbb{F}^n$,
