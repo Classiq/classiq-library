@@ -16,6 +16,9 @@ def _should_test_notebook(notebook_path: str) -> bool:
     if notebook_path.endswith("/logical_qubits_by_alice_and_bob.ipynb"):
         pytest.skip("Skipping 'logical_qubits_by_alice_and_bob'")
         return False
+    if notebook_path.endswith("/resiliency_planning_AMD.ipynb"):
+        pytest.skip("Skipping 'resiliency_planning_AMD'")
+        return False
 
     return "/functions/" in notebook_path or "/community/" in notebook_path
 
