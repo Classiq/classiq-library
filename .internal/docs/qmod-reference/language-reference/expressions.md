@@ -166,7 +166,7 @@ on the Assignment documentation page.
 
 Classical expressions are expressions that involve classical variables and
 constant literals, but no quantum variables.
-Classical variables may have known values at [compile time, link time, or runtime]](https://docs.classiq.io/latest/qmod-reference/language-reference/classical-variables/#semantics).
+Classical variables may have known values at [compile time, link time, or runtime](https://docs.classiq.io/latest/qmod-reference/language-reference/classical-variables/#semantics).
 Classical expressions with only compile-time variables are evaluated and
 simplified during compilation.
 This applies sub-expressions of quantum expressions too.

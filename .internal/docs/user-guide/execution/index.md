@@ -16,7 +16,7 @@ When designing your model, do not forget to include [execution primitives](primi
 
     When viewing a quantum program in the "Quantum Program" page, after synthesizing your model or uploading your quantum program file, click "Execute":
 
-    ![Execute a quantum program](../resources/execute_circuit_button.png)
+    ![Execute a quantum program](../resources/newvis_execute_circuit_button.png)
 
     In the next screen you can choose your execution preferences and run your quantum program.
 
@@ -25,26 +25,26 @@ When designing your model, do not forget to include [execution primitives](primi
     [comment]: DO_NOT_TEST
 
 ```python
-from classiq import qfunc, Output, QBit, synthesize, execute, allocate
+from classiq import *
 
 
 # Design your quantum model
 @qfunc
 def main(res: Output[QBit]) -> None:
-    allocate(1, res)
+    allocate(res)
 
 
 # Synthesize a quantum program from the quantum model
 quantum_program = synthesize(main)
 
 # Execute the quantum program and access the result
-job = execute(quantum_program)
-results = job.result()
+ex = execute(quantum_program)
+results = ex.result()
 ```
 
 ### Execution Preferences
 
-You can configure the execution process by modifying the execution preferences.
+You can configure the execution process by modifying the execution preferences with the function [`ExecutionPreferences`](../../sdk-reference/execution/#classiq.execution.ExecutionPreferences).
 The main execution preferences:
 
 -   Backend preferences, such as provider, backend name, and credentials. See [Cloud Providers](cloud-providers/index.md).
@@ -58,13 +58,13 @@ The main execution preferences:
 
     Choose your backend preferences in the "Execute Quantum Circuit" window:
 
-    ![Choose backend preferences](../resources/backend_preferences.png)
+    ![Choose backend preferences](../resources/newvis_backend_preferences.png)
 
     You can select more than one backend on which to run, but note that a maximum of five backends can be selected at a time.
 
     Optionally configure more execution preferences in the "Execution Configuration" window:
 
-    ![Choose execution preferences](../resources/execution_preferences.png)
+    ![Choose execution preferences](../resources/newvis_execution_preferences.png)
 
     Finally, execute your program by clicking "Run".
 
@@ -75,7 +75,7 @@ The main execution preferences:
     [comment]: DO_NOT_TEST
 
     ```python
-    from classiq import set_execution_preferences, ExecutionPreferences
+    from classiq import *
 
     # Define execution preferences
     execution_preferences = ExecutionPreferences(
@@ -83,9 +83,9 @@ The main execution preferences:
     )  # set your real preferences instead!
 
     # Set the execution preferences
-    model = set_execution_preferences(model, execution_preferences)
+    with ExecutionSession(qprog, execution_preferences=execution_preferences) as es:
+        results_more_shots = es.sample()
     ```
-    See [ExecutionPreferences](../../sdk-reference/execution/#classiq.execution.ExecutionPreferences) in the SDK reference for more details.
 
     <!-- prettier-ignore-start -->
     !!! tip
@@ -131,6 +131,8 @@ regardless of whether they were originally sent via the IDE or the SDK.
     job = ExecutionJob.from_id("00000000-0000-0000-0000-000000000000")
     ```
 
+    See also [`get_execution_jobs` reference](../../sdk-reference/execution/#classiq.execution.jobs.get_execution_jobs)
+
 ### Results
 
 === "IDE"
@@ -143,8 +145,7 @@ regardless of whether they were originally sent via the IDE or the SDK.
 
     It is possible to filter the results by specifying them:
 
-    ![Filter results](../resources/filter_results_button.png)
-    ![Filtered results](../resources/filtered_results.png)
+    ![Filter results](../resources/newvis_filter_results_button.png)
 
 === "SDK"
 

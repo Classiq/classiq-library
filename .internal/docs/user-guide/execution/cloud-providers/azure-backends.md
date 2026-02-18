@@ -16,7 +16,7 @@ The Classiq executor supports execution on Azure Quantum cloud simulators and ha
 
 Possible modes of operation:
 
--   Running through Classiq-Azure integration. In this mode you do not need to provide credentials or location.
+-   Running via Classiq-Azure integration. In this mode you do not need to provide credentials or location.
 -   Executing on your private Azure Quantum Workspace by providing credentials.
     For more details, see [Executing on Your Quantum Workspace](#executing-on-your-quantum-workspace).
 
@@ -30,12 +30,12 @@ Possible modes of operation:
         AzureBackendPreferences,
     )
 
-    # Running through Classiq-Azure integration:
+    # Running via Classiq-Azure integration:
     preferences = AzureBackendPreferences(
         backend_name="Name of requsted simulator or hardware",
     )
 
-    # Running through a private Azure account:
+    # Running via a private Azure account:
     cred = AzureCredential(
         tenant_id="Azure Tenant ID (from Azure Active Directory)",
         client_id="Azure Application (client) ID",
@@ -54,7 +54,7 @@ Possible modes of operation:
 
      ![Opening info tab](../../../resources/execution_azure_login.png)
 
-For academic users, backends run through Classiq-Azure integration by default. To override this configuration, switch on "Run with my own credentials" in the backends summary section on the Execution page:
+For academic users, backends run via Classiq-Azure integration by default. To override this configuration, switch on "Run with my own credentials" in the backends summary section on the Execution page:
 
 ![Config run with own credentials](../../../resources/config-run-with-own-credentials.png)
 

@@ -43,6 +43,7 @@ of the _power_ operation.
 
     ```python
     from classiq import *
+    from classiq.qmod.symbolic import pi
 
 
     @qfunc
@@ -52,8 +53,7 @@ of the _power_ operation.
 
 
     @qfunc
-    def main() -> None:
-        q = QBit()
+    def main(q: Output[QBit]) -> None:
         allocate(q)
         power(2, lambda: foo(5, q))
     ```

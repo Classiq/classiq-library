@@ -10,5 +10,6 @@ search:
         show_if_no_docstrings: false
         members:
             - select_rotation
+            - select_z_rotation
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->
