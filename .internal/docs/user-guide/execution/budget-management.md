@@ -5,13 +5,13 @@ search:
 
 # Managing Execution Budget
 
-Enrolled users can run quantum programs on multiple backends without needing to provide their own credentials, by using `run_through_classiq`.
+Enrolled users can run quantum programs on multiple backends without needing to provide their own credentials, by using `run_via_classiq`.
 
-When a job is submitted using `run_through_classiq`, it will only proceed if the estimated cost is within the remaining budget allocated for the chosen provider.
+When a job is submitted using `run_via_classiq`, it will only proceed if the estimated cost is within the remaining budget allocated for the chosen provider.
 
 Additionally, we offer methods to monitor usage and set limits, helping you control and optimize your spending.
 
-For example, to set up execution using `run_through_classiq` on the Amazon Braket SV1 simulator:
+For example, to set up execution using `run_via_classiq` on the Amazon Braket SV1 simulator:
 
 [comment]: DO_NOT_TEST
 
@@ -29,7 +29,7 @@ qprog = synthesize(main)
 exec_pref = ExecutionPreferences(
     backend_preferences=AwsBackendPreferences(
         backend_name="SV1",
-        run_through_classiq=True,
+        run_via_classiq=True,
     )
 )
 

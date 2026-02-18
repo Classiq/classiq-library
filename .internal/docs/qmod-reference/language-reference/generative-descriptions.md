@@ -141,7 +141,7 @@ The example below demonstrates the declaration and use of a function parameter w
 a Python type. The function `my_operator` takes a function parameter `my_operand`,
 which expects a Python `float` as parameter. In function `main`, `my_operator` is called
 and passed a lambda expression in which the corresponding `ratio` parameter is used
-in Python context expression, namely as the argument of `math.asin`. If `ration*2` were
+in Python context expression, namely as the argument of `math.asin`. If `ratio*2` were
 a symbolic expression, it would be illegal to use it in this context.
 
 ```python

@@ -223,6 +223,7 @@ the values are rounded down:
 
 Output measurements:
 
+```
     state=[{'x': 1.0, 'y': 1.25}: 268,
             {'x': 1.5, 'y': 2.0}: 262,
             {'x': 2.5, 'y': 3.25}: 261,
@@ -231,6 +232,7 @@ Output measurements:
             {'x': 3.5, 'y': 0.75}: 253,
             {'x': 0.5, 'y': 0.5}: 251,
             {'x': 3.0, 'y': 0.0}: 238]
+```
 
 Notice, for instance, when `x = 1.0`, the exact product 1.4 is rounded down to 1.25 to fit into `y`'s available qubits.
 
@@ -491,9 +493,11 @@ diffuser is defined in a generic way and uses the qubit array view of the state.
 Executing this model will sample a state representing a solution to the problem in
 very high probability. This is an example of an output. Here is an output example:
 
+```
     state={'p': {'a': 0.0, 'b': 0.625}} shots=350
     state={'p': {'a': 0.25, 'b': 0.375}} shots=344
     state={'p': {'a': 0.5, 'b': 0.125}} shots=306
+```
 
 In Qmod's Python embedding, the size of `MyProblem` is given by
 `MyProblem.num_qubits`:
