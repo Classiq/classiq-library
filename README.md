@@ -5,7 +5,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.48550/arXiv.2412.07372.svg)](https://doi.org/10.48550/arXiv.2412.07372)
 
 <div align="center">
-    <img src="README_resources/classiq-logo.svg" width="300" height="150">
+    <img src=".internal/README_resources/classiq-logo.svg" width="300" height="150">
 </div>
 
 # Classiq: High-Level Quantum Modeling Language
@@ -260,7 +260,7 @@ Every example found in this repository can also be accessed via [Classiq's platf
 
 Additionally, one may write their own model in the model editor (highlighted in green) or upload his own model (highlighted in red)
 
-![writing_models.png](README_resources/writing_models.png)
+![writing_models.png](.internal/README_resources/writing_models.png)
 
 ### Example: 3+5 with Classiq
 
@@ -294,28 +294,28 @@ qfunc main(output res: qnum){
 2. Press Synthesize:
 <center>
 
-![Model_Screenshot_3_plus_5.png](README_resources/Model_Screenshot_3_plus_5.png)
+![Model_Screenshot_3_plus_5.png](.internal/README_resources/Model_Screenshot_3_plus_5.png)
 
 </center>
 
 3. Press Execute:
 <center>
 
-![Program_Screenshot_3_plus_5.png](README_resources/Program_Screenshot_3_plus_5.png)
+![Program_Screenshot_3_plus_5.png](.internal/README_resources/Program_Screenshot_3_plus_5.png)
 
 </center>
 
 4. Press Run:
 <center>
 
-![Execution_Screenshot_3_plus_5.png](README_resources/Execution_Screenshot_3_plus_5.png)
+![Execution_Screenshot_3_plus_5.png](.internal/README_resources/Execution_Screenshot_3_plus_5.png)
 
 </center>
 
 5. View Results:
 <center>
 
-![Jobs_Screenshot_3_plus_5.png](README_resources/Jobs_Screenshot_3_plus_5.png)
+![Jobs_Screenshot_3_plus_5.png](.internal/README_resources/Jobs_Screenshot_3_plus_5.png)
 
 </center>
 
