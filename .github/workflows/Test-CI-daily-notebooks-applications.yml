@@ -50,9 +50,3 @@ jobs:
           # Passing environment information
           CLASSIQ_IDE: "https://nightly.platform.classiq.io"
           CLASSIQ_HOST: "https://nightly.platform.classiq.io"
-
-      - name: Send Qmods Slack notification
-        if: failure()
-        uses: ./.github/actions/send_qmods_slack_notification
-        with:
-          slack_bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
