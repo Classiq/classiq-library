@@ -12,24 +12,29 @@ repos:
       - id: check-json
       - id: check-yaml
       - id: end-of-file-fixer
+        name: format end of file
       - id: trailing-whitespace
+        name: format trailing whitespace
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.1.0
     hooks:
       - id: prettier
+        name: format prettier
   - repo: https://github.com/psf/black
     rev: 24.3.0
     hooks:
       - id: black-jupyter
+        name: format notebook black
   - repo: https://github.com/nbQA-dev/nbQA
     rev: 1.8.4
     hooks:
       - id: nbqa-isort
+        name: format notebook isort
 
   - repo: local
     hooks:
       - id: upgrade-nbformat
-        name: Upgrade notebooks nbformat
+        name: format nbformat upgrade
         entry: .internal/pre_commit_tools/set_nbformat.py
         language: python
         files: \.ipynb$
@@ -37,7 +42,7 @@ repos:
           - "nbformat"
         require_serial: true
       - id: extra-nbstripout
-        name: Strip further stuff from notebooks
+        name: format nbformat strip
         entry: .internal/pre_commit_tools/extra_nbstripout.py
         language: python
         files: \.ipynb$
@@ -45,7 +50,7 @@ repos:
           - "nbformat"
         require_serial: true
       - id: verify-notebook-format-execution-count
-        name: Verify that execution-count >= 0
+        name: format nbformat execution-count
         language: pygrep
         files: \.ipynb$
         entry: '"execution_count": -'
@@ -54,6 +59,7 @@ repos:
     rev: 0.8.1
     hooks:
       - id: nbstripout
+        name: format nbformat nbstripout
         args:
           [
             --keep-output,
@@ -77,14 +83,14 @@ repos:
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: '[?&]version=[^ \t\n]*\.dev'
       - id: verify-platform-links-old
-        name: Forbid old generated links
+        name: Forbid links from older versions
         language: pygrep
         files: \.ipynb$
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: '"Opening:\s+https://'
 
       - id: notebook-pre-commit
-        name: Notebook pre commit collection
+        name: Validate naming notebooks
         description: Ensure notebooks conventions
         entry: .internal/pre_commit_tools/notebook_pre_commit_collection.py
         language: python
@@ -93,7 +99,7 @@ repos:
           - "pyyaml==6.0"
         require_serial: true
       - id: qmod-pre-commit
-        name: Qmod pre commit collection
+        name: Validate naming qmods
         description: Ensure qmods conventions
         entry: .internal/pre_commit_tools/qmod_pre_commit_collection.py
         language: python
