@@ -1,0 +1,95 @@
+name: "Test Library CI (qmods)"
+
+on: [pull_request]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  detect-qmod-changes:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    outputs:
+      has_any_qmod_file_changed: ${{ steps.changed-files.outputs.any_changed }}
+      changed_qmod_files: ${{ steps.changed-files.outputs.all_changed_files }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for changed QMOD files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            **/*.qmod
+
+  test:
+    needs: detect-qmod-changes
+    if: needs.detect-qmod-changes.outputs.has_any_qmod_file_changed == 'true'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      #
+      # Setup Python
+      #
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          set -e
+          python -m pip install -U pip
+          python -m pip install -U -r requirements.txt
+          python -m pip install -U -r requirements_tests.txt
+
+      #
+      # Setup qmod_parser
+      #
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
+      - name: Download and install Qmod parser
+        env:
+          WHL_FILE_NAME: qmod_parser-0.0.0-cp311-cp311-linux_x86_64.whl
+          S3_BUCKET_SOURCE: s3://public-library-resources
+        run: |
+          set -eux
+          classiq_version=$(pip show classiq | awk '/Version:/ {print $2}')
+          mkdir qmod_parser
+          aws s3 cp "$S3_BUCKET_SOURCE/qmod_parser/$classiq_version/$WHL_FILE_NAME" "qmod_parser/$WHL_FILE_NAME"
+          python -m pip install "qmod_parser/$WHL_FILE_NAME"
+
+      #
+      # Setup Environment
+      #
+      # Set authentication with M2M token
+      - name: Set authentication
+        run: .github/scripts/get_m2m_token.sh
+        env:
+          IS_DEV: "false"
+          M2M_SECRET_ARN: "${{ secrets.PROD_M2M_SECRET_ARN }}"
+
+      # Run Tests
+      - name: Run qmod tests
+        run: python -m pytest tests/qmods/test_qmods.py
+        env:
+          # Passing which notebooks changed
+          SHOULD_TEST_ALL_FILES: "true" # quick tests should run all files
+          LIST_OF_QMOD_CHANGED: "${{ needs.detect-qmod-changes.outputs.changed_qmod_files }}"
