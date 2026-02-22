@@ -1,5 +1,6 @@
 # Quantum Differential Equation Solvers
 
+Differential equations are ubiquitous in many fields of science and technology, such as physics, biology, and economics. These equations usually involve many degrees of freedom, requiring efficient numerical methods to obtain accurate dynamical solutions.
 The folder presents quantum algorithms for solving differential equations,
 demonstrating how linear systems and dynamical evolution problems can be mapped to quantum circuits.
 The examples highlight both stationary and time-dependent formulations, leveraging block-encoding

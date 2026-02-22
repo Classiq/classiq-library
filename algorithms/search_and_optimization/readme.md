@@ -12,7 +12,7 @@ Knapsack, XORSAT, and other discrete optimization problems.
   belonging to a finite field $\mathbb{F}$, and an optimization function, $f(x)$, depending on $B$ and an input vector $x\in \mathbb{F}^n$,
   the algorithm produces optimal input, maximizing $f$. Shown to give a quantum advantage in Optimal Polynomial Intersection problem.
   In the present notebook, a simplified version of the problem called max-XORSAT, is utilized to demonstrate the key algorithmic steps.
-- **Grover** - A canonical quantum algorithms, providing the solution of an unstructured search problem.
+- **Grover** - A canonical quantum algorithm, providing the solution of an unstructured search problem.
   A general routine is defined and then applied to generic use cases, including the 3-SAT problem and the Max-Cut problem on a graph.
   The use of the phase_oracle quantum function from the Classiq open library, together with the Qmod language for high-level
   arithmetic operations, helps avoid the low-level implementation details typically required on other platforms.

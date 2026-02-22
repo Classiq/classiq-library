@@ -18,7 +18,7 @@ including RSA, elliptic-curve cryptography, and the Diffie–Hellman key exchang
 - **Hidden shift problem** - Implementation of an algorithm to find the hidden-shift for the family of Boolean bent functions, which
   are characterized by high non-linearity and a perfectly flat Fourier transform. Given access to queries of a functions $f$,
   the algorithm finds the shift, a boolean string, which satisfies $f(x) = f(x \oplus s)$. The quantum algorithm provides
-  an exponential separation in query complexity relative to any (even the best) classical algorithm.
+  an exponential separation in query complexity relative to any (including the optimal) classical algorithm.
 - **Shor's algorithm** - Evaluates the prime factors of a large integer. The algorithm played a foundational role in
   the development of the field, providing an exponential speedup over currently known classical algorithms. The quantum component
   is naturally structured as a Quantum Phase Estimation (QPE) routine, utilizing

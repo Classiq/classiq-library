@@ -1,9 +1,9 @@
 # Quantum State Preparation
 
-This folder explores advanced quantum state preparation techniques, including adaptive
+State preparation algorithms are essential building blocks in quantum simulation and optimization.
+The present folder explores advanced quantum state preparation techniques, including adaptive
 variational eigensolvers and block-encoding–based Gibbs state generation. The examples emphasize
-both practical hybrid workflows and algorithmic primitives central to quantum simulation and
-optimization.
+both practical hybrid workflows and algorithmic primitives.
 
 - **ADAPT VQE** -
   The Adaptive Derivative-Assembled Pseudo-Trotter Variational Quantum Eigensolver (ADAPT-VQE)
