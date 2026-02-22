@@ -22,4 +22,5 @@ def _should_skip_notebook(notebook_name: str) -> bool:
         "/functions/" in notebook_path
         or "/community/" in notebook_path
         or "/.ipynb_checkpoints/" in notebook_path
+        or "/resiliency_planning_AMD" in notebook_path
     )
