@@ -6,9 +6,8 @@ variational eigensolvers and block-encoding–based Gibbs state generation. The 
 both practical hybrid workflows and algorithmic primitives.
 
 - **ADAPT VQE** -
-  The Adaptive Derivative-Assembled Pseudo-Trotter Variational Quantum Eigensolver (ADAPT-VQE)
-  is a variational hybrid algorithm. It constitutes an extension of the Variational Quantum Eigensolver (VQE) framework,
-  constructing problem-specific solution in an adaptive manner. By increasing the number of measurements the algorithms
+  The Adaptive Derivative-Assembled Pseudo-Trotter Variational Quantum Eigensolver (ADAPT-VQE) is a variational hybrid algorithm. It constitutes an extension of the Variational Quantum Eigensolver (VQE) framework,
+  constructing problem-specific solution in an adaptive manner. By increasing the number of measurements, the algorithms
   produces shallower circuit relative to the standard VQE algorithm.
 
 - **Gibbs state preparation** - An important quantum primitive employed as a subroutine in higher-level algorithms,
