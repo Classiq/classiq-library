@@ -38,6 +38,7 @@ FILES_TO_NOT_GENERATE_METADATA = [
     "pennylane_catalyst_discrete_quantum_walk.ipynb",
     "qiskit_discrete_quantum_walk.ipynb",
     "tket_discrete_quantum_walk.ipynb",
+    "resiliency_planning_AMD.ipynb",
 ]
 FILES_TO_IGNORE_SAME_NAME = [
     "qaoa.ipynb",
