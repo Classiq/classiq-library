@@ -1,7 +1,6 @@
 # QML
 
-This folder presents a collection of Quantum Machine Learning (QML) algorithms
-implemented within hybrid quantum–classical frameworks. The examples demonstrate how
+Quantum Machine Learning (QML) algorithms are a family of hybrid quantum–classical frameworks. A number of key QML algorithms are implemented, demonstrating how
 parameterized quantum circuits can be integrated with classical optimization and
 deep-learning tools to perform classification, generative modeling, and data compression tasks.
 Each implementation highlights both the algorithmic principles and the practical workflow,

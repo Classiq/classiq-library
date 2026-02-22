@@ -1,9 +1,9 @@
 # Quantum Phase Estimation (QPE)
 
-The present folder explores Quantum Phase Estimation as a spectral analysis tool for Hermitian matrices.
-The implementations include Trotterized Hamiltonian simulation and qubitization-based block-encoding
+Quantum Phase Estimation is a central building block in many quantum algroithm, commonly utilized as a spectral analysis tool for Hermitian matrices.
+Examples include Trotterized Hamiltonian simulation and qubitization-based block-encoding
 techniques, highlighting how eigenvalues can be extracted from controlled unitary dynamics.
-These examples demonstrate core primitives underlying quantum chemistry, Hamiltonian simulation,
+The following implementations demonstrate these techniques and showcase the core primitives underlying quantum chemistry, Hamiltonian simulation,
 and advanced linear-algebraic quantum algorithms.
 
 - **QPE for a matrix** - Quantum Phase Estimation (QPE) is a fundamental quantum algorithm and a common primitive in many algorithms,

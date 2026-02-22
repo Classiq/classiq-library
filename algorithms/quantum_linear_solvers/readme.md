@@ -1,8 +1,8 @@
 # Quantum Linear Solvers
 
-The present folder collects core quantum linear system algorithms,
+A range of algorithms for quantum linear systems have been developed,
 including adiabatic methods, the HHL algorithm, QSVT-based matrix inversion,
-and variational solvers. The examples illustrate different computational models—adiabatic
+and variational solvers. The examples bellow illustrate different computational models—adiabatic
 evolution, block-encoding with singular value transformation, and hybrid quantum–classical
 optimization—providing a unified view of how linear algebraic problems can be addressed within
 quantum computing frameworks.

@@ -1,11 +1,10 @@
 # Amplitude Amplification and Estimation
 
-The directory contains algorithmic variations of the amplitude amplification and estimation algorithm.
-Amplitude amplification is a technique, constitutes a generalization of the Grover's search,
-allowing to increase the probability of measuring marked ("good") states.
-Generally, producing a quadratic speedup, relative to classical repetition. Specifically, a marked state which
+Algorithmic variations of the amplitude amplification and estimation algorithm.
+Amplitude amplification is a technique to increase the probability of measuring marked ("good") states. The scaling is typically achieved employing the Grover operator as a canonical building block.
+Generally, the methods produce a quadratic speedup, relative to classical repetition, so a marked state which
 has probability $p$ to be measured, can be found with a probability close to unity by employing $O(1/\sqrt{p})$
-measurements.
+measurements. In contrast, the goal of amplitude estimation is to estimate the probability value, $p$. It achieves an additive error $\epsilon$ in $O(1/\epsilon)$ iterations, obtaining a quadratic speed up relative to the classical Monte Carlo.
 
 The directory contains the following methods:
 
