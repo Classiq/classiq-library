@@ -16,10 +16,12 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     num_qubits = tb.ref_pydantic("NUM_QUBITS")
+    SCALING_CONST = tb.ref_pydantic("SCALING_CONST")
     x, prob = tb.ref_pydantic("x"), tb.ref_pydantic("prob")
     assert (
         np.linalg.norm(
-            (1 / 2 ** (num_qubits / 2) * np.cos(2 * np.pi * x) ** 3) ** 2 - prob
+            (1 / 2 ** (num_qubits / 2) * np.cos(2 * np.pi * x) ** 3) ** 2
+            - prob / SCALING_CONST**2
         )
         < 0.1
     )
