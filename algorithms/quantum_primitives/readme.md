@@ -1,5 +1,9 @@
 # Quantum Primitives
 
+<<<<<<< HEAD
+=======
+Quantum primitives are foundational quantum algorithmic building-blocks for higher-level applications.
+>>>>>>> ed4ce571 (updated the readme file)
 The examples include Generalized Quantum Signal Processing (GQSP), enabling flexible polynomial
 transformations of block-encoded unitaries, as well as the Swap Test, a standard subroutine for estimating
 quantum state overlaps and the Hadamard test. Together, these primitives underpin a wide range of algorithms in
