@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("hadamard_test", timeout_seconds=44)
+@wrap_testbook("hadamard_test_tutorial", timeout_seconds=44)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # warning: the notebook overrides the `qmod` and `qprog` parameter
 
