@@ -13,7 +13,8 @@ including state preparation, circuit design, training procedures, and performanc
   upon the deep-learning PyTorch module.
 - **Quantum Generative Adversarial Networks (GANs)** - A quantum analogue of a classical learning algorithm that generates new
   data which mimics the training set data. The original model is trained by an adversarial optimization in a two-player minmax game,
-  utilizing a gradient-based learning. In the quantum algorithm, the classical neural networks are replaced by quantum neural networks.
+  utilizing a gradient-based learning. In the quantum algorithm, the classical neural networks are replaced by quantum neural networks,
+  which are parameterized quantum circuits.
 - **Quantum Support Vector Machine (QSVM)** - Quantum version of the classical machine learning algorithm, classifying
   data points between into two distinct categories. Employing the dual problem formulation, the classification is dictated by a
   defined feature map and the
