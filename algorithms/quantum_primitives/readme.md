@@ -1,6 +1,5 @@
 # Quantum Primitives
 
-The folder contains foundational quantum algorithmic primitives that serve as building blocks for higher-level applications.
 The examples include Generalized Quantum Signal Processing (GQSP), enabling flexible polynomial
 transformations of block-encoded unitaries, as well as the Swap Test, a standard subroutine for estimating
 quantum state overlaps and the Hadamard test. Together, these primitives underpin a wide range of algorithms in
