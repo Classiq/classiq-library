@@ -4,15 +4,15 @@ name: "Test Library CI (main)"
 # PRs from users (should be from a fork) need to targePrint repository namet `main` branch which runs against `prod` environment
 
 on:
-  push: # Trigger the workflow on push to the specific branch
+  push:
     branches:
       - main
-      - clean_ci
-  pull_request: # Trigger the workflow on pull requests targeting the specific branch
+      - clean_ci_3
+  pull_request_target:
     # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
       - main
-      - clean_ci
+      - clean_ci_3
 
   workflow_dispatch:
 
