@@ -10,4 +10,5 @@ These functions require the `cudaq` extra (install `classiq[cudaq]`).
 Note that the `cudaq` extra is only available in Classiq Studio and on any Linux
 Machine.
 
-::: classiq.qprog_to_cudaq
+::: classiq.cudaq.qprog_to_cudaq.qprog_to_cudaq_kernel
+::: classiq.cudaq.pauli_op_to_cudaq.pauli_operator_to_cudaq_spin_op

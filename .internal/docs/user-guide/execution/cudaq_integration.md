@@ -21,7 +21,9 @@ The Integration is built around two Classiq SDK helper functions:
 
 -   `qprog_to_cudaq_kernel()`  
     Converts a synthesized Classiq quantum program (`qprog`) into a CUDA-Q kernel that can be executed using CUDA-Q SDK.
-
+    The default kernel type is a main kernel, which is compatible with CUDA-Q execution functions and key capabilities.
+    In case that the kernel is meant to be added as a component to another main kernel, use `is_main_kernel=False` so that it can be passed as a parameter to `apply_call`
+    (for example: `other_kernel.apply_call(your_kernel)`).
 -   `pauli_operator_to_cudaq_spin_op()`  
     Transforms Qmod's `SparsePauliOp` data structure to CUDA-Q's `SpinOperator`.
 

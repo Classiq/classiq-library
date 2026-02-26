@@ -197,10 +197,10 @@ and populates `MyStruct` in its call to `foo`.
 ## Hamiltonians
 
 Qmod's Python embedding offers a specialized syntax for creating
-[sparse Hamiltonian](https://docs.classiq.io/latest/qmod-reference/api-reference/classical-types/#classiq.qmod.builtins.structs.SparsePauliOp)
+[sparse Hamiltonian](../../../sdk-reference/qmod/classical-types/#classiq.qmod.builtins.structs.SparsePauliOp)
 objects.
 Calling a
-[Pauli](https://docs.classiq.io/latest/qmod-reference/api-reference/classical-types/#classiq.qmod.builtins.enums.Pauli)
+[Pauli](../../../sdk-reference/qmod/classical-types/#classiq.qmod.builtins.enums.Pauli)
 enum value (e.g., `Pauli.X`) with an index (e.g., `Pauli.X(3)`) creates a
 single-qubit Pauli operator.
 The multiplication of single-qubit Pauli operators (e.g.,

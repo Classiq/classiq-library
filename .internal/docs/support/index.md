@@ -90,7 +90,7 @@ Welcome to the Classiq Support Center. This page is designed to help you quickly
     There are two ways to work around this: either bind the qubits you want to a QArray (see [bind](/latest/qmod-reference/language-reference/statements/bind/)) or slice the QArrays (see [Path Operators](/latest/qmod-reference/language-reference/expressions/#relational-operators)).
 
 ??? note "How do I apply a single-qubit gate to multiple qubits?"
-    Use the `apply_to_all` function. See [Utility functions](/latest/qmod-reference/api-reference/functions/open_library/utility_functions/).
+    Use the `apply_to_all` function. See [Utility functions](/latest/sdk-reference/qmod/functions/open_library/utility_functions/).
 
 ??? note "How can I uncompute a qubit?"
     You can use the `free()` function. For more information, see [Uncomputation](/latest/qmod-reference/language-reference/uncomputation/).
