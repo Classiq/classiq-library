@@ -12,3 +12,6 @@ search:
 ::: classiq.set_quantum_program_execution_preferences
 ::: classiq.Constraints
 ::: classiq.set_constraints
+::: classiq.create_model
+::: classiq.write_qmod
+::: classiq.qasm_to_qmod

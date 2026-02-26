@@ -14,5 +14,6 @@ search:
             - prepare_amplitudes
             - inplace_prepare_state
             - inplace_prepare_amplitudes
+            - assign_phase_table
 <!-- prettier-ignore-end -->
 <!-- spell-checker: enable -->

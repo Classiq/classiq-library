@@ -8,15 +8,15 @@ search:
 Expressions in Qmod have syntax, semantics, and use, similar to expressions in
 conventional programming languages.
 They comprise literal values, variables, and operators applied to them.
-However, Qmod is unique in that variables can be of either [classical](https://docs.classiq.io/latest/qmod-reference/api-reference/classical-types) or
-[quantum](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-types) types, and quantum variables have states that can be a
+However, Qmod is unique in that variables can be of either [classical](../../../sdk-reference/qmod/classical-types) or
+[quantum](../quantum-types) types, and quantum variables have states that can be a
 superposition of values, entangled with the states of other variables.
 Expressions over quantum variables evaluate to a superposition of correlated
 values.
-For example, if `x` is a [classical variable](https://docs.classiq.io/latest/qmod-reference/language-reference/classical-variables)
+For example, if `x` is a [classical variable](../classical-variables)
 of type `CInt` (an integer), then `x + 1` is a classical expression of type
 `CInt` comprising the operator `+` (plus) applied to `x` and the literal `1`.
-Similarly, if `qarr` is a [quantum variable](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-variables)
+Similarly, if `qarr` is a [quantum variable](../quantum-variables)
 of type `QArray[QNum[3]]`, then `qarr[0] > x` is a quantum expression of type
 `QBit`.
 
@@ -170,7 +170,7 @@ Classical variables may have known values at [compile time, link time, or runtim
 Classical expressions with only compile-time variables are evaluated and
 simplified during compilation.
 This applies sub-expressions of quantum expressions too.
-Qmod supports several built-in classical [constants and functions](https://docs.classiq.io/latest/qmod-reference/api-reference/symbolic-functions/),
+Qmod supports several built-in classical [constants and functions](../../../sdk-reference/qmod/symbolic-functions/),
 such as `pi` and `sin`.
 
 ### Example
