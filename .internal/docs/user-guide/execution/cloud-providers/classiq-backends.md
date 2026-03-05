@@ -58,6 +58,8 @@ Classiq supports two types of Nvidia simulators, with the same inputs and output
 Both `ClassiqNvidiaBackendNames.SIMULATOR_STATEVECTOR` and `ClassiqNvidiaBackendNames.braket_nvidia_simulator_statevector` return the state vector at the end of the circuit's execution (analogous to the
 above `simulator_statevector`).
 
+**Precision:** Nvidia and Braket Nvidia simulators use **double precision** (float64) by default. Set `use_single_precision=True` in `ClassiqBackendPreferences` to use single precision (float32), which can be faster and use less memory at the cost of numerical precision.
+
 === "SDK"
 
     ```python
@@ -65,6 +67,12 @@ above `simulator_statevector`).
 
     preferences = ClassiqBackendPreferences(
         backend_name=ClassiqNvidiaBackendNames.SIMULATOR
+    )
+
+    # Optional: use single precision (float32) instead of default double (float64)
+    preferences_single = ClassiqBackendPreferences(
+        backend_name=ClassiqNvidiaBackendNames.BRAKET_NVIDIA_SIMULATOR,
+        use_single_precision=True,
     )
     ```
 
