@@ -98,14 +98,6 @@ jobs:
           python -m pip install -U pip
           python -m pip install -U -r requirements.txt -r requirements_tests.txt
 
-      # Configure AWS credentials
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: us-east-1
-          mask-aws-account-id: true
-
       - name: Install couenne solver
         env:
           COIN_DIST_URL: https://github.com/ampl/coin/releases/download/v20191215/coin-linux64.tar.gz
@@ -121,6 +113,14 @@ jobs:
       #
       # Setup Environment
       #
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
       # Set authentication with M2M token
       - name: Set authentication
         run: .github/scripts/get_m2m_token.sh
