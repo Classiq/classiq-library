@@ -147,7 +147,7 @@ jobs:
 
       # Run Tests
       - name: Run Notebooks (quick tests)
-        run: python -m pytest -c tests/config_quick_tests.ini --roordir=.
+        run: python -m pytest -c tests/config_quick_tests.ini --rootdir=.
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
@@ -159,7 +159,7 @@ jobs:
           LIMIT_TEST_LINKS_TO_FILES_ONLY: "true"
 
       - name: Run Notebooks (executing notebooks and testing content)
-        run: python -m pytest -c tests/config_notebook_execute_tests.ini --roordir=.
+        run: python -m pytest -c tests/config_notebook_execute_tests.ini --rootdir=.
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
