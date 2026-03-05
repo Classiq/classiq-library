@@ -2,12 +2,19 @@ import pytest
 import os
 from utils_for_tests import get_all_notebooks, ROOT_DIRECTORY, resolve_notebook_path
 
+TESTS_FOLDER = ROOT_DIRECTORY / "tests"
+
+
+@pytest.fixture
+def all_test_file_names() -> list[str]:
+    return [i.name for i in TESTS_FOLDER.rglob("test_*.py")]
+
 
 @pytest.mark.parametrize("notebook_name", map(os.path.basename, get_all_notebooks()))
-def test_is_notebook_tested(notebook_name: str):
+def test_is_notebook_tested(notebook_name: str, all_test_file_names: list[str]):
     if not _should_skip_notebook(notebook_name):
         expected_test_name = f"test_{notebook_name[:-6]}.py"  # [:-6] removes ".ipynb"
-        assert list(ROOT_DIRECTORY.rglob(expected_test_name)), (
+        assert expected_test_name in all_test_file_names, (
             f"No test was found for '{notebook_name}'. Expecting to find '{expected_test_name}'"
             f"\nIt is common for notebooks tests to be placed in 'ROOT_FOLDER/tests/notebooks/{expected_test_name}'."
             "\nNote: tests are auto-generated when using pre-commit."
