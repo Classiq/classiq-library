@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      VENV_PATH: .venv
       # Previosly we had:
       #   if workflow_dispatch: True
       #   if pull_request_target: False
@@ -56,18 +57,46 @@ jobs:
 
       - name: Get latest classiq version for cache key
         id: classiq-version
+        shell: python
         run: |
-          echo "LATEST_CLASSIQ_VERSION=$(pip index versions classiq 2>/dev/null | grep classiq | cut -d '(' -f2 | cut -d ')' -f1)" >> $GITHUB_OUTPUT
+          import urllib.request
+          import json
+          import os
+
+          url = 'https://pypi.org/pypi/classiq/json'
+          with urllib.request.urlopen(url) as response:
+              data = json.loads(response.read())
+              version = data['info']['version']
+
+          output_file = os.environ['GITHUB_OUTPUT']
+          with open(output_file, 'a') as f:
+              f.write(f"LATEST_CLASSIQ_VERSION={version}\n")
 
       # The caching we do follows from
       #   https://stackoverflow.com/questions/59127258/how-can-i-use-pip-cache-in-github-actions
       - uses: actions/cache@v4
-        id: cache-pip
+        id: cache-venv
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements*.txt') }}-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
+          path: ${{ env.VENV_PATH }}
+          key: ${{ runner.os }}-venv-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}-requirements-${{ hashFiles('**/requirements*.txt') }}
           restore-keys: |
-            ${{ runner.os }}-venv-
+            ${{ runner.os }}-venv-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
+
+      - name: Enter venv
+        run: echo "$PWD/${{ env.VENV_PATH }}/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          set -e
+
+          if [ ! -d "${{ env.VENV_PATH }}" ]; then
+            python -m venv "${{ env.VENV_PATH }}"
+            hash -r  # refresh memory of last process location, to use python from venv
+          fi
+
+          python -m pip install -U pip
+          python -m pip install -U -r requirements.txt -r requirements_tests.txt
 
       # Configure AWS credentials
       - name: Configure AWS Credentials
@@ -76,13 +105,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: us-east-1
           mask-aws-account-id: true
-
-      - name: Install dependencies
-        run: |
-          set -e
-          python -m pip install -U pip
-          python -m pip install -U -r requirements.txt
-          python -m pip install -U -r requirements_tests.txt
 
       - name: Install couenne solver
         env:
