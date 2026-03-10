@@ -25,7 +25,7 @@ def ensure_report_dirs(root: str | Path = "../report") -> Path:
     root = Path(root)
     (root / "data").mkdir(parents=True, exist_ok=True)
     (root / "sections").mkdir(parents=True, exist_ok=True)
-    (root / "build").mkdir(parents=True, exist_ok=True)
+    (root / "build_report").mkdir(parents=True, exist_ok=True)
     return root
 
 
@@ -84,7 +84,7 @@ def df_to_latex_table_mixed(df: pd.DataFrame, numeric_cols: set[str]) -> str:
 
     cols = list(df.columns)
 
-    # build colspec: l for text cols, S for numeric cols
+    # build_report colspec: l for text cols, S for numeric cols
     spec_parts = []
     for c in cols:
         if c in numeric_cols:
@@ -204,7 +204,7 @@ def build_report(root: str | Path = "../report", force: bool = True) -> None:
         "-pdf",
         "-interaction=nonstopmode",
         "-halt-on-error",
-        "-outdir=build",
+        "-outdir=build_report",
     ]
     if force:
         cmd.append("-g")
