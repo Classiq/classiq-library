@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from classiq import (
     create_model,
     synthesize_async,
@@ -57,6 +57,7 @@ class HardwareRunner:
     backend_service_provider: str
     backend_name: str
     num_shots: int
+    backend_kwargs: dict = field(default_factory=dict)
 
     def _get_syn_prefs(self):
         if self.backend_service_provider == "Classiq":
@@ -71,7 +72,9 @@ class HardwareRunner:
         return ExecutionPreferences(
             num_shots=self.num_shots,
             backend_preferences=execution_preferences_wrapper(
-                self.backend_service_provider, self.backend_name
+                self.backend_service_provider,
+                self.backend_name,
+                **self.backend_kwargs,
             ),
         )
 
