@@ -1,4 +1,3 @@
-from __future__ import annotations
 from dataclasses import dataclass, field
 from classiq import (
     create_model,
@@ -16,50 +15,52 @@ import os
 from pathlib import Path
 import pandas as pd
 import datetime
-
-TypeResult = dict
-RESULT_TIMEOUT = {"score": float("nan")}
+import abc
 
 
-@dataclass(frozen=True)
-class BenchmarkExample:
+RESULT_TIMEOUT = float("nan")
+
+#
+# Locks
+#
+EXECUTION_SEMAPHORE = asyncio.Semaphore(3)
+FILE_LOCK = asyncio.Lock()
+
+
+@dataclass
+class BenchmarkExample(abc.ABC):
     name: str
     num_qubits: int
-
-    # user supplies "unrolled" callables
-    get_main: callable  # (num_qubits) -> main
-    execute: callable  # async (num_qubits, qprog, execution_prefs) -> results
-    score: callable  # (num_qubits, results) -> TypeResult
-    constraints: object = None  # constraints for synthesis
-
-    # materialized
-    main: object = None
-    executor: object = None  # async (qprog, execution_prefs) -> results
-    scorer: object = None  # (results) -> TypeResult
+    constraints: Constraints = field(
+        default_factory=Constraints
+    )  # constraints for synthesis
 
     def __post_init__(self):
-        object.__setattr__(self, "main", self.get_main(self.num_qubits))
+        self.main = self.create_main()
 
-        async def executor(qprog):
-            return await self.execute(self.num_qubits, qprog)
+    @abc.abstractmethod
+    def create_main(self) -> callable:  # () -> main
+        pass
 
-        async def scorer(job):
-            return await self.score(self.num_qubits, job)
+    @abc.abstractmethod
+    async def execute(self, qprog: QuantumProgram) -> str:  # (qprog) -> job.id
+        pass
 
-        object.__setattr__(self, "executor", executor)
-        object.__setattr__(self, "scorer", scorer)
+    @abc.abstractmethod
+    def score(self, df: pandas.DataFrame) -> float:  # (result_dataframe) -> float
+        pass
 
 
 @dataclass
 class HardwareRunner:
-    exec_sem: object  # asyncio.Semaphore(3)
-    max_timeout: int  # seconds
     backend_service_provider: str
     backend_name: str
+    max_timeout: int  # seconds
     num_shots: int
     backend_kwargs: dict = field(default_factory=dict)
 
-    def _get_syn_prefs(self):
+    @property
+    def _synthesis_preferences(self) -> Preferences:
         if self.backend_service_provider == "Classiq":
             return Preferences()
         else:
@@ -68,7 +69,8 @@ class HardwareRunner:
                 backend_name=self.backend_name,
             )
 
-    def _get_exe_prefs(self):
+    @property
+    def _execution_preferences(self):
         return ExecutionPreferences(
             num_shots=self.num_shots,
             backend_preferences=execution_preferences_wrapper(
@@ -78,64 +80,45 @@ class HardwareRunner:
             ),
         )
 
-    async def build(self, example: BenchmarkExample):
-        constraints = (
-            example.constraints if example.constraints is not None else Constraints()
-        )
+    async def _synthesize(self, example: BenchmarkExample) -> QuantumProgram:
         qmod = create_model(
-            example.main, preferences=self._get_syn_prefs(), constraints=constraints
+            example.main,
+            preferences=self._synthesis_preferences,
+            constraints=example.constraints,
         )
         qprog = await synthesize_async(qmod)
-        qprog = set_quantum_program_execution_preferences(qprog, self._get_exe_prefs())
+        qprog = set_quantum_program_execution_preferences(
+            qprog, self._execution_preferences
+        )
         return qprog
 
-    async def submit_to_backend(self, example: BenchmarkExample) -> TypeResult:
-        qprog = await self.build(example)
+    async def submit_execution(self, example: BenchmarkExample) -> str:
+        qprog = await self._synthesize(example)
 
-        await self.exec_sem.acquire()
+        await EXECUTION_SEMAPHORE.acquire()
         try:
-            job_id = await example.executor(qprog)
+            job_id = await example.execute(qprog)
         finally:
-            self.exec_sem.release()
+            EXECUTION_SEMAPHORE.release()
 
         return job_id
 
-    async def get_backend_score(
-        self, example: BenchmarkExample, job_id: str
-    ) -> TypeResult:
-        return await example.scorer(job_id)
+    async def score(self, example: BenchmarkExample, job_id: str) -> float:
+        job = ExecutionJob.from_id(job_id)
+        result = await job.result_async()
 
-    async def _run_with_timeout(
-        self, example: BenchmarkExample, job_id: str
-    ) -> TypeResult:
-        try:
-            return await asyncio.wait_for(
-                self.get_backend_score(example, job_id), timeout=self.max_timeout
-            )
-        except asyncio.TimeoutError:
-            return RESULT_TIMEOUT
+        df = result[0].value.dataframe
+        return await example.score(df)
 
-    async def run(self, example: BenchmarkExample) -> TypeResult:
-        """
-        Full run of a benchmark example. When running several examples asynchronously use
-        the class ResultCollector instead, which separates the submission and scoring.
-        """
-        result = {
+    def to_dict(self, example: BenchmarkExample, **kwargs):
+        return {
             "example": example.name,
             "num_qubits": example.num_qubits,
             "backend_service_provider": self.backend_service_provider,
             "backend_name": self.backend_name,
-            "submitted_timestamp": datetime.datetime.now(),
+            "num_shots": self.num_shots,
+            **kwargs,
         }
-        job_id = await self.submit_to_backend(example)
-        result["status"] = "SUBMITTED"
-        result["job_id"] = job_id
-        scores = await self._run_with_timeout(example, job_id)
-        result["status"] = "COMPLETED"
-        result_time = datetime.datetime.now()
-        result.update(scores)
-        result.update({"timestamp": result_time})
-        return result
 
 
 # Constants for ResultCollector
@@ -322,7 +305,7 @@ class ResultCollector:
         build_each_time: bool = False,
     ):
         self.filename = filename
-        self.lock = asyncio.Lock()
+        FILE_LOCK = asyncio.Lock()
         self.report_root = report_root
         self.build_each_time = build_each_time
 
@@ -350,7 +333,7 @@ class ResultCollector:
         key = make_key(example, runner)
 
         # 1) Decide what to do (quick, under lock)
-        async with self.lock:
+        async with FILE_LOCK:
             idx = find_index_by_key(self.results, key)
             existing = self.results[idx] if idx is not None else None
 
@@ -370,13 +353,13 @@ class ResultCollector:
 
         # 2) Submit if needed (network, OUTSIDE lock)
         if need_submit:
-            job_id = await runner.submit_to_backend(example)
+            job_id = await runner.submit_execution(example)
             submitted_ts = datetime.datetime.now()
             print(
                 f"{submitted_ts}: Submit {example.name}-{example.num_qubits} for {runner.backend_service_provider} - {runner.backend_name}"
             )
 
-            async with self.lock:
+            async with FILE_LOCK:
                 await self._upsert_and_write(
                     key,
                     {
@@ -393,14 +376,16 @@ class ResultCollector:
 
         # 3) Score (network, OUTSIDE lock)
         try:
-            scores = await asyncio.wait_for(
-                runner.get_backend_score(example, job_id),
+            score = await asyncio.wait_for(
+                runner.score(example, job_id),
                 timeout=runner.max_timeout,
             )
             status = "COMPLETED"
         except asyncio.TimeoutError:
-            scores = RESULT_TIMEOUT
+            score = RESULT_TIMEOUT
             status = "TIMEOUT"
+
+        scores = {"score": score}
 
         completed_ts = datetime.datetime.now()
         print(
@@ -408,7 +393,7 @@ class ResultCollector:
         )
 
         # 4) Finalize + write (quick, under lock)
-        async with self.lock:
+        async with FILE_LOCK:
             final_result = await self._upsert_and_write(
                 key,
                 {
