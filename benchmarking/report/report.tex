@@ -1,0 +1,50 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+
+% background image
+\usepackage{graphicx}
+\usepackage{eso-pic}
+
+% \usepackage{datetime2}
+
+% theme color
+\usepackage{xcolor}
+\definecolor{ThemeText}{HTML}{D7F75B}
+
+% tables
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{detect-weight=true, detect-family=true}
+
+\newcommand\BackgroundPic{%
+  \put(0,0){%
+    \parbox[b][\paperheight]{\paperwidth}{%
+      \vfill
+      \centering
+      \includegraphics[width=\paperwidth,height=\paperheight]{background.pdf}%
+      \vfill
+    }%
+  }%
+}
+
+\begin{document}
+\AddToShipoutPictureBG{\BackgroundPic}
+\color{ThemeText}
+
+\begin{center}
+  {\LARGE\bfseries Quantum Benchmarks\par}
+  \vspace{0.3em}
+  {\large Hardware Runs\par}
+  \vspace{0.4em}
+  {\normalsize Report issue date: \today\par}
+\end{center}
+
+\vspace{1em}
+
+
+
+
+\IfFileExists{sections/_includes.tex}{\input{sections/_includes.tex}}{}
+
+\end{document}
