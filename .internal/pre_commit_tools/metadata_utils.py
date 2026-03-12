@@ -150,6 +150,11 @@ ORDERED_FIELDS = [field.name for field in ALL_FIELDS]
 
 def generate_empty_metadata_file(file: str) -> None:
     metadata = {field.name: field.generate_default_value(file) for field in ALL_FIELDS}
+
+    # remove fields which are not yet ready
+    for field in ["id", "thumbnail", "preview-file/code", "quantum-program", "type"]:
+        metadata.pop(field)
+
     return dump_metadata(file, metadata)
 
 
