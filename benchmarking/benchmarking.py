@@ -27,6 +27,7 @@ RESULT_TIMEOUT = {"score": float("nan")}
 #
 EXECUTION_SEMAPHORE = asyncio.Semaphore(3)
 FILE_LOCK = asyncio.Lock()
+REPORT_LOCK = asyncio.Lock()
 
 
 @dataclass
@@ -272,7 +273,7 @@ class ResultCollector:
             )
 
             #
-            # Step 3 - Write result & generate report
+            # Step 3 - Write result
             #
             final_result = await self._upsert_and_write(
                 runner,
@@ -282,30 +283,34 @@ class ResultCollector:
                 **scores,
             )
 
-            async with FILE_LOCK:
-                all_results = load_results(self.filename)
+            #
+            # Step 4 - Update report / build PDF (serialized)
+            #
+            async with REPORT_LOCK:
+                async with FILE_LOCK:
+                    all_results = load_results(self.filename)
 
-            df = make_df_for_example_qubits(
-                all_results, example.name, example.num_qubits
-            )
-
-            add_section(
-                name=section_name(example.name, example.num_qubits),
-                title=section_title(example.name, example.num_qubits),
-                df=df,
-                numeric_cols={"Score", "Time Elapsed (min)"},
-                root=self.report_root,
-                level="section",
-            )
-
-            write_includes(root=self.report_root)
-
-            if self.build_each_time:
-                await asyncio.to_thread(build_report, self.report_root, True)
-                print(
-                    f"** Report updated: {example.name}-{example.num_qubits} "
-                    f"for {runner.backend_service_provider} - {runner.backend_name}"
+                df = make_df_for_example_qubits(
+                    all_results, example.name, example.num_qubits
                 )
+
+                add_section(
+                    name=section_name(example.name, example.num_qubits),
+                    title=section_title(example.name, example.num_qubits),
+                    df=df,
+                    numeric_cols={"Score", "Time Elapsed (min)"},
+                    root=self.report_root,
+                    level="section",
+                )
+
+                write_includes(root=self.report_root)
+
+                if self.build_each_time:
+                    await asyncio.to_thread(build_report, self.report_root, True)
+                    print(
+                        f"** Report updated: {example.name}-{example.num_qubits} "
+                        f"for {runner.backend_service_provider} - {runner.backend_name}"
+                    )
 
             return final_result
 
@@ -315,7 +320,6 @@ class ResultCollector:
     async def _upsert_and_write(
         self, runner: HardwareRunner, example: BenchmarkExample, **extra_data
     ) -> dict:
-        """Updates an existing entry or appends a new one to prevent duplicate rows."""
         new_entry = runner.to_dict(example, **extra_data)
         base_dict = runner.to_dict(example)
 
