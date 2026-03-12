@@ -1,4 +1,11 @@
 from dataclasses import dataclass, field
+import csv
+import os
+from pathlib import Path
+import pandas as pd
+import datetime
+import asyncio
+
 from classiq import (
     create_model,
     synthesize_async,
@@ -9,12 +16,6 @@ from classiq import (
 )
 from hardwares_prefs import execution_preferences_wrapper
 from reporting import *
-import asyncio
-import csv
-import os
-from pathlib import Path
-import pandas as pd
-import datetime
 import abc
 
 
@@ -121,125 +122,54 @@ class HardwareRunner:
         }
 
 
-# Constants for ResultCollector
-RESULT_TIMEOUT = {"score": float("nan")}
-FIELDNAMES = [
-    "Example",
-    "Qubits",
-    "Provider",
-    "Backend Name",
-    "Num Shots",
-    "Status",
-    "Job ID",
-    "Submitted Time",
-    "Completed Time",
-    "Score",
-]
-
-
-# Utility functions for ResultCollector
-def dt_to_str(dt):
-    if isinstance(dt, datetime.datetime):
-        return dt.isoformat(timespec="seconds")
-    return "" if dt is None else str(dt)
-
-
-def str_to_dt(s: str):
-    if not s:
-        return None
-    try:
-        return datetime.datetime.fromisoformat(s)
-    except Exception:
-        return None
-
-
-def result_key(result: dict):
-    return (
-        result.get("example"),
-        result.get("num_qubits"),
-        result.get("backend_service_provider"),
-        result.get("backend_name"),
-        result.get("num_shots"),
-    )
-
-
-def make_key(example, runner):
-    return (
-        getattr(example, "name", "UNKNOWN"),
-        int(getattr(example, "num_qubits", -1)),
-        runner.backend_service_provider,
-        runner.backend_name,
-        int(runner.num_shots),
-    )
-
-
-def find_index_by_key(results: list[dict], key: tuple):
-    for i, r in enumerate(results):
-        if result_key(r) == key:
-            return i
-    return None
-
-
-def result_to_row(r: dict) -> dict:
-    return {
-        "Example": r.get("example", ""),
-        "Qubits": r.get("num_qubits", ""),
-        "Provider": r.get("backend_service_provider", ""),
-        "Backend Name": r.get("backend_name", ""),
-        "Num Shots": r.get("num_shots", ""),
-        "Status": r.get("status", ""),
-        "Job ID": r.get("job_id", ""),
-        "Submitted Time": dt_to_str(r.get("submitted_timestamp")),
-        "Completed Time": dt_to_str(r.get("timestamp")),
-        "Score": r.get("score", ""),
-    }
-
-
-def row_to_result(row: dict) -> dict:
-    def to_int(x):
-        try:
-            return int(float(x))
-        except Exception:
-            return None
-
-    def to_float(x):
-        try:
-            return float(x)
-        except Exception:
-            return None
-
-    return {
-        "example": row.get("Example", ""),
-        "num_qubits": to_int(row.get("Qubits", "")),
-        "backend_service_provider": row.get("Provider", ""),
-        "backend_name": row.get("Backend Name", ""),
-        "num_shots": to_int(row.get("Num Shots", "")),
-        "status": row.get("Status", ""),
-        "job_id": row.get("Job ID", ""),
-        "submitted_timestamp": str_to_dt(row.get("Submitted Time", "")),
-        "timestamp": str_to_dt(row.get("Completed Time", "")),
-        "score": to_float(row.get("Score", "")),
-    }
-
-
-def read_results_csv(path: str) -> list[dict]:
-    p = Path(path)
-    if not p.exists() or p.stat().st_size == 0:
+#
+# Utility functions & CSV I/O
+#
+def load_results(filename: str) -> list[dict]:
+    """Reads the CSV and converts numerical/datetime strings back to objects."""
+    if not os.path.exists(filename) or os.stat(filename).st_size == 0:
         return []
-    with open(path, "r", encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        return [row_to_result(row) for row in reader]
+
+    results = []
+    with open(filename, "r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            # Restore types dynamically
+            for k in ["num_qubits", "num_shots"]:
+                if row.get(k):
+                    row[k] = int(float(row[k]))
+            if row.get("score"):
+                row["score"] = float(row["score"])
+            for k in ["submitted_timestamp", "timestamp"]:
+                if row.get(k):
+                    row[k] = datetime.datetime.fromisoformat(row[k])
+
+            results.append(row)
+    return results
 
 
-def write_results_csv_atomic(path: str, results: list[dict]) -> None:
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=FIELDNAMES)
-        w.writeheader()
+def dump_results(filename: str, results: list[dict]) -> None:
+    """Safely writes a list of dicts to CSV via an atomic replacement."""
+    if not results:
+        return
+
+    Path(filename).parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = filename + ".tmp"
+
+    # Extract keys from the first dictionary to use as CSV headers
+    fieldnames = list(results[0].keys())
+
+    with open(tmp_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
         for r in results:
-            w.writerow(result_to_row(r))
-    os.replace(tmp, path)
+            # Convert datetimes to isoformat strings for clean saving
+            row = {
+                k: (v.isoformat() if isinstance(v, datetime.datetime) else v)
+                for k, v in r.items()
+            }
+            writer.writerow(row)
+
+    os.replace(tmp_path, filename)
 
 
 def make_df_for_example_qubits(
@@ -247,44 +177,33 @@ def make_df_for_example_qubits(
 ) -> pd.DataFrame:
     rows = []
     for r in results:
-        if r.get("example") != example_name:
-            continue
-        if r.get("num_qubits") != num_qubits:
-            continue
-        if r.get("status") not in {"COMPLETED", "TIMEOUT", "ERROR"}:
-            continue
-
-        submitted = r.get("submitted_timestamp")
-        completed = r.get("timestamp")
-
-        elapsed_min = None
-        if isinstance(submitted, datetime.datetime) and isinstance(
-            completed, datetime.datetime
+        if (
+            r.get("example") == example_name
+            and r.get("num_qubits") == num_qubits
+            and r.get("status") in {"COMPLETED", "TIMEOUT", "ERROR"}
         ):
-            elapsed_sec = (completed - submitted).total_seconds()
-            elapsed_min = elapsed_sec / 60.0
+            sub, comp = r.get("submitted_timestamp"), r.get("timestamp")
+            elapsed_min = (
+                (comp - sub).total_seconds() / 60.0 if (sub and comp) else None
+            )
 
-        rows.append(
-            {
-                "Provider": r.get("backend_service_provider", ""),
-                "Backend Name": r.get("backend_name", ""),
-                "Score": r.get("score", float("nan")),
-                "Time Elapsed (min)": elapsed_min,
-            }
-        )
+            rows.append(
+                {
+                    "Provider": r.get("backend_service_provider", ""),
+                    "Backend Name": r.get("backend_name", ""),
+                    "Score": r.get("score", float("nan")),
+                    "Time Elapsed (min)": elapsed_min,
+                }
+            )
 
     df = pd.DataFrame(rows)
-    if df.empty:
-        return df
+    if not df.empty:
+        df["Score"] = pd.to_numeric(df["Score"], errors="coerce").round(4)
+        df["Time Elapsed (min)"] = pd.to_numeric(
+            df["Time Elapsed (min)"], errors="coerce"
+        ).round(1)
+        df = df.sort_values(["Provider", "Backend Name"]).reset_index(drop=True)
 
-    # --- formatting rules ---
-    df["Score"] = pd.to_numeric(df["Score"], errors="coerce").round(4)
-
-    df["Time Elapsed (min)"] = pd.to_numeric(
-        df["Time Elapsed (min)"], errors="coerce"
-    ).round(1)
-
-    df = df.sort_values(["Provider", "Backend Name"]).reset_index(drop=True)
     return df
 
 
@@ -296,85 +215,43 @@ def section_title(example_name: str, num_qubits: int) -> str:
     return f"{example_name} - {num_qubits} qubits"
 
 
+#
+# Collector
+#
+@dataclass
 class ResultCollector:
-    def __init__(
-        self,
-        filename: str,
-        reset_file: bool = False,
-        report_root: str = "../report",
-        build_each_time: bool = False,
-    ):
-        self.filename = filename
-        FILE_LOCK = asyncio.Lock()
-        self.report_root = report_root
-        self.build_each_time = build_each_time
+    filename: str
+    report_root: str = "../report"
+    build_each_time: bool = False
 
-        if reset_file:
-            self.results = []
-            write_results_csv_atomic(self.filename, self.results)
+    async def run(
+        self, runner: HardwareRunner, example: BenchmarkExample
+    ) -> dict | None:
+        #
+        # Step 1 - load existing data, or submit if needed
+        #
+        existing_data = await self._load_existing_data(runner, example)
+
+        if existing_data is None:
+            job_id = await self._submit_and_write(runner, example)
         else:
-            self.results = read_results_csv(self.filename)
-
-    async def _upsert_and_write(self, key: tuple, patch: dict) -> dict:
-        """
-        Must be called under the lock.
-        """
-        idx = find_index_by_key(self.results, key)
-        if idx is None:
-            self.results.append(patch.copy())
-            idx = len(self.results) - 1
-        else:
-            self.results[idx].update(patch)
-
-        write_results_csv_atomic(self.filename, self.results)
-        return dict(self.results[idx])
-
-    async def run_hardware(self, runner, example) -> dict:
-        key = make_key(example, runner)
-
-        # 1) Decide what to do (quick, under lock)
-        async with FILE_LOCK:
-            idx = find_index_by_key(self.results, key)
-            existing = self.results[idx] if idx is not None else None
-
-            if existing and existing.get("status") == "COMPLETED":
-                return dict(existing)
-
-            if (
-                existing
-                and existing.get("status") == "SUBMITTED"
-                and existing.get("job_id")
-            ):
-                job_id = existing["job_id"]
-                need_submit = False
+            if existing_data["status"] == "COMPLETED":
+                return existing_data
+            elif existing_data["status"] == "SUBMITTED":
+                job_id = existing_data["job_id"]
+            elif existing_data["status"] == "TIMEOUT":
+                print(
+                    "Previous attempt timed out. We're NOT trying again automatically."
+                )
+                return None
             else:
-                job_id = None
-                need_submit = True
-
-        # 2) Submit if needed (network, OUTSIDE lock)
-        if need_submit:
-            job_id = await runner.submit_execution(example)
-            submitted_ts = datetime.datetime.now()
-            print(
-                f"{submitted_ts}: Submit {example.name}-{example.num_qubits} for {runner.backend_service_provider} - {runner.backend_name}"
-            )
-
-            async with FILE_LOCK:
-                await self._upsert_and_write(
-                    key,
-                    {
-                        "example": example.name,
-                        "num_qubits": example.num_qubits,
-                        "backend_service_provider": runner.backend_service_provider,
-                        "backend_name": runner.backend_name,
-                        "num_shots": runner.num_shots,
-                        "status": "SUBMITTED",
-                        "job_id": job_id,
-                        "submitted_timestamp": submitted_ts,
-                    },
+                raise ValueError(
+                    "Weird case. There is already an entry, and it's not COMPLETED and not SUBMITTED."
                 )
 
-        # 3) Score (network, OUTSIDE lock)
+        #
+        # Step 2 - Wait for execution and Score
+        #
         try:
             score = await asyncio.wait_for(
                 runner.score(example, job_id),
@@ -385,45 +262,101 @@ class ResultCollector:
             score = RESULT_TIMEOUT
             status = "TIMEOUT"
 
-        scores = {"score": score}
-
         completed_ts = datetime.datetime.now()
         print(
-            f"{completed_ts}: Completed {example.name}-{example.num_qubits} for {runner.backend_service_provider} - {runner.backend_name} --> Score {scores}"
+            f"{completed_ts}: Completed {example.name}-{example.num_qubits} for {runner.backend_service_provider} - {runner.backend_name} --> Score {score}"
         )
 
-        # 4) Finalize + write (quick, under lock)
+        #
+        # Step 3 - Write result & Generate pdf
+        #
+        final_result = await self._upsert_and_write(
+            runner,
+            example,
+            status=status,
+            score=score,
+            timestamp=completed_ts,
+        )
+
+        # --- Generate Report ---
         async with FILE_LOCK:
-            final_result = await self._upsert_and_write(
-                key,
-                {
-                    "status": status,
-                    "timestamp": completed_ts,
-                    **scores,
-                },
+            all_results = load_results(self.filename)
+
+        df = make_df_for_example_qubits(all_results, example.name, example.num_qubits)
+
+        add_section(
+            name=section_name(example.name, example.num_qubits),
+            title=section_title(example.name, example.num_qubits),
+            df=df,
+            numeric_cols={"Score", "Time Elapsed (min)"},
+            root=self.report_root,
+            level="section",
+        )
+
+        write_includes(root=self.report_root)
+
+        if self.build_each_time:
+            await asyncio.to_thread(build_report, self.report_root, True)
+            print(
+                f"** Report updated: {example.name}-{example.num_qubits} for {runner.backend_service_provider} - {runner.backend_name}"
             )
 
-            # --- report update goes HERE (still under the same lock) ---
-            ex = final_result["example"]
-            nq = final_result["num_qubits"]
+        return final_result
 
-            df = make_df_for_example_qubits(self.results, ex, nq)
+    async def _upsert_and_write(
+        self, runner: HardwareRunner, example: BenchmarkExample, **extra_data
+    ) -> dict:
+        """Updates an existing entry or appends a new one to prevent duplicate rows."""
+        new_entry = runner.to_dict(example, **extra_data)
+        base_dict = runner.to_dict(example)
 
-            add_section(
-                name=section_name(ex, nq),  # e.g. "adder_q4"
-                title=section_title(ex, nq),  # e.g. "Adder - 4 qubits"
-                df=df,
-                numeric_cols={"Score", "Time Elapsed (min)"},
-                root=self.report_root,
-                level="section",
-            )
+        async with FILE_LOCK:
+            results = load_results(self.filename)
 
-            write_includes(root=self.report_root)
+            updated = False
+            for i, res in enumerate(results):
+                # If the base attributes match, this is our row to update
+                if base_dict.items() <= res.items():
+                    results[i].update(new_entry)
+                    new_entry = results[i]
+                    updated = True
+                    break
 
-            if self.build_each_time:
-                await asyncio.to_thread(build_report, self.report_root, True)
-                print(
-                    f"** Report updated: {example.name}-{example.num_qubits} for {runner.backend_service_provider} - {runner.backend_name}"
-                )
+            if not updated:
+                results.append(new_entry)
 
-            return final_result
+            dump_results(self.filename, results)
+
+        return new_entry
+
+    async def _submit_and_write(
+        self, runner: HardwareRunner, example: BenchmarkExample
+    ) -> str:
+        job_id = await runner.submit_execution(example)
+
+        submitted_ts = datetime.datetime.now()
+        print(
+            f"{submitted_ts}: Submit {example.name}-{example.num_qubits} for {runner.backend_service_provider} - {runner.backend_name}"
+        )
+
+        await self._upsert_and_write(
+            runner,
+            example,
+            status="SUBMITTED",
+            job_id=job_id,
+            submitted_timestamp=submitted_ts,
+        )
+        return job_id
+
+    async def _load_existing_data(
+        self, runner: HardwareRunner, example: BenchmarkExample
+    ) -> dict | None:
+        example_dict = runner.to_dict(example)
+
+        async with FILE_LOCK:
+            results = load_results(self.filename)
+
+        for res in results:
+            if example_dict.items() <= res.items():
+                return res
+        return None
