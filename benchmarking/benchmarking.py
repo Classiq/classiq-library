@@ -6,6 +6,7 @@ import pandas as pd
 import datetime
 import asyncio
 import abc
+import traceback
 
 from classiq import (
     create_model,
@@ -15,6 +16,7 @@ from classiq import (
     ExecutionPreferences,
     Constraints,
     QuantumProgram,
+    ExecutionJob,
 )
 from hardwares_preferences import execution_preferences_wrapper
 from reporting import *
@@ -28,6 +30,13 @@ RESULT_TIMEOUT = {"score": float("nan")}
 EXECUTION_SEMAPHORE = asyncio.Semaphore(3)
 FILE_LOCK = asyncio.Lock()
 REPORT_LOCK = asyncio.Lock()
+
+
+class StageError(Exception):
+    def __init__(self, stage: str, original: Exception):
+        super().__init__(f"{stage} failed: {original}")
+        self.stage = stage
+        self.original = original
 
 
 @dataclass
@@ -49,6 +58,18 @@ class BenchmarkExample(abc.ABC):
         Submit the execution and return a job_id.
         """
         pass
+
+    async def get_job_result(self, job_id: str):
+        """
+        Helper for concrete benchmarks.
+        Use this inside score() so retrieve-job failures are tagged correctly.
+        """
+        try:
+            job = ExecutionJob.from_id(job_id)
+            result = await job.result_async()
+            return job, result
+        except Exception as exc:
+            raise StageError("retrieve_job", exc) from exc
 
     @abc.abstractmethod
     async def score(self, job_id: str) -> dict:
@@ -89,24 +110,37 @@ class HardwareRunner:
         )
 
     async def _synthesize(self, example: BenchmarkExample) -> QuantumProgram:
-        qmod = create_model(
-            example.main,
-            preferences=self._synthesis_preferences,
-            constraints=example.constraints,
-        )
-        qprog = await synthesize_async(qmod)
-        qprog = set_quantum_program_execution_preferences(
-            qprog, self._execution_preferences
-        )
-        return qprog
+        try:
+            qmod = create_model(
+                example.main,
+                preferences=self._synthesis_preferences,
+                constraints=example.constraints,
+            )
+            qprog = await synthesize_async(qmod)
+            qprog = set_quantum_program_execution_preferences(
+                qprog, self._execution_preferences
+            )
+            return qprog
+        except Exception as exc:
+            raise StageError("synthesis", exc) from exc
 
     async def submit_execution(self, example: BenchmarkExample) -> str:
-        qprog = await self._synthesize(example)
-        job_id = await example.submit(qprog)
-        return job_id
+        try:
+            qprog = await self._synthesize(example)
+            job_id = await example.submit(qprog)
+            return job_id
+        except StageError:
+            raise
+        except Exception as exc:
+            raise StageError("submit_job", exc) from exc
 
     async def score(self, example: BenchmarkExample, job_id: str) -> dict:
-        return await example.score(job_id)
+        try:
+            return await example.score(job_id)
+        except StageError:
+            raise
+        except Exception as exc:
+            raise StageError("score", exc) from exc
 
     def to_dict(self, example: BenchmarkExample, **kwargs):
         return {
@@ -220,10 +254,76 @@ class ResultCollector:
     filename: str
     report_root: str = "../report"
     build_each_time: bool = False
+    log_filename: str | None = None
+
+    def __post_init__(self):
+        if self.log_filename is None:
+            p = Path(self.filename)
+            self.log_filename = str(p.with_suffix(p.suffix + ".errors.log"))
 
     async def reset_file(self) -> None:
         async with FILE_LOCK:
             dump_results(self.filename, [])
+
+    def _append_error_log(
+        self,
+        stage: str,
+        runner: HardwareRunner,
+        example: BenchmarkExample,
+        exc: Exception,
+        job_id: str | None = None,
+    ) -> None:
+        Path(self.log_filename).parent.mkdir(parents=True, exist_ok=True)
+        now = datetime.datetime.now().isoformat(timespec="seconds")
+
+        with open(self.log_filename, "a", encoding="utf-8") as f:
+            f.write("=" * 100 + "\n")
+            f.write(f"time: {now}\n")
+            f.write(f"stage: {stage}\n")
+            f.write(f"example: {example.name}\n")
+            f.write(f"num_qubits: {example.num_qubits}\n")
+            f.write(f"provider: {runner.backend_service_provider}\n")
+            f.write(f"backend: {runner.backend_name}\n")
+            f.write(f"num_shots: {runner.num_shots}\n")
+            if job_id is not None:
+                f.write(f"job_id: {job_id}\n")
+            f.write(f"exception_type: {type(exc).__name__}\n")
+            f.write(f"exception_message: {exc}\n")
+            f.write("\nTRACEBACK\n")
+            f.write(
+                "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+            )
+            f.write("\n")
+
+    async def _record_error(
+        self,
+        runner: HardwareRunner,
+        example: BenchmarkExample,
+        stage: str,
+        exc: Exception,
+        job_id: str | None = None,
+        **extra_data,
+    ) -> dict:
+        self._append_error_log(stage, runner, example, exc, job_id=job_id)
+
+        payload = {
+            "status": "ERROR",
+            "timestamp": datetime.datetime.now(),
+            "job_id": job_id,
+            "error_stage": stage,
+            "error_type": type(exc).__name__,
+            "error_message": str(exc),
+            **extra_data,
+        }
+
+        try:
+            return await self._upsert_and_write(runner, example, **payload)
+        except Exception as write_exc:
+            # If even the CSV write fails, at least log that too and return a best-effort dict.
+            self._append_error_log(
+                "write_error_record", runner, example, write_exc, job_id=job_id
+            )
+            return runner.to_dict(example, **payload)
 
     async def run(
         self, runner: HardwareRunner, example: BenchmarkExample
@@ -233,10 +333,22 @@ class ResultCollector:
             #
             # Step 1 - load existing data, or submit if needed
             #
-            existing_data = await self._load_existing_data(runner, example)
+            try:
+                existing_data = await self._load_existing_data(runner, example)
+            except Exception as exc:
+                return await self._record_error(runner, example, "load_results", exc)
+
+            job_id = None
 
             if existing_data is None:
-                job_id = await self._submit_and_write(runner, example)
+                try:
+                    job_id = await self._submit_and_write(runner, example)
+                except StageError as exc:
+                    return await self._record_error(
+                        runner, example, exc.stage, exc.original
+                    )
+                except Exception as exc:
+                    return await self._record_error(runner, example, "submit_job", exc)
             else:
                 if existing_data["status"] == "COMPLETED":
                     return existing_data
@@ -247,9 +359,18 @@ class ResultCollector:
                         "Previous attempt timed out. We're NOT trying again automatically."
                     )
                     return None
+                elif existing_data["status"] == "ERROR":
+                    print(
+                        "Previous attempt ended with ERROR. We're NOT trying again automatically."
+                    )
+                    return existing_data
                 else:
-                    raise ValueError(
-                        "Weird case. There is already an entry, and it's not COMPLETED and not SUBMITTED."
+                    return await self._record_error(
+                        runner,
+                        example,
+                        "load_results",
+                        ValueError("Existing row has an unexpected status."),
+                        job_id=existing_data.get("job_id"),
                     )
 
             #
@@ -264,6 +385,14 @@ class ResultCollector:
             except asyncio.TimeoutError:
                 scores = RESULT_TIMEOUT
                 status = "TIMEOUT"
+            except StageError as exc:
+                return await self._record_error(
+                    runner, example, exc.stage, exc.original, job_id=job_id
+                )
+            except Exception as exc:
+                return await self._record_error(
+                    runner, example, "score", exc, job_id=job_id
+                )
 
             completed_ts = datetime.datetime.now()
             print(
@@ -275,42 +404,62 @@ class ResultCollector:
             #
             # Step 3 - Write result
             #
-            final_result = await self._upsert_and_write(
-                runner,
-                example,
-                status=status,
-                timestamp=completed_ts,
-                **scores,
-            )
+            try:
+                final_result = await self._upsert_and_write(
+                    runner,
+                    example,
+                    status=status,
+                    timestamp=completed_ts,
+                    **scores,
+                )
+            except Exception as exc:
+                return await self._record_error(
+                    runner,
+                    example,
+                    "write_results",
+                    exc,
+                    job_id=job_id,
+                    **scores,
+                )
 
             #
             # Step 4 - Update report / build PDF (serialized)
             #
-            async with REPORT_LOCK:
-                async with FILE_LOCK:
-                    all_results = load_results(self.filename)
+            try:
+                async with REPORT_LOCK:
+                    async with FILE_LOCK:
+                        all_results = load_results(self.filename)
 
-                df = make_df_for_example_qubits(
-                    all_results, example.name, example.num_qubits
-                )
-
-                add_section(
-                    name=section_name(example.name, example.num_qubits),
-                    title=section_title(example.name, example.num_qubits),
-                    df=df,
-                    numeric_cols={"Score", "Time Elapsed (min)"},
-                    root=self.report_root,
-                    level="section",
-                )
-
-                write_includes(root=self.report_root)
-
-                if self.build_each_time:
-                    await asyncio.to_thread(build_report, self.report_root, True)
-                    print(
-                        f"** Report updated: {example.name}-{example.num_qubits} "
-                        f"for {runner.backend_service_provider} - {runner.backend_name}"
+                    df = make_df_for_example_qubits(
+                        all_results, example.name, example.num_qubits
                     )
+
+                    add_section(
+                        name=section_name(example.name, example.num_qubits),
+                        title=section_title(example.name, example.num_qubits),
+                        df=df,
+                        numeric_cols={"Score", "Time Elapsed (min)"},
+                        root=self.report_root,
+                        level="section",
+                    )
+
+                    write_includes(root=self.report_root)
+
+                    if self.build_each_time:
+                        await asyncio.to_thread(build_report, self.report_root, True)
+                        print(
+                            f"** Report updated: {example.name}-{example.num_qubits} "
+                            f"for {runner.backend_service_provider} - {runner.backend_name}"
+                        )
+            except Exception as exc:
+                return await self._record_error(
+                    runner,
+                    example,
+                    "report",
+                    exc,
+                    job_id=job_id,
+                    **scores,
+                )
 
             return final_result
 
