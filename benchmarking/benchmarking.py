@@ -529,3 +529,32 @@ class ResultCollector:
             if example_dict.items() <= res.items():
                 return res
         return None
+
+    async def print_status(self) -> None:
+        async with FILE_LOCK:
+            results = load_results(self.filename)
+
+        print("=" * 10 + f" ({datetime.datetime.now()})   " + "=" * 10)
+        if not results:
+            print("No jobs recorded.")
+            return
+
+        for res in results:
+            status = res.get("status", "")
+            prefix = (
+                f"{res.get('example')}-{res.get('num_qubits')} | "
+                f"{res.get('backend_service_provider')} - {res.get('backend_name')}"
+            )
+
+            if status == "COMPLETED":
+                score = res.get("score")
+                exe_time_min = res.get("execution_time")
+                print(
+                    f"{prefix} | COMPLETED | score={score:.4f} | time={exe_time_min:.2f} min"
+                )
+            elif status == "SUBMITTED":
+                print(f"{prefix} | {status} | at={res.get('submitted_timestamp')}")
+            elif status == "ERROR" or status == "TIMEOUT":
+                print(f"{prefix} | {status} ")
+            else:
+                print(f"{prefix} | {status} | Not submitted yet")
