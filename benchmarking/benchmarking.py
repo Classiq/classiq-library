@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 import csv
 import os
-from pathlib import Path
-import pandas as pd
 import datetime
 import asyncio
 import abc
@@ -17,6 +15,8 @@ from classiq import (
     Constraints,
     QuantumProgram,
     ExecutionJob,
+    synthesize,
+    show,
 )
 from hardwares_preferences import execution_preferences_wrapper
 from reporting import *
@@ -79,6 +79,13 @@ class BenchmarkExample(abc.ABC):
         and computing the benchmark score.
         """
         pass
+
+    def show(self) -> None:
+        qprog = synthesize(
+            self.main,
+            constraints=self.constraints,
+        )
+        show(qprog)
 
 
 @dataclass
@@ -308,7 +315,7 @@ class ResultCollector:
 
         payload = {
             "status": "ERROR",
-            "timestamp": datetime.datetime.now(),
+            "timestamp": datetime.datetime.now(),  # note this is the time in which the result was received. The job time is returned with the score.
             "job_id": job_id,
             "error_stage": stage,
             "error_type": type(exc).__name__,
