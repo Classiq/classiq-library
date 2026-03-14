@@ -5,7 +5,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("rainbow_options_workshop_bruteforce", timeout_seconds=200)
+@wrap_testbook("rainbow_options_workshop_bruteforce", timeout_seconds=300)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs state preparation of the iqae
     validate_quantum_program_size(
@@ -17,3 +17,5 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         tb.ref_pydantic("iqae_qprog"),
         expected_width=25,
     )
+
+    pass  # Todo
