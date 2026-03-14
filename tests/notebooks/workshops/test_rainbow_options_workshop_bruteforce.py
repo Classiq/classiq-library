@@ -9,7 +9,7 @@ from testbook.client import TestbookNotebookClient
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs state preparation of the iqae
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog"),
+        tb.ref_pydantic("sp_qprog"),
         expected_width=23,
     )
     # test quantum program of full the iqae
