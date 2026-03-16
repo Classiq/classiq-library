@@ -20,6 +20,8 @@ from classiq import (
 )
 from hardwares_preferences import execution_preferences_wrapper
 from reporting import *
+from collections import Counter
+from pathlib import Path
 
 
 RESULT_TIMEOUT = {"score": float("nan")}
@@ -27,9 +29,11 @@ RESULT_TIMEOUT = {"score": float("nan")}
 #
 # Locks
 #
-EXECUTION_SEMAPHORE = asyncio.Semaphore(3)
+EXECUTION_SEMAPHORE = asyncio.Semaphore(8)
 FILE_LOCK = asyncio.Lock()
 REPORT_LOCK = asyncio.Lock()
+
+SUBMISSION_LOCK = asyncio.Lock()
 
 
 class StageError(Exception):
@@ -163,6 +167,33 @@ class HardwareRunner:
 #
 # Utility functions & CSV I/O
 #
+
+
+def status_counts_in_dir(data_dir: str | Path) -> dict[str, int]:
+    counts = Counter()
+    data_dir = Path(data_dir)
+
+    if not data_dir.exists():
+        return {}
+
+    for path in data_dir.glob("*.csv"):
+        try:
+            results = load_results(str(path))
+        except Exception:
+            continue
+
+        for res in results:
+            status = res.get("status")
+            if status is not None:
+                counts[status] += 1
+
+    return dict(counts)
+
+
+def count_submitted_jobs_in_dir(data_dir: str | Path) -> int:
+    return status_counts_in_dir(data_dir).get("SUBMITTED", 0)
+
+
 def load_results(filename: str) -> list[dict]:
     if not os.path.exists(filename) or os.stat(filename).st_size == 0:
         return []
@@ -262,11 +293,20 @@ class ResultCollector:
     report_root: str = "../report"
     build_each_time: bool = False
     log_filename: str | None = None
+    skip_report: bool = False
+
+    # New
+    max_submitted_jobs_in_dir: int | None = 3
+    data_dir: str | None = None
 
     def __post_init__(self):
+        p = Path(self.filename)
+
         if self.log_filename is None:
-            p = Path(self.filename)
             self.log_filename = str(p.with_suffix(p.suffix + ".errors.log"))
+
+        if self.data_dir is None:
+            self.data_dir = str(p.parent)
 
     async def reset_file(self) -> None:
         async with FILE_LOCK:
@@ -332,6 +372,29 @@ class ResultCollector:
             )
             return runner.to_dict(example, **payload)
 
+    async def _submit_if_capacity_available(
+        self,
+        runner: HardwareRunner,
+        example: BenchmarkExample,
+    ) -> str | None:
+        # No directory-level limit configured
+        if self.max_submitted_jobs_in_dir is None:
+            return await self._submit_and_write(runner, example)
+
+        async with SUBMISSION_LOCK:
+            async with FILE_LOCK:
+                num_submitted = count_submitted_jobs_in_dir(self.data_dir)
+
+            if num_submitted >= self.max_submitted_jobs_in_dir:
+                print(
+                    f"Submission budget full in {self.data_dir}: "
+                    f"{num_submitted}/{self.max_submitted_jobs_in_dir} jobs are already SUBMITTED. "
+                    f"Skipping new submission for now."
+                )
+                return None
+
+            return await self._submit_and_write(runner, example)
+
     async def run(
         self, runner: HardwareRunner, example: BenchmarkExample
     ) -> dict | None:
@@ -349,7 +412,9 @@ class ResultCollector:
 
             if existing_data is None:
                 try:
-                    job_id = await self._submit_and_write(runner, example)
+                    job_id = await self._submit_if_capacity_available(runner, example)
+                    if job_id is None:
+                        return None
                 except StageError as exc:
                     return await self._record_error(
                         runner, example, exc.stage, exc.original
@@ -432,41 +497,44 @@ class ResultCollector:
             #
             # Step 4 - Update report / build PDF (serialized)
             #
-            try:
-                async with REPORT_LOCK:
-                    async with FILE_LOCK:
-                        all_results = load_results(self.filename)
+            if not self.skip_report:
+                try:
+                    async with REPORT_LOCK:
+                        async with FILE_LOCK:
+                            all_results = load_results(self.filename)
 
-                    df = make_df_for_example_qubits(
-                        all_results, example.name, example.num_qubits
-                    )
-
-                    add_section(
-                        name=section_name(example.name, example.num_qubits),
-                        title=section_title(example.name, example.num_qubits),
-                        df=df,
-                        numeric_cols={"Score", "Time Elapsed (min)"},
-                        root=self.report_root,
-                        level="section",
-                    )
-
-                    write_includes(root=self.report_root)
-
-                    if self.build_each_time:
-                        await asyncio.to_thread(build_report, self.report_root, True)
-                        print(
-                            f"** Report updated: {example.name}-{example.num_qubits} "
-                            f"for {runner.backend_service_provider} - {runner.backend_name}"
+                        df = make_df_for_example_qubits(
+                            all_results, example.name, example.num_qubits
                         )
-            except Exception as exc:
-                return await self._record_error(
-                    runner,
-                    example,
-                    "report",
-                    exc,
-                    job_id=job_id,
-                    **scores,
-                )
+
+                        add_section(
+                            name=section_name(example.name, example.num_qubits),
+                            title=section_title(example.name, example.num_qubits),
+                            df=df,
+                            numeric_cols={"Score", "Time Elapsed (min)"},
+                            root=self.report_root,
+                            level="section",
+                        )
+
+                        write_includes(root=self.report_root)
+
+                        if self.build_each_time:
+                            await asyncio.to_thread(
+                                build_report, self.report_root, True
+                            )
+                            print(
+                                f"** Report updated: {example.name}-{example.num_qubits} "
+                                f"for {runner.backend_service_provider} - {runner.backend_name}"
+                            )
+                except Exception as exc:
+                    return await self._record_error(
+                        runner,
+                        example,
+                        "report",
+                        exc,
+                        job_id=job_id,
+                        **scores,
+                    )
 
             return final_result
 
