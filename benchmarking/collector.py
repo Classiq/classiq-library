@@ -1,30 +1,23 @@
-from dataclasses import dataclass, field
-import csv
-import os
+from dataclasses import dataclass
+
 import datetime
 import asyncio
-import abc
 import traceback
 
-from classiq import (
-    create_model,
-    synthesize_async,
-    Preferences,
-    set_quantum_program_execution_preferences,
-    ExecutionPreferences,
-    Constraints,
-    QuantumProgram,
-    ExecutionJob,
-    synthesize,
-    show,
-)
-from hardwares_preferences import execution_preferences_wrapper
 from reporting import *
-from collections import Counter
 from pathlib import Path
 
-
-RESULT_TIMEOUT = {"score": float("nan")}
+from benchmark import BenchmarkExample
+from hardware import HardwareRunner
+from errors import StageError, RESULT_TIMEOUT
+from storage import (
+    load_results,
+    make_df_for_example_qubits,
+    section_name,
+    dump_results,
+    section_title,
+    count_submitted_jobs_in_dir,
+)
 
 #
 # Locks
@@ -36,257 +29,6 @@ REPORT_LOCK = asyncio.Lock()
 SUBMISSION_LOCK = asyncio.Lock()
 
 
-class StageError(Exception):
-    def __init__(self, stage: str, original: Exception):
-        super().__init__(f"{stage} failed: {original}")
-        self.stage = stage
-        self.original = original
-
-
-@dataclass
-class BenchmarkExample(abc.ABC):
-    name: str
-    num_qubits: int
-    constraints: Constraints = field(default_factory=Constraints)
-
-    def __post_init__(self):
-        self.main = self.create_main()
-
-    @abc.abstractmethod
-    def create_main(self) -> callable:
-        pass
-
-    @abc.abstractmethod
-    async def submit(self, qprog: QuantumProgram) -> str:
-        """
-        Submit the execution and return a job_id.
-        """
-        pass
-
-    async def get_job_result(self, job_id: str):
-        """
-        Helper for concrete benchmarks.
-        Use this inside score() so retrieve-job failures are tagged correctly.
-        """
-        try:
-            job = ExecutionJob.from_id(job_id)
-            result = await job.result_async()
-            return job, result
-        except Exception as exc:
-            raise StageError("retrieve_job", exc) from exc
-
-    @abc.abstractmethod
-    async def score(self, job_id: str) -> dict:
-        """
-        Return a dict like {"score": float}.
-        This method is responsible for reading the job result
-        and computing the benchmark score.
-        """
-        pass
-
-    def show(self) -> None:
-        qprog = synthesize(
-            self.main,
-            constraints=self.constraints,
-        )
-        show(qprog)
-
-
-@dataclass
-class HardwareRunner:
-    backend_service_provider: str
-    backend_name: str
-    max_timeout: int  # seconds
-    num_shots: int
-    backend_kwargs: dict = field(default_factory=dict)
-
-    @property
-    def _synthesis_preferences(self) -> Preferences:
-        if self.backend_service_provider == "Classiq":
-            return Preferences()
-        return Preferences(
-            backend_service_provider=self.backend_service_provider,
-            backend_name=self.backend_name,
-        )
-
-    @property
-    def _execution_preferences(self):
-        return ExecutionPreferences(
-            num_shots=self.num_shots,
-            backend_preferences=execution_preferences_wrapper(
-                self.backend_service_provider,
-                self.backend_name,
-                **self.backend_kwargs,
-            ),
-        )
-
-    async def _synthesize(self, example: BenchmarkExample) -> QuantumProgram:
-        try:
-            qmod = create_model(
-                example.main,
-                preferences=self._synthesis_preferences,
-                constraints=example.constraints,
-            )
-            qprog = await synthesize_async(qmod)
-            qprog = set_quantum_program_execution_preferences(
-                qprog, self._execution_preferences
-            )
-            return qprog
-        except Exception as exc:
-            raise StageError("synthesis", exc) from exc
-
-    async def submit_execution(self, example: BenchmarkExample) -> str:
-        try:
-            qprog = await self._synthesize(example)
-            job_id = await example.submit(qprog)
-            return job_id
-        except StageError:
-            raise
-        except Exception as exc:
-            raise StageError("submit_job", exc) from exc
-
-    async def score(self, example: BenchmarkExample, job_id: str) -> dict:
-        try:
-            return await example.score(job_id)
-        except StageError:
-            raise
-        except Exception as exc:
-            raise StageError("score", exc) from exc
-
-    def to_dict(self, example: BenchmarkExample, **kwargs):
-        return {
-            "example": example.name,
-            "num_qubits": example.num_qubits,
-            "backend_service_provider": self.backend_service_provider,
-            "backend_name": self.backend_name,
-            "num_shots": self.num_shots,
-            **kwargs,
-        }
-
-
-#
-# Utility functions & CSV I/O
-#
-
-
-def status_counts_in_dir(data_dir: str | Path) -> dict[str, int]:
-    counts = Counter()
-    data_dir = Path(data_dir)
-
-    if not data_dir.exists():
-        return {}
-
-    for path in data_dir.glob("*.csv"):
-        try:
-            results = load_results(str(path))
-        except Exception:
-            continue
-
-        for res in results:
-            status = res.get("status")
-            if status is not None:
-                counts[status] += 1
-
-    return dict(counts)
-
-
-def count_submitted_jobs_in_dir(data_dir: str | Path) -> int:
-    return status_counts_in_dir(data_dir).get("SUBMITTED", 0)
-
-
-def load_results(filename: str) -> list[dict]:
-    if not os.path.exists(filename) or os.stat(filename).st_size == 0:
-        return []
-
-    results = []
-    with open(filename, "r", encoding="utf-8", newline="") as f:
-        for row in csv.DictReader(f):
-            for k in ["num_qubits", "num_shots"]:
-                if row.get(k):
-                    row[k] = int(float(row[k]))
-
-            for k in ["score", "execution_time"]:
-                if row.get(k):
-                    row[k] = float(row[k])
-
-            for k in ["submitted_timestamp", "timestamp"]:
-                if row.get(k):
-                    row[k] = datetime.datetime.fromisoformat(row[k])
-
-            results.append(row)
-    return results
-
-
-def dump_results(filename: str, results: list[dict]) -> None:
-    Path(filename).parent.mkdir(parents=True, exist_ok=True)
-    tmp_path = filename + ".tmp"
-
-    if not results:
-        with open(tmp_path, "w", encoding="utf-8", newline="") as f:
-            pass
-        os.replace(tmp_path, filename)
-        return
-
-    fieldnames = []
-    for r in results:
-        for k in r.keys():
-            if k not in fieldnames:
-                fieldnames.append(k)
-
-    with open(tmp_path, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for r in results:
-            row = {
-                k: (v.isoformat() if isinstance(v, datetime.datetime) else v)
-                for k, v in r.items()
-            }
-            writer.writerow(row)
-
-    os.replace(tmp_path, filename)
-
-
-def make_df_for_example_qubits(
-    results: list[dict], example_name: str, num_qubits: int
-) -> pd.DataFrame:
-    rows = []
-    for r in results:
-        if (
-            r.get("example") == example_name
-            and r.get("num_qubits") == num_qubits
-            and r.get("status") in {"COMPLETED", "TIMEOUT", "ERROR"}
-        ):
-            rows.append(
-                {
-                    "Provider": r.get("backend_service_provider", ""),
-                    "Backend Name": r.get("backend_name", ""),
-                    "Score": r.get("score", float("nan")),
-                    "Time Elapsed (min)": r.get("execution_time", float("nan")),
-                }
-            )
-
-    df = pd.DataFrame(rows)
-    if not df.empty:
-        df["Score"] = pd.to_numeric(df["Score"], errors="coerce").round(4)
-        df["Time Elapsed (min)"] = pd.to_numeric(
-            df["Time Elapsed (min)"], errors="coerce"
-        ).round(1)
-        df = df.sort_values(["Provider", "Backend Name"]).reset_index(drop=True)
-
-    return df
-
-
-def section_name(example_name: str, num_qubits: int) -> str:
-    return f"{example_name.lower().replace(' ', '_')}_q{num_qubits}"
-
-
-def section_title(example_name: str, num_qubits: int) -> str:
-    return f"{example_name} - {num_qubits} qubits"
-
-
-#
-# Collector
-#
 @dataclass
 class ResultCollector:
     filename: str
