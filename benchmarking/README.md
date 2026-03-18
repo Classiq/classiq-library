@@ -1,22 +1,22 @@
 # Benchmarking
 
-This directory contains a lightweight framework for benchmarking quantum programs across multiple backends and collecting the results into CSV files and a single summarizing PDF report.
+This directory contains a lightweight framework for benchmarking quantum programs across multiple backends, collecting the results into CSV files, and optionally generating a single summary PDF report.
 
-The framework is designed around a simple workflow: define a benchmarked quantum task, define one or more backend runners, execute them through a result collector, store results incrementally, and optionally update a LaTeX report after each completed run.
-This makes it suitable for comparative benchmarking across different providers through Classiq.
+The framework is designed around a simple workflow: define a benchmarked quantum task, define one or more backend runners, execute them through a result collector, store results incrementally, and optionally update a LaTeX report after each completed run. This makes it suitable for comparative benchmarking across different providers through Classiq.
 
-### Requirements:
+### Requirements
 
-PDF generation uses latexmk. The benchmarking notebooks assume that latexmk is installed and available in $PATH.
+PDF generation uses `latexmk`. The benchmarking notebooks assume that `latexmk` is installed and available in `$PATH`.
 
 ## What this directory does
 
 The benchmarking framework supports the following tasks:
 
 - Defining benchmark examples in a backend-independent way
-- Running the same benchmark across multiple hardware or simulator backends, including hardware-aware-compilation
+- Running the same benchmark across multiple hardware or simulator backends, including hardware-aware compilation
 - Collecting and storing results incrementally in CSV format
 - Resuming partially completed benchmark campaigns without restarting from scratch
+- Defining a Quantum Volume protocol based on a benchmark example with varying width
 - Updating a report directory with generated tables and LaTeX sections
 - Optionally rebuilding a PDF report after each completed result
 
@@ -37,8 +37,8 @@ A `HardwareRunner` represents one backend configuration. It stores:
 - the backend provider
 - the backend name
 - the number of shots
-- timeout and concurrency parameters
-- optional backend-specific keyword arguments (e.g., credentials)
+- backend execution timeout parameters
+- optional backend-specific keyword arguments (for example, credentials)
 
 The same `BenchmarkExample` can be run on many different `HardwareRunner`s.
 
@@ -48,13 +48,14 @@ The same `BenchmarkExample` can be run on many different `HardwareRunner`s.
 
 Its responsibilities include:
 
-- checking whether a benchmark/backend pair was already completed
+- checking whether a benchmark/backend pair has already been completed
 - submitting jobs only when needed
 - resuming from partially completed CSV files
 - updating results safely
+- enforcing local submission and execution limits
 - optionally rebuilding the report after every completed run
 
-This makes it possible to stop and resume long benchmark runs without losing progress.
+The result file path is the single source of truth for a `ResultCollector` object. This makes it possible to stop and resume long benchmark runs without losing progress, as well as to add new `HardwareRunner`s to an existing experiment.
 
 ## Result files
 
@@ -68,7 +69,7 @@ Each row corresponds to a benchmark/backend combination and may include fields s
 - backend name
 - number of shots
 - status
-- job id
+- job ID
 - timestamps
 - score
 - runtime metrics
@@ -85,6 +86,10 @@ The framework can also maintain a LaTeX report directory containing:
 - a built PDF report
 
 When `build_each_time=True`, the report is updated every time a benchmark finishes.
+
+## Quantum Volume protocol
+
+The framework also includes classes for defining a Quantum Volume `BenchmarkExample`, as well as a `QuantumVolumeProtocol` class to run and manage result collectors for this benchmark across varying widths.
 
 ## Summary
 
