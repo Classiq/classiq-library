@@ -1,13 +1,14 @@
-\documentclass{article}
+\documentclass[a4paper]{article}
 
-\usepackage[margin=1in]{geometry}
+\usepackage[a4paper,margin=1in]{geometry}
 
 % background image
 \usepackage{graphicx}
 \usepackage{eso-pic}
 
-% \usepackage{datetime2}
 \usepackage{hyperref}
+\usepackage{etoolbox}
+
 % theme color
 \usepackage{xcolor}
 \definecolor{ThemeText}{HTML}{D7F75B}
@@ -17,19 +18,16 @@
 \usepackage{siunitx}
 \sisetup{detect-weight=true, detect-family=true}
 
-\newcommand\BackgroundPic{%
-  \put(0,0){%
-    \parbox[b][\paperheight]{\paperwidth}{%
-      \vfill
-      \centering
-      \includegraphics[width=\paperwidth,height=\paperheight]{background.pdf}%
-      \vfill
-    }%
+\AddToShipoutPictureBG{%
+  \AtPageLowerLeft{%
+    \includegraphics[width=\paperwidth,height=\paperheight]{background.pdf}%
   }%
 }
 
+% Start each section on a new page
+\preto\section{\clearpage}
+
 \begin{document}
-\AddToShipoutPictureBG{\BackgroundPic}
 \color{ThemeText}
 
 \begin{center}
@@ -41,8 +39,6 @@
 \end{center}
 
 \vspace{1em}
-
-
 
 \input{sections/_version.tex}
 

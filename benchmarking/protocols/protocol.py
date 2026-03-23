@@ -4,7 +4,7 @@ sys.path.insert(0, "..")
 from collector import ResultCollector
 from hardware import HardwareRunner
 from storage import load_results
-from reporting import write_includes, add_section, build_report
+from reporting import write_includes, add_section, build_report, add_text_block
 from qv_example import QVExample
 import asyncio
 from dataclasses import dataclass
@@ -29,8 +29,17 @@ class QuantumVolumeProtocol:
     sigma_factor: float = 2.0
     max_submitted_jobs_in_dir: int = 3
 
+    report_family_title: str = "Quantum Volume"
+    report_family_description: str = ""
+
     def widths(self) -> list[int]:
         return list(range(self.min_num_qubits, self.max_num_qubits + 1))
+
+    def shots_label(self) -> str:
+        shots_values = sorted({runner.num_shots for runner in self.runners})
+        if len(shots_values) == 1:
+            return f"{shots_values[0]} shots"
+        return "multiple shot counts"
 
     def filename_for_width(self, num_qubits: int) -> str:
         return str(Path(self.results_dir) / f"qv_{num_qubits}.csv")
@@ -480,13 +489,21 @@ class QuantumVolumeProtocol:
         csv_path = data_dir / "quantum_volume.csv"
         df.to_csv(csv_path, index=False)
 
+        add_text_block(
+            name="20_quantum_volume",
+            title=self.report_family_title,
+            text=self.report_family_description,
+            root=str(root),
+            level="section",
+        )
+
         add_section(
-            name="quantum_volume",
-            title=f"Quantum Volume {self.min_num_qubits}--{self.max_num_qubits} ({self.num_trials} trials)",
+            name="20_quantum_volume_summary",
+            title=f"{self.min_num_qubits}--{self.max_num_qubits} qubits ({self.num_trials} trials, {self.shots_label()})",
             df=df,
             numeric_cols={"Quantum Volume", "Average Elapsed Time (min)"},
             root=str(root),
-            level="section",
+            level="subsection",
         )
 
         write_includes(root=str(root))
