@@ -249,13 +249,41 @@ class ResultCollector:
                             all_results, example.name, example.num_qubits
                         )
 
+                        # set num_shots for subtitle
+                        matching_results = [
+                            r
+                            for r in all_results
+                            if r.get("example") == example.name
+                            and r.get("num_qubits") == example.num_qubits
+                        ]
+
+                        shots_values = sorted(
+                            {
+                                r.get("num_shots")
+                                for r in matching_results
+                                if r.get("num_shots") is not None
+                            }
+                        )
+
+                        title = example.report_instance_title
+                        if len(shots_values) == 1:
+                            title += f" ({shots_values[0]} shots)"
+
+                        add_text_block(
+                            name=f"10_{example.name}",
+                            title=example.report_family_title,
+                            text=example.report_family_description,
+                            root=self.report_root,
+                            level="section",
+                        )
+
                         add_section(
-                            name=section_name(example.name, example.num_qubits),
-                            title=section_title(example.name, example.num_qubits),
+                            name=f"10_{example.name}_{example.num_qubits:03d}",
+                            title=title,
                             df=df,
                             numeric_cols={"Score", "Time Elapsed (min)"},
                             root=self.report_root,
-                            level="section",
+                            level="subsection",
                         )
 
                         write_includes(root=self.report_root)

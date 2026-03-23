@@ -145,6 +145,29 @@ def df_to_latex_table_mixed(df: pd.DataFrame, numeric_cols: set[str]) -> str:
     return "\n".join(table) + "\n"
 
 
+def add_text_block(
+    name: str,
+    title: str,
+    text: str,
+    root: str | Path = "../report",
+    level: str = "section",
+) -> None:
+    root = ensure_report_dirs(root)
+    section_path = root / "sections" / f"{name}.tex"
+
+    heading = r"\section*{" if level == "section" else r"\subsection*{"
+
+    tex = []
+    tex.append("% Auto-generated. Do not edit by hand.")
+    tex.append(heading + latex_escape(title) + r"}")
+    tex.append("")
+    if text:
+        tex.append(text)
+        tex.append("")
+
+    section_path.write_text("\n".join(tex), encoding="utf-8")
+
+
 def add_section(
     name: str,
     title: str,
