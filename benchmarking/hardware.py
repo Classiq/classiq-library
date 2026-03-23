@@ -55,11 +55,32 @@ class HardwareRunner:
         except Exception as exc:
             raise StageError("synthesis", exc) from exc
 
-    async def submit_execution(self, example: BenchmarkExample) -> str:
+    def _extract_circuit_metrics(self, qprog: QuantumProgram) -> dict:
+        tc = qprog.transpiled_circuit
+
+        depth = tc.depth
+        count_ops = tc.count_ops
+
+        two_qubit_gate_count = 0
+        for key, count in count_ops.items():
+            name = str(key).lower()
+            if any(
+                g in name
+                for g in ["cx", "cz", "cnot", "swap", "ecr", "iswap", "xx", "yy", "zz"]
+            ):
+                two_qubit_gate_count += count
+
+        return {
+            "circuit_depth": depth,
+            "two_qubit_gate_count": two_qubit_gate_count,
+        }
+
+    async def submit_execution(self, example: BenchmarkExample) -> tuple[str, dict]:
         try:
             qprog = await self._synthesize(example)
+            metrics = self._extract_circuit_metrics(qprog)
             job_id = await example.submit(qprog)
-            return job_id
+            return job_id, metrics
         except StageError:
             raise
         except Exception as exc:

@@ -281,7 +281,12 @@ class ResultCollector:
                             name=f"10_{example.name}_{example.num_qubits:03d}",
                             title=title,
                             df=df,
-                            numeric_cols={"Score", "Time Elapsed (min)"},
+                            numeric_cols={
+                                "Score",
+                                "Time Elapsed (min)",
+                                "Depth",
+                                "2Q Gate Count",
+                            },
                             root=self.report_root,
                             level="subsection",
                         )
@@ -338,7 +343,7 @@ class ResultCollector:
     async def _submit_and_write(
         self, runner: HardwareRunner, example: BenchmarkExample
     ) -> str:
-        job_id = await runner.submit_execution(example)
+        job_id, metrics = await runner.submit_execution(example)
 
         submitted_ts = datetime.datetime.now()
         print(
@@ -352,6 +357,7 @@ class ResultCollector:
             status="SUBMITTED",
             job_id=job_id,
             submitted_timestamp=submitted_ts,
+            **metrics,
         )
         return job_id
 
