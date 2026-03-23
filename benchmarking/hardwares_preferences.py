@@ -18,12 +18,24 @@ HARDWARES = {
         "simulator_density_matrix",
         "nvidia_simulator",
     ],
+    "Amazon Braket": [
+        "Ankaa-3",
+        "Garnet",
+        "Forte 1",
+    ],
+    "Azure Quantum": [
+        "ionq.qpu.forte-enterprise-1",
+        "ionq.qpu.aria-1",
+        "ionq.qpu.forte-1",
+    ],
 }
 
 from classiq import (
     IBMBackendPreferences,
     IonqBackendPreferences,
     ClassiqBackendPreferences,
+    AwsBackendPreferences,
+    AzureBackendPreferences,
 )
 
 
@@ -49,6 +61,18 @@ def execution_preferences_wrapper(
 
     elif backend_service_provider == "IonQ":
         return IonqBackendPreferences(
+            backend_name=backend_name,
+            run_via_classiq=True,
+        )
+
+    elif backend_service_provider == "Amazon Braket":
+        return AwsBackendPreferences(
+            backend_name=backend_name,
+            run_via_classiq=True,
+        )
+
+    elif backend_service_provider == "Azure Quantum":
+        return AzureBackendPreferences(
             backend_name=backend_name,
             run_via_classiq=True,
         )

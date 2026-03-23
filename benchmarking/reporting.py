@@ -3,6 +3,7 @@ import subprocess
 import shutil
 from pathlib import Path
 import pandas as pd
+from importlib.metadata import PackageNotFoundError, version
 
 _LATEX_ESCAPE_MAP = {
     "\\": r"\textbackslash{}",
@@ -16,6 +17,28 @@ _LATEX_ESCAPE_MAP = {
     "~": r"\textasciitilde{}",
     "^": r"\textasciicircum{}",
 }
+
+
+def get_classiq_version() -> str:
+    try:
+        return version("classiq")
+    except PackageNotFoundError:
+        try:
+            import classiq
+
+            return getattr(classiq, "__version__", "unknown")
+        except Exception:
+            return "unknown"
+
+
+def write_version_file(root: str | Path = "../report") -> None:
+    root = ensure_report_dirs(root)
+    version_path = root / "sections" / "_version.tex"
+    classiq_version = latex_escape(get_classiq_version())
+    version_path.write_text(
+        rf"\newcommand{{\classiqversion}}{{{classiq_version}}}" + "\n",
+        encoding="utf-8",
+    )
 
 
 def latex_escape(s: str) -> str:
@@ -164,7 +187,7 @@ def write_includes(root: str | Path = "../report") -> None:
     include_path = sections_dir / "_includes.tex"
 
     tex_files = sorted(
-        p.name for p in sections_dir.glob("*.tex") if p.name != "_includes.tex"
+        p.name for p in sections_dir.glob("*.tex") if not p.name.startswith("_")
     )
 
     lines = ["% Auto-generated. Do not edit by hand."]
@@ -192,6 +215,7 @@ def add_heading(
 def build_report(root: str | Path = "../report", force: bool = True) -> None:
     root = Path(root)
     ensure_report_dirs(root)
+    write_version_file(root)
 
     cmd = [
         "latexmk",
