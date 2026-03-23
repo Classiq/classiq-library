@@ -1,0 +1,17 @@
+We benchmark the preparation of an \(n\)-qubit state with linearly increasing amplitudes,
+\[
+|\psi\rangle = \frac{1}{\sqrt{M}} \sum_{x=0}^{2^n-1} x \, |x\rangle ,
+\]
+where
+\[
+M = \sum_{x=0}^{2^n-1} x^2 .
+\]
+
+The score is defined from the total variation distance between the observed output distribution \(p\) and the ideal distribution \(u\),
+\[
+D_{\mathrm{TV}}(p,u) = \frac{1}{2}\sum_{i=0}^{2^n-1} |p_i-u_i| .
+\]
+We then define
+\[
+S = 1 - \frac{D_{\mathrm{TV}}(p,u)}{1-1/n}.
+\]

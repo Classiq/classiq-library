@@ -17,8 +17,18 @@ class BenchmarkExample(abc.ABC):
     num_qubits: int
     constraints: Constraints = field(default_factory=Constraints)
 
+    report_family_title: str | None = None
+    report_family_description: str = ""
+
     def __post_init__(self):
+        if self.report_family_title is None:
+            self.report_family_title = self.name.capitalize()
+
         self.main = self.create_main()
+
+    @property
+    def report_instance_title(self) -> str:
+        return f"{self.name} - {self.num_qubits} qubits"
 
     @abc.abstractmethod
     def create_main(self) -> callable:
