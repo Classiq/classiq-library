@@ -482,7 +482,7 @@ class QuantumVolumeProtocol:
 
         add_section(
             name="quantum_volume",
-            title=f"Quantum Volume {self.min_num_qubits}--{self.max_num_qubits} ({self.num_trials} trails)",
+            title=f"Quantum Volume {self.min_num_qubits}--{self.max_num_qubits} ({self.num_trials} trials)",
             df=df,
             numeric_cols={"Quantum Volume", "Average Elapsed Time (min)"},
             root=str(root),
