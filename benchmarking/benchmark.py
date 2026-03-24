@@ -68,3 +68,7 @@ class BenchmarkExample(abc.ABC):
             constraints=self.constraints,
         )
         show(qprog)
+
+    @property
+    def default_results_filename(self) -> str:
+        return f"data/{self.name}{self.num_qubits}.csv"

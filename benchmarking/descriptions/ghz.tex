@@ -1,1 +1,12 @@
-Enter text here
+We benchmark the preparation of the \(n\)-qubit GHZ state,
+\[
+\frac{|0\rangle^{\otimes n} + |1\rangle^{\otimes n}}{\sqrt{2}}.
+\]
+Following the population-and-parity fidelity estimator of \href{https://link.aps.org/doi/10.1103/PhysRevLett.106.130506}{Monz et al., PRL 106, 130506 (2011)}, the score combines the population \(P = p_0 + p_{2^n-1}\) with the coherence \(C\), extracted from the amplitude of the parity oscillation \(\Pi(\phi) = P_{\mathrm{even}}(\phi) - P_{\mathrm{odd}}(\phi)\) under a collective analysis rotation. The resulting fidelity estimator is
+\[
+F = \frac{P + C}{2}.
+\]
+\smallskip
+
+For more details see \href{https://github.com/Classiq/classiq-library/tree/main/benchmarking/benchmarks/benchmark\_ghz.ipynb}{Benchmark GHZ notebook}.
+\medskip
