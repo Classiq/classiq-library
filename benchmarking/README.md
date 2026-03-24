@@ -57,6 +57,8 @@ Its responsibilities include:
 
 The result file path is the single source of truth for a `ResultCollector` object. This makes it possible to stop and resume long benchmark runs without losing progress, as well as to add new `HardwareRunner`s to an existing experiment.
 
+When running on Classiq backends, there is currently a limit of three parallel submitted jobs. Accordingly, `ResultCollector` ensures that no more than three jobs are submitted at the same time by default. This behavior is controlled by the `max_submitted_jobs_in_dir` property, which can be adjusted if a higher submission limit is available. If a notebook run is interrupted, rerunning it will both check whether previously submitted jobs have completed and submit new jobs when submission capacity becomes available.
+
 ## Result files
 
 Benchmark results are written incrementally into a CSV file.

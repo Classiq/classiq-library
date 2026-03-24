@@ -11,6 +11,27 @@ from hardwares_preferences import execution_preferences_wrapper
 from benchmark import BenchmarkExample
 from errors import StageError
 
+LIST_OF_2Q_GATES = [
+    "cx",
+    "cy",
+    "cz",
+    "swap",
+    "ecr",
+    "rxx",
+    "ryy",
+    "rzz",
+    "rzx",
+    "crx",
+    "cry",
+    "crz",
+    "csx",
+    "cu1",
+    "cu",
+    "ch",
+    "cp",
+    "iswap",
+]
+
 
 @dataclass
 class HardwareRunner:
@@ -64,10 +85,7 @@ class HardwareRunner:
         two_qubit_gate_count = 0
         for key, count in count_ops.items():
             name = str(key).lower()
-            if any(
-                g in name
-                for g in ["cx", "cz", "cnot", "swap", "ecr", "iswap", "xx", "yy", "zz"]
-            ):
+            if any(g in name for g in LIST_OF_2Q_GATES):
                 two_qubit_gate_count += count
 
         return {
