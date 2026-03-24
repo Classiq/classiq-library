@@ -1,4 +1,24 @@
 % Auto-generated. Do not edit by hand.
 \section*{Grover Search Algorithm}
 
-Enter text here
+We benchmark Grover's search algorithm on \(n\) qubits with a single marked state \(|C\rangle\). The algorithm applies
+\[
+r = \left\lfloor \frac{\pi}{4\theta} - \frac{1}{2} \right\rfloor
+\]
+Grover iterations, where
+\[
+\theta = \arcsin\!\left(\frac{1}{\sqrt{2^n}}\right),
+\]
+yielding the ideal success probability
+\[
+P_{\mathrm{ideal}} = \sin^2\!\bigl((2r+1)\theta\bigr).
+\]
+The score is defined as the ratio of the measured success probability to the ideal one,
+\[
+S = \frac{P_{\mathrm{good}}}{P_{\mathrm{ideal}}}.
+\]
+This benchmark also probes the correct implementation of a multi-controlled \(X\) operation, which appears in the Grover oracle and diffusion step.
+\smallskip
+
+For more details see \href{https://github.com/Classiq/classiq-library/tree/main/benchmarking/benchmarks/benchmark\_grover.ipynb}{Benchmark Grover notebook}.
+\medskip

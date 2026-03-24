@@ -27,6 +27,18 @@
 % Start each section on a new page
 \preto\section{\clearpage}
 
+% Footnote color
+\makeatletter
+\renewcommand\@makefntext[1]{%
+    \parindent 1em%
+    \color{ThemeText}%
+    \noindent
+    \hb@xt@1.8em{\hss\@makefnmark}#1%
+}
+\makeatother
+
+\renewcommand{\thefootnote}{\color{ThemeText}\arabic{footnote}}
+
 \begin{document}
 \color{ThemeText}
 
@@ -43,7 +55,13 @@
 \input{sections/_version.tex}
 
 This benchmarking report was generated using Classiq \href{https://platform.classiq.io/}{v\classiqversion}.
+\medskip
 
+The report includes hardware runs for a collection of pre-defined and user-defined functions and algorithms,
+where each benchmark can be instantiated at different problem sizes. For each benchmark experiment,
+we report a score defined specifically for that example,
+together with the execution time\footnote{Currently, the reported time includes both execution time and waiting time.}
+and quantum-program properties obtained through Classiq's hardware-aware synthesis\footnote{The properties of the actual circuit executed on the hardware may differ slightly due to pre-run transpilation.}.
 For further information, see the \href{https://github.com/Classiq/classiq-library/tree/main/benchmarking}{Benchmarking directory in classiq-library}.
 
 \bigskip
