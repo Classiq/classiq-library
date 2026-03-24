@@ -19,4 +19,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    pass  # Todo
+    pass
