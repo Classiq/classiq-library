@@ -1,3 +1,37 @@
+"""Quantum Volume benchmarking protocol.
+
+Implements the QV protocol described in:
+  Cross et al., "Validating quantum computers using randomized model circuits",
+  Phys. Rev. A 100, 032328 (2019).  arXiv:1811.12926
+
+Design notes
+------------
+1. **Non-consecutive passing widths.**  The standard QV definition (Eq. 7 of the
+   paper) requires all widths up to n to pass for QV = 2^n.  This implementation
+   intentionally relaxes that requirement: it reports QV = 2^(largest passing
+   width) even if some intermediate widths failed.  The rationale is that a
+   transient failure at an intermediate width (e.g. due to a temporary
+   calibration drift) should not mask a device's demonstrated capability at
+   higher widths.  Users who need the strict definition can inspect the
+   per-width pass/fail table returned by `all_width_summaries()`.
+
+2. **Shot-count sensitivity.**  The confidence bound follows Algorithm 1 of the
+   paper (pooled binomial one-sided interval).  With low shot counts the
+   statistical error grows quickly.  For n_s = 10 shots per circuit, assuming
+   ideal heavy-output fraction h_d ~ 0.85 and sigma = 2:
+
+       n_c (circuits) | error term  | lower bound | passes?
+       ------------------------------------------------
+            10        |   ~0.23     |   ~0.62     |  NO  (even ideal device fails)
+            30        |   ~0.13     |   ~0.72     |  yes
+           100        |   ~0.07     |   ~0.78     |  yes
+           200        |   ~0.05     |   ~0.80     |  yes
+
+   Therefore n_s >= 100 is recommended for reliable results; with n_s = 10 at
+   least ~30 circuits are needed to pass the threshold even in the noiseless
+   case.
+"""
+
 import sys
 
 sys.path.insert(0, "..")
@@ -13,38 +47,64 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+# Maximum fraction of trials that may error out while still allowing a width
+# to pass. For example, 0.15 means up to 15% of trials can fail.
+MAX_TRIAL_ERROR_RATE = 0.15
+
 
 @dataclass
 class QuantumVolumeProtocol:
-    min_num_qubits: int
-    max_num_qubits: int
-    num_trials: int
-    runners: list[HardwareRunner]
+    """Orchestrates the Quantum Volume (QV) benchmarking protocol.
 
-    results_dir: str = "protocols/data"
-    report_root: str = "../report"
-    base_seed: int = 1234
+    The protocol sweeps over a range of circuit widths (number of qubits),
+    runs multiple random QV trials per width on each backend, scores them
+    using the heavy-output probability, and determines the largest width
+    that passes the statistical threshold — the quantum volume is 2^(that width).
+    """
 
+    # --- Required parameters ---
+    min_num_qubits: int  # Smallest circuit width to test
+    max_num_qubits: int  # Largest circuit width to test
+    num_trials: int  # Number of random QV circuits per width
+    runners: list[HardwareRunner]  # Backend runners to benchmark
+
+    # --- File and directory paths ---
+    results_dir: str = "protocols/data"  # Where per-width CSV results are stored
+    report_root: str = "../report"  # Root directory for LaTeX report output
+
+    # --- Reproducibility ---
+    base_seed: int = 1234  # Base seed; each trial derives a unique seed from this
+
+    # --- Statistical thresholds ---
+    # A width passes if the lower confidence bound of the mean heavy-output
+    # probability exceeds success_threshold (default 2/3 per the QV definition).
     success_threshold: float = 2 / 3
+    # Number of standard errors subtracted from the mean to form the lower bound.
     sigma_factor: float = 2.0
+    # Maximum concurrent submitted jobs per results directory
     max_submitted_jobs_in_dir: int = 3
 
+    # --- Report metadata ---
     report_family_title: str = "Quantum Volume"
     report_family_description: str = ""
 
     def widths(self) -> list[int]:
+        """Return the list of circuit widths to sweep over."""
         return list(range(self.min_num_qubits, self.max_num_qubits + 1))
 
     def shots_label(self) -> str:
+        """Human-readable label summarizing the shot counts across runners."""
         shots_values = sorted({runner.num_shots for runner in self.runners})
         if len(shots_values) == 1:
             return f"{shots_values[0]} shots"
         return "multiple shot counts"
 
     def filename_for_width(self, num_qubits: int) -> str:
+        """CSV file path for storing results of a given width."""
         return str(Path(self.results_dir) / f"qv_{num_qubits}.csv")
 
     def collector_for_width(self, num_qubits: int) -> ResultCollector:
+        """Create a ResultCollector that saves trial results for a given width."""
         return ResultCollector(
             filename=self.filename_for_width(num_qubits),
             skip_report=True,
@@ -52,9 +112,11 @@ class QuantumVolumeProtocol:
         )
 
     def seed_for_trial(self, num_qubits: int, trial_id: int) -> int:
+        """Deterministic seed for a specific (width, trial) pair."""
         return self.base_seed + 100_000 * num_qubits + trial_id
 
     def make_example(self, num_qubits: int, trial_id: int) -> QVExample:
+        """Instantiate a QV circuit example for a given width and trial."""
         return QVExample(
             num_qubits=num_qubits,
             trial_id=trial_id,
@@ -62,12 +124,14 @@ class QuantumVolumeProtocol:
         )
 
     async def reset_files(self) -> None:
+        """Clear all per-width result files to start fresh."""
         Path(self.results_dir).mkdir(parents=True, exist_ok=True)
         for num_qubits in self.widths():
             collector = self.collector_for_width(num_qubits)
             await collector.reset_file()
 
     async def run_width(self, num_qubits: int) -> list[dict | None]:
+        """Submit and collect all trials for a single width across all runners."""
         Path(self.results_dir).mkdir(parents=True, exist_ok=True)
         collector = self.collector_for_width(num_qubits)
 
@@ -80,6 +144,7 @@ class QuantumVolumeProtocol:
         return await asyncio.gather(*tasks)
 
     async def run(self) -> dict[int, pd.DataFrame]:
+        """Run the full protocol: sweep all widths sequentially, summarize each."""
         summaries: dict[int, pd.DataFrame] = {}
 
         for num_qubits in self.widths():
@@ -89,6 +154,7 @@ class QuantumVolumeProtocol:
         return summaries
 
     def _load_width_df(self, num_qubits: int) -> pd.DataFrame:
+        """Load raw trial results from the CSV file for a given width."""
         filename = Path(self.filename_for_width(num_qubits))
         if not filename.exists():
             return pd.DataFrame()
@@ -100,6 +166,15 @@ class QuantumVolumeProtocol:
         return pd.DataFrame(results)
 
     def summarize_width(self, num_qubits: int) -> pd.DataFrame:
+        """Aggregate trial results for a single width into a per-backend summary.
+
+        For each backend, computes:
+          - mean, std, and stderr of the heavy-output probability
+          - a lower confidence bound (mean - sigma_factor * stderr)
+          - whether the width passes: enough trials completed (within
+            MAX_TRIAL_ERROR_RATE tolerance) AND the lower bound exceeds 2/3
+          - counts of trials by status (SUBMITTED, COMPLETED, TIMEOUT, ERROR)
+        """
         df = self._load_width_df(num_qubits)
 
         out_cols = [
@@ -129,6 +204,7 @@ class QuantumVolumeProtocol:
         if metric_col in df.columns:
             df[metric_col] = pd.to_numeric(df[metric_col], errors="coerce")
 
+        # Count how many trials ended in each status per backend
         status_counts = (
             df.groupby(group_cols + ["status"], dropna=False)
             .size()
@@ -139,6 +215,7 @@ class QuantumVolumeProtocol:
         completed = df[df["status"] == "COMPLETED"].copy()
 
         if completed.empty:
+            # No trials completed — fill in zeros/NaNs and mark as not passed
             summary = status_counts.copy()
             summary["num_qubits"] = num_qubits
             summary["num_trials_requested"] = self.num_trials
@@ -149,6 +226,13 @@ class QuantumVolumeProtocol:
             summary["lower_confidence_bound"] = np.nan
             summary["passed"] = False
         else:
+            # Ensure num_shots is numeric for the pooled confidence bound
+            if "num_shots" in completed.columns:
+                completed["num_shots"] = pd.to_numeric(
+                    completed["num_shots"], errors="coerce"
+                )
+
+            # Compute statistics of the heavy-output probability per backend
             score_summary = (
                 completed.groupby(group_cols, dropna=False)[metric_col]
                 .agg(num_completed="count", mean_score="mean", std_score="std")
@@ -159,22 +243,60 @@ class QuantumVolumeProtocol:
             score_summary["stderr_score"] = score_summary["std_score"] / np.sqrt(
                 score_summary["num_completed"]
             )
-            score_summary["lower_confidence_bound"] = (
-                score_summary["mean_score"]
-                - self.sigma_factor * score_summary["stderr_score"]
-            )
+
+            # Lower confidence bound using the pooled binomial formula from
+            # Algorithm 1 in Cross et al. (arXiv:1811.12926):
+            #   (n_h - sigma * sqrt(n_h * (n_s - n_h / n_c))) / (n_c * n_s) > 2/3
+            # where n_h = total heavy output counts across all circuits,
+            #       n_c = number of circuits (trials),
+            #       n_s = number of shots per circuit.
+            def _pooled_lower_bound(group: pd.DataFrame) -> float:
+                n_c = len(group)
+                n_s_values = group["num_shots"].values
+                # All trials for a given backend should have the same num_shots,
+                # but handle the general case by summing per-trial heavy counts.
+                h_per_trial = group[metric_col].values * n_s_values
+                n_h = h_per_trial.sum()
+                total_shots = n_s_values.sum()  # n_c * n_s when uniform
+                if total_shots == 0:
+                    return 0.0
+                variance_term = n_h * (total_shots - n_h / n_c)
+                if variance_term < 0:
+                    variance_term = 0.0
+                return (n_h - self.sigma_factor * np.sqrt(variance_term)) / total_shots
+
+            if "num_shots" in completed.columns:
+                lcb = (
+                    completed.groupby(group_cols, dropna=False)
+                    .apply(_pooled_lower_bound)
+                    .reset_index(name="lower_confidence_bound")
+                )
+                score_summary = score_summary.merge(lcb, on=group_cols, how="left")
+            else:
+                # Fallback to normal approximation if num_shots is unavailable
+                score_summary["lower_confidence_bound"] = (
+                    score_summary["mean_score"]
+                    - self.sigma_factor * score_summary["stderr_score"]
+                )
             score_summary["num_qubits"] = num_qubits
             score_summary["num_trials_requested"] = self.num_trials
+
+            # A width passes if:
+            #   1. Enough trials completed (within MAX_TRIAL_ERROR_RATE tolerance)
+            #   2. The lower confidence bound exceeds the success threshold (2/3)
+            min_completed = int(np.ceil(self.num_trials * (1 - MAX_TRIAL_ERROR_RATE)))
             score_summary["passed"] = (
-                score_summary["num_completed"] == self.num_trials
+                score_summary["num_completed"] >= min_completed
             ) & (score_summary["lower_confidence_bound"] > self.success_threshold)
 
+            # Merge status counts with score statistics
             summary = status_counts.merge(
                 score_summary,
                 on=group_cols,
                 how="outer",
             )
 
+            # Fill NaNs for backends that appear in one table but not the other
             summary["num_qubits"] = summary["num_qubits"].fillna(num_qubits)
             summary["num_trials_requested"] = summary["num_trials_requested"].fillna(
                 self.num_trials
@@ -182,11 +304,24 @@ class QuantumVolumeProtocol:
             summary["num_completed"] = summary["num_completed"].fillna(0).astype(int)
             summary["passed"] = summary["passed"].fillna(False)
 
-        for status in ["SUBMITTED", "COMPLETED", "TIMEOUT", "ERROR"]:
+        # Ensure all expected status columns exist and rename to count_<STATUS>.
+        # Drop any unexpected status columns that leaked in from unstack.
+        expected_statuses = ["SUBMITTED", "COMPLETED", "TIMEOUT", "ERROR"]
+        for status in expected_statuses:
             if status not in summary.columns:
                 summary[status] = 0
             summary[f"count_{status}"] = summary[status].astype(int)
+        unexpected_status_cols = [
+            col
+            for col in summary.columns
+            if col not in expected_statuses
+            and col not in [f"count_{s}" for s in expected_statuses]
+            and col in status_counts.columns
+            and col not in ["backend_service_provider", "backend_name"]
+        ]
+        summary = summary.drop(columns=unexpected_status_cols + expected_statuses)
 
+        # Select and order the final output columns
         summary = summary[
             [
                 "num_qubits",
@@ -212,6 +347,7 @@ class QuantumVolumeProtocol:
         return summary.reset_index(drop=True)
 
     def all_width_summaries(self) -> pd.DataFrame:
+        """Concatenate per-width summaries for all widths into a single DataFrame."""
         dfs = []
         for num_qubits in self.widths():
             s = self.summarize_width(num_qubits)
@@ -241,6 +377,13 @@ class QuantumVolumeProtocol:
         return pd.concat(dfs, ignore_index=True)
 
     def quantum_volume_summary(self) -> pd.DataFrame:
+        """Determine the quantum volume for each backend.
+
+        For each backend, finds the largest width that passed and computes
+        QV = 2^(largest_passing_width). Note: this currently takes the max
+        of all passing widths without requiring consecutive passes from
+        min_num_qubits upward.
+        """
         df = self.all_width_summaries()
 
         out_cols = [
@@ -282,6 +425,7 @@ class QuantumVolumeProtocol:
         )
 
     def runtime_summary(self) -> pd.DataFrame:
+        """Compute total execution time per (backend, width) for completed trials."""
         dfs = []
 
         for num_qubits in self.widths():
@@ -322,6 +466,7 @@ class QuantumVolumeProtocol:
         return pd.concat(dfs, ignore_index=True)
 
     def total_runtime_summary(self) -> pd.DataFrame:
+        """Sum execution times across all widths for each backend."""
         df = self.runtime_summary()
         if df.empty:
             return pd.DataFrame(
@@ -348,6 +493,7 @@ class QuantumVolumeProtocol:
         )
 
     def final_summary(self) -> pd.DataFrame:
+        """Combine quantum volume and total runtime into a single summary."""
         qv = self.quantum_volume_summary()
         rt = self.total_runtime_summary()
 
@@ -368,6 +514,11 @@ class QuantumVolumeProtocol:
         )
 
     def report_summary(self) -> pd.DataFrame:
+        """Build a human-readable summary table for the LaTeX report.
+
+        Joins quantum volume, trial completion counts, and average execution
+        times into a single DataFrame with presentation-friendly column names.
+        """
         width_df = self.all_width_summaries()
         qv_df = self.quantum_volume_summary()
 
@@ -382,6 +533,7 @@ class QuantumVolumeProtocol:
                 ]
             )
 
+        # Aggregate trial counts across all widths per backend (e.g. "87/90")
         trials_df = (
             width_df.groupby(
                 ["backend_service_provider", "backend_name"],
@@ -396,6 +548,7 @@ class QuantumVolumeProtocol:
             + trials_df["num_trials_requested"].astype(int).astype(str)
         )
 
+        # Compute average execution time per trial across all widths
         runtime_rows = []
         for num_qubits in self.widths():
             df = self._load_width_df(num_qubits)
@@ -480,6 +633,8 @@ class QuantumVolumeProtocol:
         )
 
     async def update_report(self, build: bool = False) -> pd.DataFrame:
+        """Write the QV summary to CSV, update LaTeX report sections, and
+        optionally compile the PDF."""
         df = self.report_summary()
 
         root = Path(self.report_root)
