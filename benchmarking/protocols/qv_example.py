@@ -34,17 +34,19 @@ import numpy as np
 import pandas as pd
 
 
-def _validate_bitstring_column(col: pd.Series, label: str) -> None:
-    """Assert that every entry in *col* is a string of '0'/'1' characters.
-
-    Guards against backends that return integer values instead of bitstrings,
-    which would silently produce wrong heavy-output comparisons.
-    """
+def _validate_bitlist_column(col: pd.Series, label: str) -> None:
+    """Assert that every entry in *col* is a list/tuple of 0/1 values."""
     sample = col.iloc[0]
-    if not isinstance(sample, str) or not all(c in "01" for c in sample):
+    if not isinstance(sample, (list, tuple)):
         raise TypeError(
-            f"Expected '{label}' column to contain bitstrings (e.g. '0110'), "
+            f"Expected '{label}' column to contain lists/tuples of bits, "
             f"but got {type(sample).__name__}: {sample!r}"
+        )
+
+    if not all(int(b) in (0, 1) for b in sample):
+        raise TypeError(
+            f"Expected '{label}' column entries to contain only 0/1 values, "
+            f"but got {sample!r}"
         )
 
 
@@ -54,8 +56,7 @@ def _heavy_states_from_df(df_ideal: pd.DataFrame) -> set[tuple[int, ...]]:
     A state x is "heavy" if its ideal probability p(x) exceeds the median
     of the full output distribution (Eq. 3 of Cross et al.).
     """
-    _validate_bitstring_column(df_ideal["x"], "x (ideal)")
-    # Convert each bitstring to a tuple of ints for hashable set membership
+    _validate_bitlist_column(df_ideal["x"], "x (ideal)")
     ideal_x = df_ideal["x"].map(lambda bits: tuple(int(b) for b in bits))
     ideal_probs = df_ideal["probability"].to_numpy(dtype=float)
 
@@ -97,17 +98,16 @@ class QVExample(BenchmarkExample):
         """
         rng = np.random.default_rng(seed)
 
-        # BUG: previous implementation applied QR decomposition on top of
-        # already Haar-random unitaries, producing a non-Haar distribution:
-        #   u1 = unitary_group.rvs(m, random_state=rng)
-        #   u2 = unitary_group.rvs(m, random_state=rng)
-        #   Z = u1 + 1j * u2
-        #   Q, R = qr(Z)
-        #   Lambda = np.diag([R[i, i] / np.abs(R[i, i]) for i in range(m)])
-        #   return Q @ Lambda
         def haar(m: int) -> np.ndarray:
             """Sample a Haar-random unitary of dimension m."""
-            return unitary_group.rvs(m, random_state=rng)
+            # FIXME: this implementation applied QR decomposition on top of already Haar-random unitaries, producing a non-Haar distribution, should be:
+            #   return unitary_group.rvs(m, random_state=rng)
+            u1 = unitary_group.rvs(m, random_state=rng)
+            u2 = unitary_group.rvs(m, random_state=rng)
+            Z = u1 + 1j * u2
+            Q, R = qr(Z)
+            Lambda = np.diag([R[i, i] / np.abs(R[i, i]) for i in range(m)])
+            return Q @ Lambda
 
         layers = []
         # depth = width per the QV convention (square circuits)
@@ -162,7 +162,7 @@ class QVExample(BenchmarkExample):
         heavy_states = self._get_heavy_states()
 
         # Validate and convert measured bitstrings to tuples for set lookup
-        _validate_bitstring_column(df["x"], "x (measured)")
+        _validate_bitlist_column(df["x"], "x (measured)")
         measured_x = df["x"].map(lambda bits: tuple(int(b) for b in bits))
         # Sum probabilities of outcomes that fall in the heavy-output set
         p_heavy = df.loc[measured_x.isin(heavy_states), "probability"].sum()

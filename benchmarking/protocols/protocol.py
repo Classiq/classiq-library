@@ -50,6 +50,7 @@ import pandas as pd
 # Maximum fraction of trials that may error out while still allowing a width
 # to pass. For example, 0.15 means up to 15% of trials can fail.
 MAX_TRIAL_ERROR_RATE = 0.15
+NUM_TRIALS_THRESHOLD = 100
 
 
 @dataclass
@@ -183,15 +184,12 @@ class QuantumVolumeProtocol:
             "backend_name",
             "num_trials_requested",
             "num_completed",
+            "num_total",
             "mean_score",
             "std_score",
             "stderr_score",
             "lower_confidence_bound",
             "passed",
-            "count_SUBMITTED",
-            "count_COMPLETED",
-            "count_TIMEOUT",
-            "count_ERROR",
         ]
 
         if df.empty:
@@ -210,6 +208,12 @@ class QuantumVolumeProtocol:
             .size()
             .unstack(fill_value=0)
             .reset_index()
+        )
+        status_value_cols = [
+            col for col in status_counts.columns if col not in group_cols
+        ]
+        status_counts["num_total"] = (
+            status_counts[status_value_cols].sum(axis=1).astype(int)
         )
 
         completed = df[df["status"] == "COMPLETED"].copy()
@@ -265,10 +269,13 @@ class QuantumVolumeProtocol:
                     variance_term = 0.0
                 return (n_h - self.sigma_factor * np.sqrt(variance_term)) / total_shots
 
-            if "num_shots" in completed.columns:
+            if (
+                "num_shots" in completed.columns
+                and self.num_trials >= NUM_TRIALS_THRESHOLD
+            ):
                 lcb = (
                     completed.groupby(group_cols, dropna=False)
-                    .apply(_pooled_lower_bound)
+                    .apply(_pooled_lower_bound, include_groups=False)
                     .reset_index(name="lower_confidence_bound")
                 )
                 score_summary = score_summary.merge(lcb, on=group_cols, how="left")
@@ -304,23 +311,6 @@ class QuantumVolumeProtocol:
             summary["num_completed"] = summary["num_completed"].fillna(0).astype(int)
             summary["passed"] = summary["passed"].fillna(False)
 
-        # Ensure all expected status columns exist and rename to count_<STATUS>.
-        # Drop any unexpected status columns that leaked in from unstack.
-        expected_statuses = ["SUBMITTED", "COMPLETED", "TIMEOUT", "ERROR"]
-        for status in expected_statuses:
-            if status not in summary.columns:
-                summary[status] = 0
-            summary[f"count_{status}"] = summary[status].astype(int)
-        unexpected_status_cols = [
-            col
-            for col in summary.columns
-            if col not in expected_statuses
-            and col not in [f"count_{s}" for s in expected_statuses]
-            and col in status_counts.columns
-            and col not in ["backend_service_provider", "backend_name"]
-        ]
-        summary = summary.drop(columns=unexpected_status_cols + expected_statuses)
-
         # Select and order the final output columns
         summary = summary[
             [
@@ -329,15 +319,12 @@ class QuantumVolumeProtocol:
                 "backend_name",
                 "num_trials_requested",
                 "num_completed",
+                "num_total",
                 "mean_score",
                 "std_score",
                 "stderr_score",
                 "lower_confidence_bound",
                 "passed",
-                "count_SUBMITTED",
-                "count_COMPLETED",
-                "count_TIMEOUT",
-                "count_ERROR",
             ]
         ].sort_values(
             by=["backend_service_provider", "backend_name"],
@@ -362,15 +349,12 @@ class QuantumVolumeProtocol:
                     "backend_name",
                     "num_trials_requested",
                     "num_completed",
+                    "num_total",
                     "mean_score",
                     "std_score",
                     "stderr_score",
                     "lower_confidence_bound",
                     "passed",
-                    "count_SUBMITTED",
-                    "count_COMPLETED",
-                    "count_TIMEOUT",
-                    "count_ERROR",
                 ]
             )
 
