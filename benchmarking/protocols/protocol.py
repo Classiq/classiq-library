@@ -133,10 +133,12 @@ class QuantumVolumeProtocol:
             collector = self.collector_for_width(num_qubits)
             await collector.reset_file()
 
-    async def run_width(self, num_qubits: int) -> list[dict | None]:
-        """Submit and collect all trials for a single width across all runners."""
+    async def run_width(self, num_qubits: int) -> tuple[list[dict | None], bool]:
         Path(self.results_dir).mkdir(parents=True, exist_ok=True)
         collector = self.collector_for_width(num_qubits)
+
+        filename = Path(self.filename_for_width(num_qubits))
+        before_mtime = filename.stat().st_mtime if filename.exists() else None
 
         tasks = []
         for runner in self.runners:
@@ -144,16 +146,21 @@ class QuantumVolumeProtocol:
                 example = self.make_example(num_qubits, trial_id)
                 tasks.append(collector.run(runner, example))
 
-        return await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks)
+
+        after_mtime = filename.stat().st_mtime if filename.exists() else None
+        had_updates = before_mtime != after_mtime
+
+        return results, had_updates
 
     async def run(self) -> dict[int, pd.DataFrame]:
         summaries: dict[int, pd.DataFrame] = {}
 
         for num_qubits in self.widths():
-            await self.run_width(num_qubits)
+            _, had_updates = await self.run_width(num_qubits)
             summaries[num_qubits] = self.summarize_width(num_qubits)
 
-            if self.update_report_each_time:
+            if had_updates and self.update_report_each_time:
                 await self.update_report(build=self.build_report_each_time)
                 if self.build_report_each_time:
                     print(f"Report updated and built for width {num_qubits}")
