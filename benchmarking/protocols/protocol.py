@@ -88,6 +88,8 @@ class QuantumVolumeProtocol:
     # --- Report metadata ---
     report_family_title: str = "Quantum Volume"
     report_family_description: str = ""
+    update_report_each_time: bool = True
+    build_report_each_time: bool = False
 
     def widths(self) -> list[int]:
         """Return the list of circuit widths to sweep over."""
@@ -145,12 +147,16 @@ class QuantumVolumeProtocol:
         return await asyncio.gather(*tasks)
 
     async def run(self) -> dict[int, pd.DataFrame]:
-        """Run the full protocol: sweep all widths sequentially, summarize each."""
         summaries: dict[int, pd.DataFrame] = {}
 
         for num_qubits in self.widths():
             await self.run_width(num_qubits)
             summaries[num_qubits] = self.summarize_width(num_qubits)
+
+            if self.update_report_each_time:
+                await self.update_report(build=self.build_report_each_time)
+                if self.build_report_each_time:
+                    print(f"Report updated and built for width {num_qubits}")
 
         return summaries
 
@@ -615,6 +621,10 @@ class QuantumVolumeProtocol:
             .sort_values(["Provider", "Backend"], kind="stable")
             .reset_index(drop=True)
         )
+
+    async def maybe_update_report(self) -> None:
+        if self.update_report_each_time:
+            await self.update_report(build=self.build_report_each_time)
 
     async def update_report(self, build: bool = False) -> pd.DataFrame:
         """Write the QV summary to CSV, update LaTeX report sections, and
