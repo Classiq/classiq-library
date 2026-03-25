@@ -1,6 +1,6 @@
 # Benchmarking
 
-This directory contains a lightweight framework for benchmarking quantum programs across multiple backends, collecting the results into CSV files, and optionally generating a single summary PDF report.
+This directory contains a framework for benchmarking quantum programs across multiple backends, collecting the results into CSV files, and optionally generating a single summary PDF report.
 
 The framework is designed around a simple workflow: define a benchmarked quantum task, define one or more backend runners, execute them through a result collector, store results incrementally, and optionally update a LaTeX report after each completed run. This makes it suitable for comparative benchmarking across different providers through Classiq.
 
@@ -21,6 +21,55 @@ The benchmarking framework supports the following tasks:
 - Optionally rebuilding a PDF report after each completed result
 
 The framework is intended for notebook-based benchmarking workflows, where a user prepares a benchmark, launches runs across several backends, and reviews the collected results in both raw and report-ready forms.
+
+## How to run benchmark experiments
+
+Benchmark notebooks are located in the `benchmarks` directory, and the Quantum Volume notebook is located in the `protocols` directory.
+
+The repository already contains data and report outputs from a previous benchmark run. To start a new benchmarking project from scratch, call the following in any of the notebooks (only once):
+
+```python
+from project_reset import reset_benchmark_project
+reset_benchmark_project()
+```
+
+After that, you can run any benchmark notebook to generate a new report from fresh data.
+
+### Benchmarks
+
+In each benchmark notebook, an example is defined, and its size can be set, for example:
+
+```python
+example = AdderExample(num_qubits=4)
+```
+
+The backends to benchmark are then specified, for example:
+
+```python
+benchmark_hardware = [
+    {"provider": "Classiq", "backend": "simulator"},
+    {"provider": "Classiq", "backend": "simulator_statevector"},
+    {"provider": "IonQ", "backend": "qpu.forte-1"},
+    {"provider": "Amazon Braket", "backend": "Ankaa-3"},
+]
+```
+
+When a notebook is run, benchmarking jobs are submitted and their results are collected asynchronously. The `report/report.pdf` file is updated whenever a new result is obtained.
+
+### Quantum Volume protocol
+
+A notebook for running the Quantum Volume protocol is located in the `protocols` directory. The range of widths and the number of trials can be configured, for example:
+
+```python
+protocol = QuantumVolumeProtocol(
+    min_num_qubits=2,
+    max_num_qubits=4,
+    num_trials=10,
+    ...
+)
+```
+
+The backends to benchmark are defined in the same way as for the benchmark notebooks. The `report/report.pdf` file is updated whenever a new result is obtained for a given width.
 
 ## Main classes
 
