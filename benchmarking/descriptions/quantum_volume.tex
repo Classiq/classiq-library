@@ -1,0 +1,23 @@
+We benchmark Quantum Volume following \href{https://journals.aps.org/pra/abstract/10.1103/PhysRevA.100.032328}{Cross et al., PRA 100, 032328 (2019)}. For each width \(n\), we generate square model circuits of width \(n\) and depth \(n\), and measure the heavy-output probability \(h\), namely the total probability assigned to outcomes whose ideal probabilities are above the median of the ideal output distribution.
+
+A width is considered to pass if the heavy-output probability exceeds the threshold \(2/3\) according to a statistical lower bound. For runs with at least \(100\) completed trials, we use the pooled confidence criterion of Cross et al. If \(n_c\) is the number of completed circuits, \(n_s\) the number of shots per circuit, \(n_h\) the total number of heavy outputs observed across all trials, and \(\sigma\) the chosen confidence parameter, we use
+\[
+h_{\mathrm{LB}}
+=
+\frac{n_h - \sigma \sqrt{\,n_h\!\left(n_c n_s - n_h/n_c\right)}}{n_c n_s},
+\]
+and declare the width successful when \(h_{\mathrm{LB}} > 2/3\). For smaller runs, we use the simpler normal approximation
+\[
+h_{\mathrm{LB}} = \bar{h} - \sigma \,\mathrm{SE}(\bar{h}),
+\]
+where \(\bar{h}\) is the sample mean heavy-output probability across trials and \(\mathrm{SE}(\bar{h})\) is its standard error.
+
+The reported Quantum Volume is
+\[
+QV = 2^{n_{\max}},
+\]
+where \(n_{\max}\) is the largest tested width that passes. Consequently, if the largest executed width also passes, the true quantum volume is at least this value and may in fact be larger.
+\smallskip
+
+For more details see \href{https://github.com/Classiq/classiq-library/tree/main/benchmarking/protocols/quantum\_volume\_protocol.ipynb}{Quantum Volume notebook}.
+\medskip

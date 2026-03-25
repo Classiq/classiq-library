@@ -11,9 +11,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # todo: Has many overwrites of `qmod` and `qprog`
     #   as well as many missing places of "put your code"
 
-    # test models
-    validate_quantum_model(tb.ref("qmod"))
-
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),

@@ -1,0 +1,25 @@
+% Auto-generated. Do not edit by hand.
+\section*{Adder}
+
+We benchmark an out-of-place addition by a constant,
+\[
+|x\rangle_n |0\rangle_n \rightarrow |x\rangle_n |x+c \bmod{2^n}\rangle_n,
+\]
+where $n$ is a the variable size and \(c\) is a fixed integer. In the benchmark, the input variable is prepared in a uniform superposition, and the constant is chosen as
+\[
+c = 2^{\lfloor n/2 \rfloor} - 1.
+\]
+The score is defined as the total measured probability of obtaining the correct arithmetic relation,
+\[
+\mathrm{Score} =
+\sum_{x,y=0}^{2^n-1} P(x,y)\,\delta_{\,y,\;x+c \bmod{2^n}},
+\]
+where \(P(x,y)\) is the measured joint output distribution of the two variables. Equivalently, the score is the total probability mass on outcomes satisfying
+\[
+y = x+c \bmod{2^n}.
+\]
+A score of \(1\) corresponds to perfect agreement with the ideal adder transformation.
+\smallskip
+
+For more details see \href{https://github.com/Classiq/classiq-library/tree/main/benchmarking/benchmarks/benchmark\_adder.ipynb}{Benchmark Adder notebook}.
+\medskip

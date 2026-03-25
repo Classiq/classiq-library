@@ -1,0 +1,16 @@
+% Auto-generated. Do not edit by hand.
+\section*{Dynamical Localization}
+
+We benchmark dynamical localization in the quantum sawtooth map on 3 qubits.
+Because this genuinely quantum effect relies on the coherent accumulation of phase over several time steps, while still admitting a relatively simple circuit implementation, it has been proposed as a clear benchmarking task for quantum hardware in \href{https://arxiv.org/abs/2105.10813}{Pizzamiglio et al., Entropy 23, 654 (2021)}. The system is initialized in the momentum eigenstate \(|\psi_0\rangle = |-2\rangle\) and evolved for \(T\) kicks. Let \(P_T(-2)\) denote the measured probability of the initial momentum after \(T\) kicks, and let \(N=2^3=8\). The normalized peak strength is
+\[
+\tilde{P}_T = \frac{P_T(-2) - 1/N}{1 - 1/N},
+\]
+clipped to \([0,1]\). The score is defined as the geometric mean over two time steps,
+\[
+S = \sqrt{\tilde{P}_2 \tilde{P}_3}.
+\]
+\smallskip
+
+For more details see \href{https://github.com/Classiq/classiq-library/tree/main/benchmarking/benchmarks/benchmark\_dynamical\_localization.ipynb}{Benchmark Dynamical Localization notebook}.
+\medskip
