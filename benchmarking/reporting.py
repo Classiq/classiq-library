@@ -264,3 +264,15 @@ def build_report(root: str | Path = "../report", force: bool = True) -> None:
         print(e.stdout)
         print(e.stderr)
         raise
+
+
+def reset_report(root: str | Path = "../report") -> None:
+    root = Path(root).resolve()
+    print(f"Resetting report under: {root}")
+
+    shutil.rmtree(root / "build", ignore_errors=True)
+    shutil.rmtree(root / "sections", ignore_errors=True)
+    shutil.rmtree(root / "data", ignore_errors=True)
+    final_pdf = root / "report.pdf"
+    if final_pdf.exists():
+        final_pdf.unlink()
