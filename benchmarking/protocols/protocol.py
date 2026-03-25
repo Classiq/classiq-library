@@ -622,10 +622,6 @@ class QuantumVolumeProtocol:
             .reset_index(drop=True)
         )
 
-    async def maybe_update_report(self) -> None:
-        if self.update_report_each_time:
-            await self.update_report(build=self.build_report_each_time)
-
     async def update_report(self, build: bool = False) -> pd.DataFrame:
         """Write the QV summary to CSV, update LaTeX report sections, and
         optionally compile the PDF."""
