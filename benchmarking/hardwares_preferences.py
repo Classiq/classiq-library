@@ -86,3 +86,8 @@ def execution_preferences_wrapper(
         raise ValueError(
             f"Unknown backend_service_provider: {backend_service_provider}"
         )
+
+
+def print_all_hardwares(hardwares: dict[str, list[str]]) -> None:
+    for backend_service_provider, backend_names in hardwares.items():
+        print(f"{backend_service_provider}: {', '.join(backend_names)}")
