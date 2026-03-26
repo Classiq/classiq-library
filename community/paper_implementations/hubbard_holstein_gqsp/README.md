@@ -5,7 +5,7 @@
 First application of Generalized Quantum Signal Processing (GQSP) to an 
 electron-phonon coupled system. Implements GQSP-based Hamiltonian simulation 
 of the Hubbard-Holstein model on the Classiq platform, with resource comparison 
-against Suzuki-Trotter and VQE.
+against Suzuki-Trotter.
 
 ## Reference Papers
 - D. Motlagh and N. Wiebe, "Generalized Quantum Signal Processing", PRX Quantum 5, 020368 (2024)
