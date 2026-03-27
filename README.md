@@ -30,7 +30,25 @@ Whether you're a researcher, developer, or student, Classiq helps you simplify c
 
 <hr>
 
+[![Contributors](https://img.shields.io/github/contributors/Classiq/classiq-library?label=Contributors&logo=github&color=ccc&style=flat-square)](https://github.com/Classiq/classiq-library/graphs/contributors)
+
+Classiq enjoys the support of more than 100 contributors!
+
+Feel free to join and submit your own fantastic quantum algorithm!
+
+[![slack](https://img.shields.io/badge/slack-classiq-4A154B.svg?style=flat-square&logo=slack)](https://short.classiq.io/join-slack)
+
+<hr>
+
+Want to cite classiq?
+[![BibTeX Download](https://img.shields.io/badge/Download%20record-e0e0e0.svg?style=flat-square&logo=LaTeX&label=BibTeX&labelColor=106f6e)](https://citation.doi.org/format?doi=10.48550/arXiv.2412.07372&style=bibtex)
+
+<hr>
+
 # Installation
+
+[![Classiq Platform](https://img.shields.io/badge/%E2%9A%9B%EF%B8%8F%20Classiq-Platform-00a99d?style=flat-square)](https://platform.classiq.io)
+[![Classiq Studio](https://img.shields.io/badge/%E2%9A%9B%EF%B8%8F%20Classiq-Studio-00a99d?style=flat-square)](https://platform.classiq.io/studio)
 
 Working with Classiq's latest GUI requires no installations!
 Just head over to [Classiq's platform](https://platform.classiq.io/) and follow the examples below over there :)
