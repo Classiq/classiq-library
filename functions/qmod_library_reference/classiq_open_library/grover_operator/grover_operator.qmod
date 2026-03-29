@@ -4,7 +4,7 @@ qstruct GroverVars {
 }
 
 qperm my_predicate(const vars: GroverVars, res: qbit) {
-  res ^= ((vars.x + vars.y) < 9) and (((vars.x * vars.y) % 4) == 1);
+  res ^= ((vars.x + vars.y) < 4) and (((vars.x * vars.y) % 4) == 2);
 }
 
 qfunc main(output vars: GroverVars) {
