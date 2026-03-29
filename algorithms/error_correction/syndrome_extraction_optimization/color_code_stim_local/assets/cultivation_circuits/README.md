@@ -1,0 +1,1 @@
+Stim circuits in this folder were obtained by using the codes in [C. Gidney, C. Jones, and N. Shutty, Data for "Magic state cultivation: growing T states as cheap as CNOT gates". Zenodo](https://doi.org/10.5281/zenodo.13777072).
