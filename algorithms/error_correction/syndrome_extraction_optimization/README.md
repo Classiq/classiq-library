@@ -1,6 +1,6 @@
 ## Release Branch (Paper Companion Code)
 
-This branch is a cleaned, benchmark-focused snapshot of the research repository.
+This directory is a cleaned, benchmark-focused snapshot of the research repository.
 It is centered on `benchmark_circuits.py` and includes only the key files needed
 for circuit generation, schedule handling, and benchmark/plot reproduction.
 
@@ -43,5 +43,5 @@ From repository root:
 
 ### Scope of this release branch
 
-This branch intentionally excludes most exploratory scripts and large intermediate
+This directory intentionally excludes most exploratory scripts and large intermediate
 research artifacts to make the paper companion code easier to navigate.
