@@ -42,3 +42,8 @@ jobs:
           # Passing environment information
           CLASSIQ_IDE: "https://nightly.platform.classiq.io"
           CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      # Summarize results for Slack copy-paste
+      - name: Summarize test results
+        if: always()
+        run: python .github/scripts/summarize_test_results.py --workflow-name "internal"
