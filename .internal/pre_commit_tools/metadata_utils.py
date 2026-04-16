@@ -37,20 +37,21 @@ class Field:
         raise NotImplementedError
 
 
+@dataclass
 class FieldStr(Field):
     allow_empty: bool = False
 
     _expected_type = str
 
     def verify_type(self, data: Any) -> bool:
-        if self.allow_empty:
-            return True
-        else:
-            return type(data) is str
+        return type(data) is str
 
     def verify_value(self, data: str) -> bool:
         # verify data is not empty
-        return bool(data)
+        if self.allow_empty:
+            return True
+        else:
+            return bool(data)
 
 
 @dataclass
@@ -130,10 +131,14 @@ ALL_FIELDS = [
     ),
     FieldList("level", _generate_empty_list, ["basic", "advanced", "demos"]),
     # New fields: str
-    FieldStr("id", _generate_empty_str),  # todo: change generate_default_value
-    FieldStr("thumbnail", _generate_empty_str),  # todo: add `validate file exists`
     FieldStr(
-        "preview-file/code", _generate_empty_str
+        "id", _generate_empty_str, allow_empty=True
+    ),  # todo: change generate_default_value
+    FieldStr(
+        "thumbnail", _generate_empty_str, allow_empty=True
+    ),  # todo: add `validate file exists`
+    FieldStr(
+        "preview-file/code", _generate_empty_str, allow_empty=True
     ),  # todo: add `validate file exists`
     # New fields: lists
     FieldList(
