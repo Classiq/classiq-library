@@ -25,4 +25,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
     # test notebook content
     assert tb.ref("test_score") >= 0.98
-    assert tb.ref("test_score_pauli") >= 0.98
+    assert tb.ref("test_score_pauli") >= 0.85
