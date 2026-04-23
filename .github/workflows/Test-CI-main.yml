@@ -98,18 +98,6 @@ jobs:
           python -m pip install -U pip
           python -m pip install -U -r requirements.txt -r requirements_tests.txt
 
-      - name: Install couenne solver
-        env:
-          COIN_DIST_URL: https://github.com/ampl/coin/releases/download/v20191215/coin-linux64.tar.gz
-          LOCAL_BIN: ${{ runner.temp }}/.local/bin
-        run: |
-          set -eux
-          mkdir -p "$LOCAL_BIN"
-          echo "$LOCAL_BIN" >>"$GITHUB_PATH"
-          wget -nv -O- "$COIN_DIST_URL" | tar -C "$RUNNER_TEMP" -xvz
-          cp "${RUNNER_TEMP}/couenne" "${LOCAL_BIN}/couenne"
-          chmod ugo+x "${LOCAL_BIN}/couenne"
-
       #
       # Setup Environment
       #
