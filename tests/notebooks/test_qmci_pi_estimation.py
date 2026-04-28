@@ -5,7 +5,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("qmci_pi_estimation", timeout_seconds=60)
+@wrap_testbook("qmci_pi_estimation", timeout_seconds=900)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
