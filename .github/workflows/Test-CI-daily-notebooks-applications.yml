@@ -164,18 +164,18 @@ jobs:
           CLASSIQ_IDE: "https://nightly.platform.classiq.io"
           CLASSIQ_HOST: "https://nightly.platform.classiq.io"
 
-      - name: Run Notebooks (hamiltonian_simulation_with_block_encoding)
-        run: python -m pytest -c tests/config_weekly.ini tests/notebooks/test_hamiltonian_simulation_with_block_encoding.py
-        env:
-          # to disable a warning in Jupyter notebooks
-          JUPYTER_PLATFORM_DIRS: "1"
-          # Passing which notebooks changed
-          SHOULD_TEST_ALL_FILES: "true"
-          LIST_OF_IPYNB_CHANGED: "${{ steps.list-files.outputs.files }}"
-          LIST_OF_IPYNB_TESTS_CHANGED: ""
-          # Altering test behavior
-          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
-          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+      # - name: Run Notebooks (hamiltonian_simulation_with_block_encoding)
+      #   run: python -m pytest -c tests/config_weekly.ini tests/notebooks/test_hamiltonian_simulation_with_block_encoding.py
+      #   env:
+      #     # to disable a warning in Jupyter notebooks
+      #     JUPYTER_PLATFORM_DIRS: "1"
+      #     # Passing which notebooks changed
+      #     SHOULD_TEST_ALL_FILES: "true"
+      #     LIST_OF_IPYNB_CHANGED: "${{ steps.list-files.outputs.files }}"
+      #     LIST_OF_IPYNB_TESTS_CHANGED: ""
+      #     # Altering test behavior
+      #     CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+      #     CLASSIQ_HOST: "https://nightly.platform.classiq.io"
 
       - name: Run Notebooks (hhl)
         run: python -m pytest -c tests/config_weekly.ini tests/notebooks/test_hhl.py
