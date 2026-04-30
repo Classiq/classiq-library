@@ -111,6 +111,1264 @@ jobs:
           CLASSIQ_IDE: "https://nightly.platform.classiq.io"
           CLASSIQ_HOST: "https://nightly.platform.classiq.io"
 
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
+      - name: run some python
+        shell: python
+        run: |
+          from classiq._internals import config
+          from classiq._internals.client import Client
+          from classiq._internals.host_checker import HostChecker
+          from classiq.interface._version import VERSION as _VERSION
+          from classiq.interface.interface_version import INTERFACE_VERSION
+
+
+          print(f"{_VERSION=}")
+          print(f"{INTERFACE_VERSION=}")
+          print(f"\n{'-'*30}\n")
+
+          c = Client(config.init())
+          x = c.sync_call_api("get", "/interface_versions", use_versioned_url=False)
+          print(x)
+          print(f"\n{'-'*30}\n")
+
+          checker = HostChecker(c, client_version=_VERSION)
+          y = checker._get_interface_version()
+          print(y)
+          print(f"\n{'-'*30}\n")
+          z = checker._get_host_version()
+          print(z)
+          print(f"\n{'-'*30}\n")
+
+          checker.check_host_version()
+
+          checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
+
       # Run Notebook Tests
       - name: Run Notebooks (gqsp)
         run: python -m pytest -c tests/config_weekly.ini tests/notebooks/test_gqsp.py
