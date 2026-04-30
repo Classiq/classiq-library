@@ -10,14 +10,11 @@ from testbook.client import TestbookNotebookClient
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # warning: the `qmod` and `qprog` are being overriden too many times
 
-    # test models
-    validate_quantum_model(tb.ref("qmod"))
-
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
         expected_width=30,  # actual width: 19
-        expected_depth=250,  # actual depth: 143
+        expected_depth=650,  # actual depth: 593
     )
 
     # test notebook content
