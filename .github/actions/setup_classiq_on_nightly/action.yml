@@ -1,5 +1,5 @@
 name: "Setup classiq nightly"
-description: "setup python ; install classiq nighyly from aws ; install quenne ; setup M2M token"
+description: "setup python ; install classiq nightly from aws ; setup M2M token"
 
 inputs:
   aws-role:
@@ -61,19 +61,6 @@ runs:
             --extra-index-url https://pypi.org/simple
         python -m pip install -U -r requirements_tests.txt \
             --extra-index-url https://pypi.org/simple
-
-    - name: Install couenne solver
-      shell: bash
-      env:
-        COIN_DIST_URL: https://github.com/ampl/coin/releases/download/v20191215/coin-linux64.tar.gz
-        LOCAL_BIN: ${{ runner.temp }}/.local/bin
-      run: |
-        set -eux
-        mkdir -p "$LOCAL_BIN"
-        echo "$LOCAL_BIN" >>"$GITHUB_PATH"
-        wget -nv -O- "$COIN_DIST_URL" | tar -C "$RUNNER_TEMP" -xvz
-        cp "${RUNNER_TEMP}/couenne" "${LOCAL_BIN}/couenne"
-        chmod ugo+x "${LOCAL_BIN}/couenne"
 
     # Set authentication with M2M token
     - name: Set authentication
