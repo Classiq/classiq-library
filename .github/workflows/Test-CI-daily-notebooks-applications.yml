@@ -120,6 +120,9 @@ jobs:
           checker.check_host_version()
 
           checker.check_deprecated_version()
+        env:
+          CLASSIQ_IDE: "https://nightly.platform.classiq.io"
+          CLASSIQ_HOST: "https://nightly.platform.classiq.io"
 
       # # Summarize results for Slack copy-paste
       # - name: Summarize test results
