@@ -113,7 +113,7 @@ jobs:
 
       # Run Notebook Tests
       - name: Run Notebooks
-        run: python -m pytest -c tests/config_weekly.ini tests/notebooks/test_lchs.py
+        run: python -m pytest -c tests/config_weekly.ini tests/notebooks/test_hidden_shift.py
         env:
           # to disable a warning in Jupyter notebooks
           JUPYTER_PLATFORM_DIRS: "1"
