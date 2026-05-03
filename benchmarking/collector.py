@@ -284,6 +284,7 @@ class ResultCollector:
                             numeric_cols={
                                 "Score",
                                 "Time Elapsed (min)",
+                                "Width",
                                 "Depth",
                                 "2Q Gate Count",
                             },
