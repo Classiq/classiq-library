@@ -14,7 +14,7 @@ from errors import StageError
 @dataclass
 class BenchmarkExample(abc.ABC):
     name: str
-    num_qubits: int
+    problem_size: int
     constraints: Constraints = field(default_factory=Constraints)
 
     report_family_title: str | None = None
@@ -28,7 +28,7 @@ class BenchmarkExample(abc.ABC):
 
     @property
     def report_instance_title(self) -> str:
-        return f"{self.name} - {self.num_qubits} qubits"
+        return f"{self.name} - {self.problem_size} qubits"
 
     @abc.abstractmethod
     def create_main(self) -> callable:
@@ -71,4 +71,4 @@ class BenchmarkExample(abc.ABC):
 
     @property
     def default_results_filename(self) -> str:
-        return f"data/{self.name}{self.num_qubits}.csv"
+        return f"data/{self.name}{self.problem_size}.csv"

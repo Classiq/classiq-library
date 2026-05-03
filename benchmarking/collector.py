@@ -12,7 +12,7 @@ from hardware import HardwareRunner
 from errors import StageError, RESULT_TIMEOUT
 from storage import (
     load_results,
-    make_df_for_example_qubits,
+    make_df_for_example,
     section_name,
     dump_results,
     section_title,
@@ -70,7 +70,7 @@ class ResultCollector:
             f.write(f"time: {now}\n")
             f.write(f"stage: {stage}\n")
             f.write(f"example: {example.name}\n")
-            f.write(f"num_qubits: {example.num_qubits}\n")
+            f.write(f"problem_size: {example.problem_size}\n")
             f.write(f"provider: {runner.backend_service_provider}\n")
             f.write(f"backend: {runner.backend_name}\n")
             f.write(f"num_shots: {runner.num_shots}\n")
@@ -210,7 +210,7 @@ class ResultCollector:
 
             completed_ts = datetime.datetime.now()
             print(
-                f"{completed_ts}: Completed {example.name}-{example.num_qubits} "
+                f"{completed_ts}: Completed {example.name}-{example.problem_size} "
                 f"for {runner.backend_service_provider} - {runner.backend_name} "
                 f"--> Score {scores}"
             )
@@ -245,8 +245,8 @@ class ResultCollector:
                         async with FILE_LOCK:
                             all_results = load_results(self.filename)
 
-                        df = make_df_for_example_qubits(
-                            all_results, example.name, example.num_qubits
+                        df = make_df_for_example(
+                            all_results, example.name, example.problem_size
                         )
 
                         # set num_shots for subtitle
@@ -254,7 +254,7 @@ class ResultCollector:
                             r
                             for r in all_results
                             if r.get("example") == example.name
-                            and r.get("num_qubits") == example.num_qubits
+                            and r.get("problem_size") == example.problem_size
                         ]
 
                         shots_values = sorted(
@@ -278,7 +278,7 @@ class ResultCollector:
                         )
 
                         add_section(
-                            name=f"10_{example.name}_{example.num_qubits:03d}",
+                            name=f"10_{example.name}_{example.problem_size:03d}",
                             title=title,
                             df=df,
                             numeric_cols={
@@ -298,7 +298,7 @@ class ResultCollector:
                                 build_report, self.report_root, True
                             )
                             print(
-                                f"** Report updated: {example.name}-{example.num_qubits} "
+                                f"** Report updated: {example.name}-{example.problem_size} "
                                 f"for {runner.backend_service_provider} - {runner.backend_name}"
                             )
                 except Exception as exc:
@@ -347,7 +347,7 @@ class ResultCollector:
 
         submitted_ts = datetime.datetime.now()
         print(
-            f"{submitted_ts}: Submit {example.name}-{example.num_qubits} "
+            f"{submitted_ts}: Submit {example.name}-{example.problem_size} "
             f"for {runner.backend_service_provider} - {runner.backend_name}"
         )
 
@@ -386,7 +386,7 @@ class ResultCollector:
         for res in results:
             status = res.get("status", "")
             prefix = (
-                f"{res.get('example')}-{res.get('num_qubits')} | "
+                f"{res.get('example')}-{res.get('problem_size')} | "
                 f"{res.get('backend_service_provider')} - {res.get('backend_name')}"
             )
 

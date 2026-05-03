@@ -69,27 +69,27 @@ def _heavy_states_from_df(df_ideal: pd.DataFrame) -> set[tuple[int, ...]]:
 class QVExample(BenchmarkExample):
     """A single Quantum Volume trial circuit.
 
-    Each trial builds a random model circuit of depth = width = num_qubits,
+    Each trial builds a random model circuit of depth = width = problem_size,
     composed of layers of Haar-random SU(4) gates applied to random qubit
     pairs (see Fig. 1 of Cross et al., arXiv:1811.12926).
     """
 
-    def __init__(self, num_qubits: int, trial_id: int, seed: int):
+    def __init__(self, problem_size: int, trial_id: int, seed: int):
         self.trial_id = trial_id
         self.seed = int(seed)
         # Pre-build the random circuit layers (deterministic given the seed)
-        self.layers = self._build_layers(num_qubits, self.seed)
+        self.layers = self._build_layers(problem_size, self.seed)
 
         # Cache for the heavy-output set (computed lazily on first score call)
         self._heavy_states: set[int] | None = None
 
         super().__init__(
-            name=f"qv_{num_qubits}_{trial_id}",
-            num_qubits=num_qubits,
+            name=f"qv_{problem_size}_{trial_id}",
+            problem_size=problem_size,
         )
 
-    def _build_layers(self, num_qubits: int, seed: int):
-        """Generate `num_qubits` layers of random two-qubit gates.
+    def _build_layers(self, problem_size: int, seed: int):
+        """Generate `problem_size` layers of random two-qubit gates.
 
         Each layer randomly permutes the qubits, pairs the first half with
         the second half, and assigns a Haar-random SU(4) gate to each pair.
@@ -111,15 +111,15 @@ class QVExample(BenchmarkExample):
 
         layers = []
         # depth = width per the QV convention (square circuits)
-        for _ in range(num_qubits):
+        for _ in range(problem_size):
             # Random permutation determines qubit pairing for this layer
-            qubit_list = rng.permutation(num_qubits).tolist()
+            qubit_list = rng.permutation(problem_size).tolist()
 
             layer = []
             # Pair qubit_list[i] with qubit_list[n//2 + i] for each i
-            for idx in range(num_qubits // 2):
+            for idx in range(problem_size // 2):
                 a = qubit_list[idx]
-                b = qubit_list[num_qubits // 2 + idx]
+                b = qubit_list[problem_size // 2 + idx]
                 # Each pair gets an independent Haar-random SU(4) gate
                 gate_matrix = haar(4)
                 layer.append((a, b, gate_matrix))
@@ -131,7 +131,7 @@ class QVExample(BenchmarkExample):
     def create_main(self) -> callable:
         """Build the Classiq quantum function for this QV circuit."""
         layers = self.layers
-        n = self.num_qubits
+        n = self.problem_size
 
         @qfunc
         def main(x: Output[QArray[n]]):

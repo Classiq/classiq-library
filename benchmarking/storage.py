@@ -14,7 +14,7 @@ def load_results(filename: str) -> list[dict]:
     results = []
     with open(filename, "r", encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
-            for k in ["num_qubits", "num_shots"]:
+            for k in ["problem_size", "num_shots"]:
                 if row.get(k):
                     row[k] = int(float(row[k]))
 
@@ -84,14 +84,14 @@ def count_submitted_jobs_in_dir(data_dir: str | Path) -> int:
     return status_counts_in_dir(data_dir).get("SUBMITTED", 0)
 
 
-def make_df_for_example_qubits(
-    results: list[dict], example_name: str, num_qubits: int
+def make_df_for_example(
+    results: list[dict], example_name: str, problem_size: int
 ) -> pd.DataFrame:
     rows = []
     for r in results:
         if (
             r.get("example") == example_name
-            and r.get("num_qubits") == num_qubits
+            and r.get("problem_size") == problem_size
             and r.get("status") in {"COMPLETED", "TIMEOUT", "ERROR"}
         ):
             rows.append(
@@ -120,9 +120,9 @@ def make_df_for_example_qubits(
     return df
 
 
-def section_name(example_name: str, num_qubits: int) -> str:
-    return f"{example_name.lower().replace(' ', '_')}_q{num_qubits}"
+def section_name(example_name: str, problem_size: int) -> str:
+    return f"{example_name.lower().replace(' ', '_')}_q{problem_size}"
 
 
-def section_title(example_name: str, num_qubits: int) -> str:
-    return f"{example_name} - {num_qubits} qubits"
+def section_title(example_name: str, problem_size: int) -> str:
+    return f"{example_name} - {problem_size} qubits"
