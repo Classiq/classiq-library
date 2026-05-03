@@ -100,6 +100,7 @@ def make_df_for_example(
                     "Backend Name": r.get("backend_name", ""),
                     "Score": r.get("score", float("nan")),
                     "Time Elapsed (min)": r.get("execution_time", float("nan")),
+                    "Width": r.get("circuit_width", float("nan")),
                     "Depth": r.get("circuit_depth", float("nan")),
                     "2Q Gate Count": r.get("two_qubit_gate_count", float("nan")),
                 }
@@ -111,6 +112,7 @@ def make_df_for_example(
         df["Time Elapsed (min)"] = pd.to_numeric(
             df["Time Elapsed (min)"], errors="coerce"
         ).round(1)
+        df["Width"] = pd.to_numeric(df["Width"], errors="coerce").astype("Int64")
         df["Depth"] = pd.to_numeric(df["Depth"], errors="coerce").astype("Int64")
         df["2Q Gate Count"] = pd.to_numeric(
             df["2Q Gate Count"], errors="coerce"

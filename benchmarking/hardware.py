@@ -6,31 +6,11 @@ from classiq import (
     set_quantum_program_execution_preferences,
     ExecutionPreferences,
     QuantumProgram,
+    ExecutionJob,
 )
 from hardwares_preferences import execution_preferences_wrapper
 from benchmark import BenchmarkExample
 from errors import StageError
-
-LIST_OF_2Q_GATES = [
-    "cx",
-    "cy",
-    "cz",
-    "swap",
-    "ecr",
-    "rxx",
-    "ryy",
-    "rzz",
-    "rzx",
-    "crx",
-    "cry",
-    "crz",
-    "csx",
-    "cu1",
-    "cu",
-    "ch",
-    "cp",
-    "iswap",
-]
 
 
 @dataclass
@@ -76,28 +56,40 @@ class HardwareRunner:
         except Exception as exc:
             raise StageError("synthesis", exc) from exc
 
-    def _extract_circuit_metrics(self, qprog: QuantumProgram) -> dict:
-        tc = qprog.transpiled_circuit
+    async def _extract_circuit_metrics(self, job_id: str) -> dict:
+        _empty = {
+            "circuit_depth": None,
+            "circuit_width": None,
+            "two_qubit_gate_count": None,
+        }
+        try:
+            job = await ExecutionJob.from_id_async(job_id)
+            circuits = await job.get_submitted_circuits_async()
+        except Exception:
+            return _empty
+        if not circuits:
+            return _empty
 
-        depth = tc.depth
-        count_ops = tc.count_ops
-
-        two_qubit_gate_count = 0
-        for key, count in count_ops.items():
-            name = str(key).lower()
-            if any(g in name for g in LIST_OF_2Q_GATES):
-                two_qubit_gate_count += count
-
+        qc = circuits[0].to_qiskit()
+        depth = qc.depth(
+            filter_function=lambda instr: instr.operation.name
+            not in ("measure", "barrier", "reset")
+        )
+        width = qc.num_qubits
+        two_qubit_gate_count = sum(
+            1 for instr in qc.data if instr.operation.num_qubits == 2
+        )
         return {
             "circuit_depth": depth,
+            "circuit_width": width,
             "two_qubit_gate_count": two_qubit_gate_count,
         }
 
     async def submit_execution(self, example: BenchmarkExample) -> tuple[str, dict]:
         try:
             qprog = await self._synthesize(example)
-            metrics = self._extract_circuit_metrics(qprog)
             job_id = await example.submit(qprog)
+            metrics = await self._extract_circuit_metrics(job_id)
             return job_id, metrics
         except StageError:
             raise
