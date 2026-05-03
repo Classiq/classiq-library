@@ -64,8 +64,8 @@ class QuantumVolumeProtocol:
     """
 
     # --- Required parameters ---
-    min_num_qubits: int  # Smallest circuit width to test
-    max_num_qubits: int  # Largest circuit width to test
+    min_problem_size: int  # Smallest circuit width to test
+    max_problem_size: int  # Largest circuit width to test
     num_trials: int  # Number of random QV circuits per width
     runners: list[HardwareRunner]  # Backend runners to benchmark
 
@@ -93,7 +93,7 @@ class QuantumVolumeProtocol:
 
     def widths(self) -> list[int]:
         """Return the list of circuit widths to sweep over."""
-        return list(range(self.min_num_qubits, self.max_num_qubits + 1))
+        return list(range(self.min_problem_size, self.max_problem_size + 1))
 
     def shots_label(self) -> str:
         """Human-readable label summarizing the shot counts across runners."""
@@ -102,48 +102,48 @@ class QuantumVolumeProtocol:
             return f"{shots_values[0]} shots"
         return "multiple shot counts"
 
-    def filename_for_width(self, num_qubits: int) -> str:
+    def filename_for_width(self, problem_size: int) -> str:
         """CSV file path for storing results of a given width."""
-        return str(Path(self.results_dir) / f"qv_{num_qubits}.csv")
+        return str(Path(self.results_dir) / f"qv_{problem_size}.csv")
 
-    def collector_for_width(self, num_qubits: int) -> ResultCollector:
+    def collector_for_width(self, problem_size: int) -> ResultCollector:
         """Create a ResultCollector that saves trial results for a given width."""
         return ResultCollector(
-            filename=self.filename_for_width(num_qubits),
+            filename=self.filename_for_width(problem_size),
             skip_report=True,
             max_submitted_jobs_in_dir=self.max_submitted_jobs_in_dir,
         )
 
-    def seed_for_trial(self, num_qubits: int, trial_id: int) -> int:
+    def seed_for_trial(self, problem_size: int, trial_id: int) -> int:
         """Deterministic seed for a specific (width, trial) pair."""
-        return self.base_seed + 100_000 * num_qubits + trial_id
+        return self.base_seed + 100_000 * problem_size + trial_id
 
-    def make_example(self, num_qubits: int, trial_id: int) -> QVExample:
+    def make_example(self, problem_size: int, trial_id: int) -> QVExample:
         """Instantiate a QV circuit example for a given width and trial."""
         return QVExample(
-            num_qubits=num_qubits,
+            problem_size=problem_size,
             trial_id=trial_id,
-            seed=self.seed_for_trial(num_qubits, trial_id),
+            seed=self.seed_for_trial(problem_size, trial_id),
         )
 
     async def reset_files(self) -> None:
         """Clear all per-width result files to start fresh."""
         Path(self.results_dir).mkdir(parents=True, exist_ok=True)
-        for num_qubits in self.widths():
-            collector = self.collector_for_width(num_qubits)
+        for problem_size in self.widths():
+            collector = self.collector_for_width(problem_size)
             await collector.reset_file()
 
-    async def run_width(self, num_qubits: int) -> tuple[list[dict | None], bool]:
+    async def run_width(self, problem_size: int) -> tuple[list[dict | None], bool]:
         Path(self.results_dir).mkdir(parents=True, exist_ok=True)
-        collector = self.collector_for_width(num_qubits)
+        collector = self.collector_for_width(problem_size)
 
-        filename = Path(self.filename_for_width(num_qubits))
+        filename = Path(self.filename_for_width(problem_size))
         before_mtime = filename.stat().st_mtime if filename.exists() else None
 
         tasks = []
         for runner in self.runners:
             for trial_id in range(self.num_trials):
-                example = self.make_example(num_qubits, trial_id)
+                example = self.make_example(problem_size, trial_id)
                 tasks.append(collector.run(runner, example))
 
         results = await asyncio.gather(*tasks)
@@ -156,20 +156,20 @@ class QuantumVolumeProtocol:
     async def run(self) -> dict[int, pd.DataFrame]:
         summaries: dict[int, pd.DataFrame] = {}
 
-        for num_qubits in self.widths():
-            _, had_updates = await self.run_width(num_qubits)
-            summaries[num_qubits] = self.summarize_width(num_qubits)
+        for problem_size in self.widths():
+            _, had_updates = await self.run_width(problem_size)
+            summaries[problem_size] = self.summarize_width(problem_size)
 
             if had_updates and self.update_report_each_time:
                 await self.update_report(build=self.build_report_each_time)
                 if self.build_report_each_time:
-                    print(f"Report updated and built for width {num_qubits}")
+                    print(f"Report updated and built for width {problem_size}")
 
         return summaries
 
-    def _load_width_df(self, num_qubits: int) -> pd.DataFrame:
+    def _load_width_df(self, problem_size: int) -> pd.DataFrame:
         """Load raw trial results from the CSV file for a given width."""
-        filename = Path(self.filename_for_width(num_qubits))
+        filename = Path(self.filename_for_width(problem_size))
         if not filename.exists():
             return pd.DataFrame()
 
@@ -179,7 +179,7 @@ class QuantumVolumeProtocol:
 
         return pd.DataFrame(results)
 
-    def summarize_width(self, num_qubits: int) -> pd.DataFrame:
+    def summarize_width(self, problem_size: int) -> pd.DataFrame:
         """Aggregate trial results for a single width into a per-backend summary.
 
         For each backend, computes:
@@ -189,10 +189,10 @@ class QuantumVolumeProtocol:
             MAX_TRIAL_ERROR_RATE tolerance) AND the lower bound exceeds 2/3
           - counts of trials by status (SUBMITTED, COMPLETED, TIMEOUT, ERROR)
         """
-        df = self._load_width_df(num_qubits)
+        df = self._load_width_df(problem_size)
 
         out_cols = [
-            "num_qubits",
+            "problem_size",
             "backend_service_provider",
             "backend_name",
             "num_trials_requested",
@@ -234,7 +234,7 @@ class QuantumVolumeProtocol:
         if completed.empty:
             # No trials completed — fill in zeros/NaNs and mark as not passed
             summary = status_counts.copy()
-            summary["num_qubits"] = num_qubits
+            summary["problem_size"] = problem_size
             summary["num_trials_requested"] = self.num_trials
             summary["num_completed"] = 0
             summary["mean_score"] = np.nan
@@ -298,7 +298,7 @@ class QuantumVolumeProtocol:
                     score_summary["mean_score"]
                     - self.sigma_factor * score_summary["stderr_score"]
                 )
-            score_summary["num_qubits"] = num_qubits
+            score_summary["problem_size"] = problem_size
             score_summary["num_trials_requested"] = self.num_trials
 
             # A width passes if:
@@ -317,7 +317,7 @@ class QuantumVolumeProtocol:
             )
 
             # Fill NaNs for backends that appear in one table but not the other
-            summary["num_qubits"] = summary["num_qubits"].fillna(num_qubits)
+            summary["problem_size"] = summary["problem_size"].fillna(problem_size)
             summary["num_trials_requested"] = summary["num_trials_requested"].fillna(
                 self.num_trials
             )
@@ -327,7 +327,7 @@ class QuantumVolumeProtocol:
         # Select and order the final output columns
         summary = summary[
             [
-                "num_qubits",
+                "problem_size",
                 "backend_service_provider",
                 "backend_name",
                 "num_trials_requested",
@@ -349,15 +349,15 @@ class QuantumVolumeProtocol:
     def all_width_summaries(self) -> pd.DataFrame:
         """Concatenate per-width summaries for all widths into a single DataFrame."""
         dfs = []
-        for num_qubits in self.widths():
-            s = self.summarize_width(num_qubits)
+        for problem_size in self.widths():
+            s = self.summarize_width(problem_size)
             if not s.empty:
                 dfs.append(s)
 
         if not dfs:
             return pd.DataFrame(
                 columns=[
-                    "num_qubits",
+                    "problem_size",
                     "backend_service_provider",
                     "backend_name",
                     "num_trials_requested",
@@ -379,7 +379,7 @@ class QuantumVolumeProtocol:
         For each backend, finds the largest width that passed and computes
         QV = 2^(largest_passing_width). Note: this currently takes the max
         of all passing widths without requiring consecutive passes from
-        min_num_qubits upward.
+        min_problem_size upward.
         """
         df = self.all_width_summaries()
 
@@ -398,7 +398,7 @@ class QuantumVolumeProtocol:
             ["backend_service_provider", "backend_name"],
             dropna=False,
         ):
-            passed_widths = g.loc[g["passed"], "num_qubits"].tolist()
+            passed_widths = g.loc[g["passed"], "problem_size"].tolist()
             largest_passing_width = max(passed_widths) if passed_widths else 0
 
             rows.append(
@@ -425,8 +425,8 @@ class QuantumVolumeProtocol:
         """Compute total execution time per (backend, width) for completed trials."""
         dfs = []
 
-        for num_qubits in self.widths():
-            df = self._load_width_df(num_qubits)
+        for problem_size in self.widths():
+            df = self._load_width_df(problem_size)
             if df.empty or "execution_time" not in df.columns:
                 continue
 
@@ -447,7 +447,7 @@ class QuantumVolumeProtocol:
                 .sum()
                 .reset_index()
             )
-            summary["num_qubits"] = num_qubits
+            summary["problem_size"] = problem_size
             dfs.append(summary)
 
         if not dfs:
@@ -455,7 +455,7 @@ class QuantumVolumeProtocol:
                 columns=[
                     "backend_service_provider",
                     "backend_name",
-                    "num_qubits",
+                    "problem_size",
                     "execution_time",
                 ]
             )
@@ -547,8 +547,8 @@ class QuantumVolumeProtocol:
 
         # Compute average execution time per trial across all widths
         runtime_rows = []
-        for num_qubits in self.widths():
-            df = self._load_width_df(num_qubits)
+        for problem_size in self.widths():
+            df = self._load_width_df(problem_size)
             if df.empty or "execution_time" not in df.columns:
                 continue
 
@@ -651,7 +651,7 @@ class QuantumVolumeProtocol:
 
         add_section(
             name="20_quantum_volume_summary",
-            title=f"{self.min_num_qubits}--{self.max_num_qubits} qubits ({self.num_trials} trials, {self.shots_label()})",
+            title=f"{self.min_problem_size}--{self.max_problem_size} qubits ({self.num_trials} trials, {self.shots_label()})",
             df=df,
             numeric_cols={"Quantum Volume", "Average Elapsed Time (min)"},
             root=str(root),

@@ -115,7 +115,7 @@ class HardwareRunner:
     def to_dict(self, example: BenchmarkExample, **kwargs):
         return {
             "example": example.name,
-            "num_qubits": example.num_qubits,
+            "problem_size": example.problem_size,
             "backend_service_provider": self.backend_service_provider,
             "backend_name": self.backend_name,
             "num_shots": self.num_shots,
