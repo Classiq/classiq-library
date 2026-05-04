@@ -206,9 +206,7 @@ def apply_basis_phase(theta: CReal, x_int: CInt, qvar: QNum) -> None:
 
 
 @qfunc
-def quantum_oracle_sketch(
-    theta: CReal, x_samples: CArray[CInt], qvar: QNum
-) -> None:
+def quantum_oracle_sketch(theta: CReal, x_samples: CArray[CInt], qvar: QNum) -> None:
     """Sketched Boolean phase oracle ``V = ∏_t exp(i θ |x_t⟩⟨x_t|)``.
 
     ``x_samples`` should be pre-filtered to the indices with ``f(x_t) = 1``;
@@ -237,9 +235,7 @@ def real_valued_oracle_sketch(
     """
     repeat(
         count=x_samples.len,
-        iteration=lambda t: apply_basis_phase(
-            angles_per_sample[t], x_samples[t], qvar
-        ),
+        iteration=lambda t: apply_basis_phase(angles_per_sample[t], x_samples[t], qvar),
     )
 
 
@@ -304,9 +300,7 @@ def ideal_phase_oracle(A: np.ndarray, theta: float) -> np.ndarray:
     return np.diag(np.exp(1j * theta * A).ravel())
 
 
-def hadamard_test_branches(
-    V_diag: np.ndarray, n: int
-) -> tuple:
+def hadamard_test_branches(V_diag: np.ndarray, n: int) -> tuple:
     """Convert a sketched phase oracle into Hadamard-test branch amplitudes.
 
     Starting from ``|0⟩_aux ⊗ |+⟩^{⊗n}_row ⊗ |+⟩^{⊗n}_col`` and applying

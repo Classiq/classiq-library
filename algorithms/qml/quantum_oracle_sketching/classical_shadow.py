@@ -59,9 +59,7 @@ def median_of_means(values: np.ndarray, k: int) -> float:
     return float(np.median([np.mean(c) for c in chunks]))
 
 
-def shadow_error_bound(
-    n_observables: int, eps: float, delta: float
-) -> tuple:
+def shadow_error_bound(n_observables: int, eps: float, delta: float) -> tuple:
     """HKP shadow size for ``n_observables`` predictions to error ``ε`` w.p. ``≥ 1 − δ``.
 
     Implements eq. (S13) of [[2]] for a Pauli-basis ensemble. The required

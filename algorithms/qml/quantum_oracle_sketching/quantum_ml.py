@@ -143,9 +143,7 @@ def qsvt_polynomial_phases(
 # ---------------------------------------------------------------------------
 
 
-def apply_qsvt_polynomial(
-    A: np.ndarray, coeffs: np.ndarray
-) -> np.ndarray:
+def apply_qsvt_polynomial(A: np.ndarray, coeffs: np.ndarray) -> np.ndarray:
     """Apply a Chebyshev polynomial ``P(A) = Σ_k c_k T_k(A)`` to a Hermitian ``A``.
 
     The numpy reference for the QSVT action: given Chebyshev coefficients of
@@ -290,10 +288,12 @@ def quantum_linear_solve(
     n = A.shape[0]
 
     # --- Stage 1: matrix-element sketch -------------------------------------
-    samples_ij = np.column_stack([
-        rng.integers(0, n, size=M_matrix),
-        rng.integers(0, n, size=M_matrix),
-    ])
+    samples_ij = np.column_stack(
+        [
+            rng.integers(0, n, size=M_matrix),
+            rng.integers(0, n, size=M_matrix),
+        ]
+    )
     V = matrix_element_sketch(A, samples_ij, theta_be)
     A_recovered = recover_matrix_from_phase_oracle(np.diag(V), theta_be, n)
     A_recovered = 0.5 * (A_recovered + A_recovered.T)  # enforce Hermiticity
@@ -314,9 +314,7 @@ def quantum_linear_solve(
     diagnostics = {
         "alpha": alpha,
         "kappa_used": qsvt_kappa,
-        "A_recovery_error": float(
-            np.linalg.norm(A_recovered - A) / np.linalg.norm(A)
-        ),
+        "A_recovery_error": float(np.linalg.norm(A_recovered - A) / np.linalg.norm(A)),
         "A_inv_error": float(
             np.linalg.norm(A_inv_full - np.linalg.inv(A))
             / np.linalg.norm(np.linalg.inv(A))
@@ -367,10 +365,12 @@ def quantum_lssvm_solve(
 
     # --- Stage 1a: matrix-element sketch of A = X^T X + λ I -----------------
     a_target = X.T @ X + lambd * np.eye(d)
-    samples_ij = np.column_stack([
-        rng.integers(0, d, size=M_matrix),
-        rng.integers(0, d, size=M_matrix),
-    ])
+    samples_ij = np.column_stack(
+        [
+            rng.integers(0, d, size=M_matrix),
+            rng.integers(0, d, size=M_matrix),
+        ]
+    )
     V = matrix_element_sketch(a_target, samples_ij, theta_be)
     a_recovered = recover_matrix_from_phase_oracle(np.diag(V), theta_be, d)
     a_recovered = 0.5 * (a_recovered + a_recovered.T)
@@ -452,10 +452,12 @@ def quantum_pca_top_eigenvector(
 
     # Stage 1: matrix-element sketch of A = X^T X.
     a_target = X_data.T @ X_data
-    samples_ij = np.column_stack([
-        rng.integers(0, n, size=M_matrix),
-        rng.integers(0, n, size=M_matrix),
-    ])
+    samples_ij = np.column_stack(
+        [
+            rng.integers(0, n, size=M_matrix),
+            rng.integers(0, n, size=M_matrix),
+        ]
+    )
     V = matrix_element_sketch(a_target, samples_ij, theta_be)
     a_recovered = recover_matrix_from_phase_oracle(np.diag(V), theta_be, n)
     a_recovered = 0.5 * (a_recovered + a_recovered.T)
