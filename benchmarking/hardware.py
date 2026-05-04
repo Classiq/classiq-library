@@ -89,8 +89,7 @@ class HardwareRunner:
         try:
             qprog = await self._synthesize(example)
             job_id = await example.submit(qprog)
-            metrics = await self._extract_circuit_metrics(job_id)
-            return job_id, metrics
+            return job_id, {}
         except StageError:
             raise
         except Exception as exc:
@@ -98,7 +97,9 @@ class HardwareRunner:
 
     async def score(self, example: BenchmarkExample, job_id: str) -> dict:
         try:
-            return await example.score(job_id)
+            scores = await example.score(job_id)
+            metrics = await self._extract_circuit_metrics(job_id)
+            return {**scores, **metrics}
         except StageError:
             raise
         except Exception as exc:
