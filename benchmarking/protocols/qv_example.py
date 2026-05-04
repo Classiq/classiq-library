@@ -100,14 +100,7 @@ class QVExample(BenchmarkExample):
 
         def haar(m: int) -> np.ndarray:
             """Sample a Haar-random unitary of dimension m."""
-            # FIXME: this implementation applied QR decomposition on top of already Haar-random unitaries, producing a non-Haar distribution, should be:
-            #   return unitary_group.rvs(m, random_state=rng)
-            u1 = unitary_group.rvs(m, random_state=rng)
-            u2 = unitary_group.rvs(m, random_state=rng)
-            Z = u1 + 1j * u2
-            Q, R = qr(Z)
-            Lambda = np.diag([R[i, i] / np.abs(R[i, i]) for i in range(m)])
-            return Q @ Lambda
+            return unitary_group.rvs(m, random_state=rng)
 
         layers = []
         # depth = width per the QV convention (square circuits)
