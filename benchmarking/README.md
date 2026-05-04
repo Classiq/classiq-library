@@ -40,7 +40,7 @@ After that, you can run any benchmark notebook to generate a new report from fre
 In each benchmark notebook, an example is defined, and its size can be set, for example:
 
 ```python
-example = AdderExample(num_qubits=4)
+example = AdderExample(problem_size=4)
 ```
 
 The backends to benchmark are then specified, for example:
@@ -62,8 +62,8 @@ A notebook for running the Quantum Volume protocol is located in the `protocols`
 
 ```python
 protocol = QuantumVolumeProtocol(
-    min_num_qubits=2,
-    max_num_qubits=4,
+    min_problem_size=2,
+    max_problem_size=4,
     num_trials=10,
     ...
 )
@@ -75,7 +75,7 @@ The backends to benchmark are defined in the same way as for the benchmark noteb
 
 ### BenchmarkExample
 
-`BenchmarkExample` represents the quantum task being benchmarked. It stores the benchmark name, the number of qubits, the logic used to build the quantum program, the logic used to execute it, the logic used to score the result, and optionally any synthesis constraints that should be applied.
+`BenchmarkExample` represents the quantum task being benchmarked. It stores the benchmark name, the problem size, the logic used to build the quantum program, the logic used to execute it, the logic used to score the result, and optionally any synthesis constraints that should be applied.
 
 This class is the benchmark-specific part of the framework. It describes what should be run and how its output should be evaluated, while remaining independent of the specific backend on which the benchmark will execute.
 
@@ -115,7 +115,7 @@ Benchmark results are written incrementally into a CSV file.
 Each row corresponds to a benchmark/backend combination and may include fields such as:
 
 - benchmark name
-- number of qubits
+- problem size
 - backend provider
 - backend name
 - number of shots
