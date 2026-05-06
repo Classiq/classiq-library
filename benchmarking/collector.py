@@ -209,10 +209,13 @@ class ResultCollector:
                 )
 
             completed_ts = datetime.datetime.now()
+            scores_display = {
+                k: f"{v:.3f}" if isinstance(v, float) else v for k, v in scores.items()
+            }
             print(
                 f"{completed_ts}: Completed {example.name}-{example.problem_size} "
                 f"for {runner.backend_service_provider} - {runner.backend_name} "
-                f"--> Score {scores}"
+                f"--> Score {scores_display}"
             )
 
             #
@@ -395,7 +398,7 @@ class ResultCollector:
                 score = res.get("score")
                 exe_time_min = res.get("execution_time")
                 print(
-                    f"{prefix} | COMPLETED | score={score:.4f} | time={exe_time_min:.2f} min"
+                    f"{prefix} | COMPLETED | score={score:.3f} | time={exe_time_min:.3f} min"
                 )
             elif status == "SUBMITTED":
                 print(f"{prefix} | {status} | at={res.get('submitted_timestamp')}")
