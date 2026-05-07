@@ -91,7 +91,7 @@ A representative selection of algorithms is presented below:
         <td>QAOA</td>
         <td><a href="https://arxiv.org/abs/1411.4028" target="_blank">A Quantum Approximate Optimization Algorithm</a></td>
         <td>
-          <a href="search_and_optimization/qaoa/qaoa.ipynb">Max Cut Problem</a>
+          <a href="search_and_optimization/QAOA/qaoa.ipynb">Max Cut Problem</a>
         </td>
         <td>QAOA for combinatorial optimization problems</td>
     </tr>
