@@ -155,7 +155,7 @@ def deutsch_jozsa(predicate: QCallable[QNum, QBit], x: QNum) -> None:
     hadamard_transform(x)
 ```
 
-A part of a QML encoder (see the full algorithm [here](/algorithms/qml/quantum_autoencoder/quantum_autoencoder.ipynb))
+A part of a QML encoder (see the full algorithm [here](/algorithms/QML/quantum_autoencoder/quantum_autoencoder.ipynb))
 
 ```python
 @qfunc
