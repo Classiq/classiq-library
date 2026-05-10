@@ -41,7 +41,7 @@ def execution_preferences_wrapper(
     backend_service_provider: str,
     backend_name: str,
     *,
-    emulate: bool = True,
+    emulate: bool = False,
     access_token: str | None = None,
     channel: str | None = None,
     instance_crn: str | None = None,
