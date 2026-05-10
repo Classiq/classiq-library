@@ -18,16 +18,13 @@ HARDWARES = {
         "simulator_density_matrix",
         "nvidia_simulator",
     ],
-    "Amazon Braket": [
-        "Ankaa-3",
-        "Garnet",
-        "Forte 1",
-    ],
+    "Amazon Braket": ["Ankaa-3", "Garnet", "Forte 1", "Emerald", "IBEX Q1"],
     "Azure Quantum": [
         "ionq.qpu.forte-enterprise-1",
         "ionq.qpu.aria-1",
         "ionq.qpu.forte-1",
     ],
+    "C12": ["Callisto Emulator"],
 }
 
 from classiq import (
@@ -36,6 +33,7 @@ from classiq import (
     ClassiqBackendPreferences,
     AwsBackendPreferences,
     AzureBackendPreferences,
+    C12BackendPreferences,
 )
 
 
@@ -81,6 +79,9 @@ def execution_preferences_wrapper(
         return ClassiqBackendPreferences(
             backend_name=backend_name,
         )
+
+    elif backend_service_provider == "C12":
+        return C12BackendPreferences(backend_name=backend_name)
 
     else:
         raise ValueError(
