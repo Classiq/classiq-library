@@ -41,6 +41,7 @@ def execution_preferences_wrapper(
     backend_service_provider: str,
     backend_name: str,
     *,
+    emulate: bool = True,
     access_token: str | None = None,
     channel: str | None = None,
     instance_crn: str | None = None,
@@ -65,8 +66,7 @@ def execution_preferences_wrapper(
 
     elif backend_service_provider == "Amazon Braket":
         return AwsBackendPreferences(
-            backend_name=backend_name,
-            run_via_classiq=True,
+            backend_name=backend_name, run_via_classiq=True, emulate=emulate
         )
 
     elif backend_service_provider == "Azure Quantum":
