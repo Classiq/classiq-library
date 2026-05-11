@@ -75,7 +75,7 @@ class HardwareRunner:
             filter_function=lambda instr: instr.operation.name
             not in ("measure", "barrier", "reset")
         )
-        width = qc.num_qubits
+        width = len({q for instr in qc.data for q in instr.qubits})
         two_qubit_gate_count = sum(
             1 for instr in qc.data if instr.operation.num_qubits == 2
         )
