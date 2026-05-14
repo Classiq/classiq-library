@@ -95,8 +95,6 @@ repos:
         entry: .internal/pre_commit_tools/notebook_pre_commit_collection.py
         language: python
         files: \.ipynb$
-        additional_dependencies:
-          - "pyyaml==6.0"
         require_serial: true
       - id: qmod-pre-commit
         name: Validate naming qmods
@@ -104,8 +102,6 @@ repos:
         entry: .internal/pre_commit_tools/qmod_pre_commit_collection.py
         language: python
         files: \.qmod$
-        additional_dependencies:
-          - "pyyaml==6.0"
         require_serial: true
       - id: validate-metadata-file
         name: Validate Metadata file
