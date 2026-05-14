@@ -6,7 +6,7 @@ import pickle
 import re
 import shutil
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable
 
 import pytest
@@ -61,7 +61,7 @@ def wrap_testbook(
 
         notebook_path = resolve_notebook_path(notebook_name)
 
-        with NotebookReplace(
+        with NotebookEdit(
             notebook_path, replacements_regex, replacements_variables
         ) as nr:
             for decorator in [
@@ -92,12 +92,19 @@ def _build_patch_testbook_client_decorator(notebook_name: str) -> Callable:
 
 FILE_COPY_SUFFIX = ".pre_test_backup"
 
+DEFAULT_CODE_INJECTIONS = [
+    # disabling all `!` commands.
+    "get_ipython().system = lambda *args: print('no !pip allowed')",
+]
+_DEFAULT_CODE_INJECTIONS = field(default_factory=lambda: DEFAULT_CODE_INJECTIONS)
+
 
 @dataclass
-class NotebookReplace:
+class NotebookEdit:
     file_path: str
     replacements_regex: list[tuple[str, str]] | None
     replacements_variables: list[tuple[str, str]] | None
+    code_injection_at_start: list[str] = _DEFAULT_CODE_INJECTIONS
 
     def __post_init__(self):
         self.was_file_copied = False
@@ -124,23 +131,30 @@ class NotebookReplace:
 
         return replacements
 
+    @property
+    def should_edit(self):
+        return self.replacements or self.code_injection_at_start
+
     def __enter__(self):
-        if self.replacements:
+        if self.should_edit:
             self._backup_notebook()
             self.was_file_copied = True
 
-            used_replacements = self._replace_notebook_content()
-            assert (
-                self.replacements == used_replacements
-            ), f"Not all replacements given were used. The onces used are: {used_replacements}. The unused are {[r for r in self.replacements if r not in used_replacements]}"
+            if self.replacements:
+                used_replacements = self._replace_notebook_content()
+                assert (
+                    self.replacements == used_replacements
+                ), f"Not all replacements given were used. The onces used are: {used_replacements}. The unused are {[r for r in self.replacements if r not in used_replacements]}"
+
+            self._inject_code()
 
         return self
 
     def __exit__(self, *args, **kwargs):
-        if not self.replacements:
+        if not self.should_edit:
             return
         if not self.was_file_copied:
-            return  # maybe raise?
+            return  # maybe raise? every `should_edit` must set `was_file_copied=True`
 
         self._restore_notebook_from_backup()
 
@@ -172,6 +186,26 @@ class NotebookReplace:
             f.write(content)
 
         return used_replacements
+
+    def _inject_code(self) -> None:
+        with open(self.file_path, "r") as f:
+            notebook = json.load(f)
+
+        for index, source_code in enumerate(self.code_injection_at_start):
+            # split so that each line retains its "\n"
+            splitted_source_code: list[str] = re.split("(?<=\\n)\\b", source_code)
+            cell = {
+                "cell_type": "code",
+                "execution_count": 1,
+                "id": f"injected_cell_{index}",
+                "metadata": {},
+                "outputs": [],
+                "source": splitted_source_code,
+            }
+            notebook["cells"].insert(0, cell)
+
+        with open(self.file_path, "w") as f:
+            json.dump(notebook, f, indent=1)
 
     def _restore_notebook_from_backup(self) -> None:
         assert os.path.isfile(
