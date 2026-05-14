@@ -1,0 +1,26 @@
+qfunc datum_angle_encoding(data_in: real[], qbv: qbit[]) {
+  repeat (index: data_in.len) {
+    RX(pi * data_in[index], qbv[index]);
+  }
+  repeat (index: data_in.len) {
+    RZ(pi * data_in[index], qbv[index]);
+  }
+}
+
+qfunc my_ansatz(weights: real[], qbv: qbit[]) {
+  repeat (index: qbv.len) {
+    RY(weights[index], qbv[index]);
+  }
+  repeat (index: qbv.len - 1) {
+    RZZ(weights[qbv.len + index], qbv[index:index + 2]);
+  }
+  if (qbv.len > 2) {
+    RZZ(weights[weights.len - 1], qbv[0:2]);
+  }
+}
+
+qfunc main(input_vec: real[4], weight: real[8], output result: qbit[4]) {
+  allocate(result);
+  datum_angle_encoding(input_vec, result);
+  my_ansatz(weight, result);
+}

@@ -1,0 +1,34 @@
+qstruct OracleVars {
+  a: qnum<2>;
+  b: qnum<2>;
+}
+
+qperm oracle(const est_reg: qbit[]) {
+  Z(est_reg[est_reg.len - 1]);
+}
+
+qperm arith_equation(const state: OracleVars, res: qbit) {
+  res ^= (state.a + state.b) <= 2;
+}
+
+qfunc iqae_state_preparation(vars: OracleVars, ind: qbit) {
+  hadamard_transform(vars);
+  arith_equation(vars, ind);
+}
+
+qfunc space_transform(est_reg: qbit[]) {
+  iqae_state_preparation(est_reg[0:est_reg.len - 1], est_reg[est_reg.len - 1]);
+}
+
+qfunc main(k: int, output indicator: qbit) {
+  est_reg: qbit[];
+  problem_vars: qbit[4];
+  allocate(problem_vars);
+  allocate(indicator);
+  within {
+    {problem_vars, indicator} -> est_reg;
+  } apply {
+    amplitude_amplification(k, oracle, space_transform, est_reg);
+  }
+  drop(problem_vars);
+}

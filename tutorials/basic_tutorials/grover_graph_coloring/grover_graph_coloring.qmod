@@ -1,0 +1,18 @@
+qstruct PredicateVars {
+  a: qnum<2, False, 0>;
+  b: qnum<2, False, 0>;
+  c: qnum<2, False, 0>;
+  d: qnum<2, False, 0>;
+  e: qnum<2, False, 0>;
+}
+
+qperm quantum_predicate(const vars: PredicateVars, res: qbit) {
+  res ^= ((((((((((((vars.a != 0) & (vars.a != 1)) & (vars.a != vars.b)) & (vars.b != 0)) & (vars.b != vars.c)) & (vars.b != vars.e)) & (vars.b != 2)) & (vars.c != 0)) & (vars.c != vars.d)) & (vars.c != vars.e)) & (vars.d != 1)) & (vars.d != 2)) & (vars.e != 3);
+}
+
+qfunc main(output vars: PredicateVars) {
+  allocate(vars.size, vars);
+  grover_search(1, lambda(vars) {
+    phase_oracle(quantum_predicate, vars);
+  }, vars);
+}

@@ -1,0 +1,7 @@
+qfunc main(output reg: qbit[]) {
+  allocate(6, reg);
+  H(reg[0]);
+  repeat (index: reg.len - 1) {
+    CX(reg[index], reg[index + 1]);
+  }
+}

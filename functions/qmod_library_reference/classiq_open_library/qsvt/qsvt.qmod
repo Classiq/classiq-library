@@ -1,0 +1,81 @@
+qfunc hadamard_transform_expanded___0(target: qbit[4]) {
+  repeat (index: 4) {
+    H(target[index]);
+  }
+}
+
+qperm proj_cnot_1_0_lambda___0_0_expanded___0(_aux: qbit, const ref_captured__qsvt_sqrt_polynomial__1: qnum<4, False, 0>) {
+  _aux ^= ref_captured__qsvt_sqrt_polynomial__1 == 0;
+}
+
+qperm projector_controlled_phase_expanded___0(phase: real, const aux: qbit, const ref_captured__qsvt_sqrt_polynomial__1: qnum<4, False, 0>) {
+  within {
+    proj_cnot_1_0_lambda___0_0_expanded___0(aux, ref_captured__qsvt_sqrt_polynomial__1);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qfunc u_sqrt_expanded___0(state: qnum<4, False, 0>, ref: qnum<4, False, 0>, ind: qbit) {
+  hadamard_transform_expanded___0(ref);
+  ind ^= state <= ref;
+}
+
+qfunc u_0_lambda___0_0_expanded___0(state_captured__qsvt_sqrt_polynomial__1: qnum<4, False, 0>, ref_captured__qsvt_sqrt_polynomial__1: qnum<4, False, 0>, ind_captured__qsvt_sqrt_polynomial__1: qbit) {
+  u_sqrt_expanded___0(state_captured__qsvt_sqrt_polynomial__1, ref_captured__qsvt_sqrt_polynomial__1, ind_captured__qsvt_sqrt_polynomial__1);
+}
+
+qperm proj_cnot_2_0_lambda___0_0_expanded___0(_aux: qbit, const ind_captured__qsvt_sqrt_polynomial__1: qbit) {
+  _aux ^= not ind_captured__qsvt_sqrt_polynomial__1;
+}
+
+qperm projector_controlled_phase_expanded___1(phase: real, const aux: qbit, const ind_captured__qsvt_sqrt_polynomial__1: qbit) {
+  within {
+    proj_cnot_2_0_lambda___0_0_expanded___0(aux, ind_captured__qsvt_sqrt_polynomial__1);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qfunc qsvt_step_expanded___0(phase1: real, phase2: real, const aux: qbit, state_captured__qsvt_sqrt_polynomial__1: qnum<4, False, 0>, ind_captured__qsvt_sqrt_polynomial__1: qbit, ref_captured__qsvt_sqrt_polynomial__1: qnum<4, False, 0>) {
+  u_0_lambda___0_0_expanded___0(state_captured__qsvt_sqrt_polynomial__1, ref_captured__qsvt_sqrt_polynomial__1, ind_captured__qsvt_sqrt_polynomial__1);
+  projector_controlled_phase_expanded___1(phase1, aux, ind_captured__qsvt_sqrt_polynomial__1);
+  invert {
+    u_0_lambda___0_0_expanded___0(state_captured__qsvt_sqrt_polynomial__1, ref_captured__qsvt_sqrt_polynomial__1, ind_captured__qsvt_sqrt_polynomial__1);
+  }
+  projector_controlled_phase_expanded___0(phase2, aux, ref_captured__qsvt_sqrt_polynomial__1);
+}
+
+qfunc qsvt_expanded___0(phase_seq: real[], aux: qbit, state_captured__qsvt_sqrt_polynomial__1: qnum<4, False, 0>, ref_captured__qsvt_sqrt_polynomial__1: qnum<4, False, 0>, ind_captured__qsvt_sqrt_polynomial__1: qbit) {
+  H(aux);
+  projector_controlled_phase_expanded___0(phase_seq[0], aux, ref_captured__qsvt_sqrt_polynomial__1);
+  repeat (index: 2) {
+    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], aux, state_captured__qsvt_sqrt_polynomial__1, ind_captured__qsvt_sqrt_polynomial__1, ref_captured__qsvt_sqrt_polynomial__1);
+  }
+  if (False) {
+  } else {
+    u_0_lambda___0_0_expanded___0(state_captured__qsvt_sqrt_polynomial__1, ref_captured__qsvt_sqrt_polynomial__1, ind_captured__qsvt_sqrt_polynomial__1);
+    projector_controlled_phase_expanded___1(phase_seq[5], aux, ind_captured__qsvt_sqrt_polynomial__1);
+  }
+  H(aux);
+}
+
+qfunc qsvt_sqrt_polynomial_expanded___0(state: qnum<4, False, 0>, ref: qnum<4, False, 0>, ind: qbit, qsvt_aux: qbit) {
+  qsvt_expanded___0([
+    (-2.401688306254694),
+    2.669374314067509,
+    3.817567704355659,
+    3.817567704355659,
+    2.669374314067509,
+    (-14.968058920613865)
+  ], qsvt_aux, state, ref, ind);
+}
+
+qfunc main(output state: qnum<4, False, 0>, output ref: qnum<4, False, 0>, output ind: qbit, output qsvt_aux: qbit) {
+  allocate(4, state);
+  allocate(4, ref);
+  allocate(1, ind);
+  allocate(1, qsvt_aux);
+  hadamard_transform_expanded___0(state);
+  qsvt_sqrt_polynomial_expanded___0(state, ref, ind, qsvt_aux);
+}

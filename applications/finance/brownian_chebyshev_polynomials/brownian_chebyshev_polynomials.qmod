@@ -1,0 +1,56 @@
+qperm two_cos_pi_x(const x: qnum, output out: qnum) {
+  out = (-6.283185307179586) * (x - 0.5);
+}
+
+qperm uk(const two_x: qnum, const uk_1: qnum, const uk_2: qnum, output uk: qnum) {
+  uk = (two_x * uk_1) - uk_2;
+}
+
+qperm sin_pi_x(const x: qnum, output out: qnum) {
+  out = ((-5) * ((x - 0.5) ** 2)) + 1;
+}
+
+qfunc truncated_wiener_series(t: qnum, output out: qnum) {
+  a0: qnum;
+  a1: qnum;
+  a2: qnum;
+  a3: qnum;
+  prepare_state([0.5, 0.5], 0, a0);
+  prepare_state([0.5, 0.5], 0, a1);
+  prepare_state([0.5, 0.5], 0, a2);
+  prepare_state([0.5, 0.5], 0, a3);
+  two_cos_pi_t: qnum;
+  sin_pi_t: qnum;
+  U0: qnum;
+  U1: qnum;
+  U2: qnum;
+  U3: qnum;
+  two_cos_pi_x(t, two_cos_pi_t);
+  U0 = 1;
+  U1 = two_cos_pi_t;
+  uk(two_cos_pi_t, U1, U0, U2);
+  uk(two_cos_pi_t, U2, U1, U3);
+  sin_pi_x(t, sin_pi_t);
+  out = (a0 * t) + ((0.450158158078553 * sin_pi_t) * (((0 + (a1 * U1)) + (a2 * U2)) + (a3 * U3)));
+  drop(a0);
+  drop(a1);
+  drop(a2);
+  drop(a3);
+  drop(U0);
+  drop(U1);
+  drop(U2);
+  drop(U3);
+}
+
+qperm return_to_price_space(const returns: qnum, const t: qnum, output price: qnum) {
+  price = ((2 * returns) + ((-1.0) * t)) + 1;
+}
+
+qfunc main(output t: qnum, output G: qnum) {
+  B: qnum;
+  allocate(1, t);
+  hadamard_transform(t);
+  truncated_wiener_series(t, B);
+  return_to_price_space(B, t, G);
+  drop(B);
+}

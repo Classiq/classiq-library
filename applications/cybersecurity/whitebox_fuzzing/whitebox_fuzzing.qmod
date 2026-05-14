@@ -1,0 +1,15 @@
+qstruct OracleVars {
+  x: qnum<6>;
+  y: qnum<6>;
+}
+
+qperm my_oracle(const vs: OracleVars) {
+  control (((vs.x + vs.y) < 9) & (((vs.x % 4) * (vs.y % 2)) == 1)) {
+    phase (pi);
+  }
+}
+
+qfunc main(output vs: OracleVars) {
+  allocate(vs);
+  grover_search(10, my_oracle, vs);
+}

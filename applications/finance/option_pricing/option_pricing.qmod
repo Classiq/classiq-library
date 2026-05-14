@@ -1,0 +1,145 @@
+qfunc load_distribution_expanded___0(asset: qnum<5, False, 0>) {
+  inplace_prepare_state([
+    0.000109666508742,
+    0.000325130998929,
+    0.000842340601738,
+    0.00193308629282,
+    0.003976413588767,
+    0.007408328814854,
+    0.012615728724158,
+    0.019796301953268,
+    0.028830852432106,
+    0.039220606562795,
+    0.050123470805103,
+    0.060487771051312,
+    0.069246621265183,
+    0.07551652217932,
+    0.078746638832103,
+    0.078786112508754,
+    0.07586474706989,
+    0.07050621661867,
+    0.063405746365352,
+    0.055304980845325,
+    0.046888761969836,
+    0.038716786569915,
+    0.031192010671914,
+    0.024559848189116,
+    0.018928411823101,
+    0.014299649883271,
+    0.010603011829449,
+    0.007725972721318,
+    0.005538421663362,
+    0.003910041668706,
+    0.002721201316664,
+    0.001868597674161
+  ], 0, asset);
+}
+
+qfunc assign_amplitude_table_expanded___0(const index: qbit[5], indicator: qbit) {
+  select_rotation(Pauli::Y, [
+    2.02077978070611,
+    1.900904936617791,
+    1.785789661822828,
+    1.673512911031646,
+    1.562527430942101,
+    1.451439473650505,
+    1.338843468590276,
+    1.223152663437657,
+    1.10236377956394,
+    0.973640134452217,
+    0.832406525609444,
+    0.669869309724091,
+    0.463020033334753,
+    0.105048622514056,
+    0.487124259272513,
+    0.687432552293585,
+    0.847215015523478,
+    0.986913030567594,
+    1.114681807853673,
+    1.234854695394653,
+    1.350157045745551,
+    1.462536387073259,
+    1.573552597492358,
+    1.684602963812924,
+    1.797088712682981,
+    1.912582884668187,
+    2.033060409124114,
+    2.161301310191762,
+    2.301757303750151,
+    2.462893910713575,
+    2.666379331072579,
+    3.141592653589793
+  ], index, indicator);
+}
+
+qfunc payoff_linear_expanded___0(const asset: qnum<5, False, 0>, ind: qbit) {
+  assign_amplitude_table_expanded___0(asset, ind);
+}
+
+qfunc payoff_expanded___0(const asset: qnum<5, False, 0>, ind: qbit) {
+  control (asset >= 13) {
+    payoff_linear_expanded___0(asset, ind);
+  }
+}
+
+qfunc european_call_state_preparation_expanded___0(asset: qnum<5, False, 0>, ind: qbit) {
+  load_distribution_expanded___0(asset);
+  payoff_expanded___0(asset, ind);
+}
+
+qfunc space_transform_expanded___0(est_reg: qbit[6]) {
+  european_call_state_preparation_expanded___0(est_reg[0:5], est_reg[5]);
+}
+
+qperm oracle_expanded___0(const est_reg: qbit[6]) {
+  Z(est_reg[5]);
+}
+
+@disable_perm_check
+@disable_const_checks(qvar)
+qperm reflect_about_zero_expanded___0(const qvar: qbit[6]) {
+  qvar_num: qnum<6, False, 0>;
+  within {
+    qvar -> qvar_num;
+  } apply {
+    control (qvar_num == 0) {
+      phase (pi);
+    }
+  }
+  phase (pi);
+}
+
+qfunc grover_diffuser_expanded___0(packed_vars: qbit[6]) {
+  within {
+    invert {
+      space_transform_expanded___0(packed_vars);
+    }
+  } apply {
+    reflect_about_zero_expanded___0(packed_vars);
+  }
+}
+
+qfunc grover_operator_expanded___0(packed_vars: qbit[6]) {
+  oracle_expanded___0(packed_vars);
+  grover_diffuser_expanded___0(packed_vars);
+}
+
+qfunc amplitude_amplification_expanded___0(reps: int, packed_qvars: qbit[6]) {
+  space_transform_expanded___0(packed_qvars);
+  power (reps) {
+    grover_operator_expanded___0(packed_qvars);
+  }
+}
+
+qfunc main(k: int, output indicator: qbit) {
+  est_reg: qbit[6];
+  problem_vars: qbit[5];
+  allocate(5, problem_vars);
+  allocate(1, indicator);
+  within {
+    {problem_vars, indicator} -> est_reg;
+  } apply {
+    amplitude_amplification_expanded___0(k, est_reg);
+  }
+  drop(problem_vars);
+}

@@ -1,0 +1,7 @@
+qfunc main(data1: real[2], data2: real[2], output qba: qnum<1>) {
+  allocate(qba);
+  inplace_encode_on_bloch(data1, qba);
+  invert {
+    inplace_encode_on_bloch(data2, qba);
+  }
+}

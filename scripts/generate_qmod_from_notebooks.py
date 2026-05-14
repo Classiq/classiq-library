@@ -199,8 +199,14 @@ def run_notebook(nb_path: Path, save_dir: str, name: str | None = None) -> list[
     # Override whatever kernel the notebook specifies so notebooks that name a
     # non-existent kernel (e.g. "prod", "prod_py3.11") still run in the current
     # Python environment.
-    nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
-    nb.cells.insert(0, nbformat.v4.new_code_cell(make_patch(save_dir, name or nb_path.stem)))
+    nb.metadata["kernelspec"] = {
+        "name": "python3",
+        "display_name": "Python 3",
+        "language": "python",
+    }
+    nb.cells.insert(
+        0, nbformat.v4.new_code_cell(make_patch(save_dir, name or nb_path.stem))
+    )
 
     errors = []
     client = NotebookClient(nb, timeout=120)
@@ -220,7 +226,6 @@ def run_python(py_path: Path, save_dir: str, tmpdir: str) -> list[str]:
     patched.write_text(make_patch(save_dir, py_path.stem) + "\n" + py_path.read_text())
     subprocess.run([sys.executable, str(patched)])
     return []
-
 
 
 def is_handwritten_qmod(path: Path) -> bool:
@@ -254,7 +259,10 @@ def process(
     qmod_path = Path(save_dir) / f"{target.stem}.qmod"
     if not force and is_handwritten_qmod(qmod_path):
         with lock:
-            print(f"  ~ {target.stem}: skipped (hand-written .qmod, use --force to override)", flush=True)
+            print(
+                f"  ~ {target.stem}: skipped (hand-written .qmod, use --force to override)",
+                flush=True,
+            )
         return target, False, None, True
 
     try:
@@ -299,7 +307,9 @@ def collect_targets(paths: list[str]) -> list[Path]:
             matches += sorted(glob.glob(f"**/{p}*.ipynb", recursive=True))
             matches += sorted(glob.glob(f"**/{p}*.py", recursive=True))
             matches += sorted(glob.glob(p, recursive=True))  # exact glob fallback
-            targets += [Path(f) for f in dict.fromkeys(matches)]  # preserve order, dedupe
+            targets += [
+                Path(f) for f in dict.fromkeys(matches)
+            ]  # preserve order, dedupe
     # dedupe across all entries while preserving order
     seen: set[Path] = set()
     result = []
@@ -315,33 +325,40 @@ def main() -> None:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
-        "paths", nargs="*",
+        "paths",
+        nargs="*",
         help="Notebooks (.ipynb), Python scripts (.py), or directories to scan. "
-             "Partial directory names (e.g. 'cfd', 'qlbm') are also accepted — "
-             "the script will search for matching sub-paths under the current directory. "
-             f"Default: {DEFAULT_DIRS}",
+        "Partial directory names (e.g. 'cfd', 'qlbm') are also accepted — "
+        "the script will search for matching sub-paths under the current directory. "
+        f"Default: {DEFAULT_DIRS}",
     )
     parser.add_argument(
-        "--from-file", metavar="FILE",
+        "--from-file",
+        metavar="FILE",
         help="Path to a text file listing entries to process, one per line "
-             "(same format as positional arguments: directories, partial names, or file paths). "
-             "Blank lines and lines starting with '#' are ignored.",
+        "(same format as positional arguments: directories, partial names, or file paths). "
+        "Blank lines and lines starting with '#' are ignored.",
     )
     parser.add_argument(
-        "--workers", type=int, default=os.cpu_count(),
+        "--workers",
+        type=int,
+        default=os.cpu_count(),
         help="Number of notebooks to run in parallel (default: number of CPU cores)",
     )
     parser.add_argument(
-        "--force", action="store_true",
+        "--force",
+        action="store_true",
         help="Overwrite hand-written .qmod files (identified by inline // comments). "
-             "By default such files are left untouched.",
+        "By default such files are left untouched.",
     )
     args = parser.parse_args()
 
     raw_paths = list(args.paths)
     if args.from_file:
         lines = Path(args.from_file).read_text().splitlines()
-        raw_paths += [line.strip() for line in lines if line.strip() and not line.startswith("#")]
+        raw_paths += [
+            line.strip() for line in lines if line.strip() and not line.startswith("#")
+        ]
 
     targets = collect_targets(raw_paths or DEFAULT_DIRS)
     if not targets:
@@ -375,7 +392,10 @@ def main() -> None:
                             print(f"  ✗ {path.stem}: {fatal}", flush=True)
                             fatal_errors.append((path, fatal))
                         else:
-                            print(f"  {'✓' if qmod_written else '○'} {path.stem}", flush=True)
+                            print(
+                                f"  {'✓' if qmod_written else '○'} {path.stem}",
+                                flush=True,
+                            )
 
     print(f"\nDone — {total_written} .qmod file(s) written next to their source files")
     if total_skipped:

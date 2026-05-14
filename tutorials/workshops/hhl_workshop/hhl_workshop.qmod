@@ -1,0 +1,125 @@
+qfunc load_b_expanded___0(b: real[], output res: qbit[2]) {
+  prepare_amplitudes(b, 0.0, res);
+}
+
+qfunc apply_to_all_expanded___0(target: qbit[4]) {
+  repeat (index: 4) {
+    H(target[index]);
+  }
+}
+
+qfunc unitary_with_matrix_0_lambda___0_0_expanded___0(target: qbit[2]) {
+  unitary([
+    [
+      ((-0.094062409501999) + 0.814906922312205j),
+      (0.035218719466751 - 0.029763534641643j),
+      ((-0.018800717000078) - 0.161428797950071j),
+      (0.437692459307647 + 0.327055549087593j)
+    ],
+    [
+      (0.035218719466751 - 0.029763534641643j),
+      ((-0.153472482988903) - 0.172752824729482j),
+      (0.231176444559085 + 0.887206997129739j),
+      (0.239718257548836 + 0.215482679212889j)
+    ],
+    [
+      ((-0.018800717000078) - 0.161428797950071j),
+      (0.231176444559085 + 0.887206997129739j),
+      ((-0.121913172051646) + 0.132001381264284j),
+      (0.295840691014956 + 0.114889387334731j)
+    ],
+    [
+      (0.437692459307648 + 0.327055549087593j),
+      (0.239718257548836 + 0.215482679212889j),
+      (0.295840691014956 + 0.114889387334731j),
+      ((-0.65638279495791) + 0.256909889911047j)
+    ]
+  ], target);
+}
+
+qfunc unitary_0_lambda___0_0_expanded___0(res_captured__my_hhl__1: qbit[2]) {
+  unitary_with_matrix_0_lambda___0_0_expanded___0(res_captured__my_hhl__1);
+}
+
+qfunc unitary_with_power_0_lambda___0_0_expanded___0(k: int, res_captured__my_hhl__1: qbit[2]) {
+  power (k) {
+    unitary_0_lambda___0_0_expanded___0(res_captured__my_hhl__1);
+  }
+}
+
+qfunc qft_no_swap_expanded___0(qbv: qbit[4]) {
+  repeat (i: 4) {
+    H(qbv[i]);
+    repeat (j: (4 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
+    }
+  }
+}
+
+qfunc qft_expanded___0(target: qbit[4]) {
+  repeat (index: 2.0) {
+    SWAP(target[index], target[3 - index]);
+  }
+  qft_no_swap_expanded___0(target);
+}
+
+qfunc qpe_flexible_expanded___0(phase: qbit[4], res_captured__my_hhl__1: qbit[2]) {
+  apply_to_all_expanded___0(phase);
+  repeat (index: 4) {
+    control (phase[index]) {
+      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, res_captured__my_hhl__1);
+    }
+  }
+  invert {
+    qft_expanded___0(phase);
+  }
+}
+
+qfunc qpe_expanded___0(phase: qnum<4, False, 4>, res_captured__my_hhl__1: qbit[2]) {
+  qpe_flexible_expanded___0(phase, res_captured__my_hhl__1);
+}
+
+qfunc assign_amplitude_table_expanded___0(const index: qbit[4], indicator: qbit) {
+  select_rotation(Pauli::Y, [
+    0.0,
+    3.141592653589793,
+    1.047197551196598,
+    0.679673818908244,
+    0.505360510284157,
+    0.402715841580662,
+    0.334896158439379,
+    0.286695137810731,
+    0.250655662336131,
+    0.222682028681928,
+    0.20033484232312,
+    0.18206955607483,
+    0.16686017322123,
+    0.153998281313647,
+    0.142978899771041,
+    0.133432296820451
+  ], index, indicator);
+}
+
+qfunc simple_eig_inv_expanded___0(const phase: qnum<4, False, 4>, output indicator: qbit) {
+  allocate(1, indicator);
+  assign_amplitude_table_expanded___0(phase, indicator);
+}
+
+qfunc my_hhl_expanded___0(b: real[], output res: qbit[2], output phase: qnum<4, False, 4>, output indicator: qbit) {
+  load_b_expanded___0(b, res);
+  allocate(4, False, 4, phase);
+  within {
+    qpe_expanded___0(phase, res);
+  } apply {
+    simple_eig_inv_expanded___0(phase, indicator);
+  }
+}
+
+qfunc main(output res: qnum<2, False, 0>, output phase: qnum<4, False, 4>, output indicator: qbit) {
+  my_hhl_expanded___0([
+    0.182574185835055,
+    0.365148371670111,
+    0.730296743340221,
+    0.547722557505166
+  ], res, phase, indicator);
+}

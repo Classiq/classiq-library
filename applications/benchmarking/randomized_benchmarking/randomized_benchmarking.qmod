@@ -1,0 +1,55 @@
+qfunc main(output target: qbit[1]) {
+  allocate(target);
+  RZ(pi, target);
+  X(target);
+  SX(target);
+  I(target);
+  I(target);
+  SX(target);
+  I(target);
+  RZ(pi, target);
+  SX(target);
+  RZ(pi, target);
+  X(target);
+  X(target);
+  I(target);
+  X(target);
+  I(target);
+  SX(target);
+  RZ(pi, target);
+  X(target);
+  RZ(pi, target);
+  X(target);
+  X(target);
+  X(target);
+  RZ(pi, target);
+  X(target);
+  I(target);
+  invert {
+    RZ(pi, target);
+    X(target);
+    SX(target);
+    I(target);
+    I(target);
+    SX(target);
+    I(target);
+    RZ(pi, target);
+    SX(target);
+    RZ(pi, target);
+    X(target);
+    X(target);
+    I(target);
+    X(target);
+    I(target);
+    SX(target);
+    RZ(pi, target);
+    X(target);
+    RZ(pi, target);
+    X(target);
+    X(target);
+    X(target);
+    RZ(pi, target);
+    X(target);
+    I(target);
+  }
+}

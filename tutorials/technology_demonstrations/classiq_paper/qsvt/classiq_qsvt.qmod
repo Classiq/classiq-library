@@ -1,0 +1,76 @@
+qfunc my_projector_controlled_phase(phase: real, block: qnum, aux: qbit) {
+  control (block == 0) {
+    X(aux);
+  }
+  RZ(phase, aux);
+  control (block == 0) {
+    X(aux);
+  }
+}
+
+qfunc my_qsvt_step(phase1: real, phase2: real, u: qfunc (qbit[], qbit[]), data: qbit[], block: qbit[], qsvt_aux: qbit) {
+  u(data, block);
+  my_projector_controlled_phase(phase1, block, qsvt_aux);
+  invert {
+    u(data, block);
+  }
+  my_projector_controlled_phase(phase2, block, qsvt_aux);
+}
+
+qfunc be_amat0(data: qbit[], block: qbit[]) {
+  del_qubit: qbit;
+  select: qbit;
+  packed: qnum<data.size + 1>;
+  within {
+    block -> {select, del_qubit};
+    {data, del_qubit} -> packed;
+    hadamard_transform(select);
+  } apply {
+    control (select) {
+      IDENTITY(packed);
+    } else {
+      packed += 2;
+    }
+    packed += -1;
+  }
+}
+
+qfunc be_projection(x: qbit[], aux: qbit) {
+  within {
+    H(aux);
+  } apply {
+    control (aux == 0) {
+      reflect_about_zero(x);
+    }
+  }
+}
+
+qfunc my_be(data: qbit[], block: qbit[]) {
+  be_amat0(data, block[0:2]);
+  be_projection(data, block[2]);
+}
+
+qfunc my_qsvt(qsvt_phases: real[], data: qbit[], block: qbit[], qsvt_aux: qbit) {
+  H(qsvt_aux);
+  my_projector_controlled_phase(qsvt_phases[0], block, qsvt_aux);
+  repeat (i: floor((qsvt_phases.len - 1) / 2)) {
+    my_qsvt_step(qsvt_phases[(2 * i) + 1], qsvt_phases[(2 * i) + 2], lambda(d, b) {
+      my_be(d, b);
+    }, data, block, qsvt_aux);
+  }
+  my_be(data, block);
+  my_projector_controlled_phase(qsvt_phases[qsvt_phases.len - 1], block, qsvt_aux);
+  H(qsvt_aux);
+}
+
+qfunc main(output block: qnum, output data: qnum, output qsvt_aux: qbit) {
+  allocate(1, qsvt_aux);
+  allocate(3, block);
+  allocate(6, data);
+  my_qsvt([
+    1.280311896404252,
+    8.127145628464149,
+    1.843960321284562,
+    (-5.002873410775335)
+  ], data, block, qsvt_aux);
+}

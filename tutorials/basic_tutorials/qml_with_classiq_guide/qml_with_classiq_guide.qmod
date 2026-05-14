@@ -1,0 +1,13 @@
+qfunc encoding(theta: real, q: qbit[]) {
+  RX(theta, q[0]);
+}
+
+qfunc mixing(theta: real, q: qbit[]) {
+  RX(theta, q[0]);
+}
+
+qfunc main(input_0: real, weight_0: real, output res: qbit[]) {
+  allocate(1, res);
+  encoding(input_0, res);
+  mixing(weight_0, res);
+}

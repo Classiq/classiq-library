@@ -1,0 +1,40 @@
+qfunc main(output nodes: qbit[], angles: real[6]) {
+  allocate(4, nodes);
+  hadamard_transform(nodes);
+  single_pauli_exponent([
+    Pauli::I,
+    Pauli::Y,
+    Pauli::Z,
+    Pauli::I
+  ], angles[0], nodes);
+  single_pauli_exponent([
+    Pauli::I,
+    Pauli::I,
+    Pauli::Z,
+    Pauli::Y
+  ], angles[1], nodes);
+  single_pauli_exponent([
+    Pauli::Y,
+    Pauli::I,
+    Pauli::Z,
+    Pauli::I
+  ], angles[2], nodes);
+  single_pauli_exponent([
+    Pauli::I,
+    Pauli::Z,
+    Pauli::I,
+    Pauli::Y
+  ], angles[3], nodes);
+  single_pauli_exponent([
+    Pauli::Y,
+    Pauli::Z,
+    Pauli::I,
+    Pauli::I
+  ], angles[4], nodes);
+  single_pauli_exponent([
+    Pauli::Y,
+    Pauli::I,
+    Pauli::I,
+    Pauli::Z
+  ], angles[5], nodes);
+}

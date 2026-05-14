@@ -1,0 +1,199 @@
+qstruct BlockEncodedLinbladianState {
+  block: LinbladianBlock;
+  state: qbit[2];
+}
+
+qstruct LinbladianBlock {
+  jump: qnum<2.0, UNSIGNED, 0>;
+  bohr_freq: qnum<4, SIGNED, 0>;
+  boltzmann_weight: qbit;
+}
+
+qfunc prepare_gaussian_state_expanded___0(t: qbit[4]) {
+  inplace_prepare_amplitudes([
+    0.008448505968335,
+    0.022863578200213,
+    0.053671305267896,
+    0.10928832979566,
+    0.193036348649671,
+    0.295759070777593,
+    0.393070748484186,
+    0.453144853594257,
+    0.453144853594257,
+    0.393070748484186,
+    0.295759070777593,
+    0.193036348649671,
+    0.10928832979566,
+    0.053671305267896,
+    0.022863578200213,
+    0.008448505968335
+  ], 0, t);
+}
+
+qfunc hamiltonian_simulation_expanded___0(hamiltonian: PauliTerm[], time: real, state: qbit[2]) {
+  suzuki_trotter(hamiltonian, time, 1, 1, state);
+}
+
+qfunc controlled_hamiltonian_simulation_expanded___0(hamiltonian: PauliTerm[], t0: real, ctrl: qbit[4], state: qbit[2]) {
+  repeat (i: 4) {
+    control (ctrl[i]) {
+      hamiltonian_simulation_expanded___0(hamiltonian, (2 ** i) * t0, state);
+    }
+  }
+}
+
+qfunc hadamard_transform_expanded___0(target: qbit[2]) {
+  repeat (index: 2) {
+    H(target[index]);
+  }
+}
+
+qfunc _prepare_uniform_trimmed_state_step_expanded___0(size_lsb: int, ctrl_val: int, lsbs_val: int, ctrl_var: qnum, rotation_var: qbit) {
+  if (lsbs_val != 0) {
+    control (ctrl_var == ctrl_val) {
+      RY(((-2) * (asin(sqrt(min((2 ** size_lsb) / lsbs_val, 1))) + (pi / 4))) + pi, rotation_var);
+    }
+  }
+}
+
+qfunc prepare_uniform_trimmed_state_expanded___0(m: int, q: qbit[2]) {
+  hadamard_transform_expanded___0(q);
+  if (m < 4) {
+    RY(((-2) * (asin(sqrt(min(2 / m, 1))) + (pi / 4))) + pi, q[1]);
+  }
+  repeat (i: 1) {
+    _prepare_uniform_trimmed_state_step_expanded___0((2 - i) - 2, floor(m / (2 ** ((2 - i) - 1))), m % (2 ** ((2 - i) - 1)), q[(2 - i) - 1:2], q[(2 - i) - 2]);
+  }
+}
+
+qfunc pauli_jump_operators_expanded___0(jump: qnum<2, False, 0>, state: qbit[2]) {
+  prepare_uniform_trimmed_state_expanded___0(4, jump);
+  control (jump == 0) {
+    X(state[0]);
+  }
+  control (jump == 1) {
+    Y(state[0]);
+  }
+  control (jump == 2) {
+    X(state[1]);
+  }
+  control (jump == 3) {
+    Y(state[1]);
+  }
+}
+
+qfunc operator_0_lambda___0_0_expanded___0(_state: qbit[2], be___block___jump_captured__block_encode_linbladian__2: qnum<2, False, 0>) {
+  pauli_jump_operators_expanded___0(be___block___jump_captured__block_encode_linbladian__2, _state);
+}
+
+qfunc qft_no_swap_expanded___0(qbv: qbit[4]) {
+  repeat (i: 4) {
+    H(qbv[i]);
+    repeat (j: (4 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
+    }
+  }
+}
+
+qfunc qft_expanded___0(target: qbit[4]) {
+  repeat (index: 2.0) {
+    SWAP(target[index], target[3 - index]);
+  }
+  qft_no_swap_expanded___0(target);
+}
+
+qfunc operator_fourier_transform_expanded___0(hamiltonian: PauliTerm[], t0: real, state: qbit[2], bohr_freq: qnum<4, True, 0>, be___block___jump_captured__block_encode_linbladian__2: qnum<2, False, 0>) {
+  prepare_gaussian_state_expanded___0(bohr_freq);
+  within {
+    controlled_hamiltonian_simulation_expanded___0(hamiltonian, t0, bohr_freq, state);
+  } apply {
+    operator_0_lambda___0_0_expanded___0(state, be___block___jump_captured__block_encode_linbladian__2);
+  }
+  invert {
+    qft_expanded___0(bohr_freq);
+  }
+}
+
+qfunc assign_amplitude_table_expanded___0(const index: qbit[4], indicator: qbit) {
+  select_rotation(Pauli::Y, [
+    1.570796326794897,
+    1.508336977207666,
+    1.446120581805428,
+    1.384385401181443,
+    1.323360527812465,
+    1.263261830882205,
+    1.204288485710753,
+    1.14662020638434,
+    2.051177405928626,
+    1.994972447205453,
+    1.93730416787904,
+    1.878330822707588,
+    1.818232125777328,
+    1.75720725240835,
+    1.695472071784365,
+    1.633255676382128
+  ], index, indicator);
+}
+
+qfunc apply_boltzmann_weight_expanded___0(bohr_freq: qnum<4, True, 0>, boltzmann_weight: qbit) {
+  assign_amplitude_table_expanded___0(bohr_freq, boltzmann_weight);
+  X(boltzmann_weight);
+}
+
+qfunc block_encode_linbladian_expanded___0(hamiltonian: PauliTerm[], be: BlockEncodedLinbladianState) {
+  operator_fourier_transform_expanded___0(hamiltonian, 0.2 * pi, be.state, be.block.bohr_freq, be.block.jump);
+  apply_boltzmann_weight_expanded___0(be.block.bohr_freq, be.block.boltzmann_weight);
+}
+
+qfunc apply_to_all_expanded___0(target: qbit[7]) {
+  repeat (index: 7) {
+    RESET(target[index]);
+  }
+}
+
+qfunc reset_var_expanded___0(qvar: qbit[7]) {
+  apply_to_all_expanded___0(qvar);
+}
+
+qfunc apply_to_all_expanded___1(target: qbit[1]) {
+  repeat (index: 1) {
+    RESET(target[index]);
+  }
+}
+
+qfunc reset_var_expanded___1(qvar: qbit[1]) {
+  apply_to_all_expanded___1(qvar);
+}
+
+qfunc delta_step_expanded___0(hamiltonian: PauliTerm[], delta: real, delta_qbit: qbit, be: BlockEncodedLinbladianState) {
+  block_encode_linbladian_expanded___0(hamiltonian, be);
+  control (not be.block.boltzmann_weight) {
+    RY(asin(2 * sqrt(delta)), delta_qbit);
+  }
+  control (not delta_qbit) {
+    invert {
+      block_encode_linbladian_expanded___0(hamiltonian, be);
+    }
+  }
+  reset_var_expanded___0(be.block);
+  reset_var_expanded___1(delta_qbit);
+}
+
+qfunc main(output be: BlockEncodedLinbladianState) {
+  delta_qbit: qbit;
+  allocate(9, be);
+  allocate(1, delta_qbit);
+  repeat (i: 50) {
+    delta_step_expanded___0([
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::Z],
+        coefficient=1
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::I],
+        coefficient=1
+      }
+    ], 0.1, delta_qbit, be);
+  }
+  drop(delta_qbit);
+}

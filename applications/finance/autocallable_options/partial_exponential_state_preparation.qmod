@@ -1,0 +1,13 @@
+qperm oracle_comp(const x: qnum, res: qbit) {
+  res ^= x >= 21;
+}
+
+qfunc main(output x: qnum) {
+  allocate(5, x);
+  exact_amplitude_amplification(0.996625424765961, lambda(_x) {
+    phase_oracle(oracle_comp, _x);
+  }, lambda(_x) {
+    prepare_exponential_state(-0.5, _x);
+  }, x);
+  x += -18;
+}

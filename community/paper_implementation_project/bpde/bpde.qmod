@@ -1,0 +1,71 @@
+qperm prepare_basis_state_expanded___0(output arr: qbit[1]) {
+  allocate(1, arr);
+  X(arr[0]);
+}
+
+qfunc main(output readout: qbit, delta_e: real) {
+  state: qbit[1];
+  allocate(1, readout);
+  prepare_basis_state_expanded___0(state);
+  H(readout);
+  control (readout) {
+    suzuki_trotter(SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[],
+          coefficient=-0.531672967442228
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {
+              pauli=Pauli::Z,
+              index=0
+            }
+          ],
+          coefficient=0.534084446291781
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {
+              pauli=Pauli::X,
+              index=0
+            }
+          ],
+          coefficient=0.196869810923244
+        }
+      ],
+      num_qubits=1
+    }, 4.0, 2, 8, state);
+  } else {
+    suzuki_trotter(SparsePauliOp {
+      terms=[
+        SparsePauliTerm {
+          paulis=[],
+          coefficient=-0.530427259238194
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {
+              pauli=Pauli::Z,
+              index=0
+            }
+          ],
+          coefficient=0.536032051970536
+        },
+        SparsePauliTerm {
+          paulis=[
+            IndexedPauli {
+              pauli=Pauli::X,
+              index=0
+            }
+          ],
+          coefficient=0.196711389481122
+        }
+      ],
+      num_qubits=1
+    }, 4.0, 2, 8, state);
+  }
+  PHASE(delta_e * 4.0, readout);
+  H(readout);
+  drop(state);
+}
