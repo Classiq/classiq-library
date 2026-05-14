@@ -89,6 +89,14 @@ repos:
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: '"Opening:\s+https://'
 
+      - id: notebook-comment-system-command
+        name: Validate pip commands
+        description: Ensure notebooks don't have pip commands
+        entry: .internal/pre_commit_tools/notebook_comment_system_commands.py
+        language: python
+        files: \.ipynb$
+        require_serial: true
+
       - id: notebook-pre-commit
         name: Validate naming notebooks
         description: Ensure notebooks conventions
