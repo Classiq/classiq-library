@@ -1,0 +1,479 @@
+qperm apply_to_all_expanded___0(target: qbit[3]) {
+  repeat (index: 3) {
+    X(target[index]);
+  }
+}
+
+qfunc qft_no_swap_expanded___0(qbv: qbit[4]) {
+  repeat (i: 4) {
+    H(qbv[i]);
+    repeat (j: (4 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
+    }
+  }
+}
+
+qfunc qft_expanded___0(target: qbit[4]) {
+  repeat (index: 2.0) {
+    SWAP(target[index], target[3 - index]);
+  }
+  qft_no_swap_expanded___0(target);
+}
+
+qperm _qct_pi_operator_expanded___0(x: qnum<3, False, 0>, const q: qbit) {
+  control (q) {
+    apply_to_all_expanded___0(x);
+    x += 1;
+  }
+}
+
+@disable_const_checks(q)
+qfunc qct_qst_type2_expanded___0(x: qbit[3], const q: qbit) {
+  extended_state: qbit[4];
+  H(q);
+  control (q) {
+    apply_to_all_expanded___0(x);
+  }
+  {x, q} -> extended_state;
+  qft_expanded___0(extended_state);
+  extended_state -> {x, q};
+  control (not q) {
+    repeat (k: 3) {
+      PHASE((pi / 16) * (2 ** k), x[k]);
+    }
+  }
+  control (q) {
+    repeat (k: 3) {
+      within {
+        X(x[k]);
+      } apply {
+        PHASE(((-pi) / 16) * (2 ** k), x[k]);
+      }
+    }
+  }
+  PHASE((-pi) / 16, q);
+  invert {
+    _qct_pi_operator_expanded___0(x, q);
+  }
+  x_num: qnum<3, False, 0>;
+  within {
+    x -> x_num;
+  } apply {
+    H(q);
+    S(q);
+    control (x_num == 0) {
+      within {
+        Z(q);
+      } apply {
+        S(q);
+        H(q);
+        S(q);
+      }
+    }
+    invert {
+      control (q) {
+        x_num += 1;
+      }
+    }
+  }
+}
+
+qfunc qst_type2_expanded___0(x: qbit[3]) {
+  q: qbit;
+  within {
+    allocate(1, q);
+    X(q);
+  } apply {
+    qct_qst_type2_expanded___0(x, q);
+  }
+}
+
+qfunc qct_type2_expanded___0(x: qbit[3]) {
+  q: qbit;
+  within {
+    allocate(1, q);
+  } apply {
+    qct_qst_type2_expanded___0(x, q);
+  }
+}
+
+qfunc qsct_2d_expanded___0(xy_variable: qnum<3, False, 0>[2]) {
+  qst_type2_expanded___0(xy_variable[0]);
+  qct_type2_expanded___0(xy_variable[1]);
+}
+
+qfunc apply_to_all_expanded___1(target: qbit[6]) {
+  repeat (index: 6) {
+    H(target[index]);
+  }
+}
+
+qfunc powered_hamiltonian_evolution_expanded___0(hamiltonian: PauliTerm[], scaling: real, p: int, qba: qbit[6]) {
+  suzuki_trotter(hamiltonian, p * ((-6.283185307179586) * scaling), 1, 1, qba);
+}
+
+qfunc my_unitary_0_lambda___0_0_expanded___0(p: int, target: qbit[6]) {
+  powered_hamiltonian_evolution_expanded___0([
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=2.25
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z
+      ],
+      coefficient=-0.25
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::I
+      ],
+      coefficient=-0.520598050073098
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::Z
+      ],
+      coefficient=-0.020598050073098
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=-1.25683487303146
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::Z
+      ],
+      coefficient=-0.049728091844915
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::Z,
+        Pauli::I
+      ],
+      coefficient=-0.103553390593274
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::Z,
+        Pauli::Z
+      ],
+      coefficient=0.103553390593274
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=1.75
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=-0.25
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=-0.520598050073098
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::I,
+        Pauli::Z,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=0.020598050073098
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=-1.25683487303146
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::Z,
+        Pauli::I,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=0.049728091844915
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::Z,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=0.103553390593274
+    },
+    PauliTerm {
+      pauli=[
+        Pauli::Z,
+        Pauli::Z,
+        Pauli::Z,
+        Pauli::I,
+        Pauli::I,
+        Pauli::I
+      ],
+      coefficient=0.103553390593274
+    }
+  ], 0.101321183642338, p, target);
+}
+
+qfunc unitary_with_power_0_lambda___0_0_expanded___0(power: int, state_captured__matrix_inversion_HHL__1: qbit[6]) {
+  my_unitary_0_lambda___0_0_expanded___0(power, state_captured__matrix_inversion_HHL__1);
+}
+
+qfunc qft_no_swap_expanded___1(qbv: qbit[6]) {
+  repeat (i: 6) {
+    H(qbv[i]);
+    repeat (j: (6 - i) - 1) {
+      CPHASE(pi / (2 ** (j + 1)), qbv[(i + j) + 1], qbv[i]);
+    }
+  }
+}
+
+qfunc qft_expanded___1(target: qbit[6]) {
+  repeat (index: 3.0) {
+    SWAP(target[index], target[5 - index]);
+  }
+  qft_no_swap_expanded___1(target);
+}
+
+qfunc qpe_flexible_expanded___0(phase: qbit[6], state_captured__matrix_inversion_HHL__1: qbit[6]) {
+  apply_to_all_expanded___1(phase);
+  repeat (index: 6) {
+    control (phase[index]) {
+      unitary_with_power_0_lambda___0_0_expanded___0(2 ** index, state_captured__matrix_inversion_HHL__1);
+    }
+  }
+  invert {
+    qft_expanded___1(phase);
+  }
+}
+
+qfunc assign_amplitude_table_expanded___0(const index: qbit[6], indicator: qbit) {
+  select_rotation(Pauli::Y, [
+    0.0,
+    0.031251271705474,
+    0.015625158950085,
+    0.01041671376227,
+    0.007812519868351,
+    0.006250010172571,
+    0.00520833922023,
+    0.004464289421483,
+    0.003906252483531,
+    0.003472223966485,
+    0.003125001271567,
+    0.002840910046256,
+    0.002604167402527,
+    0.00240384673262,
+    0.002232143320542,
+    0.002083333710094,
+    0.001953125310441,
+    0.001838235552934,
+    0.001736111329144,
+    0.001644737027492,
+    0.001562500158946,
+    0.001488095375399,
+    0.001420454664873,
+    0.001358695756683,
+    0.001302083425316,
+    0.00125000008138,
+    0.00120192314927,
+    0.00115740747201,
+    0.001116071486496,
+    0.001077586259033,
+    0.001041666713762,
+    0.001008064558812,
+    0.000976562538805,
+    0.000946969732353,
+    0.000919117679411,
+    0.000892857172515,
+    0.00086805558281,
+    0.000844594619698,
+    0.000822368444226,
+    0.000801282072718,
+    0.000781250019868,
+    0.000762195140401,
+    0.000744047636211,
+    0.00072674420204,
+    0.000710227287655,
+    0.000694444458399,
+    0.000679347839151,
+    0.000664893629269,
+    0.000651041678164,
+    0.000637755112849,
+    0.000625000010173,
+    0.000612745107625,
+    0.000600961547505,
+    0.00058962265005,
+    0.000578703711779,
+    0.000568181825825,
+    0.000558035721526,
+    0.000548245620901,
+    0.000538793109965,
+    0.00052966102314,
+    0.00052083333922,
+    0.000512295087569,
+    0.0005040322634,
+    0.000496031751117
+  ], index, indicator);
+}
+
+qfunc matrix_inversion_HHL_expanded___0(state: qbit[6], phase: qnum<6, False, 0>, output indicator: qbit) {
+  allocate(1, indicator);
+  within {
+    qpe_flexible_expanded___0(phase, state);
+  } apply {
+    assign_amplitude_table_expanded___0(phase, indicator);
+  }
+}
+
+qfunc main(output xy_variable: qnum<3, False, 0>[2], output phase_var: qnum<6, False, 0>, output indicator: qbit) {
+  prepare_amplitudes([
+    0.000929993205782,
+    0.006286469530795,
+    0.012502019419285,
+    0.016402935309807,
+    0.016402935309807,
+    0.012502019419285,
+    0.006286469530795,
+    0.000929993205782,
+    0.006286469530795,
+    0.042483535100607,
+    0.084462252893842,
+    0.110795378713038,
+    0.110795378713038,
+    0.084462252893842,
+    0.042483535100607,
+    0.006286469530795,
+    0.012502019419285,
+    0.084462252893842,
+    0.167861987330958,
+    0.220148535873839,
+    0.220148535873839,
+    0.167861987330958,
+    0.084462252893842,
+    0.012502019419285,
+    0.016402935309807,
+    0.110795378713038,
+    0.220148535873839,
+    0.28868174986543,
+    0.28868174986543,
+    0.220148535873839,
+    0.110795378713038,
+    0.016402935309807,
+    0.016402935309807,
+    0.110795378713038,
+    0.220148535873839,
+    0.28868174986543,
+    0.28868174986543,
+    0.220148535873839,
+    0.110795378713038,
+    0.016402935309807,
+    0.012502019419285,
+    0.084462252893842,
+    0.167861987330958,
+    0.220148535873839,
+    0.220148535873839,
+    0.167861987330958,
+    0.084462252893842,
+    0.012502019419285,
+    0.006286469530795,
+    0.042483535100607,
+    0.084462252893842,
+    0.110795378713038,
+    0.110795378713038,
+    0.084462252893842,
+    0.042483535100607,
+    0.006286469530795,
+    0.000929993205782,
+    0.006286469530795,
+    0.012502019419285,
+    0.016402935309807,
+    0.016402935309807,
+    0.012502019419285,
+    0.006286469530795,
+    0.000929993205782
+  ], 0.0, xy_variable);
+  allocate(6, phase_var);
+  within {
+    qsct_2d_expanded___0(xy_variable);
+  } apply {
+    matrix_inversion_HHL_expanded___0(xy_variable, phase_var, indicator);
+  }
+}

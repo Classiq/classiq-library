@@ -1,0 +1,40 @@
+qfunc my_state_preparation(states: int[], x: qnum, ind: qbit) {
+  hadamard_transform(x);
+  repeat (i: states.len) {
+    control (x == states[i]) {
+      X(ind);
+    }
+  }
+}
+
+qfunc my_grover(x: qnum, ind: qbit) {
+  Z(ind);
+  within {
+    invert {
+      my_state_preparation([2, 3, 5, 7, 11, 13], x, ind);
+    }
+  } apply {
+    within {
+      X(ind);
+      H(ind);
+    } apply {
+      control (x == 0) {
+        X(ind);
+      }
+    }
+  }
+  U(0, 0, 0, 3.141592653589793, ind);
+}
+
+qfunc main(output phase: qnum) {
+  ind: qbit;
+  allocate(1, ind);
+  x: qnum;
+  allocate(4, False, 0, x);
+  allocate(5, False, 5, phase);
+  qpe(lambda() {
+    my_grover(x, ind);
+  }, phase);
+  drop(x);
+  drop(ind);
+}

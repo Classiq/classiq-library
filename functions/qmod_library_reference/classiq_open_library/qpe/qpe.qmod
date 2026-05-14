@@ -1,9 +1,21 @@
 qfunc main(output state: qbit[], output phase: qnum<2, UNSIGNED, 2>) {
-  allocate(phase);
   allocate(2, state);
-  X(state[0]);
-  X(state[1]);
-  qpe(lambda() {
-    CRZ(pi, state[0], state[1]);
+  allocate(phase);
+  hadamard_transform(state);
+  qpe_flexible(lambda(power) {
+    suzuki_trotter([
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::Z],
+        coefficient=-0.125
+      },
+      PauliTerm {
+        pauli=[Pauli::Z, Pauli::I],
+        coefficient=-0.25
+      },
+      PauliTerm {
+        pauli=[Pauli::I, Pauli::I],
+        coefficient=0.375
+      }
+    ], ((-2) * pi) * power, 1, 1, state);
   }, phase);
 }

@@ -1,0 +1,36 @@
+qfunc apply_ry_on_all(params: real[], io: qbit[]) {
+  repeat (index: io.len) {
+    RY(params[index], io[index]);
+  }
+}
+
+qfunc apply_fixed_3_qubit_system_ansatz(angles: real[], system_qubits: qbit[]) {
+  apply_ry_on_all([
+    angles[0],
+    angles[1],
+    angles[2]
+  ], system_qubits);
+  repeat (index: system_qubits.len - 1) {
+    CZ(system_qubits[0], system_qubits[index + 1]);
+  }
+  CZ(system_qubits[1], system_qubits[2]);
+  apply_ry_on_all([
+    angles[3],
+    angles[4],
+    angles[5]
+  ], system_qubits);
+  repeat (index: system_qubits.len - 1) {
+    CZ(system_qubits[system_qubits.len - 1], system_qubits[index]);
+  }
+  CZ(system_qubits[1], system_qubits[0]);
+  apply_ry_on_all([
+    angles[6],
+    angles[7],
+    angles[8]
+  ], system_qubits);
+}
+
+qfunc main(params: real[9], output system_qubits: qbit[]) {
+  allocate(3, system_qubits);
+  apply_fixed_3_qubit_system_ansatz(params, system_qubits);
+}

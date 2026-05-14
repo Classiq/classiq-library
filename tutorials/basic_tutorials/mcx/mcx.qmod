@@ -1,0 +1,11 @@
+qfunc my_mcx(cntrl: qbit[], target: qbit) {
+  control (cntrl) {
+    X(target);
+  }
+}
+
+qfunc main(output cntrl: qbit[], output target: qbit) {
+  allocate(50, cntrl);
+  allocate(target);
+  my_mcx(cntrl, target);
+}

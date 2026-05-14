@@ -1,0 +1,33 @@
+qstruct KnapsackVars {
+  a: qnum<3>;
+  b: qnum<2>;
+}
+
+qfunc init_layer(v: qbit[]) {
+  apply_to_all(lambda(q) {
+    H(q);
+  }, v);
+}
+
+qfunc cost_layer(v: KnapsackVars, gamma: real) {
+  control (((v.a * 2) + (v.b * 3)) <= 12) {
+    phase (-((v.a * 3) + (v.b * 5)), gamma);
+  }
+}
+
+qfunc mixer_layer(v: qbit[], beta: real) {
+  apply_to_all(lambda(q) {
+    RX(beta, q);
+  }, v);
+}
+
+qfunc main(params: real[6], output v: KnapsackVars) {
+  allocate(v);
+  init_layer(v);
+  cost_layer(v, params[0]);
+  mixer_layer(v, params[3]);
+  cost_layer(v, params[1]);
+  mixer_layer(v, params[4]);
+  cost_layer(v, params[2]);
+  mixer_layer(v, params[5]);
+}

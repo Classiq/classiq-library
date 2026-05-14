@@ -1,0 +1,68 @@
+qfunc prepare_initial_state(x: qnum<2>, y: qnum<2>) {
+  hadamard_transform(x);
+  control (x == 0) {
+    inplace_prepare_state([
+      0.0,
+      0.333333333333333,
+      0.333333333333333,
+      0.333333333333333
+    ], 0.0, y);
+  }
+  control (x == 1) {
+    inplace_prepare_state([0.5, 0.0, 0.5, 0.0], 0.0, y);
+  }
+  control (x == 2) {
+    inplace_prepare_state([0.5, 0.5, 0.0, 0.0], 0.0, y);
+  }
+  control (x == 3) {
+    inplace_prepare_state([1.0, 0.0, 0.0, 0.0], 0.0, y);
+  }
+}
+
+qfunc discrete_quantum_walk(time: int, coin_qfuncs: qfunc (qnum, qnum), shift_qfuncs: qfunc (qnum, qnum), x: qnum, y: qnum) {
+  power (time) {
+    coin_qfuncs(x, y);
+    shift_qfuncs(x, y);
+  }
+}
+
+qfunc my_coin(x: qnum<2>, y: qnum<2>) {
+  control (x == 0) {
+    grover_diffuser(lambda(y) {
+      inplace_prepare_state([
+        0.0,
+        0.333333333333333,
+        0.333333333333333,
+        0.333333333333333
+      ], 0.0, y);
+    }, y);
+  }
+  control (x == 1) {
+    grover_diffuser(lambda(y) {
+      inplace_prepare_state([0.5, 0.0, 0.5, 0.0], 0.0, y);
+    }, y);
+  }
+  control (x == 2) {
+    grover_diffuser(lambda(y) {
+      inplace_prepare_state([0.5, 0.5, 0.0, 0.0], 0.0, y);
+    }, y);
+  }
+  control (x == 3) {
+    grover_diffuser(lambda(y) {
+      inplace_prepare_state([1.0, 0.0, 0.0, 0.0], 0.0, y);
+    }, y);
+  }
+}
+
+qfunc my_shift(x: qnum<2>, y: qnum<2>) {
+  multiswap(x, y);
+}
+
+qfunc main(output x: qnum<2>) {
+  y: qnum<2>;
+  allocate(2, x);
+  allocate(2, y);
+  prepare_initial_state(x, y);
+  discrete_quantum_walk(3, my_coin, my_shift, x, y);
+  drop(y);
+}

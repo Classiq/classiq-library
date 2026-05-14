@@ -1,0 +1,11 @@
+qfunc main(output x: qbit[]) {
+  allocate(4, x);
+  hadamard_transform(x);
+  control (x) {
+    phase (pi);
+  }
+  control (x[3]) {
+    phase (pi);
+  }
+  hadamard_transform(x);
+}

@@ -1,0 +1,50 @@
+qfunc coin_opeator(C: qnum) {
+  grover_diffuser(lambda(i) {
+    hadamard_transform(i);
+  }, C);
+}
+
+qfunc shift_plus(pos: qnum) {
+  pos += 1;
+}
+
+qfunc shift_minus(pos: qnum) {
+  pos += -1;
+}
+
+qfunc shift_opeartor(x: qnum, y: qnum, C: qnum) {
+  control (C == 0) {
+    shift_plus(x);
+  }
+  control (C == 1) {
+    shift_minus(x);
+  }
+  control (C == 2) {
+    shift_plus(y);
+  }
+  control (C == 3) {
+    shift_minus(y);
+  }
+}
+
+qfunc quantum_walk(x: qnum, y: qnum, C: qnum) {
+  coin_opeator(C);
+  shift_opeartor(x, y, C);
+}
+
+qfunc coin_walk(t: int, x: qnum, y: qnum, C: qnum) {
+  power (t) {
+    quantum_walk(x, y, C);
+  }
+}
+
+qfunc main(t: int, output x: qnum, output y: qnum) {
+  C: qnum;
+  allocate(5, x);
+  allocate(5, y);
+  x ^= 16;
+  y ^= 16;
+  prepare_amplitudes([0.5, 0.5, (-0.5), (-0.5)], 0.0, C);
+  coin_walk(t, x, y, C);
+  drop(C);
+}

@@ -1,0 +1,116 @@
+qstruct OracleVars {
+  a: qnum<2>;
+  b: qnum<1>;
+  c: qnum<3>;
+}
+
+qfunc hadamard_transform_expanded___0(target: qbit[6]) {
+  repeat (index: 6) {
+    H(target[index]);
+  }
+}
+
+qfunc initial_state_projector_expanded___0(state: qnum<6, False, 0>, aux: qbit) {
+  within {
+    hadamard_transform_expanded___0(state);
+  } apply {
+    aux ^= state == 0;
+  }
+}
+
+qfunc proj_cnot_1_0_lambda___0_0_expanded___0(_aux: qbit, state_captured__qsvt_fpaa__1: OracleVars) {
+  initial_state_projector_expanded___0(state_captured__qsvt_fpaa__1, _aux);
+}
+
+qfunc projector_controlled_phase_expanded___0(phase: real, aux: qbit, state_captured__qsvt_fpaa__1: OracleVars) {
+  within {
+    proj_cnot_1_0_lambda___0_0_expanded___0(aux, state_captured__qsvt_fpaa__1);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qperm u_0_lambda___0_0_expanded___0(const state_captured__qsvt_fpaa__1: OracleVars) {
+  IDENTITY(state_captured__qsvt_fpaa__1);
+}
+
+qperm arith_equation_expanded___0(state: OracleVars, res: qbit) {
+  res ^= ((state.a + state.b) == 3) and ((state.a + (-state.c)) == (-2));
+}
+
+qperm target_state_projector_expanded___0(state: qbit[6], aux: qbit) {
+  arith_equation_expanded___0(state, aux);
+}
+
+qperm proj_cnot_2_0_lambda___0_0_expanded___0(_aux: qbit, state_captured__qsvt_fpaa__1: OracleVars) {
+  target_state_projector_expanded___0(state_captured__qsvt_fpaa__1, _aux);
+}
+
+qperm projector_controlled_phase_expanded___1(phase: real, const aux: qbit, const state_captured__qsvt_fpaa__1: OracleVars) {
+  within {
+    proj_cnot_2_0_lambda___0_0_expanded___0(aux, state_captured__qsvt_fpaa__1);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qfunc qsvt_step_expanded___0(phase1: real, phase2: real, aux: qbit, state_captured__qsvt_fpaa__1: OracleVars) {
+  u_0_lambda___0_0_expanded___0(state_captured__qsvt_fpaa__1);
+  projector_controlled_phase_expanded___1(phase1, aux, state_captured__qsvt_fpaa__1);
+  invert {
+    u_0_lambda___0_0_expanded___0(state_captured__qsvt_fpaa__1);
+  }
+  projector_controlled_phase_expanded___0(phase2, aux, state_captured__qsvt_fpaa__1);
+}
+
+qfunc qsvt_expanded___0(phase_seq: real[], aux: qbit, state_captured__qsvt_fpaa__1: OracleVars) {
+  H(aux);
+  projector_controlled_phase_expanded___0(phase_seq[0], aux, state_captured__qsvt_fpaa__1);
+  repeat (index: 12) {
+    qsvt_step_expanded___0(phase_seq[(2 * index) + 1], phase_seq[(2 * index) + 2], aux, state_captured__qsvt_fpaa__1);
+  }
+  if (False) {
+  } else {
+    u_0_lambda___0_0_expanded___0(state_captured__qsvt_fpaa__1);
+    projector_controlled_phase_expanded___1(phase_seq[25], aux, state_captured__qsvt_fpaa__1);
+  }
+  H(aux);
+}
+
+qfunc qsvt_fpaa_expanded___0(state: OracleVars, output aux: qbit) {
+  allocate(1, aux);
+  qsvt_expanded___0([
+    (-1.433699528629295),
+    3.083538811696024,
+    3.212401795341816,
+    3.055563303483763,
+    3.246000344455865,
+    3.014602346197096,
+    3.29714073365046,
+    2.948423145716331,
+    3.387183429437787,
+    2.816633064497373,
+    3.603434404330445,
+    2.38372208112054,
+    4.896965176813679,
+    4.89696517681368,
+    2.38372208112054,
+    3.603434404330444,
+    2.816633064497374,
+    3.387183429437787,
+    2.948423145716331,
+    3.29714073365046,
+    3.014602346197096,
+    3.246000344455865,
+    3.055563303483763,
+    3.212401795341816,
+    3.083538811696024,
+    (-76.83192321478433)
+  ], aux, state);
+}
+
+qfunc main(output state: OracleVars, output aux: qbit) {
+  allocate(6, state);
+  hadamard_transform_expanded___0(state);
+  qsvt_fpaa_expanded___0(state, aux);
+}

@@ -1,0 +1,21 @@
+qstruct KnapsackVars {
+  a: qnum<3>;
+  b: qnum<2>;
+}
+
+qfunc apply_cost(gamma: real, v: KnapsackVars) {
+  control (((v.a * 2) + (v.b * 3)) <= 12) {
+    phase (-((v.a * 3) + (v.b * 5)), gamma);
+  }
+}
+
+qfunc main(params: real[6], output v: KnapsackVars) {
+  allocate(v);
+  hadamard_transform(v);
+  repeat (i: 3) {
+    apply_cost(params[0:3][i], v);
+    apply_to_all(lambda(q) {
+      RX(params[3:6][i], q);
+    }, v);
+  }
+}

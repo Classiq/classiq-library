@@ -1,0 +1,25 @@
+qfunc increment(x: qbit[]) {
+  repeat (i: x.len - 1) {
+    control (x[0:((x.len - 1) - i)]) {
+      X(x[(x.len - 1) - i]);
+    }
+  }
+  X(x[0]);
+}
+
+qfunc single_step_walk(coin: qbit, x: qnum) {
+  H(coin);
+  control (coin == 0) {
+    increment(x);
+  } else {
+    invert {
+      increment(x);
+    }
+  }
+}
+
+qfunc main(output x: qnum<6, UNSIGNED, 0>, output coin: qbit) {
+  allocate(x);
+  allocate(coin);
+  single_step_walk(coin, x);
+}

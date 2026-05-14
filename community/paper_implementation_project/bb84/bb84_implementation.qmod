@@ -1,0 +1,22 @@
+qfunc bb84(message: int[], alice_bases: int[], bob_bases: int[], qba: qbit[]) {
+  repeat (i: message.len) {
+    if (message[i] == 1) {
+      X(qba[i]);
+    }
+  }
+  repeat (i: alice_bases.len) {
+    if (alice_bases[i] == 1) {
+      H(qba[i]);
+    }
+  }
+  repeat (i: bob_bases.len) {
+    if (bob_bases[i] == 1) {
+      H(qba[i]);
+    }
+  }
+}
+
+qfunc main(output qba: qbit[]) {
+  allocate(8, qba);
+  bb84([0, 0, 1, 1, 0, 0, 0, 1], [1, 1, 0, 1, 1, 1, 0, 1], [1, 0, 0, 0, 0, 1, 1, 0], qba);
+}

@@ -1,0 +1,24 @@
+qfunc q_space_evolution(kick_mag: real, p: qnum) {
+  within {
+    qft(p);
+  } apply {
+    phase (((kick_mag * pi) / (2 ** p.size)) * (p ** 2));
+  }
+}
+
+qfunc p_space_evolution(p: qnum) {
+  phase ((-(pi / (2 ** p.size))) * (p ** 2));
+}
+
+qfunc single_step(kick_mag: real, p: qnum) {
+  q_space_evolution(kick_mag, p);
+  p_space_evolution(p);
+}
+
+qfunc main(num_kicks: int, kick_mag: real, output p: qnum<3, SIGNED, 0>) {
+  allocate(p);
+  p ^= -2;
+  power (num_kicks) {
+    single_step(0.1, p);
+  }
+}

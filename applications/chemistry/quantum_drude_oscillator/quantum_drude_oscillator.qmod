@@ -1,0 +1,28 @@
+qfunc ansatz_layer(params: real[4], state: qbit[]) {
+  RZ(1.570796326794897, state[0]);
+  RZ(1.570796326794897, state[1]);
+  RY(1.570796326794897, state[1]);
+  CX(state[1], state[0]);
+  RY(params[0], state[0]);
+  RZ(params[1], state[0]);
+  RY(params[2], state[1]);
+  RZ(params[3], state[1]);
+  CX(state[1], state[0]);
+  RY(-1.570796326794897, state[1]);
+  RZ(-1.570796326794897, state[0]);
+  RZ(-1.570796326794897, state[1]);
+}
+
+qfunc main(params: real[40], output state: qbit[]) {
+  allocate(6, state);
+  ansatz_layer(params[0:4], {state[0], state[1]});
+  ansatz_layer(params[4:8], {state[2], state[3]});
+  ansatz_layer(params[8:12], {state[4], state[5]});
+  ansatz_layer(params[12:16], {state[1], state[2]});
+  ansatz_layer(params[16:20], {state[3], state[4]});
+  ansatz_layer(params[20:24], {state[0], state[1]});
+  ansatz_layer(params[24:28], {state[2], state[3]});
+  ansatz_layer(params[28:32], {state[4], state[5]});
+  ansatz_layer(params[32:36], {state[1], state[2]});
+  ansatz_layer(params[36:40], {state[3], state[4]});
+}

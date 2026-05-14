@@ -1,0 +1,222 @@
+qstruct FullBE {
+  time_slice: LongSliceBE;
+  counter: qnum<3.0>;
+}
+
+qstruct LongSliceBE {
+  magnus: MagnusBE;
+  qsvt_amplification_aux: qbit;
+}
+
+qstruct MagnusBE {
+  time_dependent: TimeDependentBE;
+  qsvt_exp_aux: qbit;
+  qsvt_exp_lcu: qbit;
+}
+
+qstruct TimeDependentBE {
+  index: qnum<2>;
+  time: qnum<2>;
+  block: qbit;
+}
+
+qfunc hadamard_transform_expanded___0(target: qbit[2]) {
+  repeat (index: 2) {
+    H(target[index]);
+  }
+}
+
+qfunc time_dependent_projector_expanded___0(qbe: TimeDependentBE, is_in_block: qbit) {
+  is_in_block ^= (not qbe.block) and (qbe.time == 0);
+}
+
+qfunc proj_cnot_1_0_lambda___0_0_expanded___0(_aux: qbit, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE) {
+  time_dependent_projector_expanded___0(qbe_st___time_dependent_captured__short_time_magnus__3, _aux);
+}
+
+qfunc projector_controlled_double_phase_expanded___0(phase_even: real, phase_odd: real, aux: qbit, const lcu: qbit, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE) {
+  within {
+    proj_cnot_1_0_lambda___0_0_expanded___0(aux, qbe_st___time_dependent_captured__short_time_magnus__3);
+  } apply {
+    control (lcu) {
+      RZ(phase_odd, aux);
+    } else {
+      RZ(phase_even, aux);
+    }
+  }
+}
+
+qperm cases_0_lambda___0_0_expanded___0(const target_captured__q1_qfunc_0__13: qbit) {
+  IDENTITY(target_captured__q1_qfunc_0__13);
+}
+
+qfunc cases_1_lambda___0_0_expanded___0(theta_captured__q1_qfunc_0__13: real, target_captured__q1_qfunc_0__13: qbit) {
+  RX(theta_captured__q1_qfunc_0__13, target_captured__q1_qfunc_0__13);
+}
+
+qfunc cases_2_lambda___0_0_expanded___0(theta_captured__q1_qfunc_0__13: real, target_captured__q1_qfunc_0__13: qbit) {
+  RY(theta_captured__q1_qfunc_0__13, target_captured__q1_qfunc_0__13);
+}
+
+qperm cases_3_lambda___0_0_expanded___0(theta_captured__q1_qfunc_0__13: real, const target_captured__q1_qfunc_0__13: qbit) {
+  RZ(theta_captured__q1_qfunc_0__13, target_captured__q1_qfunc_0__13);
+}
+
+qfunc switch_expanded___0(selector: int, theta_captured__q1_qfunc_0__13: real, target_captured__q1_qfunc_0__13: qbit) {
+  if (selector == 0) {
+    cases_0_lambda___0_0_expanded___0(target_captured__q1_qfunc_0__13);
+  } else {
+    if (selector == 1) {
+      cases_1_lambda___0_0_expanded___0(theta_captured__q1_qfunc_0__13, target_captured__q1_qfunc_0__13);
+    } else {
+      if (selector == 2) {
+        cases_2_lambda___0_0_expanded___0(theta_captured__q1_qfunc_0__13, target_captured__q1_qfunc_0__13);
+      } else {
+        if (selector == 3) {
+          cases_3_lambda___0_0_expanded___0(theta_captured__q1_qfunc_0__13, target_captured__q1_qfunc_0__13);
+        }
+      }
+    }
+  }
+}
+
+qfunc q1_qfunc_0_lambda___0_0_expanded___0(theta: real, target: qbit, bases_captured__linear_pauli_rotations__11: Pauli[], index_captured__linear_pauli_rotations__11: int) {
+  switch_expanded___0(bases_captured__linear_pauli_rotations__11[index_captured__linear_pauli_rotations__11], theta, target);
+}
+
+qfunc _single_pauli_expanded___0(slope: real, offset: real, const x: qbit[2], q: qbit, bases_captured__linear_pauli_rotations__11: Pauli[], index_captured__linear_pauli_rotations__11: int) {
+  repeat (index: 2) {
+    control (x[index]) {
+      q1_qfunc_0_lambda___0_0_expanded___0((2 ** index) * slope, q, bases_captured__linear_pauli_rotations__11, index_captured__linear_pauli_rotations__11);
+    }
+  }
+  q1_qfunc_0_lambda___0_0_expanded___0(offset, q, bases_captured__linear_pauli_rotations__11, index_captured__linear_pauli_rotations__11);
+}
+
+qfunc linear_pauli_rotations_expanded___0(bases: Pauli[], slopes: real[], offsets: real[], x: qbit[2], q: qbit[1]) {
+  repeat (index: 1) {
+    _single_pauli_expanded___0(slopes[index], offsets[index], x, q[index], bases, index);
+  }
+}
+
+qfunc block_encode_time_dependent_A_expanded___0(a: real, b: real, qbe: TimeDependentBE) {
+  linear_pauli_rotations_expanded___0([Pauli::Y], [(((b - a) * 2) / 4)], [(2 * a)], qbe.time, qbe.block);
+  linear_pauli_rotations_expanded___0([Pauli::Y], [2], [0], qbe.index, qbe.block);
+}
+
+qfunc short_time_summation_expanded___0(a: real, b: real, qbe: TimeDependentBE) {
+  within {
+    hadamard_transform_expanded___0(qbe.time);
+  } apply {
+    block_encode_time_dependent_A_expanded___0(a, b, qbe);
+  }
+}
+
+qfunc u_0_lambda___0_0_expanded___0(a_captured__short_time_magnus__3: real, b_captured__short_time_magnus__3: real, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE) {
+  short_time_summation_expanded___0(a_captured__short_time_magnus__3, b_captured__short_time_magnus__3, qbe_st___time_dependent_captured__short_time_magnus__3);
+}
+
+qfunc proj_cnot_2_0_lambda___0_0_expanded___0(_aux: qbit, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE) {
+  time_dependent_projector_expanded___0(qbe_st___time_dependent_captured__short_time_magnus__3, _aux);
+}
+
+qfunc projector_controlled_double_phase_expanded___1(phase_even: real, phase_odd: real, aux: qbit, const lcu: qbit, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE) {
+  within {
+    proj_cnot_2_0_lambda___0_0_expanded___0(aux, qbe_st___time_dependent_captured__short_time_magnus__3);
+  } apply {
+    control (lcu) {
+      RZ(phase_odd, aux);
+    } else {
+      RZ(phase_even, aux);
+    }
+  }
+}
+
+qfunc qsvt_lcu_step_expanded___0(phases_even: real[], phases_odd: real[], aux: qbit, const lcu: qbit, a_captured__short_time_magnus__3: real, b_captured__short_time_magnus__3: real, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE) {
+  u_0_lambda___0_0_expanded___0(a_captured__short_time_magnus__3, b_captured__short_time_magnus__3, qbe_st___time_dependent_captured__short_time_magnus__3);
+  projector_controlled_double_phase_expanded___1(phases_even[0], phases_odd[0], aux, lcu, qbe_st___time_dependent_captured__short_time_magnus__3);
+  invert {
+    u_0_lambda___0_0_expanded___0(a_captured__short_time_magnus__3, b_captured__short_time_magnus__3, qbe_st___time_dependent_captured__short_time_magnus__3);
+  }
+  projector_controlled_double_phase_expanded___0(phases_even[1], phases_odd[1], aux, lcu, qbe_st___time_dependent_captured__short_time_magnus__3);
+}
+
+qfunc projector_controlled_phase_expanded___0(phase: real, aux: qbit, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE) {
+  within {
+    proj_cnot_2_0_lambda___0_0_expanded___0(aux, qbe_st___time_dependent_captured__short_time_magnus__3);
+  } apply {
+    RZ(phase, aux);
+  }
+}
+
+qfunc qsvt_lcu_expanded___0(phase_seq_even: real[], phase_seq_odd: real[], aux: qbit, const lcu: qbit, a_captured__short_time_magnus__3: real, b_captured__short_time_magnus__3: real, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE) {
+  H(aux);
+  projector_controlled_double_phase_expanded___0(phase_seq_even[0], phase_seq_odd[0], aux, lcu, qbe_st___time_dependent_captured__short_time_magnus__3);
+  repeat (index: 3) {
+    qsvt_lcu_step_expanded___0(phase_seq_even[((2 * index) + 1):((2 * index) + 3)], phase_seq_odd[((2 * index) + 1):((2 * index) + 3)], aux, lcu, a_captured__short_time_magnus__3, b_captured__short_time_magnus__3, qbe_st___time_dependent_captured__short_time_magnus__3);
+  }
+  if (True) {
+    control (lcu) {
+      u_0_lambda___0_0_expanded___0(a_captured__short_time_magnus__3, b_captured__short_time_magnus__3, qbe_st___time_dependent_captured__short_time_magnus__3);
+      projector_controlled_phase_expanded___0(phase_seq_odd[7], aux, qbe_st___time_dependent_captured__short_time_magnus__3);
+    }
+  }
+  if (False) {
+  }
+  H(aux);
+}
+
+qfunc select_0_lambda___0_0_expanded___0(const lcu_aux: qnum<1, False, 0>, a_captured__short_time_magnus__3: real, b_captured__short_time_magnus__3: real, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE, qbe_st___qsvt_exp_aux_captured__short_time_magnus__3: qbit) {
+  qsvt_lcu_expanded___0([
+    (-1.570795782831349),
+    3.141854708249845,
+    3.192321950343251,
+    4.545907566228902,
+    3.192321950343251,
+    3.141854708249845,
+    (-17.278759050780312)
+  ], [
+    (-1.570796311606896),
+    3.141602886172768,
+    3.144884260928891,
+    3.459864811753731,
+    3.459864811753731,
+    3.144884260928891,
+    3.141602886172768,
+    (-20.420352233145657)
+  ], qbe_st___qsvt_exp_aux_captured__short_time_magnus__3, lcu_aux, a_captured__short_time_magnus__3, b_captured__short_time_magnus__3, qbe_st___time_dependent_captured__short_time_magnus__3);
+}
+
+qfunc prepare_select_expanded___0(block: qnum<1, False, 0>, a_captured__short_time_magnus__3: real, b_captured__short_time_magnus__3: real, qbe_st___time_dependent_captured__short_time_magnus__3: TimeDependentBE, qbe_st___qsvt_exp_aux_captured__short_time_magnus__3: qbit) {
+  within {
+    inplace_prepare_state([0.5, 0.5], 0, block);
+  } apply {
+    select_0_lambda___0_0_expanded___0(block, a_captured__short_time_magnus__3, b_captured__short_time_magnus__3, qbe_st___time_dependent_captured__short_time_magnus__3, qbe_st___qsvt_exp_aux_captured__short_time_magnus__3);
+    if (False) {
+    }
+  }
+}
+
+qfunc short_time_magnus_expanded___0(a: real, b: real, qbe_st: MagnusBE) {
+  prepare_select_expanded___0(qbe_st.qsvt_exp_lcu, a, b, qbe_st.time_dependent, qbe_st.qsvt_exp_aux);
+}
+
+qfunc long_time_integrator_step_naive_expanded___0(a: real, b: real, qbe_full: FullBE) {
+  short_time_magnus_expanded___0(a, b, qbe_full.time_slice.magnus);
+  control ((not qbe_full.time_slice.magnus.time_dependent.block) and (not qbe_full.time_slice.magnus.qsvt_exp_aux) and (not qbe_full.time_slice.magnus.qsvt_exp_lcu) and (qbe_full.time_slice.magnus.time_dependent.time == 0)) {
+    qbe_full.counter += -1;
+  }
+}
+
+qfunc long_time_integrator_naive_expanded___0(T: real, num_slices: int, qbe_full: FullBE) {
+  qbe_full.counter ^= num_slices;
+  repeat (i: num_slices) {
+    long_time_integrator_step_naive_expanded___0((i * T) / num_slices, ((i + 1) * T) / num_slices, qbe_full);
+  }
+}
+
+qfunc main(output qbe: FullBE) {
+  allocate(11, qbe);
+  hadamard_transform_expanded___0(qbe.time_slice.magnus.time_dependent.index);
+  long_time_integrator_naive_expanded___0(2, 4, qbe);
+}

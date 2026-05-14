@@ -1,0 +1,486 @@
+qfunc main(output qn: qnum, time_point: real) {
+  allocate(3, qn);
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[],
+        coefficient=226.875
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          }
+        ],
+        coefficient=-32.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          }
+        ],
+        coefficient=13.75
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=-19.5
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=-2.25
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=2
+          }
+        ],
+        coefficient=(-20) + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          }
+        ],
+        coefficient=-1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=12.75
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=-21.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=-15.75
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=-52.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=2
+          }
+        ],
+        coefficient=(-15) + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=1
+          }
+        ],
+        coefficient=16.25 + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=15.5 + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=0.25 + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=2
+          }
+        ],
+        coefficient=16.75 + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=2
+          }
+        ],
+        coefficient=(-11.75) + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          }
+        ],
+        coefficient=-11.875
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=3.5
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=2
+          }
+        ],
+        coefficient=5.5 + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          }
+        ],
+        coefficient=-33.125
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=-6.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=41.875
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=2.5
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=-66.875
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          }
+        ],
+        coefficient=3.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=-6.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=4.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Y,
+            index=2
+          }
+        ],
+        coefficient=(-4) + 0j
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          }
+        ],
+        coefficient=118.125
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=0.5
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=13.125
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=9.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=2
+          }
+        ],
+        coefficient=-8.125
+      }
+    ],
+    num_qubits=3
+  }, time_point, 1, 10, qn);
+}

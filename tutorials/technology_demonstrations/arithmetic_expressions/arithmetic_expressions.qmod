@@ -1,0 +1,7 @@
+qfunc main(output x: qnum, output y: qnum, output z: qnum) {
+  allocate(2, x);
+  allocate(1, y);
+  hadamard_transform(x);
+  hadamard_transform(y);
+  z = (((2 * x) + y) + max(3 * y, 2)) > 4;
+}

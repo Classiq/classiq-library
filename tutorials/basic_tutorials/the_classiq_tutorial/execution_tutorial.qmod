@@ -1,0 +1,5 @@
+qfunc main(output x: qnum<3>, output y: qnum) {
+  allocate(x);
+  hadamard_transform(x);
+  y = (x ** 2) + 1;
+}

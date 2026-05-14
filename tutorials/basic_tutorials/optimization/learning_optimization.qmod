@@ -1,0 +1,15 @@
+qstruct QAOAVars {
+  x: qnum<2, False, 0>[2];
+  constraint_slack_var: qbit[4];
+}
+
+qfunc main(params: real[2], output v: QAOAVars) {
+  allocate(v.size, v);
+  hadamard_transform(v);
+  repeat (i: 1) {
+    phase (-(((3 * v.x[0]) + (2 * v.x[1])) + (20 * (((((((v.constraint_slack_var[0] + (2 * v.constraint_slack_var[1])) + (4 * v.constraint_slack_var[2])) + (3 * v.constraint_slack_var[3])) - (3.0 * v.x[0])) - v.x[1]) + 2.0) ** 2))), params[i]);
+    apply_to_all(lambda(q) {
+      RX(params[1 + i], q);
+    }, v);
+  }
+}

@@ -1,0 +1,100 @@
+qfunc hadamard_transform_expanded___0(target: qbit[8]) {
+  repeat (index: 8) {
+    H(target[index]);
+  }
+}
+
+qfunc cost_layer_expanded___0(gamma: real, v: qbit[8]) {
+  phase (((((2 * ((((((((v[0] * v[1]) + (v[0] * v[2])) + (v[1] * v[3])) + (v[2] * v[3])) + (v[4] * v[5])) + (v[4] * v[6])) + (v[5] * v[7])) + (v[6] * v[7]))) + (-(((((((((((((((0.7525 * v[0]) * v[4]) + ((0.8004 * v[0]) * v[5])) + (0.1 * v[0])) + (0.1 * v[1])) + ((0.1924 * v[2]) * v[4])) + (0.1 * v[2])) + (0.1 * v[4])) + (0.1 * v[5])) + ((0.1581 * v[3]) * v[6])) + ((0.9165 * v[3]) * v[7])) + (0.1 * v[3])) + (0.1 * v[6])) + (0.1 * v[7])) + 3.4127))) + ((0.9382 * v[1]) * v[6])) + ((0.2143 * v[1]) * v[7])) + ((0.9182 * v[2]) * v[5]), gamma);
+}
+
+qfunc adaptive_mixer_layer_expanded___0(beta: real, qba: qbit[8]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=0
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=1
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=2
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=3
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=4
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=5
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=6
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::X,
+            index=7
+          }
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=8
+  }, beta, 1, 1, qba);
+}
+
+qfunc qaoa_adaptive_ansatz_expanded___0(gammas: real[1], betas: real[1], qba: qbit[8]) {
+  cost_layer_expanded___0(gammas[0], qba);
+  adaptive_mixer_layer_expanded___0(betas[0], qba);
+}
+
+qfunc main(params: real[2], output v: qbit[8]) {
+  allocate(8, v);
+  hadamard_transform_expanded___0(v);
+  qaoa_adaptive_ansatz_expanded___0(params[0:1], params[1:2], v);
+}

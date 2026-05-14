@@ -1,0 +1,12 @@
+qfunc main(output res: qbit[]) {
+  x: qbit[];
+  allocate(3, x);
+  hadamard_transform(x);
+  lsb: qbit;
+  msb: qnum<2>;
+  x -> {lsb, msb};
+  control (msb == 1) {
+    RY(pi / 3, lsb);
+  }
+  {lsb, msb} -> res;
+}

@@ -1,0 +1,15 @@
+qstruct Variables {
+  x: qnum<2, False, 0>;
+  y: qnum<2, False, 0>;
+}
+
+qperm quantum_oracle(const vars: Variables, z: qnum) {
+  z ^= (vars.x - vars.y) == 2;
+}
+
+qfunc main(output vars: Variables) {
+  allocate(vars.size, vars);
+  grover_search(2, lambda(vars) {
+    phase_oracle(quantum_oracle, vars);
+  }, vars);
+}

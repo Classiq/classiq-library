@@ -1,0 +1,103 @@
+qstruct EstimationVars {
+  x1: qnum<2>;
+  x2: qnum<2>;
+}
+
+qperm affine_max_expanded___0(const x1: qnum<2, False, 0>, const x2: qnum<2, False, 0>, output res: qnum<3, False, 1>) {
+  res = max(x1, (0.5 * (x1 + x2)) + (-1.5));
+}
+
+qfunc assign_amplitude_table_expanded___0(const index: qbit[3], indicator: qbit) {
+  select_rotation(Pauli::Y, [
+    1.46997779512378,
+    1.46997779512378,
+    1.46997779512378,
+    1.46997779512378,
+    1.613710603790383,
+    1.870987524791402,
+    2.226584824607679,
+    3.141592653589793
+  ], index, indicator);
+}
+
+qfunc brute_force_payoff_expanded___0(const max_reg: qnum<3, False, 1>, ind_reg: qbit) {
+  max_reg_fixed: qnum<3, False, 3>;
+  max_reg -> max_reg_fixed;
+  assign_amplitude_table_expanded___0(max_reg_fixed, ind_reg);
+  max_reg_fixed -> max_reg;
+}
+
+qfunc rainbow_brute_force_expanded___0(qvars: EstimationVars, ind: qbit) {
+  inplace_prepare_state([
+    0.065634503010069,
+    0.434365496989931,
+    0.434365496989931,
+    0.065634503010069
+  ], 0, qvars.x1);
+  inplace_prepare_state([
+    0.065634503010069,
+    0.434365496989931,
+    0.434365496989931,
+    0.065634503010069
+  ], 0, qvars.x2);
+  max_out: qnum<3, False, 1>;
+  affine_max_expanded___0(qvars.x1, qvars.x2, max_out);
+  brute_force_payoff_expanded___0(max_out, ind);
+}
+
+qfunc space_transform_expanded___0(est_reg: qbit[5]) {
+  rainbow_brute_force_expanded___0(est_reg[0:4], est_reg[4]);
+}
+
+qperm oracle_expanded___0(const est_reg: qbit[5]) {
+  Z(est_reg[4]);
+}
+
+@disable_perm_check
+@disable_const_checks(qvar)
+qperm reflect_about_zero_expanded___0(const qvar: qbit[5]) {
+  qvar_num: qnum<5, False, 0>;
+  within {
+    qvar -> qvar_num;
+  } apply {
+    control (qvar_num == 0) {
+      phase (pi);
+    }
+  }
+  phase (pi);
+}
+
+qfunc grover_diffuser_expanded___0(packed_vars: qbit[5]) {
+  within {
+    invert {
+      space_transform_expanded___0(packed_vars);
+    }
+  } apply {
+    reflect_about_zero_expanded___0(packed_vars);
+  }
+}
+
+qfunc grover_operator_expanded___0(packed_vars: qbit[5]) {
+  oracle_expanded___0(packed_vars);
+  grover_diffuser_expanded___0(packed_vars);
+}
+
+qfunc amplitude_amplification_expanded___0(reps: int, packed_qvars: qbit[5]) {
+  space_transform_expanded___0(packed_qvars);
+  power (reps) {
+    grover_operator_expanded___0(packed_qvars);
+  }
+}
+
+qfunc main(k: int, output indicator: qbit) {
+  est_reg: qbit[5];
+  problem_vars: qbit[4];
+  allocate(4, problem_vars);
+  allocate(1, indicator);
+  within {
+    {problem_vars, indicator} -> est_reg;
+  } apply {
+    amplitude_amplification_expanded___0(k, est_reg);
+  }
+  drop(problem_vars);
+}

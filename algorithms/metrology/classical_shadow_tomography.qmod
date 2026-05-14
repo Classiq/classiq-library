@@ -1,0 +1,27 @@
+qfunc clifford_application(state: qbit[]) {
+  S(state[0]);
+  H(state[0]);
+  S(state[1]);
+  S(state[1]);
+  S(state[0]);
+  H(state[1]);
+  CX(state[0], state[1]);
+  CX(state[0], state[1]);
+  S(state[0]);
+  H(state[1]);
+  S(state[0]);
+  H(state[0]);
+  S(state[0]);
+  S(state[0]);
+  CX(state[1], state[0]);
+  H(state[1]);
+  H(state[1]);
+  S(state[0]);
+  S(state[0]);
+  S(state[0]);
+}
+
+qfunc main(output qarr: qbit[]) {
+  prepare_bell_state(1, qarr);
+  clifford_application(qarr);
+}

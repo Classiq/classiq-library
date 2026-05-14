@@ -1,0 +1,14 @@
+qfunc mixer_layer(beta: real, qba: qbit[]) {
+  apply_to_all(lambda(q) {
+    RX(beta, q);
+  }, qba);
+}
+
+qfunc main(params: real[8], output v: qbit[]) {
+  allocate(5, v);
+  hadamard_transform(v);
+  repeat (i: params.len / 2) {
+    phase (-((((((0 + ((v[0] * (1 - v[1])) + (v[1] * (1 - v[0])))) + ((v[0] * (1 - v[2])) + (v[2] * (1 - v[0])))) + ((v[1] * (1 - v[2])) + (v[2] * (1 - v[1])))) + ((v[1] * (1 - v[3])) + (v[3] * (1 - v[1])))) + ((v[2] * (1 - v[4])) + (v[4] * (1 - v[2])))) + ((v[3] * (1 - v[4])) + (v[4] * (1 - v[3])))), params[2 * i]);
+    mixer_layer(params[(2 * i) + 1], v);
+  }
+}

@@ -1,0 +1,18 @@
+qstruct PortfolioOptimizationVars {
+  a: qnum<2>[3];
+}
+
+qfunc mixer_layer(beta: real, qba: qbit[]) {
+  apply_to_all(lambda(q) {
+    RX(beta, q);
+  }, qba);
+}
+
+qfunc main(params: real[6], output w_array: PortfolioOptimizationVars) {
+  allocate(w_array);
+  hadamard_transform(w_array);
+  repeat (i: params.len / 2) {
+    phase (((((0 + (w_array.a[0] * (((0 + (w_array.a[0] * 0.9)) + (w_array.a[1] * 0.5)) + (w_array.a[2] * (-0.7))))) + (w_array.a[1] * (((0 + (w_array.a[0] * 0.5)) + (w_array.a[1] * 0.9)) + (w_array.a[2] * (-0.2))))) + (w_array.a[2] * (((0 + (w_array.a[0] * (-0.7))) + (w_array.a[1] * (-0.2))) + (w_array.a[2] * 0.9)))) - (10.0 * (((0 + (3 * w_array.a[0])) + (4 * w_array.a[1])) + ((-1) * w_array.a[2])))) + (2.0 * (((((0 + w_array.a[0]) + w_array.a[1]) + w_array.a[2]) - 6) ** 2)), params[2 * i]);
+    mixer_layer(params[(2 * i) + 1], w_array);
+  }
+}

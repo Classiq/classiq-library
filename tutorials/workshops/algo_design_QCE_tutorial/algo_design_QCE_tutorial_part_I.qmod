@@ -1,0 +1,10 @@
+qfunc main(output x: qnum<3>, output y: qnum<4>) {
+  allocate(x);
+  hadamard_transform(x);
+  allocate(y);
+  within {
+    qft(y);
+  } apply {
+    phase (y * (x ** 2), 6.283185307179586 / (2 ** y.size));
+  }
+}

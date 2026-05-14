@@ -1,0 +1,131 @@
+qstruct OracleVars {
+  x: qnum<2, False, 0>[3];
+  aux_reg: qnum<4.0>;
+  sum_log_return: qnum<4.0, SIGNED, 2>;
+  first_bin_valid: qbit;
+  second_bin_valid: qbit;
+  barriers_crossed: qbit[3];
+}
+
+qperm oracle(const est_reg: qbit[]) {
+  Z(est_reg[est_reg.len - 1]);
+}
+
+qperm check_binary(const log_return: qnum, round_K_bin_norm: real, binary_valid: qbit) {
+  binary_valid ^= log_return > round_K_bin_norm;
+}
+
+qfunc binary_payoff(binary_payoff: real, target: qbit) {
+  RY(binary_payoff, target);
+}
+
+qperm check_barrier_crossed(const log_return: qnum, barrier_crossed: qbit) {
+  barrier_crossed ^= log_return < (-0.25);
+}
+
+qperm check_K_put(const log_return: qnum<4.0, SIGNED, 2>, k_put_valid: qbit) {
+  k_put_valid ^= log_return < 0.0;
+}
+
+qperm check_put_activate(const barriers_crossed: qbit[], const k_put_valid: qbit, put_alone_valid: qbit) {
+  put_alone_valid ^= ((((barriers_crossed[0] == 1) | (barriers_crossed[1] == 1)) | (barriers_crossed[2] == 1)) & (k_put_valid == 1)) == 1;
+}
+
+qperm populate_put_alone_valid(const sum_log_return: qnum, barriers_crossed: qbit[], output put_alone_valid: qbit) {
+  k_put_valid: qbit;
+  allocate(put_alone_valid);
+  within {
+    allocate(k_put_valid);
+    check_K_put(sum_log_return, k_put_valid);
+    check_barrier_crossed(sum_log_return, barriers_crossed[2]);
+  } apply {
+    check_put_activate(barriers_crossed, k_put_valid, put_alone_valid);
+  }
+}
+
+qfunc zero_payoff(target: qbit) {
+  RY(0.818547457426368, target);
+}
+
+qperm add_minimum(x: qbit[]) {
+  X(x[x.size - 1]);
+}
+
+qfunc integrator(exp_rate: real, const x: qnum, ref: qnum, res: qbit) {
+  prepare_exponential_state(-exp_rate, ref);
+  res ^= x >= ref;
+}
+
+qfunc integration_load_amplitudes(const y: qnum, aux_reg: qnum, ind_reg: qbit) {
+  integrator(0.25, y, aux_reg, ind_reg);
+}
+
+qfunc integration_payoff(const log_return: qnum, aux_reg: qnum, ind_reg: qbit) {
+  log_return_unsigned: qnum<log_return.size>;
+  within {
+    log_return -> log_return_unsigned;
+    add_minimum(log_return_unsigned);
+  } apply {
+    integration_load_amplitudes(log_return_unsigned, aux_reg, ind_reg);
+  }
+}
+
+qfunc final_payoff(const check_all_zeros: qnum, const sum_log_return: qnum, aux_reg: qnum, ind_reg: qbit) {
+  control (check_all_zeros == 0) {
+    zero_payoff(ind_reg);
+  }
+  control (check_all_zeros == 1) {
+    integration_payoff(sum_log_return, aux_reg, ind_reg);
+  }
+}
+
+qfunc autocallable_integration(x: qnum[3], aux_reg: qnum, ind_reg: qbit, sum_log_return: qnum, first_bin_valid: qbit, second_bin_valid: qbit, barriers_crossed: qbit[]) {
+  repeat (i: x.len) {
+    inplace_prepare_state([
+      0.065634503010069,
+      0.434365496989931,
+      0.434365496989931,
+      0.065634503010069
+    ], 0, x[i]);
+  }
+  sum_log_return ^= 0.1274075 + ((0.238268134860707 * sqrt(1)) * ((x[0] * 1.5) + (-3.0)));
+  check_binary(sum_log_return, 0.0, first_bin_valid);
+  control (first_bin_valid) {
+    binary_payoff(0.875426634895785, ind_reg);
+  }
+  check_barrier_crossed(sum_log_return, barriers_crossed[0]);
+  sum_log_return += 0.1274075 + ((0.238268134860707 * sqrt(1)) * ((x[1] * 1.5) + (-3.0)));
+  check_binary(sum_log_return, 0.0, second_bin_valid);
+  control (((first_bin_valid == 0) & (second_bin_valid == 1)) == 1) {
+    binary_payoff(0.89966916778117, ind_reg);
+  }
+  check_barrier_crossed(sum_log_return, barriers_crossed[1]);
+  sum_log_return += 0.1274075 + ((0.238268134860707 * sqrt(1)) * ((x[2] * 1.5) + (-3.0)));
+  put_alone_valid: qbit;
+  within {
+    populate_put_alone_valid(sum_log_return, barriers_crossed, put_alone_valid);
+  } apply {
+    final_payoff({put_alone_valid, first_bin_valid, second_bin_valid}, sum_log_return, aux_reg, ind_reg);
+  }
+}
+
+qfunc iqae_state_preparation(state: OracleVars, ind: qbit) {
+  autocallable_integration(state.x, state.aux_reg, ind, state.sum_log_return, state.first_bin_valid, state.second_bin_valid, state.barriers_crossed);
+}
+
+qfunc space_transform(est_reg: qbit[]) {
+  iqae_state_preparation(est_reg[0:est_reg.len - 1], est_reg[est_reg.len - 1]);
+}
+
+qfunc main(k: int, output indicator: qbit) {
+  est_reg: qbit[];
+  problem_vars: qbit[19.0];
+  allocate(problem_vars);
+  allocate(indicator);
+  within {
+    {problem_vars, indicator} -> est_reg;
+  } apply {
+    amplitude_amplification(k, oracle, space_transform, est_reg);
+  }
+  drop(problem_vars);
+}

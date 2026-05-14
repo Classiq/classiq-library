@@ -1,0 +1,79 @@
+qfunc _gqsp_r_gate(theta: real, phi: real, _lambda: real, q: qbit) {
+  within {
+    X(q);
+  } apply {
+    U(2 * theta, phi, _lambda, 0, q);
+  }
+  Z(q);
+}
+
+qfunc gqsp(u: qfunc (), aux: qbit, phases: real[3][], negative_power: int) {
+  _gqsp_r_gate(phases[0][0], phases[0][1], phases[0][2], aux);
+  if ((phases.len - negative_power) > 1) {
+    foreach (theta, phi, _lambda: phases[1:(phases.len - negative_power)]) {
+      control (aux == 0) {
+        u();
+      }
+      _gqsp_r_gate(theta, phi, _lambda, aux);
+    }
+  }
+  if (phases.len > (phases.len - negative_power)) {
+    foreach (theta, phi, _lambda: phases[(phases.len - negative_power):phases.len]) {
+      control (aux == 1) {
+        invert {
+          u();
+        }
+      }
+      _gqsp_r_gate(theta, phi, _lambda, aux);
+    }
+  }
+}
+
+qfunc u_func(x: qnum) {
+  phase (6.283185307179586 * x);
+}
+
+qfunc main(output x: qnum<7, UNSIGNED, 7>, output ind: qbit) {
+  allocate(ind);
+  allocate(x);
+  hadamard_transform(x);
+  gqsp(lambda() {
+    u_func(x);
+  }, ind, [
+    [
+      1.398691412985988,
+      (-3.141592653589793),
+      (-23.561944901923447)
+    ],
+    [
+      0.0,
+      (-3.141592653589793),
+      0.0
+    ],
+    [
+      (-0.542523512926326),
+      (-3.141592653589793),
+      0.0
+    ],
+    [
+      0.0,
+      (-3.141592653589793),
+      0.0
+    ],
+    [
+      (-0.542523512926326),
+      (-3.141592653589793),
+      0.0
+    ],
+    [
+      0.0,
+      (-3.141592653589793),
+      0.0
+    ],
+    [
+      (-0.172104913808909),
+      (-23.561944901923447),
+      0.0
+    ]
+  ], 3);
+}

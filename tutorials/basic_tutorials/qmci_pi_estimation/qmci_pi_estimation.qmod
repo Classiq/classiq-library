@@ -1,0 +1,38 @@
+qstruct position {
+  x: qnum<1>;
+  y: qnum<1>;
+}
+
+qperm oracle(const est_reg: qbit[]) {
+  Z(est_reg[est_reg.len - 1]);
+}
+
+qfunc encode_prob(p: position) {
+  hadamard_transform(p);
+}
+
+qperm oracle_func(const p: position, res: qbit) {
+  res ^= ((p.x ** 2) + (p.y ** 2)) < 4;
+}
+
+qfunc iqae_state_preparation(p: position, ind: qbit) {
+  encode_prob(p);
+  oracle_func(p, ind);
+}
+
+qfunc space_transform(est_reg: qbit[]) {
+  iqae_state_preparation(est_reg[0:est_reg.len - 1], est_reg[est_reg.len - 1]);
+}
+
+qfunc main(k: int, output indicator: qbit) {
+  est_reg: qbit[];
+  problem_vars: qbit[2];
+  allocate(problem_vars);
+  allocate(indicator);
+  within {
+    {problem_vars, indicator} -> est_reg;
+  } apply {
+    amplitude_amplification(k, oracle, space_transform, est_reg);
+  }
+  drop(problem_vars);
+}
