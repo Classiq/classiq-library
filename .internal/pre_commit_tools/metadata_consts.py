@@ -39,6 +39,7 @@ FILES_TO_NOT_GENERATE_METADATA = [
     "qiskit_discrete_quantum_walk.ipynb",
     "tket_discrete_quantum_walk.ipynb",
     "resiliency_planning_AMD.ipynb",
+    "vlasov_ampere_qiskit.ipynb",
 ]
 FILES_TO_IGNORE_SAME_NAME = [
     "qaoa.ipynb",
