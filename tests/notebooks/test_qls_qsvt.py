@@ -3,18 +3,20 @@ from tests.utils_for_testbook import (
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
+import numpy as np
 
 
 @wrap_testbook("qls_qsvt", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog_banded"),
-        expected_width=9,  # actual 7
-        expected_depth=120000,  # actual 61666
-    )
-    validate_quantum_program_size(
-        tb.ref_pydantic("qprog_pauli"),
+        tb.ref_pydantic("qprog_small_pauli"),
         expected_width=11,  # actual 9
         expected_depth=120000,  # actual 65325
     )
+
+    qsols = ([tb.ref("qsol_small_pauli"), tb.ref("qsol_008_banded")],)
+    expected_sols = [tb.ref("expected_small"), tb.ref("expected_008")]
+    errs = [0.1, 0.1]
+    for qsol, clsol, err in zip(qsols, expected_sols, errs):
+        assert np.linalg.norm(qsol - clsol) < err
