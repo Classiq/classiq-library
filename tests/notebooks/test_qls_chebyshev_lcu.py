@@ -10,22 +10,20 @@ import numpy as np
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog_cheb_lcu_pauli"),
+        tb.ref_pydantic("qprog_small_pauli"),
         expected_width=15,  # actual 13
         expected_depth=50000,  # actual 20578
     )
 
-    qsols = (
-        [
-            tb.ref("qsol_small_pauli"),
-            tb.ref("qsol_008_banded"),
-            tb.ref("qsol_008_banded_approx"),
-        ],
-    )
+    qsols = [
+        tb.ref_numpy("qsol_small_pauli"),
+        tb.ref_numpy("qsol_008_banded"),
+        tb.ref_numpy("qsol_008_banded_approx"),
+    ]
     expected_sols = [
-        tb.ref("expected_small"),
-        tb.ref("expected_008"),
-        tb.ref("expected_008"),
+        tb.ref_numpy("expected_small"),
+        tb.ref_numpy("expected_008"),
+        tb.ref_numpy("expected_008"),
     ]
     errs = [0.1, 0.1, 0.2]
     for qsol, clsol, err in zip(qsols, expected_sols, errs):

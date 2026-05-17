@@ -15,8 +15,8 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_depth=120000,  # actual 65325
     )
 
-    qsols = ([tb.ref("qsol_small_pauli"), tb.ref("qsol_008_banded")],)
-    expected_sols = [tb.ref("expected_small"), tb.ref("expected_008")]
+    qsols = [tb.ref_numpy("qsol_small_pauli"), tb.ref_numpy("qsol_008_banded")]
+    expected_sols = [tb.ref_numpy("expected_small"), tb.ref_numpy("expected_008")]
     errs = [0.1, 0.1]
     for qsol, clsol, err in zip(qsols, expected_sols, errs):
         assert np.linalg.norm(qsol - clsol) < err
