@@ -36,6 +36,8 @@ __all__ = [
     "interferometric_shadow_snapshots",
     "interferometric_shadow_estimate",
     "random_pauli_shadow",
+    "snapshot_reconstruction",
+    "estimate_observable",
     "median_of_means",
     "shadow_error_bound",
 ]
@@ -59,27 +61,41 @@ def median_of_means(values: np.ndarray, k: int) -> float:
     return float(np.median([np.mean(c) for c in chunks]))
 
 
-def shadow_error_bound(n_observables: int, eps: float, delta: float) -> tuple:
-    """HKP shadow size for ``n_observables`` predictions to error ``ε`` w.p. ``≥ 1 − δ``.
+def shadow_error_bound(
+    observables: list[list[tuple[float, int]]],
+    eps: float,
+    delta: float,
+) -> tuple[int, int]:
+    """HKP random-Pauli shadow size for ``M`` observables to error ``ε`` w.p. ``≥ 1 − δ``.
 
-    Implements eq. (S13) of [[2]] for a Pauli-basis ensemble. The required
-    shadow size is
+    Implements Eq. (S13) of [[2]] with the random-Pauli shadow-norm bound for
+    a sum of Pauli terms ``O = Σ_a c_a P_a``,
 
-    ``N · K = ⌈34 · max ‖O‖²_shadow / ε²⌉ · ⌈2 log(2 M / δ)⌉``,
+    ``‖O‖²_shadow ≤ ( Σ_a |c_a| · √(3^{weight(P_a)}) )²``,
 
-    where ``‖O‖_shadow = max ‖O - tr(O)/2^n · I‖_∞`` for Pauli observables.
-    For a generic ensemble see eq. (S7) of the same paper.
+    where ``weight(P_a)`` is the number of non-identity factors in the Pauli
+    string ``P_a``. The ``3^k`` locality factor is essential: without it the
+    bound underestimates the required samples by ``3^k`` for a ``k``-local
+    observable.
 
     Args:
-        n_observables: number of observables ``M`` to predict simultaneously.
-        eps:           additive accuracy.
-        delta:         failure probability.
+        observables: list of observables; each observable is a list of
+            ``(coefficient, weight)`` tuples — one per Pauli term in its
+            expansion ``Σ_a c_a P_a``, where ``weight`` is the number of
+            non-identity Paulis in ``P_a``.
+        eps:         desired additive accuracy.
+        delta:       failure probability.
 
     Returns:
-        ``(N_shadow_total, K_chunks)``.
+        ``(N_shadow_total, K_chunks)`` — total snapshots ``N · K`` and the
+        number of median-of-means divisions ``K``.
     """
-    k = int(np.ceil(2.0 * np.log(2.0 * n_observables / delta)))
-    n = int(np.ceil(34.0 / eps**2))  # assumes ‖O_i‖_shadow = O(1); user can rescale
+    m = len(observables)
+    k = int(np.ceil(2.0 * np.log(2.0 * m / delta)))
+    shadow_norms = [
+        sum(abs(c) * np.sqrt(3.0**w) for c, w in obs) ** 2 for obs in observables
+    ]
+    n = int(np.ceil(34.0 * max(shadow_norms) / eps**2))
     return n * k, k
 
 
@@ -208,11 +224,14 @@ def random_pauli_shadow(
     snapshots = np.zeros((n_snapshots, n_qubits), dtype=int)
     ids = np.zeros((n_snapshots, n_qubits), dtype=int)
 
-    # Single-qubit Pauli rotations from Z basis.
+    # Single-qubit pre-measurement rotations to diagonalise Z. Matches the
+    # convention used by `snapshot_reconstruction`. For Y the rotation is HS:
+    # b=0 then corresponds to Y eigenvalue -1, b=1 to Y eigenvalue +1 (the
+    # sign flip is handled by `estimate_observable`).
     h = (1.0 / np.sqrt(2.0)) * np.array([[1.0, 1.0], [1.0, -1.0]], dtype=complex)
     s = np.array([[1.0, 0.0], [0.0, 1.0j]], dtype=complex)
     eye = np.eye(2, dtype=complex)
-    rotations = [h, h @ s.conj().T, eye]  # X, Y, Z basis
+    rotations = [h, h @ s, eye]  # X, Y, Z basis (HS for Y to match notebook)
 
     for k in range(n_snapshots):
         basis = rng.integers(0, 3, size=n_qubits)
@@ -227,3 +246,97 @@ def random_pauli_shadow(
         bits = [(outcome >> (n_qubits - 1 - q)) & 1 for q in range(n_qubits)]
         snapshots[k] = bits
     return snapshots, ids
+
+
+def snapshot_reconstruction(
+    snapshot: np.ndarray, snapshot_ids: np.ndarray
+) -> np.ndarray:
+    """Reconstruct the density-matrix estimator of a single random-Pauli snapshot.
+
+    Applies Eq. (S44) of [[2]] per qubit,
+    ``ρ̂_q = 3 (U_q^† |b_q⟩⟨b_q| U_q) - I``, with ``U_q`` the pre-measurement
+    rotation indicated by ``snapshot_ids[q]`` (``HS`` for Y, matching the
+    convention of the companion notebook).
+
+    Args:
+        snapshot:     ``(n,)`` measurement bits in ``{0, 1}``.
+        snapshot_ids: ``(n,)`` basis ids in ``{0, 1, 2}`` (= X, Y, Z).
+
+    Returns:
+        ``(2^n, 2^n)`` density-matrix estimator.
+    """
+    h = (1.0 / np.sqrt(2.0)) * np.array([[1.0, 1.0], [1.0, -1.0]], dtype=complex)
+    s = np.array([[1.0, 0.0], [0.0, 1.0j]], dtype=complex)
+    eye = np.eye(2, dtype=complex)
+    unitaries = [h, h @ s, eye]  # X, Y, Z
+
+    zero = np.array([[1.0, 0.0], [0.0, 0.0]], dtype=complex)
+    one = np.array([[0.0, 0.0], [0.0, 1.0]], dtype=complex)
+
+    result = np.array([[1.0]], dtype=complex)
+    for b, basis_id in zip(np.asarray(snapshot), np.asarray(snapshot_ids)):
+        local_state = zero if int(b) == 0 else one
+        u = unitaries[int(basis_id)]
+        local = 3.0 * (u.conj().T @ local_state @ u) - eye
+        result = np.kron(result, local)
+    return result
+
+
+def estimate_observable(
+    snapshots: np.ndarray,
+    ids: np.ndarray,
+    observable: list[tuple[float, np.ndarray]],
+    div: int,
+) -> float:
+    """Estimate ``⟨O⟩`` from a random-Pauli classical shadow with median-of-means.
+
+    For each Pauli term ``c_a · P_a`` in ``observable``, the per-snapshot
+    contribution factorises across qubits: a qubit on which the snapshot's
+    measurement basis matches the term's Pauli contributes ``±3`` (sign set
+    by the corresponding eigenvalue), and a mismatched non-identity qubit
+    contributes ``0``. The Y-basis convention follows the ``HS`` rotation
+    used in ``random_pauli_shadow``/``snapshot_reconstruction``: for Y the
+    sign mapping is reversed (``b=0 → −3``, ``b=1 → +3``). This fix corrects
+    the sign bug present in the companion notebook's ``estimate_observable``,
+    which was hidden because that notebook only validates against ``ZZ``.
+
+    Args:
+        snapshots:  ``(N, n)`` measurement bits.
+        ids:        ``(N, n)`` basis ids in ``{0, 1, 2}``.
+        observable: list of ``(coefficient, paulis)`` where ``paulis`` is an
+            ``(n,)`` array with entries in ``{-1, 0, 1, 2}`` for ``{I, X, Y, Z}``.
+        div:        number of median-of-means divisions ``K``.
+
+    Returns:
+        Estimated expectation value ``⟨O⟩``.
+    """
+    snapshots = np.asarray(snapshots)
+    ids = np.asarray(ids)
+    n_snapshots = snapshots.shape[0]
+    chunk = n_snapshots // div
+
+    total = 0.0
+    for coeff, paulis in observable:
+        paulis = np.asarray(paulis)
+        non_id = paulis != -1
+        is_y = paulis == 1
+
+        # Sign per qubit for matched-basis snapshots:
+        # +1 eigenvalue → +3, −1 eigenvalue → −3.
+        # X (HS rotation flipped to H), Z (no rotation): b=0 → +1, b=1 → −1.
+        # Y (HS rotation): b=0 → −1, b=1 → +1.
+        match = (ids == paulis[None, :]) & non_id[None, :]
+        eigenvals = np.where(snapshots == 0, 1.0, -1.0)
+        eigenvals = np.where(is_y[None, :], -eigenvals, eigenvals)
+        per_qubit = np.where(match, 3.0 * eigenvals, 1.0)
+
+        mismatch = (~match) & non_id[None, :]
+        per_qubit = np.where(mismatch, 0.0, per_qubit)
+
+        per_snapshot = np.prod(per_qubit, axis=1)
+        means = [
+            float(np.mean(per_snapshot[k * chunk : (k + 1) * chunk]))
+            for k in range(div)
+        ]
+        total += float(coeff) * float(np.median(means))
+    return total
