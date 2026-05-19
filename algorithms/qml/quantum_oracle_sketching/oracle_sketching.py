@@ -1,4 +1,4 @@
-"""Quantum oracle sketching — stage 1 primitives.
+"""Quantum oracle sketching algorithm primitives
 
 This module collects the data-loading helpers from the
 ``qauntum_oracle_sketching.ipynb`` notebook so they can be reused across the
