@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import time
@@ -12,6 +13,26 @@ from utils_for_tests import (
     resolve_notebook_path,
     ROOT_DIRECTORY,
 )
+
+logger = logging.getLogger(__name__)
+
+_DOMAINS_BLOCKING_CI: dict[str, list[int]] = {
+    "https://en.wikipedia.org/": [403],
+    "https://arxiv.org/": [406],
+    "https://pytorch.org/": [403],
+    "https://quantum-journal.org/": [403],
+    "https://doi.org/10.22331/": [403, 302],
+}
+
+_URLS_BLOCKING_CI: dict[str, list[int]] = {
+    "https://short.classiq.io/join-slack": [403, 302],
+    "https://pubmed.ncbi.nlm.nih.gov/8604144/": [403],
+    "https://users.cs.fiu.edu/~prabakar/ugc/2022/QC_notes/AndrewChilds_qa.pdf": [403],
+    "https://www.e3s-conferences.org/articles/e3sconf/pdf/2019/50/e3sconf_ses18_04011.pdf": [
+        403
+    ],
+    "https://www.mdpi.com/1099-4300/27/5/454": [403],
+}
 
 URL_ALLOW_LIST_FILE = ROOT_DIRECTORY / ".internal" / "url_allow_list.txt"
 URL_GITHUB_PREFIX = "https://github.com/classiq/classiq-library/blob/main/"
@@ -98,14 +119,38 @@ def _test_single_url(
 
     try:
         if use_head:
-            response = httpx.head(url, headers=headers, follow_redirects=True)
+            response = httpx.head(
+                url, headers=headers, follow_redirects=follow_redirects
+            )
         else:
-            response = httpx.get(url, headers=headers, follow_redirects=True)
+            response = httpx.get(
+                url, headers=headers, follow_redirects=follow_redirects
+            )
 
         # we don't check cloudflare links
         if (not response.is_success) and response.headers.get(
             "server", ""
         ).lower() == "cloudflare":
+            return True
+
+        if any(
+            url.startswith(prefix) and response.status_code in codes
+            for prefix, codes in _DOMAINS_BLOCKING_CI.items()
+        ):
+            logger.debug(
+                "Got %d for %s — known CI-blocking domain, treating as valid",
+                response.status_code,
+                url,
+            )
+            return True
+
+        if response.status_code in _URLS_BLOCKING_CI.get(url, []):
+            logger.debug(
+                "Got %d for %s (final URL: %s) — known CI-blocking URL, treating as valid",
+                response.status_code,
+                url,
+                response.url,
+            )
             return True
 
         # Method not allowed
@@ -135,14 +180,24 @@ def _test_single_url(
             )
 
         if response.status_code == 403:
-            # Unsure why, but wikipedia now gives 403 for requests when sent from the CI,
-            #   but 200ok for the same requests from my personal computer
-            #   so we don't fully test it, and count on wikipedia pages to not change so frequently
-            if url.startswith("https://en.wikipedia.org/"):
-                return True
-
-            # Some flaky error with "doi.org" links
+            logger.debug("Got 403 for %s (final URL: %s)", url, response.url)
             return _test_single_url(url, retry - 1, use_head=use_head)
+
+        if response.is_success and any(
+            url.startswith(prefix) for prefix in _DOMAINS_BLOCKING_CI
+        ):
+            logger.debug(
+                "Got %d for %s (domain is in CI-blocking list — bypass may be removable)",
+                response.status_code,
+                url,
+            )
+
+        if response.is_success and url in _URLS_BLOCKING_CI:
+            logger.debug(
+                "Got %d for %s — URL is in CI-blocking list, bypass may be removable",
+                response.status_code,
+                url,
+            )
 
         return response.is_success
     except httpx.HTTPError:
