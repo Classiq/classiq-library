@@ -120,8 +120,10 @@ def run_statevector_simulation(
         print("Circuit Depth:", qprog.transpiled_circuit.depth)
         print("Gate Counts:", qprog.transpiled_circuit.count_ops)
 
-    sv = calculate_state_vector(qprog)
-    df = sv[sv.ancilla == 0]
+    df = calculate_state_vector(qprog)
+    if filter_ancilla and "ancilla" in df.columns:
+        print("Filtering out states with ancilla qubits in state |1>...")
+        df = df[df["ancilla"] == 0]
     df.sort_values(by="x", inplace=True)
 
     return df
