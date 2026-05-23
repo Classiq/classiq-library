@@ -120,17 +120,10 @@ def run_statevector_simulation(
         print("Circuit Depth:", qprog.transpiled_circuit.depth)
         print("Gate Counts:", qprog.transpiled_circuit.count_ops)
 
-    backend_preferences = ClassiqBackendPreferences(
-        backend_name="simulator_statevector"
-    )
-    execution_preferences = ExecutionPreferences(
-        num_shots=1, backend_preferences=backend_preferences
-    )
-    with ExecutionSession(qprog, execution_preferences=execution_preferences) as es:
-        if filter_ancilla:
-            es.set_measured_state_filter("ancilla", lambda v: v == 0)
-        results_statevector = es.sample()
-    df = results_statevector.dataframe
+    sv = calculate_state_vector(qprog)
+    df = sv[sv.ancilla == 0]
+    df.sort_values(by="x", inplace=True)
+
     return df
 
 
