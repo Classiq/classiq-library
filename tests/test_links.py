@@ -84,10 +84,11 @@ def get_url_allow_list() -> list[str]:
         return []
 
 
-def check_file_instead_of_url(url: str) -> bool:
-    if not url.lower().startswith(URL_GITHUB_PREFIX):
-        return False
+def should_check_file_instead_of_url(url: str) -> bool:
+    return url.lower().startswith(URL_GITHUB_PREFIX)
 
+
+def check_file_instead_of_url(url: str) -> bool:
     file_location = url[len(URL_GITHUB_PREFIX) :]
     return (ROOT_DIRECTORY / file_location).is_file()
 
@@ -98,8 +99,8 @@ def _test_single_url(
     use_head: bool = True,
     follow_redirects: bool = True,
 ) -> bool:
-    if check_file_instead_of_url(url):
-        return True
+    if should_check_file_instead_of_url(url):
+        return check_file_instead_of_url(url)
 
     if os.environ.get("LIMIT_TEST_LINKS_TO_FILES_ONLY", "false").lower() == "true":
         return True  # if we only wish to check files, then we end this test here.
