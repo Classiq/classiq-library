@@ -138,7 +138,7 @@ def _test_single_url(
             url.startswith(prefix) and response.status_code in codes
             for prefix, codes in _DOMAINS_BLOCKING_CI.items()
         ):
-            logger.debug(
+            logger.info(
                 "Got %d for %s — known CI-blocking domain, treating as valid",
                 response.status_code,
                 url,
@@ -146,7 +146,7 @@ def _test_single_url(
             return True
 
         if response.status_code in _URLS_BLOCKING_CI.get(url, []):
-            logger.debug(
+            logger.info(
                 "Got %d for %s (final URL: %s) — known CI-blocking URL, treating as valid",
                 response.status_code,
                 url,
@@ -181,20 +181,20 @@ def _test_single_url(
             )
 
         if response.status_code == 403:
-            logger.debug("Got 403 for %s (final URL: %s)", url, response.url)
+            logger.info("Got 403 for %s (final URL: %s)", url, response.url)
             return _test_single_url(url, retry - 1, use_head=use_head)
 
         if response.is_success and any(
             url.startswith(prefix) for prefix in _DOMAINS_BLOCKING_CI
         ):
-            logger.debug(
+            logger.info(
                 "Got %d for %s (domain is in CI-blocking list — bypass may be removable)",
                 response.status_code,
                 url,
             )
 
         if response.is_success and url in _URLS_BLOCKING_CI:
-            logger.debug(
+            logger.info(
                 "Got %d for %s — URL is in CI-blocking list, bypass may be removable",
                 response.status_code,
                 url,
