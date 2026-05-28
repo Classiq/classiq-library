@@ -23,7 +23,7 @@ _DEGRADATION_RE = re.compile(
 _PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (
         re.compile(
-            r"lack.of.resources|InsufficientResources|insufficient.*resources",
+            r"lack.of.resources|InsufficientResources|insufficient.*resources|resources.*insufficient",
             re.IGNORECASE,
         ),
         "lack of resources",
