@@ -120,33 +120,35 @@ def run_statevector_simulation(
         print("Circuit Depth:", qprog.transpiled_circuit.depth)
         print("Gate Counts:", qprog.transpiled_circuit.count_ops)
 
-    df = calculate_state_vector(qprog)
-    if filter_ancilla and "ancilla" in df.columns:
-        print("Filtering out states with ancilla qubits in state |1>...")
-        df = df[df["ancilla"] == 0]
+    if filter_ancilla:
+        df = calculate_state_vector(qprog, filters={"ancilla": 0})
+    else:
+        df = calculate_state_vector(qprog)
     df.sort_values(by="x", inplace=True)
 
     return df
 
 
 def run_standard_simulation(qfunc_to_run, show_circuit=False):
-    # Run a regular simulator
     qprog = synthesize(qfunc_to_run)
     if show_circuit:
         show(qprog)
-    job = execute(qprog)
-    # job.open_in_ide()
-    pc = job.get_sample_result().parsed_counts
-    df = job.get_sample_result().dataframe
+    n_shots = 2048
+    df = sample(qprog, num_shots=n_shots)
     df.sort_values(
         "counts", ascending=False, inplace=True
     )  # Verify that the most common state is first, as expected from a statevector simulation
 
-    return pc, df
+    return df
 
 
 # ****** Result Processing ******
 def state_to_gradient(value, p):
+    if type(value) == list:
+        result = []
+        for v in value:
+            result.append(state_to_gradient(v, p))
+        return result
     return value / (p.N / p.m)
 
 
@@ -184,14 +186,25 @@ def compute_success_rate(df, analytic_derivatives, p, tolerance=None):
     success_shots = 0
 
     for _, row in df.iterrows():
-        est = {name: state_to_gradient(row[name], p) for name in analytic_derivatives}
-
         correct = True
         for name, analytic_val in analytic_derivatives.items():
-            measured_val = est.get(name)
-            if measured_val is None or abs(measured_val - analytic_val) >= tolerance:
-                correct = False
-                break
+            measured_val = row[name]
+
+            if isinstance(analytic_val, list):
+                measured_val = state_to_gradient(measured_val, p)
+                if measured_val is None or any(
+                    abs(m - a) >= tolerance for m, a in zip(measured_val, analytic_val)
+                ):
+                    correct = False
+                    break
+            else:
+                measured_val = state_to_gradient(measured_val, p)
+                if (
+                    measured_val is None
+                    or abs(measured_val - analytic_val) >= tolerance
+                ):
+                    correct = False
+                    break
 
         if correct:
             success_shots += int(row["counts"])
@@ -200,35 +213,71 @@ def compute_success_rate(df, analytic_derivatives, p, tolerance=None):
     return success_rate, success_shots, total_shots
 
 
-def analyze_results(pc, df, p):
+def analyze_results(df, p):
     analytical_gradient = p.analytical_gradient(0)
 
-    # Print the results and compute the majority gradient
-    print("Parsed counts:", pc)
+    print("Parsed probabilities:", df.set_index("x").to_dict()["probability"])
     print(f"The analytical gradient is: {analytical_gradient}")
     majority_state = dict(df.iloc[0])
     majority_gradient = state_to_gradient(majority_state.get("x"), p)
     print(f"The majority gradient is: {majority_gradient}")
 
-    # Check if the majority result is correct within the resolution of the algorithm
     resolution = m / N
     is_correct = abs(majority_gradient - analytical_gradient) < resolution / 2
     print(f"The majority result is", "correct" if is_correct else "incorrect")
     print("####################################################")
 
-    # Compute the success rate of the algorithm, i.e. the percentage of shots that are correct within the resolution of the algorithm.
     success_rate, success_shots, total_shots = compute_success_rate(
         df, analytic_derivatives={"x": analytical_gradient}, p=p
     )
     print(f"Success rate: {success_rate:.2%} ({success_shots}/{total_shots} shots)")
     show_bar(success_rate)
 
-    # Visualize the theoretical values of the phases
-    # We used the standard simulation, so this is theoretical values only without the phases from the simulation
-    plot_theoretical()
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 7))
 
-    # Plot histogram of the results
-    plot_histogram(df, analytical_gradient=analytical_gradient)
+    x_array = np.arange(-N // 2, N // 2)
+    f_classical = f_normalized(x_array)
+    f_classical -= f_classical[N // 2]
+
+    plt.sca(ax1)
+    plot_classical()
+    ax1.plot(x_array, f_classical, "o", label="Theoretical values", markersize=8)
+    xmin, xmax = -N, N
+    ymin, ymax = -N // 2, N // 2
+    ax1.set_xlim(xmin, xmax)
+    ax1.set_ylim(ymin, ymax)
+    ax1.vlines(-N // 2, ymin, ymax, colors="lightgray", linestyles="dashed")
+    ax1.vlines(N // 2 - 1, ymin, ymax, colors="lightgray", linestyles="dashed")
+    ax1.hlines(-N / 4 + 0.5, xmin, xmax, colors="lightgray", linestyles="dashed")
+    ax1.hlines(N / 4, xmin, xmax, colors="lightgray", linestyles="dashed")
+    ax1.legend(fontsize=12)
+    ax1.set_title("Theoretical Phases", fontsize=14, fontweight="bold")
+    ax1.tick_params(labelsize=11)
+    ax1.set_xlabel("x (index)", fontsize=12)
+    ax1.set_ylabel("f (normalized)", fontsize=12)
+
+    plt.sca(ax2)
+    percentage = df["counts"] / df["counts"].sum() * 100
+    ax2.bar(df["x"], percentage, color="lightblue", label="Measurement counts")
+    ax2.set_xlabel("x (index)", fontsize=12)
+    ax2.set_ylabel("Percentage of shots (%)", fontsize=12)
+    ax2.set_xlim(-N // 2 - 1, N // 2)
+    ax2.set_ylim(0, 100)
+    ax2.set_title("Measurement Histogram", fontsize=14, fontweight="bold")
+    ax2.tick_params(labelsize=11)
+    if analytical_gradient is not None:
+        x_analytic = analytical_gradient * (N / m)
+        ax2.axvline(
+            x=x_analytic,
+            color="green",
+            linestyle="dashed",
+            label="Analytical gradient",
+            linewidth=2,
+        )
+    ax2.legend(fontsize=12)
+
+    plt.tight_layout()
+    plt.show()
 
 
 # ****** Plotting ******
