@@ -8,7 +8,7 @@ from testbook.client import TestbookNotebookClient
 @wrap_testbook("glued_trees", timeout_seconds=500)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     actual_widths = [10, 20]
-    actual_depths = [779, 1314]
+    actual_depths = [1532, 2626]
 
     for qprog, e_width, e_depth in zip(
         tb.ref_pydantic("qprogs"), actual_widths, actual_depths
