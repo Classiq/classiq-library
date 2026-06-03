@@ -30,14 +30,40 @@ qfunc prepare_gaussian_state_expanded___0(t: qbit[4]) {
   ], 0, t);
 }
 
-qfunc hamiltonian_simulation_expanded___0(hamiltonian: PauliTerm[], time: real, state: qbit[2]) {
-  suzuki_trotter(hamiltonian, time, 1, 1, state);
+qfunc hamiltonian_simulation_expanded___0(time: real, state: qbit[2]) {
+  suzuki_trotter(SparsePauliOp {
+    terms=[
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=0
+          },
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          }
+        ],
+        coefficient=1.0
+      },
+      SparsePauliTerm {
+        paulis=[
+          IndexedPauli {
+            pauli=Pauli::Z,
+            index=1
+          }
+        ],
+        coefficient=1.0
+      }
+    ],
+    num_qubits=2
+  }, time, 1, 1, state);
 }
 
-qfunc controlled_hamiltonian_simulation_expanded___0(hamiltonian: PauliTerm[], t0: real, ctrl: qbit[4], state: qbit[2]) {
+qfunc controlled_hamiltonian_simulation_expanded___0(t0: real, ctrl: qbit[4], state: qbit[2]) {
   repeat (i: 4) {
     control (ctrl[i]) {
-      hamiltonian_simulation_expanded___0(hamiltonian, (2 ** i) * t0, state);
+      hamiltonian_simulation_expanded___0((2 ** i) * t0, state);
     }
   }
 }
@@ -102,10 +128,10 @@ qfunc qft_expanded___0(target: qbit[4]) {
   qft_no_swap_expanded___0(target);
 }
 
-qfunc operator_fourier_transform_expanded___0(hamiltonian: PauliTerm[], t0: real, state: qbit[2], bohr_freq: qnum<4, True, 0>, be___block___jump_captured__block_encode_linbladian__2: qnum<2, False, 0>) {
+qfunc operator_fourier_transform_expanded___0(t0: real, state: qbit[2], bohr_freq: qnum<4, True, 0>, be___block___jump_captured__block_encode_linbladian__2: qnum<2, False, 0>) {
   prepare_gaussian_state_expanded___0(bohr_freq);
   within {
-    controlled_hamiltonian_simulation_expanded___0(hamiltonian, t0, bohr_freq, state);
+    controlled_hamiltonian_simulation_expanded___0(t0, bohr_freq, state);
   } apply {
     operator_0_lambda___0_0_expanded___0(state, be___block___jump_captured__block_encode_linbladian__2);
   }
@@ -140,8 +166,8 @@ qfunc apply_boltzmann_weight_expanded___0(bohr_freq: qnum<4, True, 0>, boltzmann
   X(boltzmann_weight);
 }
 
-qfunc block_encode_linbladian_expanded___0(hamiltonian: PauliTerm[], be: BlockEncodedLinbladianState) {
-  operator_fourier_transform_expanded___0(hamiltonian, 0.2 * pi, be.state, be.block.bohr_freq, be.block.jump);
+qfunc block_encode_linbladian_expanded___0(be: BlockEncodedLinbladianState) {
+  operator_fourier_transform_expanded___0(0.2 * pi, be.state, be.block.bohr_freq, be.block.jump);
   apply_boltzmann_weight_expanded___0(be.block.bohr_freq, be.block.boltzmann_weight);
 }
 
@@ -165,14 +191,14 @@ qfunc reset_var_expanded___1(qvar: qbit[1]) {
   apply_to_all_expanded___1(qvar);
 }
 
-qfunc delta_step_expanded___0(hamiltonian: PauliTerm[], delta: real, delta_qbit: qbit, be: BlockEncodedLinbladianState) {
-  block_encode_linbladian_expanded___0(hamiltonian, be);
+qfunc delta_step_expanded___0(delta: real, delta_qbit: qbit, be: BlockEncodedLinbladianState) {
+  block_encode_linbladian_expanded___0(be);
   control (not be.block.boltzmann_weight) {
     RY(asin(2 * sqrt(delta)), delta_qbit);
   }
   control (not delta_qbit) {
     invert {
-      block_encode_linbladian_expanded___0(hamiltonian, be);
+      block_encode_linbladian_expanded___0(be);
     }
   }
   reset_var_expanded___0(be.block);
@@ -184,16 +210,7 @@ qfunc main(output be: BlockEncodedLinbladianState) {
   allocate(9, be);
   allocate(1, delta_qbit);
   repeat (i: 50) {
-    delta_step_expanded___0([
-      PauliTerm {
-        pauli=[Pauli::Z, Pauli::Z],
-        coefficient=1
-      },
-      PauliTerm {
-        pauli=[Pauli::Z, Pauli::I],
-        coefficient=1
-      }
-    ], 0.1, delta_qbit, be);
+    delta_step_expanded___0(0.1, delta_qbit, be);
   }
   drop(delta_qbit);
 }
