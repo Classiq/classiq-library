@@ -46,6 +46,10 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
         "timeout",
     ),
     (
+        re.compile(r"\b429\b|rate.?limit", re.IGNORECASE),
+        "API error 429",
+    ),
+    (
         re.compile(r"HTTP.*4\d\d|404|broken.*link|link.*broken", re.IGNORECASE),
         "broken link",
     ),
