@@ -159,14 +159,14 @@ def _format_summary(
     sorted_categories = sorted(by_category.items(), key=lambda x: -len(x[1]))
 
     for category, items in sorted_categories:
+        lines.append(f"  - {category}:")
         if any(detail for _, detail in items):
-            lines.append(f"  - {category}:")
             for notebook, detail in items:
                 suffix = f" ({detail})" if detail else ""
                 lines.append(f"    - {notebook}{suffix}")
         else:
-            notebooks = ", ".join(nb for nb, _ in items)
-            lines.append(f"  - {category}: {notebooks}")
+            for notebook, _ in items:
+                lines.append(f"    - {notebook}")
 
     return "\n".join(lines)
 
