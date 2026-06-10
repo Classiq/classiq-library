@@ -16,7 +16,7 @@ MARKED_STATE = 5
 def num_grover_iterations(problem_size):
     N = 2**problem_size
     theta = np.arcsin(1 / np.sqrt(N))
-    r = np.floor(np.pi / (4 * theta) - 0.5)
+    r = np.floor(np.pi / (4 * theta) - 0.5).astype(int)
     P_success = np.sin((2 * r + 1) * theta) ** 2
     return r, P_success
 
