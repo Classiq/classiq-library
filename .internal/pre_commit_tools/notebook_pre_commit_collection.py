@@ -8,8 +8,6 @@ from collections import Counter
 from collections.abc import Iterable
 from pathlib import Path
 
-import yaml
-
 PROJECT_ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
 
 
