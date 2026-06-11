@@ -158,15 +158,19 @@ def _format_summary(
     # Most frequent categories first
     sorted_categories = sorted(by_category.items(), key=lambda x: -len(x[1]))
 
+    # We use 4-space as indentation, instead of 2, since copy-pasting into slack's `markup` ignores 2-spaces indentation.
+    # Thus, in order to create an indented bullet list in slack, we need the "raw" text to have 4-space indentations (or tabs)
+    _i = "    "  # indentation: 4 spaces
+
     for category, items in sorted_categories:
-        lines.append(f"  - {category}:")
+        lines.append(f"{_i}- {category}:")
         if any(detail for _, detail in items):
             for notebook, detail in items:
                 suffix = f" ({detail})" if detail else ""
-                lines.append(f"    - {notebook}{suffix}")
+                lines.append(f"{_i}{_i}- {notebook}{suffix}")
         else:
             for notebook, _ in items:
-                lines.append(f"    - {notebook}")
+                lines.append(f"{_i}{_i}- {notebook}")
 
     return "\n".join(lines)
 
