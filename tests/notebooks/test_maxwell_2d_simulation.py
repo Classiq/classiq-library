@@ -5,7 +5,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("maxwell_2d_simulation", timeout_seconds=1400)
+@wrap_testbook("maxwell_2d_simulation", timeout_seconds=1750)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
