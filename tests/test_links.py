@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 _DOMAINS_BLOCKING_CI: dict[str, list[int]] = {
     "https://en.wikipedia.org/": [403],
-    "https://arxiv.org/": [406],
     "https://pytorch.org/": [403],
     "https://quantum-journal.org/": [403],
+    "https://theoryofcomputing.org/": [403],
     "https://doi.org/10.22331/": [403, 302],
 }
 
