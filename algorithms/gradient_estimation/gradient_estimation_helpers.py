@@ -109,43 +109,6 @@ class params:
             namespace.update(vals)
 
 
-def make_phase_oracle(
-    f: Callable,
-    l: float,
-    m: float,
-    N: int,
-    x0: float = 0.0,
-    d: int = 1,
-) -> Callable:
-    """Return a @qfunc phase oracle that applies phase(f_norm(reg), 2*pi).
-
-    The oracle encodes the normalized function value as a phase:
-        f_norm(reg) = f(l/N * reg - x0) * N / (l * m)
-
-    Args:
-        f:   Symbolic Python callable representing the mathematical function.
-        l:   Sampling interval half-width.
-        m:   Gradient magnitude bound (output range).
-        N:   Number of sample points (2^n).
-        x0:  Evaluation point; shifts the sampling window.
-        d:   Dimensionality of the function.
-    """
-    if d == 1:
-
-        @qfunc
-        def phase_oracle(reg: QNum) -> None:
-            phase(f(l / N * reg - x0) * N / (l * m), 2 * pi)
-
-    else:
-
-        @qfunc
-        def phase_oracle(coords: QArray[QNum]) -> None:
-            args = [l / N * coords[i] - x0 for i in range(d)]
-            phase(f(*args) * N / (l * m), 2 * pi)
-
-    return phase_oracle
-
-
 # ****** Simulation ******
 def run_statevector_simulation(
     qfunc_to_run, print_circuit_info=False, filter_ancilla=False, show_circuit=False
@@ -392,7 +355,7 @@ def plot_simplified_df(simplified_df, show=True):
     plt.plot(
         simplified_df.index,
         simplified_df["phase_over_2pi"],
-        "o",
+        ".",
         label="Measured phases",
     )
     plt.legend()
