@@ -10,7 +10,9 @@ def all_test_file_names() -> list[str]:
     return [i.name for i in TESTS_FOLDER.rglob("test_*.py")]
 
 
-@pytest.mark.parametrize("notebook_name", map(os.path.basename, get_all_notebooks()))
+@pytest.mark.parametrize(
+    "notebook_name", [os.path.basename(nb) for nb in get_all_notebooks()]
+)
 def test_is_notebook_tested(notebook_name: str, all_test_file_names: list[str]):
     if not _should_skip_notebook(notebook_name):
         expected_test_name = f"test_{notebook_name[:-6]}.py"  # [:-6] removes ".ipynb"
