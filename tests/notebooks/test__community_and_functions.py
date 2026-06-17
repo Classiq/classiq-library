@@ -32,7 +32,7 @@ def cwd(path):
 
 
 @pytest.mark.parametrize(
-    "notebook_path", filter(_should_test_notebook, iterate_notebooks())
+    "notebook_path", [nb for nb in iterate_notebooks() if _should_test_notebook(nb)]
 )
 def test_notebooks(notebook_path: str) -> None:
     with cwd(os.path.dirname(notebook_path)):

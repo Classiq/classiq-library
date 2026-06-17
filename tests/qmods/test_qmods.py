@@ -22,7 +22,7 @@ def all_qmods_params() -> Iterator[ParameterSet]:
     if os.environ.get("SHOULD_TEST_ALL_FILES", "") != "true":
         iterator = filter(_should_test_file, iterator)
 
-    return (pytest.param(qmod_file, id=qmod_file.name) for qmod_file in iterator)
+    return [pytest.param(qmod_file, id=qmod_file.name) for qmod_file in iterator]
 
 
 @pytest.mark.parametrize("qmod_file", all_qmods_params())
