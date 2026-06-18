@@ -59,8 +59,28 @@ def references_heading_is_plural(nb: nbformat.NotebookNode, auto_fix: bool) -> s
     return f"singular heading {found} — use the plural 'References'"
 
 
+_OLD_RESULT_PARSE = re.compile(r"\.result\(\)\s*\[\s*0\s*\]\s*\.value")
+
+
+def results_use_result_value(nb: nbformat.NotebookNode, auto_fix: bool) -> str:
+    """Parse execution results via `.result_value()`, not `.result()[0].value`."""
+    count = 0
+    for cell in nb.cells:
+        if cell.cell_type != "code":
+            continue
+        if not (hits := len(_OLD_RESULT_PARSE.findall(cell.source))):
+            continue
+        count += hits
+        if auto_fix:
+            cell.source = _OLD_RESULT_PARSE.sub(".result_value()", cell.source)
+    if not count:
+        return NO_ERROR
+    return f".result()[0].value should be .result_value() ({count} occurrence(s))"
+
+
 UNIFORMITY_RULES: list[UniformityRule] = [
     references_heading_is_plural,
+    results_use_result_value,
 ]
 
 
