@@ -117,3 +117,12 @@ repos:
         language: python
         files: \.ipynb$
         require_serial: true
+      - id: notebook-uniformity
+        name: Enforce notebook uniformity
+        description: Auto-fix simple uniformity conventions (e.g. plural "References" heading)
+        entry: .internal/pre_commit_tools/notebook_uniformity.py
+        language: python
+        files: \.ipynb$
+        additional_dependencies:
+          - "nbformat"
+        require_serial: true
