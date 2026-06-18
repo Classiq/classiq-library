@@ -78,9 +78,29 @@ def results_use_result_value(nb: nbformat.NotebookNode, auto_fix: bool) -> str:
     return f".result()[0].value should be .result_value() ({count} occurrence(s))"
 
 
+_CIRCUIT_SHOW_METHOD = re.compile(r"\b(qprog\w*|quantum_program\w*|qp)\.show\(\)")
+
+
+def show_uses_function_form(nb: nbformat.NotebookNode, auto_fix: bool) -> str:
+    """Show a circuit with show(qprog), not the qprog.show() method form."""
+    count = 0
+    for cell in nb.cells:
+        if cell.cell_type != "code":
+            continue
+        if not (hits := _CIRCUIT_SHOW_METHOD.findall(cell.source)):
+            continue
+        count += len(hits)
+        if auto_fix:
+            cell.source = _CIRCUIT_SHOW_METHOD.sub(r"show(\1)", cell.source)
+    if not count:
+        return NO_ERROR
+    return f"qprog.show() should be show(qprog) ({count} occurrence(s))"
+
+
 UNIFORMITY_RULES: list[UniformityRule] = [
     references_heading_is_plural,
     results_use_result_value,
+    show_uses_function_form,
 ]
 
 
