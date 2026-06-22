@@ -370,6 +370,80 @@
     .code-footer-note { font-size: 12px; color: var(--text-dim); }
     .code-footer-note a { color: var(--accent-lt); text-decoration: none; }
     .code-footer-note a:hover { text-decoration: underline; }
+
+    /* ── Copy button ────────────────────────────────────────────────── */
+    .copy-btn {
+      background: var(--surface2); border: 1.5px solid var(--border);
+      color: var(--text-dim); border-radius: 6px;
+      padding: 5px 12px; font-size: 11px; font-weight: 600;
+      cursor: pointer; letter-spacing: .4px;
+      transition: color .15s, border-color .15s;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--accent-lt); }
+    .copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+    /* ── Screen fade transitions ────────────────────────────────────── */
+    .screen {
+      opacity: 0;
+      transition: opacity .25s ease;
+      pointer-events: none;
+    }
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── Truck-pop animation (canvas flash overlay) ─────────────────── */
+    @keyframes truck-pop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    #game-canvas.pop { animation: truck-pop .18s ease-out; }
+
+    /* ── Perfect score celebration ───────────────────────────────────── */
+    #confetti-canvas {
+      position: fixed; inset: 0; pointer-events: none;
+      z-index: 300; display: none;
+    }
+
+    /* ── Intro animated grid background ─────────────────────────────── */
+    #intro-bg {
+      position: absolute; inset: 0; overflow: hidden;
+      pointer-events: none; z-index: 0;
+    }
+    .intro-content { position: relative; z-index: 1; display: contents; }
+
+    /* ── Mobile layout ───────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      body { overflow: auto; }
+      .screen { height: auto; min-height: 100vh; }
+
+      #game-screen { flex-direction: column; }
+      #canvas-area { min-height: 55vw; }
+      #game-panel  {
+        width: 100%; min-width: unset;
+        border-left: none; border-top: 1.5px solid var(--border);
+        flex-direction: row; flex-wrap: wrap; gap: 12px; padding: 14px 16px;
+      }
+      #game-panel .divider    { display: none; }
+      #game-panel .stat-block { flex: 1; min-width: 120px; }
+      #game-panel .instructions { display: none; }
+      #game-panel .panel-actions { width: 100%; flex-direction: row; }
+      #game-panel .panel-scenario-tag,
+      #game-panel .panel-scenario-name,
+      #game-panel .panel-scenario-desc { display: none; }
+
+      .results-inner { flex-direction: column; align-items: center; }
+      .results-right { width: 100%; }
+      #results-canvas { max-width: 100%; }
+
+      .intro-title { font-size: 26px; }
+      .scenario-cards { flex-direction: column; align-items: center; }
+      .scenario-card  { width: min(320px, 90vw); }
+
+      .code-modal { max-height: 92vh; }
+    }
   </style>
 </head>
 <body>
@@ -523,7 +597,10 @@
         <div class="code-header-title">⚛ Quantum Solution — Classiq Qmod</div>
         <div class="code-header-sub" id="code-header-sub"></div>
       </div>
-      <button class="code-close" id="code-close-btn">✕</button>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="copy-btn" id="copy-code-btn">Copy code</button>
+        <button class="code-close" id="code-close-btn">✕</button>
+      </div>
     </div>
     <div class="code-explainer" id="code-explainer"></div>
     <div class="code-body">
@@ -542,6 +619,7 @@
   </div>
 </div>
 
+<canvas id="confetti-canvas"></canvas>
 <div id="toast"></div>
 
 <script>
@@ -1051,6 +1129,10 @@ function toggleTruck(posIdx) {
   state.placement[posIdx] ^= 1;
   updateStatsUI();
   renderCity(gctx, gameCanvas, state.scenario, state.placement, null, state.hoveredPos);
+  // Brief canvas pop for tactile feedback
+  gameCanvas.classList.remove('pop');
+  requestAnimationFrame(() => gameCanvas.classList.add('pop'));
+  gameCanvas.addEventListener('animationend', () => gameCanvas.classList.remove('pop'), {once: true});
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1059,7 +1141,10 @@ function toggleTruck(posIdx) {
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  // Small rAF delay so transition fires after display:flex kicks in
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => document.getElementById(id).classList.add('active'));
+  });
 }
 
 function startScenario(sc) {
@@ -1102,14 +1187,16 @@ function submitPlacement() {
   state.phase         = 'scored';
   state.showOptimal   = false;
 
-  // ── Score ring ──
-  const ring = document.getElementById('score-ring-fill');
-  const circ = 2 * Math.PI * 50;
-  let ringColor = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
+  // ── Score ring (animates after screen transition) ──
+  const ring      = document.getElementById('score-ring-fill');
+  const circ      = 2 * Math.PI * 50;
+  const ringColor = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
   ring.style.stroke = ringColor;
-  ring.style.strokeDashoffset = circ * (1 - score/100);
-  document.getElementById('score-num').textContent = score + '%';
-  document.getElementById('score-big').textContent = score + '%';
+  // Start from 0, animate to final
+  ring.style.transition = 'none';
+  ring.style.strokeDashoffset = circ;
+  document.getElementById('score-num').textContent = '0%';
+  document.getElementById('score-big').textContent = '0%';
   document.getElementById('score-big').style.color = ringColor;
 
   // ── Message ──
@@ -1143,16 +1230,55 @@ function submitPlacement() {
   renderCity(rctx, resultsCanvas, sc, state.placement, null, null);
 
   showScreen('results-screen');
+  // Animate score counter 400ms after screen appears
+  setTimeout(() => animateScore(score, ring, circ, ringColor), 400);
+  if (score === 100) setTimeout(launchConfetti, 800);
+}
+
+function animateScore(finalScore, ring, circ, ringColor) {
+  const numEl = document.getElementById('score-num');
+  const bigEl = document.getElementById('score-big');
+  const dur   = 1100; // ms
+  const start = performance.now();
+  ring.style.transition = 'none';
+
+  function step(now) {
+    const t      = Math.min(1, (now - start) / dur);
+    const eased  = 1 - Math.pow(1 - t, 3);         // ease-out cubic
+    const cur    = Math.round(finalScore * eased);
+    numEl.textContent              = cur + '%';
+    bigEl.textContent              = cur + '%';
+    ring.style.strokeDashoffset   = circ * (1 - cur / 100);
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 function revealOptimal() {
-  const sc = state.scenario;
-  state.showOptimal = true;
+  const sc  = state.scenario;
+  const btn = document.getElementById('show-optimal-btn');
+  btn.disabled = true;
   document.getElementById('legend-optimal').style.display = 'flex';
-  renderCity(rctx, resultsCanvas, sc, state.placement, sc.optimal_placement, null);
-  document.getElementById('show-optimal-btn').textContent = '✓ Quantum Solution Revealed';
-  document.getElementById('show-optimal-btn').style.background = 'var(--success)';
-  document.getElementById('show-optimal-btn').disabled = true;
+
+  // Reveal trucks one-by-one in order of traffic (highest first)
+  const optIndices = sc.positions
+    .map((_, i) => i)
+    .filter(i => sc.optimal_placement[i] === 1)
+    .sort((a, b) => sc.traffic[b] - sc.traffic[a]);
+
+  const tempReveal = new Array(sc.positions.length).fill(0);
+
+  optIndices.forEach((idx, step) => {
+    setTimeout(() => {
+      tempReveal[idx] = 1;
+      renderCity(rctx, resultsCanvas, sc, state.placement, [...tempReveal], null);
+      if (step === optIndices.length - 1) {
+        state.showOptimal = true;
+        btn.textContent = '✓ Quantum Solution Revealed';
+        btn.style.background = 'var(--success)';
+      }
+    }, step * 220);
+  });
 }
 
 function showCode() {
@@ -1275,12 +1401,29 @@ document.getElementById('back-btn').addEventListener('click', () => showScreen('
 document.getElementById('play-again-btn').addEventListener('click', () => showScreen('intro-screen'));
 document.getElementById('show-optimal-btn').addEventListener('click', revealOptimal);
 document.getElementById('show-code-btn').addEventListener('click', showCode);
-document.getElementById('code-close-btn').addEventListener('click', () => {
-  document.getElementById('code-overlay').classList.remove('active');
-});
+
+const closeOverlay = () => document.getElementById('code-overlay').classList.remove('active');
+document.getElementById('code-close-btn').addEventListener('click', closeOverlay);
 document.getElementById('code-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('code-overlay'))
-    document.getElementById('code-overlay').classList.remove('active');
+  if (e.target === document.getElementById('code-overlay')) closeOverlay();
+});
+
+// Copy code to clipboard
+document.getElementById('copy-code-btn').addEventListener('click', function() {
+  if (!state.scenario) return;
+  navigator.clipboard.writeText(state.scenario.display_code).then(() => {
+    this.textContent = '✓ Copied!';
+    this.classList.add('copied');
+    setTimeout(() => {
+      this.textContent = 'Copy code';
+      this.classList.remove('copied');
+    }, 2000);
+  }).catch(() => showToast('Copy not available in this browser'));
+});
+
+// ESC closes code overlay
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeOverlay();
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1325,7 +1468,49 @@ function buildIntroCards() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 11. INIT
+// 11. CONFETTI  (perfect score celebration)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function launchConfetti() {
+  const cv  = document.getElementById('confetti-canvas');
+  const ctx = cv.getContext('2d');
+  cv.width  = window.innerWidth;
+  cv.height = window.innerHeight;
+  cv.style.display = 'block';
+
+  const COLORS = ['#A78BFA','#7C3AED','#10B981','#FFD700','#818CF8','#F472B6'];
+  const particles = Array.from({length: 120}, () => ({
+    x:  Math.random() * cv.width,
+    y: -10 - Math.random() * 80,
+    vx: (Math.random() - .5) * 3,
+    vy: 2 + Math.random() * 3,
+    r:  3 + Math.random() * 4,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    angle: Math.random() * Math.PI * 2,
+    spin:  (Math.random() - .5) * .15,
+  }));
+
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += .05; p.angle += p.spin;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.r, -p.r * .5, p.r * 2, p.r);
+      ctx.restore();
+    });
+    frame++;
+    if (frame < 140) requestAnimationFrame(draw);
+    else { ctx.clearRect(0, 0, cv.width, cv.height); cv.style.display = 'none'; }
+  }
+  requestAnimationFrame(draw);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 12. INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
 buildIntroCards();
