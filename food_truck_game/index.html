@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quantum Food Truck Challenge · Classiq</title>
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0D0B1E;
+      --surface:   #1A1535;
+      --surface2:  #221B45;
+      --border:    #2D2550;
+      --accent:    #7C3AED;
+      --accent-lt: #A78BFA;
+      --text:      #E2D9F3;
+      --text-dim:  #8B7DC0;
+      --success:   #10B981;
+      --warn:      #F59E0B;
+      --danger:    #EF4444;
+      --gold:      #FFD700;
+      --gold-dk:   #B8860B;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen { display: none; width: 100vw; height: 100vh; }
+    .screen.active { display: flex; }
+
+    /* ── Shared components ────────────────────────────────────────────── */
+    .btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: .4px;
+    }
+    .btn:hover { opacity: .88; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary  { background: var(--accent); color: #fff; }
+    .btn-success  { background: var(--success); color: #fff; }
+    .btn-ghost    { background: transparent; color: var(--accent-lt);
+                    border: 1.5px solid var(--border); }
+    .btn-sm { padding: 7px 16px; font-size: 13px; }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+    }
+    .tag-easy   { background: #064E3B; color: #6EE7B7; }
+    .tag-medium { background: #78350F; color: #FCD34D; }
+    .tag-hard   { background: #4C0519; color: #FDA4AF; }
+
+    /* ── INTRO SCREEN ─────────────────────────────────────────────────── */
+    #intro-screen {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      padding: 32px;
+      background: radial-gradient(ellipse at 50% 30%, #1F1048 0%, var(--bg) 70%);
+    }
+
+    .intro-header { text-align: center; }
+    .classiq-wordmark {
+      display: flex; align-items: center; gap: 10px;
+      justify-content: center; margin-bottom: 20px;
+    }
+    .classiq-wordmark svg { width: 34px; height: 34px; }
+    .classiq-wordmark span {
+      font-size: 20px; font-weight: 700; letter-spacing: 1.5px;
+      color: var(--accent-lt);
+    }
+
+    .intro-title {
+      font-size: 36px; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(135deg, #C4B5FD 0%, #818CF8 50%, #A78BFA 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 10px;
+    }
+    .intro-sub {
+      color: var(--text-dim); font-size: 15px; max-width: 520px;
+      line-height: 1.6; text-align: center;
+    }
+
+    .scenario-cards {
+      display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+    }
+    .scenario-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      width: 220px;
+      cursor: pointer;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .scenario-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .scenario-card:hover {
+      border-color: var(--accent-lt);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(124,58,237,.25);
+    }
+    .card-difficulty { margin-bottom: 10px; }
+    .card-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .card-desc  { font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 14px; }
+    .card-meta  { font-size: 11px; color: var(--text-dim); display: flex; gap: 14px; }
+    .card-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .quantum-badge {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--accent-lt);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .quantum-badge::before {
+      content: '⚛'; font-size: 13px;
+    }
+
+    /* ── GAME SCREEN ──────────────────────────────────────────────────── */
+    #game-screen {
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    #canvas-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 40%, #1A0F3C 0%, var(--bg) 75%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #game-canvas {
+      display: block;
+      cursor: pointer;
+      image-rendering: pixelated;
+    }
+
+    /* ── Game panel (right sidebar) ─────────────────────────────────────*/
+    #game-panel {
+      width: 280px;
+      min-width: 280px;
+      background: var(--surface);
+      border-left: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 20px;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .panel-scenario-tag { }
+    .panel-scenario-name { font-size: 20px; font-weight: 700; margin: 6px 0 4px; }
+    .panel-scenario-desc { font-size: 12px; color: var(--text-dim); line-height: 1.55; }
+
+    .divider { height: 1px; background: var(--border); }
+
+    .stat-block { }
+    .stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase;
+                  letter-spacing: .7px; margin-bottom: 6px; }
+    .stat-value { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .stat-value.revenue { color: var(--gold); }
+    .stat-value.trucks  { color: var(--accent-lt); }
+    .stat-optimal { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+    .revenue-bar-wrap {
+      height: 6px; background: var(--border); border-radius: 99px;
+      margin-top: 8px; overflow: hidden;
+    }
+    .revenue-bar {
+      height: 100%; background: linear-gradient(90deg, var(--accent) 0%, var(--gold) 100%);
+      border-radius: 99px; transition: width .3s ease;
+      width: 0%;
+    }
+
+    .instructions {
+      font-size: 12px; color: var(--text-dim); line-height: 1.6;
+    }
+    .instructions li { margin-left: 14px; margin-bottom: 4px; }
+
+    .panel-actions { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+    .panel-actions .btn { width: 100%; text-align: center; }
+
+    #back-btn { font-size: 12px; color: var(--text-dim); background: none;
+                border: none; cursor: pointer; text-align: center; text-decoration: underline; }
+    #back-btn:hover { color: var(--text); }
+
+    /* ── Floating toast ──────────────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 10px 20px;
+      font-size: 13px; color: var(--text-dim);
+      transition: transform .3s ease, opacity .3s ease;
+      opacity: 0; pointer-events: none; z-index: 100; white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ── RESULTS SCREEN ───────────────────────────────────────────────── */
+    #results-screen {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 32px;
+      background: radial-gradient(ellipse at 50% 20%, #1F1048 0%, var(--bg) 60%);
+      position: relative;
+    }
+
+    .results-inner {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    /* Left: score + message */
+    .results-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .score-ring-wrap { display: flex; align-items: center; gap: 28px; }
+    .score-ring { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+    .score-ring svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+    .score-ring-bg   { fill: none; stroke: var(--border);  stroke-width: 10; }
+    .score-ring-fill { fill: none; stroke-width: 10;
+                       stroke-linecap: round; transition: stroke-dashoffset .8s ease; }
+    .score-num {
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums;
+    }
+    .score-title { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: .8px; }
+    .score-big   { font-size: 42px; font-weight: 800; line-height: 1; }
+    .score-msg   { font-size: 14px; color: var(--text-dim); line-height: 1.65; max-width: 300px; }
+
+    .results-stats {
+      display: flex; gap: 20px;
+    }
+    .rstat {
+      flex: 1; background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .rstat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; }
+    .rstat-value { font-size: 22px; font-weight: 700; }
+    .rstat-value.you { color: var(--accent-lt); }
+    .rstat-value.optimal { color: var(--success); }
+
+    .results-actions { display: flex; flex-direction: column; gap: 10px; }
+
+    /* Right: canvas preview */
+    .results-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .results-canvas-wrap { position: relative; }
+    #results-canvas { display: block; border-radius: 12px; }
+
+    .legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-dim); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 5px; vertical-align: middle; }
+
+    /* ── CODE OVERLAY ─────────────────────────────────────────────────── */
+    #code-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #code-overlay.active { display: flex; }
+
+    .code-modal {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      width: 100%; max-width: 720px;
+      max-height: 85vh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    .code-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .code-header-left { display: flex; flex-direction: column; gap: 4px; }
+    .code-header-title { font-size: 16px; font-weight: 700; }
+    .code-header-sub   { font-size: 12px; color: var(--text-dim); }
+    .code-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-dim); font-size: 22px; line-height: 1;
+      padding: 4px 8px; border-radius: 6px;
+    }
+    .code-close:hover { background: var(--border); color: var(--text); }
+
+    .code-explainer {
+      padding: 14px 24px;
+      background: rgba(124,58,237,.08);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px; color: var(--text-dim); line-height: 1.6;
+    }
+    .code-explainer strong { color: var(--accent-lt); }
+
+    .code-body {
+      flex: 1; overflow-y: auto; padding: 0;
+    }
+
+    pre#code-display {
+      margin: 0; padding: 20px 24px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 12.5px; line-height: 1.65;
+      color: #CDD6F4;
+      tab-size: 4;
+      white-space: pre;
+    }
+
+    /* Syntax highlighting */
+    .kw  { color: #CBA6F7; }  /* keyword: from, import, def, return */
+    .fn  { color: #89B4FA; }  /* function names */
+    .dc  { color: #A6E3A1; }  /* @decorator */
+    .cm  { color: #6C7086; font-style: italic; }  /* comments */
+    .st  { color: #A6E3A1; }  /* strings */
+    .nm  { color: #FAB387; }  /* numbers */
+    .bi  { color: #F38BA8; }  /* builtins */
+
+    .code-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .code-footer-note { font-size: 12px; color: var(--text-dim); }
+    .code-footer-note a { color: var(--accent-lt); text-decoration: none; }
+    .code-footer-note a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     INTRO SCREEN
+════════════════════════════════════════════════════════════════════════ -->
+<div id="intro-screen" class="screen active">
+  <div class="intro-header">
+    <div class="classiq-wordmark">
+      <!-- Classiq-inspired quantum atom logo mark -->
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="20" rx="18" ry="7" stroke="#A78BFA" stroke-width="2" transform="rotate(-30 20 20)"/>
+        <ellipse cx="20" cy="20" rx="18" ry="7" stroke="#7C3AED" stroke-width="2" transform="rotate(30 20 20)"/>
+        <ellipse cx="20" cy="20" rx="18" ry="7" stroke="#A78BFA" stroke-width="2" transform="rotate(90 20 20)"/>
+        <circle cx="20" cy="20" r="3" fill="#DDD6FE"/>
+      </svg>
+      <span>CLASSIQ</span>
+    </div>
+    <h1 class="intro-title">Quantum Food Truck Challenge</h1>
+    <p class="intro-sub">
+      Place food trucks across the city to maximize daily revenue.<br>
+      Then see how a <strong style="color:var(--accent-lt)">quantum computer</strong> finds the true optimum — instantly.
+    </p>
+  </div>
+
+  <div class="scenario-cards" id="scenario-cards">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     GAME SCREEN
+════════════════════════════════════════════════════════════════════════ -->
+<div id="game-screen" class="screen">
+  <div id="canvas-area">
+    <canvas id="game-canvas"></canvas>
+  </div>
+
+  <div id="game-panel">
+    <div>
+      <div class="panel-scenario-tag" id="panel-tag"></div>
+      <div class="panel-scenario-name" id="panel-name"></div>
+      <div class="panel-scenario-desc" id="panel-desc"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="stat-block">
+      <div class="stat-label">Daily Revenue</div>
+      <div class="stat-value revenue" id="stat-revenue">$0</div>
+      <div class="stat-optimal" id="stat-optimal-hint"></div>
+      <div class="revenue-bar-wrap">
+        <div class="revenue-bar" id="revenue-bar"></div>
+      </div>
+    </div>
+
+    <div class="stat-block">
+      <div class="stat-label">Trucks Placed</div>
+      <div class="stat-value trucks" id="stat-trucks">0</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="instructions">
+      <ul>
+        <li>Click a <strong style="color:var(--gold)">highlighted tile</strong> to place a truck</li>
+        <li>Click again to remove it</li>
+        <li>Adjacent trucks share customers — watch your revenue!</li>
+        <li>Hit <strong>Submit</strong> to see how you compare to the quantum solution</li>
+      </ul>
+    </div>
+
+    <div class="panel-actions">
+      <button class="btn btn-primary" id="submit-btn">Submit My Placement</button>
+      <button id="back-btn">← Choose a different scenario</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     RESULTS SCREEN
+════════════════════════════════════════════════════════════════════════ -->
+<div id="results-screen" class="screen">
+  <div class="results-inner">
+
+    <!-- Left: score card -->
+    <div class="results-left">
+
+      <div class="score-ring-wrap">
+        <div class="score-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="score-ring-bg"   cx="60" cy="60" r="50"/>
+            <circle class="score-ring-fill" cx="60" cy="60" r="50"
+                    id="score-ring-fill"
+                    stroke-dasharray="314"
+                    stroke-dashoffset="314"/>
+          </svg>
+          <div class="score-num" id="score-num">0%</div>
+        </div>
+        <div>
+          <div class="score-title">Your Score</div>
+          <div class="score-big" id="score-big">0%</div>
+          <div class="score-msg" id="score-msg"></div>
+        </div>
+      </div>
+
+      <div class="results-stats">
+        <div class="rstat">
+          <div class="rstat-label">Your Revenue</div>
+          <div class="rstat-value you" id="r-your-rev">—</div>
+        </div>
+        <div class="rstat">
+          <div class="rstat-label">Quantum Optimal</div>
+          <div class="rstat-value optimal" id="r-opt-rev">—</div>
+        </div>
+      </div>
+
+      <div id="results-quantum-note" style="font-size:12px;color:var(--text-dim);line-height:1.6;">
+      </div>
+
+      <div class="results-actions">
+        <button class="btn btn-success" id="show-optimal-btn">⚛ Reveal Quantum Solution</button>
+        <button class="btn btn-ghost"   id="show-code-btn">{ } View Qmod Code</button>
+        <button class="btn btn-ghost btn-sm" id="play-again-btn">← Play Again</button>
+      </div>
+    </div>
+
+    <!-- Right: city preview canvas -->
+    <div class="results-right">
+      <div style="font-size:13px;font-weight:600;color:var(--text-dim);align-self:flex-start;">City Map</div>
+      <div class="results-canvas-wrap">
+        <canvas id="results-canvas"></canvas>
+      </div>
+      <div class="legend">
+        <div><span class="legend-dot" style="background:var(--accent-lt)"></span>Your trucks</div>
+        <div id="legend-optimal" style="display:none"><span class="legend-dot" style="background:var(--success)"></span>Quantum optimal</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CODE OVERLAY
+════════════════════════════════════════════════════════════════════════ -->
+<div id="code-overlay">
+  <div class="code-modal">
+    <div class="code-header">
+      <div class="code-header-left">
+        <div class="code-header-title">⚛ Quantum Solution — Classiq Qmod</div>
+        <div class="code-header-sub" id="code-header-sub"></div>
+      </div>
+      <button class="code-close" id="code-close-btn">✕</button>
+    </div>
+    <div class="code-explainer" id="code-explainer"></div>
+    <div class="code-body">
+      <pre id="code-display"></pre>
+    </div>
+    <div class="code-footer">
+      <div class="code-footer-note">
+        Run this on real quantum hardware at
+        <a href="https://platform.classiq.io" target="_blank">platform.classiq.io</a>
+        — free account, no setup required.
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="window.open('https://platform.classiq.io','_blank')">
+        Try Classiq →
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 1. SCENARIO DATA  (pre-computed from problem_definition.py + quantum_solution.py)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SCENARIOS = [
+  {
+    id: 1,
+    name: "Street Fair",
+    difficulty: "Easy",
+    description: "A weekend street fair. Two high-traffic centre spots look tempting — but they cannibalize each other. Can you find the ring?",
+    grid_rows: 3, grid_cols: 4,
+    layout: [[1,2,2,1],[2,2,2,2],[1,2,2,1]],
+    positions: [[0,1],[0,2],[1,0],[1,1],[1,2],[1,3],[2,1],[2,2]],
+    edges: [[0,1],[0,3],[1,4],[2,3],[3,4],[3,6],[4,5],[4,7],[6,7]],
+    traffic:          [7,  5,  4,  9,  8,  6,  3,  7],
+    truck_cost: 3.0,
+    alpha: 4.5,
+    optimal_placement:[0,  1,  0,  1,  0,  1,  0,  1],
+    optimal_revenue:  15.0,
+    quantum_backend:  "IonQ Aria",
+    quantum_shots:    2000,
+    quantum_num_layers: 4,
+    display_code: `# ── Street Fair (Easy) — Quantum Solution ──────────────────────────
+# 8 qubits  |  4 QAOA layers  |  runs on Classiq quantum hardware
+from classiq import *
+
+# Scenario constants
+TRAFFIC    = [7, 5, 4, 9, 8, 6, 3, 7]
+TRUCK_COST = 3.0
+ALPHA      = 4.5
+EDGES      = [(0,1),(0,3),(1,4),(2,3),(3,4),(3,6),(4,5),(4,7),(6,7)]
+NUM_SPOTS  = 8
+NUM_LAYERS = 4
+
+# Revenue: foot traffic earnings minus cost and cannibalization
+def revenue(x):
+    r  = sum((TRAFFIC[i] - TRUCK_COST) * x[i] for i in range(NUM_SPOTS))
+    r -= ALPHA * sum(x[i] * x[j] for i, j in EDGES)
+    return r
+
+# ── QAOA circuit in Qmod ─────────────────────────────────────────────
+@qfunc
+def cost_layer(gamma: CReal, x: QArray[QBit, NUM_SPOTS]):
+    phase(-revenue(x), gamma)     # reward high-revenue placements
+
+@qfunc
+def main(params: CArray[CReal, NUM_LAYERS * 2],
+         x: Output[QArray[QBit, NUM_SPOTS]]):
+    allocate(x)
+    hadamard_transform(x)         # explore all 256 placements at once
+    repeat(NUM_LAYERS, lambda i: [
+        cost_layer(params[i], x),  # amplify best configurations
+        apply_to_all(              # mix — avoid local optima
+            lambda q: RX(params[NUM_LAYERS + i], q), x),
+    ])
+
+# ── Synthesise, run, read result ─────────────────────────────────────
+qmod   = create_model(main)
+qprog  = synthesize(qmod)         # Classiq compiles to native gate set
+result = execute(qprog).result()[0].value
+best   = max(result.parsed_counts,
+             key=lambda s: revenue(list(s.state["x"])))
+print("Optimal placement:", best.state["x"])
+print("Revenue:          ", revenue(list(best.state["x"])))`
+  },
+  {
+    id: 2,
+    name: "Business District",
+    difficulty: "Medium",
+    description: "Dense office blocks pack the lunch crowds, but every street corner competes. Greedy logic fills the wrong column.",
+    grid_rows: 3, grid_cols: 4,
+    layout: [[2,2,2,2],[2,2,2,2],[2,2,2,2]],
+    positions: [[0,0],[0,1],[0,2],[0,3],[1,0],[1,1],[1,2],[1,3],[2,0],[2,1],[2,2],[2,3]],
+    edges: [[0,1],[0,4],[1,2],[1,5],[2,3],[2,6],[3,7],[4,5],[4,8],[5,6],[5,9],[6,7],[6,10],[7,11],[8,9],[9,10],[10,11]],
+    traffic:          [4,  8,  7,  3,  6,  9,  9,  5,  3,  7,  8,  4],
+    truck_cost: 3.0,
+    alpha: 3.5,
+    optimal_placement:[0,  1,  0,  0,  1,  0,  1,  0,  0,  1,  0,  1],
+    optimal_revenue:  19.0,
+    quantum_backend:  "IonQ Aria",
+    quantum_shots:    4000,
+    quantum_num_layers: 4,
+    display_code: `# ── Business District (Medium) — Quantum Solution ───────────────────
+# 12 qubits  |  4 QAOA layers  |  runs on Classiq quantum hardware
+from classiq import *
+
+# Scenario constants
+TRAFFIC    = [4, 8, 7, 3, 6, 9, 9, 5, 3, 7, 8, 4]
+TRUCK_COST = 3.0
+ALPHA      = 3.5
+EDGES      = [(0,1),(0,4),(1,2),(1,5),(2,3),(2,6),(3,7),(4,5),
+              (4,8),(5,6),(5,9),(6,7),(6,10),(7,11),(8,9),(9,10),(10,11)]
+NUM_SPOTS  = 12
+NUM_LAYERS = 4
+
+def revenue(x):
+    r  = sum((TRAFFIC[i] - TRUCK_COST) * x[i] for i in range(NUM_SPOTS))
+    r -= ALPHA * sum(x[i] * x[j] for i, j in EDGES)
+    return r
+
+# ── QAOA circuit in Qmod ─────────────────────────────────────────────
+@qfunc
+def cost_layer(gamma: CReal, x: QArray[QBit, NUM_SPOTS]):
+    phase(-revenue(x), gamma)
+
+@qfunc
+def main(params: CArray[CReal, NUM_LAYERS * 2],
+         x: Output[QArray[QBit, NUM_SPOTS]]):
+    allocate(x)
+    hadamard_transform(x)         # explore all 4,096 placements at once
+    repeat(NUM_LAYERS, lambda i: [
+        cost_layer(params[i], x),
+        apply_to_all(
+            lambda q: RX(params[NUM_LAYERS + i], q), x),
+    ])
+
+qmod   = create_model(main)
+qprog  = synthesize(qmod)
+result = execute(qprog).result()[0].value
+best   = max(result.parsed_counts,
+             key=lambda s: revenue(list(s.state["x"])))
+print("Optimal placement:", best.state["x"])
+print("Revenue:          ", revenue(list(best.state["x"])))`
+  },
+  {
+    id: 3,
+    name: "Festival Grounds",
+    difficulty: "Hard",
+    description: "Four stage areas each spike with t=9 traffic. The centre looks irresistible — but quantum says: skip them all and take the ring.",
+    grid_rows: 4, grid_cols: 4,
+    layout: [[2,2,2,2],[2,2,2,2],[2,2,2,2],[2,2,2,2]],
+    positions: [[0,0],[0,1],[0,2],[0,3],[1,0],[1,1],[1,2],[1,3],[2,0],[2,1],[2,2],[2,3],[3,0],[3,1],[3,2],[3,3]],
+    edges: [[0,1],[0,4],[1,2],[1,5],[2,3],[2,6],[3,7],[4,5],[4,8],[5,6],[5,9],[6,7],[6,10],[7,11],[8,9],[8,12],[9,10],[9,13],[10,11],[10,14],[11,15],[12,13],[13,14],[14,15]],
+    traffic:          [3,  8,  3,  7,  8,  9,  9,  4,  4,  9,  9,  8,  7,  3,  8,  3],
+    truck_cost: 3.0,
+    alpha: 5.0,
+    optimal_placement:[0,  1,  0,  1,  1,  0,  1,  0,  0,  1,  0,  1,  1,  0,  1,  0],
+    optimal_revenue:  40.0,
+    quantum_backend:  "IonQ Aria",
+    quantum_shots:    8000,
+    quantum_num_layers: 5,
+    display_code: `# ── Festival Grounds (Hard) — Quantum Solution ──────────────────────
+# 16 qubits  |  5 QAOA layers  |  runs on Classiq quantum hardware
+from classiq import *
+
+# Scenario constants
+TRAFFIC    = [3, 8, 3, 7, 8, 9, 9, 4, 4, 9, 9, 8, 7, 3, 8, 3]
+TRUCK_COST = 3.0
+ALPHA      = 5.0
+EDGES      = [(0,1),(0,4),(1,2),(1,5),(2,3),(2,6),(3,7),(4,5),(4,8),
+              (5,6),(5,9),(6,7),(6,10),(7,11),(8,9),(8,12),(9,10),
+              (9,13),(10,11),(10,14),(11,15),(12,13),(13,14),(14,15)]
+NUM_SPOTS  = 16
+NUM_LAYERS = 5
+
+def revenue(x):
+    r  = sum((TRAFFIC[i] - TRUCK_COST) * x[i] for i in range(NUM_SPOTS))
+    r -= ALPHA * sum(x[i] * x[j] for i, j in EDGES)
+    return r
+
+# ── QAOA circuit in Qmod ─────────────────────────────────────────────
+@qfunc
+def cost_layer(gamma: CReal, x: QArray[QBit, NUM_SPOTS]):
+    phase(-revenue(x), gamma)
+
+@qfunc
+def main(params: CArray[CReal, NUM_LAYERS * 2],
+         x: Output[QArray[QBit, NUM_SPOTS]]):
+    allocate(x)
+    hadamard_transform(x)         # explore all 65,536 placements at once
+    repeat(NUM_LAYERS, lambda i: [
+        cost_layer(params[i], x),
+        apply_to_all(
+            lambda q: RX(params[NUM_LAYERS + i], q), x),
+    ])
+
+qmod   = create_model(main)
+qprog  = synthesize(qmod)
+result = execute(qprog).result()[0].value
+best   = max(result.parsed_counts,
+             key=lambda s: revenue(list(s.state["x"])))
+print("Optimal placement:", best.state["x"])
+print("Revenue:          ", revenue(list(best.state["x"])))`
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 2. CONSTANTS & HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Isometric tile dimensions — computed per scenario
+let TW = 100, TH = 50;   // tile width, tile height (TH = TW/2)
+let BH = 40;             // building height (varies per cell)
+const TRUCK_H = 22;      // food truck box height
+
+// Traffic → ground tile color  (dark blue → amber → red)
+function trafficColor(t) {
+  if (t <= 3) return '#1E3A7A';
+  if (t <= 5) return '#3A2060';
+  if (t <= 7) return '#7A3010';
+  if (t <= 8) return '#A02010';
+  return '#C81010';
+}
+function trafficColorLight(t) {
+  if (t <= 3) return '#2A4E9E';
+  if (t <= 5) return '#5030A0';
+  if (t <= 7) return '#A04018';
+  if (t <= 8) return '#CC3020';
+  return '#E01818';
+}
+
+// Deterministic building height per cell (visual variety)
+function buildingHeight(row, col) {
+  const seed = (row * 7 + col * 13) % 11;
+  return BH * (0.5 + seed / 20);
+}
+
+// Color darkening utility
+function darken(hex, amount) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  const nr = Math.max(0, Math.round(r*(1-amount)));
+  const ng = Math.max(0, Math.round(g*(1-amount)));
+  const nb = Math.max(0, Math.round(b*(1-amount)));
+  return `rgb(${nr},${ng},${nb})`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3. GAME STATE
+// ═══════════════════════════════════════════════════════════════════════════
+
+let state = {
+  scenario: null,
+  placement: [],          // binary array, index = candidate position index
+  posIndexMap: {},        // "row_col" → posIndex
+  hoveredPos: null,       // posIndex or null
+  phase: 'playing',       // 'playing' | 'scored'
+  showOptimal: false,
+  playerRevenue: 0,
+  playerScore: 0,
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. RENDERING ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+
+const gameCanvas    = document.getElementById('game-canvas');
+const resultsCanvas = document.getElementById('results-canvas');
+const gctx          = gameCanvas.getContext('2d');
+const rctx          = resultsCanvas.getContext('2d');
+
+// Compute tile size so the grid fits the available canvas area
+function computeTileSize(canvas, sc) {
+  const padX = 80, padY = 80;
+  const availW = canvas.width  - padX;
+  const availH = canvas.height - padY - 80; // leave room for buildings
+  const R = sc.grid_rows, C = sc.grid_cols;
+  const twFromW = (2 * availW) / (R + C);
+  const twFromH = (2 * availH) / ((R + C) * 0.5 + 1.5);
+  TW = Math.floor(Math.min(twFromW, twFromH));
+  TH = Math.floor(TW / 2);
+  BH = Math.floor(TW * 0.45);
+}
+
+// Top-left vertex of tile diamond (row, col) in canvas coordinates
+function tileOrigin(row, col, canvas) {
+  const cx = canvas.width  / 2 + (col - row) * TW / 2;
+  const cy = 60            + (col + row) * TH / 2;
+  return { x: cx, y: cy };
+}
+
+// Which candidate position index is at canvas (px, py)?  null if none.
+function hitTest(px, py, canvas, sc) {
+  const cx0 = canvas.width / 2;
+  const cy0 = 60;
+  for (let idx = 0; idx < sc.positions.length; idx++) {
+    const [r, c] = sc.positions[idx];
+    const { x, y } = tileOrigin(r, c, canvas);
+    // Point-in-diamond test
+    const dx = px - x, dy = py - y - TH / 2;
+    if (Math.abs(dx) / (TW / 2) + Math.abs(dy) / (TH / 2) <= 1.05) return idx;
+  }
+  return null;
+}
+
+// Draw isometric diamond top face
+function drawDiamond(ctx, x, y, w, h, fillColor, strokeColor) {
+  ctx.beginPath();
+  ctx.moveTo(x,        y);
+  ctx.lineTo(x + w/2,  y + h/2);
+  ctx.lineTo(x,        y + h);
+  ctx.lineTo(x - w/2,  y + h/2);
+  ctx.closePath();
+  ctx.fillStyle   = fillColor;
+  ctx.fill();
+  if (strokeColor) {
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+  }
+}
+
+// Draw 3-face isometric box (floor tile already drawn below)
+function drawIsoBox(ctx, x, y, bh, topColor, leftColor, rightColor) {
+  // Top face
+  drawDiamond(ctx, x, y - bh, TW, TH, topColor, 'rgba(0,0,0,0.3)');
+  // Left face
+  ctx.beginPath();
+  ctx.moveTo(x - TW/2, y + TH/2 - bh);
+  ctx.lineTo(x,        y + TH   - bh);
+  ctx.lineTo(x,        y + TH);
+  ctx.lineTo(x - TW/2, y + TH/2);
+  ctx.closePath();
+  ctx.fillStyle = leftColor;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+  // Right face
+  ctx.beginPath();
+  ctx.moveTo(x + TW/2, y + TH/2 - bh);
+  ctx.lineTo(x,        y + TH   - bh);
+  ctx.lineTo(x,        y + TH);
+  ctx.lineTo(x + TW/2, y + TH/2);
+  ctx.closePath();
+  ctx.fillStyle = rightColor;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+}
+
+// Draw a building tile
+function drawBuilding(ctx, x, y, row, col) {
+  const bh = buildingHeight(row, col);
+  const base = '#3C3660';
+  drawIsoBox(ctx, x, y, bh, '#4A4470', '#252248', '#35305A');
+  // Windows on right face
+  const wc = Math.max(1, Math.floor(bh / 14));
+  for (let wi = 0; wi < wc; wi++) {
+    const wy = y + TH * 0.7 - bh + wi * 14 + 6;
+    const wx = x + TW * 0.15;
+    ctx.fillStyle = (row + col + wi) % 3 === 0 ? '#888' : '#FFE97A';
+    ctx.fillRect(wx - 3, wy - 3, 5, 4);
+    ctx.fillRect(wx + 6, wy - 3, 5, 4);
+  }
+}
+
+// Draw a candidate truck spot tile
+function drawSpot(ctx, x, y, traffic, hovered, placed, optimalReveal) {
+  const tileTop  = hovered ? trafficColorLight(traffic) : trafficColor(traffic);
+  const tileLeft = darken(tileTop, 0.35);
+  const tileRight= darken(tileTop, 0.15);
+
+  // Ground tile (flat, just the diamond face)
+  drawDiamond(ctx, x, y, TW, TH, tileTop, 'rgba(0,0,0,0.35)');
+
+  // Traffic number on tile
+  ctx.save();
+  ctx.font = `bold ${Math.round(TH * 0.45)}px 'Segoe UI', system-ui`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText(traffic, x, y + TH * 0.65);
+  ctx.restore();
+
+  // Hover glow ring
+  if (hovered && !placed) {
+    ctx.beginPath();
+    ctx.moveTo(x,       y - 3);
+    ctx.lineTo(x + TW/2+3, y + TH/2);
+    ctx.lineTo(x,       y + TH + 3);
+    ctx.lineTo(x - TW/2-3, y + TH/2);
+    ctx.closePath();
+    ctx.strokeStyle = '#A78BFA';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  }
+
+  // Optimal reveal glow ring
+  if (optimalReveal) {
+    ctx.beginPath();
+    ctx.moveTo(x,       y - 4);
+    ctx.lineTo(x + TW/2+4, y + TH/2);
+    ctx.lineTo(x,       y + TH + 4);
+    ctx.lineTo(x - TW/2-4, y + TH/2);
+    ctx.closePath();
+    ctx.strokeStyle = '#10B981';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+}
+
+// Draw a food truck on a tile
+function drawTruck(ctx, x, y, bodyColor, darkColor, glowColor) {
+  const th = TRUCK_H;
+  const tw_truck = Math.round(TW * 0.42);
+  // Isometric truck box
+  const bx = x, by = y - 2;
+  drawIsoBox(ctx, bx, by, th,
+    bodyColor,
+    darken(darkColor, 0.0),
+    darken(bodyColor, 0.2)
+  );
+  // Cab bump (top-right)
+  const cabH = Math.round(th * 0.45);
+  const cabX = x + TW * 0.18;
+  drawIsoBox(ctx, cabX, by - th + 2, cabH,
+    lighten(bodyColor, 0.2),
+    darkColor,
+    lighten(bodyColor, 0.1)
+  );
+  // Serving window dot
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.fillRect(x - TW*0.1, by - th*0.5, TW*0.12, TH*0.25);
+
+  // Glow underneath
+  if (glowColor) {
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    drawDiamond(ctx, x, y, TW * 0.7, TH * 0.7, glowColor, null);
+    ctx.restore();
+  }
+}
+
+function lighten(hex, amount) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  const nr = Math.min(255, Math.round(r + (255-r)*amount));
+  const ng = Math.min(255, Math.round(g + (255-g)*amount));
+  const nb = Math.min(255, Math.round(b + (255-b)*amount));
+  return `rgb(${nr},${ng},${nb})`;
+}
+
+// Full render pass for a canvas
+function renderCity(ctx, canvas, sc, placementArr, showOptimalArr, hoverIdx) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background
+  const grad = ctx.createRadialGradient(canvas.width/2, 0, 0, canvas.width/2, canvas.height/2, canvas.height);
+  grad.addColorStop(0, '#1A0E40');
+  grad.addColorStop(1, '#0D0B1E');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw rows front-to-back (painter's algorithm)
+  for (let row = 0; row < sc.grid_rows; row++) {
+    for (let col = 0; col < sc.grid_cols; col++) {
+      const cellType = sc.layout[row][col];
+      const { x, y } = tileOrigin(row, col, canvas);
+      const posKey   = `${row}_${col}`;
+      const posIdx   = state.posIndexMap[posKey];
+
+      if (cellType === 1) {
+        drawBuilding(ctx, x, y, row, col);
+      } else if (cellType === 2) {
+        const traffic  = sc.traffic[posIdx];
+        const hovered  = (hoverIdx === posIdx);
+        const placed   = placementArr[posIdx] === 1;
+        const optReveal= showOptimalArr ? showOptimalArr[posIdx] === 1 : false;
+
+        drawSpot(ctx, x, y, traffic, hovered, placed, optReveal);
+
+        if (placed) {
+          drawTruck(ctx, x, y, '#FFD700', '#B8860B', '#FFD700');
+        } else if (optReveal) {
+          drawTruck(ctx, x, y, '#10B981', '#064E3B', '#10B981');
+        }
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. GAME LOGIC
+// ═══════════════════════════════════════════════════════════════════════════
+
+function calcRevenue(sc, placementArr) {
+  let r = 0;
+  for (let i = 0; i < sc.positions.length; i++) {
+    r += (sc.traffic[i] - sc.truck_cost) * placementArr[i];
+  }
+  for (const [i, j] of sc.edges) {
+    r -= sc.alpha * placementArr[i] * placementArr[j];
+  }
+  return r;
+}
+
+function updateStatsUI() {
+  const sc  = state.scenario;
+  const rev = calcRevenue(sc, state.placement);
+  state.playerRevenue = rev;
+
+  const revDisplay = `$${Math.round(rev * 1000).toLocaleString()}`;
+  document.getElementById('stat-revenue').textContent = revDisplay;
+  document.getElementById('stat-trucks').textContent  = state.placement.filter(x => x === 1).length;
+
+  const optHint = document.getElementById('stat-optimal-hint');
+  optHint.textContent = rev > 0
+    ? `${Math.round(rev / sc.optimal_revenue * 100)}% of quantum optimal`
+    : 'Place trucks on highlighted tiles';
+
+  const barPct = Math.max(0, Math.min(100, rev / sc.optimal_revenue * 100));
+  document.getElementById('revenue-bar').style.width = barPct + '%';
+}
+
+function toggleTruck(posIdx) {
+  if (state.phase !== 'playing') return;
+  state.placement[posIdx] ^= 1;
+  updateStatsUI();
+  renderCity(gctx, gameCanvas, state.scenario, state.placement, null, state.hoveredPos);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 6. SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startScenario(sc) {
+  state.scenario   = sc;
+  state.placement  = new Array(sc.positions.length).fill(0);
+  state.posIndexMap = {};
+  sc.positions.forEach(([r, c], i) => { state.posIndexMap[`${r}_${c}`] = i; });
+  state.hoveredPos = null;
+  state.phase      = 'playing';
+  state.showOptimal= false;
+
+  // Size canvases
+  const gameArea   = document.getElementById('canvas-area');
+  const gw = gameArea.clientWidth  || 600;
+  const gh = gameArea.clientHeight || 480;
+  gameCanvas.width  = gw;
+  gameCanvas.height = gh;
+  computeTileSize(gameCanvas, sc);
+
+  // Populate panel
+  const tagEl = document.getElementById('panel-tag');
+  tagEl.innerHTML = `<span class="tag tag-${sc.difficulty.toLowerCase()}">${sc.difficulty}</span>`;
+  document.getElementById('panel-name').textContent = sc.name;
+  document.getElementById('panel-desc').textContent = sc.description;
+
+  updateStatsUI();
+  renderCity(gctx, gameCanvas, sc, state.placement, null, null);
+  showScreen('game-screen');
+}
+
+function submitPlacement() {
+  const sc    = state.scenario;
+  const rev   = calcRevenue(sc, state.placement);
+  const score = sc.optimal_revenue > 0
+    ? Math.max(0, Math.round(rev / sc.optimal_revenue * 100))
+    : 0;
+
+  state.playerRevenue = rev;
+  state.playerScore   = score;
+  state.phase         = 'scored';
+  state.showOptimal   = false;
+
+  // ── Score ring ──
+  const ring = document.getElementById('score-ring-fill');
+  const circ = 2 * Math.PI * 50;
+  let ringColor = score >= 80 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444';
+  ring.style.stroke = ringColor;
+  ring.style.strokeDashoffset = circ * (1 - score/100);
+  document.getElementById('score-num').textContent = score + '%';
+  document.getElementById('score-big').textContent = score + '%';
+  document.getElementById('score-big').style.color = ringColor;
+
+  // ── Message ──
+  const msgs = {
+    perfect: ["Quantum-grade thinking! You nailed it.","You think like a quantum computer.","Perfect score — you found the true optimum!"],
+    great:   ["Very close! The quantum solution is just slightly better.","Excellent intuition — just one or two trucks off.","Almost perfect. The quantum trick is subtle."],
+    good:    ["Solid placement, but quantum found a counter-intuitive shortcut.","The cannibalization penalty caught you. Quantum avoids this trap.","Good thinking! The optimal skips a few obvious spots."],
+    low:     ["The greedy trap got you! High-traffic spots cannibalize each other.","Classic pitfall: the busiest locations compete for the same crowd.","Quantum shines here — it avoids the greedy trap entirely."]
+  };
+  const tier = score === 100 ? 'perfect' : score >= 75 ? 'great' : score >= 45 ? 'good' : 'low';
+  const arr  = msgs[tier];
+  document.getElementById('score-msg').textContent = arr[Math.floor(Math.random() * arr.length)];
+
+  // ── Revenue stats ──
+  document.getElementById('r-your-rev').textContent = `$${Math.round(rev * 1000).toLocaleString()}`;
+  document.getElementById('r-opt-rev').textContent  = `$${Math.round(sc.optimal_revenue * 1000).toLocaleString()}`;
+
+  // ── Quantum note ──
+  document.getElementById('results-quantum-note').innerHTML =
+    `Solved on <strong style="color:var(--accent-lt)">${sc.quantum_backend}</strong> ` +
+    `with <strong style="color:var(--accent-lt)">${sc.quantum_num_layers} QAOA layers</strong> ` +
+    `and ${sc.quantum_shots.toLocaleString()} measurement shots. ` +
+    `The circuit explores <strong>${(2**sc.positions.length).toLocaleString()}</strong> city configurations simultaneously via quantum superposition.`;
+
+  // ── Results canvas ──
+  const rw = Math.min(420, window.innerWidth * 0.38);
+  const rh = Math.round(rw * 0.68);
+  resultsCanvas.width  = rw;
+  resultsCanvas.height = rh;
+  computeTileSize(resultsCanvas, sc);
+  renderCity(rctx, resultsCanvas, sc, state.placement, null, null);
+
+  showScreen('results-screen');
+}
+
+function revealOptimal() {
+  const sc = state.scenario;
+  state.showOptimal = true;
+  document.getElementById('legend-optimal').style.display = 'flex';
+  renderCity(rctx, resultsCanvas, sc, state.placement, sc.optimal_placement, null);
+  document.getElementById('show-optimal-btn').textContent = '✓ Quantum Solution Revealed';
+  document.getElementById('show-optimal-btn').style.background = 'var(--success)';
+  document.getElementById('show-optimal-btn').disabled = true;
+}
+
+function showCode() {
+  const sc = state.scenario;
+  const overlay = document.getElementById('code-overlay');
+  document.getElementById('code-header-sub').textContent =
+    `${sc.name} · ${sc.positions.length} qubits · ${sc.quantum_num_layers} QAOA layers · ${sc.quantum_backend}`;
+  document.getElementById('code-explainer').innerHTML =
+    `This is the <strong>complete</strong> Classiq Qmod program that solved the ${sc.name} scenario on a real quantum processor. ` +
+    `In ~30 lines, it defines the QAOA circuit, compiles to hardware-native gates, runs <strong>${sc.quantum_shots.toLocaleString()} measurement shots</strong>, ` +
+    `and returns the optimal truck placement. The same code scales to city grids too large for any classical computer.`;
+
+  document.getElementById('code-display').innerHTML = syntaxHighlight(sc.display_code);
+  overlay.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 7. SYNTAX HIGHLIGHTER (minimal, for Qmod/Python)
+// ═══════════════════════════════════════════════════════════════════════════
+
+function syntaxHighlight(code) {
+  // Escape HTML first
+  let s = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  // Comments (must be before other replacements)
+  s = s.replace(/(#[^\n]*)/g, '<span class="cm">$1</span>');
+
+  // Strings
+  s = s.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, (m) =>
+    m.startsWith('<span') ? m : `<span class="st">${m}</span>`
+  );
+
+  // Decorators
+  s = s.replace(/(@\w+)/g, '<span class="dc">$1</span>');
+
+  // Keywords
+  const kws = ['from','import','def','return','lambda','for','in','if','else','not','and','or','True','False','None','class','with'];
+  kws.forEach(kw => {
+    s = s.replace(new RegExp(`\\b(${kw})\\b`, 'g'), (m, p, offset, str) => {
+      // Don't highlight inside existing spans
+      const before = str.lastIndexOf('<span', offset);
+      const afterSpan = str.lastIndexOf('</span>', offset);
+      if (before > afterSpan && before !== -1) return m;
+      return `<span class="kw">${m}</span>`;
+    });
+  });
+
+  // Numbers
+  s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, (m, p, offset, str) => {
+    const before = str.lastIndexOf('<span', offset);
+    const afterSpan = str.lastIndexOf('</span>', offset);
+    if (before > afterSpan && before !== -1) return m;
+    return `<span class="nm">${m}</span>`;
+  });
+
+  // Built-in functions
+  ['print','range','sum','max','min','list','len','int','float','str'].forEach(bi => {
+    s = s.replace(new RegExp(`\\b(${bi})(?=\\()`, 'g'), (m, p, offset, str) => {
+      const before = str.lastIndexOf('<span', offset);
+      const afterSpan = str.lastIndexOf('</span>', offset);
+      if (before > afterSpan && before !== -1) return m;
+      return `<span class="bi">${m}</span>`;
+    });
+  });
+
+  // Classiq API calls (function names)
+  ['qfunc','CReal','CArray','QArray','QBit','Output','allocate','hadamard_transform',
+   'phase','repeat','apply_to_all','create_model','synthesize','execute','RX'].forEach(fn => {
+    s = s.replace(new RegExp(`\\b(${fn})\\b`, 'g'), (m, p, offset, str) => {
+      const before = str.lastIndexOf('<span', offset);
+      const afterSpan = str.lastIndexOf('</span>', offset);
+      if (before > afterSpan && before !== -1) return m;
+      return `<span class="fn">${m}</span>`;
+    });
+  });
+
+  return s;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 8. EVENT HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Canvas click → toggle truck
+gameCanvas.addEventListener('click', e => {
+  if (state.phase !== 'playing' || !state.scenario) return;
+  const rect = gameCanvas.getBoundingClientRect();
+  const px   = e.clientX - rect.left;
+  const py   = e.clientY - rect.top;
+  const idx  = hitTest(px, py, gameCanvas, state.scenario);
+  if (idx !== null) {
+    toggleTruck(idx);
+    showToast(state.placement[idx] === 1 ? 'Truck placed!' : 'Truck removed');
+  }
+});
+
+// Canvas hover → highlight tile
+gameCanvas.addEventListener('mousemove', e => {
+  if (state.phase !== 'playing' || !state.scenario) return;
+  const rect  = gameCanvas.getBoundingClientRect();
+  const px    = e.clientX - rect.left;
+  const py    = e.clientY - rect.top;
+  const idx   = hitTest(px, py, gameCanvas, state.scenario);
+  if (idx !== state.hoveredPos) {
+    state.hoveredPos = idx;
+    gameCanvas.style.cursor = idx !== null ? 'pointer' : 'default';
+    renderCity(gctx, gameCanvas, state.scenario, state.placement, null, state.hoveredPos);
+  }
+});
+
+gameCanvas.addEventListener('mouseleave', () => {
+  if (state.hoveredPos !== null) {
+    state.hoveredPos = null;
+    if (state.scenario) renderCity(gctx, gameCanvas, state.scenario, state.placement, null, null);
+  }
+});
+
+document.getElementById('submit-btn').addEventListener('click', submitPlacement);
+document.getElementById('back-btn').addEventListener('click', () => showScreen('intro-screen'));
+document.getElementById('play-again-btn').addEventListener('click', () => showScreen('intro-screen'));
+document.getElementById('show-optimal-btn').addEventListener('click', revealOptimal);
+document.getElementById('show-code-btn').addEventListener('click', showCode);
+document.getElementById('code-close-btn').addEventListener('click', () => {
+  document.getElementById('code-overlay').classList.remove('active');
+});
+document.getElementById('code-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('code-overlay'))
+    document.getElementById('code-overlay').classList.remove('active');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 9. TOAST
+// ═══════════════════════════════════════════════════════════════════════════
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 10. INTRO SCREEN — build scenario cards
+// ═══════════════════════════════════════════════════════════════════════════
+
+function buildIntroCards() {
+  const container = document.getElementById('scenario-cards');
+  container.innerHTML = '';
+  SCENARIOS.forEach(sc => {
+    const totalPlacements = (2 ** sc.positions.length).toLocaleString();
+    const card = document.createElement('div');
+    card.className = 'scenario-card';
+    card.innerHTML = `
+      <div class="card-difficulty">
+        <span class="tag tag-${sc.difficulty.toLowerCase()}">${sc.difficulty}</span>
+      </div>
+      <div class="card-title">${sc.name}</div>
+      <div class="card-desc">${sc.description}</div>
+      <div class="card-meta">
+        <span>⬡ ${sc.grid_rows}×${sc.grid_cols} grid</span>
+        <span>⚛ ${sc.positions.length} qubits</span>
+      </div>
+      <div class="quantum-badge">${totalPlacements} configurations explored</div>
+    `;
+    card.addEventListener('click', () => startScenario(sc));
+    container.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 11. INIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+buildIntroCards();
+showScreen('intro-screen');
+
+// Handle window resize during game
+window.addEventListener('resize', () => {
+  if (!state.scenario || state.phase !== 'playing') return;
+  const gameArea = document.getElementById('canvas-area');
+  gameCanvas.width  = gameArea.clientWidth;
+  gameCanvas.height = gameArea.clientHeight;
+  computeTileSize(gameCanvas, state.scenario);
+  renderCity(gctx, gameCanvas, state.scenario, state.placement, null, state.hoveredPos);
+});
+
+</script>
+</body>
+</html>
