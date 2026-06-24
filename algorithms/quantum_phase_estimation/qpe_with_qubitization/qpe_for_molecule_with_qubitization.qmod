@@ -509,7 +509,7 @@ qfunc qft_no_swap_expanded___0(qbv: qbit[5]) {
 }
 
 qfunc qft_expanded___0(target: qbit[5]) {
-  repeat (index: 2.5) {
+  repeat (index: 2) {
     SWAP(target[index], target[4 - index]);
   }
   qft_no_swap_expanded___0(target);
