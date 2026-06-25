@@ -82,6 +82,16 @@ def strip_single_notebook(notebook_path: str) -> bool:
             # keys that were intentionally kept:
             # - colab
 
+        # Normalize the opening markdown cell: a leading blank line hides the H1
+        # title (the notebook then reads as having no title), so strip the
+        # surrounding whitespace and let the title render first.
+        if nb.cells and nb.cells[0].get("cell_type") == "markdown":
+            source = nb.cells[0]["source"]
+            text = "".join(source) if isinstance(source, list) else source
+            if (stripped := text.strip()) != text:
+                nb.cells[0]["source"] = stripped.splitlines(keepends=True)
+                did_nb_change = True
+
         if did_nb_change:
             result = False
             print(f"Rewriting '{notebook_path}'")
