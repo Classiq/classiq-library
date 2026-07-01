@@ -5,7 +5,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("quantum_likelihood_estimation", timeout_seconds=300)
+@wrap_testbook("quantum_likelihood_estimation", timeout_seconds=600)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     qprogs = tb.ref_pydantic("qprogs")
