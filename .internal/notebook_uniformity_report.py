@@ -328,16 +328,30 @@ def point_1_synthesis_flow(nbs: Sequence[Notebook]) -> None:
 
 @check
 def point_2_result_variable(nbs: Sequence[Notebook]) -> None:
-    # The execution result is named `result` (or `result_<suffix>` when several);
-    # suffix only — `result_1` is fine, but `res`, `job`, or `stage_result` are not.
-    exceptions: list[AcceptedDeviation] = []
+    # A variable holding an execution outcome is named from one of three families,
+    # by what it holds (suffix-not-prefix; `result_1` is fine, `stage_result` is not):
+    #   result / result_<suffix>  — the parsed result value
+    #   job / job_<suffix>        — the ExecutionJob object itself
+    #   df / df_<suffix> / dfs     — a DataFrame (e.g. from sample())
+    # So `res`, `results`, `execution_job`, or a df called `result` are deviations.
+    exceptions: list[AcceptedDeviation] = [
+        ("qaoa_in_qaoa", "vqe_result is a keyword-argument name, not a variable"),
+    ]
 
     def _result_vars(code: str) -> list[str]:
-        return re.findall(r"(\w+)\s*=\s*(?:execute\(|\w+\.result(?:_value)?\()", code)
+        return re.findall(
+            r"(\w+)\s*=\s*(?:execute\(|sample\(|get_sample_result\("
+            r"|\w+\.result(?:_value)?\()",
+            code,
+        )
 
     def offenders(nb: Notebook) -> list[str]:
         return sorted(
-            {v for v in _result_vars(nb.code) if not re.fullmatch(r"result(_\w+)?", v)}
+            {
+                v
+                for v in _result_vars(nb.code)
+                if not re.fullmatch(r"(?:result|job)(?:_\w+)?|dfs?(?:_\w+)?", v)
+            }
         )
 
     def deviates(nb: Notebook) -> bool:
@@ -345,7 +359,7 @@ def point_2_result_variable(nbs: Sequence[Notebook]) -> None:
 
     report_coverage(
         "2",
-        "Execution result variable named result / result_<suffix>",
+        "Execution outcome variable named result / job / df (by what it holds)",
         nbs,
         deviates=deviates,
         exceptions=exceptions,
@@ -530,9 +544,26 @@ def point_12_math_delimiters(nbs: Sequence[Notebook]) -> None:
 
 @check
 def point_15_has_main(nbs: Sequence[Notebook]) -> None:
-    # A classiq notebook defines `@qfunc def main(...)`. Cross-framework comparison
-    # notebooks legitimately do not — those are documented exceptions.
+    # A classiq notebook builds its circuit either from `@qfunc def main(...)` or via
+    # a recognized higher-level wrapper that generates the circuit for you:
+    #   construct_combinatorial_optimization_model / CombinatorialProblem  (QAOA)
+    #   IQAE(...)                                                          (amplitude estimation)
+    #   QSVM(...)                                                          (quantum ML)
+    #   benchmark_project(...)                                             (benchmarking harness)
+    # Cross-framework comparison notebooks (and one pure-math notebook) are documented.
+    entry = re.compile(
+        r"def\s+main\s*\("
+        r"|construct_combinatorial_optimization_model"
+        r"|CombinatorialProblem\("
+        r"|\bIQAE\("
+        r"|\bQSVM\("
+        r"|benchmark_project\("
+    )
     exceptions: list[AcceptedDeviation] = [
+        (
+            "jacobi_anger_expansion",
+            "QSP coefficient-computation notebook, builds no circuit",
+        ),
         (
             "classiq_paper/qsvt/qiskit_qsvt",
             "Qiskit comparison notebook, no classiq main",
@@ -558,11 +589,11 @@ def point_15_has_main(nbs: Sequence[Notebook]) -> None:
     ]
 
     def deviates(nb: Notebook) -> bool:
-        return not re.search(r"def\s+main\s*\(", nb.code)
+        return not entry.search(nb.code)
 
     report_coverage(
         "15",
-        "Defines @qfunc def main(...) (comparison nbs excepted)",
+        "Builds a circuit via def main or a recognized wrapper API",
         nbs,
         deviates=deviates,
         exceptions=exceptions,
