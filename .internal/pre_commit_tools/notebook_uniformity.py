@@ -12,6 +12,9 @@ conforms). Add a rule by writing such a function and appending it to
 
 Currently enforced:
   - a references section heading is plural ("References", not "Reference").
+  - execution results are parsed via .result_value(), not .result()[0].value.
+  - a circuit is shown via show(qprog), not the qprog.show() method form.
+  - a notebook opens with an H1 title (optionally after a logo/banner cell).
 """
 
 import re
@@ -97,10 +100,43 @@ def show_uses_function_form(nb: nbformat.NotebookNode, auto_fix: bool) -> str:
     return f"qprog.show() should be show(qprog) ({count} occurrence(s))"
 
 
+_H1_HEADING = re.compile(r"^\s*#[ \t]+\S")
+
+
+def _is_h1_cell(cell: nbformat.NotebookNode) -> bool:
+    return cell.cell_type == "markdown" and bool(_H1_HEADING.match(cell.source))
+
+
+def _is_logo_cell(cell: nbformat.NotebookNode) -> bool:
+    """A banner/logo cell: an <img> (or other html) with no prose text of its own."""
+    if cell.cell_type != "markdown" or "<img" not in cell.source:
+        return False
+    return not re.search(r"[A-Za-z0-9]", re.sub(r"<[^>]+>", "", cell.source))
+
+
+def opens_with_h1_title(nb: nbformat.NotebookNode, auto_fix: bool) -> str:
+    """A notebook opens with an H1 title, optionally after one logo/banner cell.
+
+    Not auto-fixable (a missing title can't be invented) — reports only.
+    """
+    cells = nb.cells
+    opens_ok = bool(cells) and (
+        _is_h1_cell(cells[0])
+        or (_is_logo_cell(cells[0]) and len(cells) > 1 and _is_h1_cell(cells[1]))
+    )
+    if opens_ok:
+        return NO_ERROR
+    return (
+        "does not open with an H1 title "
+        "('# Title' in the first cell, optionally after a logo/banner cell)"
+    )
+
+
 UNIFORMITY_RULES: list[UniformityRule] = [
     references_heading_is_plural,
     results_use_result_value,
     show_uses_function_form,
+    opens_with_h1_title,
 ]
 
 
