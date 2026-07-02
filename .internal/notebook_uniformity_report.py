@@ -64,11 +64,14 @@ class Notebook:
     markdown: str  # all markdown cells, joined
     first_cell_type: str  # "markdown" | "code" | ""
     first_cell_source: str
+    second_cell_type: str  # 2nd cell — lets a logo/image precede the H1 title
+    second_cell_source: str
 
     @classmethod
     def from_path(cls, path: Path, root: Path) -> "Notebook":
         cells = json.loads(path.read_text()).get("cells", [])
         first = cells[0] if cells else {}
+        second = cells[1] if len(cells) > 1 else {}
         rel = path.relative_to(root)
         return cls(
             rel=str(rel),
@@ -77,6 +80,8 @@ class Notebook:
             markdown=_join(cells, "markdown"),
             first_cell_type=first.get("cell_type", ""),
             first_cell_source="".join(first.get("source", [])),
+            second_cell_type=second.get("cell_type", ""),
+            second_cell_source="".join(second.get("source", [])),
         )
 
     @property
@@ -85,7 +90,13 @@ class Notebook:
 
     @property
     def opens_with_h1_title(self) -> bool:
-        return bool(re.match(r"^#\s+\S", self.first_cell_source))
+        # H1 in the first markdown cell — tolerating one leading logo/image cell
+        # (some notebooks open with a centered banner, then the H1 in cell 2).
+        if _is_h1(self.first_cell_type, self.first_cell_source):
+            return True
+        if _is_image_only(self.first_cell_type, self.first_cell_source):
+            return _is_h1(self.second_cell_type, self.second_cell_source)
+        return False
 
 
 def _join(cells: list[dict], cell_type: str) -> str:
@@ -103,6 +114,17 @@ def _group(rel: Path) -> str:
     if top == COMMUNITY_DIR:
         return "community"
     return "other"
+
+
+def _is_h1(cell_type: str, source: str) -> bool:
+    return cell_type == "markdown" and bool(re.match(r"^\s*#\s+\S", source))
+
+
+def _is_image_only(cell_type: str, source: str) -> bool:
+    # a banner/logo cell: an <img> (or html) with no prose text of its own
+    if cell_type != "markdown" or "<img" not in source:
+        return False
+    return not re.search(r"[A-Za-z0-9]", re.sub(r"<[^>]+>", "", source))
 
 
 @lru_cache
