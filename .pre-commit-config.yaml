@@ -21,12 +21,12 @@ repos:
       - id: prettier
         name: format prettier
   - repo: https://github.com/psf/black
-    rev: 24.3.0
+    rev: 26.5.1
     hooks:
       - id: black-jupyter
         name: format notebook black
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.8.4
+    rev: 1.9.1
     hooks:
       - id: nbqa-isort
         name: format notebook isort
@@ -56,7 +56,7 @@ repos:
         entry: '"execution_count": -'
 
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.8.1
+    rev: 0.9.1
     hooks:
       - id: nbstripout
         name: format nbformat nbstripout
