@@ -23,216 +23,94 @@ from gen._circuit_util import (
 
 
 def test_gates_used_by_circuit():
-    assert (
-        gates_used_by_circuit(
-            stim.Circuit(
-                """
+    assert gates_used_by_circuit(stim.Circuit("""
         H 0
         TICK
         CX 0 1
-    """
-            )
-        )
-        == {"H", "TICK", "CX"}
-    )
+    """)) == {"H", "TICK", "CX"}
 
-    assert (
-        gates_used_by_circuit(
-            stim.Circuit(
-                """
+    assert gates_used_by_circuit(stim.Circuit("""
         S 0
         XCZ 0 1
-    """
-            )
-        )
-        == {"S", "XCZ"}
-    )
+    """)) == {"S", "XCZ"}
 
-    assert (
-        gates_used_by_circuit(
-            stim.Circuit(
-                """
+    assert gates_used_by_circuit(stim.Circuit("""
         MPP X0*X1 Z2*Z3*Z4 Y0*Z1
-    """
-            )
-        )
-        == {"MXX", "MZZZ", "MYZ"}
-    )
+    """)) == {"MXX", "MZZZ", "MYZ"}
 
-    assert (
-        gates_used_by_circuit(
-            stim.Circuit(
-                """
+    assert gates_used_by_circuit(stim.Circuit("""
         CX rec[-1] 1
-    """
-            )
-        )
-        == {"feedback"}
-    )
+    """)) == {"feedback"}
 
-    assert (
-        gates_used_by_circuit(
-            stim.Circuit(
-                """
+    assert gates_used_by_circuit(stim.Circuit("""
         CX sweep[1] 1
-    """
-            )
-        )
-        == {"sweep"}
-    )
+    """)) == {"sweep"}
 
-    assert (
-        gates_used_by_circuit(
-            stim.Circuit(
-                """
+    assert gates_used_by_circuit(stim.Circuit("""
         CX rec[-1] 1 0 1
-    """
-            )
-        )
-        == {"feedback", "CX"}
-    )
+    """)) == {"feedback", "CX"}
 
 
 def test_gate_counts_for_circuit():
-    assert (
-        gate_counts_for_circuit(
-            stim.Circuit(
-                """
+    assert gate_counts_for_circuit(stim.Circuit("""
         H 0
         TICK
         CX 0 1
-    """
-            )
-        )
-        == {"H": 1, "TICK": 1, "CX": 1}
-    )
+    """)) == {"H": 1, "TICK": 1, "CX": 1}
 
-    assert (
-        gate_counts_for_circuit(
-            stim.Circuit(
-                """
+    assert gate_counts_for_circuit(stim.Circuit("""
         S 0
         XCZ 0 1
-    """
-            )
-        )
-        == {"S": 1, "XCZ": 1}
-    )
+    """)) == {"S": 1, "XCZ": 1}
 
-    assert (
-        gate_counts_for_circuit(
-            stim.Circuit(
-                """
+    assert gate_counts_for_circuit(stim.Circuit("""
         MPP X0*X1 Z2*Z3*Z4 Y0*Z1
-    """
-            )
-        )
-        == {"MXX": 1, "MZZZ": 1, "MYZ": 1}
-    )
+    """)) == {"MXX": 1, "MZZZ": 1, "MYZ": 1}
 
-    assert (
-        gate_counts_for_circuit(
-            stim.Circuit(
-                """
+    assert gate_counts_for_circuit(stim.Circuit("""
         CX rec[-1] 1
-    """
-            )
-        )
-        == {"feedback": 1}
-    )
+    """)) == {"feedback": 1}
 
-    assert (
-        gate_counts_for_circuit(
-            stim.Circuit(
-                """
+    assert gate_counts_for_circuit(stim.Circuit("""
         CX sweep[1] 1
-    """
-            )
-        )
-        == {"sweep": 1}
-    )
+    """)) == {"sweep": 1}
 
-    assert (
-        gate_counts_for_circuit(
-            stim.Circuit(
-                """
+    assert gate_counts_for_circuit(stim.Circuit("""
         CX rec[-1] 1 0 1
-    """
-            )
-        )
-        == {"feedback": 1, "CX": 1}
-    )
+    """)) == {"feedback": 1, "CX": 1}
 
-    assert (
-        gate_counts_for_circuit(
-            stim.Circuit(
-                """
+    assert gate_counts_for_circuit(stim.Circuit("""
         H 0 1
         REPEAT 100 {
             S 0 1 2
             CX 0 1 2 3
         }
-    """
-            )
-        )
-        == {"H": 2, "S": 300, "CX": 200}
-    )
+    """)) == {"H": 2, "S": 300, "CX": 200}
 
 
 def test_count_measurement_layers():
     assert count_measurement_layers(stim.Circuit()) == 0
-    assert (
-        count_measurement_layers(
-            stim.Circuit(
-                """
+    assert count_measurement_layers(stim.Circuit("""
         M 0 1 2
-    """
-            )
-        )
-        == 1
-    )
-    assert (
-        count_measurement_layers(
-            stim.Circuit(
-                """
+    """)) == 1
+    assert count_measurement_layers(stim.Circuit("""
         M 0 1
         MX 2
         MR 3
-    """
-            )
-        )
-        == 1
-    )
-    assert (
-        count_measurement_layers(
-            stim.Circuit(
-                """
+    """)) == 1
+    assert count_measurement_layers(stim.Circuit("""
         M 0 1
         MX 2
         TICK
         MR 3
-    """
-            )
-        )
-        == 2
-    )
-    assert (
-        count_measurement_layers(
-            stim.Circuit(
-                """
+    """)) == 2
+    assert count_measurement_layers(stim.Circuit("""
         R 0
         CX 0 1
         TICK
         M 0
-    """
-            )
-        )
-        == 1
-    )
-    assert (
-        count_measurement_layers(
-            stim.Circuit(
-                """
+    """)) == 1
+    assert count_measurement_layers(stim.Circuit("""
         R 0
         CX 0 1
         TICK
@@ -243,11 +121,7 @@ def test_count_measurement_layers():
         OBSERVABLE_INCLUDE(0) rec[-1]
         MPP X0*X1
         DETECTOR rec[-1]
-    """
-            )
-        )
-        == 1
-    )
+    """)) == 1
     assert (
         count_measurement_layers(
             stim.Circuit.generated(

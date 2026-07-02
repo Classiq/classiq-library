@@ -6,7 +6,6 @@ from pathlib import Path
 sys.path.insert(0, "..")
 from benchmark import BenchmarkExample
 
-
 LOCALIZATION_DESCRIPTION = Path("../descriptions/dynamical_localization.tex").read_text(
     encoding="utf-8"
 )

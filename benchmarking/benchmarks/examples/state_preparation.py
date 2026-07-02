@@ -7,7 +7,6 @@ import numpy as np
 sys.path.insert(0, "..")
 from benchmark import BenchmarkExample
 
-
 SP_DESCRIPTION = Path("../descriptions/state_preparation.tex").read_text(
     encoding="utf-8"
 )

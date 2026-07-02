@@ -46,10 +46,8 @@ def test_iter_split_op_moments():
     assert (
         list(
             _iter_split_op_moments(
-                stim.Circuit(
-                    """
-    """
-                ),
+                stim.Circuit("""
+    """),
                 immune_qubit_indices=set(),
             )
         )
@@ -59,11 +57,9 @@ def test_iter_split_op_moments():
     assert (
         list(
             _iter_split_op_moments(
-                stim.Circuit(
-                    """
+                stim.Circuit("""
         H 0
-    """
-                ),
+    """),
                 immune_qubit_indices=set(),
             )
         )
@@ -73,12 +69,10 @@ def test_iter_split_op_moments():
     assert (
         list(
             _iter_split_op_moments(
-                stim.Circuit(
-                    """
+                stim.Circuit("""
         H 0
         TICK
-    """
-                ),
+    """),
                 immune_qubit_indices=set(),
             )
         )
@@ -88,12 +82,10 @@ def test_iter_split_op_moments():
     assert (
         list(
             _iter_split_op_moments(
-                stim.Circuit(
-                    """
+                stim.Circuit("""
         H 0 1
         TICK
-    """
-                ),
+    """),
                 immune_qubit_indices=set(),
             )
         )
@@ -103,12 +95,10 @@ def test_iter_split_op_moments():
     assert (
         list(
             _iter_split_op_moments(
-                stim.Circuit(
-                    """
+                stim.Circuit("""
         H 0 1
         TICK
-    """
-                ),
+    """),
                 immune_qubit_indices={3},
             )
         )
@@ -120,13 +110,11 @@ def test_iter_split_op_moments():
     assert (
         list(
             _iter_split_op_moments(
-                stim.Circuit(
-                    """
+                stim.Circuit("""
         H 0
         TICK
         H 1
-    """
-                ),
+    """),
                 immune_qubit_indices=set(),
             )
         )
@@ -139,15 +127,13 @@ def test_iter_split_op_moments():
     assert (
         list(
             _iter_split_op_moments(
-                stim.Circuit(
-                    """
+                stim.Circuit("""
         CX rec[-1] 0 1 2 3 4
         MPP X5*X6 Y5
         CX 8 9 10 11
         TICK
         H 0
-    """
-                ),
+    """),
                 immune_qubit_indices=set(),
             )
         )
@@ -193,9 +179,7 @@ def test_occurs_in_classical_control_system():
 def test_si_1000():
     model = NoiseModel.si1000(1e-3)
     assert (
-        model.noisy_circuit(
-            stim.Circuit(
-                """
+        model.noisy_circuit(stim.Circuit("""
         R 0 1 2 3
         TICK
         ISWAP 0 1 2 3 4 5
@@ -203,11 +187,8 @@ def test_si_1000():
         H 4 5 6 7
         TICK
         M 0 1 2 3
-    """
-            )
-        )
-        == stim.Circuit(
-            """
+    """))
+        == stim.Circuit("""
         R 0 1 2 3
         X_ERROR(0.002) 0 1 2 3
         DEPOLARIZE1(0.0001) 4 5 6 7
@@ -224,8 +205,7 @@ def test_si_1000():
         DEPOLARIZE1(0.001) 0 1 2 3
         DEPOLARIZE1(0.0001) 4 5 6 7
         DEPOLARIZE1(0.002) 4 5 6 7
-    """
-        )
+    """)
     )
 
 
@@ -239,9 +219,7 @@ def test_measure_any():
         measure_rules={"XX": gen.NoiseRule(flip_result=0.375, after={})},
     )
     assert (
-        model.noisy_circuit(
-            stim.Circuit(
-                """
+        model.noisy_circuit(stim.Circuit("""
         H 0
         TICK
         CX 0 1
@@ -249,11 +227,8 @@ def test_measure_any():
         M 0 1
         TICK
         MPP Z0*Z1 X2*X3 X4*X5*X6
-    """
-            )
-        )
-        == stim.Circuit(
-            """
+    """))
+        == stim.Circuit("""
         H 0
         TICK
         CX 0 1
@@ -265,8 +240,7 @@ def test_measure_any():
         MPP(0.375) X2*X3
         MPP(0.25) X4*X5*X6
         DEPOLARIZE1(0.125) 0 1 4 5 6
-    """
-        )
+    """)
     )
 
 
@@ -278,9 +252,7 @@ def test_tick_depolarization():
         any_measurement_rule=gen.NoiseRule(after={}),
     )
     assert (
-        model.noisy_circuit(
-            stim.Circuit(
-                """
+        model.noisy_circuit(stim.Circuit("""
         H 0
         TICK
         CX 0 1
@@ -288,11 +260,8 @@ def test_tick_depolarization():
         M 0 1
         TICK
         MPP Z0*Z1 X2*X3 X4*X5*X6
-    """
-            )
-        )
-        == stim.Circuit(
-            """
+    """))
+        == stim.Circuit("""
         H 0
         DEPOLARIZE1(0.375) 0 1 2 3 4 5 6
         TICK
@@ -304,6 +273,5 @@ def test_tick_depolarization():
         TICK
         MPP Z0*Z1 X2*X3 X4*X5*X6
         DEPOLARIZE1(0.375) 0 1 2 3 4 5 6
-    """
-        )
+    """)
     )

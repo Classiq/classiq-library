@@ -23,18 +23,13 @@ def test_errors():
     with pytest.raises(ValueError, match="must be a stim.DetectorErrorModel"):
         chromobius.compile_decoder_for_dem(object())
     with pytest.raises(ValueError, match="4th coordinate"):
-        chromobius.compile_decoder_for_dem(
-            stim.DetectorErrorModel(
-                """
+        chromobius.compile_decoder_for_dem(stim.DetectorErrorModel("""
             error(0.1) D0
-        """
-            )
-        )
+        """))
 
 
 def test_decoding():
-    color_rep_code = stim.Circuit(
-        """
+    color_rep_code = stim.Circuit("""
         X_ERROR(0.1) 0 1 2 3 4 5 6 7 8
         M 0 1 2 3 4 5 6 7 8
         DETECTOR(0, 0, 0, 0) rec[-9] rec[-8] rec[-7]
@@ -54,8 +49,7 @@ def test_decoding():
         OBSERVABLE_INCLUDE(6) rec[-7]
         OBSERVABLE_INCLUDE(7) rec[-8]
         OBSERVABLE_INCLUDE(8) rec[-9]
-    """
-    )
+    """)
 
     err = color_rep_code.search_for_undetectable_logical_errors(
         dont_explore_detection_event_sets_with_size_above=7,

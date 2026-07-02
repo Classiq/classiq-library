@@ -19,13 +19,11 @@ import gen
 
 def test_builder_init():
     builder = gen.Builder.for_qubits([0, 1j, 3 + 2j])
-    assert builder.circuit == stim.Circuit(
-        """
+    assert builder.circuit == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(0, 1) 1
         QUBIT_COORDS(3, 2) 2
-    """
-    )
+    """)
 
 
 def test_measure_code():
@@ -51,8 +49,7 @@ def test_measure_code():
         observables_first=True,
         ancilla_qubits_for_xz_observable_pairs=[1j],
     )
-    assert builder.circuit == stim.Circuit(
-        """
+    assert builder.circuit == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(0, 1) 1
         QUBIT_COORDS(1, 0) 2
@@ -64,8 +61,7 @@ def test_measure_code():
         MPP Z0*Z1*Z2*Z3*Z4*Z5
         OBSERVABLE_INCLUDE(1) rec[-1]
         MPP X0*Z2*Z3*X4 X2*Z3*Z4*X5 X0*X3*Z4*Z5 Z0*X2*X4*Z5
-    """
-    )
+    """)
 
     builder.circuit.clear()
     builder.measure_stabilizer_code(
@@ -75,8 +71,7 @@ def test_measure_code():
         observables_first=False,
         ancilla_qubits_for_xz_observable_pairs=[1j],
     )
-    assert builder.circuit == stim.Circuit(
-        """
+    assert builder.circuit == stim.Circuit("""
         MPP X0*Z2*Z3*X4 X2*Z3*Z4*X5 X0*X3*Z4*Z5 Z0*X2*X4*Z5
         DETECTOR(0, 1, 0) rec[-8] rec[-4]
         DETECTOR(1, 1, 0) rec[-7] rec[-3]
@@ -86,5 +81,4 @@ def test_measure_code():
         OBSERVABLE_INCLUDE(0) rec[-1]
         MPP Z0*Z1*Z2*Z3*Z4*Z5
         OBSERVABLE_INCLUDE(1) rec[-1]
-    """
-    )
+    """)

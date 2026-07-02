@@ -509,9 +509,7 @@ def test_diagram():
             ),
         ],
     )
-    assert (
-        patch_outline_svg_viewer([boundary]).strip()
-        == """
+    assert patch_outline_svg_viewer([boundary]).strip() == """
 <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#FF0000" x="1" y="1" width="20" height="20" />
 <text x="11" y="11" fill="white" font-size="20" text-anchor="middle" alignment-baseline="central">X</text>
@@ -533,4 +531,3 @@ def test_diagram():
 <rect fill="none" stroke="#999" x="-10.714285714285708" y="-10.714285714285708" width="500.0" height="500.0" />
 </svg>
 """.strip()
-    )

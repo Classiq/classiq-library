@@ -3,7 +3,6 @@ from typing import Any
 
 from utils_for_tests import ROOT_DIRECTORY
 
-
 README_FILE = ROOT_DIRECTORY / "README.md"
 PYTHON_CODE_PATTERN = r"(?s)```python\s*\n(.*?)```"
 SHOW_PATTERN = r"\s*show\(.*\)"

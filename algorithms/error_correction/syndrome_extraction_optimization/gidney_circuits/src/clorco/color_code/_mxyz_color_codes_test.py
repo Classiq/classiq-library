@@ -51,8 +51,7 @@ def test_make_mxyz_phenom_color_code_exact():
         rounds=100,
         noise=1e-3,
     )
-    assert circuit == stim.Circuit(
-        """
+    assert circuit == stim.Circuit("""
         QUBIT_COORDS(-1, -1) 0
         QUBIT_COORDS(0, 0) 1
         QUBIT_COORDS(1, 1) 2
@@ -116,8 +115,7 @@ def test_make_mxyz_phenom_color_code_exact():
         OBSERVABLE_INCLUDE(0) rec[-1]
         MPP Z0*Z1*Z5*Z7
         OBSERVABLE_INCLUDE(1) rec[-1]
-    """
-    )
+    """)
 
 
 def test_make_mxyz_color_code_from_stim_gen():
@@ -140,8 +138,7 @@ def test_make_mxyz_color_code_from_stim_gen():
     )
     assert len(err) == 3
 
-    assert circuit == stim.Circuit(
-        """
+    assert circuit == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(1, 0) 1
         QUBIT_COORDS(2, 0) 2
@@ -374,5 +371,4 @@ def test_make_mxyz_color_code_from_stim_gen():
         OBSERVABLE_INCLUDE(0) rec[-15] rec[-16] rec[-17] rec[-18] rec[-19]
         DEPOLARIZE1(0.001) 0 1 3 4 6 8 9 11 12 13 15 16 18 19 21 23 24 25 27
         X_ERROR(0.001) 2 5 7 10 14 17 20 22 26
-    """
-    )
+    """)

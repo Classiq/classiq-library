@@ -20,7 +20,6 @@ from gen._core._util import sorted_complex, min_max_complex
 from gen._core._tile import Tile
 from gen._util import write_file
 
-
 DESIRED_Z_TO_ORIENTATION: dict[str, str] = {
     "X": "ZX",
     "Y": "ZY",

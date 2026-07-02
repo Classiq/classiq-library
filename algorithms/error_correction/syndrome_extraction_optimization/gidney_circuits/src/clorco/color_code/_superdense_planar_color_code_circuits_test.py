@@ -82,8 +82,7 @@ def test_make_superdense_color_code_circuit_exact():
         basis="X",
         rounds=100,
     )
-    assert circuit == stim.Circuit(
-        """
+    assert circuit == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(1, 0) 1
         QUBIT_COORDS(1, 1) 2
@@ -247,5 +246,4 @@ def test_make_superdense_color_code_circuit_exact():
         OBSERVABLE_INCLUDE(0) rec[-28] rec[-27] rec[-26] rec[-25] rec[-24] rec[-23] rec[-22] rec[-21] rec[-20] rec[-19] rec[-18] rec[-17] rec[-16] rec[-15] rec[-14] rec[-13] rec[-12] rec[-11] rec[-10] rec[-9] rec[-8] rec[-7] rec[-5] rec[-4] rec[-3] rec[-2]
         SHIFT_COORDS(0, 0, 1)
         TICK
-    """
-    )
+    """)

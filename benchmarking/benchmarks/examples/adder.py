@@ -5,7 +5,6 @@ from pathlib import Path
 sys.path.insert(0, "..")
 from benchmark import BenchmarkExample
 
-
 ADDER_DESCRIPTION = Path("../descriptions/adder.tex").read_text(encoding="utf-8")
 
 

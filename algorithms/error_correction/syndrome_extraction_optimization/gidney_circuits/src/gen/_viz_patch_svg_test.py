@@ -61,9 +61,7 @@ def test_patch_svg_exact():
         ]
     )
     svg_content = gen.patch_svg_viewer([patch])
-    assert (
-        svg_content.strip()
-        == """
+    assert svg_content.strip() == """
 <svg viewBox="0 0 1400 500" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#FF8080" x="1" y="1" width="20" height="20" />
 <text x="11" y="11" fill="white" font-size="20" text-anchor="middle" alignment-baseline="central">X</text>
@@ -118,4 +116,3 @@ def test_patch_svg_exact():
 <rect fill="none" stroke="#999" x="112.5" y="-12.499999999999991" width="400.0" height="400.0" />
 </svg>
     """.strip()
-    )

@@ -524,8 +524,7 @@ def test_make_toric_color_code_phenom_circuit_exact():
         height=8,
         ablate_into_matchable_code=True,
     )
-    assert code.make_code_capacity_circuit(noise=0.125) == stim.Circuit(
-        """
+    assert code.make_code_capacity_circuit(noise=0.125) == stim.Circuit("""
         QUBIT_COORDS(0, -1) 0
         QUBIT_COORDS(0, 2) 1
         QUBIT_COORDS(0, 3) 2
@@ -589,8 +588,7 @@ def test_make_toric_color_code_phenom_circuit_exact():
         OBSERVABLE_INCLUDE(2) rec[-1]
         MPP Z5*Z10*Z11*Z12*Z13
         OBSERVABLE_INCLUDE(3) rec[-1]
-    """
-    )
+    """)
 
 
 def test_make_toric_color_code_exact_square_coords():

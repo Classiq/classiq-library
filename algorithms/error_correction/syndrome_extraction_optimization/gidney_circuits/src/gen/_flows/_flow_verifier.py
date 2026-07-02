@@ -21,7 +21,6 @@ import stim
 from gen._flows._flow import Flow
 from gen._flows._chunk import Chunk
 
-
 FLIP_REV_SET = {
     "CX",
     "CY",
