@@ -15,6 +15,7 @@ Currently enforced:
   - execution results are parsed via .result_value(), not .result()[0].value.
   - a circuit is shown via show(qprog), not the qprog.show() method form.
   - a notebook opens with an H1 title (optionally after a logo/banner cell).
+  - a notebook has exactly one H1 (later H1 headings are demoted to H2).
 """
 
 import re
@@ -132,11 +133,45 @@ def opens_with_h1_title(nb: nbformat.NotebookNode, auto_fix: bool) -> str:
     )
 
 
+def single_h1_title(nb: nbformat.NotebookNode, auto_fix: bool) -> str:
+    """Exactly one H1 (the title); demote any later H1 headings to H2.
+
+    The first H1 encountered is kept as the title; every subsequent `# ` heading
+    is demoted to `## `. Fenced code blocks are skipped so a `#` comment inside
+    ``` ``` ``` isn't mistaken for a heading.
+    """
+    seen_h1 = False
+    demoted: list[str] = []
+    for cell in nb.cells:
+        if cell.cell_type != "markdown":
+            continue
+        lines = cell.source.split("\n")
+        in_fence = False
+        for i, line in enumerate(lines):
+            if re.match(r"^\s*```", line):
+                in_fence = not in_fence
+                continue
+            if in_fence or not re.match(r"^#[ \t]+\S", line):
+                continue
+            if seen_h1:
+                demoted.append(line.strip())
+                if auto_fix:
+                    lines[i] = "#" + line  # H1 -> H2
+            else:
+                seen_h1 = True
+        if auto_fix:
+            cell.source = "\n".join(lines)
+    if not demoted:
+        return NO_ERROR
+    return f"multiple H1 headings — demoted {len(demoted)} to H2 (keep one H1 title): {demoted}"
+
+
 UNIFORMITY_RULES: list[UniformityRule] = [
     references_heading_is_plural,
     results_use_result_value,
     show_uses_function_form,
     opens_with_h1_title,
+    single_h1_title,
 ]
 
 
