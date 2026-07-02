@@ -35,7 +35,7 @@ class OpenCurve:
 
     @staticmethod
     def from_sequence(
-        points_and_bases: Iterable[Literal["X", "Z"] | complex | int | float]
+        points_and_bases: Iterable[Literal["X", "Z"] | complex | int | float],
     ):
         points_and_bases = list(points_and_bases)
 

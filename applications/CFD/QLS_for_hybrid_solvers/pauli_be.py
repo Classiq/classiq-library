@@ -14,7 +14,7 @@ def of_op_to_cl_op(qubit_op: QubitOperator) -> SparsePauliOp:
     return SparsePauliOp(
         terms=[
             SparsePauliTerm(
-                paulis=[  # type:ignore[arg-type]
+                paulis=[  # type: ignore[arg-type]
                     IndexedPauli(
                         pauli=getattr(Pauli, pauli),
                         index=qubit,

@@ -20,11 +20,9 @@ import gen
 
 def test_verify_h():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             H 0
-        """
-        ),
+        """),
         q2i={1j: 0},
         flows=[
             gen.Flow(
@@ -37,11 +35,9 @@ def test_verify_h():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             H 0
-        """
-        ),
+        """),
         q2i={1j: 0},
         flows=[
             gen.Flow(
@@ -57,11 +53,9 @@ def test_verify_h():
 
 def test_verify_r():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             R 0
-        """
-        ),
+        """),
         q2i={1j: 0},
         flows=[
             gen.Flow(
@@ -75,11 +69,9 @@ def test_verify_r():
         chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             R 0
-        """
-        ),
+        """),
         q2i={1j: 0},
         flows=[
             gen.Flow(
@@ -94,14 +86,12 @@ def test_verify_r():
 
 def test_verify_measurement():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             R 1
             CX 0 1 2 1
             M 1 3
             H 0
-        """
-        ),
+        """),
         q2i={0: 0, 1j: 1, 2j: 2, 3j: 3},
         flows=[
             gen.Flow(
@@ -121,11 +111,9 @@ def test_verify_measurement():
 
 def test_verify_mpp():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MPP X0*Y1*Z2
-        """
-        ),
+        """),
         q2i={0: 0, 1j: 1, 2j: 2, 3j: 3},
         flows=[
             gen.Flow(
@@ -138,12 +126,10 @@ def test_verify_mpp():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MPP X0*Y1*Z2
             MPP X0*X1*Z2
-        """
-        ),
+        """),
         q2i={0: 0, 1j: 1, 2j: 2, 3j: 3},
         flows=[
             gen.Flow(
@@ -159,11 +145,9 @@ def test_verify_mpp():
 
 def test_verify_c_xyz():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             C_XYZ 0 1 2
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2},
         flows=[
             gen.Flow(
@@ -176,11 +160,9 @@ def test_verify_c_xyz():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             C_ZYX 0 1 2
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2},
         flows=[
             gen.Flow(
@@ -195,11 +177,9 @@ def test_verify_c_xyz():
 
 def test_verify_s():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             S 0 1 2
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2},
         flows=[
             gen.Flow(
@@ -212,11 +192,9 @@ def test_verify_s():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             S_DAG 0 1 2
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2},
         flows=[
             gen.Flow(
@@ -229,11 +207,9 @@ def test_verify_s():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             H_XY 0 1 2
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2},
         flows=[
             gen.Flow(
@@ -248,11 +224,9 @@ def test_verify_s():
 
 def test_verify_sqrt_x():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             SQRT_X 0 1 2
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2},
         flows=[
             gen.Flow(
@@ -265,11 +239,9 @@ def test_verify_sqrt_x():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             SQRT_X_DAG 0 1 2
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2},
         flows=[
             gen.Flow(
@@ -282,11 +254,9 @@ def test_verify_sqrt_x():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             H_YZ 0 1 2
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2},
         flows=[
             gen.Flow(
@@ -301,11 +271,9 @@ def test_verify_sqrt_x():
 
 def test_verify_cy():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             CY 0 1 2 3 4 5
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5},
         flows=[
             gen.Flow(
@@ -318,11 +286,9 @@ def test_verify_cy():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             CY 0 1 2 3 4 5
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5},
         flows=[
             gen.Flow(
@@ -335,11 +301,9 @@ def test_verify_cy():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             CY 0 1 2 3 4 5
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5},
         flows=[
             gen.Flow(
@@ -434,11 +398,9 @@ def test_verify_gate_flows_vs_stim_tableau(gate: str):
 
 def test_verify_swap():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             SWAP 0 1 2 3 4 5
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5},
         flows=[
             gen.Flow(
@@ -453,11 +415,9 @@ def test_verify_swap():
 
 def test_verify_xcy():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             XCY 0 1 2 3 4 5
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5},
         flows=[
             gen.Flow(
@@ -470,11 +430,9 @@ def test_verify_xcy():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             YCX 1 0 3 2 5 4
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5},
         flows=[
             gen.Flow(
@@ -487,11 +445,9 @@ def test_verify_xcy():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             XCY 0 1 2 3 4 5
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5},
         flows=[
             gen.Flow(
@@ -504,11 +460,9 @@ def test_verify_xcy():
     chunk.verify()
 
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             XCY 0 1 2 3 4 5
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5},
         flows=[
             gen.Flow(
@@ -523,13 +477,11 @@ def test_verify_xcy():
 
 def test_reset_analysis():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             R 0 1 2 3 4
             CX 2 0
             M 0
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1, 2: 2, 3: 3, 4: 4},
         flows=[
             gen.Flow(
@@ -546,22 +498,18 @@ def test_reset_analysis():
     inverted = gen.FlowStabilizerVerifier.invert(chunk)
     inverted.verify()
     assert len(inverted.flows) == len(chunk.flows)
-    assert inverted.circuit == stim.Circuit(
-        """
+    assert inverted.circuit == stim.Circuit("""
         R 0
         CX 2 0
         M 4 3 2 1 0
-    """
-    )
+    """)
 
 
 def test_verify_mr():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MR 0
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1},
         flows=[
             gen.Flow(
@@ -580,12 +528,10 @@ def test_verify_mr():
 
 def test_verify_feedback_cx():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MR 0
             CX rec[-1] 1
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1},
         flows=[
             gen.Flow(
@@ -620,12 +566,10 @@ def test_verify_feedback_cx():
         ],
     )
     chunk2 = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MR 0
             CX rec[-1] 1
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1},
         flows=[
             gen.Flow(
@@ -642,12 +586,10 @@ def test_verify_feedback_cx():
 
 def test_verify_feedback_cz():
     chunk = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MR 0
             CZ rec[-1] 1
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1},
         flows=[
             gen.Flow(
@@ -682,12 +624,10 @@ def test_verify_feedback_cz():
         ],
     )
     chunk2 = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MR 0
             CX rec[-1] 1
-        """
-        ),
+        """),
         q2i={0: 0, 1: 1},
         flows=[
             gen.Flow(
@@ -704,13 +644,11 @@ def test_verify_feedback_cz():
 
 def test_verify_feedback_passthrough():
     gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             M 0
             R 0
             CX rec[-1] 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(
@@ -722,13 +660,11 @@ def test_verify_feedback_passthrough():
     ).verify()
 
     gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             M 0
             R 0
             CX rec[-1] 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(
@@ -740,13 +676,11 @@ def test_verify_feedback_passthrough():
     ).verify()
 
     gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             M 0
             R 0
             CX rec[-1] 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(
@@ -758,13 +692,11 @@ def test_verify_feedback_passthrough():
     ).verify()
 
     gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MX 0
             RX 0
             CZ rec[-1] 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(
@@ -775,13 +707,11 @@ def test_verify_feedback_passthrough():
         ],
     ).verify()
     gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MX 0
             RX 0
             CZ rec[-1] 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(
@@ -792,13 +722,11 @@ def test_verify_feedback_passthrough():
         ],
     ).verify()
     gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MX 0
             RX 0
             CZ rec[-1] 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(
@@ -812,12 +740,10 @@ def test_verify_feedback_passthrough():
 
 def test_reproduce_feedback_verification_failure():
     gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MRX 1
             CZ rec[-1] 1
-        """
-        ),
+        """),
         q2i={
             1j: 0,
             2j: 1,

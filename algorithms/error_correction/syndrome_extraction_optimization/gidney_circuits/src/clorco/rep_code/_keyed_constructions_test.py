@@ -53,8 +53,7 @@ def test_exact_construction():
         debug_out_dir=None,
     )
     circuit = make_named_rep_code_constructions()[style](params)
-    assert circuit == stim.Circuit(
-        """
+    assert circuit == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(1, 0) 1
         QUBIT_COORDS(2, 0) 2
@@ -121,5 +120,4 @@ def test_exact_construction():
         DETECTOR(2.5, 0, 0, 3) rec[-5] rec[-4] rec[-1]
         OBSERVABLE_INCLUDE(0) rec[-7]
         DEPOLARIZE1(0.001) 0 1 2 3 4 5 6
-    """
-    )
+    """)

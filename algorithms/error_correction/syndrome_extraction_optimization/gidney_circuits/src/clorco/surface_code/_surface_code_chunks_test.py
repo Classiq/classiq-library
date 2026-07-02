@@ -27,8 +27,7 @@ def test_magic_init_surface_code_chunk():
     c2.verify()
     c3 = c.magic_end_chunk()
     c3.verify()
-    assert gen.compile_chunks_into_circuit([c2, c3]) == stim.Circuit(
-        """
+    assert gen.compile_chunks_into_circuit([c2, c3]) == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(0, 1) 1
         QUBIT_COORDS(0, 2) 2
@@ -61,8 +60,7 @@ def test_magic_init_surface_code_chunk():
         OBSERVABLE_INCLUDE(0) rec[-1]
         SHIFT_COORDS(0, 0, 1)
         TICK
-    """
-    )
+    """)
 
 
 def test_verify_normal_surface_code_chunk():
@@ -87,8 +85,7 @@ def test_verify_normal_surface_code_chunk():
         == 3
     )
 
-    assert circuit == stim.Circuit(
-        """
+    assert circuit == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(0, 1) 1
         QUBIT_COORDS(0, 2) 2
@@ -176,5 +173,4 @@ def test_verify_normal_surface_code_chunk():
         OBSERVABLE_INCLUDE(0) rec[-13] rec[-12] rec[-11]
         SHIFT_COORDS(0, 0, 1)
         TICK
-    """
-    )
+    """)

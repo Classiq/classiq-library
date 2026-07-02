@@ -7,7 +7,6 @@ import numpy as np
 sys.path.insert(0, "..")
 from benchmark import BenchmarkExample
 
-
 QFT_DESCRIPTION = Path("../descriptions/qft.tex").read_text(encoding="utf-8")
 
 

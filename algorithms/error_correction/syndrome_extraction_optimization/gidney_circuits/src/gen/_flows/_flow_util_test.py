@@ -39,11 +39,9 @@ def test_magic_init_for_chunk():
 
 def test_compile_postselected_chunks():
     chunk1 = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             R 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(
@@ -53,11 +51,9 @@ def test_compile_postselected_chunks():
         ],
     )
     chunk2 = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             M 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(
@@ -73,11 +69,9 @@ def test_compile_postselected_chunks():
         ],
     )
     chunk3 = gen.Chunk(
-        circuit=stim.Circuit(
-            """
+        circuit=stim.Circuit("""
             MR 0
-        """
-        ),
+        """),
         q2i={0: 0},
         flows=[
             gen.Flow(

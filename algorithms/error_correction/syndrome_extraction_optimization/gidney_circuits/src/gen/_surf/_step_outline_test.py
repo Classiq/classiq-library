@@ -81,8 +81,7 @@ def test_step_outline_simple():
         edit_cur_obs={},
         o2i={},
     )
-    assert builder.circuit == stim.Circuit(
-        """
+    assert builder.circuit == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(0, 1) 1
         QUBIT_COORDS(0, 2) 2
@@ -171,8 +170,7 @@ def test_step_outline_simple():
         DETECTOR(1.5, 2.5, 0.5) rec[-12] rec[-9] rec[-5]
         SHIFT_COORDS(0, 0, 1)
         TICK
-    """
-    )
+    """)
 
 
 def test_step_outline_alternating():
@@ -239,8 +237,7 @@ def test_step_outline_alternating():
         edit_cur_obs={},
         o2i={},
     )
-    assert builder.circuit == stim.Circuit(
-        """
+    assert builder.circuit == stim.Circuit("""
         QUBIT_COORDS(0, 0) 0
         QUBIT_COORDS(0, 1) 1
         QUBIT_COORDS(0, 2) 2
@@ -375,5 +372,4 @@ def test_step_outline_alternating():
         DETECTOR(1.5, 2.5, 0.5) rec[-12] rec[-9] rec[-5]
         SHIFT_COORDS(0, 0, 1)
         TICK
-    """
-    )
+    """)

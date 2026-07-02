@@ -6,6 +6,7 @@ Loads aggregated_results.csv, converts to sinter.TaskStats, and produces
 the qubit-scaling plot (error rate per round vs qubits) with proper
 uncertainty bands and styling.
 """
+
 import argparse
 import os
 import re

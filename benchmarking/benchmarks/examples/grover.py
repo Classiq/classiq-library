@@ -7,7 +7,6 @@ import numpy as np
 sys.path.insert(0, "..")
 from benchmark import BenchmarkExample
 
-
 GROVER_DESCRIPTION = Path("../descriptions/grover.tex").read_text(encoding="utf-8")
 
 MARKED_STATE = 5

@@ -18,7 +18,6 @@ from typing import Callable
 
 import gen
 
-
 BASIS_COLORS = {
     "X": "#FF8080",
     "Z": "#8080FF",

@@ -94,8 +94,7 @@ def test_exact_color_code_circuit():
         convert_to_cz=False,
         editable_extras={},
     )
-    assert circuit == stim.Circuit(
-        """
+    assert circuit == stim.Circuit("""
         QUBIT_COORDS(0, 1) 0
         QUBIT_COORDS(1, 1) 1
         QUBIT_COORDS(1, 2) 2
@@ -309,5 +308,4 @@ def test_exact_color_code_circuit():
         OBSERVABLE_INCLUDE(0) rec[-7] rec[-5] rec[-1]
         SHIFT_COORDS(0, 0, 1)
         DEPOLARIZE1(0.001) 4 2 8 6 5 3 0 7 1
-    """
-    )
+    """)

@@ -18,7 +18,6 @@ import collections
 
 import stim
 
-
 ANNOTATION_OPS = {
     "DETECTOR",
     "OBSERVABLE_INCLUDE",
