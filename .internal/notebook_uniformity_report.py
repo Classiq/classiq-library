@@ -85,8 +85,14 @@ class Notebook:
         )
 
     @property
+    def prose_markdown(self) -> str:
+        """Markdown with ``` fenced code blocks ``` removed, so their `#` comment
+        lines aren't counted as headings and their code isn't read as prose."""
+        return _strip_fenced_code(self.markdown)
+
+    @property
     def h1_titles(self) -> list[str]:
-        return re.findall(r"(?m)^#\s+(.*\S)", self.markdown)
+        return re.findall(r"(?m)^#\s+(.*\S)", self.prose_markdown)
 
     @property
     def opens_with_h1_title(self) -> bool:
@@ -97,6 +103,17 @@ class Notebook:
         if _is_image_only(self.first_cell_type, self.first_cell_source):
             return _is_h1(self.second_cell_type, self.second_cell_source)
         return False
+
+
+def _strip_fenced_code(markdown: str) -> str:
+    lines, in_fence = [], False
+    for line in markdown.splitlines():
+        if re.match(r"^\s*```", line):
+            in_fence = not in_fence
+            continue
+        if not in_fence:
+            lines.append(line)
+    return "\n".join(lines)
 
 
 def _join(cells: list[dict], cell_type: str) -> str:
@@ -141,7 +158,7 @@ def load_notebooks() -> tuple[Notebook, ...]:
 # --------------------------------------------------------------------------- #
 def _first_prose(nb: Notebook) -> str:
     """First real sentence of prose — skips headings, html, images, lists, math."""
-    for line in nb.markdown.splitlines():
+    for line in nb.prose_markdown.splitlines():
         stripped = line.strip()
         if stripped and not stripped.startswith(
             ("#", "<", "!", "[", ">", "-", "*", "$", "|", "=")
@@ -188,8 +205,10 @@ def report_coverage(
     deviates: Callable[[Notebook], bool],
     exceptions: Sequence[AcceptedDeviation] = (),
     details: Sequence[str] = (),
+    annotate: Callable[[Notebook], str] | None = None,
 ) -> None:
-    """Binary convention check. `deviates(nb)` is True when nb breaks the rule."""
+    """Binary convention check. `deviates(nb)` is True when nb breaks the rule.
+    `annotate(nb)` optionally adds a per-notebook note to each to-fix line."""
     print(f"\n[{point}] {title}")
     for line in details:
         print(f"       {line}")
@@ -219,7 +238,8 @@ def report_coverage(
     print(f"       -> to fix: {len(todo)}")
     shown = todo if Config.MAX_LISTED == 0 else todo[: Config.MAX_LISTED]
     for nb in shown:
-        print(f"           {nb.rel}")
+        note = f"  — {annotate(nb)}" if annotate else ""
+        print(f"           {nb.rel}{note}")
     if len(shown) < len(todo):
         print(f"           ... (+{len(todo) - len(shown)} more)")
 
@@ -315,10 +335,13 @@ def point_2_result_variable(nbs: Sequence[Notebook]) -> None:
     def _result_vars(code: str) -> list[str]:
         return re.findall(r"(\w+)\s*=\s*(?:execute\(|\w+\.result(?:_value)?\()", code)
 
-    def deviates(nb: Notebook) -> bool:
-        return any(
-            not re.fullmatch(r"result(_\w+)?", name) for name in _result_vars(nb.code)
+    def offenders(nb: Notebook) -> list[str]:
+        return sorted(
+            {v for v in _result_vars(nb.code) if not re.fullmatch(r"result(_\w+)?", v)}
         )
+
+    def deviates(nb: Notebook) -> bool:
+        return bool(offenders(nb))
 
     report_coverage(
         "2",
@@ -326,6 +349,7 @@ def point_2_result_variable(nbs: Sequence[Notebook]) -> None:
         nbs,
         deviates=deviates,
         exceptions=exceptions,
+        annotate=lambda nb: ", ".join(offenders(nb)),
     )
 
 
@@ -338,10 +362,13 @@ def point_2b_qprog_variable(nbs: Sequence[Notebook]) -> None:
     def _qprog_vars(code: str) -> list[str]:
         return re.findall(r"(\w+)\s*=\s*synthesize\(", code)
 
-    def deviates(nb: Notebook) -> bool:
-        return any(
-            not re.fullmatch(r"qprog(_\w+)?", name) for name in _qprog_vars(nb.code)
+    def offenders(nb: Notebook) -> list[str]:
+        return sorted(
+            {v for v in _qprog_vars(nb.code) if not re.fullmatch(r"qprog(_\w+)?", v)}
         )
+
+    def deviates(nb: Notebook) -> bool:
+        return bool(offenders(nb))
 
     report_coverage(
         "2b",
@@ -349,6 +376,7 @@ def point_2b_qprog_variable(nbs: Sequence[Notebook]) -> None:
         nbs,
         deviates=deviates,
         exceptions=exceptions,
+        annotate=lambda nb: ", ".join(offenders(nb)),
     )
 
 
@@ -386,7 +414,7 @@ def point_5_references_plural(nbs: Sequence[Notebook]) -> None:
     exceptions: list[AcceptedDeviation] = []
 
     def deviates(nb: Notebook) -> bool:
-        return bool(re.search(r"(?mi)^#{1,4}\s+reference\s*$", nb.markdown))
+        return bool(re.search(r"(?mi)^#{1,4}\s+reference\s*$", nb.prose_markdown))
 
     report_coverage(
         "5",
@@ -418,7 +446,7 @@ def point_6_single_h1(nbs: Sequence[Notebook]) -> None:
 def point_7_deep_nesting(nbs: Sequence[Notebook]) -> None:
     # Investigate only — no auto-fix. Show a few with and without H4+ to eyeball.
     def uses_h4plus(nb: Notebook) -> bool:
-        return bool(re.search(r"(?m)^#{4,6}\s+\S", nb.markdown))
+        return bool(re.search(r"(?m)^#{4,6}\s+\S", nb.prose_markdown))
 
     with_deep = sorted(nb.rel for nb in nbs if uses_h4plus(nb))
     without = sorted(nb.rel for nb in nbs if not uses_h4plus(nb) and nb.group == "main")
@@ -454,7 +482,7 @@ def point_9_section_vocabulary(nbs: Sequence[Notebook]) -> None:
     print("\n[ 9] Section-heading vocabulary  (distribution -> agent unifies)")
     counts: Counter[str] = Counter()
     for nb in nbs:
-        for _level, text in re.findall(r"(?m)^(#{2,4})\s+(.*)$", nb.markdown):
+        for _level, text in re.findall(r"(?m)^(#{2,4})\s+(.*)$", nb.prose_markdown):
             if name := _normalized_heading(text):
                 counts[name] += 1
     for name, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:25]:
@@ -469,13 +497,13 @@ def point_12_math_delimiters(nbs: Sequence[Notebook]) -> None:
         # ("path/fragment.ipynb", "renders only under \\[ for reason ..."),
     ]
     styles: dict[str, Callable[[Notebook], bool]] = {
-        "$$...$$": lambda nb: "$$" in nb.markdown,
-        "\\[...\\]": lambda nb: "\\[" in nb.markdown,
+        "$$...$$": lambda nb: "$$" in nb.prose_markdown,
+        "\\[...\\]": lambda nb: "\\[" in nb.prose_markdown,
         "\\begin{equation}": lambda nb: bool(
-            re.search(r"\\begin\{equation\*?\}", nb.markdown)
+            re.search(r"\\begin\{equation\*?\}", nb.prose_markdown)
         ),
         "\\begin{align}": lambda nb: bool(
-            re.search(r"\\begin\{align\*?\}", nb.markdown)
+            re.search(r"\\begin\{align\*?\}", nb.prose_markdown)
         ),
     }
     groups = _split(nbs)
