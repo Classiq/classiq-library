@@ -1,5 +1,19 @@
 import numpy as np
 
+from classiq import calculate_state_vector
+
+
+def get_projected_state_vector(qprog, data_size: int) -> np.ndarray:
+    """
+    Runs a statevector simulation of the quantum program and returns the reduced
+    statevector of the 'data' variable, projected on the 'block' variable being
+    in the |0> state.
+    """
+    df = calculate_state_vector(qprog, filters={"block": 0}, amplitude_threshold=1e-12)
+    proj_statevector = np.zeros(2**data_size).astype(complex)
+    proj_statevector[df["data"].astype(int)] = df["amplitude"]
+    return proj_statevector
+
 
 def compare_quantum_classical_states(
     expected_state: np.ndarray,
