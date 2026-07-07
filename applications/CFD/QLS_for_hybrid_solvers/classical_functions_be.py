@@ -2,17 +2,17 @@ import numpy as np
 
 
 def get_projected_state_vector(  # type: ignore[no-untyped-def]
-    execution_result,
+    state_vector_df,
     measured_var: str,
+    projected_size: int,
 ) -> np.ndarray:
     """
-    This function returns a reduced statevector from execution results.
-    measured var: the name of the reduced variable
+    Return a reduced (post-selected) statevector from a calculate_state_vector DataFrame.
+    measured_var: the name of the reduced variable (a column in the DataFrame)
+    projected_size: number of qubits of measured_var
     """
-    projected_size = len(execution_result.output_qubits_map[measured_var])
     proj_statevector = np.zeros(2**projected_size).astype(complex)
-    df = execution_result.dataframe
-    filtered_st = df[np.abs(df.amplitude) > 1e-12]
+    filtered_st = state_vector_df[np.abs(state_vector_df.amplitude) > 1e-12]
 
     # Allocate values
     proj_statevector[filtered_st[measured_var]] = filtered_st.amplitude
