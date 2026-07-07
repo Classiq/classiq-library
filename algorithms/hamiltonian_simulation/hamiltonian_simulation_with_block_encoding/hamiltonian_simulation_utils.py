@@ -1,20 +1,6 @@
 import numpy as np
 
 
-def get_projected_state_vector(res) -> np.ndarray:
-    """
-    Returns a reduced statevector from execution results.
-    Expects a 'data' variable, and a 'block' variable to be filtered out when not in the |0> state.
-    """
-    state_size = 2 ** len(res.output_qubits_map["data"])
-    proj_statevector = np.zeros(state_size).astype(complex)
-
-    df = res.dataframe
-    filtered_st = df[(df.block == 0) & (np.abs(df.amplitude) > 1e-12)]
-    proj_statevector[filtered_st.data] = filtered_st.amplitude
-    return proj_statevector
-
-
 def compare_quantum_classical_states(
     expected_state: np.ndarray,
     resulted_state: np.ndarray,
