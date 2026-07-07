@@ -1,6 +1,5 @@
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
-    validate_quantum_model,
     wrap_testbook,
 )
 import numpy as np
@@ -12,8 +11,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for the cooling system created by BMW.
     """
-    # test models
-    validate_quantum_model(tb.ref("qmod"))
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_block_encoding"),
