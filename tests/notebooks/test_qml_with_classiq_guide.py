@@ -1,9 +1,12 @@
+import pytest
+
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
-    validate_quantum_model,
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
+
+pytest.importorskip("torch")
 
 
 @wrap_testbook("qml_with_classiq_guide", timeout_seconds=300)
