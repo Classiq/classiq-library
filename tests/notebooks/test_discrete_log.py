@@ -36,12 +36,9 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
 
 def _get_result_as_dataframe(tb: TestbookNotebookClient) -> pd.DataFrame:
-    parsed_counts = tb.ref("[res.dict() for res in result_Z5.parsed_counts]")
-    data_list = [
-        (sample_state.state["func_res"], sample_state.shots)
-        for sample_state in parsed_counts
-    ]
-    df = pd.DataFrame(data_list).rename(columns={0: "func_res", 1: "shots"})
+    func_res = tb.ref('result_Z5["func_res"].tolist()')
+    shots = tb.ref('result_Z5["counts"].tolist()')
+    df = pd.DataFrame({"func_res": func_res, "shots": shots})
     return df
 
 

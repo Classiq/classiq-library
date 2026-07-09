@@ -31,16 +31,14 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     ]
     formula_names = ["small_3sat_formula", "large_3sat_formula"]
     for res_name, formula_name in zip(res_names, formula_names):
-        res = tb.ref_pydantic(res_name)
-        prob = res.parsed_counts[0].shots / res.num_shots
-        state = res.parsed_counts[0].state["x"]
+        prob = tb.ref(f'{res_name}.iloc[0]["counts"] / {res_name}["counts"].sum()')
+        state = tb.ref(f'{res_name}.iloc[0]["x"]')
         orcale_cl = tb.get(formula_name)
         assert orcale_cl(state) == True and prob > 0.08
 
     # test Max Cut
-    cut_size = tb.ref_pydantic("CUT_SIZE")
-    res = tb.ref_pydantic("res_max_cut")
-    prob = res.parsed_counts[0].shots / res.num_shots
-    state = res.parsed_counts[0].state["nodes"]
+    cut_size = tb.ref("CUT_SIZE")
+    prob = tb.ref('res_max_cut.iloc[0]["counts"] / res_max_cut["counts"].sum()')
+    state = tb.ref('res_max_cut.iloc[0]["nodes"]')
     orcale_cl = tb.get("cut_predicate")
     assert orcale_cl(cut_size, state) == True and prob > 0.08
