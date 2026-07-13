@@ -66,12 +66,13 @@ def render(point: Point, nbs: list[Notebook], short: bool) -> None:
     offenders = _offenders(point, nbs)
     ok, total = len(nbs) - len(offenders), len(nbs)
     tick = "OK " if not offenders else "-> "
-    tags = (["enforced"] if point.enforced else []) + [point.solution()]
+    tags = " · ".join(point.tags())
     if short:
-        print(f"  {tick}{point.key:18} {ok:>3}/{total}   [{' · '.join(tags)}]")
+        print(f"  {tick}{point.title:18} {ok:>3}/{total}   [{tags}]")
         return
-    print(f"\n{tick}{point.key}   [{' · '.join(tags)}]")
-    print(f"      {point.example}")
+    detail = point.detail if point.static else f"agent: {point.detail}"
+    print(f"\n{tick}{point.title}   [{tags}]")
+    print(f"      {detail}")
     print(f"      {point.description}")
     print(f"      {ok}/{total} conforming    ({_split(nbs, offenders)})")
     for nb in offenders[:5]:

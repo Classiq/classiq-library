@@ -24,9 +24,10 @@ def fix(cells: list) -> bool:
 
 
 POINT = Point(
-    key="result_value",
-    example="result()[0].value  ->  result_value()",
+    title="result_value",
+    detail="result()[0].value  ->  result_value()",
     description="Read the parsed value with .result_value(), not .result()[0].value.",
+    static=True,
     detect=detect,
     fix=fix,
     enforced=True,

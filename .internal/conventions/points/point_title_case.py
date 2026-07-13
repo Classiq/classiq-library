@@ -19,9 +19,9 @@ def detect(nb: Notebook) -> list[str]:
 
 
 POINT = Point(
-    key="title_case",
-    example="## the quantum model  ->  ## The Quantum Model",
-    description="Headings use Title Case; acronyms (QAOA, HHL) and math stay intact.",
+    title="title_case",
+    detail="agents/notebook-title-case.md",
+    description="Headings use Title Case; acronyms (QAOA, HHL) and math stay intact. (approximate)",
+    static=False,
     detect=detect,
-    agent="agents/notebook-title-case.md",
 )

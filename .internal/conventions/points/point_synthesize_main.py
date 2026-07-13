@@ -15,10 +15,11 @@ def detect(nb: Notebook) -> list[str]:
 
 
 POINT = Point(
-    key="synthesize_main",
-    example="create_model(main); synthesize(qmod)  ->  synthesize(main)",
-    description="Prefer the one-step synthesize(main) over create_model() + synthesize().",
+    title="synthesize_main",
+    detail="create_model(main); synthesize(qmod)  ->  synthesize(main)",
+    description="Prefer one-step synthesize(main). Trivial cases scripted; the rest "
+    "(execution_preferences / constraints) are manual or fall out of the execution migration.",
+    static=True,
     detect=detect,
     fix=None,  # trivial cases scripted; remaining ones are context-dependent
-    agent="one_off_fixes/collapse_synthesize.py (safe subset); manual for the rest",
 )

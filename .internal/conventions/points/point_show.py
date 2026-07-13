@@ -24,9 +24,10 @@ def fix(cells: list) -> bool:
 
 
 POINT = Point(
-    key="show",
-    example="qprog.show()  ->  show(qprog)",
+    title="show",
+    detail="qprog.show()  ->  show(qprog)",
     description="Present a circuit with the show(qprog) function, not the .show() method.",
+    static=True,
     detect=detect,
     fix=fix,
     enforced=True,
