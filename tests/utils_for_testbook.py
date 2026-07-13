@@ -8,6 +8,7 @@ import shutil
 import warnings
 from dataclasses import dataclass, field
 from typing import Any, Callable
+import classiq
 
 import pytest
 from testbook import testbook
@@ -294,21 +295,26 @@ def validate_quantum_program_size(
 ) -> None:
     if compare_to is not None:
         assert compare_to.transpiled_circuit is not None  # for mypy
+        _metrics = classiq.get_transpiled_circuit_metrics(compare_to).circuit_metrics
         return validate_quantum_program_size(
             quantum_program,
             expected_width=compare_to.data.width,
-            expected_depth=compare_to.transpiled_circuit.depth,
-            expected_cx_count=compare_to.transpiled_circuit.count_ops.get("cx", 0),
+            expected_depth=_metrics.depth,
+            expected_cx_count=_metrics.count_ops.get("cx", 0),
         )
 
     actual_width = quantum_program.data.width
     _validate_size(actual_width, expected_width, "width", allow_zero_size)
 
     if quantum_program.transpiled_circuit is not None:
-        actual_depth = quantum_program.transpiled_circuit.depth
+        _metrics = classiq.get_transpiled_circuit_metrics(
+            quantum_program
+        ).circuit_metrics
+
+        actual_depth = _metrics.depth
         _validate_size(actual_depth, expected_depth, "depth", allow_zero_size)
 
-        actual_cx_count = quantum_program.transpiled_circuit.count_ops.get("cx", 0)
+        actual_cx_count = _metrics.count_ops.get("cx", 0)
         # allow_zero_size set to True here since there may be valid circuits with no CX gate.
         _validate_size(actual_cx_count, expected_cx_count, "cx_count", True)
     else:
