@@ -16,8 +16,8 @@ def detect(nb: Notebook) -> list[str]:
 
 POINT = Point(
     title="intro_opener",
-    detail="agents/notebook-intro-opener.md (to write)",
-    description="The first sentence opens with a shared phrasing. (approximate; target TBD)",
+    detail="agents/notebook-intro-opener.md",
+    description="The first sentence opens with 'This notebook ...' (or tutorial/workshop). (approximate)",
     static=False,
     detect=detect,
 )

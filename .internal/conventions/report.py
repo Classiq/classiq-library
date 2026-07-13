@@ -84,11 +84,31 @@ def render(point: Point, nbs: list[Notebook], short: bool) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--short", action="store_true", help="one line per point")
-    short = ap.parse_args().short
+    ap.add_argument(
+        "--rule", metavar="TITLE", help="run only this point (default: all)"
+    )
+    ap.add_argument(
+        "--list",
+        action="store_true",
+        help="print only the offending file paths (to pipe into a fixer)",
+    )
+    args = ap.parse_args()
     nbs, points = load_notebooks(), load_points()
+
+    if args.rule:
+        points = [p for p in points if p.title == args.rule]
+        if not points:
+            titles = ", ".join(sorted(p.title for p in load_points()))
+            sys.exit(f"unknown rule '{args.rule}'. available: {titles}")
+
+    if args.list:  # just the paths, newline-joined, for `... --list | xargs fixer`
+        files = sorted({nb.rel for p in points for nb in _offenders(p, nbs)})
+        print("\n".join(files))
+        return
+
     print(f"NOTEBOOK CONVENTIONS  —  {len(nbs)} notebooks, {len(points)} points")
     for point in points:
-        render(point, nbs, short)
+        render(point, nbs, args.short)
 
 
 if __name__ == "__main__":
