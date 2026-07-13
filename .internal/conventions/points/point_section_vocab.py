@@ -14,9 +14,9 @@ def detect(nb: Notebook) -> list[str]:
 
 POINT = Point(
     title="section_vocab",
-    detail="agents/notebook-section-vocab.md (to write)",
+    detail="agents/notebook-section-vocab.md",
     description="Section headings drawn from a shared vocabulary (Introduction, Background, "
-    "References, ...). (approximate; target TBD)",
+    "References, ...). (approximate)",
     static=False,
     detect=detect,
 )
