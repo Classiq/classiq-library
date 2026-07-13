@@ -55,18 +55,19 @@ def strip_fences(markdown: str) -> str:
 
 @dataclass
 class Point:
-    key: str  # short id, e.g. "result_value"
-    example: str  # short before/after, e.g. "result[0].value -> result_value"
-    description: str  # one or two plain sentences
+    # the three strings + the one boolean that describe every convention:
+    title: str  # short id, e.g. "result_value"
+    detail: str  # STATIC: "before -> after" code | AGENTIC: mission-doc path
+    description: str  # one or two plain sentences (may end with "(approximate)")
+    static: bool  # True: a mechanical code rule | False: solved by an agent
+
     detect: Callable[[Notebook], list[str]]  # offenders; [] means it conforms
     fix: Optional[Callable[[list], bool]] = None  # static in-place fix, or None
-    agent: Optional[str] = None  # agent mission doc (relative to conventions/)
     enforced: bool = False  # wired into the pre-commit hook?
     exceptions: tuple = field(default_factory=tuple)  # (path_fragment, reason)
 
-    def solution(self) -> str:
-        if self.fix:
-            return "auto-fix (pre-commit)" if self.enforced else "static fix"
-        if self.agent:
-            return f"agent: {self.agent}"
-        return "manual"
+    def tags(self) -> list[str]:
+        if not self.static:
+            return ["agent"]
+        kind = "auto-fix" if self.fix else "check"
+        return ["static", "enforced", kind] if self.enforced else ["static", kind]

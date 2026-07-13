@@ -33,9 +33,10 @@ def fix(cells: list) -> bool:
 
 
 POINT = Point(
-    key="single_h1",
-    example="two '# ' headings  ->  one '# ' title + '## ' sections",
+    title="single_h1",
+    detail="two '# ' headings  ->  one '# ' title + '## ' sections",
     description="A notebook has exactly one H1 (its title); deeper sections use H2+.",
+    static=True,
     detect=detect,
     fix=fix,
     enforced=True,
