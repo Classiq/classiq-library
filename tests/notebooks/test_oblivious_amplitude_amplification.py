@@ -30,6 +30,8 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 def _get_fraction_of_good_results(
     tb: TestbookNotebookClient, result_name: str
 ) -> float:
-    block_sum = tb.ref(f'{result_name}[{result_name}["block"] == 0]["counts"].sum()')
-    num_shots = tb.ref(f'{result_name}["counts"].sum()')
+    block_sum = tb.ref(
+        f'int({result_name}[{result_name}["block"] == 0]["counts"].sum())'
+    )
+    num_shots = tb.ref(f'int({result_name}["counts"].sum())')
     return block_sum / num_shots
