@@ -3,12 +3,20 @@ import numpy as np
 from testbook.client import TestbookNotebookClient
 
 from tests.utils_for_testbook import (
+    validate_quantum_program_size,
     wrap_testbook,
 )
 
 
-@wrap_testbook("projected_based_embedding_tutorial", timeout_seconds=1200)
+@wrap_testbook("projected_based_embedding_tutorial", timeout_seconds=2400)
 def test_notebook(tb: TestbookNotebookClient) -> None:
+    validate_quantum_program_size(
+        tb.ref_pydantic("qprog"),
+        expected_width=None,
+        expected_depth=None,
+        expected_cx_count=None,
+    )
+
     # Embedding partition: all 10 electrons assigned to fragment, none to environment
     assert tb.ref("mean_field_data.n_electrons_A") == 10
     assert tb.ref("mean_field_data.n_electrons_B") == 0
