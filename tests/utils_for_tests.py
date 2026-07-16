@@ -42,7 +42,29 @@ def get_notebook_of_test(test_path: str) -> str | None:
 
     find_results = re.findall('@wrap_testbook\\([\n\\s]*"(\\S*?)"', test_data)
     if len(find_results) == 1:
-        return resolve_notebook_path(find_results[0])
+        # Previously, we simply had `return resolve...`
+        # however, we got a case where `LIST_OF_IPYNB_TESTS_CHANGED` had a test to which
+        #   it's corresponding notebook did not exist.
+        # this is indeed a bug. BUT, it's a bug *for that test only*.
+        # What actually happened is that pytest failed collecting all the tests.
+        # Now, aside from us not wanting to fail the collection process,
+        # it was also "scary" to see so many failures.
+        # Thus, this solution, albeit a hack, solves this problem.
+        # It makes it so that tests with missing notebooks gets "resolved"
+        #   in a minimal way - only the `notebook_name` is returned
+        #   and that's fine, since `should_skip_notebook`, which is the
+        #   function that failed in the collection process, only uses
+        #   `iterate_notebook_names`
+        # this way, every other test will successfully get skipped (or not skipped)
+        # and the test with the missing notebook will fail in `wrap_testbook`
+        #   when it calls `resolve_notebook_path`
+        # thus the collection process will now fail (as it failed before this fix)
+        #   only now it fails collecting only 1 test - the one with the missing notebook
+        #   rather than failing to collect all the tests.
+        try:
+            return resolve_notebook_path(find_results[0])
+        except LookupError:
+            return find_results[0]
     else:
         print(f"Failed extracting notebook name from test file")
         return None
