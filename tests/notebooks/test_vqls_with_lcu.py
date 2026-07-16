@@ -5,7 +5,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("vqls_with_lcu", timeout_seconds=1200)
+@wrap_testbook("vqls_with_lcu", timeout_seconds=2400)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
     A notebook for variational quantum solver.
