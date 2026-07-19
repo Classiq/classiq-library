@@ -8,7 +8,7 @@ from tests.utils_for_testbook import (
 )
 
 
-@wrap_testbook("projected_based_embedding_tutorial", timeout_seconds=2400)
+@wrap_testbook("projected_based_embedding_tutorial", timeout_seconds=1200)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
