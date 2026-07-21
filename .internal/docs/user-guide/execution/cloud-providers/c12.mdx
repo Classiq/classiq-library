@@ -1,0 +1,72 @@
+---
+title: "Execution on C12 Quantum Cloud"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+[C12](https://www.c12qe.com/) is building scalable carbon-based quantum computers. Classiq supports execution on C12 QPU-emulators.
+
+C12 simulator Callisto imitates the physical parameters of noise from C12's hardware. The fidelity parameters of the simulator can be accessed from C12's [documentation](https://c12qe.github.io/c12-callisto-clients/0.%20README.html).
+
+## Configuration
+
+C12 introduces several customizable hardware parameters:
+
+### inilabel
+
+The initial state specified using a binary label format, such as "00", "01", etc.
+
+### inistatevector
+
+The initial state vector for each qubit, provided as a comma-separated list of complex values.
+Example: "1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j"
+
+Note: Either `inilabel` or `inistatevector` can be provided but not both.
+
+### ininoisy
+
+Indicates whether noisy initialization of the circuit should be used.
+
+###
+
+## Usage Example
+
+If you are using [Classiq IDE](https://platform.classiq.io/), simply choose C12 in the checkbox menu under Execution page.
+
+### Setting up Backend Preferences
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq.execution import C12BackendPreferences
+from classiq import ExecutionPreferences, ExecutionSession, synthesize
+
+backend_preferences = C12BackendPreferences(
+    backend_name="c12sim-iswap",
+    inilabel="00",  # Either inilabel or inistatevector must be provided
+    # inistatevector="1.+0.j, 0.+0.j,", # Either inilabel or inistatevector must be provided
+    ininoisy=True,
+)
+
+execution_preferences = ExecutionPreferences(
+    num_shots=1000,
+    backend_preferences=backend_preferences,
+)
+```
+
+### Execute with ExecutionSession
+
+Create your model, set execution preferences, synthesize, then run with `ExecutionSession`:
+
+[comment]: DO_NOT_TEST
+
+```python
+quantum_program = synthesize(your_model, preferences=preferences)
+
+with ExecutionSession(quantum_program, execution_preferences) as session:
+    result = session.sample()
+```
+
+## Supported Backends
+
+-   SIMULATOR = "Callisto Emulator"

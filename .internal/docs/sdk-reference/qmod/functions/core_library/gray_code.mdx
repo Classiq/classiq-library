@@ -1,0 +1,64 @@
+---
+title: Gray Code
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `select_rotation` | [Qmod core-library function]. |
+| `select_z_rotation` | [Qmod core-library function]. |
+
+
+### select_rotation
+
+
+<pre><code>select_rotation(
+    basis: Pauli,
+    angles: CArray[CReal],
+    selector: Const[QNum],
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies a set of controlled single-qubit rotations to a target qubit, using
+a specified rotation axis and a list of rotation angles.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `basis` | `Pauli` | The Pauli operator defining the rotation axis. | *required* |
+| `angles` | `CArray[CReal]` | The list of rotation angles in radians. The list must have length 2**selector.size. | *required* |
+| `selector` | `Const[QNum]` | The qubits that act as the selection register. | *required* |
+| `target` | `QBit` | The qubit on which the selected rotation is applied. | *required* |
+
+
+
+### select_z_rotation
+
+
+<pre><code>select_z_rotation(
+    angles: CArray[CReal],
+    selector: Const[QNum],
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies a set of controlled single-qubit Z rotations to a target qubit, using
+a list of rotation angles.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `angles` | `CArray[CReal]` | The list of rotation angles in radians. The list must have length 2**selector.size. | *required* |
+| `selector` | `Const[QNum]` | The qubits that act as the selection register. | *required* |
+| `target` | `Const[QBit]` | The qubit on which the selected rotation is applied. | *required* |

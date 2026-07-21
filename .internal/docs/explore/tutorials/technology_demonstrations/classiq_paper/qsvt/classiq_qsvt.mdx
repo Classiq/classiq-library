@@ -1,0 +1,162 @@
+---
+title: "Classiq code for QSVT example"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/classiq_paper/qsvt/classiq_qsvt.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook shows how to generate for the QSVT example using `classiq`.
+
+```python
+import time
+
+import numpy as np
+
+from classiq import *
+from classiq.qmod.symbolic import floor
+```
+```python
+
+MAX_WIDTH = 11
+SIZE = 6
+DEGREE = 3
+QSVT_PHASES = [
+    1.280311896404252,
+    8.127145628464149,
+    1.8439603212845617,
+    -5.002873410775335,
+]
+
+constraints = Constraints(optimization_parameter="cx", max_width=MAX_WIDTH)
+```
+
+## Quantum Functions
+
+```python
+@qfunc
+def be_projection(x: QArray, aux: QBit):
+    within_apply(
+        lambda: H(aux),
+        lambda: control(
+            aux == 0,
+            lambda: reflect_about_zero(x),
+        ),
+    )
+
+
+@qfunc
+def be_amat0(data: QArray, block: QArray):
+
+    del_qubit = QBit()
+    select = QBit()
+    packed = QNum(size=data.size + 1)
+
+    within_apply(
+        lambda: (
+            bind(block, [select, del_qubit]),
+            bind([data, del_qubit], packed),
+            hadamard_transform(select),
+        ),
+        lambda: (
+            control(select, lambda: IDENTITY(packed), lambda: inplace_add(2, packed)),
+            inplace_add(-1, packed),
+        ),
+    )
+
+
+@qfunc
+def my_be(data: QArray, block: QArray):
+
+    be_amat0(data, block[0:2])
+    be_projection(data, block[2])
+
+
+@qfunc
+def my_projector_controlled_phase(phase: CReal, block: QNum, aux: QBit):
+    control(block == 0, lambda: X(aux))
+    RZ(phase, aux)
+    control(block == 0, lambda: X(aux))
+
+
+@qfunc
+def my_qsvt_step(
+    phase1: CReal,
+    phase2: CReal,
+    u: QCallable[QArray, QArray],
+    data: QArray,
+    block: QArray,
+    qsvt_aux: QBit,
+):
+
+    u(data, block)
+    my_projector_controlled_phase(phase1, block, qsvt_aux)
+    invert(lambda: u(data, block))
+    my_projector_controlled_phase(phase2, block, qsvt_aux)
+
+
+@qfunc
+def my_qsvt(qsvt_phases: CArray[CReal], data: QArray, block: QArray, qsvt_aux: QBit):
+
+    H(qsvt_aux)
+    my_projector_controlled_phase(qsvt_phases[0], block, qsvt_aux)
+    repeat(
+        floor((qsvt_phases.len - 1) / 2),
+        lambda i: my_qsvt_step(
+            qsvt_phases[(2 * i) + 1],
+            qsvt_phases[(2 * i) + 2],
+            lambda d, b: my_be(d, b),
+            data,
+            block,
+            qsvt_aux,
+        ),
+    )
+    my_be(data, block)
+    my_projector_controlled_phase(qsvt_phases[qsvt_phases.len - 1], block, qsvt_aux)
+    H(qsvt_aux)
+```
+```python
+
+from classiq import CustomHardwareSettings, Preferences
+
+preferences = Preferences(
+    custom_hardware_settings=CustomHardwareSettings(basis_gates=["cx", "u"]),
+    transpilation_option="custom",
+    debug_mode=False,
+)
+```
+
+## Example for getting a data point
+
+```python
+start_time = time.time()
+
+
+@qfunc
+def main(block: Output[QNum], data: Output[QNum], qsvt_aux: Output[QBit]):
+    allocate(1, qsvt_aux)
+    allocate(3, block)
+    allocate(SIZE, data)
+    my_qsvt(QSVT_PHASES, data, block, qsvt_aux)
+
+
+qprog = synthesize(main, constraints=constraints, preferences=preferences)
+
+compilation_time = time.time() - start_time
+width = qprog.data.width
+depth = qprog.transpiled_circuit.depth
+cx_counts = qprog.transpiled_circuit.count_ops["cx"]
+print(f"==== classiq for {SIZE}==== time {compilation_time}")
+```
+<Info>
+  **Output:**
+
+  
+
+```
+==== classiq for 6==== time 33.173584938049316
+  
+
+```
+</Info>

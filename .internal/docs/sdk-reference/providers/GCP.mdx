@@ -1,0 +1,50 @@
+---
+title: Gcp
+icon: "/icons/bulletsharp.svg"
+---
+
+### GCPBackendPreferences
+
+Represents the backend preferences specific to Google Cloud Platform (GCP) services.
+
+Inherits from `BackendPreferences` and sets the backend service provider to Google.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [is_nvidia_backend](#is_nvidia_backend) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `backend_service_provider` | `ProviderTypeVendor.GOOGLE` | Indicates the backend service provider as Google, |
+| `noise_model` | `str \| None` | Optional named preset simulator noise (see ``CLASSIQ_NOISE_MODELS``). Mutually exclusive with ``simulator_noise_spec``. |
+| `simulator_noise_spec` | `ClassiqSimulatorNoiseSpecification \| None` | Optional user-defined noise; same type as on ``ClassiqBackendPreferences``. Mutually exclusive with ``noise_model``. |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.GOOGLE = pydantic.Field(default=(ProviderVendor.GOOGLE))`
+
+
+### use_double_precision
+
+
+`use_double_precision: bool = pydantic.Field(default=False, description='Use double precision on Nvidia simulators. Default is single.')`
+
+
+### noise_model
+
+
+`noise_model: str | None = pydantic.Field(default=None, description='Preset noise model for Classiq simulators. Mutually exclusive with simulator_noise_spec.')`
+
+
+### simulator_noise_spec
+
+
+`simulator_noise_spec: ClassiqSimulatorNoiseSpecification | None = pydantic.Field(default=None, description='Custom noise for Classiq simulators. Mutually exclusive with noise_model.')`

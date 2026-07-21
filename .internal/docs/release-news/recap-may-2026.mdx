@@ -1,0 +1,202 @@
+---
+title: "Release News: May 2026"
+sidebarTitle: "May 2026"
+icon: "/icons/bulletsharp.svg"
+---
+
+5 versions released in May, spanning improvements to the execution workflow, scalability, and quantum developer experience.
+
+<CardGroup cols={2}>
+  <Card title="Key Update: Simplified Execution" icon="star" href="#simplified-execution">
+    New top-level execution functions and simplified execution session methods
+  </Card>
+  <Card title="7 Enhancements" icon="bolt" href="#enhancements">
+    New capabilities and performance improvements
+  </Card>
+  <Card title="3 Documentation & Library Additions" icon="book" href="#documentation-additions">
+    New guides and notebooks
+  </Card>
+  <Card title="11 Bug Fixes & Deprecations" icon="wrench" href="#bug-fixes">
+    Correctness fixes and API deprecations
+  </Card>
+</CardGroup>
+
+## Simplified Execution
+
+The execution workflow has been refreshed across several areas:
+
+- Three new top-level execution functions for one-call execution and result retrieval.
+- New `ExecutionSession` methods for simplified execution.
+- `ExecutionSession` preferences can now be passed directly.
+- OpenQASM 2.0 and 3.0 strings now accepted in place of a `QuantumProgram`.
+
+### New Top-Level Execution Functions
+
+Three new top-level functions now enable execution and result retrieval in a single call, each returning results directly:
+
+- `sample()` for shot-based measurement statistics, returned as a DataFrame.
+- `observe()` for the expectation value of a Hermitian observable, returned as a scalar.
+- `calculate_state_vector()` for the full quantum state including amplitudes and phases, returned as a DataFrame (simulators only).
+
+Previously, this required managing job objects manually: submitting, polling, and unpacking results through separate API calls.
+
+All three support single and batch execution and accept the same arguments, as well as `run_via_classiq`. See the [Execution](/user-guide/execution) user guide for the full workflow and function reference.
+
+Usage examples:
+
+```python
+from classiq import *
+
+# Example function: Applies a Hadamard gate on a single qubit
+@qfunc
+def main(res: Output[QBit]):
+    allocate(res)
+    H(res)
+
+# Synthesizing the model into a quantum program
+qprog = synthesize(main)
+
+# Shot-based measurement statistics
+df = sample(qprog, num_shots=1000)
+
+# Expectation value of an observable (Pauli Z matrix)
+value = observe(qprog, observable=Pauli.Z(0), num_shots=1000)
+
+# Full quantum state (simulators only)
+df = calculate_state_vector(qprog)
+```
+
+### Updated Execution Session Methods
+
+New `ExecutionSession` methods `sample()` and `estimate()` replace earlier dedicated batch functions (see [Execution Session](/user-guide/execution/ExecutionSession#operations) user guide), supporting both single and batch execution by accepting a parameter dictionary or a list of dictionaries.
+
+The dedicated `batch_sample`, `submit_batch_sample`, `batch_estimate`, and `submit_batch_estimate` methods are deprecated as a result, with a removal date of **June 22nd, 2026**.
+
+Usage examples:
+
+[comment]: DO_NOT_TEST
+
+```python
+with ExecutionSession(qprog) as es:
+    # Single execution
+    result = es.sample({"t": 0.5})
+
+    # Batch execution (2 iterations)
+    results = es.sample([{"t": 0.5}, {"t": 0.6}])
+
+    # Expectation value
+    hamiltonian = Pauli.Z(0)
+    value = es.estimate(hamiltonian, {"t": 0.5})
+
+    # Batch expectation values (2 iterations)
+    values = es.estimate(hamiltonian, [{"t": 0.5}, {"t": 0.6}])
+```
+
+In addition, the `ExecutionSession` method `minimize()` for variational optimization of a cost function over the quantum program's initial parameter values has been renamed to `variational_minimize`.
+
+<Note>`variational_minimize` is now also available as a standalone function, usable outside the scope of `ExecutionSession`. It supports Hamiltonian and classical cost functions, `run_via_classiq`, and includes improved input validation. For more details, see [SDK Reference](/sdk-reference/execution#variational_minimize).</Note>
+
+### Direct Execution Session Preferences
+
+`ExecutionSession` now also accepts configuration parameters directly as keyword arguments, rather than through a separate `ExecutionPreferences` object.
+
+Usage example:
+
+[comment]: DO_NOT_TEST
+
+```python
+with ExecutionSession(qprog, num_shots=2000, random_seed=42) as es:
+    results = es.sample()
+```
+
+Passing an `ExecutionPreferences` object via `execution_preferences=` can still be used, but is deprecated and will be removed on **June 22nd, 2026**.
+
+<Note>Parameters that `ExecutionSession` may now accept directly: `backend`, `num_shots`, `random_seed`, `transpilation_option`, `run_via_classiq`, `config`.</Note>
+
+### OpenQASM Support
+
+OpenQASM 2.0 and 3.0 strings are now accepted directly by `sample()` and `ExecutionSession` as an alternative to a synthesized `QuantumProgram`. Results are returned in the same histogram DataFrame format.
+
+Note that the `parameters` argument is not supported for OpenQASM strings. For parametric circuits, use a `QuantumProgram`, or bind parameters inside the QASM circuit directly. See the [Execution](/user-guide/execution) and [Execution Session](/user-guide/execution/ExecutionSession#initializing) user guides for more details.
+
+## Enhancements
+
+### Seamless Support for Larger Models
+
+The SDK now handles significantly larger synthesis and execution workloads without hitting payload size limits. Upgraded backend data handling enables seamless processing of large-scale models and datasets, requiring no changes from users.
+
+### Improved Visualizer Rendering
+
+The visualizer can now fully render large circuits, with all child operations visible. This lifts a previous limitation where a per-block child operation limit could leave some operations unrendered in large circuits.
+
+### GitHub Copilot in Classiq Studio
+
+GitHub Copilot is now available within Classiq Studio, our web-based pre-configured IDE. It includes three main capabilities:
+
+- **Chat-based AI Assistant**: ask questions about the Qmod language, Classiq workflow, or circuit debugging.
+- **Coding agent**: let Copilot write or refactor your Qmod code.
+- **Autocomplete**: inline suggestions as you write your quantum algorithm within the Studio.
+
+The Copilot is available on Classiq Studio without any additional setup if you hold an active GitHub Copilot subscription.
+
+![GitHub Copilot in Classiq Studio](/resources/github_copilot_screenshot.png)
+
+### Faster Synthesis for Large Hamiltonians
+
+Synthesis for models containing large Hamiltonian objects is now significantly faster. If you have been working with molecule simulations or large combinatorial problems and synthesis felt slow, this directly cuts that wait time.
+
+See [Observables and Operators](/user-guide/modeling/observables-and-operators) for how Hamiltonians are defined and used in Qmod.
+
+### Qmod-Variable Array Slice Operator
+
+`classiq.qmod.symbolic` now includes a `slice(array, start, stop)` operator that accepts unsigned integer Qmod variables as the `start` and `stop` arguments (see [Path Operators](/qmod-reference/language-reference/expressions#path-operators)). It is the slice counterpart to the existing `subscript` operator for single-element access.
+
+When `array` is a Qmod variable, the standard bracket syntax `array[start:stop]` can be used directly; the `slice()` syntax is required when `array` is a regular Python list and integer Qmod variables are used as indices.
+
+### QSVM Application (QML)
+
+A new [Quantum Support Vector Machine](/sdk-reference/applications/QSVM) (QSVM) module is now available in the Classiq Python SDK. It combines quantum-computed kernel matrices with classical SVMs, enabling quantum-enhanced classification through a `QSVM` class with `train`, `test`, and `predict` methods.
+
+Users can select from built-in quantum feature maps or supply their own. The SDK handles circuit synthesis, execution, and kernel-matrix construction automatically. Relevant notebooks in the Classiq Library have been updated accordingly.
+
+### New SDK Utilities
+
+Two new utility functions have been added to the SDK for diagnostics and backend exploration:
+
+- **`print_diagnostics()` function:** A new `classiq.print_diagnostics()` function prints a snapshot of the current SDK environment, including SDK version, Python version, backend host and version, authentication status, and user ID. Useful for quick inclusion in support tickets.
+
+- **`get_backend_details()` function:** A new function that returns a DataFrame of all supported quantum backends, with details on provider, backend name, type (hardware or simulator), qubit count, availability, pending jobs, and queue time. For details, see the [Execution](/user-guide/execution/index#step-2--inspect-available-backends) user guide.
+
+## Documentation Additions
+
+- **[Hello World](/getting-started) Guide:** Build, synthesize, and run your first quantum algorithm, covering everything you need before diving deeper into the Classiq platform.
+
+- **Streamlined [Execution](/user-guide/execution) and [Execution Session](/user-guide/execution/ExecutionSession) Guides:** The Execution and Execution Session user guides have been updated to cover the three new execution functions, the updated `ExecutionSession` methods, direct preferences passing, and a step-by-step workflow guide. See the [Simplified Execution](#simplified-execution) section for more details.
+
+## Library Additions
+
+- **1D Fermi-Hubbard Model Simulation:** A new [notebook](https://github.com/Classiq/classiq-library/blob/main/applications/physical_systems/fermi_hubbard_model_1D/fermi_hubbard_1D.ipynb) for simulating the 1D Fermi-Hubbard model has been added to the Classiq Library. The Fermi-Hubbard model is a key model in condensed matter physics; this notebook, inspired by Google Quantum AI's 2020 experiment, demonstrates state preparation, time evolution, and spin-charge separation using the Classiq SDK.
+
+  The implementation is fully high-level, with optimized quantum circuits generated automatically.
+
+## Bug Fixes
+
+- **Fixed unintended relative phase in controlled amplitude preparation:** `prepare_amplitudes` and `inplace_prepare_amplitudes` state preparation functions (see [state preparation routines](/qmod-reference/library-reference/core-library-functions/prepare_state_and_amplitudes/prepare_state_and_amplitudes)) could introduce an unintended global phase in certain scenarios. For the uncontrolled version this is unobservable, but when used inside a `control()` statement (see [control](/qmod-reference/language-reference/statements/control)), the global phase could become a relative phase conditional on the control qubit. This is now fixed.
+
+- **Combinatorial optimization now handles degenerate constraints correctly:** `CombinatorialProblem` converts classical optimization problems into quantum models for algorithms like QAOA (see [Learning Optimization](/explore/tutorials/basic_tutorials/optimization/learning_optimization#learning-optimization)). A `KeyError` that was raised when an inequality constraint became degenerate (collapsed to a single feasible value) after another constraint had already fixed one of its variables to a single value is now corrected.
+
+- **Inconsistency in gate arguments of QASM output resolved:** `QuantumProgram.qasm` could produce incorrect gate arguments in certain scenarios. While transpilation would correct this automatically during synthesis, the problem could carry through to simulation when manually disabling transpilation via `transpilation_option=TranspilationOption.NONE` (see [Quantum Program Transpilation](/user-guide/synthesis/quantum-program-transpilation)). This is now fixed.
+
+- **Models saved with older SDK versions can now be successfully synthesized:** A compatibility issue that prevented most models saved with earlier SDK versions from being synthesized is now resolved.
+
+- **Circuit visualizer now able to recover from GPU context loss:** The visualizer would go blank and fail to recover if the WebGPU/WebGL graphics context was lost. The visualizer now includes automatic recovery from context loss.
+
+- **NVIDIA GPU worker now initializes correctly:** An issue that caused the NVIDIA GPU worker to fail during initialization is now fixed.
+
+## Deprecations
+
+- **`ExecutionSession` batch methods deprecated:** `batch_sample` and `batch_estimate` are replaced by passing parameters directly to `ExecutionSession.sample()` or `ExecutionSession.estimate()`, as covered in the [Simplified Execution](#updated-execution-session-methods) section above.<br/>Removal date: **June 22nd, 2026**.
+- **`ExecutionPreferences` object deprecated:** Replaced with direct keyword arguments in `ExecutionSession`, as covered in the [Simplified Execution](#direct-execution-session-preferences) section above.<br/>Removal date: **June 22nd, 2026**.
+- **`theta` parameter of `phase` renamed to `coefficient`:** The old `theta` parameter name has been deprecated and removed for the `phase` function specifically; it remains valid in other functions.
+- **`randomized_benchmarking` function deprecated and removed:** This function has been deprecated and removed from the SDK.
+- **`pretty_qasm` field in Synthesis Preferences removed:** OpenQASM 2 output is now always formatted with line breaks inside gate declarations (the previous default). If you were explicitly setting `pretty_qasm=False` to get unformatted output, that option no longer exists (see [synthesis preferences](/user-guide/synthesis/preferences) user guide).

@@ -1,0 +1,68 @@
+---
+title: Cudaq
+icon: "/icons/bulletsharp.svg"
+---
+
+&lt;!-- cspell:ignore cudaq --&gt;
+
+Classiq to [CUDA-Q](https://developer.nvidia.com/cuda-q) translation.
+These functions require the `cudaq` extra (install `classiq[cudaq]`).
+Note that the `cudaq` extra is only available in Classiq Studio and on any Linux
+Machine.
+
+### qprog_to_cudaq_kernel
+
+
+<pre><code>qprog_to_cudaq_kernel(
+    quantum_program: QuantumProgram,
+    is_main_kernel: bool = True
+) -> Union[cudaq.PyKernel, tuple]</code></pre>
+
+
+Translates a quantum program into a CUDA-Q kernel.
+
+The 'is_main_kernel' parameter controls the kind of the returned kernel.
+If 'is_main_kernel' is True, the returned kernel can be used with CUDA-Q functions
+such as 'cudaq.draw()' and 'cudaq.get_state()', but it cannot be added to another
+kernel via `apply_call()'.
+If 'is_main_kernel' is False, the reverse holds: The returned kernel cannot be used
+with CUDA-Q functions but can be added to another kernel.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | `QuantumProgram` | The quantum program to translate into CUDA-Q kernel. This is the result of the function 'synthesize()'. | *required* |
+| `is_main_kernel` | `bool` | Whether the kernel is compatible with CUDA-Q functions (`is_main_kernel=True`, the default behavior) or 'apply_call()' (`is_main_kernel=False`) | True |
+
+
+
+**Returns:**
+
+- **Type:** `Union[cudaq.PyKernel, tuple]`
+- A CUDA-Q kernel. If the quantum program includes foreach statements, a tuple
+- containing a CUDA-Q kernel and its foreach arguments will be returned.
+### pauli_operator_to_cudaq_spin_op
+
+
+<pre><code>pauli_operator_to_cudaq_spin_op(
+    operator: SparsePauliOp
+) -> cudaq.SpinOperator</code></pre>
+
+
+Transforms Qmod's SparsePauliOp data structure to CUDA-Q's SpinOperator.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `operator` | `SparsePauliOp` | The operator to be transformed | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `cudaq.SpinOperator`
+- The equivalent operator in CUDA-Q's data structure

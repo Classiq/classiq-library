@@ -1,0 +1,38 @@
+---
+title: "Predefined Benchmarks"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+The predefined benchmarks let you measure and compare how well quantum backends run a set of
+well-established quantum circuits. You pick a benchmark, a range of problem sizes,
+and a set of backends; Classiq runs every combination, scores each result, and
+returns a table and a scalability chart you can use to decide which hardware fits
+your workload.
+
+Running benchmarks is available from the SDK via the `run_benchmark` function, and
+will soon be available in the **Classiq IDE** as well: a no-code interface on the
+Execution page, ideal for interactive hardware evaluation and for comparing devices
+without writing any code.
+
+## Supported benchmarks
+
+Each benchmark targets a different circuit family and scales with a single
+**problem size** parameter. Every benchmark returns a **score** between 0 and 1,
+where higher is better and lower values reflect hardware noise and errors. For most
+benchmarks 1 corresponds to ideal, noiseless behavior; for some (such as Dynamical
+Localization) the ideal noiseless value can itself be lower than 1. The score is
+defined per benchmark:
+
+| Benchmark | What it measures | Problem size | Score |
+|---|---|---|---|
+| **GHZ** | Ability to create and preserve a maximally entangled GHZ state | Number of qubits | Fidelity of the prepared GHZ state |
+| **Adder** | Correctness of in-circuit modular addition | Register size (bits) | Probability of measuring the correct sum |
+| **QFT** | Accuracy of the Quantum Fourier Transform output distribution | Number of qubits | 1 − total-variation distance from the ideal distribution |
+| **State Preparation** | Accuracy of preparing a target (linear-amplitude) state | Number of qubits | 1 − total-variation distance from the ideal distribution |
+| **Dynamical Localization** | Preservation of localization dynamics under repeated kicks | System size | Normalized localization peak (geometric mean over kick counts) |
+
+<Note>
+Some benchmarks enforce a minimum problem size (for example, GHZ and Adder start
+at 3).
+</Note>

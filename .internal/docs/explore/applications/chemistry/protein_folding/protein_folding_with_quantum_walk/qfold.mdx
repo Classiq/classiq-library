@@ -1,0 +1,514 @@
+---
+title: "QFold: Quantum Walks and Deep Learning to Solve Protein Folding"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/chemistry/protein_folding/protein_folding_with_quantum_walk/qfold.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+## Introduction
+
+Protein folding is an important problem at the foundation of biological phenomena. If we could predict how a sequence of amino acids folds into a three-dimensional structure, it would greatly contribute to drug design and understanding diseases. However, the folding problem is extremely difficult in computational science.
+
+1. Structure space grows explosively
+
+   
+
+- Each amino-acid residue has dihedral angles ψ and φ, and their combinations generate countless possible spatial structures.
+   
+
+- For example, if φ and ψ are each discretized into several dozen levels, the number of possible structures grows exponentially with respect to the number of residues N.
+
+1. Limitations of classical computation
+
+   
+
+- Classically, the search is performed using molecular dynamics (MD) simulations or Monte Carlo (MC) methods.
+   
+
+- In the MC method in particular, the procedure "compute energy difference ΔE → determine whether to accept the new structure using the classical Metropolis rule" is repeated.
+   
+
+- However, because many energy minima exist, classical searches tend to fall into local optima, and large-scale exploration is computationally difficult.
+
+1. Potential of quantum computation
+
+   
+
+- Quantum computers can make use of superposition (parallelism) and amplitude amplification.
+   
+
+- In particular, the Szegedy-type quantum walk is a quantized version of a classical Markov chain, and the paper shows the possibility of accelerating the Metropolis method. In other words, by representing local moves with a quantum walk, it is expected that the structure space can be explored more efficiently.
+
+## Method: QFold, A protein-folding method based on quantum walks
+
+In the proposed method, there is a classical processing part (Initialization module) that uses deep learning, and a quantum/classical Metropolis method (Simulation module) that executes quantum computation based on the obtained classical processing.
+
+The combination of this classical processing part and the quantum computation part is called QFold.
+
+The quantum computation part alone is referred to as the quantum Metropolis method.
+
+The quantum Metropolis method aims to perform an approximate exploration of the energy landscape by embedding an update rule similar to the Metropolis-Hastings method into a quantum circuit based on the Szegedy-type quantum walk.
+
+#
+
+## 
+
+- Classical processing \[2]
+
+In QFold's classical preprocessing, prior to executing the quantum computation, a finite set of φ-ψ angle configurations is sampled.
+
+For each configuration, using quantum chemistry software (e.g., **Psi4**), the **energy difference ΔE** in the transition from the current structure to the proposed structure is calculated and saved as a dataset.
+
+Through this process, the "stability" of each local structural change is provided as numerical values. However, in this notebook, classical processing is not performed; instead, the dataset already computed in \[2] is used, and the focus is placed only on the quantum computation.
+
+#
+
+## 
+
+- Quantum encoding
+
+In the quantum encoding of the protein, the degrees of freedom of the structure are mapped onto qubits as follows:
+
+- Rotation-angle qubits: encode the discretized angles φ and ψ
+- Move-id register: selects the dihedral angle to be updated
+- Coin qubit: encodes the Metropolis acceptance probability
+
+Through this correspondence, candidate protein structures are represented within the quantum circuit.
+
+#
+
+## 
+
+- Coin preparation and acceptance probability
+
+For each move, the acceptance probability is defined as
+
+$$
+A = \min \left( 1, e^{-\beta \Delta E} \right)
+$$
+(β is the inverse-temperature parameter).
+
+This probability is converted into the rotation angle
+
+$$
+\theta = 2 \arcsin \left( \sqrt{A} \right)
+$$
+and Ry(θ) is applied to the coin qubit. As a result, low-energy structures are assigned higher amplitudes, and the transitions of the quantum walk are biased toward energetically favorable directions. Next, when the coin qubit is 1, the dihedral angle (φ or ψ) indicated by the move-id is updated. Afterwards, the auxiliary computation is uncomputed, and the reversibility of the entire operation is preserved. Furthermore, a **Grover-type reflection operator** is applied, and according to Szegedy's quantization of the Markov chain, the amplitudes of the low-energy states are amplified through interference effects.
+
+#
+
+## 
+
+- Measurement and interpretation of the results
+
+After repeating the walk operator for multiple steps, the φ and ψ registers are measured.
+
+Combinations that appear with high frequency in the measurement results correspond to low free-energy, stable folding structures.
+
+## Dataset
+
+The dataset used in this study is a table of **energy differences ΔE** that were precomputed by classical computation (e.g., Psi4) after restricting the protein folding problem to a **finite number of discrete states**. In this notebook, the energy set by Minifold is not computed; instead, the dataset described in reference \[2] is used.
+
+Each state is uniquely represented by a **binary string of five types of bits**, and each bit is assigned the following meaning.
+
+The dataset stores "**the ΔE obtained when a state (φ, ψ) is changed according to the move-id**."
+
+| Quantum register | Physical meaning                                               | Notes                                                                        |
+| ---------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| $\phi$ register  | Current value of the dihedral angle $\phi$ (0 = 0°, 1 = $\pi$) | Rotational degree of freedom of the protein backbone                         |
+| $\psi$ register  | Current value of the dihedral angle $\psi$ (0 = 0°, 1 = $\pi$) | The other main dihedral angle                                                |
+| $M$ register     | move-id (0 → change $\phi$ / 1 → change $\psi$)                | Specifies which angle to move                                                |
+| move-val         | (0 = $−\pi$, 1 = $+\pi$)                                       | In the 1-bit discretization this is always **1** (fixed at +π)               |
+| coin (auxiliary) | coin placeholder                                               | The actual coin qubit is generated inside the circuit; the input is always 0 |
+
+Example: **key = "00100"**
+
+- $b_0 = 0 \rightarrow \phi = 0°$
+- $b_1 = 0 \rightarrow \psi = 0°$
+- $b_2 = 1 \rightarrow {\rm move}\,\, \psi$
+- $b_3 = 0 \rightarrow −\pi$ (the dataset always uses 1, so fixed to 1)
+- $b_4 = 0 \rightarrow$ coin placeholder
+
+The $\Delta E$ value corresponding to this key means "the energy difference when the current structure ($\phi = 0, \psi = 0$) has $\psi = 0$ changed by +$\pi$."
+
+## Loading Dataset
+
+```python
+import numpy as np
+
+from classiq import *
+
+# import classiq
+# classiq.authenticate()
+```
+
+We use the simple dataset from the github repository \[2].
+
+```python
+protein_data = {
+    "protein": "alanylalanine",
+    "numberBitsRotation": 1,
+    "psi4_min_energy": -567.4480058904624,
+    "deltas": {
+        "00000": 0.9746468282557998,
+        "00001": 0.9746468282557998,
+        "00100": 25.86237460092684,
+        "00101": 25.86237460092684,
+        "01000": 0.8548282413310062,
+        "01001": 0.8548282413310062,
+        "01100": -25.86237460092684,
+        "01101": -25.86237460092684,
+        "10000": -0.9746468282557998,
+        "10001": -0.9746468282557998,
+        "10100": 25.742556014002048,
+        "10101": 25.742556014002048,
+        "11000": -0.8548282413310062,
+        "11001": -0.8548282413310062,
+        "11100": -25.742556014002048,
+        "11101": -25.742556014002048,
+    },
+    "initial_min_energy": -567.4480058903016,
+    "index_min_energy": "0-0",
+    "initialization_stats": {
+        "phis_precision": [100.0],
+        "psis_precision": [100.0],
+        "phi_angles_psi4": [2.5801230429979163],
+        "psi_angles_psi4": [-2.6017795753816184],
+        "phis_initial_rotation": [2.5801230429979163],
+        "psis_initial_rotation": [-2.6017795753816184],
+    },
+}
+```
+```python
+
+protein_data["deltas"]
+```
+<Info>
+  **Output:**
+
+  
+
+```
+{'00000': 0.9746468282557998,
+   '00001': 0.9746468282557998,
+   '00100': 25.86237460092684,
+   '00101': 25.86237460092684,
+   '01000': 0.8548282413310062,
+   '01001': 0.8548282413310062,
+   '01100': -25.86237460092684,
+   '01101': -25.86237460092684,
+   '10000': -0.9746468282557998,
+   '10001': -0.9746468282557998,
+   '10100': 25.742556014002048,
+   '10101': 25.742556014002048,
+   '11000': -0.8548282413310062,
+   '11001': -0.8548282413310062,
+   '11100': -25.742556014002048,
+   '11101': -25.742556014002048}
+  
+
+```
+</Info>
+
+```python
+import json
+
+
+def read_dataset_info(data):
+
+    delta_table = data["deltas"]
+    num_bits_rotation = data.get("numberBitsRotation")
+    phi_angles = data.get("initialization_stats", {}).get("phi_angles_psi4", [])
+    psi_angles = data.get("initialization_stats", {}).get("psi_angles_psi4", [])
+
+    return delta_table, num_bits_rotation, phi_angles, psi_angles
+```
+```python
+
+delta_tbl, num_bits_rotation, phi_angles, psi_angles = read_dataset_info(protein_data)
+```
+```python
+
+# in_bits = self.n_angles * self.angle_precision_bits + self.move_id_len + 1
+qbit_rotation_angle = num_bits_rotation * len(phi_angles) + num_bits_rotation * len(
+    psi_angles
+)
+qbit_move_id = int(np.ceil(np.log2(len(phi_angles) + len(psi_angles))))
+print("numberBitsRotation:", num_bits_rotation)
+print("number of qubits representing roations φ_i, ψ_i:", qbit_rotation_angle)
+print("number of qubits representing move id:", qbit_move_id)
+print(
+    "total qbit = qbit_rotation_angle+qbit_move_id+1:",
+    qbit_rotation_angle + qbit_move_id + 1,
+)
+print("phi_angles_psi4:", phi_angles)
+print("psi_angles_psi4:", psi_angles)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+numberBitsRotation: 1
+  number of qubits representing roations φ_i, ψ_i: 2
+  number of qubits representing move id: 1
+  total qbit = qbit_rotation_angle+qbit_move_id+1: 4
+  phi_angles_psi4: [2.5801230429979163]
+  psi_angles_psi4: [-2.6017795753816184]
+  
+
+```
+</Info>
+
+## Implementation of walk operator
+
+#
+
+## Coin Preparation
+
+Following Algorithm 1, for each state $(\phi, \psi, M)$, $\Delta E$ is read out and the corresponding $\theta$ is computed.
+
+For example, in the case $M = 0$ (updating $\psi$), $\Delta E$ is obtained for the current structure with $\phi = 0$ and $\psi = 1$, and by taking its average, $A_\phi$ is determined.
+
+This is converted into $\theta_\phi$, and a controlled rotation is applied to the coin register.
+Similarly, when $M = 1$, $\theta_\psi$ for updating $\psi$ is computed and applied to the coin register.
+If the coin register is 1, the $\phi$ or $\psi$ register is flipped according to the corresponding move-id.
+
+This corresponds to accepting the new structure.
+
+After that, the coin rotation is uncomputed to erase the auxiliary information, and by adding the oracle operator, the amplitude of states corresponding to low-energy structures is amplified.
+
+In QFold (particularly in the quantum circuit of Fig. 6), the reason the oracle is applied to $|CM\rangle = |00\rangle$ is that at every step of the walk, the auxiliary registers for coin and move are always reset to $|00\rangle$.
+In other words, since all update processes (the accept/reject decision) proceed starting from that state, the oracle operator for selecting "good structures" is also defined with respect to $|CM\rangle = |00\rangle$.
+Below, the actions of the coin operator and the oracle operator are explained.
+
+First, write the state as $|\phi\psi MC\rangle$:
+
+$$
+|\psi_0\rangle = \frac{1}{2} \sum_{\phi,\psi \in {0,1}} |\phi\psi\rangle \otimes |M=0\rangle \otimes |C=0\rangle
+$$
+Next, a rotation is given to the coin based on $\Delta E$.
+
+For example, when $M = 0$ (updating $\phi$):
+
+$$
+|\phi\psi, M=0, C=0\rangle \longrightarrow
+\sqrt{1-A_\phi}|\phi\psi,0,0\rangle
++
+\sqrt{A_\phi}|\phi\psi,0,1\rangle
+$$
+Here, $A_\phi = \min(1, e^{-\beta \Delta E})$.
+Next, the coin operator is applied (Compute).
+If $C = 1$, $\phi$ is flipped:
+
+$$
+|\phi\psi, M=0, C=1\rangle \to |(\phi \oplus 1)\psi, 0,1\rangle
+$$
+If $C = 0$, nothing is done.
+
+Next, the Uncompute of the coin operator is performed.
+Then, by reversing the coin rotation, $C$ is reset to $0$:
+
+$$
+\sqrt{1-A_\phi}|\phi\psi,0,0\rangle
++
+\sqrt{A_\phi}|(\phi\oplus 1)\psi,0,0\rangle
+$$
+As a result, the information of the rotation angle (which rotation angle was applied) remains only in $\phi\psi$, and $M, C$ return again to $|00\rangle$.
+
+Finally, by applying the oracle operator to the subspace $|MC\rangle = |00\rangle$, the information of the acceptance probability alone is marked:
+
+$$
+|\phi\psi,00\rangle \mapsto -|\phi\psi,00\rangle
+$$
+Therefore, by alternately applying the coin operator, the oracle operator, and the shift operator at each walk step, the information including the acceptance probability $\sqrt{A_\phi}$ is amplified, and by repeatedly implementing the quantum walk, the information reflecting the optimal structure is obtained.
+
+More detailed information is described in \[1].
+
+In Algorithm 1 of the paper, in constructing the coin operator, energy-difference values that are close to each other are used.
+
+For $R_0$, "00001" and "01001" are used, and for $R_1$, "00101" and "10101" are used.
+
+One might think that it is not necessary to include other information, but by using only the information of $\phi$ and $\psi$, other rotation information (for example, $\ket{110}$) can be included through quantum parallelism arising from superposition.
+
+This can be expressed by the following code.
+
+```python
+import json
+import math
+
+
+def build_coin_prep_from_dataset(data: dict, beta: float = 1.0):
+    delta_tbl = data["deltas"]
+
+    # ΔE → θ
+    def theta(dE: float) -> float:
+        A = min(1.0, math.exp(-beta * dE))
+        return 2 * math.asin(math.sqrt(A))
+
+    # φ
+    keys_phi = ["00001", "01001"]
+    # ψ
+    keys_psi = ["00101", "10101"]
+
+    # average A
+    A_phi = 0.5 * sum(min(1.0, math.exp(-beta * delta_tbl[k])) for k in keys_phi)
+    A_psi = 0.5 * sum(min(1.0, math.exp(-beta * delta_tbl[k])) for k in keys_psi)
+
+    # θ
+    theta_phi = 2 * math.asin(math.sqrt(A_phi))
+    theta_psi = 2 * math.asin(math.sqrt(A_psi))
+
+    return theta_phi, theta_psi
+```
+```python
+
+angle_data = build_coin_prep_from_dataset(protein_data, beta=1.0)
+data_psi = angle_data[0]
+data_phi = angle_data[1]
+print(data_psi, data_phi)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+1.3721747807752471 4.9944226978996045e-06
+  
+
+```
+</Info>
+
+#
+
+## bulding blocks
+
+```python
+from classiq import *
+
+
+@qfunc
+def coin_operator(C: QNum, M: QNum, psi: QNum, phi: QNum):
+    X(C)
+    H(M)
+    """
+    R0: phi=0, M=0
+    """
+    control(((phi == 0) & (M == 0)), lambda: RY(data_phi, C))
+    temp1 = QNum("temp1")
+    """
+    R1: phi=0, M=1
+    """
+    control(((psi == 0) & (M == 1)), lambda: RY(data_psi, C))
+    X(C)
+
+
+@qfunc
+def shift(C: QNum, M: QNum, psi: QNum, phi: QNum):
+    control(((C == 1) & (M == 1)), lambda: X(psi))
+    control(((C == 1) & (M == 0)), lambda: X(phi))
+
+
+@qfunc
+def oracle(C: QNum, M: QNum):
+    for i in [C, M]:
+        X(i)
+    CZ(C, M)
+    for i in [C, M]:
+        X(i)
+
+
+@qfunc
+def initial_state(psi: QNum, phi: QNum):
+    H(psi)
+    H(phi)
+
+
+@qfunc
+def walk_operator(C: QNum, M: QNum, psi: QNum, phi: QNum):
+    within_apply(lambda: coin_operator(C, M, psi, phi), lambda: shift(C, M, psi, phi))
+    oracle(C, M)
+
+
+@qfunc
+def main(phi: Output[QNum], psi: Output[QNum]):
+    step = 1
+    qC = QNum("C")
+    qM = QNum("M")
+    allocate(1, qC)
+    allocate(qbit_move_id, qM)
+    allocate(len(phi_angles), phi)
+    allocate(len(psi_angles), psi)
+    initial_state(psi, phi)
+    power(step, lambda: walk_operator(qC, qM, psi, phi))
+    drop(qC)
+    drop(qM)
+```
+```python
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/36pnhFUPTpKeuu4jO6gPLZeWTV7
+  
+
+```
+</Info>
+
+```python
+result = execute(qprog).result_value()
+```
+```python
+
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'phi': 1, 'psi': 1}: 608,
+   {'phi': 0, 'psi': 1}: 594,
+   {'phi': 0, 'psi': 0}: 446,
+   {'phi': 1, 'psi': 0}: 400]
+  
+
+```
+</Info>
+
+```python
+# extract the energy data from search result
+filtered_dict = {k: v for k, v in delta_tbl.items() if k.startswith("01")}
+print(filtered_dict)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+{'01000': 0.8548282413310062, '01001': 0.8548282413310062, '01100': -25.86237460092684, '01101': -25.86237460092684}
+  
+
+```
+</Info>
+
+We can see that the structure `01101` or `01100` has close to minimum energy of given protein.
+
+## References
+
+\[1] [https://arxiv.org/pdf/2101.10279](https://arxiv.org/pdf/2101.10279)
+
+\[2] [https://github.com/awslabs/quantum-computing-exploration-for-drug-discovery-on-aws/tree/main/source/src/notebook/healthcare-and-life-sciences/c-1-protein-folding-quantum-random-walk](https://github.com/awslabs/quantum-computing-exploration-for-drug-discovery-on-aws/tree/main/source/src/notebook/healthcare-and-life-sciences/c-1-protein-folding-quantum-random-walk)

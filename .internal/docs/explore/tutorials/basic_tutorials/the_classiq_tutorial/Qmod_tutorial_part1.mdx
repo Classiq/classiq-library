@@ -1,0 +1,1016 @@
+---
+title: "Qmod Tutorial - Part 1"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/basic_tutorials/the_classiq_tutorial/Qmod_tutorial_part1.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+In this tutorial, we will cover the basics of the Qmod language and its accompanying library.
+We will learn to use quantum variables, functions, and operators.
+
+Let's begin with a simple code example:
+
+```python
+from classiq import *
+
+
+@qfunc
+def foo(q: QBit) -> None:
+    X(q)
+    H(q)
+
+
+@qfunc
+def main(q: Output[QBit]) -> None:
+    allocate(q)
+    foo(q)
+
+
+qprog = synthesize(main)
+```
+
+Function `foo` takes the quantum parameter `q` of type `QBit` and applies `X` gate to it, followed by `H` gate.
+
+Function `main` declares a single `Output` parameter `q` of type `QBit`. It first allocates a qubit to `q` in the state $\vert 0 \rangle$, then calls `foo` to operate on it.
+A quantum program `qprog` is created based on function `main`, so that it can later be executed.
+
+What results do we expect when executing this quantum program?
+
+- By calling `allocate`, `q` is initialized in the default state $|0\rangle$.
+- Then, `foo` is called:
+  
+
+- It applies `X` (NOT gate), changing `q`'s state to $|1\rangle$.
+  
+
+- Then it applies `H` (Hadamard gate), resulting in the superposition $\frac{1}{\sqrt{2}} (|0\rangle - |1\rangle)$.
+
+When executing the quantum program, the output variable `q` is sampled. We can run the following code and make sure that the states $|0\rangle$ and $|1\rangle$ are sampled roughly equally:
+
+```python
+res = sample(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/13788264-32b8-4146-8b28-132d8de188b3
+  
+
+```
+</Info>
+
+## Qmod Fundamentals
+
+The simple model above demonstrates several features that are essential in every Qmod code:
+
+#
+
+## The `@qfunc` Decorator
+
+Qmod is a quantum programming language embedded in Python.
+
+The decorator `@qfunc` designates a quantum function, so that it can be processed by the Qmod tool chain.
+
+The Python function is executed at a later point to construct the Qmod representation.
+
+This decorator is used for every Qmod function definition.
+
+#
+
+## Function `main`
+
+A complete Qmod model, that is, a description that can be synthesized and executed, must define a function called `main`.
+
+Function `main` is the quantum entry point - it specifies the inputs and outputs of the quantum program, that is, its interface with the external classical execution logic.
+
+Similar to conventional programming languages, function `main`, can call other functions.
+
+Output variables that are declared in `main` definition are the ones to be measured when the program is executed.
+
+#
+
+## Working with Quantum Variables
+
+Quantum objects are representations of data (boolean values, numbers, arrays of numbers and so on), that are stored in specific qubits.
+In Qmod, quantum objects are handled and manipulated using **quantum variables**.
+
+Quantum variables must be declared and initialized explicitly.
+
+The model above demonstrates two important kinds of declaration:
+
+- Function `foo` declares parameter `q` thus: `q: QBit`.
+
+This declaration means `foo` expects a pre-existing quantum object.
+- Function `main` declares parameter `q` thus: `q: Output[QBit]`. In this case, `q` is an output-only parameter - it is initialized inside the scope of `main`.
+
+Prior to their initialization, local quantum variables and output parameters do not reference any object (this is analogous to null reference in conventional languages).
+
+They may be initialized in the following ways:
+
+- Using [`allocate`](https://docs.classiq.io/latest/sdk-reference/qmod/operations/#classiq.qmod.builtins.operations.allocate) to initialize the variable to a new object, with all its qubits in the default $|0\rangle$ state.
+- Using [numeric assignment](https://docs.classiq.io/latest/user-guide/modeling/quantum-numbers-arithmetics/#numeric-assignment) to initialize the variable to an object representing the result of a quantum expression.
+- Using functions with output parameters (for example, [state preparation](https://docs.classiq.io/latest/qmod-reference/library-reference/core-library-functions/prepare_state_and_amplitudes/prepare_state_and_amplitudes/)).
+
+Note: all the variables in `main` must be declared as `Output`, as `main` is the entry point of the model (Think about it: where could a variable be initialized before `main` was called?).
+
+Other functions can declare parameters with or without the `Output` modifier.
+
+#
+
+## Exercise #0
+
+Rewrite the above model, so that `q` is initilized inside `foo`.
+A solution is provided in the end of the notebook.
+Hint: it only requires to move one line of code and add the `Output` modifier in the correct place.
+
+**Why does `foo` need the `Output` modifier?**
+
+In the original model, `foo` declares `q: QBit` - a regular parameter.
+
+This tells Qmod that `q` must already be an initialized quantum object when `foo` is called; the caller is responsible for creating it.
+
+When we move `allocate` inside `foo`, the responsibility shifts: `foo` is now the one creating `q`. At the moment `foo(q)` is called from `main`, `q` has not yet been initialized - it is just an unallocated reference.
+
+Passing an uninitialized variable to a regular parameter is not allowed, because Qmod expects a live quantum object there.
+
+The `Output` modifier changes this contract: `q: Output[QBit]` tells Qmod that `q` *enters the function uninitialized*, and that the function itself is responsible for initializing it (here, via `allocate`).
+
+This lines up with the call site in `main`, where `q` - itself an `Output` parameter - is still unallocated when `foo(q)` is invoked.
+
+In short: use `Output` whenever a function is responsible for **creating** a quantum variable, rather than receiving one that already exists.
+
+```python
+from classiq import *
+
+# Your code here
+...
+
+# execute the model to see that we get similar results
+qprog = synthesize(main)
+res = sample(qprog)
+res
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'q': 0}: 1051, {'q': 1}: 997]
+  
+
+```
+</Info>
+
+## Quantum Types, Statements and Opertions
+
+Now that we have grasped the principles that are essential for any Qmod code, we can start building up our expressive toolkit, letting us create increasingly sophisticated models.
+
+The following exercises introduce some of the most useful variable types, statements and operations that Qmod supports.
+
+#
+
+## Exercise #1 
+
+- Quantum Arrays
+
+After we have familiarized with the `QBit` varible type (which is simply a single qubit), it is a good timing to introduce the quantum array type `QArray`.
+
+In this exercise, we will prepare the famous $|\Phi^+\rangle$ [Bell state](https://en.wikipedia.org/wiki/Bell_state) into a 2-qubit [Quantum array](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-types/#quantum-arrays).
+
+Recall that $|\Phi^+\rangle$ represents the state $\frac{1}{\sqrt{2}} (|00\rangle + |11\rangle)$.
+
+Instructions:
+
+1. Declare a quantum variable `qarr` of type `QArray`, and initilize it by allocating to it 2 qubits. Don't forget to use the `Output` modifier.
+1. Apply a Hadamard gate on the first qubit of `qarr`.
+
+Qmod counts from 0, so the first entry of `qarr` is `qarr[0]`.
+1. Apply `CX` (controlled-NOT gate), with the `control` parameter being `qarr[0]` and the `target` parameter being `qarr[1]`.
+
+Synthesize and execute your model to assure that $|00\rangle$ and $|11\rangle$ are the only states to be measured, and that they are measured roughly equally.
+
+```python
+from classiq import *
+
+# Your code here:
+...
+
+# execute and inspect the results
+
+qprog = synthesize(main)
+res = sample(qprog)
+res
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'q': 1}: 1026, {'q': 0}: 1022]
+  
+
+```
+</Info>
+
+#
+
+## Exercise #2 
+
+- The Repeat Statement
+
+Use Qmod's `repeat` statement to create your own Hadamard Transform - a function that takes a `QArray` of an unspecified size and applies `H` to each of its qubits.
+
+Instructions:
+
+1. Define a function `my_hadamard_transform`:
+   
+
+- It should have a single `QArray` argument `q`.
+   
+
+- Use `repeat` to apply `H` on each of `q`'s qubits.
+   
+
+- Note that the `iteration` block of the `repeat` statement must use the Python `lambda` syntax (see `repeat` [documentation](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/classical-control-flow/#classical-repeat)).
+1. define a `main` function that initializes a `QArray` of length 10, and then passes it to `my_hadamard_transform`.
+
+The provided code continues by calling `show` to let you inspect the resulting circuit - make sure that is applies `H` to each of `q`'s qubits.
+
+```python
+from classiq import *
+
+# Your code here:
+...
+
+# synthesize the model and show the result
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FkslFO3s96H1p0Byswqn8kNLh
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FkslFO3s96H1p0Byswqn8kNLh?login=True&version=17
+  
+
+```
+</Info>
+
+#
+
+## Exercise #3 
+
+- Power
+
+Raising a quantum operation to an integer power appears in many known algorithms; for example, in Grover search and Quantum Phase Estimation.
+In the general case the implementation involves repeating the same circuit multiple times.
+
+Sometimes, however, the implementation of the power operation can be simplified, thereby saving computational resources.
+A simple example is the operation of rotating a single qubit about the X, Y, or Z axis. In this case the rotation gate can be used once with the angle multiplied by the exponent. A similar example is the function [unitary](https://docs.classiq.io/latest/qmod-reference/library-reference/core-library-functions/unitary/unitary/) - an operation expressed as an explicit unitary matrix (i.e., all $2^n \times 2^n$ matrix terms are given).
+
+Raising the operation can be done by raising the matrix to that power via classical computation.
+
+See [power operator](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/power/#syntax).
+
+Use the following code to define the value of a Qmod constant named `unitary_matrix` as a 4x4 (real) unitary:
+
+```python
+from typing import List
+
+import numpy as np
+
+from classiq import *
+
+rng = np.random.default_rng(seed=0)
+random_matrix = rng.random((4, 4))
+qr_unitary, _ = np.linalg.qr(random_matrix)
+
+unitary_matrix = qr_unitary.tolist()
+```
+1. Create a model that applies `unitary_matrix` on a 2-qubit variable three times (e.g. using `repeat`).
+1. Create another model that applies `unitary_matrix` raised to the power of 3 on a 2-qubit variable.
+1. Compare the gate count via the Classiq IDE in both cases.
+
+```python
+from classiq import *
+
+# Your code here:
+...
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FktCgbPgQamVuDUKU7aryhsBX
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FktCgbPgQamVuDUKU7aryhsBX?login=True&version=17
+  
+
+```
+</Info>
+
+#
+
+## Exercise 4 
+
+- User-defined Operators
+
+Create a function that applies a given single-qubit operation to all qubits in its quantum argument (call your function `my_apply_to_all`).
+
+Such a function is also called an operator; i.e., a function that takes another function as an argument (its operand).
+
+See [operators](https://docs.classiq.io/latest/qmod-reference/language-reference/operators/).
+
+Follow these guidelines:
+
+1. Your function declares a parameter of type qubit array and a parameter of a function type with a single qubit parameter.
+1. The body applies the operand to all qubits in the argument (you may use `repeat` or even `for` inside `my_apply_to_all` for this).
+
+Now, re-implement `my_hadamard_transform` from Exercise 2 so that its body calls `my_apply_to_all` rather than calling `repeat` directly.
+
+The goal is that `my_hadamard_transform` expresses *what* to do (apply `H` to all qubits), while `my_apply_to_all` encapsulates *how* to iterate.
+
+Use the same `main` function from Exercise 
+
+2.
+
+```python
+from classiq import *
+
+# Your code here:
+...
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FktteE7eZY1m1BPPnKpcoFdrO
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FktteE7eZY1m1BPPnKpcoFdrO?login=True&version=17
+  
+
+```
+</Info>
+
+#
+
+## Exercise 5 
+
+-  Quantum Conditionals
+
+#
+
+### Exercise 5a 
+
+- Control Operator
+
+Use the built-in `control` operator to create a function that receives two single qubit variables and uses one of them to control an RY gate with a `pi/2` angle acting on the other variable (without using the `CRY` function).
+
+See [control](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/control/#syntax).
+
+```python
+from classiq import *
+
+# Your code here:
+...
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FkuNEqkobTN3fzL04KPAHLctb
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FkuNEqkobTN3fzL04KPAHLctb?login=True&version=17
+  
+
+```
+</Info>
+
+#
+
+### Exercise 5b 
+
+- Control Operator with Quantum Expressions
+
+The `control` operator is the conditional application of some operation, with the condition being that all control qubits are in the state $|1\rangle$.
+
+This notion is generalized in Qmod to other control states, where the condition is specified as a comparison between a quantum numeric variable and a numeric value, similar to a classical `if` statement.
+
+Quantum numeric variables are declared with class `QNum`.
+
+See [numeric types](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-types/#syntax).
+
+1. Declare a `QNum` output argument using `Output[QNum]` and name it `x`.
+1. Use numeric assignment (the `|=` operator) to initialize it to `9`.
+1. Execute the circuit and observe the results.
+1. Declare another output argument of type `QBit` and perform a `control` such that if `x` is 9, the qubit is flipped.
+
+Execute the circuit and observe the results.
+
+Repeat for a different condition.
+
+```python
+from classiq import *
+
+# Your code here:
+...
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FkuwxPd8DP1cXGAdra4Gbthlk
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FkuwxPd8DP1cXGAdra4Gbthlk?login=True&version=17
+  
+
+```
+</Info>
+
+#
+
+## Exercise 6 
+
+- Phase statement
+
+The `phase` statement allows the user to perform the mapping $|x\rangle \rightarrow e^{i\theta f(x_1, x_2, \ldots, x_n)} |x\rangle,$
+given a function $f(x_1, x_2, \dots, x_n)$.
+
+This operation is extremely valuable to algorithms such as [Grover's](https://docs.classiq.io/latest/explore/algorithms/search_and_optimization/grover/grover/) and [QAOA](https://docs.classiq.io/latest/explore/tutorials/technology_demonstrations/qaoa/qaoa_demonstration/).
+
+See [phase](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/phase/).
+
+#
+
+### Exercise 6a 
+
+- Phase with arithmetic condition
+
+1. Declare a `QNum` output argument using `Output[QNum]` and name it `x`.
+1. Allocate 4 qubits to `x`.
+1. Perform a hadamard transform in `x`.
+1. Using `phase`, create a phase according to the rule $f(x) = \pi \cdot x / 2$.
+1. Apply the hadamard transform in `x` again.
+1. Execute the quantum program and analyze the outputs.
+
+```python
+from classiq import *
+
+# Your code here:
+...
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+
+## Solutions
+
+#
+
+## Solution 
+
+- Excercise #0
+
+```python
+from classiq import *
+
+
+# rewrite the model, initializing q inside foo
+@qfunc
+def foo(q: Output[QBit]) -> None:
+    allocate(1, q)
+    X(q)
+    H(q)
+
+
+@qfunc
+def main(q: Output[QBit]) -> None:
+    foo(q)
+
+
+# execute the model to see that we get similar results
+
+qprog = synthesize(main)
+job = execute(qprog)
+job.get_sample_result().parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'q': 1}: 1053, {'q': 0}: 995]
+  
+
+```
+</Info>
+
+> **Key takeaway:** The `Output` modifier defines the beginning of a quantum variable's lifecycle. A parameter declared as `Output[T]` enters the function uninitialized; the function must allocate it before use. A quantum variable not declared as `Output` requires the caller to pass an already-initialized variable. Moving `allocate` into a function therefore requires adding `Output` to that parameter.
+
+#
+
+## Solution 
+
+- Exercise #1
+
+```python
+from classiq import *
+
+
+@qfunc
+def bell(qarr: QArray[QBit, 2]) -> None:
+    H(qarr[0])
+    CX(qarr[0], qarr[1])
+
+
+@qfunc
+def main(qarr: Output[QArray]) -> None:
+    allocate(2, qarr)
+    bell(qarr)
+
+
+# execute and inspect the results
+
+qprog = synthesize(main)
+job = execute(qprog)
+job.get_sample_result().parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'qarr': [0, 0]}: 1041, {'qarr': [1, 1]}: 1007]
+  
+
+```
+</Info>
+
+> **Key takeaway:** `QArray` is the quantum equivalent of a classical array. Individual qubits are accessed by index (`qarr[0]`, `qarr[1]`, ...), and any operation can be applied to a specific element. Entanglement - such as the Bell state - arises from combining single-qubit gates (like `H`) with two-qubit gates (like `CX`).
+
+#
+
+## Solution 
+
+- Exercise #2
+
+```python
+from classiq import *
+
+
+@qfunc
+def my_hadamard_transform(q: QArray[QBit]) -> None:
+    repeat(q.len, lambda i: H(q[i]))
+
+
+@qfunc
+def main(q: Output[QArray[QBit]]) -> None:
+    allocate(10, q)
+    my_hadamard_transform(q)
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FkwWTQYravU16TBazOhSia9Mh
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FkwWTQYravU16TBazOhSia9Mh?login=True&version=17
+  
+
+```
+</Info>
+
+> **Key takeaway:** The `repeat` statement is the standard way to apply an operation to every qubit in a `QArray`. The iteration body must be a Python `lambda` that receives the loop index. Because the array size can be left unspecified (`QArray[QBit]`), functions built with `repeat` work on arrays of any length without modification.
+
+#
+
+## Solution 
+
+- Exercise #3
+
+```python
+from typing import List
+
+import numpy as np
+
+from classiq import *
+
+rng = np.random.default_rng(seed=0)
+random_matrix = rng.random((4, 4))
+qr_unitary, _ = np.linalg.qr(random_matrix)
+
+unitary_matrix = qr_unitary.tolist()
+
+
+@qfunc
+def main(q: Output[QArray[QBit]]) -> None:
+    allocate(2, q)
+    power(3, lambda: unitary(unitary_matrix, q))
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3DuGj36iISWmWu99iKy62wYDSI3
+  
+
+```
+</Info>
+
+> **Key takeaway:** Using `power(n, ...)` is more efficient than repeating an operation `n` times when the Classiq engine can exploit algebraic structure. For example, raising the unitary matrix to the power classically rather than replicating the circuit gates. This optimization is critical in algorithms such as Grover search and Quantum Phase Estimation, where operations must be applied many times.
+
+#
+
+## Solution 
+
+- Exercise #4
+
+```python
+from classiq import *
+
+
+@qfunc
+def my_apply_to_all(operand: QCallable[QBit], q: QArray[QBit]) -> None:
+    repeat(q.len, lambda i: operand(q[i]))
+
+
+@qfunc
+def my_hadamard_transform(q: QArray[QBit]) -> None:
+    my_apply_to_all(lambda t: H(t), q)
+
+
+@qfunc
+def main(q: Output[QArray[QBit]]) -> None:
+    allocate(10, q)
+    my_hadamard_transform(q)
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FkxdlIYR5uVaLDdjkZptuMWNf
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FkxdlIYR5uVaLDdjkZptuMWNf?login=True&version=17
+  
+
+```
+</Info>
+
+#
+
+## Alternative Solution 
+
+- Exercise #4
+
+```python
+from classiq import *
+
+
+@qfunc
+def my_apply_to_all(operand: QCallable[QBit], q: QArray[QBit]) -> None:
+    for i in range(q.len):
+        operand(q[i])
+
+
+@qfunc
+def my_hadamard_transform(q: QArray[QBit]) -> None:
+    my_apply_to_all(lambda t: H(t), q)
+
+
+@qfunc
+def main(q: Output[QArray[QBit]]) -> None:
+    allocate(10, q)
+    my_hadamard_transform(q)
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3DuKk33l8U9zkvCjEBCOs32eye3
+  
+
+```
+</Info>
+
+> **Key takeaway:** User-defined operators (functions that accept other functions as arguments) separate *what* to do from *how* to iterate. `my_apply_to_all` encapsulates the looping logic; the caller expresses the intent: apply `H` to every qubit. Both `repeat` and a classical `for` loop are valid iteration mechanisms inside the operator body.
+
+#
+
+## Solution 
+
+- Exercise #5
+
+#
+
+### Solution 
+
+- Exercise #5a
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def my_controlled_ry(control_bit: QBit, target: QBit) -> None:
+    control(ctrl=control_bit, stmt_block=lambda: RY(pi / 2, target))
+
+
+@qfunc
+def main(control_bit: Output[QBit], target: Output[QBit]) -> None:
+    allocate(1, control_bit)
+    allocate(1, target)
+    my_controlled_ry(control_bit, target)
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39Fky8yK3HVrNdbfS9XOP4MfxHd
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39Fky8yK3HVrNdbfS9XOP4MfxHd?login=True&version=17
+  
+
+```
+</Info>
+
+> **Key takeaway:** The `control` operator lets you condition *any* quantum operation on a control qubit being in state $|1\rangle$, without needing a dedicated controlled gate. This is how Qmod builds controlled versions of arbitrary operations.
+
+#
+
+### Solution 
+
+- Exercise #5b
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum], target: Output[QBit]) -> None:
+    x |= 9
+    allocate(1, target)
+    control(ctrl=(x == 9), stmt_block=lambda: X(target))
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+> **Key takeaway:** Quantum `control` generalizes beyond single-qubit conditions. A `QNum` variable can be compared to a classical integer (e.g., `x == 9`), and the resulting boolean expression used directly as the control condition. This is the quantum analog of a classical `if` statement: the controlled operation is applied (or not) depending on the value in the quantum register, across all branches of a superposition simultaneously.
+
+#
+
+## Solution 
+
+- Exercise #6a
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(x: Output[QNum]):
+    allocate(4, x)
+    hadamard_transform(x)
+    phase(x, pi / 2)
+    hadamard_transform(x)
+
+
+qprog = synthesize(main)
+res = sample(qprog)
+res
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'x': 2}: 1050, {'x': 3}: 998]
+  
+
+```
+</Info>
+
+> **Key takeaway:** The `phase` statement applies a state-dependent phase $e^{i \theta f(x)}$ to each basis state without changing the measurement probabilities of `x` in isolation. When conjugated between Hadamard transforms, phase differences cause constructive and destructive interference that shifts probability weight to specific output states.
+
+#
+
+## Solution 
+
+- Exercise #6b
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(x: Output[QArray]):
+    allocate(4, x)
+    hadamard_transform(x)
+    control(ctrl=x, stmt_block=lambda: phase(pi))
+    control(ctrl=x[3], stmt_block=lambda: phase(pi))
+    hadamard_transform(x)
+
+
+qprog = synthesize(main)
+res = sample(qprog)
+res
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/914bf74e-9512-4296-9b71-d4e94952c6ef
+  
+
+```
+</Info>
+
+|    | x             | counts | probability | bitstring |
+| -- | ------------- | ------ | ----------- | --------- |
+| 0  | \[0, 0, 0, 1] | 1556   | 0.759766    | 1000      |
+| 1  | \[1, 0, 1, 0] | 46     | 0.022461    | 0101      |
+| 2  | \[0, 0, 1, 0] | 42     | 0.020508    | 0100      |
+| 3  | \[0, 1, 0, 1] | 39     | 0.019043    | 1010      |
+| 4  | \[1, 0, 1, 1] | 39     | 0.019043    | 1101      |
+| 5  | \[1, 1, 0, 0] | 38     | 0.018555    | 0011      |
+| 6  | \[1, 1, 1, 0] | 36     | 0.017578    | 0111      |
+| 7  | \[0, 0, 1, 1] | 33     | 0.016113    | 1100      |
+| 8  | \[1, 0, 0, 0] | 31     | 0.015137    | 0001      |
+| 9  | \[0, 1, 0, 0] | 31     | 0.015137    | 0010      |
+| 10 | \[1, 0, 0, 1] | 29     | 0.014160    | 1001      |
+| 11 | \[0, 0, 0, 0] | 28     | 0.013672    | 0000      |
+| 12 | \[0, 1, 1, 0] | 26     | 0.012695    | 0110      |
+| 13 | \[1, 1, 0, 1] | 26     | 0.012695    | 1011      |
+| 14 | \[1, 1, 1, 1] | 25     | 0.012207    | 1111      |
+| 15 | \[0, 1, 1, 1] | 23     | 0.011230    | 1110      |
+
+> **Key takeaway:** Phase operations and `control` can be combined to selectively apply a phase to specific computational basis states. The `hadamard_transform` utility applies `H` to all qubits of an array in a single call, and `control` with a full `QArray` as the operand conditions the operation on all control qubits being in state $|1\rangle$.

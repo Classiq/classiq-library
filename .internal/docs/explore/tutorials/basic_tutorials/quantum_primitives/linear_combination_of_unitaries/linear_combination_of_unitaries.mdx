@@ -1,0 +1,298 @@
+---
+title: "Linear Combination of Unitaries (LCU)"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/basic_tutorials/quantum_primitives/linear_combination_of_unitaries/linear_combination_of_unitaries.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+Quantum computing is based on the principles of quantum mechanics, which includes an important feature: unitarity.
+
+The operations that evolve quantum states on quantum computers are unitary.
+
+Would this mean that problems requiring non-unitary operations are out of hand for quantum computers? This is the task solved by the Linear Combination of Unitaries (LCU) algorithm \[[1](#childs-paper), [2](#childs-notes)].
+
+Given a non-unitary matrix $A$ that can be decomposed into a sum of unitary matrices as follows:
+
+$$
+\begin{equation}
+    A = \sum_{i=0}^{2^n-1} \alpha_i U_i,
+\end{equation}
+$$
+where $\alpha_i$ are real, positive coefficients and $U_i$ are unitary matrices, the LCU algorithm applies the action of $A$, up to a normalization factor, on a desired quantum state.
+
+It does so by embedding the matrix $A$ in a bigger unitary.
+
+The first step of the LCU is to prepare the following state on an auxiliary quantum register according to the coefficients $\alpha_i$ using the function PREPARE:
+
+$$
+\begin{equation}
+    |\psi_0\rangle = PREPARE|0\rangle = \sum_i \sqrt{\frac{\alpha_i}{\lambda}}|i\rangle,
+\end{equation}
+$$
+where $\lambda = \sum_i |\alpha_i|$ is a normalization factor.
+
+This quantum register with the prepared state is used as a controller for the next step. Then, according to the controller quantum register, the following state is being prepared:
+
+$$
+\begin{equation}
+    SELECT|i\rangle|\psi\rangle = |i\rangle U_i |\psi\rangle,
+\end{equation}
+$$
+where $|\psi\rangle$ is the desired quantum state the matrix $A$ should be applied on.
+
+The final step is to have the PREPARE operation inversed such that the following desired state is created:
+
+$$
+\begin{equation}
+    LCU|0\rangle|\psi\rangle = PREPARE^{-1}\, SELECT\, PREPARE |0\rangle|\psi\rangle = V |0\rangle |\psi\rangle,
+\end{equation}
+$$
+where $V$ can be represented as
+
+$$
+V = \begin{bmatrix}A & \cdot \\ \cdot & \cdot \end{bmatrix}.
+$$
+This is called the Block Encoding of the matrix A. By projecting the controller quantum register on the $|0\rangle$ state the desired outcome is obtained:
+
+$$
+\begin{equation}
+    \left(|0\rangle\langle0|\otimes I\right)LCU|0\rangle|\phi\rangle = |0\rangle\frac{A}{\lambda}|\psi\rangle.
+\end{equation}
+$$
+Therefore, the action of the sequence of operations over the target qubit will be the non-unitary operation $A$, up to a normalization factor.
+
+A detailed mathematical description of the algorithm can be seen [below](#mathematical-description) and in reference \[[1](#childs-paper)]. It is also important to notice that the projection onto the $|0\rangle$ state depends on a success probability, detailed in [\[1\]](https://arxiv.org/abs/1202.5822).
+
+Overall, a scheme of the algorithm looks like:
+
+<center><center> <img src="https://docs.classiq.io/resources/LCU_circuit_new_visual_fin.png" alt="LCU_blocks" border="0" /></center>
+</center>
+
+## Guided Implementation
+
+Now that we know how the LCU algorithm works, it's time to implement it on Classiq.
+
+For that, we will be using two important functions:
+
+- [Within-Apply](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/within-apply/)
+- [Prepare state](https://docs.classiq.io/latest/qmod-reference/library-reference/core-library-functions/prepare_state_and_amplitudes/prepare_state_and_amplitudes/)
+
+<Accordion title="How does the Within-Apply function work?">
+  The Within-Apply maps unitary operations of the kind $V = U^{-1}WU$ into the quantum circuit, given $U$ and $W$.
+</Accordion>
+
+The Prepare state function realizes the initial state preparation step of a quantum algorithm, given a bound for the error and the probabilities of the quantum states.
+
+Using [this tutorial](https://docs.classiq.io/latest/qmod-reference/library-reference/core-library-functions/prepare_state_and_amplitudes/prepare_state_and_amplitudes/), one can play with this function.
+
+The objective of our quantum circuit is to define the matrices $U$ and $W$ following the $V = U^{-1} W U$ decomposition used in the Within-Apply function. A quick look on the definition of the LCU operator is enough to identify $U = PREPARE$ and $W = SELECT$. As an example, we will be considering the following SELECT operator:
+
+$$
+\begin{equation}
+    SELECT = |0\rangle\langle 0|\otimes I + |1\rangle\langle 1|\otimes QFT +   |2\rangle\langle 2| \otimes QFT^{-1},
+\end{equation}
+$$
+where QFT is the Quantum Fourier Transform operator that acts over the two target qubits, and that the probabilities are $\alpha = [0.5,0.25,0.25,0]$.
+
+Now that the operations are identified, we just need to build them and then use the Within-Apply function.
+
+The SELECT operation can be build using the [control](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/control/) statement, and the [QFT function](https://docs.classiq.io/latest/explore/functions/qmod_library_reference/classiq_open_library/qft/qft/):
+
+```python
+from classiq import *
+
+
+@qfunc
+def select(controller: QNum, psi: QNum):
+    control(ctrl=controller == 0, stmt_block=lambda: apply_to_all(IDENTITY, psi))
+
+    control(ctrl=controller == 1, stmt_block=lambda: qft(psi))
+
+    control(ctrl=controller == 2, stmt_block=lambda: invert(lambda: qft(psi)))
+```
+
+Using two auxiliary qubits, this sequence of operations can be seen in Classiq's IDE as
+
+![select.gif](https://docs.classiq.io/resources/Select_function_final.gif)
+
+With the SELECT function defined, we are able to apply the V operator, by using the Within-Apply function.
+
+For this, it is necessary to build the PREPARE operator, which will be done using the inplace\_prepare\_state() function, that requires the probability distribution $\alpha$, the maximum error in the decomposition of the operator and the target qubits, which are the controllers.
+
+```python
+@qfunc
+def prepare(controller: QNum):
+    # Defining the error bound and probability distribution
+    error_bound = 0.01
+    controller_probabilities = [0.5, 0.25, 0.25, 0]
+    inplace_prepare_state(controller_probabilities, error_bound, controller)
+```
+
+Thus, the sequence of operations we will define in our quantum program is:
+
+- Define the error bound in the decomposition, and define the probability distribution $\alpha$
+- Allocate target and control qubits
+- Execute the Within-Apply function, using the PREPARE and SELECT functions
+
+```python
+@qfunc
+def main(controller: Output[QNum], psi: Output[QNum]):
+    # Allocating the target and control qubits, respectively
+    allocate(2, psi)
+    allocate(2, controller)
+    # Executing the Within-Apply function with the select and the prepare functions.
+    within_apply(
+        within=lambda: prepare(controller),
+        apply=lambda: select(controller, psi),
+    )
+
+
+qmod_1 = create_model(main)
+qprog_1 = synthesize(qmod_1)
+```
+
+Your quantum program is done! You can see it using Classiq's IDE with the show() command:
+
+```python
+show(qprog_1)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FkkG2O0kmXD4dTWHX7WKDCm4r
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FkkG2O0kmXD4dTWHX7WKDCm4r?login=True&version=17
+  
+
+```
+</Info>
+
+## Mathematical Description
+
+The initial state of our circuit is $|0\rangle|\Psi\rangle$, for some general $\Psi$.
+
+After that, the PREPARE operation is applied, transforming it in the state:
+
+$$
+\begin{equation}
+    PREPARE|0\rangle|\Psi\rangle = \left(\sum_{i=0}^{2^n-1} \sqrt{\frac{|\alpha_i|}{\lambda}} |i\rangle\right)|\Psi\rangle.
+\end{equation}
+$$
+We can always represent the PREPARE operation, which acts only in the control qubits, as being:
+
+$$
+\begin{equation}
+    PREPARE = \sum_{i=0}^{2^n-1} \sqrt{\frac{|\alpha_i|}{\lambda}} |i\rangle\langle 0| + \sum_{i=0}^{2^n-1}\sum_{j=1}^{2^n-1} \beta_{i,j} |i\rangle\langle j|,
+\end{equation}
+$$
+for some $\beta_{i,j}$.
+
+The SELECT operation, which acts both in the control and target qubits, can also be described this way by
+
+$$
+\begin{equation}
+    SELECT = \sum_{i=0}^{2^n-1} |i\rangle\langle i|\otimes U_i.
+\end{equation}
+$$
+Now, the state generated by $PREPARE^{-1}\, SELECT\, PREPARE |0\rangle|\psi\rangle$ is given by:
+
+$$
+\begin{equation}
+    PREPARE^{-1}\, SELECT\, PREPARE |0\rangle|\psi\rangle = \frac{1}{\lambda}|0\rangle\sum_{i=0}^{2^n-1} \alpha_i \, U_i |\Psi\rangle + \sum_{j=1}^{2^n-1} \left( \sum_{i=0}^{2^n-1} \beta_{i,j}^*\right) |j\rangle\,U_j |\Psi\rangle
+\end{equation}
+$$
+When applying the projector $|0\rangle\langle 0|$ onto the control qubits, we finally obtain the desired state
+
+$$
+\begin{equation}
+    \frac{1}{\lambda}|0\rangle\sum_{i=0}^{2^n-1} \alpha_i \, U_i |\Psi\rangle = |0\rangle\frac{A}{\lambda}|\Psi\rangle.
+\end{equation}
+$$
+
+## All the Code Together
+
+```python
+from classiq import *
+
+
+@qfunc
+def select(controller: QNum, psi: QNum):
+    control(ctrl=controller == 0, stmt_block=lambda: apply_to_all(IDENTITY, psi))
+
+    control(ctrl=controller == 1, stmt_block=lambda: qft(psi))
+
+    control(ctrl=controller == 2, stmt_block=lambda: invert(lambda: qft(psi)))
+
+
+@qfunc
+def prepare(controller: QNum):
+    # Defining the error bound and probability distribution
+    error_bound = 0.01
+    controller_probabilities = [0.5, 0.25, 0.25, 0]
+    inplace_prepare_state(controller_probabilities, error_bound, controller)
+
+
+@qfunc
+def main(controller: Output[QNum], psi: Output[QNum]):
+    # Allocating the target and control qubits, respectively
+    allocate(2, psi)
+    allocate(2, controller)
+    # Executing the Within-Apply function with the select and the prepare functions.
+    within_apply(
+        within=lambda: prepare(controller),
+        apply=lambda: select(controller, psi),
+    )
+
+
+qmod_2 = create_model(main)
+qprog_2 = synthesize(qmod_2)
+
+show(qprog_2)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/39FklKFg3swhJR0OH8xkqcRIWqb
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/39FklKFg3swhJR0OH8xkqcRIWqb?login=True&version=17
+  
+
+```
+</Info>
+
+## References
+
+<a id="childs-paper">\[1]</a>: [Hamiltonian Simulation Using Linear Combinations of Unitary Operations (Andrew M. Childs and Nathan Wiebe)](https://arxiv.org/abs/1202.5822)
+
+<a id="childs-notes">\[2]</a>: [Lecture Notes on
+Quantum Algorithms (Andrew M. Childs)](https://www.cs.umd.edu/~amchilds/qa/qa.pdf)

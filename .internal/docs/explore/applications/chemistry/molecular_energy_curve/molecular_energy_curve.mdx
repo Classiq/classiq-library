@@ -1,0 +1,258 @@
+---
+title: "Creating a Molecule's Potential Energy Curve"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/chemistry/molecular_energy_curve/molecular_energy_curve.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+A potential energy curve gives the ground energy of an assembly of atoms as a function of the distances between them.
+
+The global minima of the curve indicates the binding energy and internuclear distance for the stable molecule. Therefore, such a curve can be powerful tool in computational chemistry for predicting the molecular structure and spectrum.
+
+This tutorial demonstrates how to use the Classiq chemistry package to create a molecule's potential energy curve. It compares the result with the Hartree-Fock approximation method and the FCI (Full Configuration Interaction) energy.
+
+```python
+!pip install -qq "classiq[chemistry]"
+```
+
+## Definitions and Initialization
+
+Define the range of internuclear distances for the model to simulate, and choose the number of sampling points in this range, which determines the graph's resolution.
+
+```python
+import numpy as np
+
+# define the sampling params
+num1 = 5  # how many sampling points - determines your resolution
+start1 = 0.20  # what is your sampling start distance
+stop1 = 1  # what is your sampling end distance
+num2 = 7  # how many sampling points - determines your resolution
+start2 = 1.4  # what is your sampling start distance
+stop2 = 3.5  # what is your sampling end distance
+
+
+# prepare x,y vectors
+distance = np.append(np.linspace(start1, stop1, num1), np.linspace(start2, stop2, num2))
+VQE_energy = []
+HF_energy = []
+exact_energy = []
+
+print(distance)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[0.2  0.4  0.6  0.8  
+
+1.   1.4  1.75 2.1  2.45 2.8  3.15 3.5 ]
+  
+
+```
+</Info>
+
+## Energy Estimations
+
+Define a for-loop, which takes these steps:
+
+1. Creating a molecule at changing distances between the atoms.
+1. Constructing a chemistry model for the corresponding Hamiltonian, using the Hartree-Fock initial state and UCC ansatz.
+1. Synthesizing the model to get a quantum program.
+1. Executing the quantum program to extract a solution for the ground energy.
+1. Obtaining the exact solution and Hartree-Fock solution.
+
+```python
+import time
+
+from classiq import *
+```
+```python
+
+from openfermion.chem import MolecularData
+from openfermionpyscf import run_pyscf
+
+from classiq.applications.chemistry.hartree_fock import get_hf_state
+from classiq.applications.chemistry.op_utils import qubit_op_to_qmod
+from classiq.applications.chemistry.problems import FermionHamiltonianProblem
+from classiq.applications.chemistry.ucc import get_ucc_hamiltonians
+from classiq.applications.chemistry.z2_symmetries import Z2SymTaperMapper
+
+# create the molecule, insert the distance, prepare H, create UCC anzats and solve in energy
+qmods = []
+qprogs = []
+results = []
+durations = []
+
+for x in distance:
+    time1 = time.time()
+
+    # Define a molecule
+    geometry = [("H", (0.0, 0.0, 0)), ("H", (0.0, 0.0, float(x)))]
+    molecule = MolecularData(geometry, basis="sto-3g", multiplicity=1, charge=0)
+    molecule = run_pyscf(
+        molecule,
+        run_mp2=True,
+        run_cisd=True,
+        run_ccsd=True,
+        run_fci=True,  # relevant for small, classically solvable problems
+    )
+
+    # Define a problem and a mapper
+    problem = FermionHamiltonianProblem.from_molecule(molecule)
+    mapper = Z2SymTaperMapper.from_problem(problem)
+
+    # Construct a model
+    hf_state = get_hf_state(problem, mapper)
+    uccsd_hamiltonians = get_ucc_hamiltonians(problem, mapper, excitations=[1, 2])
+    num_params = len(uccsd_hamiltonians)
+    vqe_hamiltonian = qubit_op_to_qmod(mapper.map(problem.fermion_hamiltonian))
+
+    @qfunc
+    def main(params: CArray[CReal, num_params], state: Output[QArray]):
+        prepare_basis_state(hf_state, state)
+        multi_suzuki_trotter(uccsd_hamiltonians, params, 1, 1, state)
+
+    # Synthesize
+    qprog = synthesize(main)
+    qprog = set_quantum_program_execution_preferences(
+        qprog,
+        preferences=ExecutionPreferences(
+            num_shots=1000,
+            backend_preferences=ClassiqBackendPreferences(
+                backend_name="simulator_statevector"
+            ),
+        ),
+    )
+    qprogs.append(qprog)
+
+    # Execute
+    with ExecutionSession(qprog) as es:
+        result = es.minimize(
+            cost_function=vqe_hamiltonian,
+            initial_params={"params": [0] * num_params},
+            max_iteration=500,
+        )
+
+    VQE_energy.append(result[-1][0])
+    HF_energy.append(molecule.hf_energy)
+    exact_energy.append(molecule.fci_energy)
+
+    time2 = time.time()
+    duration = time2 - time1
+    durations.append(duration)
+    print(duration)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+6.627692937850952
+  3.974622964859009
+  3.1045420169830322
+  2.99271297454834
+  3.1956491470336914
+  2.8807778358459473
+  3.190415859222412
+  3.426532745361328
+  3.10728120803833
+  3.5942270755767822
+  3.1468281745910645
+  3.6718368530273438
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+10.790261507034302
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+9.763712167739868
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+9.770148515701294
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+9.85509705543518
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+15.547704696655273
+  
+
+```
+</Info>
+
+## Graph Creation
+
+```python
+import matplotlib.pyplot as plt
+
+plt.plot(
+    distance, VQE_energy, "r--", distance, HF_energy, "bs", distance, exact_energy, "g^"
+)
+
+plt.xlabel("distance [Å]")
+plt.ylabel("energy [Ha]")
+plt.legend(["Classiq VQE", "Hartree-Fock", "Exact solution"])
+plt.title("Binding Curve H_{2}")
+
+plt.show()
+```
+![output](./molecular_energy_curve_files/molecular_energy_curve_1.png)
+
+This graph presents the ground state for the $H_{2}$ molecule as a function of the distance between the two hydrogen atoms.
+
+Note that both the HF solution and Classiq VQE present decent results around the global minima.
+
+For further distances, Classiq VQE stays close to the exact solution while the HF solution gradually deviates.
+
+The source of this lack of correspondence is with the lack of flexible correlations within the HF model, which is enabled within the VQE scope.
+
+You can explore more curves, creating graphs for different molecules (even n-dimensional or larger atom assemblies) in a similar fashion.

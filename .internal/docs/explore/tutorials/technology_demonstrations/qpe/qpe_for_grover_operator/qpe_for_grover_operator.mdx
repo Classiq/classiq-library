@@ -1,0 +1,379 @@
+---
+title: "Quantum Phase Estimation on a Grover Operator"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/QPE/qpe_for_grover_operator/qpe_for_grover_operator.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook demonstrates the capability of Classiq's QPE function, focusing on a case where it is applied on a Grover Operator.
+
+This is the core of the Amplitude Estimation algorithm.
+
+The demonstration done for a toy model, where the Grover operator is constructed for a "good state" on 5 qubits $|\psi\rangle_{\rm good}\propto (|2\rangle+|3\rangle+|5\rangle+|7\rangle+|11\rangle+|13\rangle$).
+
+## 
+
+1. Building a model with Classiq
+
+```python
+from classiq import (
+    CArray,
+    CInt,
+    H,
+    Output,
+    QArray,
+    QBit,
+    QNum,
+    U,
+    X,
+    Z,
+    allocate,
+    control,
+    create_model,
+    drop,
+    hadamard_transform,
+    invert,
+    qfunc,
+    qpe,
+    repeat,
+    synthesize,
+    within_apply,
+)
+```
+```python
+
+import numpy as np
+
+NUM_QUBITS = 5
+ints_to_flip = [2, 3, 5, 7, 11, 13]
+precisions = [l for l in range(1, 6)]
+print("precisions:", precisions)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+precisions: [1, 2, 3, 4, 5]
+  
+
+```
+</Info>
+
+```python
+transpilation_options = {"classiq": "custom", "qiskit": 3}
+```
+#
+
+## 1.1 Constructing the Relevant Quantum Functions
+
+```python
+# qfunc for specific state preparation
+
+
+@qfunc
+def my_state_preparation(states: CArray[CInt], x: QNum, ind: QBit):
+
+    hadamard_transform(x)
+    repeat(states.len, lambda i: control(x == states[i], lambda: X(ind)))
+```
+```python
+
+# qfunc for grover
+import numpy as np
+
+
+@qfunc
+def my_grover(x: QNum, ind: QBit):
+    Z(ind)  # oracle for the good state
+    within_apply(
+        lambda: invert(lambda: my_state_preparation(ints_to_flip, x, ind)),
+        lambda: within_apply(
+            lambda: (X(ind), H(ind)), lambda: control(x == 0, lambda: X(ind))
+        ),  # zero oracle 1-|0><0|
+    )
+    U(0, 0, 0, np.pi, ind)
+```
+```python
+
+from classiq import CustomHardwareSettings, Preferences
+
+preferences = Preferences(
+    custom_hardware_settings=CustomHardwareSettings(basis_gates=["cx", "u"]),
+    transpilation_option=transpilation_options["classiq"],
+    timeout_seconds=1000,
+)
+```
+#
+
+## 1.2 Synthesizing with two Different Optimization Scenarios
+
+```python
+from classiq import (
+    Constraints,
+    OptimizationParameter,
+    QuantumProgram,
+    set_constraints,
+    set_preferences,
+    synthesize,
+)
+```
+```python
+
+classiq_depths_ae_opt_width = []
+classiq_cx_counts_ae_opt_width = []
+classiq_widths_ae_opt_width = []
+
+classiq_cx_counts_ae_opt_depth_max_width = []
+classiq_depths_ae_opt_depth_max_width = []
+classiq_widths_ae_opt_depth_max_width = []
+
+qmods = []
+qmods_width = []
+qmods_cx = []
+
+qmods_cx_max_width = []
+
+qprogs_width = []
+qprogs_cx = []
+
+
+for precision in precisions:
+
+    @qfunc
+    def main(phase: Output[QNum]):
+        ind = QBit("ind")
+        allocate(1, ind)
+        x = QNum("x")
+        allocate(NUM_QUBITS - 1, False, 0, x)
+        allocate(precision, False, precision, phase)
+        qpe(lambda: my_grover(x, ind), phase)
+        drop(x)
+        drop(ind)
+
+    qmod = create_model(main)
+    qmod = set_preferences(qmod, preferences=preferences)
+    qmods.append(qmod)
+    qprog = synthesize(qmod)
+
+    # width optimization
+    qmod_width = set_constraints(
+        qmod, optimization_parameter=OptimizationParameter.WIDTH
+    )
+    qmods_width.append(qmod_width)
+    qprog_width = synthesize(qmod_width)
+    classiq_widths_ae_opt_width.append(qprog_width.data.width)
+    classiq_depths_ae_opt_width.append(qprog_width.transpiled_circuit.depth)
+    classiq_cx_counts_ae_opt_width.append(
+        qprog_width.transpiled_circuit.count_ops["cx"]
+    )
+    qprogs_width.append(qprog_width)
+
+    # Depth Optimization with a Constrained Width
+    qmods_cx_max_width.append(15 + 3 * (precision - 1))
+    qmod_cx = set_constraints(
+        qmod,
+        optimization_parameter=OptimizationParameter.DEPTH,
+        max_width=qmods_cx_max_width[-1],  # setting some bound
+    )
+    qmods_cx.append(qmod_cx)
+    qprog_cx = synthesize(qmod_cx)
+    qprogs_cx.append(qprog_cx)
+    classiq_widths_ae_opt_depth_max_width.append(qprog_cx.data.width)
+    classiq_depths_ae_opt_depth_max_width.append(qprog_cx.transpiled_circuit.depth)
+    classiq_cx_counts_ae_opt_depth_max_width.append(
+        qprog_cx.transpiled_circuit.count_ops["cx"]
+    )
+
+print("classiq depths:", classiq_depths_ae_opt_width)
+print("classiq cx_counts:", classiq_cx_counts_ae_opt_width)
+print("classiq widths:", classiq_widths_ae_opt_width)
+
+print("classiq depths:", classiq_depths_ae_opt_depth_max_width)
+print("classiq cx_counts:", classiq_cx_counts_ae_opt_depth_max_width)
+print("classiq widths:", classiq_widths_ae_opt_depth_max_width)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+classiq depths: [866, 2596, 6056, 12976, 26816]
+  classiq cx_counts: [513, 1544, 3600, 7713, 15929]
+  classiq widths: [6, 7, 8, 9, 10]
+  classiq depths: [426, 1272, 2926, 6196, 13015]
+  classiq cx_counts: [241, 722, 1664, 3523, 7384]
+  classiq widths: [15, 18, 21, 24, 27]
+  
+
+```
+</Info>
+
+## 
+
+2. Comparing to Qiskit Implementation
+
+The qiskit data was generated using qiskit version 1.
+
+0.
+
+0. To run the qiskit code uncomment the commented cells below.
+
+```python
+qiskit_depths_ae = [3094, 9262, 21596, 46254, 95560]
+qiskit_cx_counts_ae = [1712, 5130, 11958, 25604, 52884]
+qiskit_widths_ae = [6, 7, 8, 9, 10]
+```
+```python
+
+# from importlib.metadata import version
+# try:
+#     import qiskit
+#     if version('qiskit') != "1.0.0":
+#       !pip uninstall qiskit -y
+#       !pip install qiskit==1.0.0
+# except ImportError:
+#     !pip install qiskit==1.0.0
+```
+```python
+
+# import numpy as np
+# from qiskit import QuantumCircuit, QuantumRegister, transpile
+# from qiskit.circuit.library import GroverOperator, PhaseEstimation, XGate
+
+# # building the state preparation circuit, the last qubit is the indicator of good/bad state
+# state_preparation = QuantumCircuit(NUM_QUBITS)
+# for q in range(NUM_QUBITS - 1):
+#     state_preparation.h(q)
+
+# for states in states_to_flip:
+#     mcx = XGate().control(num_ctrl_qubits=NUM_QUBITS - 1, ctrl_state=states)
+#     state_preparation.append(mcx, [k for k in range(NUM_QUBITS)])
+
+# circuit = QuantumCircuit(NUM_QUBITS)
+# circuit.compose(state_preparation, [k for k in range(NUM_QUBITS)], inplace=True)
+
+# # building oracle
+# oracle = QuantumCircuit(NUM_QUBITS)
+# oracle.z(4)  # good state = last qubit is |1>
+
+# # building the grover operator
+# grover_op = GroverOperator(oracle, state_preparation=circuit, insert_barriers=True)
+
+
+# qiskit_depths_ae = []
+# qiskit_cx_counts_ae = []
+# qiskit_widths_ae = []
+# for precision in precisions:
+#     qpe_qc = PhaseEstimation(precision, circuit)
+#     transpiled_cir = transpile(
+#         qpe_qc,
+#         basis_gates=["u", "cx"],
+#         optimization_level=transpilation_options["qiskit"],
+#     )
+#     qiskit_depths_ae.append(transpiled_cir.depth())
+#     qiskit_cx_counts_ae.append(transpiled_cir.count_ops()["cx"])
+#     qiskit_widths_ae.append(transpiled_cir.width())
+```
+
+## 
+
+3. Plotting the Data
+
+```python
+import matplotlib.pyplot as plt
+
+classiq_color = "#119DA4"
+classiq_color_1 = "#F43764"
+qiskit_color = "#bb8bff"
+plt.rcParams["font.family"] = "serif"
+plt.rc("savefig", dpi=300)
+plt.rcParams["axes.linewidth"] = 1
+plt.rcParams["xtick.major.size"] = 5
+plt.rcParams["xtick.minor.size"] = 5
+plt.rcParams["ytick.major.size"] = 5
+plt.rcParams["ytick.minor.size"] = 5
+
+(qiskit1,) = plt.semilogy(
+    precisions,
+    qiskit_depths_ae,
+    "-s",
+    label="qiskit",
+    markerfacecolor=qiskit_color,
+    markeredgecolor="k",
+    markersize=6,
+    markeredgewidth=1.5,
+    color=qiskit_color,
+)
+
+(classiq1,) = plt.semilogy(
+    precisions,
+    classiq_depths_ae_opt_width,
+    "-D",
+    label="classiq width opt.",
+    markerfacecolor=classiq_color,
+    markeredgecolor="k",
+    markersize=6.5,
+    markeredgewidth=1.5,
+    color=classiq_color,
+)
+
+(classiq2,) = plt.semilogy(
+    precisions,
+    classiq_depths_ae_opt_depth_max_width,
+    "-o",
+    label="classiq depth opt.",
+    markerfacecolor=classiq_color_1,
+    markeredgecolor="k",
+    markersize=7,
+    markeredgewidth=1.5,
+    linewidth=1.5,
+    color=classiq_color_1,
+)
+
+
+first_legend = plt.legend(
+    handles=[qiskit1, classiq1, classiq2], fontsize=16, loc="upper left"
+)
+
+
+plt.ylabel("Depth", fontsize=16)
+plt.xlabel("QPE-precision", fontsize=16)
+plt.yticks(fontsize=16)
+plt.xticks(fontsize=16)
+plt.axis(ymin=3e2, ymax=5e5)
+plt.xticks(precisions)
+
+
+for x, y, num_qubits in zip(
+    precisions, classiq_depths_ae_opt_width, classiq_widths_ae_opt_width
+):
+    plt.text(x * 0.94, y * 1.2, str(num_qubits), fontsize=16, color=classiq_color)
+for x, y, num_qubits in zip(
+    precisions,
+    classiq_depths_ae_opt_depth_max_width,
+    classiq_widths_ae_opt_depth_max_width,
+):
+    plt.text(x * 0.96, y * 1.25, str(num_qubits), fontsize=16, color=classiq_color_1)
+for x, y, num_qubits in zip(precisions, qiskit_depths_ae, qiskit_widths_ae):
+    plt.text(x * 0.98, y * 1.2, str(num_qubits), fontsize=16, color=qiskit_color)
+plt.text(4.8, 5e2, "(b)", fontsize=16)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Text(4.8, 500.0, '(b)')
+  
+
+```
+</Info>
+
+![output](./qpe_for_grover_operator_files/qpe_for_grover_operator_1.png)

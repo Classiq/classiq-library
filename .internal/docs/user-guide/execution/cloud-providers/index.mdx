@@ -1,0 +1,38 @@
+---
+title: "Supported Cloud Providers"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+Classiq offers integration with multiple cloud providers, to allow seamless
+execution of quantum programs on multiple backends.
+
+
+<Note>
+Some hardware providers may require an appropriate account.
+
+
+</Note>
+To estimate execution cost before running, see [Cost Estimation](/user-guide/execution/cost-estimation).
+
+-   [Classiq](/user-guide/execution/cloud-providers/classiq-backends)
+-   [Custom noise models (Classiq simulators)](/user-guide/execution/cloud-providers/custom-noise-models)
+-   [Google](/user-guide/execution/cloud-providers/google-backends)
+-   [IBM](/user-guide/execution/cloud-providers/ibm-backends)
+-   [Intel](/user-guide/execution/cloud-providers/intel-backends)
+-   [Amazon Braket](/user-guide/execution/cloud-providers/amazon-backends)
+-   [IonQ](/user-guide/execution/cloud-providers/ionq-backends)
+-   [Azure Quantum](/user-guide/execution/cloud-providers/azure-backends)
+-   [Alice & Bob](/user-guide/execution/cloud-providers/alice-and-bob-backends)
+-   [C12](/user-guide/execution/cloud-providers/c12)
+
+## `emulate` by provider
+
+The SDK exposes an `emulate` flag on several backend preference types; **semantics differ by provider**:
+
+| Provider          | Doc section                                                                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| IBM Quantum       | [IBM hardware noise simulation (emulate)](/user-guide/execution/cloud-providers/ibm-backends#ibm-hardware-noise-simulation-emulate)                                       |
+| IonQ (direct API) | [IonQ hardware noise simulation (emulate)](/user-guide/execution/cloud-providers/ionq-backends#ionq-hardware-noise-simulation-emulate)                                    |
+| Azure Quantum     | [IonQ hardware noise simulation on Azure Quantum (emulate)](/user-guide/execution/cloud-providers/azure-backends#ionq-hardware-noise-simulation-on-azure-quantum-emulate) |
+| Amazon Braket     | [Device emulation (emulate)](/user-guide/execution/cloud-providers/amazon-backends#device-emulation-emulate)                                                              |

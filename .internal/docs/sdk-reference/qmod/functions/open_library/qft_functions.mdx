@@ -1,0 +1,57 @@
+---
+title: Qft Functions
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `qft_no_swap` | [Qmod Classiq-library function]. |
+| `qft` | [Qmod Classiq-library function]. |
+
+
+### qft_no_swap
+
+
+<pre><code>qft_no_swap(
+    qbv: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the Quantum Fourier Transform (QFT) without the swap gates.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qbv` | `QArray[QBit]` | The quantum number to which the QFT is applied. | *required* |
+
+
+
+### qft
+
+
+<pre><code>qft(
+    target: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Performs the Quantum Fourier Transform (QFT) on `target` in-place.
+Implements the following transformation:
+
+$$
+y_{k} = \frac{1}{\sqrt{N}} \sum_{j=0}^{N-1} x_j e^{2\pi i \frac{jk}{N}}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `QArray[QBit]` | The quantum object to be transformed | *required* |

@@ -1,0 +1,83 @@
+---
+title: "Classiq code for discrete quantum walk"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/classiq_paper/quantum_walk/classiq_discrete_quantum_walk.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook shows how to generate data for discrete quantum walk using `classiq`.
+
+```python
+import time
+
+from classiq import *
+
+SIZE = 6
+MAX_WIDTH = 2 * SIZE
+constraints = Constraints(optimization_parameter="cx", max_width=MAX_WIDTH)
+```
+```python
+
+# define increment circuit as an MCX cascade
+@qfunc
+def increment(x: QArray):
+    repeat(
+        x.len - 1, lambda i: control(x[0 : x.len - 1 - i], lambda: X(x[x.len - 1 - i]))
+    )
+    X(x[0])
+
+
+@qfunc
+def single_step_walk(
+    coin: QBit,  # coin
+    x: QNum,  # position
+):
+    H(coin)
+    control(coin == 0, lambda: increment(x), lambda: invert(lambda: increment(x))),
+```
+```python
+
+from classiq import CustomHardwareSettings, Preferences
+
+preferences = Preferences(
+    custom_hardware_settings=CustomHardwareSettings(basis_gates=["cx", "u"]),
+    transpilation_option="custom",
+    debug_mode=False,
+)
+```
+
+## Example for getting a data point
+
+```python
+start_time = time.time()
+
+
+@qfunc
+def main(x: Output[QNum[SIZE, UNSIGNED, 0]], coin: Output[QBit]):
+    allocate(x)
+    allocate(coin)
+    single_step_walk(coin, x)
+
+
+qprog = synthesize(main, constraints=constraints, preferences=preferences)
+compilation_time = time.time() - start_time
+
+width = qprog.data.width
+depth = qprog.transpiled_circuit.depth
+cx_counts = qprog.transpiled_circuit.count_ops["cx"]
+
+print(f"==== classiq for {SIZE}==== time {compilation_time}")
+```
+<Info>
+  **Output:**
+
+  
+
+```
+==== classiq for 6==== time 19.030019283294678
+  
+
+```
+</Info>

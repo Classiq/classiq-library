@@ -1,0 +1,627 @@
+---
+title: Operations
+icon: "/icons/bulletsharp.svg"
+---
+
+This is a list of the operations that are built-in in `Qmod`.
+For more information regarding classical types see the `Statements` section in the [language reference](/qmod-reference/language-reference/index).
+
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `QuantumLambdaFunction` | The definition of an anonymous function passed as operand to higher-level functions. |
+| `H` | [Qmod core-library function]. |
+| `S` | [Qmod core-library function]. |
+| `QBit` | A type representing a single qubit. |
+| `QNum` | QNum is a quantum variable that represents a numeric value, which can be either integer or fixed-point, encoded within a quantum register. |
+| `allocate` | Initialize a quantum variable to a new quantum object in the zero state:. |
+| `bind` | Reassign qubit or arrays of qubits by redirecting their logical identifiers. |
+| `if_` | Conditionally executes quantum operations based on a symbolic or boolean expression. |
+| `control` | Conditionally executes quantum operations based on the value of quantum variables or expressions. |
+| `skip_control` | Applies quantum statements unconditionally. |
+| `assign` | Initialize a scalar quantum variable using an arithmetic expression. |
+| `inplace_add` | Add an arithmetic expression to a quantum variable. |
+| `inplace_xor` | Bitwise-XOR a quantum variable with an arithmetic expression. |
+| `within_apply` | Given two operations $U$ and $V$, performs the composition of operations $U^\{-1\} V U$. |
+| `repeat` | Executes a quantum loop a specified number of times, applying a quantum operation on each iteration. |
+| `power` | Apply a quantum operation raised to a symbolic or integer power. |
+| `invert` | Apply the inverse of a quantum gate. |
+| `phase` | Applies a state-dependent or fixed phase shift (Z rotation) to the quantum state. |
+| `foreach` | Loops through the elements of a classical list, applying a quantum operation on each iteration. |
+| `assign_amplitude_poly_sin` | Encodes the value of the sine/cosine of a polynomial into the amplitude of the respective computational basis state:. |
+| `lookup_table` | Reduces a classical function into a lookup table over all the possible values of the quantum numbers. |
+
+
+### QuantumLambdaFunction
+
+The definition of an anonymous function passed as operand to higher-level functions
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [has_generative_blocks](#has_generative_blocks) |  |
+| [set_py_callable](#set_py_callable) |  |
+| [set_op_decl](#set_op_decl) |  |
+
+
+### pos_rename_params
+
+
+`pos_rename_params: list[str] = pydantic.Field(default_factory=list, description='Mapping of the declared param to the actual variable name used')`
+
+
+### body
+
+
+`body: StatementBlock = pydantic.Field(description='A list of function calls passed to the operator')`
+
+
+### py_callable
+
+
+`py_callable: Callable`
+
+
+### func_decl
+
+
+`func_decl: AnonQuantumOperandDeclaration`
+
+
+### named_func_decl
+
+
+`named_func_decl: AnonQuantumOperandDeclaration`
+
+### H
+
+
+<pre><code>H(
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the Hadamard gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+H = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `QBit` | The qubit to apply the Hadamard gate to. | *required* |
+
+
+
+### S
+
+
+<pre><code>S(
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the S gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+S = \begin{bmatrix} 1 & 0 \\ 0 & i \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `Const[QBit]` | The qubit to apply the S gate to. | *required* |
+
+
+
+### QBit
+
+A type representing a single qubit.
+
+`QBit` serves both as a placeholder for a temporary, non-allocated qubit
+and as the type of an allocated physical or logical qubit.
+Conceptually, a qubit is a two-level quantum system, described by the
+superposition of the computational basis states:
+
+$$
+|0\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix},
+\quad
+|1\rangle = \begin{pmatrix} 0 \\ 1 \end{pmatrix}
+$$
+
+Therefore, a qubit state is a linear combination:
+
+$$
+|\psi\rangle = \alpha |0\rangle + \beta |1\rangle,
+$$
+
+where \( \alpha \) and \( \beta \) are complex numbers satisfying:
+
+$$
+|\alpha|^2 + |\beta|^2 = 1.
+$$
+
+Typical usage includes:
+
+- Representing an unallocated qubit before its allocation.
+- Acting as the output type for a qubit or an allocated qubit in the main function after calling an allocation function.
+
+Examples:
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [to_qvar](#to_qvar) |  |
+| [get_qmod_type](#get_qmod_type) |  |
+
+### QNum
+
+QNum is a quantum variable that represents a numeric value, which can be either integer or fixed-point,
+encoded within a quantum register. It consists of an array of qubits for quantum representation and
+classical metadata (number of fraction digits, sign) to define its numeric behavior.
+
+QNum enables numerical computation in quantum circuits, supporting both signed and unsigned
+formats, as well as configurable fixed-point precision. It is a parameterizable scalar type,
+meaning its behavior can depend on symbolic or compile-time values. The total number of
+qubits (`size`) determines the resolution and range of representable values.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [to_qvar](#to_qvar) |  |
+| [get_qmod_type](#get_qmod_type) |  |
+| [get_maximal_bounds](#get_maximal_bounds) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [CONSTRUCTOR_DEPTH](#constructor_depth) |  |  |
+
+
+### fraction_digits
+
+
+`fraction_digits: CParamScalar | int`
+
+
+### is_signed
+
+
+`is_signed: CParamScalar | bool`
+
+
+### CONSTRUCTOR_DEPTH
+
+
+```python
+CONSTRUCTOR_DEPTH = '3'
+```
+
+### allocate
+
+
+<pre><code>allocate(
+    args: Any = (),
+    kwargs: Any = {}
+) -> None</code></pre>
+
+
+Initialize a quantum variable to a new quantum object in the zero state:
+
+$$
+    \left|\text{out}\right\rangle = \left|0\right\rangle^{\otimes \text{num_qubits}}
+$$
+
+If 'num_qubits' is not specified, it will be inferred according to the type of 'out'.
+In case the quantum variable is of type `QNum`, its numeric attributes can be specified as
+well.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `args` | `Any` |  | () |
+| `kwargs` | `Any` |  | {} |
+
+
+
+### bind
+
+
+<pre><code>bind(
+    source: Input[QVar] | list[Input[QVar]],
+    destination: Output[QVar] | list[Output[QVar]]
+) -> None</code></pre>
+
+
+Reassign qubit or arrays of qubits by redirecting their logical identifiers.
+
+This operation rewires the logical identity of the `source` qubits to new objects given in `destination`.
+For example, an array of two qubits `X` can be mapped to individual qubits `Y` and `Z`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `source` | `Input[QVar] \| list[Input[QVar]]` | A qubit or list of initialized qubits to reassign. | *required* |
+| `destination` | `Output[QVar] \| list[Output[QVar]]` | A qubit or list of target qubits to bind to. Must match the number of qubits in `source`. | *required* |
+
+
+
+### if_
+
+
+<pre><code>if_(
+    condition: SymbolicExpr | bool,
+    then: QCallable | Callable[[], Statements],
+    else_: QCallable | Callable[[], Statements] | int = _MISSING_VALUE
+) -> None</code></pre>
+
+
+Conditionally executes quantum operations based on a symbolic or boolean expression.
+
+This function defines classical control flow within a quantum program. It allows quantum operations to be
+conditionally executed based on symbolic expressions - such as parameters used in variational algorithms,
+loop indices, or other classical variables affecting quantum control flow.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `condition` | `SymbolicExpr \| bool` | A symbolic or boolean expression evaluated at runtime to determine the execution path. | *required* |
+| `then` | `QCallable \| Callable[[], Statements]` | A quantum operation executed when `condition` evaluates to True. | *required* |
+| `else_` | `QCallable \| Callable[[], Statements] \| int` | (Optional) A quantum operation executed when `condition` evaluates to False. | _MISSING_VALUE |
+
+
+
+### control
+
+
+<pre><code>control(
+    ctrl: SymbolicExpr | QBit | QArray[QBit] | list[QVar],
+    stmt_block: QCallable | Callable[[], Statements],
+    else_block: QCallable | Callable[[], Statements] | None = None
+) -> None</code></pre>
+
+
+Conditionally executes quantum operations based on the value of quantum variables or expressions.
+
+This operation enables quantum control flow similar to classical `if` statements. It evaluates a quantum condition
+and executes one of the provided quantum code blocks accordingly.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `ctrl` | `SymbolicExpr \| QBit \| QArray[QBit] \| list[QVar]` | A quantum control expression, which can be a logical expression, a single `QBit`, or a `QArray[QBit]`. If `ctrl` is a logical expression, `stmt_block` is executed when it evaluates to `True`. If `ctrl` is a `QBit` or `QArray[QBit]`, `stmt_block` is executed if all qubits are in the \`\|1>` state. | *required* |
+| `stmt_block` | `QCallable \| Callable[[], Statements]` | The quantum operations to execute when the condition holds. This can be a `QCallable` or a function returning a `Statements` block. | *required* |
+| `else_block` | `QCallable \| Callable[[], Statements] \| None` | (Optional) Quantum operations to execute when the condition does not hold. | None |
+
+
+
+### skip_control
+
+
+<pre><code>skip_control(
+    stmt_block: QCallable | Callable[[], Statements]
+) -> None</code></pre>
+
+
+Applies quantum statements unconditionally.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `stmt_block` | `QCallable \| Callable[[], Statements]` | A callable that produces a quantum operation. | *required* |
+
+
+
+### assign
+
+
+<pre><code>assign(
+    expression: SymbolicExpr,
+    target_var: QScalar
+) -> None</code></pre>
+
+
+Initialize a scalar quantum variable using an arithmetic expression.
+If specified, the variable numeric properties (size, signedness, and fraction
+digits) must match the expression properties.
+
+Equivalent to `<target_var> |= <expression>`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `expression` | `SymbolicExpr` | A classical or quantum arithmetic expression | *required* |
+| `target_var` | `QScalar` | An uninitialized scalar quantum variable | *required* |
+
+
+
+### inplace_add
+
+
+<pre><code>inplace_add(
+    expression: SymbolicExpr,
+    target_var: QScalar
+) -> None</code></pre>
+
+
+Add an arithmetic expression to a quantum variable.
+
+Equivalent to `<target_var> += <expression>`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `expression` | `SymbolicExpr` | A classical or quantum arithmetic expression | *required* |
+| `target_var` | `QScalar` | A scalar quantum variable | *required* |
+
+
+
+### inplace_xor
+
+
+<pre><code>inplace_xor(
+    expression: SymbolicExpr,
+    target_var: QScalar
+) -> None</code></pre>
+
+
+Bitwise-XOR a quantum variable with an arithmetic expression.
+
+Equivalent to `<target_var> ^= <expression>`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `expression` | `SymbolicExpr` | A classical or quantum arithmetic expression | *required* |
+| `target_var` | `QScalar` | A scalar quantum variable | *required* |
+
+
+
+### within_apply
+
+
+<pre><code>within_apply(
+    within: Callable[[], Statements],
+    apply: Callable[[], Statements]
+) -> None</code></pre>
+
+
+Given two operations $U$ and $V$, performs the composition of operations $U^\{-1\} V U$.
+
+This operation is used to represent a sequence where the operation `U` is applied, followed by another operation `V`, and then `U^{-1}` is applied to uncompute. This pattern is common in reversible
+computation and quantum subroutines.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `within` | `Callable[[], Statements]` | The unitary operation `U` to be computed and then uncomputed. | *required* |
+| `apply` | `Callable[[], Statements]` | The operation `V` to be applied within the `U` block. | *required* |
+
+
+
+### repeat
+
+
+<pre><code>repeat(
+    count: SymbolicExpr | int,
+    iteration: Callable[[int], Statements]
+) -> None</code></pre>
+
+
+Executes a quantum loop a specified number of times, applying a quantum operation on each iteration.
+
+This operation provides quantum control flow similar to a classical `for` loop, enabling repeated
+application of quantum operations based on classical loop variables.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `count` | `SymbolicExpr \| int` | An integer or symbolic expression specifying the number of loop iterations. | *required* |
+| `iteration` | `Callable[[int], Statements]` | A callable that takes a single integer index and returns the quantum operations to be performed at each iteration. | *required* |
+
+
+
+### power
+
+
+<pre><code>power(
+    exponent: SymbolicExpr | int,
+    stmt_block: QCallable | Callable[[], Statements]
+) -> None</code></pre>
+
+
+Apply a quantum operation raised to a symbolic or integer power.
+
+This function enables exponentiation of a quantum gate, where the exponent can be a
+symbolic expression or an integer. It is typically used within a quantum program
+to repeat or scale quantum operations in a parameterized way.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `exponent` | `SymbolicExpr \| int` | The exponent value, either as an integer or a symbolic expression. | *required* |
+| `stmt_block` | `QCallable \| Callable[[], Statements]` | A callable that produces the quantum operation to be exponentiated. | *required* |
+
+
+
+### invert
+
+
+<pre><code>invert(
+    stmt_block: QCallable | Callable[[], Statements]
+) -> Any</code></pre>
+
+
+Apply the inverse of a quantum gate.
+
+This function allows inversion of a quantum gate. It is typically used within a quantum program
+to invert a sequence of operations.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `stmt_block` | `QCallable \| Callable[[], Statements]` | A callable that produces the quantum operation to be inverted. | *required* |
+
+
+
+### phase
+
+
+<pre><code>phase(
+    phase_expr: SymbolicExpr | float | None = None,
+    coefficient: SymbolicExpr | float = 1.0
+) -> None</code></pre>
+
+
+Applies a state-dependent or fixed phase shift (Z rotation) to the quantum state.
+
+This operation multiplies each computational-basis state $|x_1,x_2,\ldots,x_n\rangle$
+by a complex phase factor $\text\{coefficient\} * \text\{phase_expr\}(x_1,x_2,\ldots,x_n)$, where
+`phase_expr` is a symbolic expression that contains quantum variables $x_1,x_2,\ldots,x_n$,
+and `coefficient` is a scalar multiplier. If `phase_expr` contains no quantum variables,
+all states are rotated by the same fixed angle.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phase_expr` | `SymbolicExpr \| float \| None` | A symbolic expression that evaluates to an angle (in radians) as a function of the state of the quantum variables occurring in it, if any, or otherwise a fixed value. Execution parameters are only allowed if no quantum variables occur in the expression. | None |
+| `coefficient` | `SymbolicExpr \| float` | (Optional, allowed only together with quantum expressions) A scalar multiplier for the evaluated expression, optionally containing execution parameters. Defaults to 1.0. | 1.0 |
+
+
+
+### foreach
+
+
+<pre><code>foreach(
+    values: SymbolicExpr | Sequence[SymbolicExpr | int | float] | Sequence[Sequence[SymbolicExpr | int | float]],
+    iteration: Callable[..., Statements]
+) -> None</code></pre>
+
+
+Loops through the elements of a classical list, applying a quantum operation on each iteration.
+
+This operation provides quantum control flow similar to a classical `for ... in` loop, enabling repeated
+application of quantum operations based on classical loop variables.
+
+The iteration callable accepts one or more classical iteration variables.
+If the iteration callable takes a single iteration variable, it will be assigned with the elements of 'values'.
+If the iteration callable takes two or more variables, the elements of 'values' will be
+unpacked into them.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `values` | `SymbolicExpr \| Sequence[SymbolicExpr \| int \| float] \| Sequence[Sequence[SymbolicExpr \| int \| float]]` | A classical list. | *required* |
+| `iteration` | `Callable[..., Statements]` | A callable that takes one or more iteration variables and returns the quantum operations to be performed at each iteration. | *required* |
+
+
+
+### assign_amplitude_poly_sin
+
+
+<pre><code>assign_amplitude_poly_sin(
+    indicator: QBit,
+    expr: SymbolicExpr
+) -> None</code></pre>
+
+
+Encodes the value of the sine/cosine of a polynomial into the amplitude of the
+respective computational basis state:
+
+$$
+\begin{aligned}
+|x_1, x_2, \ldots, x_n\rangle|0\rangle &\rightarrow
+\cos(\mathrm{poly}(x_1, x_2, \ldots, x_n))|x_1, x_2, \ldots, x_n\rangle|0\rangle \\
+&\quad + \sin(\mathrm{poly}(x_1, x_2, \ldots, x_n))|x_1, x_2, \ldots, x_n\rangle|1\rangle
+\end{aligned}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `indicator` | `QBit` | The quantum indicator qubit | *required* |
+| `expr` | `SymbolicExpr` | A polynomial expression over quantum scalars x_1, x_2, \\ldots, x_n | *required* |
+
+
+
+### lookup_table
+
+
+<pre><code>lookup_table(
+    func: RealFunction,
+    targets: QScalar | list[QScalar]
+) -> list[float]</code></pre>
+
+
+Reduces a classical function into a lookup table over all the possible values
+of the quantum numbers.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `func` | `RealFunction` | A Python function | *required* |
+| `targets` | `QScalar \| list[QScalar]` | One or more initialized quantum numbers | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `list[float]`
+- The function's lookup table
+    options:
+        show_source: false
+        show_if_no_docstring: false

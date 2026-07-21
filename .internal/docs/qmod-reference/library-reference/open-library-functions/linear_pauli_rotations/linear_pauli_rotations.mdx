@@ -1,0 +1,88 @@
+---
+title: "Linear Pauli Rotations"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/classiq_open_library/linear_pauli_rotations/linear_pauli_rotations.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This function performs a rotation on a series of $m$ target qubits,
+where the rotation angle is a linear function of an $n$-qubit
+control register, as follows:
+
+$$
+\left|x\right\rangle _{n}\left|q\right\rangle
+_{m}\rightarrow\left|x\right\rangle
+_{n}\prod_{k=1}^{m}\left(\cos\left(\frac{a_{k}}{2}x+\frac{b_{k}}{2}\right)-
+i\sin\left(\frac{a_{k}}{2}x+\frac{b_{k}}{2}\right)P_{k}\right)\left|q_{k}\right\rangle
+$$
+where $\left|x\right\rangle$ is the control register,
+$\left|q\right\rangle$ is the target register, each $P_{k}$ is one of
+the three Pauli matrices $X$, $Y$, or $Z$, and $a_{k}$, $b_{k}$ are
+the user given slopes and offsets, respectively.
+
+For example, the operation of a linear $Y$ rotation on a zero-input
+qubit is
+
+$$
+\left|x\right\rangle _{n}\left|0\right\rangle
+\rightarrow\left|x\right\rangle _{n}\left(
+\cos\left(\frac{a}{2}x+\frac{b}{2}\right)\left|0\right\rangle
++\sin\left(\frac{a}{2}x+\frac{b}{2}\right)\left|1\right\rangle \right)
+$$
+Such a rotation can be realized as a series of controlled rotations
+as follows:
+
+$$
+\left[R_{y}\left(2^{n-1}a\right)\right]^{x_{n-1}}\cdots
+\left[R_{y}\left(2^{1}a\right)\right]^{x_{1}}
+\left[R_{y}\left(2^{0}a\right)\right]^{x_{0}}R_{y}\left(b\right)
+$$
+
+Function: `linear_pauli_rotations`
+
+Arguments:
+
+- `bases: CArray[int]` 
+
+- List of Pauli Enums.
+- `slopes: CArray[float]` 
+
+- Rotation slopes for each of the given Pauli bases.
+- `offsets: CArray[float]` 
+
+- Rotation offsets for each of the given Pauli bases.
+- `x: QArray[QBit]` 
+
+- Quantum state to apply the rotation based on its value.
+- `q: QArray[QBit]` 
+
+- List of indicator qubits for each of the given Pauli bases.
+
+Notice that `bases`, `slopes`, `offset` and `q` should be of the same size.
+
+## Example: Three Y Rotations Controlled by a 6-qubit State
+
+This example generates a quantum program with a $6$-qubit control
+state and $3$ target qubits, acted upon by Y rotations with different slopes and offsets.
+
+```python
+from classiq import *
+
+NUM_STATE_QUBITS = 6
+BASES = [Pauli.Y.value] * 3
+OFFSETS = [0.1, 0.3, 0.33]
+SLOPES = [2.1, 1, 7.0]
+
+
+@qfunc
+def main(x: Output[QArray[QBit]], ind: Output[QArray[QBit]]):
+    allocate(NUM_STATE_QUBITS, x)
+    allocate(len(BASES), ind)
+    linear_pauli_rotations(BASES, SLOPES, OFFSETS, x, ind)
+```
+```python
+
+qprog = synthesize(main)
+```

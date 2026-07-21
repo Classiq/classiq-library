@@ -1,0 +1,277 @@
+---
+title: "Learning Optimization"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/basic_tutorials/optimization/learning_optimization.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This is a step-by-step example of how to use the Classiq platform at the application level.
+
+The goal is to see how easy it can be to use quantum algorithms to solve problems.
+
+This is a basic optimization problem:
+
+*minimize the expression* $3x_0+2x_1$ *for the non-negative integers* $x_0,x_1$, *given the constraint that* $3x_0+x_1\ge2$.
+
+Of course this is trivial and the solution is $x_0=1,x_1=0$.
+
+The goal is to understand how to incorporate the problem with the platform, so you can then continue on to define more complicated problems.
+
+This kind of optimization problem is relevant for many real-life scenarios.
+
+For example, Amazon wants to determine the best value it can offer to a customer for two items on a Black Friday sale, but it has to earn some minimum value.
+
+## How to Solve It?
+
+Define the optimization problem with the classical [Pyomo](https://pyomo.readthedocs.io/en/stable/index.html) optimization package in Python. Then, use the platform to convert it to a high-level functional model of quantum algorithms.
+
+This functional model is at the heart of the platform as this is the object that is synthesized to an actual quantum circuit using the synthesis engine!
+
+After the circuit is synthesized, run it on actual hardware or on a simulator to actually get the result from the quantum algorithm.
+
+This tutorial runs the algorithm on the IBM quantum simulator as it is the default option.
+
+## What Do You Need to Know about Quantum Algorithms?
+
+You need to know almost nothing regarding quantum algorithms, besides one thing.
+
+There are two common algorithms used for optimization problems (as well as chemistry): QAOA and VQE.
+
+Both are very similar, where QAOA could be seen as a specific type of VQE.
+
+For this problem, use the QAOA algorithm.
+
+The algorithm has a mandatory parameter that you need to choose, as explained below.
+
+## Getting Started
+
+Import the relevant packages.
+
+The first is the Pyomo package; the classical optimization package that was installed when you installed Classiq:
+
+```python
+import pyomo.environ as pyo
+```
+
+Import the objects that translate the optimization problem from the Pyomo language to a high-level quantum functional model:
+
+```python
+from classiq import *
+from classiq.applications.combinatorial_optimization import *
+```
+
+## Defining the Problem
+
+Initiate a Pyomo application object.
+
+```python
+application_level_object = pyo.ConcreteModel()
+```
+
+This object will contain all the relevant information regarding the optimization problem.
+
+The first piece of relevant information is what are the variables. In Pyomo, the way to incorporate the information regarding the variables is using the `pyo.Var` object:
+
+```python
+application_level_object.x = pyo.Var(
+    [0, 1],  # variables names
+    domain=pyo.NonNegativeIntegers,  # variables type
+    bounds=(0, 3),  # variables range
+)
+```
+
+In the first line, define 'application\_object' with a field called 'x' to contain the problem variables.
+
+The variables are defined with a 'pyo.Var' object, containing several things:
+
+1. The names of the variables.
+
+These are defined by $[1,2]$, indicating $x_0$ and $x_1$, respectively. (Likewise, $[3,7]$ would indicate two variables: $x_3, x_7$.)
+
+1. The type/domain of the variables.
+
+The variables are non-negative integers, so configure them accordingly using the 'pyo.NonNegativeIntegers' command.
+
+1. The bounds of the variables.
+
+The variables are configured to get values from 0 to 3, inclusive.
+
+While you may prefer a larger range, today's quantum computers (and simulators) are not big enough, so the size of the problems you can solve is quite small (here defined by the number of options: two variables each with four options; i.e., 16 options total).
+
+In the application object, define the cost function, which is the objective:
+
+```python
+application_level_object.cost = pyo.Objective(
+    expr=3 * application_level_object.x[0] + 2 * application_level_object.x[1]
+)
+```
+
+In other words, *minimize* $3x_0+2x_1$.
+
+Together with the objective, define the constraint:
+
+```python
+application_level_object.constraint = pyo.Constraint(
+    expr=3 * application_level_object.x[0] + application_level_object.x[1] >= 2
+)
+```
+
+I.e., the constraint is $3x_0 + 2x_1 \ge 2$.
+
+There are several ways to define constraints in Pyomo. Here, add a field to the application object called `constraint`, which is equal to some Pyomo constraint object.
+
+Read [link](https://docs.classiq.io/latest/user-guide/applications/optimization/problem-formulation/) for more ways of defining constraints.
+
+Examine the application object using the Pyomo method 'pprint':
+
+```python
+application_level_object.pprint()
+```
+<Info>
+  **Output:**
+
+  
+
+```
+1 Var Declarations
+      x : Size=2, Index={0, 1}
+          Key : Lower : Value : Upper : Fixed : Stale : Domain
+            0 :     0 :  None :     3 : False :  True : NonNegativeIntegers
+            1 :     0 :  None :     3 : False :  True : NonNegativeIntegers
+
+  1 Objective Declarations
+      cost : Size=1, Index=None, Active=True
+          Key  : Active : Sense    : Expression
+          None :   True : minimize : 3*x[0] + 2*x[1]
+
+  1 Constraint Declarations
+      constraint : Size=1, Index=None, Active=True
+          Key  : Lower : Body          : Upper : Active
+          None :   2.0 : 3*x[0] + x[1] :  +Inf :   True
+
+  3 Declarations: x cost constraint
+  
+
+```
+</Info>
+
+See how all the information regarding the problem is organized in this Pyomo application object.
+
+## Entering the Quantum World
+
+So far, you have only used the Pyomo package and spoken the *optimization language*.
+
+You now need some quantum knowledge for the optimization problem.
+
+Set the number of repetitions of the QAOA sub-circuit.
+
+The QAOA algorithm contains a QAOA sub-circuit that might repeat several times.
+
+Roughly speaking, the more repetitions, the better the algorithm.
+
+Having said that, as you saw, there is a limited range of parameters due to the small size of today's quantum computers.
+
+There is also an issue with the length of the quantum circuit due to the relatively low quality of today's quantum circuits (again due to the limited power of the quantum simulators). Therefore, start with one repetition of the sub-circuit, and later you can change it to see how the results change.
+
+Define the QAOA configuration:
+
+```python
+combi = CombinatorialProblem(application_level_object, num_layers=1, penalty_factor=20)
+```
+
+## Seamlessly Generating the Functional Level Model
+
+Now with the application object and the QAOA configuration defined, ask the platform to convert it into a high-level quantum functional model.
+
+```python
+qmod = combi.get_model()
+```
+
+Congratulations! You just defined your first quantum model that encapsulates the functionality of your quantum algorithm, without mentioning anything related to qubits or quantum gates!
+
+Ask the system to solve the model using the quantum algorithm:
+
+Synthesizing the model:
+
+```python
+qprog = combi.get_qprog()
+```
+
+Optimize the parameters of the circuit:
+
+```python
+optimized_params = combi.optimize()
+```
+
+Examine the solution:
+
+```python
+import pandas as pd
+
+optimization_result = combi.sample(optimized_params)
+optimization_result.sort_values(by="cost").head(5)
+```
+|     | solution                                               | probability | cost |
+| --- | ------------------------------------------------------ | ----------- | ---- |
+| 211 | \{'x': \[1, 0], 'constraint\_slack\_var': \[1, 0, 0... | 0.002441    | 3.0  |
+| 35  | \{'x': \[0, 2], 'constraint\_slack\_var': \[0, 0, 0... | 0.005371    | 4.0  |
+| 241 | \{'x': \[1, 1], 'constraint\_slack\_var': \[0, 1, 0... | 0.001465    | 5.0  |
+| 225 | \{'x': \[2, 0], 'constraint\_slack\_var': \[1, 0, 0... | 0.002441    | 6.0  |
+| 103 | \{'x': \[2, 0], 'constraint\_slack\_var': \[0, 0, 1... | 0.003906    | 6.0  |
+
+```python
+idx = optimization_result.cost.idxmin()
+print(
+    "x =", optimization_result.solution[idx], ", cost =", optimization_result.cost[idx]
+)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+x = {'x': [1, 0], 'constraint_slack_var': [1, 0, 0, 0]} , cost = 3.0
+  
+
+```
+</Info>
+
+The solution is $x_0=1, x_1=0$. Yes, you succeeded in solving the optimization problem using a quantum algorithm! :)
+
+Wait a minute, you might ask, *'Where are all the qubits and gates I have heard about?
+'*
+
+That is a good question! While you can design algorithms at the application and functional levels, you also have access to the qubit level to further understand the algorithm and get into detail with more options!
+
+This is easily done.
+
+The synthesis engine output is a quantum circuit object, so visualize it with the 'show' command that prompts a website to interactively display the circuit for deeper analysis.
+
+You can examine how your circuit looks, from high level to the qubit level.
+
+```python
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/31EYZhPUvLDS1WdG6oKHQSmqAxR
+  
+
+```
+</Info>
+
+Now that you understand better how the platform works, there is one last thing worth mentioning.
+
+When you solved the model by executing the synthesis engine's output quantum circuit, behind the scenes the circuit was sent to the default Executor (IBM simulator) with classical optimization preferences to return the optimization result.
+
+Because this example shows how to use the platform at the application level, many details in the flow were determined behind the scenes.
+
+For more control of your design, and to design the algorithm from the functional level so to gain more control and capabilities, do the next tutorial ;)

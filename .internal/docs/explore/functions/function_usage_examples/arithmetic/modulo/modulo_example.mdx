@@ -1,0 +1,78 @@
+---
+title: "Modulo"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/modulo/modulo_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The modulo operation (denoted as '%') returns the remainder (called "modulus") of a division.
+
+Given two numbers $a$ and $n$, the result of ($a \% n$) is the remainder of the division of a by n.
+
+The modulo operation is supported only for $n = 2^m$ for an integer $m$, its result is the $m$ least significant bits.
+
+For example, the binary representation of the number $53$ is $0b110101$.
+
+The expression ($53 \% 8$) equals $0b101 = 5$, because $8 = 2^3$, which means only accounting for the $3$ least
+significant bits of $53$.
+
+#
+
+### Implementation in Expressions
+
+If an expression is defined using a modulo operation, the output size is set recursively to all of its subexpressions.
+
+But if for some sub-expressions, another modulo operation is used,
+the sub-expression's output\_size is determined by the minimal value between
+the output\_size of the sub-expression and the expression.
+
+See this example: $(((a + b) \% 4) + (c + d)) \% 8$.
+
+The result of expression $a + b$ is saved on a two-qubit register,
+and the results of expressions $c + d$ and $((a + b) \% 4) + (c + d)$ are saved
+using three qubits each.
+
+## Example
+
+This example generates a quantum program that adds two five-qubit arguments: a on qubits 0-4, and b on qubits 5-
+
+9. The adder result should have been calculated on a 6-qubit register.
+However, the modulo operation decides that the output register of the adder only contains its two least significant
+qubits. Thus, the adder result is written to a two-qubit register, on qubits 10-
+
+11.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum], b: Output[QNum], res: Output[QNum]) -> None:
+    allocate(5, a)
+    allocate(5, b)
+
+    a ^= 4
+    b ^= 7
+
+    res |= (a + b) % 4
+```
+```python
+
+qprog = synthesize(main)
+
+result = execute(qprog).result_value()
+print(result.parsed_counts)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 4.0, 'b': 7.0, 'res': 3.0}: 1000]
+  
+
+```
+</Info>

@@ -1,0 +1,57 @@
+---
+title: "Auxiliary Reuse and Management"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/auxiliary_managment/auxiliary_management.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This tutorial demonstrates automatic auxiliary qubits management by the synthesis engine. It synthesizes a simple state preparation function, which comprises several multi-controlled rotations.
+
+These rotations can use auxiliary qubits to reduce depth.
+
+For a given **global** width constraint, the initialization and reuse of auxiliary qubits between different function blocks is automated.
+
+```python
+import numpy as np
+
+from classiq import *
+
+MAX_WIDTH = 8
+
+NUM_QUBITS = 4
+np.random.seed(12)
+amplitudes = 1 - 2 * np.random.rand(2**NUM_QUBITS)
+amplitudes = (amplitudes / np.linalg.norm(amplitudes)).tolist()
+
+
+@qfunc
+def main(out: Output[QArray]) -> None:
+    prepare_amplitudes(amplitudes=amplitudes, bound=0.2, out=out)
+
+
+preferences = Preferences(
+    custom_hardware_settings=CustomHardwareSettings(basis_gates=["cx", "u"]),
+    random_seed=1235,
+    optimization_timeout_seconds=100,
+)
+constraints = Constraints(
+    optimization_parameter=OptimizationParameter.DEPTH, max_width=MAX_WIDTH
+)
+
+qprog = synthesize(main, preferences=preferences, constraints=constraints)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/30er6gl4kTKzjmcqlFQ8Qhs2bLA
+  
+
+```
+</Info>

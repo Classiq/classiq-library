@@ -1,0 +1,942 @@
+---
+title: Standard Gates
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `H` | [Qmod core-library function]. |
+| `X` | [Qmod core-library function]. |
+| `Y` | [Qmod core-library function]. |
+| `Z` | [Qmod core-library function]. |
+| `I` | [Qmod core-library function]. |
+| `S` | [Qmod core-library function]. |
+| `T` | [Qmod core-library function]. |
+| `SDG` | [Qmod core-library function]. |
+| `TDG` | [Qmod core-library function]. |
+| `PHASE` | [Qmod core-library function]. |
+| `RX` | [Qmod core-library function]. |
+| `RY` | [Qmod core-library function]. |
+| `RZ` | [Qmod core-library function]. |
+| `R` | [Qmod core-library function]. |
+| `RXX` | [Qmod core-library function]. |
+| `RYY` | [Qmod core-library function]. |
+| `RZZ` | [Qmod core-library function]. |
+| `CH` | [Qmod core-library function]. |
+| `CX` | [Qmod core-library function]. |
+| `CY` | [Qmod core-library function]. |
+| `CZ` | [Qmod core-library function]. |
+| `CRX` | [Qmod core-library function]. |
+| `CRY` | [Qmod core-library function]. |
+| `CRZ` | [Qmod core-library function]. |
+| `CPHASE` | [Qmod core-library function]. |
+| `SWAP` | [Qmod core-library function]. |
+| `IDENTITY` | [Qmod core-library function]. |
+| `U` | [Qmod core-library function]. |
+| `CCX` | [Qmod core-library function]. |
+
+
+### H
+
+
+<pre><code>H(
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the Hadamard gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+H = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `QBit` | The qubit to apply the Hadamard gate to. | *required* |
+
+
+
+### X
+
+
+<pre><code>X(
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the Pauli-X gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+X = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `QBit` | The qubit to apply the Pauli-X gate to. | *required* |
+
+
+
+### Y
+
+
+<pre><code>Y(
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the Pauli-Y gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+Y = \begin{bmatrix} 0 & -i \\ i & 0 \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `QBit` | The qubit to apply the Pauli-Y gate to. | *required* |
+
+
+
+### Z
+
+
+<pre><code>Z(
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the Pauli-Z gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+Z = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `Const[QBit]` | The qubit to apply the Pauli-Z gate to. | *required* |
+
+
+
+### I
+
+
+<pre><code>I(
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the identity gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+I = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `Const[QBit]` | The qubit to apply the identity gate to. | *required* |
+
+
+
+### S
+
+
+<pre><code>S(
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the S gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+S = \begin{bmatrix} 1 & 0 \\ 0 & i \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `Const[QBit]` | The qubit to apply the S gate to. | *required* |
+
+
+
+### T
+
+
+<pre><code>T(
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the T gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+T = \begin{bmatrix} 1 & 0 \\ 0 & e^{i\frac{\pi}{4}} \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `Const[QBit]` | The qubit to apply the T gate to. | *required* |
+
+
+
+### SDG
+
+
+<pre><code>SDG(
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the S-dagger gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+S^\dagger = \begin{bmatrix} 1 & 0 \\ 0 & -i \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `Const[QBit]` | The qubit to apply the S-dagger gate to. | *required* |
+
+
+
+### TDG
+
+
+<pre><code>TDG(
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the T-dagger gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+T^\dagger = \begin{bmatrix} 1 & 0 \\ 0 & e^{-i\frac{\pi}{4}} \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `Const[QBit]` | The qubit to apply the T-dagger gate to. | *required* |
+
+
+
+### PHASE
+
+
+<pre><code>PHASE(
+    theta: CReal,
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the phase gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+PHASE(\theta) = \begin{bmatrix} 1 & 0 \\ 0 & e^{i\theta} \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The phase angle in radians. | *required* |
+| `target` | `Const[QBit]` | The qubit to apply the phase gate to. | *required* |
+
+
+
+### RX
+
+
+<pre><code>RX(
+    theta: CReal,
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the Pauli-X rotation gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+R_X(\theta) = e^{-i\frac{\theta}{2}X}
+ = \begin{bmatrix} cos(\frac{\theta}{2}) & -i sin(\frac{\theta}{2}) \\ -i sin(\frac{\theta}{2}) & cos(\frac{\theta}{2}) \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `target` | `QBit` | The qubit to apply the Pauli-X rotation gate to. | *required* |
+
+
+
+### RY
+
+
+<pre><code>RY(
+    theta: CReal,
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the Pauli-Y rotation gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+R_Y(\theta) = e^{-i\frac{\theta}{2}Y}
+ = \begin{bmatrix} cos(\frac{\theta}{2}) & -sin(\frac{\theta}{2}) \\ sin(\frac{\theta}{2}) & cos(\frac{\theta}{2}) \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `target` | `QBit` | The qubit to apply the Pauli-Y rotation gate to. | *required* |
+
+
+
+### RZ
+
+
+<pre><code>RZ(
+    theta: CReal,
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the Pauli-Z rotation gate on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+R_Z(\theta) = e^{-i\frac{\theta}{2}Z}
+ = \begin{bmatrix} e^{-i\frac{\theta}{2}} & 0 \\ 0 & e^{i\frac{\theta}{2}} \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `target` | `Const[QBit]` | The qubit to apply the Pauli-Z rotation gate to. | *required* |
+
+
+
+### R
+
+
+<pre><code>R(
+    theta: CReal,
+    phi: CReal,
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs a rotation of $\theta$ around the $cos(\phi)\hat\{x\} + sin(\phi)\hat\{y\}$ axis on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+R(\theta, \phi) = e^{-i \frac{\theta}{2} (cos(\phi)X + sin(\phi)Y)}
+ = \begin{bmatrix} cos(\frac{\theta}{2}) & -i e^{-i\phi} sin(\frac{\theta}{2}) \\ -i e^{i\phi} sin(\frac{\theta}{2}) & cos(\frac{\theta}{2}) \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `phi` | `CReal` | The phase angle in radians. | *required* |
+| `target` | `QBit` | The qubit to apply the general single-qubit rotation gate to. | *required* |
+
+
+
+### RXX
+
+
+<pre><code>RXX(
+    theta: CReal,
+    target: QArray[QBit, Literal[2]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the XX rotation gate on a pair of qubits.
+
+This operation is represented by the following matrix:
+
+$$
+R_{XX}(\theta) = e^{-i\frac{\theta}{2}X \otimes X}
+ = \begin{bmatrix} cos(\frac{\theta}{2}) & 0 & 0 & -i sin(\frac{\theta}{2}) \\ 0 & cos(\frac{\theta}{2}) & -i sin(\frac{\theta}{2}) & 0 \\ 0 & -i sin(\frac{\theta}{2}) & cos(\frac{\theta}{2}) & 0 \\ -i sin(\frac{\theta}{2}) & 0 & 0 & cos(\frac{\theta}{2}) \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `target` | `QArray[QBit, Literal[2]]` | The pair of qubits to apply the XX rotation gate to. | *required* |
+
+
+
+### RYY
+
+
+<pre><code>RYY(
+    theta: CReal,
+    target: QArray[QBit, Literal[2]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the YY rotation gate on a pair of qubits.
+
+This operation is represented by the following matrix:
+
+$$
+R_{YY}(\theta) = e^{-i\frac{\theta}{2}Y \otimes Y}
+ = \begin{bmatrix} cos(\frac{\theta}{2}) & 0 & 0 & -sin(\frac{\theta}{2}) \\ 0 & cos(\frac{\theta}{2}) & sin(\frac{\theta}{2}) & 0 \\ 0 & sin(\frac{\theta}{2}) & cos(\frac{\theta}{2}) & 0 \\ -sin(\frac{\theta}{2}) & 0 & 0 & cos(\frac{\theta}{2}) \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `target` | `QArray[QBit, Literal[2]]` | The pair of qubits to apply the YY rotation gate to. | *required* |
+
+
+
+### RZZ
+
+
+<pre><code>RZZ(
+    theta: CReal,
+    target: Const[QArray[QBit, Literal[2]]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs the ZZ rotation gate on a pair of qubits.
+
+This operation is represented by the following matrix:
+
+$$
+R_{ZZ}(\theta) = e^{-i\frac{\theta}{2}Z \otimes Z}
+ = \begin{bmatrix} e^{-i\frac{\theta}{2}} & 0 & 0 & 0 \\ 0 & e^{i\frac{\theta}{2}} & 0 & 0 \\ 0 & 0 & e^{i\frac{\theta}{2}} & 0 \\ 0 & 0 & 0 & e^{-i\frac{\theta}{2}} \end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `target` | `Const[QArray[QBit, Literal[2]]]` | The pair of qubits to apply the ZZ rotation gate to. | *required* |
+
+
+
+### CH
+
+
+<pre><code>CH(
+    ctrl: Const[QBit],
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the Hadamard gate to the target qubit, conditioned on the control qubit.
+
+This operation is represented by the following matrix:
+
+$$
+CH = \frac{1}{\sqrt{2}} \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 1 \\
+0 & 0 & 1 & -1
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `ctrl` | `Const[QBit]` | The control qubit. | *required* |
+| `target` | `QBit` | The qubit to apply the Hadamard gate on. | *required* |
+
+
+
+### CX
+
+
+<pre><code>CX(
+    ctrl: Const[QBit],
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the Pauli-X gate to the target qubit, conditioned on the control qubit.
+
+This operation is represented by the following matrix:
+
+$$
+CX = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+0 & 0 & 1 & 0
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `ctrl` | `Const[QBit]` | The control qubit. | *required* |
+| `target` | `QBit` | The qubit to apply the Pauli-X gate on. | *required* |
+
+
+
+### CY
+
+
+<pre><code>CY(
+    ctrl: Const[QBit],
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the Pauli-Y gate to the target qubit, conditioned on the control qubit.
+
+This operation is represented by the following matrix:
+
+$$
+CY = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0 & -i \\
+0 & 0 & i & 0
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `ctrl` | `Const[QBit]` | The control qubit. | *required* |
+| `target` | `QBit` | The qubit to apply the Pauli-Y gate on. | *required* |
+
+
+
+### CZ
+
+
+<pre><code>CZ(
+    ctrl: Const[QBit],
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the Pauli-Z gate to the target qubit, conditioned on the control qubit.
+
+This operation is represented by the following matrix:
+
+$$
+CZ = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & -1
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `ctrl` | `Const[QBit]` | The control qubit. | *required* |
+| `target` | `Const[QBit]` | The qubit to apply the Pauli-Z gate on. | *required* |
+
+
+
+### CRX
+
+
+<pre><code>CRX(
+    theta: CReal,
+    ctrl: Const[QBit],
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the RX gate to the target qubit, conditioned on the control qubit.
+
+This operation is represented by the following matrix:
+
+$$
+CRX = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & cos(\frac{\theta}{2}) & -i*sin(\frac{\theta}{2}) \\
+0 & 0 & -i*sin(\frac{\theta}{2}) & cos(\frac{\theta}{2})
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `ctrl` | `Const[QBit]` | The control qubit. | *required* |
+| `target` | `QBit` | The qubit to apply the RX gate on. | *required* |
+
+
+
+### CRY
+
+
+<pre><code>CRY(
+    theta: CReal,
+    ctrl: Const[QBit],
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the RY gate to the target qubit, conditioned on the control qubit.
+
+This operation is represented by the following matrix:
+
+$$
+CRY = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & cos(\frac{\theta}{2}) & -sin(\frac{\theta}{2}) \\
+0 & 0 & sin(\frac{\theta}{2}) & cos(\frac{\theta}{2})
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `ctrl` | `Const[QBit]` | The control qubit. | *required* |
+| `target` | `QBit` | The qubit to apply the RY gate on. | *required* |
+
+
+
+### CRZ
+
+
+<pre><code>CRZ(
+    theta: CReal,
+    ctrl: Const[QBit],
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the RZ gate to the target qubit, conditioned on the control qubit.
+
+This operation is represented by the following matrix:
+
+$$
+CRZ = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & e^{-i\frac{\theta}{2}} & 0 \\
+0 & 0 & 0 & e^{i\frac{\theta}{2}}
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `ctrl` | `Const[QBit]` | The control qubit. | *required* |
+| `target` | `Const[QBit]` | The qubit to apply the RZ gate on. | *required* |
+
+
+
+### CPHASE
+
+
+<pre><code>CPHASE(
+    theta: CReal,
+    ctrl: Const[QBit],
+    target: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the PHASE gate to the target qubit, conditioned on the control qubit.
+
+This operation is represented by the following matrix:
+
+$$
+CPHASE = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & e^{i\theta}
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The rotation angle in radians. | *required* |
+| `ctrl` | `Const[QBit]` | The control qubit. | *required* |
+| `target` | `Const[QBit]` | The qubit to apply the PHASE gate on. | *required* |
+
+
+
+### SWAP
+
+
+<pre><code>SWAP(
+    qbit0: QBit,
+    qbit1: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Swaps the states of two qubits.
+
+This operation is represented by the following matrix:
+
+$$
+SWAP = \begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qbit0` | `QBit` | The first qubit. | *required* |
+| `qbit1` | `QBit` | The second qubit. | *required* |
+
+
+
+### IDENTITY
+
+
+<pre><code>IDENTITY(
+    target: Const[QArray[QBit]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Does nothing.
+
+This operation is represented by the following matrix:
+
+$$
+IDENTITY = {\begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix}} ^{\otimes n}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `Const[QArray[QBit]]` | The qubits to apply the IDENTITY gate on. | *required* |
+
+
+
+### U
+
+
+<pre><code>U(
+    theta: CReal,
+    phi: CReal,
+    lam: CReal,
+    gam: CReal,
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Performs a general single-qubit unitary gate that applies phase and rotation with three Euler angles on a qubit.
+
+This operation is represented by the following matrix:
+
+$$
+U(\theta, \phi, \lambda, \gamma) = e^{i \gamma}
+\begin{bmatrix}
+cos(\theta/2) & -e^{i(\lambda)} sin(\theta/2) \\
+e^{i\phi} sin(\theta/2) & e^{i(\phi + \lambda)} cos(\theta/2)
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `theta` | `CReal` | The first Euler angle in radians. | *required* |
+| `phi` | `CReal` | The second Euler angle in radians. | *required* |
+| `lam` | `CReal` | The third Euler angle in radians. | *required* |
+| `gam` | `CReal` | The global phase angle in radians. | *required* |
+| `target` | `QBit` | The qubit to apply the general single-qubit unitary gate to. | *required* |
+
+
+
+### CCX
+
+
+<pre><code>CCX(
+    ctrl: Const[QArray[QBit, Literal[2]]],
+    target: QBit
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the Pauli-X gate to the target qubit, conditioned on the two control qubits (Toffoli).
+
+This operation is represented by the following matrix:
+
+$$
+CCX = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
+\end{bmatrix}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `ctrl` | `Const[QArray[QBit, Literal[2]]]` | The control qubits. | *required* |
+| `target` | `QBit` | The qubit to apply the conditioned Pauli-X gate on. | *required* |

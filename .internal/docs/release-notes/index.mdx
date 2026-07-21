@@ -1,0 +1,2601 @@
+---
+title: "Changelog"
+sidebarTitle: "Changelog"
+icon: "/icons/bulletsharp.svg"
+rss: true
+---
+
+A chronological record of changes and improvements for each release.
+
+## Upgrade Instructions
+
+-   [Python SDK](/getting-started/sdk_installation#platform-version-updates)
+-   The IDE upgrades automatically.
+
+## Releases by Version
+
+<Update label="1.22.0" description="2026-07-16">
+
+## Enhancements
+
+-   **Synthesis:** The executable representation of a quantum program returned by [`synthesize`](../sdk-reference/synthesis#synthesize) is now Qmod-based, significantly improving compilation performance and enabling quantum programs to scale better. Execution, resource estimation, and quantum program visualization now operate directly on the Qmod-based representation. [`export`](../sdk-reference/synthesis#export) can be used to generate the corresponding description in an external format, such as OpenQASM 2.0, OpenQASM 3.0, or QIR.
+-   **Language:** `QArray` and `QNum` now accept their arguments positionally when the variable name is omitted, so a call such as `QArray(QBit, 2)` or `QNum(4)` works as intended instead of raising an internal error. Passing a non-string name to any quantum variable constructor (`QArray`, `QNum`, `QBit`, or `QStruct`) now raises a clear error instead of failing internally.
+
+## Bug Fixes
+
+-   Fixed the `subscript`, `slice`, and `reversed_` classical functions in the Python SDK, which returned wrong-typed objects instead of inferring the result type from their argument (for example, subscripting a nested list returned a scalar that could not be indexed further).
+
+## Interface Changes
+
+-   **[`QuantumProgram`](../sdk-reference/synthesis#quantumprogram) circuit attributes:** Deprecated the `qasm` and `transpiled_circuit` attributes of `QuantumProgram`, following the move to a Qmod-based synthesis representation; they will no longer be supported in a future release.
+    -   Use [`export`](../sdk-reference/synthesis#export) to obtain a circuit in an external format such as OpenQASM 2.0.
+    -   Use [`get_circuit_metrics`](../sdk-reference/synthesis#get_circuit_metrics) for approximate circuit depth and gate counts, and [`get_transpiled_circuit_metrics`](../sdk-reference/synthesis#get_transpiled_circuit_metrics) for accurate depth and gate counts after transpilation.
+-   **Legacy synthesis flow:** To continue using the legacy synthesis flow from version 1.21.0 and earlier, set the Boolean [`compatibility_mode`](../sdk-reference/synthesis#compatibility_mode) attribute under [`Preferences`](../sdk-reference/synthesis#preferences).
+-   **Execution:** [`ExecutionSession`](../sdk-reference/execution#executionsession) now accepts the advanced flat constructor arguments `noise_properties`, `amplitude_threshold`, `include_zero_amplitude_outputs`, and `job_name`, matching the fields previously available only through `execution_preferences`.
+
+</Update>
+
+<Update label="1.21.0" description="2026-07-12">
+
+## Enhancements
+
+-   **Hardware benchmarking:** Added predefined hardware benchmarks that measure and compare how well quantum backends run a set of well-established quantum circuits (GHZ, Adder, QFT, State Preparation, and Dynamical Localization). Sweep a range of problem sizes across multiple backends and get a per-backend score from the SDK via `run_benchmark` (and soon in the new Benchmark mode on the IDE Execution page). See the new [Predefined Benchmarks](../user-guide/execution/benchmarking/predefined-benchmarks) user guide.
+-   **Classiq Studio:** `execute_qnn` now runs locally via the Studio simulator. Sampling runs locally, and requests that pass an observable now compute exact (state vector, shot-free) expectation values locally instead of falling back to remote simulation.
+-   **QLayer observables:** `QLayer` now accepts a keyword-only `observable` (a `SparsePauliOp`, the same type accepted by `ExecutionSession.observe`) when constructed without a custom `execute` function. The layer estimates the observable's expectation value instead of sampling: exact state vector expectation values inside Classiq Studio, and the `observe` flow remotely. The `post_process` callback receives a `SavedResult` wrapping an `EstimationResult` (read the value via `result.value.value.real`), and gradients work unchanged.
+-   **Language:** Added the `range_` and `reversed_` classical functions, available both in classical expressions and in the Python SDK.
+
+## Bug Fixes
+
+-   **Synthesis:**
+    -   Fixed `power` applied to a `foreach` loop, which distributed the exponent into each iteration instead of raising the whole loop to the power.
+    -   Fixed `invert` applied to a `foreach` loop, which kept the original iteration order instead of reversing it.
+
+## Interface Changes
+
+-   **execute_qnn observable type:** `execute_qnn` now takes the observable as a `SparsePauliOp` (the same type accepted by `ExecutionSession.observe`). Passing the legacy `PauliOperator` is deprecated; it is converted automatically and emits a `DeprecationWarning`.
+
+</Update>
+
+<Update label="1.20.1" description="2026-07-09">
+
+## Enhancements
+
+-   **AI with Classiq:**
+    -   **Classiq Assistant (Beta):** Added an AI assistant to the platform home page and the Quantum Program page. Describe a quantum problem in natural language to the assistant (or upload a circuit image), and it will build a qmod-native model, synthesize it into a quantum program, and open it on the Quantum Program page. The assistant keeps conversation context within a session and supports follow-up messages, so you can ask it to explain or refine the circuit. For more information, see the new [Classiq Assistant](../user-guide/ai/classiq-assistant) user guide.
+    -   **Quantum Engineer Plugin:** Added a Quantum Engineer plugin that brings Classiq into local AI coding agents such as Claude, Cursor, and Codex. The plugin pairs a set of Classiq skills with the Classiq MCP, letting the agents model, synthesize, execute, and analyze quantum programs across the full Classiq workflow. For more information, see the new [Quantum Engineer Plugin](../user-guide/ai/quantum-engineer-plugin) user guide.
+
+</Update>
+
+<Update label="1.20.0" description="2026-07-05">
+
+## Enhancements
+
+-   **Execution:** Added the option to run on a GPU-accelerated statevector simulator hosted on an NVIDIA DGX system, selected by passing `backend="classiq/dgx_simulator"`. It supports both sampling and statevector modes and handles circuits of up to 35 qubits in single precision (float32). Access requires specific license permissions. See [DGX Statevector Simulator](../user-guide/execution/cloud-providers/classiq-backends#dgx-statevector-simulator).
+-   **Synthesis:**
+    -   Added a new `export` function to the SDK that converts a synthesized quantum program into a circuit string in a chosen target language (QASM2, QASM3, QIR, Cirq JSON, or Q#), with an optional transpilation configuration. See [export](../sdk-reference/synthesis#export).
+    -   Improved the algorithm that approximates RZ rotations over the Clifford+T basis when exporting to a fault-tolerant gate set (via `FaultTolerantTranspilationConfig`), which now uses gridsynth to produce lower-error decompositions.
+-   **Projection-based WF-in-DFT embedding:** Added a new `EmbeddingCalculator` API for running projection-based wavefunction-in-DFT (WF-in-DFT) embedding calculations. This method enables accurate quantum-chemistry simulations of large molecules by treating a small active fragment with a quantum solver while capturing the effect of the surrounding environment at the DFT level. Users define a molecule via `MoleculeSpec` (supporting inline geometry, `.pdb`, and `.xyz` files) and configure the embedding with `EmbeddingConfig` (fragment atom selection, DFT mean-field method, exchange-correlation functional, active-virtual selection, and optional core freezing). The calculator drives a three-stage pipeline, full-system DFT, fragment embedding, and Hamiltonian construction, entirely server-side as queued backend jobs, returning the embedded and physical Hamiltonians as `openfermion.FermionOperator` objects ready for a quantum solver.
+    -   Both blocking (`run_dft`, `run_dft_embedding`) and non-blocking (`submit_dft`, `submit_dft_embedding`) execution modes are supported; the non-blocking variants return a `ChemistryJob` handle that can be polled, cancelled, or reconnected from a later process via `ChemistryJob.from_id`.
+    -   Built-in validation diagnostics (`DFT-in-DFT`, `FCI active space`, `probability leak`, `trace conservation`, `geometry perturbation`) can run automatically at the end of the embedding pipeline or be requested post-hoc via `run_validations`.
+    -   Restricted and unrestricted spin treatments are supported, with an `AUTO` mode that resolves based on the number of unpaired electrons.
+-   **Classiq Studio:**
+    -   The Studio image now installs the Classiq SDK with all optional dependencies (`analyzer_sdk`, `qml`, `chemistry`, `qsp`, and `cudaq`) automatically.
+    -   When executing inside Classiq Studio, `execute_qnn` now runs sampling locally via the Studio simulator; requests that pass an observable continue to use remote simulation.
+
+</Update>
+
+<Update label="1.19.1" description="2026-07-01">
+
+## Bug Fixes
+
+-   Fixed Latex export failures on large circuits.
+
+</Update>
+
+<Update label="1.19.0" description="2026-06-28">
+
+## Enhancements
+
+-   **Execution:** Benchmarking is now available, with built-in benchmark classes and an end-to-end flow for creating and running benchmark jobs. Supported benchmark classes are `GHZ`, `Adder` & `Dynamic Localization`.
+
+</Update>
+
+<Update label="1.18.1" description="2026-06-24">
+
+## Enhancements
+
+-   **IonQ Hosted Hybrid variational minimization:** On IonQ backends, `variational_minimize`, `ExecutionSession.variational_minimize`, and `ExecutionSession.submit_variational_minimize` now accept `hosted=True` to delegate the full optimization loop to IonQ's Hosted Hybrid service instead of executing a separate Classiq sample job on every iteration. Classiq submits and polls a single IonQ optimization job through the standard execution job API, so the SDK never contacts IonQ directly. Hosted mode requires a Hamiltonian cost function, a single execution parameter (`CReal` or `CArray`), and `quantile=1.0`; classical Qmod cost functions and CVaR (`quantile < 1.0`) are not supported.
+
+-   **Sticky IBM Runtime sessions under `ExecutionSession`:** When you run on a remote IBM backend inside a single `ExecutionSession`, successive primitives (`sample`, `observe`, `estimate_cost`, `variational_minimize`, and their non-blocking `submit_*` counterparts) reuse the same IBM Quantum Runtime session instead of opening a new one for every job. This reduces queue overhead for multi-step workflows such as variational optimization followed by a validation sample.
+
+## Interface Changes
+
+-   **`ExecutionSession.close()`:** Closing a session now calls a server-side close API that releases provider resources, including an open IBM Runtime session. Using `ExecutionSession` as a context manager (recommended) invokes `close()` automatically when the block exits.
+
+</Update>
+
+<Update label="1.18.0" description="2026-06-21">
+
+## Bug Fixes
+
+-   **Incorrect circuits from `foreach`/`power` loops that modify a quantum-numeric variable:** When the body of a `foreach` or `power` loop modified a quantum-numeric variable, a comparison against that variable (for example `x == 0`) could be folded against its value at loop entry instead of its actual per-iteration value, producing an incorrect circuit. Such comparisons are no longer folded against stale bounds.
+
+-   **Incorrect circuit for a control whose body reuses the condition variable:** A control such as `control(q == 0, lambda: Z(q))` whose controlled block operates on the same variable used in the condition could leak a phase onto the controlled state, producing an incorrect circuit. The condition is now computed out of place when the variable is reused, so such controls compile correctly.
+
+-   **Internal error when indexing a `subscript` with a quantum expression:** Using a quantum expression as the index of a `subscript` (for example `res ^= subscript(table, a + b)`) raised an internal error instead of synthesizing. Such expressions are now lowered correctly by computing the index into a temporary quantum variable.
+
+-   **Error when a classical expression repeats a variable (for example `k + k`):** Expressions that used the same classical variable on both sides of an operation, such as `power(k + k, ...)` or two consecutive `power(k, ...)` blocks, failed with "both sides of the operation are identical". This restriction only applies to in-place quantum arithmetic and is no longer enforced on classical expressions.
+
+-   **Internal error when exporting a parametric program to QASM2:** Calling `export` on a parametric quantum program with the default `target_language=TargetLanguage.QASM2` failed with an opaque internal error, since QASM2 cannot represent parametric circuits. It now raises an indicative error suggesting `target_language=TargetLanguage.QASM3` instead.
+
+-   **QP Visualization:** Fixed Expand All freezing or crashing the browser tab on very large function blocks. In the quantum program visualizer (Classiq Studio and the Classiq IDE), expanding all operations when a function block had too many child operations to render could freeze or crash the tab. Expand All is now blocked in these cases with a warning that the function block is too large to visualize, and expanding an individual block over the same limit shows the same warning instead of failing silently or crashing.
+
+## Interface Changes
+
+-   **`exponentiation_with_depth_constraint` removed:** The previously deprecated `exponentiation_with_depth_constraint` function has been removed. Use `exponentiate` instead.
+
+</Update>
+
+<Update label="1.17.0" description="2026-06-15">
+
+## Enhancements
+
+-   **Hardware modality in `get_backend_details`:** The DataFrame returned by `get_backend_details` now includes a `modality` column (for example, `superconducting`, `trapped-ion`, `simulator-cpu`, or `simulator-gpu`), exposing the modality already tracked in the hardware catalog. Backends without a recorded modality show `None`.
+
+-   **Jobs page results display:** The measurement results and state vector histograms now show at most the 64 highest-probability states; circuits with 6 or fewer qubits still show every state, including zero-probability ones. The results table below the histogram lists only measured states, so a zero-probability state can appear as an empty bar in the histogram while being omitted from the table.
+
+## Bug Fixes
+
+-   Fixed an issue that prevented `classiq` from being imported in Jupyter notebooks.
+
+## Interface Changes
+
+-   **`ExecutionSession.calculate_state_vector`** (and its non-blocking `submit_calculate_state_vector` counterpart) is a new primitive for statevector calculation. Use this instead of `sample` on the state vector simulator.
+
+</Update>
+
+<Update label="1.16.0" description="2026-06-07">
+
+## Enhancements
+
+-   **QP Visualization:** Added visual label management.
+    -   Adjacent variables that repeat across wires are now automatically suppressed to reduce clutter and save visual space in quantum program diagrams.
+    -   Suppressed variable labels can still be viewed by hovering over the wire, which shows a tooltip with the hidden name(s).
+    -   A right-click context menu on each variable wire lets you show or hide individual labels as needed.
+
+## Interface Changes
+
+-   **`ExecutionSession.sample()`, `observe()`, and `variational_minimize()`:** Accept optional per-call `num_shots` and `run_via_classiq` keyword arguments that override the session defaults for that invocation only (including the matching `submit_*` methods).
+
+</Update>
+
+<Update label="1.15.0" description="2026-05-31">
+
+## Enhancements
+
+-   The Python SDK now collects telemetry to help us improve our product. This can be disabled by setting the environment variable `CLASSIQ_TELEMETRY_MODE=disabled`.
+
+## Bug Fixes
+
+-   Fixed incorrect gate arguments in `QuantumProgram.qasm`. This also affected simulation when `transpilation_option=TranspilationOption.NONE`.
+
+</Update>
+
+<Update label="1.14.1" description="2026-05-27">
+
+## Bug Fixes
+
+-   Fixed an issue where the nvidia-gpu worker would fail during initialization.
+
+</Update>
+
+<Update label="1.14.0" description="2026-05-24">
+
+## Interface Changes
+
+-   The **pretty_qasm** field was removed from `Preferences`. OpenQASM 2 outputs are now always formatted with line breaks inside gate declarations (the previous default behavior).
+
+-   **`ExecutionSession`** now accepts individual configuration parameters directly: `ExecutionSession(qprog, backend=..., num_shots=..., random_seed=..., transpilation_option=..., run_via_classiq=..., config=...)`. The `execution_preferences=` keyword form still works but is deprecated and will be removed on 2026-06-22.
+
+</Update>
+
+<Update label="1.13.1" description="2026-05-24">
+
+## Enhancements
+
+-   **QP Visualization:** Improved support for larger circuits and operations. Visualizations can now display much larger quantum programs, with the maximum number of child operations that can be expanded at once raised from 1,000 to 2,500, so large composite gates, functions, and generated code blocks expand and render fully.
+
+</Update>
+
+<Update label="1.13.0" description="2026-05-17">
+
+## Enhancements
+
+-   **GitHub Copilot Integration:** Added support for GitHub Copilot in Classiq Studio, including chat-based AI assistance, coding agent features, and code autocomplete. These features are now available in the browser-based IDE experience.
+
+## Bug Fixes
+
+-   **`CombinatorialProblem`:** Fixed a `KeyError` raised when an inequality constraint became degenerate (collapsed to a single feasible value) after another constraint had fixed one of its variables.
+
+</Update>
+
+<Update label="1.12.1" description="2026-05-13">
+
+## Bug Fixes
+
+-   Restored the Studio button to its original location in the left sidebar of the IDE.
+
+</Update>
+
+<Update label="1.12.0" description="2026-05-10">
+
+## Enhancements
+
+-   **Synthesis:** Faster synthesis for models containing very large [Hamiltonian](../qmod-reference/language-reference/classical-types#hamiltonians) objects.
+-   Added support for the C12 provider when using `sample`, `observe`, and related functions with `backend='c12/<backend_name>'`.
+-   Added support for large-scale models by uploading/downloading execution and synthesis inputs/outputs directly to S3 via pre-signed URLs, bypassing payload size limitations.
+
+</Update>
+
+<Update label="1.11.0" description="2026-05-03">
+
+## Bug Fixes
+
+-   **`prepare_amplitudes` / `inplace_prepare_amplitudes`:** Fixed a wrong global phase that affected the controlled version for some amplitude vectors.
+-   **QP Visualization:** Improved robustness of the QP Visualization feature by adding webGPU/webGL context loss recovery, preventing blank screens when the graphics context is lost.
+
+</Update>
+
+<Update label="1.10.1" description="2026-04-28">
+
+## Bug Fixes
+
+-   Fixed a bug in the infrastructure.
+
+</Update>
+
+<Update label="1.10.0" description="2026-04-26">
+
+## Enhancements
+
+-   **Studio:** `latexmk` and a TeX Live subset are now pre-installed, enabling the benchmarking application from the Classiq library to generate its PDF report directly in the Studio.
+
+</Update>
+
+<Update label="1.9.1" description="2026-04-23">
+
+## Bug Fixes
+
+-   Fixed an issue where most models saved with older SDK versions could not be synthesized.
+
+</Update>
+
+<Update label="1.9.0" description="2026-04-19">
+
+## Enhancements
+
+-   **`ExecutionSession.sample` and `ExecutionSession.estimate`:** These methods now accept a list of parameter dictionaries for batch execution, returning a list of results. The dedicated `batch_sample`, `submit_batch_sample`, `batch_estimate`, and `submit_batch_estimate` methods are deprecated — pass a list to the standard methods instead.
+-   **`variational_minimize` function:** Added a new public `variational_minimize` function for variational optimization of a cost function over the parameter values of a quantum program. Supports Hamiltonian and classical cost functions, `run_via_classiq`, and improved input validation. See the [SDK reference](/sdk-reference/execution/) for details.
+-   Added `slice(array, start, stop)` in `classiq.qmod.symbolic` as the Python alternative for [array slice expressions](../qmod-reference/language-reference/expressions/#path-operators) on Python lists, analogous to `subscript`.
+-   **`classiq.print_diagnostics()`:** New function that prints a snapshot of the SDK version, Python environment, backend host and version, authentication status, and user ID - for easy inclusion in support tickets.
+
+## Bug Fixes
+
+-   **Execution:** Sample jobs started with `execute()` now persist submitted-circuit metadata so `ExecutionJob.get_submitted_circuits()` matches the documented behavior.
+-   **Classiq Studio:** Fixed light mode not being saved in user preferences.
+-   **Classiq IDE:** Fixed the Synthesize button repeatedly appearing and disappearing.
+-   Fixed synthesis of nested concatenations in control condition.
+
+## Interface Changes
+
+-   The `theta` parameter of function `phase` was renamed to `coefficient`.
+    The old name is deprecated and will no longer be supported starting on
+    2026-05-04 at the earliest.
+-   Function `randomized_benchmarking` is deprecated and will no longer be
+    supported starting on 2026-05-11 at the earliest.
+
+</Update>
+
+<Update label="1.8.0" description="2026-03-30">
+
+## Enhancements
+
+-   **`sample` function:** Added a new top-level `sample` function for executing a quantum program and retrieving results as a DataFrame directly, without managing a job object. Supports single and batch execution — pass a list of parameter dictionaries to `parameters` to run multiple parameter sets and receive a list of DataFrames. Also supports `run_via_classiq=True` to run using Classiq's provider credentials against your allocated budget. See the [SDK reference](../sdk-reference/execution/) for details.
+-   **`observe` function:** Added a new public `observe` function that computes the expectation value of a Hermitian observable with respect to a quantum program's output state. Supports exact statevector calculation or shot-based estimation, batch execution, and `run_via_classiq`. See the [SDK reference](../sdk-reference/execution/) for details.
+-   **`get_backend_details` function:** Added a `get_backend_details` function that returns a DataFrame of all supported quantum backends, including provider, backend name, type (hardware or simulator), qubit count, availability, pending jobs, and queue time.
+-   **`calculate_state_vector` function:** Added a new public `calculate_state_vector` function that returns the full state vector of a quantum program as a DataFrame. Supports batch execution by passing a list of parameter dictionaries. Available on Classiq simulators (e.g. `classiq/simulator`).
+-   **`minimize` function:** Added a new public `minimize` function for variational optimization of a cost function over the parameter values of a quantum program. Supports Hamiltonian and classical cost functions, `run_via_classiq`, and improved input validation. See the [SDK reference](../sdk-reference/execution/) for details.
+-   **OpenQASM in `sample` and `ExecutionSession`:** You can pass **OpenQASM 2.0 or 3.0** source as a string to `sample()` (first argument) or to `ExecutionSession` instead of a synthesized `QuantumProgram`. Results use the same histogram DataFrame shape (`bitstring`, `counts`, etc.). The `parameters` argument is not supported for OpenQASM strings (use a `QuantumProgram` for Qmod `main` parameters, or bind parameters inside the QASM circuit). See the [Execution](../user-guide/execution/#sampling-openqasm) section of the user guide.
+-   Improved error messages related to qfunc arguments.
+-   Added `emulate` on `AzureBackendPreferences` to enable IonQ hardware noise simulation on Azure Quantum when using an IonQ QPU target (`ionq.qpu.*`); ignored for other Azure targets.
+-   Added a QSVM application with a `QSVM` class that provides `train`, `test`, and `predict` methods for easy implementation of Quantum Support Vector Machine training and data classification. The relevant notebooks in the classiq-library will be updated accordingly.
+
+</Update>
+
+<Update label="1.7.1" description="2026-04-06">
+
+## Enhancements
+
+-   Upgraded infrastructure to enable future support in AWS Marketplace.
+
+</Update>
+
+<Update label="1.7.0" description="2026-03-23">
+
+## Enhancements
+
+-   **Execution:** Added optional `emulate` on `IBMBackendPreferences` and `IBMConfig`. Set `emulate=True` (default `False`) to run on Classiq AerSimulator with an IBM noise model derived from the backend name (e.g. `ibm_pittsburgh`, `ibm_boston`). Only valid for real IBM hardware backends (not fake backends); backend name must be in `CLASSIQ_NOISE_MODELS`. See [IBM backends](../user-guide/execution/cloud-providers/ibm-backends) for details.
+-   Added `ExecutionJob.get_submitted_circuits()` to return the final quantum circuits submitted to the provider (sample jobs only). The returned circuits reflect the actual QASM after transpilation and parameter assignment. Each circuit can be converted to QASM via `to_qasm()` or to a Qiskit `QuantumCircuit` via `to_qiskit()`.
+-   **Amplitude threshold for state vector simulation:** Added `amplitude_threshold` to `ExecutionPreferences`. When running state vector simulation, only states with amplitude magnitude strictly greater than the threshold are included in the result. Defaults to `0` (filters exactly zero-amplitude states, same as before). Setting a higher threshold reduces the size of the result for circuits where most amplitudes are negligibly small. `include_zero_amplitude_outputs=True` overrides this and includes all states regardless of amplitude. See [State Vector Filtering](../user-guide/execution/state-vector-filtering) for details.
+-   **QP Visualization:** Fixed a bug in the visualization of split operations.
+-   Added `estimate_sample_cost` and `estimate_sample_batch_cost` to the Python SDK for user-facing cost estimation before executing quantum programs. These functions return a `CostEstimateResult` with `cost` and `currency` fields. See [SDK execution reference](../sdk-reference/execution) for details.
+
+## Bug Fixes
+
+-   Fixed error messages when calling built-in operations with the wrong number of arguments.
+
+</Update>
+
+<Update label="1.6.0" description="2026-03-15">
+
+## Enhancements
+
+-   **Predefined noise models for Classiq simulators:** Added optional `noise_model` on `ClassiqBackendPreferences` to run Classiq Aer, Nvidia, and Braket Nvidia simulators with a device-style noise model. The value is a predefined name in the form `<provider>_<target>` (e.g. `ibm_pittsburgh`, `ibm_boston`). Supported names are listed in `CLASSIQ_NOISE_MODELS`; initially IBM backend names are supported. The noise model is built from the provider (e.g. via IBM Runtime) and passed to the underlying AerSimulator.
+-   **IonQ execution:** Replaced explicit `noise_model` with an `emulate` flag on `IonqBackendPreferences` and `IonQConfig`. Set `emulate=True` (default `False`) to run on the IonQ simulator with a noise model derived from the backend name (e.g. `qpu.aria-1` → `aria-1`). Only valid when the backend is a QPU. See [IonQ backends](../user-guide/execution/cloud-providers/ionq-backends#usage) for details.
+-   **QLayer check-pointing:** Improved save/load behavior for models containing a `QLayer`. Non-picklable `post_process` callables are now omitted when saving and can be restored via `layer.register_post_process()` after loading. Added `serializable_post_process=False` constructor option to suppress the related warning when `post_process` is intentionally non-picklable.
+
+## Bug Fixes
+
+-   **Execution:** When execution runs with no transpilation (`transpilation_level = None`), the circuit is now submitted to the provider without any backend transpilation when it already uses only the provider’s basis gates. If the circuit contains gates not supported by the provider, an error is raised that lists the provider’s supported gates, the invalid gates in the program, and suggests using `transpilation_level = "decompose"` (or `transpile_to_hardware = "decompose"` in ExecutionPreferences).
+-   Re-enabled negative indices for classical arrays.
+-   Fixed the problem where users were not redirected to the login page when attempting to synthesize while logged out.
+-   **Classiq IDE:** Changed the exported CSV on the results page to match the displayed tables.
+-   **QLayer:** Fixed saving models that contain a `QLayer` when `post_process` or the execution path use local functions or lambdas (e.g. `torch.save(model, path)` or saving an epoch state dict). Such callables are now omitted from the pickled state and re-created or restored after load so that save/load no longer raises "Can't pickle local object".
+-   Added an indicative error message when calling a classical function with quantum arguments in an arithmetic expression.
+
+</Update>
+
+<Update label="1.5.0" description="2026-03-08">
+
+## Enhancements
+
+-   Added `use_double_precision` to `ClassiqBackendPreferences` to control numerical precision on Nvidia and Braket Nvidia simulators. Default is `False` (single precision). Set `use_double_precision=True` for double precision. See [Classiq backends](/user-guide/execution/cloud-providers/classiq-backends/#nvidia-simulator-usage) for details.
+
+## Bug Fixes
+
+-   Fixed an incorrect compilation when an arithmetic operation appears inside a `repeat` statement and the left-hand side uses the repeat index as a subscript.
+
+## Interface Changes
+
+-   Changed default vendor from Azure to Classiq.
+-   Removed `max_depth` and `max_gate_count` from `Constraints`. These fields were deprecated since 0.52 and are no longer supported.
+
+</Update>
+
+<Update label="1.4.2" description="2026-03-05">
+
+## Bug Fixes
+
+-   Fixed a bug causing an internal error during synthesis when calling a function containing `foreach` twice or more.
+
+</Update>
+
+<Update label="1.4.0" description="2026-03-02">
+
+## Enhancements
+
+-   **Classiq Platform:** Updated the [platform home page](https://platform.classiq.io).
+
+</Update>
+
+<Update label="1.3.0" description="2026-02-22">
+
+## Enhancements
+
+-   The function `poly_inversion` now supports `error_type` (`"relative"` default or `"uniform"`) to choose between minimizing relative error
+    |xp(x)-1| or absolute uniform error |p(x)-1/x| over x in [1/kappa,1].
+    The same `error_type` option is also available in `poly_inversion_degree` and `poly_inversion_error`.
+-   Added the [_foreach_](../qmod-reference/language-reference/statements/classical-control-flow#classical-foreach) statement to Qmod. _Foreach_ iterates efficiently through the elements of a classical array.
+-   Added support for `QBit`s in addition to `QNum`s in `lookup_table`.
+
+## Interface Changes
+
+-   Renamed `sample` to `cmain_sample` in legacy `cscope`. This does not affect any usage of ExecutionSession.
+
+</Update>
+
+<Update label="1.2.0" description="2026-02-15">
+
+## Enhancements
+
+-   Introduced [CUDA-Q Integration](/user-guide/execution/cudaq_integration), enabling translation of synthesized Qmod programs into Python CUDA-Q kernels, to leverage CUDA-Q’s high-performance simulation and hybrid quantum–classical workflows.
+
+## Bug Fixes
+
+-   Fixed compilation of symbolic values in concatenations (for example, `[q[i], q[j]]` where `i` and `j` are of type `CInt`).
+
+## Interface Changes
+
+-   Renamed parameter `run_through_classiq` of `BackendPreferences` to `run_via_classiq`. `run_through_classiq` is deprecated and will no longer be supported starting on 2026-03-09 at the earliest.
+
+</Update>
+
+<Update label="1.1.0" description="2026-02-08">
+
+## Enhancements
+
+-   **Classiq IDE:**
+    -   Adjusted the table shown in "State Vector" jobs.
+    -   Added a table to "Measurement Results" jobs.
+-   Noise models are now available for IonQ simulators.
+
+## Bug Fixes
+
+-   **Classiq IDE:** Fixed the phase legend not matching the actual phase.
+-   Fixed compilation of the `I` (identity) gate.
+-   Fixed evaluation of constants in `main` function parameter types.
+
+## Interface Changes
+
+-   Removed previously deprecated `"count"` column from execution result dataframe. Use `"counts"` column instead.
+
+</Update>
+
+<Update label="1.0.1" description="2026-02-03">
+
+## Enhancements
+
+-   Reduced CX count and circuit depth for multi-controlled Pauli rotations (RX, RY, RZ).
+
+</Update>
+
+<Update label="1.0.0" description="2026-01-27">
+
+## Enhancements
+
+-   **Classiq IDE:**
+    -   Improved the appearance of the histograms and bar plots shown for results.
+    -   Improved native Qmod library usability.
+-   **Classiq Studio:** Added support for light mode visualization in the Quantum Program (QP) visualizer. Users can now switch between light and dark themes for an improved viewing experience.
+-   C12 Cloud support was added. See the [Cloud Providers](/user-guide/execution/cloud-providers/) section in the user guide.
+
+</Update>
+
+<Update label="0.105.0" description="2026-01-19">
+
+## Bug Fixes
+
+-   Fixed error message for a measurement under unitary context.
+
+</Update>
+
+<Update label="0.104.0" description="2026-01-11">
+
+## Enhancements
+
+-   Support array subscripts with missing slices (e.g., `arr[1:]` and `arr[:9]`) in Python Qmod.
+-   Add qmod_to_qubit_op function to convert from SparsePauliOp to OpenFermion's QubitOp data structure.
+
+## Bug Fixes
+
+-   IDE - Fix selection in Quantum Program Execution Jobs tab - Make the first job on the jobs list be selected
+-   Fix synthesis of functions with `Output` quantum parameters called under `invert`.
+
+</Update>
+
+<Update label="0.103.0" description="2026-01-05">
+
+## Bug Fixes
+
+-   IDE - Fix expand / collapse of backend details in the HW Catalogue
+-   In the dataframe, change the `count` field to `counts` so as not to override the built-in `count` method on pandas dataframes.
+    The current `count` field is deprecated and will be removed in the next release.
+-   Fix multi-value Boolean operations in Native Qmod (e.g., `a or b or c`).
+-   Fix synthesis error when controlling `X` with >=13 control qubits.
+-   Raise indicative errors when overriding internal functions (for example, when re-defining `prepare_state`).
+
+## Enhancements
+
+-   Support `QArray[QBit]` assignment statements, for example, `qarr |= [1, 0, 0, 1]`.
+-   Improve implementation of in-place quantum subscript assignments (e.g., `x ^= subscript([1, 2, 3, 4], y)`).
+-   IDE - Execution in the IDE now supports running through Classiq account for Amazon Braket, Microsoft Azure Quantum, and IonQ backends. Authorized users can enable this option using the "Run through Classiq" switch, which eliminates the need to provide their own credentials for these backends. This feature also includes spending tracking and budget management capabilities.
+-   Support assignments of non-scalar variables, for example, `qarr1 |= qarr2`.
+    Both variables must have the same type.
+-   Improve error message when assigning a symbolic value to a generative parameter.
+
+## Deprecations
+
+-   IDE - Removed support for `max depth` and `max gate count` synthesis constraints in the model
+
+</Update>
+
+<Update label="0.102.0" description="2025-12-21">
+
+## Interface Changes
+
+-   Violations of [uncomputation rules](/qmod-reference/language-reference/uncomputation) are now flagged as errors instead of warnings.
+-   The function `qubit_op_to_pauli_terms` in the `chemistry` module is
+    deprecated due to incorrect order of qubits in its result. Please use
+    `qubit_op_to_qmod` instead.
+
+## Bug Fixes
+
+-   Resolved an issue with labeling CX gate inputs in QP visualization, so that the correct qubit labels are now displayed.
+-   Fixed `qfunc`s being expanded declaratively (symbolically) when passed as arguments to other `qfunc`s.
+-   Improved the error message for type errors with function arrays.
+-   Fixed error message for `nan` values.
+-   Fix mapping from output registers to measured qubits on parametrized repeat circuits with HW aware synthesis.
+-   Fix `phase` applied with an execution parameter under multiple controls.
+-   Fix `unscheduled_suzuki_trotter` and `qdrift` implementations.
+-   Fix SDK function get_execution_actions
+    -   Flattened the cost field. The result holds now cost, currency_code
+    -   Add session_id in the result
+-   Fix compilation of unused variables defined in nested blocks.
+
+## Classiq Studio
+
+-   Classiq Studio now includes built-in AI integration, allowing users to generate, optimize, and execute quantum models directly within the Studio. This capability leverages Classiq's quantum resources and requires no external API tokens.
+
+</Update>
+
+<Update label="0.101.0" description="2025-12-07">
+
+## Enhancements
+
+-   Add quantum modular arithmetic functions to the open library, enabling modular quantum operations:
+    modular addition, multiplication, squaring, negation, and inversion: `modular_add_inplace`,
+    `modular_double_inplace`, `modular_negate_inplace`, `modular_multiply`, `modular_square`,
+    `modular_multiply_constant`, `modular_multiply_constant_inplace`, `modular_to_montgomery_inplace`,
+    `modular_montgomery_to_standard_inplace`, `modular_inverse_inplace`, `kaliski_iteration`, and
+    `modular_rsub_inplace`.
+-   Add functions `get_execution_actions` and `get_execution_actions_async` return a pandas DataFrame of execution actions. Filter by id, session_id, status, name, provider, backend, program_id, cost range (total_cost_min/max), and time ranges (start_time_min/max, end_time_min/max). All filters are combined with AND logic.
+-   Add functions `get_synthesis_actions` and `get_synthesis_actions_async` return a pandas DataFrame of synthesis actions. Filter by id, status, backend, program_id, backend_name, optimization_parameter, random_seed, max_width, max_gate_count, cost range (total_cost_min/max), and time ranges (start_time_min/max, end_time_min/max). All filters are combined with AND logic.
+
+## Bug Fixes
+
+-   Fix uncomputation of function calls with input or output concatenations.
+-   Fix within-apply bug caused by variable declarations nested in the "within"
+    block.
+
+</Update>
+
+<Update label="0.100.1" description="2025-12-07">
+
+## Bug Fixes
+
+-   Fix memory issue in Synthesis queue mechanism.
+
+</Update>
+
+<Update label="0.100.0" description="2025-11-30">
+
+## Enhancements
+
+-   Add functions for encoding conversions between binary, unary, and one-hot representations:
+    `binary_to_one_hot`, `binary_to_unary`, `one_hot_to_unary`,
+    `one_hot_to_binary`, `unary_to_one_hot`, `unary_to_binary`,
+    `inplace_binary_to_one_hot`, and `inplace_one_hot_to_unary`.
+-   Change precision of GPU simulators to single-precision to make better use of hardware.
+
+## Bug Fixes
+
+-   Fixed a bug in Hardware-Aware Quantum Program.
+-   Fixed [concatenations](/qmod-reference/language-reference/quantum-variables/#concatenation-operator)
+    arguments to input and output quantum parameters.
+
+## Classiq IDE
+
+-   Fixed a bug in Jobs page after Executing on several hardwares.
+-   Added a better labeling in the QP visualization. Now on "Show label" user will see label as on the closed box. On hover user will see full label.
+-   Fixed issue with duplicate error snackbar in the Jobs page.
+
+</Update>
+
+<Update label="0.99.0" description="2025-11-24">
+
+## Interface Changes
+
+-   Function `exponentiation_with_depth_constraint` is deprecated and will no
+    longer be supported starting on 2025-12-10 at the earliest.
+    Instead, use `exponentiate`.
+
+## Enhancements
+
+-   Add SX gate to Qmod core functions
+
+</Update>
+
+
+<Update label="0.98.0" description="2025-11-11">
+
+## Classiq IDE
+
+-   Basis Gates field under “Hardware Aware” now starts empty. If left empty, synthesis applies default basis gates automatically based on connectivity; select one or more gates to override.
+
+## Interface Changes
+
+-   Update the QSVT functions to use [Capturing](/qmod-reference/language-reference/operators/?h=captur#capturing-context-variables-and-parameters).
+    See the following [example](/explore/functions/qmod_library_reference/classiq_open_library/qsvt/qsvt/).
+
+## Enhancements
+
+-   Add functions for getting polynomial approximations for common use cases - `poly_jacobi_anger_<>` for
+    Hamiltonian Simulation and `poly_inversion` for matrix inversion.
+
+## Bug Fixes
+
+-   Fix an issue that caused certain execution runs to fail due to incompatible gates
+
+</Update>
+
+<Update label="0.97.1" description="2025-11-09">
+
+## Bug Fixes
+
+-   Fixed minor issues in registration flow
+
+</Update>
+
+<Update label="0.97.0" description="2025-11-03">
+
+## Enhancements
+
+-   Qmod now supports **automatic uncomputation** of local variables and enforces
+    rules that guarantee their correct uncomputation. Similar rules are enforced
+    on variables initialized inside a _within-apply_ statement.
+
+    For more details, see [Uncomputation](../qmod-reference/language-reference/uncomputation).
+
+    Currently, violations of uncomputation rules are issued as warnings for backward compatibility.
+    These will become compilation errors no earlier than 2025-12-03.
+
+-   Add the `assign_amplitude_table` and `assign_amplitude_poly_sin`
+    open-library functions, to replace the `*=` operator and the
+    `assign_amplitude` function.
+-   Add [`unscheduled_suzuki_trotter`](../sdk-reference/qmod/functions/core_library/exponentiation/#classiq.qmod.builtins.functions.exponentiation.unscheduled_suzuki_trotter),
+    a variant of `multi_suzuki_trotter` that doesn't re-order the Pauli terms.
+-   Improve synthesis of controlled phase with theta=pi.
+-   This release includes initial support of classical local variables,
+    assignment of mid-circuit measurements, and runtime if statements.
+    Currently, only variables of type QBit can be measured, and only the
+    classical bool type is supported for local variable declaration and
+    assignment. This enables simple algorithms such as the quantum teleportation
+    protocol. These constructs have the corresponding dedicated graphics in the
+    quantum program visualization. See more details under [Classical variables](/qmod-reference/language-reference/classical-variables))
+    and [Mid-circuit measurement](../qmod-reference/language-reference/mid-circuit-measurement).
+
+## Interface Changes
+
+-   The `*=` operator and the `assign_amplitude` function are deprecated and
+    will no longer be supported starting on 2025-12-03 at the earliest. Use
+    `assign_amplitude_table` instead.
+-   Function `qdrift` now receives a sparse Hamiltonian ([`SparsePauliOp`](../sdk-reference/qmod/classical-types/#classiq.qmod.builtins.structs.SparsePauliOp))
+    instead of a list of non-sparse Pauli terms (`CArray[PauliTerm]`).
+    Non-sparse pauli terms in `qdrift` will no longer be supported starting on
+    2025-12-03 at the earliest.
+
+## Bug Fixes
+
+-   Fix `multi_suzuki_trotter` synthesis with symbolic evolution coefficients
+    raising an internal error.
+-   Fix a bug where an internal error is raised when synthesizing with a maximum width constraint
+    a model that contains control on a function, or a statement block, that allocates and frees qubits.
+
+## Security
+
+-   Internal dependencies have been upgraded to address security vulnerabilities.
+
+</Update>
+
+<Update label="0.96.1" description="2025-10-30">
+
+## Bug Fixes
+
+-   Fix transpilation and execution of `unitary` functions when compiling to
+    QASM2.
+
+</Update>
+
+<Update label="0.96.0" description="2025-10-27">
+
+## Enhancements
+
+-   We've changed our AWS Braket integration, now AWS credentials consist of an access key ID and a secret access key. For more information, see [AWS Credentials](https://aws.amazon.com/blogs/quantum-computing/setting-up-your-local-development-environment-in-amazon-braket/).
+-   Added the function `prepare_select` for the definition of structured Linear Combination of Unitaries primitive (LCU) schemes.
+
+## Bug Fixes
+
+-   Report assignments into non-numeric variables.
+-   Fix concatenation operator on single variable not casting to QArray.
+-   Fix lambda list (`QCallableList`) scoping issue causing a bug when a lambda
+    list item is invoked in a different lambda.
+-   Fix error which caused execution jobs on IonQ to fail if they took more than 5 minutes.
+
+</Update>
+
+<Update label="0.95.0" description="2025-10-20">
+
+## Interface Changes
+
+-   The **debug_info** field was removed from the QuantumProgram class
+
+## Bug Fixes
+
+-   Report quantum types instantiated with execution parameters.
+
+</Update>
+
+
+<Update label="0.94.0" description="2025-09-29">
+
+## Deprecations
+
+1. Python 3.9 is no longer supported in the Python SDK. The minimum supported
+   version is now Python 3.10.
+
+## Enhancements
+
+-   Added the [`skip_control` statement](/qmod-reference/language-reference/statements/skip-control/)
+    to the Qmod language. `skip_control` applies a quantum statements
+    unconditionally.
+-   Add `pauli_operator_to_matrix`, the sparse counterpart of `hamiltonian_to_matrix`.
+-   Add new quantum functions for modular arithmetics: `modular_add_qft_space`, `modular_multiply`,
+    and `inplace_modular_multiply`.
+    Those functions use `skip_control` statements for specifying their efficient controlled version.
+
+## Bug Fixes
+
+-   Fix a bug where an error is raised when synthesizing with a maximum width constraint, even though a solution exists.
+-   Fix `qasm_to_qmod` quantum argument size calculations (resulting in, for
+    instance, illegal `control` statements generated from `mcx` gates).
+
+</Update>
+
+<Update label="0.93.0" description="2025-09-15">
+
+## Deprecations
+
+-   SDK versions below 0.92 will be deprecated as planned from October 13, 2025 (at the earliest). As a one-time exception, the version deprecation error message will not be as usual. Instead of “You are using an unsupported version of Classiq SDK—... “, users will experience a “504 Gateway Timeout ERROR” or a similar message. We apologize for the inconvenience.
+
+## Bug Fixes
+
+-   Fix a bug where an internal error occurred during hardware-aware synthesis with a basis gate set of Clifford + T.
+-   Fix `allocate` with floating-point size when the `max_width` constraint is
+    set.
+
+## Classiq Studio
+
+-   A progress bar was added to the classiq studio start up page.
+
+</Update>
+
+<Update label="0.92.0" description="2025-09-08">
+
+## Deprecations
+
+-   Python version 3.9 will no longer be supported starting on 2025-10-01 at the
+    earliest.
+
+## Enhancements
+
+-   The new [`qasm_to_qmod` function](/sdk-reference/synthesis#qasm_to_qmod)
+    de-compiles QASM 2 or 3 into Python/Native Qmod source code.
+-   Added methods for [execution budget management](/user-guide/execution/budget-management).
+-   Classiq's AI agent is now installed in Classiq Studio, providing seamless AI-powered quantum development. See the [AI documentation](/user-guide/ai/index) for setup instructions.
+-   Remove negligibly small amplitudes from state vectors when the auxiliary
+    (non-output) qubits are non-zero. These amplitudes are caused by numeric
+    error during simulation, but they result in multiple states with
+    the same assignment for the variables, which caused confusion.
+-   Added several Quantum Signal Processing [(QSP)](/sdk-reference/applications/QSP) related functions to the SDK:
+    `qsvt_phases` for obtaining QSVT phases,
+    `qsp_approximate` for approximating QSP-compatible Chebyshev polynomials,
+    `gqsp_phases` for calculating Generalized-QSP (GQSP) phases,
+    and a quantum `gqsp` function that implements GQSP.
+    To use these functions the user should `pip install classiq[qsp]`.
+    The existing QSVT examples and a new GQSP example will be updated in the library
+    towards the next version release.
+
+## Bug Fixes
+
+-   Fix a bug where the visualization generated unnecessary variable splits
+    and assigned incorrect variable names in certain cases.
+-   Support classical functions in the cost expression of `minimize`.
+-   Prevent invisible blocks from being collapsed.
+-   Adjust CZ gate boundaries to align with disconnected variable lines.
+-   Fix Studio loading stuck until page reload.
+
+</Update>
+
+<Update label="0.91.1" description="2025-08-31">
+
+## Bug Fixes
+
+-   **Visualization tooltips are now supported and displayed in the Studio.** This enhancement improves the user experience by providing helpful information directly within visualizations, making it easier to understand and interact with your data.
+
+</Update>
+
+<Update label="0.91.0" description="2025-08-25">
+
+## Enhancements
+
+-   Add magnitude and phase to the dataframe for state vector simulations.
+-   Increase the limit of the number of qubits that can be simulated on Classiq's Simulator from 25 to 28.
+    Note that wider circuits take longer to simulate, so Classiq's Nvidia Simulator will likely have improved performance
+    for wide/deep circuits.
+
+    Also, increase the limit on Classiq's State Vector Simulator to 28 qubits, as long as
+    [State Vector Filtering](/user-guide/execution/state-vector-filtering/) reduces the number
+    of output (unfiltered) qubits to 18 or less, the previous limit. For example, it is now possible
+    to get the state vector from a quantum program of 20 qubits with a 2-qubit QNum filtered out.
+
+-   Add support for bitwise operators in [phase statements](/qmod-reference/language-reference/statements/phase/#semantics).
+
+### Documentation Enhancements
+
+-   A new tutorial on execution is now available under [The Classiq Tutorial](/getting-started/classiq_tutorial/)
+-   New explanations on visualization features in the [Synthesis Tutorial](/explore/tutorials/basic_tutorials/the_classiq_tutorial/synthesis_tutorial/)
+-   Search results have been improved to show the most relevant information at the top.
+
+</Update>
+
+<Update label="0.90.0" description="2025-08-19">
+
+## Enhancements
+
+-   Loading of large Pandas Dataframes is now available in the studio, up to 200MB files.
+-   Use non-blocking flow for execution jobs on the Classiq Nvidia Simulator. This allows for longer-running jobs.
+-   The 'phase' statement has been generalized to support a fixed (classically
+    specified) rotation angle, that is, to insert a global phase. A global
+    phase across an entire circuit is undetectable in quantum hardware, but when
+    applied in a controlled context, it introduces a relative phase between
+    positive and negative condition states. This variant of the 'phase'
+    statement is useful to directly express key idioms in quantum algorithms
+    such as phase oracles, reflections, and relative-phase computations.
+
+### QP Visualization: Improved Handling of Long Function Blocks Sub-labels
+
+Long sub-labels in the quantum program visualizer are now automatically
+truncated to prevent overflow and maintain a clean layout.
+When a sub-label is truncated, the full text is accessible via a tooltip on
+hover, ensuring that all information remains available without cluttering the
+interface.
+This enhancement improves readability and usability, especially for circuits
+with verbose or complex expressions.
+
+## Deprecations
+
+-   The following functions and classes have been deprecated and will no longer
+    be supported starting on 2025-09-18 at the earliest:
+    `construct_chemistry_model`, `molecule_ucc`, `molecule_hva`,
+    `molecule_hartree_fock`, `fock_hamiltonian_hva`,
+    `fock_hamiltonian_hartree_fock`, `GroundStateProblem`, `MoleculeProblem` and
+    `HamiltonianProblem`. For more information on Classiq's chemistry
+    application, see [here](/explore/applications/chemistry/classiq_chemistry_application/classiq_chemistry_application).
+
+## Bug Fixes
+
+-   Fix a bug where allocating quantum variables in disallowed blocks was
+    not always reported.
+-   Fix a bug where controlled free operations could cause the visualization to crash. The visualization now handles these cases correctly and no longer fails when such operations are present.
+
+## Interface Changes
+
+-   Parameter `expr` of function 'phase' has been renamed to `phase_expr`.
+    Parameter `expr` will no longer be supported starting on 2025-09-19 at the
+    earliest. Change `phase(expr=..., theta=...)` to
+    `phase(phase_expr=..., theta=...)` or `phase(..., ...)`.
+
+</Update>
+
+<Update label="0.89.0" description="2025-08-12">
+
+## Classiq Studio
+
+-   You can now install and import Torch, PyQSP, and CUDA-Q packages in the Classiq Studio environment. Previously, these imports failed due to environment limitations, but they are now supported for your workflows.
+-   PyGLPK package is installed and usable in the Classiq Studio.
+-   Uploading files up to 1 GB to the user persistent workspace in the Classiq Studio is now enabled.
+
+## Enhancements
+
+-   Added the functions `prepare_sparse_amplitudes` and `inplace_prepare_sparse_amplitudes` to the function library.
+-   Add support for numpy 2.2.6 (Python >=3.10) and numpy 2.3.2 (Python >=3.11)
+-   Shared QP links now come with the actual visualization image previews.
+
+## Security
+
+-   Improved web application security
+
+</Update>
+
+<Update label="0.88.0" description="2025-08-04">
+
+## Enhancements
+
+-   Added the function `prepare_linear_amplitudes` for preparing the state $|\psi\rangle = \frac\{1\}\{Z\}\sum_\{x=0\}^\{2^n-1\}\{x|x\rangle\}$.
+-   Extended the visualization of controlled functions as transparent boxes
+    displaying control lines to all Qmod statements.
+-   Support [state vector filtering](/user-guide/execution/state-vector-filtering) for Classiq's `simulator_statevector`.
+-   Added tolerance parameter to the minimize method of the execution session.
+
+</Update>
+
+<Update label="0.87.0" description="2025-07-28">
+
+## Enhancements
+
+-   Added the functions `lcu` and `lcu_pauli` for creating the Linear Combination of Unitaries primitive (LCU).
+-   IBM Cloud is now available. See [Cloud Providers](/user-guide/execution/cloud-providers/) section in the user guide.
+-   The default optimization level in the synthesis preferences has been changed from `OptimizationLevel.HIGH` (3)
+    to `OptimizationLevel.LIGHT` (1). For more information about optimization level
+    see the [optimization level](/user-guide/synthesis/preferences/#optimization-level) section in the user guide.
+
+### Introducing “Variables View”
+
+A new compact visualization mode that displays quantum variable flow at a higher level perspective. Toggle between this streamlined view and the traditional qubit grid overlay using the Variables View switch in the visualization menu bar.”
+
+## Classiq Studio
+
+### Memory monitor
+
+A new memory monitoring feature that tracks and displays resource usage during Classiq Studio Usage, providing real-time insights into memory consumption patterns.
+![plot](/release-notes/resources/images/memory-usage.png "vscode memory usage")
+
+## Bug Fixes
+
+-   Fix a synthesis bug that causes, in some cases, the function under power to have
+    a separate power for each function, instead of sharing it as a whole.
+-   Fix a failure in hardware-aware synthesis of parametric models for the
+    `Azure Quantum` provider.
+-   Fix a bug in `get_hf_state` when using qubit tapering.
+
+</Update>
+
+<Update label="0.86.0" description="2025-07-15">
+
+## Enhancements
+
+-   [Concatenations](/qmod-reference/language-reference/quantum-variables/#concatenation-operator)
+    can now also be used as [control](/qmod-reference/language-reference/statements/control/)
+    expressions.
+-   Lower model creation and synthesis run times for large models.
+
+## Bug Fixes
+
+-   Classical `if` statements are now supported in QP visualization, where they previously caused a failure.
+-   Fix synthesis bug which caused wrong results when using the bitwise invert (`~`) operator.
+-   Fix bug relating to classical struct arguments (such as
+    [Hamiltonians](/qmod-reference/language-reference/classical-types/#hamiltonians)).
+-   Use the Solovay-Kitaev algorithm in more cases when transpiling. Previously, we used the algorithm when transpiling with
+    respect to a particular fixed set of basis gates. Now, we use this algorithm whenever the basis gate set contains the Clifford gates
+    `X`, `Z`, `H`, `T`, and `CX` but does not contain arbitrary-angle rotation gates such as `RX` or `CRZ`.
+
+## Classiq IDE
+
+1. Add mechanism to allow more models to be visualized in new visualization.
+
+2. ### Visualization: Data Tab Removal
+
+The Data tab has been removed from the left panel in the visualization interface. This change is removing redundant functionality.
+
+3. ### Deprecation: QP Visualization Basic View Mode
+
+Deprecated "Basic" mode quantum program visualization in favor of the new visualization scheme with enhanced designs, views, and analysis capabilities.
+
+4. ### Visualization: Focused Search
+
+The search panel focuses only on user written functions and QMOD statements.
+
+</Update>
+
+<Update label="0.85.0" description="2025-06-30">
+
+## Bug Fixes
+
+-   Fix the value range analysis of numerical variables declared with specified size.
+
+## Deprecations
+
+-   The Qmod function `allocate_num` has been removed.
+
+## Classiq IDE
+
+### New Feature: QP Visualization Enhancements
+
+The Classiq IDE now includes an improved QP visualization feature. Controlled functions are displayed in transparent boxes blocks, where:
+
+-   The transparent section represents the control mechanism.
+-   The filled block highlights the controlled function.
+
+This enhancement provides a clearer and more intuitive representation of quantum programs, making it easier to understand and debug complex circuits.
+
+</Update>
+
+<Update label="0.84.0" description="2025-06-25">
+
+## Enhancements
+
+-   Added new [chemistry functions](/sdk-reference/applications/chemistry) to
+    the Python SDK for using Hartree-Fock and UCC ansatz in Qmod. In order to
+    use them, it is required to install the Python SDK with the extra
+    `chemistry` dependency.
+-   Qmod functions are represented with a single symbolic definition throughout
+    the compilation process when their use of classical parameters allows it.
+    This improves compilation time and output QASM code size in many cases.
+-   Added a new function, [`multi_suzuki_trotter`](http://../sdk-reference/qmod/functions/core_library/exponentiation/#classiq.qmod.builtins.functions.exponentiation.multi_suzuki_trotter),
+    that applies the Suzuki-Trotter decomposition jointly to a sum of Hamiltonians.
+-   Added a new syntax for specifying sparse Hamiltonians ([`SparsePauliOp`](http://../sdk-reference/qmod/classical-types/#classiq.qmod.builtins.structs.SparsePauliOp))
+    in Qmod's Python embedding. For example: `0.5 * Pauli.Z(0) * Pauli.Y(1) * Pauli.X(2) + 0.8 * Pauli.X(1)`.
+    Check out the [documentation](http:///qmod-reference/language-reference/classical-types/#hamiltonians)
+    for more details.
+-   Added a `dataframe` property to ExecutionDetails object. Example usage:
+
+    ```
+    with ExecutionSession(qprog) as es:
+        result = es.sample()
+
+    df = result.dataframe
+    ```
+
+-   Added a new execution primitive [`ExecutionSession.minimize`](/sdk-reference/execution#classiq.execution.ExecutionSession.minimize)
+    that encapsulates classical optimization of ansatz parameters.
+    The cost function to minimize is specified either as a quantum observable (Hamiltonian) or an arithmetic expression.
+    This offers a significant performance advantage compared to executing the same logic on the client side, as it eliminates
+    communication overhead. Note that it utilizes a fixed generic minimization scheme (`scipy-COBYLA`).
+    In non-trivial cases, you may still need to implement your own optimization logic.
+-   The total size of quantum structs can be retrieved using the new
+<Card title="__PROTECTED_0__ class attribute" href="http:///qmod-reference/language-reference/quantum-types/#attributes_2" />
+    of `QStruct`.
+
+## Interface Changes
+
+-   Function `sparse_suzuki_trotter` will no longer be supported starting on
+    21/7/25 at the earliest. Instead, use `suzuki_trotter`.
+-   Function `parametric_suzuki_trotter` will no longer be supported starting on
+    21/7/25 at the earliest. Instead, use `multi_suzuki_trotter`.
+-   Function `suzuki_trotter` now receives a sparse Hamiltonian ([`SparsePauliOp`](http://../sdk-reference/qmod/classical-types/#classiq.qmod.builtins.structs.SparsePauliOp))
+    instead of a list of non-sparse Pauli terms (`CArray[PauliTerm]`).
+    Non-sparse pauli terms in `suzuki_trotter` are deprecated, use
+    `SparsePauliOp` instead.
+-   [`ExecutionSession`](http:///sdk-reference/execution/#classiq.execution.ExecutionSession)'s
+    `estimate` methods now accept a sparse Hamiltonian ([`SparsePauliOp`](http://../sdk-reference/qmod/classical-types/#classiq.qmod.builtins.structs.SparsePauliOp))
+    instead of a list of non-sparse Pauli terms (`CArray[PauliTerm]`).
+    Non-sparse pauli terms in `ExecutionSession` will no longer be supported
+    starting on 21/7/25 at the earliest. Use `SparsePauliOp` instead.
+
+</Update>
+
+<Update label="0.83.0" description="2025-06-09">
+
+## Enhancements
+
+-   Added the concatenation operator to Qmod. This operator packs a sequence of
+    quantum variables (or their parts) into a qubit array. For example,
+    `hadamard_transform([my_qnum, my_qarray[1:3]])` passes an array of the
+    respective qubits to the function. See more under
+    [concatenation operator](/qmod-reference/language-reference/quantum-variables/#concatenation-operator).
+
+-   Width constraints are now treated more systematically for optimization
+    levels 0-2 (partitioning the model into separate synthesis steps), yielding
+    solutions in cases where previously no solution was found. See more under
+    [Optimization Level](/user-guide/synthesis/preferences#optimization-level).
+
+## Interface Changes
+
+-   The type `SerailizedQuantumProgram` and method `QuantumProgram.get_qprog` are no longer available.
+
+</Update>
+
+<Update label="0.82.1" description="2025-06-04">
+
+## Bug Fixes
+
+-   Removed the "Login required" error message when not authenticated
+
+</Update>
+
+<Update label="0.82.0" description="2025-06-03">
+
+## Enhancements
+
+-   In Quantum Program visualization, engine-level (grey) boxes are flattened when they are single children.
+
+</Update>
+
+<Update label="0.81.0" description="2025-05-26">
+
+## Deprecations
+
+1. The Qmod function `allocate_num` is deprecated and will no longer be
+   supported starting on 16/06/2025 at the earliest. Instead, use
+<Card title="__PROTECTED_0__" href="../sdk-reference/qmod/operations#classiq.qmod.builtins.operations.allocate" />
+   which supports the same parameters.
+
+</Update>
+
+<Update label="0.80.1" description="2025-05-22">
+
+## Security
+
+-   Updated dependencies to fix security vulnerabilities.
+
+</Update>
+
+<Update label="0.80.0" description="2025-05-19">
+
+## Enhancements
+
+1. Quantum functions inside a control statement get a `c-` prefix
+
+2. Added the functions `prepare_dicke_state` and `prepare_dicke_state_unary_input`.
+
+3. A new exponentiation function, [sparse_suzuki_trotter](../sdk-reference/qmod/functions/core_library/exponentiation#classiq.qmod.builtins.functions.exponentiation.sparse_suzuki_trotter),
+   has been added to the core library, performing Suzuki-Trotter decomposition using a sparse representation
+   of the Hamiltonian. It is recommended to use this function instead of `suzuki_trotter` when you handle a sparse Hamiltonian, as it is more efficient.
+
+4. Include `classiq.execution` in the top level `classiq` package in the SDK.
+
+    Old:
+
+    ```
+    from classiq.execution import ExecutionPreferences
+    ```
+
+    New:
+
+    ```
+    from classiq import ExecutionPreferences
+    ```
+
+6. [`allocate`](../sdk-reference/qmod/operations#classiq.qmod.builtins.operations.allocate) now
+   supports specifying numeric attributes of the allocated variable.
+
+</Update>
+
+<Update label="0.79.1" description="2025-05-15">
+
+## Bug Fixes
+
+1. Fix a system bug that caused execution jobs to fail with an "insufficient
+   resources" message.
+2. Fix a bug related to execution parameters.
+
+</Update>
+
+<Update label="0.79.0" description="2025-05-12">
+
+## Enhancements
+
+1. Value range analysis of arithmetic expressions is now generalized to apply
+   across statements, optimizing quantum variables sizes and arithmetic expressions
+   implementation in more cases.
+
+</Update>
+
+<Update label="0.78.0" description="2025-05-05">
+
+## Enhancements
+
+1. A new `IQAE` application has been added to the SDK. It allows you to define `iqae` problems in terms of Qmod function,
+   and directly estimate the amplitude of the state you prepared.
+
+<Card title="IQAE application Descriptions" href="/sdk-reference/applications/IQAE" />
+
+    It is recommended to use this application in `iqae` problems, rather than `cmain`
+    with the primitive `iqae`.
+
+## Bug Fixes
+
+1. Fixed an issue where the “Basic” view was always empty; it now correctly renders the circuit as intended.
+2. Fixed bugs causing several example models to not be supported in the "New" circuit visualization, including "Shor's Algorithm Modular Exponentiation".
+
+</Update>
+
+<Update label="0.77.0" description="2025-04-28">
+
+## Enhancements
+
+1. In Qmod's Python embedding, you can now declare quantum functions with classical parameters
+   of Python builtin types such as `int`, `float`, and `list`. These variables can be
+   used in expressions that require Python values, such as Python `for` loops and 3rd party
+   library functions, as is shown in the example below. See more on this under the new
+   reference page on
+<Card title="Generative Descriptions" href="/qmod-reference/language-reference/generative-descriptions" />
+
+    [comment]: DO_NOT_TEST
+    ```python
+    @qfunc
+    def rotate(ratio: float, qa: QArray[QBit]):
+        for i in range(qa.len):  # 'qa.len' is a Python integer
+            PHASE(math.asin(ratio * i), qa[i])  # 'ratio * i' evaluates to a Python float
+    ```
+
+## Interface Changes
+
+1. With _Enhancement 1_ described above, Python-type parameters supersede classical Qmod-type parameters
+   in generative functions. Hence, the use of the function decorator `@qfunc(generative=True)`
+   is no longer required. Qmod-type parameters are treated symbolically in Python, and their
+   use in Python expressions is deprecated.
+
+## Classiq IDE
+
+1. Improved UX in Quantum program visualization: collapsing a Quantum operation block will scroll the viewport into the parent operation block position
+
+</Update>
+
+<Update label="0.76.0" description="2025-04-21">
+
+## Enhancements
+
+1. It is now legal to [out-of-place assign](/qmod-reference/language-reference/statements/assignment#out-of-place-assignment)
+   to a variable whose declared size is larger than the minimal size required to
+   fit the range of possible expression values.
+
+## Interface Changes
+
+1. The function `synthesize` now returns an object of type `QuantumProgram`, and its fields can be accessed directly.
+   The type `SerailizedQuantumProgram` and method `QuantumProgram.get_qprog` are no longer needed, they are deprecated and will be removed in a future version.
+
+2. Email Service Update - We've replaced the Community button with a new
+   dropdown menu.
+   Users can now select "Contact Us", which opens a form.
+   Once the form is submitted with user details, an email is sent directly to Classiq.
+
+3. Layout Fixes - Resolved an issue with inconsistent padding across the layout to ensure a cleaner, more polished UI.
+
+4. Enhanced Sharing Options - In addition to existing platforms, users can now share content to LinkedIn and Reddit with a single click.
+
+</Update>
+
+<Update label="0.75.0" description="2025-04-08">
+
+## Classiq Studio
+
+Added a new command `reset-user-env` to reset the virtual environment to its default state
+helping resolve dependency issues and clean up installations.
+
+## Classiq IDE
+
+Added a "User Terms" button inside the IDE website at the bottom of the screen, and clicking on it opens a modal displaying our user terms.
+
+## Enhancements
+
+When estimating using the `ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR` backend,
+whether using the `ExecutionSession` or classical main, compute the expectation
+value directly from the state vector instead of running shots.
+
+</Update>
+
+<Update label="0.74.0" description="2025-03-31">
+
+## Enhancements
+
+-   `QuantumProgram` objects have been optimized to be significantly leaner, improving performance across all actions that handle them.
+-   Visualizing Quantum Programs is now significantly faster.
+-   Added the functions `prepare_complex_amplitudes` and `inplace_prepare_complex_amplitudes`.
+
+### Quantum Program Visualization
+
+-   Auto-expand QMOD statements without expressions (e.g. `power`).
+    ![plot](/release-notes/resources/images/power_expanded_example.png "expanded power commmand")
+-   Statements with quantum expressions now display their corresponding expression directly on the block.
+    ![plot](/release-notes/resources/images/expression-details-example.png "details of arithmetic expression")
+
+</Update>
+
+<Update label="0.73.0" description="2025-03-24">
+
+## Interface Changes
+
+1. The functions `construct_qsvm_model`, `construct_finance_model`, and
+   `construct_grover_model` have been removed from the SDK.
+   Check out our Qmod implementations of the QSVM, finance, and Grover
+   algorithms in the [Classiq library](https://github.com/Classiq/classiq-library).
+
+</Update>
+
+<Update label="0.72.1" description="2025-03-20">
+
+## Enhancements
+
+1. Improve `control` statement visualization to distinguish control qubits from target qubits.
+
+</Update>
+
+<Update label="0.72.0" description="2025-03-18">
+
+## Enhancements
+
+1. Add new execution backends `BRAKET_NVIDIA_SIMULATOR` and `BRAKET_NVIDIA_SIMULATOR_STATEVECTOR`. These simulators run on Amazon Braket's infrastructure and provide faster execution for single circuits. See [Execution on Classiq Backends](/user-guide/execution/cloud-providers/classiq-backends) for more information.
+2. Improve `prepare_amplitudes` and `prepare_state` performance for `bound=0`.
+3. Add [`RESET`](../sdk-reference/qmod/functions/core_library/mid_circuit_measurement/#classiq.qmod.builtins.functions.mid_circuit_measurement.RESET), an atomic function that resets a qubit to the `|0>` state.
+4. Intel simulator is now available as a backend for execution. See [Cloud Providers](/user-guide/execution/cloud-providers/) section in the user guide.
+
+</Update>
+
+<Update label="0.71.0" description="2025-03-10">
+
+## Classiq IDE
+
+1. Models page is now open to non-signed-up users.
+
+## Classiq Studio
+
+1. Trust Classiq Library workspace by default.
+
+</Update>
+
+<Update label="0.70.0" description="2025-02-26">
+
+## Enhancements
+
+1. Improve depth and gate count for transpilation options "intensive" and
+   "custom".
+2. Improve the synthesis of the `suzuki_trotter` function for small Hamiltonians.
+3. Updated the Quantum program icon in the drawer to a newer version.
+
+## Bug Fixes
+
+1. Fixed a bug where arithmetic expressions that classically evaluate to constant boolean values could not be used.
+2. Fixed a bug where using the `show` function in the Python SDK would open the IDE with a "Not Authorized" error.
+3. Fixed a bug where certain operations in the Quantum Program visualization are displayed with very long name that describes the operation's hierarchy.
+
+</Update>
+
+<Update label="0.69.0" description="2025-02-17">
+
+## Classiq Studio
+
+### **We’re launching Classiq Studio!**
+
+Classiq Studio is a web-based coding environment where you can write and run Python code in a pre-configured setup. Access it now via the [Classiq Platform](https://platform.classiq.io).
+For details, see the [Classiq Studio user guide](/user-guide/studio/index).
+
+## Enhancements
+
+1. Improved the synthesis of the `molecule_ucc` function for small molecules.
+2. Social Sharing is now available. You can share circuits to various social platforms.
+3. Added SLSQP optimizer for use in [VQE](/user-guide/execution/).
+
+## Interface Changes
+
+1. Introduced a new QMOD core-library function [`commuting_paulis_exponent`](../sdk-reference/qmod/functions/core_library/exponentiation#classiq.qmod.builtins.functions.exponentiation.commuting_paulis_exponent).
+
+## Bug Fixes
+
+1. Fixed unexpected resets when using Classiq Studio.
+
+## Support
+
+1. Error messages now include a link to our [support system](https://classiq-community.freshdesk.com/support/tickets/new) for reporting bugs or opening support tickets. You can also reach us on our [Slack community channel](https://short.classiq.io/join-slack).
+
+</Update>
+
+<Update label="0.68.0" description="2025-02-11">
+
+## Enhancements
+
+1. Arithmetic assignments and control conditions now support [quantum subscript
+   expressions](/qmod-reference/language-reference/expressions/#path-operators).
+   A quantum subscript expression comprises a classical list accessed by a quantum
+   subscript, e.g., `x |= subscript([1, 2, 3, 4], y)`
+   (in Native Qmod: `x = [1, 2, 3, 4][y];`).
+2. Report an indicative error when not releasing local variables inside
+   [control](/qmod-reference/language-reference/statements/control),
+   [invert](/qmod-reference/language-reference/statements/invert) and
+   [power](/qmod-reference/language-reference/statements/power) statements.
+3. When running VQE using the `ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR` backend,
+   compute the expectation value directly from the state vector instead of running shots.
+4. In the Python SDK, arguments of type `CArray` can now be NumPy arrays, tuples, and
+   similar sequential objects. For example, the following statements are
+   equivalent:
+   `prepare_state([0.25, 0.25, 0.25, 0.25], 0, q)` and
+   `prepare_state(np.ones(4) / 4, 0, q)`.
+
+## Interface Changes
+
+1. The `synthesize` and `write_qmod` functions now accept a
+   [quantum entry point](/qmod-reference/language-reference/quantum-entry-point/?h=quantum+entry+point#model-outputs).
+   Instead of `synthesize(create_model(main))`, write `synthesize(main)`.
+
+</Update>
+
+<Update label="0.67.0" description="2025-02-02">
+
+## Enhancements
+
+1. Unreleased local variables of a function are now un-computed
+   and released when calling the function under a _compute_ block of a
+<Card title="Within-apply" href="/qmod-reference/language-reference/statements/within-apply" />
+   statement.
+
+## Bug Fixes
+
+1. Fix control optimization for constant equality conditions
+   (e.g., `control(x == 1, ...)`) producing wrong circuits under certain
+   conditions.
+2. Fix in-place XOR optimization for classical values (e.g., `x ^= -0.5`)
+   producing wrong circuits under certain conditions.
+3. Fix in-place XOR optimization for Boolean expressions
+   (e.g., `x ^= (y > 0) & (z > 0)`) producing wrong circuits under certain
+   conditions.
+4. Fix a bug causing an internal error in arithmetic expression that use comparison,
+   subtraction, or negation (e.g. `x > 0.3`, `0.2 - x`, `-x`) when synthesizing
+   models with the machine precision set to higher than 8.
+
+</Update>
+
+<Update label="0.66.1" description="2025-01-27">
+
+## Interface Changes
+
+1. Add the functions `amplitude_amplification` and `exact_amplitude_amplification` to the function library.
+
+</Update>
+
+<Update label="0.66.0" description="2025-01-20">
+
+## Enhancements
+
+1. The `num_qubits` argument of function `allocate` is now optional. If it is
+   not specified, it is inferred automatically according to the quantum type
+   of the allocated variable. Example:
+
+    [comment]: DO_NOT_TEST
+    ```python
+    q = QBit()
+    allocate(q)  # allocates one qubit for variable 'q'
+    ```
+
+2. The `execute` parameter of the `QLayer` object is now optional. Example:
+
+    [comment]: DO_NOT_TEST
+    ```python
+    QLayer(quantum_program, post_process)
+    ```
+
+## Deprecations
+
+The simulator name "nvidia_state_vector_simulator" has been removed. Please use
+ClassiqNvidiaBackendNames.SIMULATOR or "nvidia_simulator" instead.
+
+## Classiq IDE
+
+1. The Application Configuration Panel used for editing examples in the Built-in Apps folder has been removed.
+2. Patched dependencies: Katex.
+
+</Update>
+
+<Update label="0.65.4" description="2025-01-14">
+
+## Enhancements
+
+1. Increase jobs memory.
+
+</Update>
+
+<Update label="0.65.3" description="2025-01-14">
+
+## Bug Fixes
+
+1. Fix failed execution jobs which stay in "running" status forever instead of
+   reporting an indicative error.
+
+</Update>
+
+<Update label="0.65.2" description="2025-01-13">
+
+## Enhancements
+
+1. Improve overall stability and performance.
+
+</Update>
+
+<Update label="0.65.1" description="2025-01-08">
+
+## Enhancements
+
+1. The name argument of local [quantum variables](/qmod-reference/language-reference/quantum-variables/)
+   is now optional. If a name is not specified, it is inferred automatically from
+   the Python code. For example, it is now possible to write `q = QBit()`
+   instead of `q = QBit("q")`.
+2. Improve the performance of executing multiple primitives inside one
+   `ExecutionSession`, such as in `execute_qaoa`.
+
+## Classiq IDE
+
+Share Quantum Programs with anyone.
+For more information, see [Sharing your Quantum Program Visualization](/user-guide/analysis/visualization-of-quantum-programs#sharing-your-quantum-program-visualization).
+
+## Deprecations
+
+Function `prepare_int` and `inplace_prepare_int` are now deprecated. Use Qmod out-of-place
+and in-place numeric assignment statements instead. For example, instead of `prepare_int(5, my_qnum)`,
+write `my_qnum |= 5`.
+See more under [numeric assignments](/qmod-reference/language-reference/statements/assignment/).
+
+</Update>
+
+<Update label="0.64.0" description="2024-12-29">
+
+## Enhancements
+
+1. Improve error messages.
+
+## Bug Fixes
+
+1. Fix quantum bits raising an error when used in in-place assignments
+   (`^=` and `+=`).
+2. Fix quantum struct field access raising an error in lambdas.
+
+## Classiq IDE
+
+1. Classiq Thumbnail: Updated the Classiq thumbnail image!
+2. Links on the IDE model page now directing to Classiq Library.
+3. Modify the Quantum Programs URL so that the circuit ID is embedded in its path
+
+### New Visualization:
+
+Compact View:
+
+-   Clean up variable names in engine blocks.
+-   Corrected the spacing miscalculation for junction dots.
+-   Refined padding before allocation
+-   Hide labels in open functional blocks to create a more space-efficient
+    display.
+-   Removed unnecessary dots and labels for low-level QC elements.
+
+</Update>
+
+
+<Update label="0.63.0" description="2024-12-23">
+
+## Enhancements
+
+1. [Generative functions](/qmod-reference/language-reference/generative-descriptions)
+   have undergone a round of significant improvements.
+   Check out our [DQI notebook](/explore/algorithms/search_and_optimization/dqi/dqi_max_xorsat/)
+   to see how generative functions are used to implement advanced quantum algorithms.
+2. A new filed `optimization_level` has been added the `Preferences` of the synthesis.
+   This field determines the trade-off between synthesis speed and the quality of the results,
+   In terms of the optimization parameter and the constraints. For more information,
+   see [here](/user-guide/synthesis/preferences#optimization-level).
+3. State vector filtering is available. This is an important step for simulating
+   large circuits with a state vector simulator. For more information, see [this page](/user-guide/execution/state-vector-filtering)
+
+## Bug Fixes
+
+1. Fix usage of overlapping quantum array slices (e.g., `qbv[1:3]` and `qbv[2]`)
+   in bodies of lambda expressions and control statements.
+
+</Update>
+
+<Update label="0.62.0" description="2024-12-16">
+
+## Enhancements
+
+1. Added a new simulator under the Classiq provider, under the name `ClassiqNvidiaBackendNames.SIMULATOR_STATEVECTOR`.
+   This simulator runs on a GPU and returns a state vector, similar to
+   `ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR` (which runs on a CPU).
+   Thus, it can handle larger circuits. The name `"nvidia_state_vector_simulator"`
+   is deprecated in favor of `ClassiqNvidiaBackendNames.SIMULATOR`. See [here](/user-guide/execution/cloud-providers/classiq-backends#nvidia-simulator-usage) for more information.
+
+## Bug Fixes
+
+1. Fix the connectivity map of the `rigetti.qpu.ankaa-9q-3` backend in Azure Quantum.
+2. Fix the connectivity map of Amazon Braket devices.
+3. Fix a bug in the method `from_id` of `ExecutionJob`.
+
+## Deprecations
+
+1. Parameters `value` and `target` of functions `inplace_add` and `inplace_xor`
+   have been renamed to `expression` and `target_var` respectively.
+    - In Native Qmod, use `+=` and `^=` instead of `inplace_add` and `inplace_xor`
+      respectively.
+
+## Classiq IDE
+
+1. Qmod examples on the Model page now contain direct links to their respective tutorials in the Classiq documentation. Simply hover over an algorithm list item from the QMODs list in the left panel and a tooltip will appear with link to the relevant tutorial.
+
+### New Visualization:
+
+1. Captured variables are now shown as uninitialized.
+
+</Update>
+
+<Update label="0.61.0" description="2024-12-10">
+
+## Enhancements
+
+1. Add a demonstration of the Decoded Quantum Interferometry (DQI) algorithm. See [notebook](/explore/algorithms/search_and_optimization/dqi/dqi_max_xorsat/).
+
+## Bug Fixes
+
+1. Operands' list elements can be used as operands (in expressions such as,
+   e.g., `[op_list[0]]`).
+
+## Interface Changes
+
+1. Add the function `qsvt_lcu` for efficiently encoding QSVT polynomials with indefinite parity.
+2. Subsequent invocations to execution primitives inside `ExecutionSession` now use different random seeds (depending on the initial seed) to avoid getting the exact same simulation results inside a session.
+
+## Classiq IDE
+
+### New Visualization:
+
+1. Clean up variable names in engine blocks.
+
+</Update>
+
+<Update label="0.60.0" description="2024-11-28">
+
+## Interface Changes
+
+1. `ExecutionSession` needs now to be explicitly closed, and it is recommended
+   to use it as a context manager. See [here](/user-guide/execution/ExecutionSession) for more information.
+
+## Classiq IDE
+
+1. Credentials for Alice & Bob hardware are now optional. Quantum programs run on Alice & Bob backends will use Classiq's credentials by default.
+
+</Update>
+
+<Update label="0.59.0" description="2024-11-25">
+
+## Enhancements
+
+1. Allow different parts of a quantum struct or array to be passed in different
+   sections of a quantum statement:
+
+    [comment]: DO_NOT_TEST
+
+    ```python
+    @qfunc
+    def main() -> None:
+        qbv = QArray("qbv")
+        allocate(2, qbv)
+        # The following line previously raised an exception, but is now valid
+        control(qbv[0], lambda: H(qbv[1]))
+    ```
+
+## Deprecations
+
+1. Using `control` as a keyword parameter for standard gates (such as `CX`) is
+   no longer supported. Use `ctrl` instead.
+
+</Update>
+
+<Update label="0.58.1" description="2024-11-21">
+
+## Bug Fixes
+
+1. Fix package dependencies.
+
+</Update>
+
+<Update label="0.58.0" description="2024-11-18">
+
+## Enhancements
+
+1. This release introduces a new version to the Quantum Program (QP) visualization tool in parallel to the legacy visualization.
+2. The new visualization version offers advanced visualization capabilities that bridge high-level algorithmic descriptions (Qmod) with gate-level implementations, incorporating interactive hierarchical views and data flow analysis.
+
+### Feature Details
+
+#### Visualization Versions:
+
+Both the new version and the legacy version are available on the Quantum Program page.
+Users can toggle between two visualization versions:
+
+-   'New' version: Advanced visualization that includes quantum data flow views and new hierarchical block structures.
+-   'Basic' version: Legacy visualization.
+
+#### Documentation & Support:
+
+[Initial documentation](/user-guide/analysis/visualization-of-quantum-programs) : A basic guide is available to help users navigate and utilize the visualization tool’s key features.
+
+Tooltip: Integrated to the QP page to provide in-line initial guidance on key functions and elements.
+
+#### Known Issues and Limitations:
+
+Supported models: The 'New' visualization doesn't yet support all models. Unsupported models may not render - in these cases it is suggested to switch back to the 'Basic' visualization.
+
+In-Progress development: This is part of an initial release milestone, with major issues being actively addressed.
+
+#### Usage Recommendations
+
+Switching between versions: It’s recommended to switch between the 'New' and 'Basic' versions to evaluate visualization consistency and effectiveness for specific quantum programs.
+
+Feedback and bug reporting: Any issues, inconsistencies, or suggested improvements should be reported through the designated Slack channel for prompt review.
+
+#### Next Steps
+
+User feedback will inform ongoing improvements and prepare the tool for broader production release. Further enhancements and bug fixes are planned in alignment with Classiq’s high-level quantum design roadmap.
+
+</Update>
+
+<Update label="0.57.0" description="2024-11-11">
+
+## Bug Fixes
+
+1. Fix walkthrough bug in the IDE.
+2. Change the default value of display_url in show(circuit, display_url) to True.
+
+</Update>
+
+<Update label="0.56.1" description="2024-11-05">
+
+## Bug Fixes
+
+Fix a bug causing execution failures on IBM in version 0.56.0.
+
+</Update>
+
+<Update label="0.56.0" description="2024-10-31">
+
+## Interface Changes
+
+1. Added an optional `else` block to the `control` statement.
+
+## Bug Fixes
+
+1. Fix Pauli feature map circuit visualization.
+2. Add missing `len` property to `QConstant`s of type `CArray` (Qmod/Python).
+
+</Update>
+
+<Update label="0.55.0" description="2024-10-28">
+
+## Enhancements
+
+1. Qmod/Python: Functions `assign`, `assign_amplitude`, `inplace_xor`, and
+   `inplace_add` are equivalent to the operators `|=`, `*=`, `^=`, and `+=`
+   respectively except that they can be used in operands (Python lambda
+   functions):
+
+[comment]: DO_NOT_TEST
+
+    ```python
+    within(
+        lambda: assign(x, y),  # y |= x
+        lambda: inplace_xor(y, z),  # z ^= y
+    )
+    ```
+
+2. Support non-equation Boolean expressions as control conditions:
+
+<Tabs>
+<Tab title="SDK">
+
+[comment]: DO_NOT_TEST
+``` python
+@qfunc
+def main(a: Output[QBit], b: Output[QBit], res: Output[QBit]) -> None:
+    allocate(1, a)
+    allocate(1, b)
+    allocate(1, res)
+    control(a & b, lambda: X(res))
+```
+</Tab>
+<Tab title="Native">
+
+```
+qfunc main(output a: qbit, output b: qbit, output res: qbit) {
+  allocate(1, a);
+  allocate(1, b);
+  allocate(1, res);
+  control (a & b) {
+    X(res);
+  }
+}
+```
+</Tab>
+</Tabs>
+
+## Interface Changes
+
+1. Parameters `value` and `target` of functions `inplace_add` and `inplace_xor`
+   have been renamed to `expression` and `target_var` respectively.
+   Parameters `value` and `target` will no longer be supported starting on
+   02/12/24 at the earliest.
+
+## Bug Fixes
+
+1. Solve a within-apply bug.
+
+</Update>
+
+<Update label="0.54.0" description="2024-10-21">
+
+## Deprecations
+
+1. Python 3.8 is no longer supported in the Python SDK. The minimum supported
+   version is now Python 3.9.
+
+## Enhancements
+
+1. Optimize in-place XOR variable assignments (`x ^= y`).
+   (The implementation no longer uses auxiliary qubits.)
+2. Improve error messages in `CArray` (array) parameter declaration.
+3. Support array subscripts and struct field access on the left-hand side of
+   in-place arithmetic assignments (`qbv[0] ^= 1` and `my_Struct.field += 2.5`).
+4. Optimize the controlled version of QFT arithmetic implementations by skipping
+   controlling the QFT and QFT dagger.
+
+</Update>
+
+<Update label="0.53.0" description="2024-10-14">
+
+## Enhancements
+
+1. Introducing generative functions
+   to the Python SDK. Generative functions are `@qfunc`s that support Python
+   control flow, integration with third-party libraries, and debugging.
+2. Execution using IBM devices is available again.
+3. New method `estimation_cost` in `ExecutionSession` evaluates a quantum
+   circuit given a classical cost function.
+4. A new `+=` operator performs
+<Card title="in-place addition" href="/qmod-reference/language-reference/statements/assignment" />
+   of quantum numerics.<br/>Example: `z += x ** 2 - 0.5 * y`
+5. The state of `SampledState` supports dot-notation for field access when
+   representing a quantum struct:
+
+    [comment]: DO_NOT_TEST
+    ```python
+    struct_sample = sample.state["my_qstruct"]
+    field_sample = struct_sample.my_field
+    ```
+6. Add a new example for hybrid classical-quantum neural network. See [notebook](/explore/algorithms/QML/hybrid_qnn/hybrid_qnn_for_subset_majority#example-hybrid-neural-network-for-the-subset-majority-function).
+
+## Interface Changes
+
+1. Parameter `control` of built-in functions such as `CX` has been renamed to
+   `ctrl`. Parameter `control` will no longer be supported starting on 4/11/24
+   at the earliest.
+2. Add two new functions for encoding classical data, `encode_in_angle` and `encode_on_bloch`. See [notebook](/explore/functions/qmod_library_reference/classiq_open_library/variational_data_encoding/variational_data_encoding/).
+
+## Bug Fixes
+
+1. Fix classical array slicing in the SDK (`my_list[1:3][0]`).
+2. Fix synthesis of arithmetic operations nested in a within-apply statement
+   when `machine_precision` is set.
+3. Fix in-place arithmetic operations (`^=`/`+=`) when the value on the
+   right-hand side is a signed variable that is not aligned with the target
+   variable.
+
+</Update>
+
+<Update label="0.52.0" description="2024-10-02">
+
+## Enhancements
+
+1. Optimize synthesis of variable and constant assignments (`x ^= y`, `x += 3`).
+2. The behavior of synthesis with [`debug_mode`](/user-guide/synthesis/preferences?h=debug_mo#toggling-quantum-program-debug-information)
+   set to `False` has been changed, such that synthesis process is up to 50% faster. However,
+   the resulting visualized quantum program may lose much of its hierarchical structure.
+   Note that the default value for debug_mode is still `True`, and this mode's behavior remains unchanged.
+3. The maximum number of shots in a single execution on Nvidia simulators has
+   been increased to 1,000,000.
+
+## Bug Fixes
+
+1. Improve circuit width estimation when `machine_precision` is set.
+2. Removing the non-gate-based devices from the available AWS Bracket devices.
+3. Fix `n ^= 1` assignments where `n` has a single qubit
+   (used to raise an exception).
+
+## Notice
+
+-   With the release of this version (`0.52.0`),
+    execution with older SDK versions may result in errors or unexpected behavior.
+    To ensure proper execution of your quantum programs via the SDK,
+    please upgrade to the latest version (See instructions guide above).
+
+-   The `Pydantic` package dependency has been upgraded from version 1 to version 2.
+    If you are using an older version of `Pydantic` in the same environment as our SDK,
+    this may lead to compatibility issues.
+    Note that installing or upgrading the SDK will also update your `Pydantic` version to V2.
+    It is recommended to verify compatibility across your environment.
+
+</Update>
+
+<Update label="0.51.1" description="2024-09-30">
+
+## Bug Fixes
+
+1. Allow the sign qubit of a quantum numeric variable to overlap the fraction
+   digits (e.g., `qnum[1, SIGNED, 1]`).
+
+</Update>
+
+<Update label="0.51.0" description="2024-09-29">
+
+## Notice
+
+-   With the release of version `0.52` (scheduled for the week of 06-12.10.2024),
+    execution with older SDK versions might result in errors or unexpected behavior.
+    In order to make sure executions of your quantum programs via the SDK work properly
+    upgrade your SDK to the latest version (See instructions guide above).
+
+## Enhancements
+
+1. Improve qubit reuse in arithmetic operations when `machine_precision` is set.
+2. Improve error messages when executing circuits on Amazon Braket.
+3. Improve error messages when executing the VQE primitive.
+4. Support constant assignments: `x |= 3`, `x ^= 3`, and `x += 3`.
+
+## Bug Fixes
+
+1. Fix in-place XOR assignments (`^=`) of 1-qubit expressions into multi-qubit
+   variables (used to raise an error).
+
+## Interface Changes
+
+1. Add a new function, `quantum_program_from_qasm`, to convert a QASM string into a Quantum Program.
+
+</Update>
+
+<Update label="0.50.0" description="2024-09-23">
+
+## Notice
+
+-   With the release of version `0.52` (scheduled for the week of 06-12.10.2024),
+    execution with older SDK versions might result in errors or unexpected behavior.
+    In order to make sure executions of your quantum programs via the SDK work properly
+    upgrade your SDK to the latest version (See instructions guide above).
+
+</Update>
+
+<Update label="0.49.0" description="2024-09-16">
+
+## Notice
+
+-   With the release of version `0.52` (scheduled for the week of 06-12.10.2024),
+    execution with older SDK versions might result in errors or unexpected behavior.
+    In order to make sure executions of your quantum programs via the SDK work properly
+    upgrade your SDK to the latest version (See instructions guide above).
+
+## Bug Fixes
+
+1. Raise indicative error when circuit cannot be visualized.
+2. Fixed synthesis of arithmetic operations nested in a within-apply statement
+   when `machine_precision` is set.
+
+</Update>
+
+<Update label="0.48.0" description="2024-09-10">
+
+## Enhancements
+
+1. Improved error messages.
+2. Added `SIGNED` and `UNSIGNED` built-in constants to improve readability of
+   QNum types. SDK: `QNum[4, SIGNED, 1]`. Native: `qnum&lt;4, SIGNED, 1>`.
+3. `QNum` types can specify just the size property. SDK: `QNum[4]` and
+   `QNum("n", 4)`. Native: `qnum&lt;4>`. Such types are unsigned
+   (`is_signed=False`) integers (`fraction_digits=0`) by default.
+4. Execution on remote providers is no longer subject to any time limit when using `ExecutionSession`
+   or executing models without classical execution code. Note: simulation on Classiq backends is still subject to time limit.
+5. In-place add operations (`inplace_add`) now support signed variables.
+6. Added a new notebook for solving the Differential equation using the HHL Algorithm, to simulate war games.
+
+## Bug Fixes
+
+1. Fixed an operand-related bug. Might occur when calling a function recursively
+   in one of its operands (for example: `foo(lambda: foo(...))`).
+2. Fixed an expression-related bug. Might occur when using the same variable
+   in multiple expressions.
+3. Fixed in-place XOR operations (`^=` / `inplace_xor`) in the presence of
+   signed variables. The sign variable is now interpreted as part of the
+   significand without special treatment.
+4. Fixed synthesis of arithmetic operations nested in a within-apply statement.
+
+## Interface Changes
+
+1. SDK: Deprecated parameter names in built-in operations were removed.
+    - `control(ctrl=..., operand=...)` => `control(ctrl=..., stmt_block=...)`
+    - `within_apply(compute=..., action=...)` => `within_apply(within=..., apply=...)`
+    - `power(power=..., operand=...)` => `power(exponent=..., stmt_block=...)`
+    - `invert(operand=)` => `invert(stmt_block=...)`
+
+
+</Update>
+
+<Update label="0.47.0" description="2024-09-02">
+
+## Enhancements
+
+1. Cancelling an execution job will now result in cancellation of any ongoing jobs sent to the provider during the execution. For more information, see [Cancellation](/user-guide/execution/index#cancellation).
+2. The Classiq SDK now supports Python 3.12.
+3. Added a new tutorial on the Oblivious Amplitude Amplification algorithm.
+
+</Update>
+
+<Update label="0.46.0" description="2024-08-21">
+
+## Enhancements
+
+1. Improve synthesis performance in unconstrained large models by lowering circuit width via qubit recycling.
+
+## Deprecations
+
+1. The Classiq SDK will drop support for Python 3.8 near its end-of-life on October 2024.
+
+</Update>
+
+<Update label="0.45.1" description="2024-08-14">
+
+## Bug Fixes
+
+1. Fixed nested quantum struct bug.
+
+</Update>
+
+<Update label="0.45.0" description="2024-08-12">
+
+## Enhancements
+
+1. Add `size` attribute to quantum variables:
+
+<Tabs>
+<Tab title="SDK">
+
+[comment]: DO_NOT_TEST
+``` python
+@qfunc
+def main(my_struct: Output[MyStruct]) -> None:
+    allocate(my_struct.size, my_struct)
+```
+</Tab>
+<Tab title="Native">
+
+```
+qfunc main(output my_struct: MyStruct) {
+  allocate(my_struct.size, my_struct);
+}
+```
+</Tab>
+</Tabs>
+
+</Update>
+
+<Update label="0.44.0" description="2024-08-04">
+
+## Bug Fixes
+
+1. Fixed a bug related to boolean arithmetic expressions with invert.
+2. Fixed a bug related to arithmetic expressions inside within-apply.
+
+## Classiq IDE
+
+1. Add back improved circuit nodes search.
+2. Fix bug in Quantum Program page .qprog file extensions uploads.
+3. Poll all active jobs in the job list, not just the selected job.
+4. Add support for Alice & Bob hardware configurations in the IDE.
+
+## Enhancements
+
+1. Add support for arithmetic boolean expressions as conditionals for control statements;
+   see [here](/qmod-reference/language-reference/statements/control/).
+2. Add quantum structs.
+3. The element type of quantum arrays can be any quantum type. N-dimensional quantum arrays are supported.
+4. Operand parameter names are optional in both Native
+   (`qfunc (indicator: qbit)` -> `qfunc (qbit)`) and Python
+   (`QCallable[QBit]` -> `QCallable[Annotated[QBit, "indicator"]]`) Qmod.
+5. Improve error messages.
+6. Provide better circuits for certain boolean arithmetic expressions.
+7. Improved qubit reuse and runtime performance for model without constraints.
+8. Add `solovay_kitaev_max_iterations` field to the synthesis preferences,
+   allowing for tuning the accuracy of the Solovay-Kitaev algorithm.
+9. Built-in classical functions to decompose/compose a matrix into/from a Hamiltonian. Example of usage:
+
+<Tabs>
+<Tab title="SDK">
+
+[comment]: DO_NOT_TEST
+
+``` python
+mat = np.array([[0, 1, 2, 3], [1, 4, 5, 6], [2, 5, 7, 8], [3, 6, 8, 9]])
+hamiltonian = matrix_to_hamiltonian(mat)
+mat = hamiltonian_to_matrix(hamiltonian)
+```
+</Tab>
+</Tabs>
+
+10. parsed_states, parsed_counts, parsed_state_vector will contain the parsed execution details as lists if a quantum array was used in the model.
+
+<Tabs>
+<Tab title="SDK">
+
+[comment]: DO_NOT_TEST
+``` python
+@qfunc
+def main(qna: Output[QArray[QNum[3, True, 0]]]) -> None:
+    allocate(6, qna)
+    hadamard_transform(qna)
+
+qp = synthesize(create_model(main))
+res = execute(qp).result()
+print(res[0].value.parsed_counts[0])
+```
+</Tab>
+</Tabs>
+
+previously this would print -> state=\{\{'qna': 43\}\} shots=27
+now it prints -> state=\{\{'qna': [-2, 3]\}\} shots=27
+
+11. Added a new tutorial on Hamiltonian simulation for block-encoded Hamiltonians, using QSVT and Qubitization.
+12. Added a new tutorial on solving the discrete Poisson's equation using the HHL algorithm, combined with quantum sine and cosine transforms; see [here](/explore/algorithms/quantum_differential_equations_solvers/discrete_poisson_solver/discrete_poisson_solver/).
+13. Enhanced the Discrete logarithm example to the case where the order is not a power of 2; see [here](/explore/algorithms/number_theory_and_cryptography/discrete_log/discrete_log/).
+14. Updated the [Quantum Types](/qmod-reference/language-reference/quantum-types/) documentation page.
+
+## Interface Changes
+
+1. Some builtin operations parameters have been renamed:
+    - `control(ctrl=..., operand=...)` => `control(ctrl=..., stmt_block=...)`
+    - `within_apply(compute=..., action=...)` => `within_apply(within=..., apply=...)`
+    - `power(power=..., operand=...)` => `power(exponent=..., stmt_block=...)`
+    - `invert(operand=)` => `invert(stmt_block=...)`
+2. Added new state preparation functions: `prepare_unifrom_trimmed_state` and `prepare_unifrom_interval_state`; see [here](/explore/functions/qmod_library_reference/classiq_open_library/special_state_preparations/prepare_partial_uniform_state/).
+
+## Deprecations
+
+1. SDK: The `@struct` decorator has been removed. Define classical structs
+   using `@dataclass`.
+2. The field `variance` in `EstimationResult` is deprecated, and will be
+   populated with the value `-1` until removed.
+3. The field `timeout_sec` in `ExecutionPreferences`, and the field
+   `job_timeout` in `AwsBackendPreferences`, have been removed.
+4. classical arguments in the native language are now inside the parentheses
+   section (`(...)`) alongside quantum variables
+   and not inside the angle brackets (`<...>`), the angle brackets section is
+   now considered deprecated.
+   For example, you should
+   migrate: `qfunc <a: real> main{...}` -> `qfunc main(a: real) {...}`
+   for info refer to the language reference about functions.
+   A Warning was added to the IDE in the case it is used.
+
+</Update>
+
+<Update label="0.43.3" description="2024-07-28">
+
+## Enhancements
+
+-   Error mitigation can now be enabled or disabled for IonQ through Azure in the SDK. Default is set to False.
+
+</Update>
+
+<Update label="0.43.2" description="2024-07-21">
+
+## Classiq IDE
+
+1. Fix infinite loop bug in Quantum Program page.
+2. Fix Quantum Program deletion bug on Quantum Program page.
+
+</Update>
+
+<Update label="0.43.1" description="2024-07-14">
+
+## Bug Fixes
+
+1. Fixed a bug related to nested control operations.
+
+## Classiq IDE
+
+1. Fix bug in .qprog files upload on Quantum Program page.
+2. New Quantum Program export option: Quantum programs can now be exported as .qprog files.
+
+</Update>
+
+<Update label="0.43.0" description="2024-07-07">
+
+## Enhancements
+
+1. Support signed quantum numerics in in-place-xor assignments (`^=`).
+2. Support quantum array subscripts in quantum expressions.
+3. Support quantum numeric arrays.
+4. Improve synthesis performance.
+5. Apply an automatic qubit reuse pass when the model is unconstrained.
+6. Add user-defined enums.
+7. Added a new technology demonstration notebook for a discrete quantum walk on a circle; see [here](/explore/tutorials/technology_demonstrations/discrete_quantum_walk_circle/discrete_quantum_walk_circle/).
+8. Added new rainbow options pricing notebooks in the public repository research folder.
+
+<Tabs>
+<Tab title="Python">
+[comment]: DO_NOT_TEST
+
+  ```python
+  @qfunc
+  def main(res: Output[QBit]) -> None:
+      allocate(1, res)
+      qnv: QArray = QArray("qnv", element_type=QNum[2, False, 0])  # quantum numeric array
+      allocate(6, qnv)
+      repeat(qnv.len, lambda i: inplace_prepare_int(i + 1, qnv[i]))
+      res ^= qnv[0] + qnv[1] == qnv[2]  # array subscripts in expressions
+  ```
+</Tab>
+<Tab title="Native">
+
+  ```
+  qfunc main(output res: qbit) {
+    allocate<1>(res);
+    qnv: qnum<2, False, 0>[]; // quantum numeric array
+    allocate<6>(qnv);
+    repeat (i: qnv.len) { inplace_prepare_int<i + 1>(qnv[i]); }
+    res ^= qnv[0] + qnv[1] == qnv[2];  // array subscripts in expressions
+  }
+  ```
+</Tab>
+</Tabs>
+
+## Interface Changes
+
+1. The classical scope in Qmod no longer supports function definitions.
+2. The `aer_simulator`, `aer_simulator_statevector`, `aer_simulator_density_matrix`, and `aer_simulator_matrix_product_state` Classiq backends are no longer accessible in the SDK. Use `simulator`, `simulator_statevector`, `simulator_density_matrix`, and `simulator_matrix_product_state` instead.
+3. The `@struct` decorator is deprecated and will be removed in a future
+   release. Use `@dataclass` instead.
+
+## Bug Fixes
+
+1. Fixed a bug where multiple in-place assignment statements resulted in a `22102` error.
+2. Fixed a bug where using the same variable in `control` operation for both the control operation and the body resulted in a non-indicative error.
+3. Fix `invert` and `within-apply` variable initialization tracking in native
+   Qmod.
+4. Fix division with classical symbolic variables.
+5. Fix rogue comma inserted to the chemistry model classical execution code
+   after IDE form update.
+6. Fix reporting uninitialized quantum variables in arithmetic expressions as
+   undefined.
+7. Fix double execution on devices requiring access tokens.
+8. Fix execution configuration being applied only to the first selected device, when one of the selected devices requires an access token.
+9. Fix a bug where Grover circuit was incorrect when reflecting about states different than uniform superposition.
+10. Fix a synthesis bug that could appear in models that constrain the width and optimize depth or vice versa.
+
+## Classiq IDE
+
+1. Graphical Model tab redesign of nodes (Function call, Output, Assignment).
+2. Restructure of node categories (Graphical Model).
+3. Fix countries list not loading sometimes during registration.
+4. Prevent Qmod editor from crashing when compiler crashes.
+5. Redesigned the Accordion and Icon status for jobs.
+6. Quantum Program tabs moved to the left drawer.
+7. Uploading Quantum Program can now be done using the Upload button on the left drawer.
+8. 3 newly introduced tabs of Quantum Program data: Transpiled Info, Program Info, Data.
+
+
+</Update>
+
+<Update label="0.42.1" description="2024-06-30">
+
+## Enhancements
+
+-   Add direct links of all examples from the documentation to Classiq's library and IDE.
+
+## Bug Fixes
+
+-   fixed broken links.
+
+</Update>
+
+<Update label="0.42.0" description="2024-06-23">
+
+## Enhancements
+
+1. HHL workshop was added to the public repository and to the User Guide.
+2. It is now possible to use the execution primitives `estimate` and `vqe` with models
+   with multiple output ports. The hamiltonian should match all the output ports
+   by their order.
+3. Amplitude encoding assignments (`ind *= foo(n)`) support all quantum numeric
+   variables, not only unsigned fractions.
+4. Add support for lookup tables in amplitude encoding assignments, e.g.,
+   `ind *= [0, 0.5, 0.5, 1][n]` where `n` is an unsigned quantum integer
+   (`ind *= subscript([0, 0.5, 0.5, 1], n)` in the SDK).
+5. A quantum COSINE and SINE transforms of types I and II were added to the open library,
+   see [Quantum COSINE and SINE Transforms](/explore/functions/qmod_library_reference/classiq_open_library/qct_qst/qct_qst.ipynb).
+6. New algorithm was added to the library: "Variational Quantum Linear Solver (VQLS) with Linear Combination of Unitaries (LCU) Block Encoding"
+<Card title="Variational Quantum Linear Solver" href="/explore/algorithms/quantum_linear_solvers/vqls/vqls_with_lcu/" />
+7. `Alice & Bob` provider is now accessible.
+
+## Interface Changes
+
+1. `compute_qaoa_initial_point` is now exposed in the SDK directly from `classiq` package.
+   `from classiq import compute_qaoa_initial_point`
+2. The examples in IDE Flow page are replaced with a new arithmetics example.
+
+## Bug Fixes
+
+1. Fixed an error related to the translation of certain circuits between synthesis and execution.
+2. Fixed an error when calling a function with local variables multiple times.
+3. Properly evaluate type attributes in `main`.
+    - Native Qmod: `qnum`'s sign field can be specified with lowercase
+      `true`/`false` in `main`'s signature.
+4. Fix execution results received from running on Amazon Braket to be correct
+   when the measured outputs are not all of the variables of the model.
+5. Improve language error reporting.
+
+## Classiq IDE
+
+1. Uniform drawer width for all pages
+2. New way to trigger node options context menu on Graphical Model page: node options menu can now be triggered by right-clicking a selected node
+
+</Update>
+
+<Update label="0.41.2" description="2024-06-16">
+
+## Enhancements
+
+-   Performance of synthesis has been improved, most significantly for synthesis requests
+    with no constraints.
+
+</Update>
+
+<Update label="0.41.1" description="2024-06-09">
+
+## Enhancements
+
+-   Add `execution request` and `execution results` to reference manual in the documentation
+
+## Bug Fixes
+
+-   Fix broken links in documentation
+
+</Update>
+
+<Update label="0.41.0" description="2024-06-02">
+
+## Enhancements
+
+1. [Hardware-aware synthesis](/user-guide/synthesis/hardware-aware-synthesis)
+   will now use the Solovay-Kitaev algorithm to approximate
+   single-qubit gates when the basis gate set is a specific variation of
+   Clifford + T (`X`, `Z`, `H`, `T`, `CX`, and `CCX`).
+2. `qsvt` function was added to the function library.
+   See [Quantum Singular Value Transformation](/explore/functions/qmod_library_reference/classiq_open_library/qsvt/qsvt.ipynb).
+3. A tutorial on discrete quantum walks was added to the tutorials library.
+   See [Discrete Quantum Walk](/explore/tutorials/advanced_tutorials/discrete_quantum_walk/discrete_quantum_walk.ipynb).
+4. SDK: Quantum functions (`@qfunc`) can be recursive.
+5. SDK: PauliTerm can be used to declare a hamiltonian.
+
+[comment]: DO_NOT_TEST
+
+    ```python
+    hamiltonian = [
+        PauliTerm(pauli=[Pauli.I], coefficient=1),
+        PauliTerm(pauli=[Pauli.Z, Pauli.X], coefficient=2),
+    ]
+    ```
+6. Introducing **ExecutionSession** which will allow choosing the execution
+   primitive in the SDK
+   without the need of changing/synthesizing the quantum program once again.
+
+[comment]: DO_NOT_TEST
+
+    ```python
+    model = create_model(main)
+    qprog = synthesize(model)
+    preferences = ExecutionPreferences(num_shots=1200)
+    execution_session = ExecutionSession(qprog, preferences)
+
+    # if the quantum program does not need any execution paramters:
+    execution_session.sample()
+
+    # if the quantum program needs execution parameters:
+    execution_session.sample({"phi": 1})
+
+    # if multiple samples are needed:
+    execution_session.batch_sample([{"phi": 1}, {"phi": 2}, {"phi": 3}])
+
+    # if an estimation is needed without execution parameters:
+    hamiltonian = [
+        PauliTerm(pauli=[Pauli.I], coefficient=1),
+        PauliTerm(pauli=[Pauli.Z], coefficient=2),
+    ]
+    execution_parameters.estimate(hamiltonian)
+
+    # if an estimation is needed with execution paramters:
+    execution_parameters.estimate(hamiltonian, {"theta": 1})
+
+    # if multiple estimations are needed:
+    execution_parameters.batch_estimate(hamiltonian, [{"theta": 1}, {"theta": 2}])
+    ```
+
+7. A Qmod library reference, with usage examples for built-in and open library functions, can now be found in
+   [the function menu](/explore/functions/index).
+
+## Interface Changes
+
+1. SDK: In `execute_qnn`, the optional argument `observables` of type `PauliOperators`
+   has been replaced with the optional argument `observable` of type `PauliOperator`.
+
+## Deprecations
+
+1. SDK: The `quantum_if` operation and the old `control` syntax have been
+   removed.
+
+-   `quantum_if` is removed. Use `control` instead.
+-   `control(operand, ctrl)` is no longer supported. Use
+    `control(ctrl, operand)` instead.
+-   `control(n, operand)` does not support quantum numeric variables (`n`).
+    Instead, use a `bind` operation to cast `n` into a quantum array, or
+    compare `n` to an integer explicitly (e.g., `n == 7`).
+
+2. SDK: The `QParam` type has been removed.
+
+-   Instead of `QParam[int]`, use `CInt`.
+-   Instead of `QParam[float]`, use `CReal`.
+-   Instead of `QParam[bool]`, use `CBool`.
+-   Instead of `QParam[List[...]]`, use `CArray[...]`.
+-   Instead of `QParam[Array[..., size]]`, use `CArray[..., size]`.
+
+3. Native Qmod: Accessing quantum variable properties (e.g., `qbv.len` or
+   `n.is_signed`) via function call syntax (`len(qbv)`, `is_signed(qbv)`) is no
+   longer supported.
+
+4. The field `optimizer_preferences` of `ExecutionPreferences` has been removed.
+
+5. The function `set_initial_values` has been removed.
+
+## Classiq IDE
+
+1. "Slack" and "Learn More" links were moved from the side drawer to the IDE
+   header. New links were added as well: Community, User Guide.
+2. Allow visualization of larger circuits and prolong the timeout for
+   visualization
+3. Users can now download a LaTeX format of their quantum programs directly from
+   the IDE, allowing for easy sharing, publication, and presentation of their
+   work.
+
+    ![plot](/release-notes/resources/images/collage-circuit-latex.jpg)
+
+4. Cookies settings are now available to adjust the given consent at any time.
+
+## Bug Fixes
+
+1. "selected example not found" error when opening the IDE
+2. Resetting now clears preferences form instead of initializing from cache on
+   the model page
+3. Naming for exported files on the Graphical Editor
+4. State vector measurement results ordering
+5. Parameter names in lambda expressions don't have to match the
+   parameter names in operand declarations:
+
+<Tabs>
+<Tab title="Python">
+
+[comment]: DO_NOT_TEST
+
+  ```python
+  @qfunc
+  def my_H(qb: QBit) -> None:
+      H(qb)
+
+
+  ...
+  apply_to_all(my_H, qba)  # used to throw an error since "qb" != "target"
+  ```
+</Tab>
+<Tab title="Native">
+
+  ```
+  qfunc my_H(qb: qbit) {
+      H(qb);
+  }
+  ...
+  apply_to_all<my_H>(qba); // used to throw an error since "qb" != "target"
+  ```
+</Tab>
+</Tabs>
+
+</Update>
+
+<Update label="0.40.0" description="2024-05-26">
+
+## Interface Changes
+
+1. The `control` and `quantum_if` statements have been unified into one
+   statement in native Qmod and the SDK under the name `control`.
+    - SDK: The unified `control` statement accepts a qbit (`q`), a q-array
+      (`qbv`), or a comparison of a qnum and an integer (`n == 5`) as the
+      first argument.
+    - SDK: The old `control` syntax (with `ctrl` as the second argument) is
+      deprecated and will be removed in the next release.
+    - SDK: The `quantum_if` operator is deprecated and will be removed in the
+      next release.
+    - Native Qmod: `quantum_if` is no longer supported, use the new `control`
+      statement instead.
+2. SDK: The `QParam` and `Array` types are deprecated and will be
+   removed in the next release.
+    - Instead of `QParam[int]`, use `CInt`.
+    - Instead of `QParam[float]`, use `CReal`.
+    - Instead of `QParam[bool]`, use `CBool`.
+    - Instead of `QParam[List[...]]`, use `CArray[...]`.
+    - Instead of `QParam[Array[..., size]]`, use `CArray[..., size]`.
+3. SDK: Using Python types (`int`, `bool`, etc.) in struct declarations
+   (`@struct`) is deprecated and will not be supported by the next release.
+   Instead, use classical data types (`CInt`, `CBool`, etc., see above).
+4. Default timeout for sending jobs to AWS changed from 5 minutes to 4 hours.
+
+## Deprecations
+
+1. The error mitigation settings in the execution preferences are no longer
+   available.
+2. The `aer_simulator` backend has been removed. Use Classiq's simulator backend
+   instead (`ClassiqSimulatorBackendNames.SIMULATOR`).
+
+## Enhancements
+
+1. Improved error messages.
+
+## Bug Fixes
+
+1. Fixed a bug preventing execution of circuits synthesized with hardware aware synthesis on Azure and IonQ.
+
+</Update>
+
+<Update label="0.39.0" description="2024-05-19">
+
+## Enhancements
+
+1. Improved the native Qmod syntax of the `repeat`, `if` statements.
+   For details, see [Classical Control Flow](/qmod-reference/language-reference/statements/classical-control-flow).
+2. Improved the native Qmod syntax of the `control`, `power`, and `invert` statements.
+   For details, see [Quantum Operators](/qmod-reference/language-reference/operators).
+3. Added the `classiq.execution.all_hardware_devices.get_all_hardware_devices`
+   function to the Python SDK.
+
+## Deprecations
+
+1. In the SDK, the `classiq.analyzer.analyzer.Analyzer.get_available_devices` method is
+   deprecated. Use `classiq.execution.all_hardware_devices.get_all_hardware_devices`
+   instead.
+
+## Interface Changes
+
+1. The `len` method for `QArray`, `QCallableList`, and `QParam` of lists, is now a property.
+   use `.len` instead of `.len()`.
+
+</Update>
+
+<Update label="0.38.0" description="2024-05-12">
+
+## Overview
+
+Release 0.38 achieves a major milestone in the migration to the new Qmod language. The following general changes are now in effect:
+
+1. In the IDE, Synthesis page is now removed. Writing and synthesizing models is now done exclusively in the Model page.
+2. All pre-defined models previously available in the Synthesis page in Json format are now available in the Model page in native Qmod syntax.
+3. Many Qmod language enhancements were introduced to enable the coding of all available models and applications, in both native Qmod and in its Python embedding (see detailed list below).
+4. A new Qmod reference manual, covering all the language concepts and constructs in both input formats, is available [Qmod-language-reference](/qmod-reference/language-reference/index).
+5. Documentation content covering old input formats - the Json input and the old SDK classes - has been removed
+
+## Enhancements
+
+1. Native Qmod now supports classical POD struct declaration, initialization, and member access.
+2. Native Qmod now supports within-apply statements.
+3. Native Qmod now supports generalized in-place quantum assignment.
+4. Native Qmod now supports global constants.
+
+## Interface Changes
+
+1. The `QStruct` decorator was renamed to `struct` in the `qmod`-python integration.
+2. The `qfunc` decorator is renamed to `quantum_function`. The newer `QFunc` and `ExternalQFunc` decorator are now available as `qfunc` and `qfunc(external=True)`. Using either classes as a decorator is deprecated, and this feature may be removed in a future release.
+3. Similarly, a new `cfunc` decorator is now available, and using the class `CFunc` as a decorator is deprecated and may be removed in the future.
+4. Renamed `GeneratedCircuit` to `QuantumProgram` in the SDK.
+5. The `QNum` type does not accept size argument without sign and fraction digits.
+6. `QNum` on the right-hand side of `bind` statements must have sign and fraction digits (inferred from initialization or declaration).
+7. The Following async methods were removed from `Analyzer` class (The documented methods without the `async` suffix are still available and can be used instead):
+    1. `get_available_devices_async`
+    2. `analyzer_app_async`
+    3. `plot_hardware_connectivity_async`
+    4. `get_hardware_comparison_table_async`
+8. The method `show_multiple_hardware_data` was removed from `RBAnalysis` class. The async equivalent `show_multiple_hardware_data_async` can be used instead.
+9. Removed `reinterpret_num` operation (instead use `QNum`/`allocate_num` arguments).
+10. Removed `split` and `join` operation (instead use `bind` operation).
+11. Added method `parsed_counts_of_outputs` to sample's result in the Python SDK; see [sample](/user-guide/execution/sample).
+12. Constants can now be used in the `qmod`-python integration with the `QConstant` class.
+13. The quantum numeric type can now receive sign and fraction digits as type arguments in parameter declarations, in both the SDK and native Qmod.
+    - Native Qmod example: `qnum&lt;5, True, 2>` to indicate a 5-bit signed number with 2 fraction digits.
+    - SDK examples:
+        - `QNum[5, True, 2]` to indicate a 5-bit signed number with 2 fraction digits (as a function argument)
+        - `QNum("x", 5, True, 2)` to indicate a 5-bit signed number with 2 fraction digits (as a local variable)
+14. The amplitude encoding flavor of quantum arithmetic (`*=` operator) is now an in-place operation in both the SDK and native Qmod.
+
+</Update>

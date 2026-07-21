@@ -1,0 +1,131 @@
+---
+title: "Arithmetic Expressions"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/arithmetic_expressions/arithmetic_expressions.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This tutorial demonstrates automatic arithmetic operation management by the synthesis engine. It synthesizes a complex arithmetic expression, where uncomputation procedure, together with initialization and reuse of auxiliary qubits, are all automated.
+
+Given different **global** width or depth constraints results in different circuits.
+
+Define a quantum model that applies some quantum arithmetic operation on `QNum` variables.
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import max
+
+
+@qfunc
+def main(x: Output[QNum], y: Output[QNum], z: Output[QNum]):
+    allocate(2, x)
+    allocate(1, y)
+    hadamard_transform(x)
+    hadamard_transform(y)
+    z |= (2 * x + y + max(3 * y, 2)) > 4
+```
+
+You can try different optimization scenarios, below we introduce two examples:
+
+1. Optimizing over depth and constraining the maximal width to 10 qubits.
+1. Optimizing over depth and constraining the maximal width to 12 qubits.
+
+Optimizing over depth and constraining the maximal width to 10 qubits
+
+```python
+NUM_QUBITS_1 = 10
+qprog_1 = synthesize(
+    main,
+    constraints=Constraints(optimization_parameter="depth", max_width=NUM_QUBITS_1),
+)
+show(qprog_1)
+sample(qprog_1)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3DcBR5bi1Kg3ZdQpUAakewAKcSh
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/6c500169-a27b-4b80-863f-be1996c1c08c
+  
+
+```
+</Info>
+
+|   | x | y | z | counts | probability | bitstring |
+| - | - | - | - | ------ | ----------- | --------- |
+| 0 | 3 | 0 | 1 | 275    | 0.134277    | 1011      |
+| 1 | 1 | 1 | 1 | 274    | 0.133789    | 1101      |
+| 2 | 3 | 1 | 1 | 261    | 0.127441    | 1111      |
+| 3 | 0 | 1 | 0 | 255    | 0.124512    | 0100      |
+| 4 | 2 | 0 | 1 | 253    | 0.123535    | 1010      |
+| 5 | 2 | 1 | 1 | 252    | 0.123047    | 1110      |
+| 6 | 0 | 0 | 0 | 242    | 0.118164    | 0000      |
+| 7 | 1 | 0 | 0 | 236    | 0.115234    | 0001      |
+
+Change the quantum model constraint to treat the second scenario for optimizing over depth and constraining the maximal width to 12 qubits:
+
+```python
+NUM_QUBITS_2 = 12
+qprog_2 = synthesize(
+    main,
+    constraints=Constraints(optimization_parameter="depth", max_width=NUM_QUBITS_2),
+)
+show(qprog_2)
+sample(qprog_2)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3DcBe5FXGO6GThlRywJnBjDrEma
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/7eafa5de-83a2-460a-ace2-e2e7332600a6
+  
+
+```
+</Info>
+
+|   | x | y | z | counts | probability | bitstring |
+| - | - | - | - | ------ | ----------- | --------- |
+| 0 | 2 | 0 | 1 | 271    | 0.132324    | 1010      |
+| 1 | 0 | 1 | 0 | 266    | 0.129883    | 0100      |
+| 2 | 0 | 0 | 0 | 260    | 0.126953    | 0000      |
+| 3 | 3 | 1 | 1 | 258    | 0.125977    | 1111      |
+| 4 | 1 | 0 | 0 | 254    | 0.124023    | 0001      |
+| 5 | 1 | 1 | 1 | 254    | 0.124023    | 1101      |
+| 6 | 2 | 1 | 1 | 245    | 0.119629    | 1110      |
+| 7 | 3 | 0 | 1 | 240    | 0.117188    | 1011      |

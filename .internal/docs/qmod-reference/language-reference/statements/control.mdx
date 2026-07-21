@@ -1,0 +1,354 @@
+---
+title: "Control"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+The _control_ statement applies a unitary operation conditionally, depending on a quantum state,
+and optionally a different one if the condition doesn't hold.
+The unitary operations are specified as nested statement blocks.
+The objects used in the statement blocks become entangled with the object used in the condition,
+so that any superposition in the state of the condition carries over to the operations in the statement blocks.
+The control statement could be viewed as the quantum equivalent of the classical _if_ statement,
+with a _then_ block and an optional _else_ block.
+
+The condition can be specified in one of two forms: as a single quantum variable, and as
+a quantum logical expression.
+
+## Syntax
+
+<Tabs>
+<Tab title="Python">
+
+[comment]: DO_NOT_TEST
+```python
+def control(
+    ctrl: Union[SymbolicExpr, QBit, QArray[QBit]],
+    stmt_block: Union[QCallable, Callable[[], None]],
+    else_block: Union[QCallable, Callable[[], None], None] = None,
+) -> None:
+    pass
+```
+</Tab>
+<Tab title="Native">
+
+**control** **(** _ctrl-var_ **)** **&#123;** _statements_ **&#125;** [**else** **&#123;** _else-statements_ **&#125;**]
+
+**control** **(** _ctrl-expression_ **)** **&#123;** _statements_ **&#125;** [**else** **&#123;** _else-statements_ **&#125;**]
+</Tab>
+</Tabs>
+
+## Semantics
+
+-   _ctrl-var_ (in the first variant) is a quantum variable of type `qbit` or `qbit[]`, and
+    _ctrl-expression_ (in the second variant) is a logical expression over a quantum variable.
+-   The statement block is applied if all the qubits in _ctrl_ are in state $|1\rangle$ (in the
+    first variant), or if the _ctrl-expression_ evaluates to `true` (in the second variant).
+-   else-statements block is optional, and is applied if the negation of the condition holds,
+    that is, if at least one of the qubits in ctrl is in state $|0\rangle$ (in the first variant),
+    or if the ctrl-expression evaluates to False (in the second variant).
+-   Currently, there exists a single limitation on the expression: if _ctrl-expression_ is an equality between a single
+    variable and a classical expression, it is restricted to integers, meaning:
+    In a _ctrl-expression_ of the form `<var> == <classical-expression>`, `<var>` should be a `qnum` with zero fraction
+    places or a `qbit`, and `<classical-expression>` should evaluate to an integer.
+-   The same variable cannot occur both in the condition and inside the statement block. This
+    restriction applies also to mutually exclusive slices of the same variable.
+-   Quantum variables declared outside the _control_ statement and used in its condition or
+    inside its nested block must be initialized prior to it and remain initialized subsequently.
+-   Quantum variables declared inside the _control_ statement, including in
+    nested function calls, must be uninitialized at the end of the statement.
+
+## Examples
+
+### Example 1: Single-qubit control
+
+In the following example, `control` statement applies function `X` on the variable `target`
+conditioned on a single qubit variable `qb`. Note that this is equivalent to using the
+built-in gate-level function `CX`.
+
+<Tabs>
+<Tab title="Python">
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(target: Output[QBit], ctrl: Output[QBit]):
+    allocate(ctrl)
+    H(ctrl)
+    allocate(target)
+    control(ctrl, lambda: X(target))
+```
+</Tab>
+<Tab title="Native">
+
+```
+qfunc main(output target: qbit, output ctrl: qbit) {
+  allocate(ctrl);
+  H(ctrl);
+  allocate(target);
+  control (ctrl) {
+    X(target);
+  }
+}
+```
+</Tab>
+</Tabs>
+
+Synthesizing this model creates the quantum program shown below.
+
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_single_qubit_bright.png"
+  alt="visualization of the single-qubit control example bright"
+  className="block dark:hidden"
+/>
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_single_qubit.png"
+  alt="visualization of the single-qubit control example dark"
+  className="hidden dark:block"
+/>
+
+### Example 2: Multi-qubit control
+
+The next example shows how `control` can be similarly used with multi-qubit control
+variable. In this case `target` is rotated when the state of `qba` is the bit string 111.
+
+<Tabs>
+<Tab title="Python">
+
+```python
+from classiq.qmod.symbolic import pi
+from classiq import *
+
+
+@qfunc
+def main(target: Output[QBit], ctrl: Output[QArray[QBit]]):
+    allocate(3, ctrl)
+    hadamard_transform(ctrl)
+    allocate(target)
+    control(ctrl, lambda: RX(pi / 2, target))
+```
+</Tab>
+<Tab title="Native">
+
+```
+qfunc main(output target: qbit, output ctrl: qbit[]) {
+  allocate(3, ctrl);
+  hadamard_transform(ctrl);
+  allocate(target);
+  control (ctrl) {
+    RX(pi / 2, target);
+  }
+}
+```
+</Tab>
+</Tabs>
+
+Synthesizing this model creates the quantum program shown below.
+
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_multi_qubit_bright.png"
+  alt="visualization of the multi-qubit control example bright"
+  className="block dark:hidden"
+/>
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_multi_qubit.png"
+  alt="visualization of the multi-qubit control example dark"
+  className="hidden dark:block"
+/>
+
+### Example 3: Numeric equality condition
+
+The following example demonstrates the use of `control` to rotate the state of a qubit
+by an angle determined by another quantum variable. In this case the condition compares
+the quantum variable with the repeat index.
+
+<Tabs>
+<Tab title="Python">
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def switch_rx(x: QNum, target: QBit):
+    repeat(4, lambda i: control(x == i, lambda: RX(pi / 2**i, target)))
+
+
+@qfunc
+def main(res: Output[QBit]):
+    allocate(res)
+    x = QNum()
+    allocate(2, x)
+    hadamard_transform(x)
+    switch_rx(x, res)
+    drop(x)
+```
+</Tab>
+<Tab title="Native">
+
+```
+qfunc switch_rx(x: qnum, target: qbit) {
+  repeat (i: 4) {
+    control (x == i) {
+      RX(pi / (2 ** i), target);
+    }
+  }
+}
+
+qfunc main(output res: qbit) {
+  allocate(res);
+  x: qnum;
+  allocate(2, x);
+  hadamard_transform(x);
+  switch_rx(x, res);
+  drop(x);
+}
+```
+</Tab>
+</Tabs>
+
+Synthesizing this model creates the following quantum program. Note how `control`
+is implemented as positive and negative controls in the respective numeric qubits.
+
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_value_bright.png"
+  alt="visualization of the control by numeric value example bright"
+  className="block dark:hidden w-3/5 h-auto"
+/>
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_value_dark.png"
+  alt="visualization of the control by numeric value example dark"
+  className="hidden dark:block w-3/5 h-auto"
+/>
+
+### Example 4: Arithmetic condition
+
+The following example demonstrates the use of `control` to rotate the state of a qubit
+according to a condition imposed by another two quantum variables, `x` and `y`. Here, the condition
+filters quantum states such that `y &lt;= x[0] + x[1] + x[2]`.
+
+<Tabs>
+<Tab title="Python">
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def conditional_rx(x: QArray[QBit], y: QNum, target: QBit):
+    control(x[0] + x[1] + x[2] >= y, lambda: RX(pi / 3, target))
+
+
+@qfunc
+def main(res: Output[QBit]):
+    allocate(res)
+    x: QArray = QArray("x", QBit, 3)
+    y: QNum = QNum("y", 3, UNSIGNED, 0)
+    allocate(x)
+    allocate(y)
+    hadamard_transform(x)
+    hadamard_transform(y)
+    conditional_rx(x, y, res)
+    drop(x)
+    drop(y)
+```
+</Tab>
+<Tab title="Native">
+
+```
+qfunc conditional_rx(x: qbit[], y: qnum, target: qbit) {
+  control (y <= ((x[0] + x[1]) + x[2])) {
+    RX(pi / 3, target);
+  }
+}
+
+qfunc main(output res: qbit) {
+  allocate(res);
+  x: qbit[3];
+  y: qnum<3, UNSIGNED, 0>;
+  allocate(x);
+  allocate(y);
+  hadamard_transform(x);
+  hadamard_transform(y);
+  conditional_rx(x, y, res);
+  drop(x);
+  drop(y);
+}
+```
+</Tab>
+</Tabs>
+
+Synthesizing this model creates the following quantum program. Note how `control`
+is implemented as a result of an arithmetic computation. After applying the `control` operation,
+the arithmetic operation is uncomputed.
+
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_arithmetic_bright.png"
+  alt="visualization of the arithmetic condition example bright"
+  className="block dark:hidden"
+/>
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_arithmetic.png"
+  alt="visualization of the arithmetic condition example dark"
+  className="hidden dark:block"
+/>
+
+
+### Example 5: Control else
+
+The following example demonstrates the use of the `else` block in the `control` statement.
+In this case, the `else` block applies an 'H' gate on the target qubit when the control
+condition is not met, instead of the 'X' gate,
+so when each qubit of the control variable is in state $|1\rangle$, the bit is flipped,
+otherwise, the Hadamard gate is applied.
+
+<Tabs>
+<Tab title="Python">
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QBit], ctrl: Output[QArray[QBit]]):
+    allocate(2, ctrl)
+    hadamard_transform(ctrl)
+    allocate(x)
+    control(ctrl, lambda: X(x), lambda: H(x))
+```
+</Tab>
+<Tab title="Native">
+
+```
+qfunc main(output x: qbit, output ctrl: qbit[]) {
+  allocate(2, ctrl);
+  hadamard_transform(ctrl);
+  allocate(x);
+  control (ctrl) {
+    X(x);
+  } else {
+    H(x);
+  }
+}
+```
+</Tab>
+</Tabs>
+
+Synthesizing this model creates the following quantum program. Note how the `else` block
+is implemented as a negation of the control condition, and the negation is uncomputed after
+the `control` operation of the else block.
+
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_else_bright.png"
+  alt="visualization of the control else example bright"
+  className="block dark:hidden"
+/>
+<img
+  src="/qmod-reference/language-reference/statements/resources/control_else.png"
+  alt="visualization of the control else example dark"
+  className="hidden dark:block"
+/>

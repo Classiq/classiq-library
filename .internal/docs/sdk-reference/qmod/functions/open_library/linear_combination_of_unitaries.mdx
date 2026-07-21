@@ -1,0 +1,110 @@
+---
+title: Linear Combination Of Unitaries
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `lcu` | [Qmod Classiq-library function]. |
+| `lcu_pauli` | [Qmod Classiq-library function]. |
+| `prepare_select` | [Qmod Classiq-library function]. |
+
+
+### lcu
+
+
+<pre><code>lcu(
+    coefficients: list[float],
+    unitaries: QCallableList,
+    block: QNum[Literal[&#x27;max(ceiling(log(coefficients.len, 2)), 1)&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Implements a general linear combination of unitaries (LCU) procedure. The algorithm prepares a superposition
+over the `unitaries` according to the given `coefficients`, and then conditionally applies each unitary controlled by the `block`.
+
+The operation is of the form:
+
+$$\sum_j \alpha_j U_j$$
+
+where $U_j$ is a unitary operation applied to `data`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `coefficients` | `list[float]` | L1-normalized array of $\\{ \alpha_j \\}$ of the LCU coefficients. | *required* |
+| `unitaries` | `QCallableList` | A list of quantum callable functions to be applied conditionally. | *required* |
+| `block` | `QNum[Literal['max(ceiling(log(coefficients.len, 2)), 1)']]` | Quantum variable that holds the superposition index used for conditional application of each unitary. | *required* |
+
+
+
+### lcu_pauli
+
+
+<pre><code>lcu_pauli(
+    operator: SparsePauliOp,
+    data: QArray[QBit, Literal[&#x27;operator.num_qubits&#x27;]],
+    block: QNum[Literal[&#x27;max(ceiling(log(operator.terms.len, 2)), 1)&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies a linear combination of unitaries (LCU) where each unitary is a Pauli term,
+represented as a tensor product of Pauli operators. The function prepares a superposition
+over the unitaries according to the given magnitudes and phases, and applies the corresponding
+Pauli operators conditionally.
+
+This is useful for implementing Hamiltonian terms of the form:
+
+$$H=\sum_j \alpha_j P_j$$
+
+where $P_j$ is a tensor product of Pauli operators.
+
+The SELECT operator (`_select_paulis`) loads each data qubit's Pauli column from the
+`block` index using gray-code uniformly-controlled RZ/RY rotations; the resulting
+per-term phases are folded into the coefficients so that the single phase table inside
+`prepare_select` corrects them together with the coefficient signs/phases.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `operator` | `SparsePauliOp` | Operator consists of pauli strings with their coefficients, represented in a sparse format. | *required* |
+| `data` | `QArray[QBit, Literal['operator.num_qubits']]` | Quantum Variable on which the Pauli operators act. Its size must match the number of qubits required by the Pauli operator. | *required* |
+| `block` | `QNum[Literal['max(ceiling(log(operator.terms.len, 2)), 1)']]` | Quantum variable that holds the superposition index used for conditional application of each term. | *required* |
+
+
+
+### prepare_select
+
+
+<pre><code>prepare_select(
+    coefficients: list[float],
+    select: QCallable[QNum],
+    block: QNum[Literal[&#x27;max(ceiling(log(coefficients.len, 2)), 1)&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the 'Prepare-Select' scheme used for Linear Combination of Unitaries (LCU).
+Compared to the `lcu` function, here the Select operator should be provided directly, allowing to take advantage of some structure for
+the unitaries of the LCU.
+The select operator is defined by: $\mathrm\{SELECT\} = \sum_\{j=0\}^\{m-1\} |j\rangle\!\langle j|_\{block\} \otimes U_j$.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `coefficients` | `list[float]` | L1-normalized array of $\\{ \alpha_j \\}$ of the LCU coefficients. | *required* |
+| `select` | `QCallable[QNum]` | A quantum callable to be applied between the state preparation and its inverse. Its input is the `block` variable, labeling the index of the unitaries in the LCU. | *required* |
+| `block` | `QNum[Literal['max(ceiling(log(coefficients.len, 2)), 1)']]` | A Quantum variable that holds the index used as input for the 'select' operator. | *required* |

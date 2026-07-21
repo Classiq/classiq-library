@@ -1,0 +1,716 @@
+---
+title: "Quantum Oracles Workshop"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/workshops/oracle_workshop/oracles_workshop.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+**Welcome to the Classiq Workshop for Quantum Oracles!**
+
+In this notebook, you will cover hands-on examples and exercises of the following topics:
+
+- Defining Quantum Oracles using arithmetics in Classiq
+- Phase Kickback and Phase encoding
+- A first example: The Deutsch-Jozsa Algorithm
+- Unstructured search: Grover's Algorithm
+
+**For each exercise, complete the code in the #TODO sections correctly.
+
+You can find the complete solutions at the end of this notebook.**
+
+Additional resources you should use:
+
+- [Classiq documentation](https://docs.classiq.io/latest/)
+- The Classiq [GitHub repository](https://github.com/Classiq/classiq-library/tree/main/community)
+- The [community Slack of Classiq](https://short.classiq.io/join-slack) - you can ask any question you have over here
+
+**Good luck!**
+
+## Quantum Arithmetics: The Oracle
+
+In quantum computing, an oracle is a method used to encode information about a function without revealing its explicit form. An oracle is also known as a black box and plays a crucial role in many quantum algorithms, such as the Deutsch-Jozsa algorithm and Grover's search algorithm.
+
+The oracle can be thought of as a tool that, when given a specific input, produces an output according to an unknown function $f(x)$.
+
+How is it possible to construct and design an oracle for a quantum algorithm? In general, an oracle is represented by a unitary operator $U_f$.
+
+This operator acts on a quantum state to evaluate a binary function $f(x)$.
+
+For example, in the context of Grover's and Deutsch-Jozsa algorithm, the oracle $U_f$ takes the action $U_f|x\rangle |y\rangle = |x\rangle |y\oplus f(x)\rangle$.
+
+The $\oplus$ represents the XOR operation:
+
+- $x \oplus y$ equals to $0$ if $x=y$;
+- $x \oplus y$ equals to $1$ if $x\neq y$.
+
+![Oracle\_fig](https://docs.classiq.io/resources/oracle_workshop.png)
+
+The quantum oracles are developed in order to entangle the $x$ and $y$ qubits according to a set of rules in a particular way we want to.
+
+Classiq provides a distinctive and efficient approach to working with oracles, which are defined through arithmetic expressions.
+
+Starting with a simple example, we create an oracle for a binary function $f(x,y)$ that follows the arithmetic expression:
+
+## Quantum oracles and arithmetics: A simple example
+
+$$
+ \begin{cases}
+    f(x,y) = 1,\text{ if }(2\cdot x+y =4)\\
+     f(x,y) = 0,\text{ else }
+\end{cases}
+$$
+
+with $x\in\{0,1\}$ and $y\in\{0,1,2,3\}$. We first define a quantum function that implements the arithmetic operation described above:
+
+```python
+from classiq import *
+```
+```python
+
+@qfunc
+def oracle(x: QNum, y: QNum, z: QBit):
+    z ^= 2 * x + y == 4
+```
+- The `^=` expression represents an in-place XOR operation between the `z` qubit on the left-hand side and the right-hand side expression, assigning the result to the qubit `z`. A short explanation of this concept can be found [here](https://docs.classiq.io/latest/explore/functions/function_usage_examples/arithmetic/bitwise_xor/bitwise_xor_example/).
+
+- Therefore, `z ^= 2*x + y == 4` means that we are doing an XOR operation that follows the rule `2*x + y == 4`, assigning the result to `z` (in-place).
+
+Now, let's see how this looks when evaluating this oracle over all possible values of `x` and `y`:
+
+```python
+@qfunc
+def main(x: Output[QNum], y: Output[QNum], z: Output[QBit]):
+    # Allocating qubits for the x, y, and z variables
+    allocate(1, x)
+    allocate(2, y)
+    allocate(z)
+    hadamard_transform(x)
+    hadamard_transform(y)
+    # calling the oracle
+    oracle(x, y, z)
+```
+```python
+
+# Synthesizing your model and visualizing it
+qprog_oracle = synthesize(main)
+show(qprog_oracle)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/36W8qce6Bvdm4BdlW5gIUNkm6kk
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/36W8qce6Bvdm4BdlW5gIUNkm6kk?login=True&version=15
+  
+
+```
+</Info>
+
+## Quantum oracles and arithmetics: Phase Kickback
+
+Every quantum algorithm can be decomposed into three key steps: 1) Encoding the data, 2) Manipulating the data, and 3) Extracting the result. In the current class, we are studying the first step, where the data is loaded into the quantum computer.
+
+For the second step, the phase kickback is a powerful technique in data manipulation, facilitating the extraction of desired results and allowing more freedom in data encoding techniques.
+
+Phase kickback deals with kicking the result of a function to the phase of a quantum state so it can be smartly manipulated with constructive and destructive interferences.
+
+The standard way to apply a classical, binary, function $f: \{0, 1\}^n \to \{0, 1\}$ on quantum states is by using the oracle with digital encoding by performing:
+
+$$
+O_f |x\rangle_n |y\rangle = |x\rangle_n |y\oplus f(x)\rangle.
+$$
+The phase kickback takes the oracle $O_f$ and performs the action
+
+$$
+|x\rangle \to (-1)^{f(x)}|x\rangle.
+$$
+The circuit that applies the Phase Kickback to a quantum Oracle $O$ is of the following form:
+
+![Oracle\_fig](https://docs.classiq.io/resources/phase_kickback_workshop.png)
+
+#
+
+## Exercise: Phase Kickback
+
+Apply the phase Kickback to the oracle given in the first example and execute it using the statevector simulator.
+
+```python
+# TODO Write your phase kickback primitive.
+# TODO Try to write your code by first declaring an auxilliary qubit and making use of the `within-apply statement
+# TODO And then try to use the more efficient method making use of the `control` and `phase` statements
+
+
+from classiq.qmod.symbolic import pi
+
+# TODO Write any functions you may need to implement the phase-kickback primitive
+
+
+@qfunc
+def main(x: Output[QNum], y: Output[QNum]):
+    # Allocating qubits for the x, y variables
+    allocate(1, x)
+    allocate(2, y)
+    # TODO: implement the phase-kickback procedure
+
+
+qprog_phase_kickback = synthesize(main)
+show(qprog_phase_kickback)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/36W8r6tJJDeek4w5ODJMuoNzxUn
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/36W8r6tJJDeek4w5ODJMuoNzxUn?login=True&version=15
+  
+
+```
+</Info>
+
+```python
+# TODO use this code to execute your code on the statevector simulator and check that you received the correct answer
+
+import numpy as np
+
+backend_prefs = ClassiqBackendPreferences(
+    backend_name=ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR
+)
+exec_prefs = ExecutionPreferences(num_shots=1, backend_preferences=backend_prefs)
+
+with ExecutionSession(qprog_phase_kickback, execution_preferences=exec_prefs) as es:
+    res = es.sample()
+
+# ---
+
+- Cleaning up results: keeping only (x,y), dropping ancillas ---
+
+-
+DATA_BITS = 3  # y (2 qubits) + x (1 qubit)
+
+rows = []
+for st in res.parsed_state_vector:
+    bstr = st.bitstring
+    if set(bstr[:-DATA_BITS]) == {"0"}:  # ancilla must be |0⟩
+        y = int(bstr[-3:-1], 2)
+        x = int(bstr[-1], 2)
+        amp = st.amplitude
+        mag = abs(amp)
+        angle_pi = np.angle(amp) / np.pi  # angle in units of π
+        note = "  ← solution" if (2 * x + y == 4) else ""
+        rows.append((x, y, mag, angle_pi, note))
+
+rows.sort(key=lambda r: (r[0], r[1]))
+
+print("x  y   |amp|      angle/π   note")
+print("----------------------------------")
+for x, y, mag, ang, note in rows:
+    print(f"{x}  {y}   {mag:.3f}     {ang:+.2f}π   {note}")
+```
+<Info>
+  **Output:**
+
+  
+
+```
+x  y   |amp|      angle/π   note
+  ---------------------------------
+
+-
+  
+
+```
+</Info>
+
+## Quantum oracles and arithmetics: The Deutsch-Jozsa Algorithm
+
+Deutch-Jozsa algorithm is a seminal quantum algorithm, well-known for its exponential speed-up over classical algorithms to identify if a binary function is either constant or balanced.
+
+Given a binary function $f$, assumed to be either constant or balanced, the Deutsch-Jozsa algorithm requires only one evaluation to assert this, while a classical algorithm would require up to $2^{n-1} +1$ evaluations of the oracle.
+
+![Oracle\_fig](https://docs.classiq.io/resources/dj_workshop.png)
+
+#
+
+## Deutsch-Jozsa Algorithm Exercise:
+
+In this exercise, we will use the Deutsch-Jozsa algorithm to check if the following function is balanced.
+
+![Oracle\_table](https://docs.classiq.io/resources/Oracle_table.png)
+
+<Accordion title="How do we build the oracle for the function displayed in the table?">
+  The function $f(x)$ assumes its value as $1$ only when the integer value of $| x \rangle$ is even.
+
+This is equivalent to the condition that the LSB must be 0 to have a phase flip.
+</Accordion>
+
+We can thus set the rule for the oracle of $f(x)$: Everytime the integer value of the qubit $| x \rangle$ is divisible by $2$, $f$ will output $1$. In other words, the oracle for this function should flip the phases of the even integers. In this case we can cleverly construct such an oracle, but it is not always an easy task to build it.
+
+Once you have found the arithmetic expression for the oracle, it is possible to construct this algorithm with only a few lines of code; the synthesis engine handles the hard work (and can optimize for circuit depth or width):
+
+When implementing the Deutsch-Jozsa algorithm below, use the new phase and control statements elegant implementation method:
+
+```python
+@qfunc
+def main(x: Output[QNum]):
+    allocate(3, x)
+    # TODO: Employ the Deutsch-Jozsa algorithm, using the phase and control method (a within apply can and should be used for the Hadamard transforms)
+```
+```python
+
+qprog_deutsch_jozsa = synthesize(main)
+show(qprog_deutsch_jozsa)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/36W8rYSwSdnzCGT3ylg9xek8mYQ
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/36W8rYSwSdnzCGT3ylg9xek8mYQ?login=True&version=15
+  
+
+```
+</Info>
+
+```python
+# TODO: Refer to the Deutsch-Jozsa class notebook to help you write a classical post-processing part,
+```
+
+## Quantum oracles and arithmetics: The Grover Algorithm
+
+Grover's algorithm is a quantum search algorithm, well-known for its ability to search an unsorted database or solve the "unstructured search problem" quadratically faster than any classical counterpart.
+
+Given an unsorted list of $N$ elements and a search condition, Grover's algorithm's task is to find the input that satisfies the condition. To achieve this, the algorithm uses an oracle associated to a function $f(x)$, which evaluates to 1 if $x$ is the desired element and 0 otherwise. Grover's algorithm performs about $\sqrt N$ iterations, each one applying a Grover operator that flips the phase of the marked state and then amplifies its amplitude.
+
+Repeating this process gradually boosts the marked state's amplitude until it becomes highly probable upon measurement.
+
+While a classical computer would require $O(N)$ queries to search a database of $N$ items, Grover's algorithm achieves this in $O(\sqrt N)$ queries, demonstrating the advantage of quantum parallelism and the effects of quantum interference.
+
+![Oracle\_fig](https://docs.classiq.io/resources/grovers_workshop.png)
+
+#
+
+## Grover's Algorithm Exercise:
+
+In this exercise, we will use the Grover algorithm to solve the following equation:
+
+$$
+    x - y = 2
+
+$$
+For this exercise, begin by defining the oracle ${O}$. First, create a `QStruct` that contains the two `QNum` variables, `x` and `y`:
+
+```python
+class Variables(QStruct):
+    x: QNum[2, False, 0]
+    y: QNum[2, False, 0]
+
+
+@qperm
+def quantum_oracle(vars: Const[Variables], z: QNum):
+    # TODO: Change this placeholder function to define the quantum oracle in terms of vars.x, vars.y, and z
+    z ^= 1
+```
+
+Next,  incorporate the quantum oracle into the `grover_search` function that automatically implements the Grover operator iterations:
+
+```python
+@qfunc
+def main(vars: Output[Variables]):
+    allocate(vars.size, vars)
+    # TODO: Fill the `grover_search` function below with the phase kickback applied to the oracle you have built.
+    # You can do this by using the built-in function phase_oracle,
+    grover_search(
+        reps=5,  # TODO: Change the number of repetitions to the correct optimal number
+        oracle=lambda vars: phase_oracle(
+            quantum_oracle, vars
+        ),  # Here we leverage the built-in phase_oracle, only having to specify the oracle while the framework takes care of the surrounding setup (you may change it)
+        packed_vars=vars,
+    )
+```
+```python
+
+# Printing the results to check that the algorithm
+qprog_grover = synthesize(main)
+show(qprog_grover)
+res = execute(qprog_grover).result()
+counts = res[0].value.parsed_counts
+counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/36W8rvARvlLxoqOoo0d4nvnbnyD
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/36W8rvARvlLxoqOoo0d4nvnbnyD?login=True&version=15
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[{'vars': {'x': 3, 'y': 2}}: 159,
+   {'vars': {'x': 2, 'y': 2}}: 141,
+   {'vars': {'x': 0, 'y': 0}}: 140,
+   {'vars': {'x': 2, 'y': 1}}: 136,
+   {'vars': {'x': 0, 'y': 2}}: 135,
+   {'vars': {'x': 3, 'y': 1}}: 132,
+   {'vars': {'x': 1, 'y': 3}}: 130,
+   {'vars': {'x': 3, 'y': 0}}: 128,
+   {'vars': {'x': 0, 'y': 1}}: 126,
+   {'vars': {'x': 0, 'y': 3}}: 123,
+   {'vars': {'x': 2, 'y': 0}}: 121,
+   {'vars': {'x': 1, 'y': 0}}: 121,
+   {'vars': {'x': 1, 'y': 1}}: 119,
+   {'vars': {'x': 1, 'y': 2}}: 116,
+   {'vars': {'x': 3, 'y': 3}}: 116,
+   {'vars': {'x': 2, 'y': 3}}: 105]
+  
+
+```
+</Info>
+
+Try to also write the Grover algorithm with the new phase and control method (not making use of the built in phase\_oracle function)!
+
+## Solutions
+
+#
+
+## Phase Kickback:
+
+#
+
+### Elegant method (Phase and Control)
+
+```python
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(x: Output[QNum], y: Output[QNum]):
+    # Allocating qubits for the x, y, and z variables
+    allocate(1, x)
+    allocate(2, y)
+    # Performing Hadamard transform over all qubits
+    hadamard_transform(x)
+    hadamard_transform(y)
+    # Using control and phase together to efficiently flip the phases
+    control(2 * x + y == 4, lambda: phase(pi))
+
+
+qprog_phase_kickback = synthesize(main)
+show(qprog_phase_kickback)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/36W8sVtISZDLFmmvGSNgzIaJHgC
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/36W8sVtISZDLFmmvGSNgzIaJHgC?login=True&version=15
+  
+
+```
+</Info>
+
+```python
+import numpy as np
+
+backend_prefs = ClassiqBackendPreferences(
+    backend_name=ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR
+)
+exec_prefs = ExecutionPreferences(num_shots=1, backend_preferences=backend_prefs)
+
+with ExecutionSession(qprog_phase_kickback, execution_preferences=exec_prefs) as es:
+    res = es.sample()
+
+# ---
+
+- Cleaning up results: keeping only (x,y), dropping ancillas ---
+
+-
+DATA_BITS = 3  # y (2 qubits) + x (1 qubit)
+
+rows = []
+for st in res.parsed_state_vector:
+    bstr = st.bitstring
+    if set(bstr[:-DATA_BITS]) == {"0"}:  # ancilla must be |0⟩
+        y = int(bstr[-3:-1], 2)
+        x = int(bstr[-1], 2)
+        amp = st.amplitude
+        mag = abs(amp)
+        angle_pi = np.angle(amp) / np.pi  # angle in units of π
+        note = "  ← solution" if (2 * x + y == 4) else ""
+        rows.append((x, y, mag, angle_pi, note))
+
+rows.sort(key=lambda r: (r[0], r[1]))
+
+print("x  y   |amp|      angle/π   note")
+print("----------------------------------")
+for x, y, mag, ang, note in rows:
+    print(f"{x}  {y}   {mag:.3f}     {ang:+.2f}π   {note}")
+```
+<Info>
+  **Output:**
+
+  
+
+```
+x  y   |amp|      angle/π   note
+  ----------------------------------
+  0  0   0.354     +0.12π   
+  0  1   0.354     +0.12π   
+  0  2   0.354     +0.12π   
+  0  3   0.354     +0.12π   
+  1  0   0.354     +0.12π   
+  1  1   0.354     +0.12π   
+  1  2   0.354     -0.88π     ← solution
+  1  3   0.354     +0.12π
+  
+
+```
+</Info>
+
+#
+
+## Deutsch-Jozsa (only new elegant method):
+
+```python
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(x: Output[QNum]):
+    allocate(3, x)
+    # Employing the Deutsch-Jozsa algorithm, using the oracle we built previouvsly.
+    within_apply(
+        lambda: hadamard_transform(x), lambda: control(x % 2 == 0, lambda: phase(pi))
+    )
+
+
+qprog_deutsch_jozsa = synthesize(main)
+show(qprog_deutsch_jozsa)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/36W8tGMR2neVUPl3uke3oc0IcZf
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/36W8tGMR2neVUPl3uke3oc0IcZf?login=True&version=15
+  
+
+```
+</Info>
+
+```python
+# Outputting whether the function is constant or balanced:
+
+
+def post_process_deutsch_jozsa(parsed_results):
+    if len(parsed_results) == 1:
+        if 0 not in parsed_results:
+            print("The function is balanced")
+        else:
+            print("The function is constant")
+    else:
+        print(
+            "cannot decide as more than one output was measured, the distribution is:",
+            parsed_results,
+        )
+
+
+result = execute(qprog_deutsch_jozsa).result_value()
+results_list = [sample.state["x"] for sample in result.parsed_counts]
+post_process_deutsch_jozsa(results_list)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+The function is balanced
+  
+
+```
+</Info>
+
+#
+
+## Grover's Algorithm:
+
+#
+
+### Regular Method:
+
+```python
+class Variables(QStruct):
+    x: QNum[2, False, 0]
+    y: QNum[2, False, 0]
+
+
+@qperm
+def quantum_oracle(vars: Const[Variables], z: QNum):
+    z ^= vars.x - vars.y == 2
+```
+```python
+
+@qfunc
+def main(vars: Output[Variables]):
+    allocate(vars.size, vars)
+
+    grover_search(
+        reps=2,
+        oracle=lambda vars: phase_oracle(quantum_oracle, vars),
+        packed_vars=vars,
+    )
+```
+```python
+
+qprog_grover = synthesize(main)
+show(qprog_grover)
+res = execute(qprog_grover).result()
+counts = res[0].value.parsed_counts
+counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/36W8u1HMOOLX47QslFlC2ZPREvc
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/36W8u1HMOOLX47QslFlC2ZPREvc?login=True&version=15
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[{'vars': {'x': 2, 'y': 0}}: 983,
+   {'vars': {'x': 3, 'y': 1}}: 961,
+   {'vars': {'x': 0, 'y': 0}}: 11,
+   {'vars': {'x': 3, 'y': 3}}: 11,
+   {'vars': {'x': 0, 'y': 1}}: 11,
+   {'vars': {'x': 1, 'y': 1}}: 10,
+   {'vars': {'x': 0, 'y': 3}}: 9,
+   {'vars': {'x': 0, 'y': 2}}: 8,
+   {'vars': {'x': 1, 'y': 3}}: 7,
+   {'vars': {'x': 2, 'y': 3}}: 7,
+   {'vars': {'x': 3, 'y': 2}}: 6,
+   {'vars': {'x': 1, 'y': 2}}: 6,
+   {'vars': {'x': 1, 'y': 0}}: 5,
+   {'vars': {'x': 2, 'y': 1}}: 5,
+   {'vars': {'x': 3, 'y': 0}}: 4,
+   {'vars': {'x': 2, 'y': 2}}: 4]
+  
+
+```
+</Info>

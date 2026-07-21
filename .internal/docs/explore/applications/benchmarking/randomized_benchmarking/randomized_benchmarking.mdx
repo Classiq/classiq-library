@@ -1,0 +1,194 @@
+---
+title: "Randomized Benchmarking"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/benchmarking/randomized_benchmarking/randomized_benchmarking.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook explains how to perform a full, end-to-end, randomized benchmarking (RB) experiment using the Classiq platform.
+
+The notebook is divided into several parts describing the different steps of the workflow: model definition, synthesis, execution, and analysis.
+
+## 1) Model Definition
+
+Start by defining the model, then the high-level function and its constraints:
+
+a) Define the number of qubits and number of cliffords that will define each benchmark model.
+
+b) Define hardware settings for the problem.
+
+Set transpilation preferences to None, to avoid gate cancellation.
+
+c) Define the clifford gates and how to apply them.
+
+d) Create a set of models for the RB, where  num\_of\_qubits determines the width and num\_of\_cliffords determines the depth.
+
+For each model draw a random choice of Clifford gates.
+
+```python
+import random
+from functools import partial
+
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+# a) Parameter definitions
+num_of_qubits = 1
+numbers_of_cliffords = [5, 10, 15, 20, 25]
+
+# b) Hardware definitions
+hw_basis_gates = ["id", "rz", "sx", "x", "cx"]
+hw_settings = CustomHardwareSettings(basis_gates=hw_basis_gates)
+preferences = Preferences(
+    custom_hardware_settings=hw_settings, transpilation_option="none"
+)
+
+# c) Gates defenition, theta is chosen to be pi for it to be a clifford gate
+clifford_gates_map = {
+    "id": I,
+    "x": X,
+    "y": Y,
+    "z": Z,
+    "rx": partial(RX, theta=pi),
+    "ry": partial(RY, theta=pi),
+    "rz": partial(RZ, theta=pi),
+    "h": H,
+    "s": S,
+    "sdg": SDG,
+    "sx": SX,
+}
+
+
+def get_random_clifford_gates(num_clifford_gates: int):
+    supported_clifford_gates = [
+        gate for gate in hw_basis_gates if gate in clifford_gates_map
+    ]
+    return [random.choice(supported_clifford_gates) for _ in range(num_clifford_gates)]
+
+
+def apply_clifford_gates(target, clifford_gates):
+    for gate in clifford_gates:
+        clifford_gates_map[gate](target=target)
+
+
+# d) Model creation
+def get_model(num_cliffords):
+    @qfunc
+    def main(target: Output[QArray[QBit, num_of_qubits]]):
+        allocate(target)
+        clifford_gates = get_random_clifford_gates(num_cliffords)
+
+        apply_clifford_gates(target, clifford_gates)
+        invert(lambda: apply_clifford_gates(target, clifford_gates))
+
+    return create_model(main, preferences=preferences)
+
+
+qmods = [get_model(num_cliffords) for num_cliffords in numbers_of_cliffords]
+```
+
+## 2) Synthesis
+
+Synthesize the constructed models using the synthesize\_async command to get the quantum program of each model.
+
+```python
+import asyncio
+
+
+async def synthesize_all_models(models):
+    return await asyncio.gather(*[synthesize_async(qmod) for qmod in qmods])
+
+
+quantum_programs = asyncio.run(synthesize_all_models(qmods))
+```
+
+## 3) Execution
+
+When you have the programs you are ready to run.
+
+Classiq allows running multiple programs on multiple backends in a single command.
+
+You specify the hardware (see details in the [execution user guide](https://docs.classiq.io/latest/user-guide/execution/)).
+
+This example runs on IBM Quantum simulators but may be replaced by any hardware with the proper access credentials.
+
+For IBM Quantum hardware access, for example, replace `ibmq_access_t` with an API token from [IBMQ's website](https://quantum-computing.ibm.com/) and specify the hardware name in the `backend_name` field of the `BackendPreferences` objects.
+
+```python
+# Execution
+from itertools import product
+
+ibmq_access_t = None
+
+backend_names = (
+    ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR,
+    ClassiqSimulatorBackendNames.SIMULATOR,
+)
+backend_prefs = ClassiqBackendPreferences.batch_preferences(
+    backend_names=backend_names,
+)
+
+qprogs_with_preferences = list()
+for qprog, backend_pref in product(quantum_programs, backend_prefs):
+    preferences = ExecutionPreferences(
+        backend_preferences=backend_pref, transpilation_option="none"
+    )
+    qprogs_with_preferences.append(
+        set_quantum_program_execution_preferences(qprog, preferences)
+    )
+
+
+async def execute_program(qprog):
+    job = await execute_async(qprog)
+    return await job.result_async()
+
+
+async def execute_all_programs(qprogs):
+    batch_size = 3
+    qprogs_batches = [
+        qprogs[i : i + batch_size] for i in range(0, len(qprogs), batch_size)
+    ]
+
+    results = []
+    for qprogs_batch in qprogs_batches:
+        results.extend(
+            await asyncio.gather(*[execute_program(qprog) for qprog in qprogs_batch])
+        )
+    return results
+
+
+results = asyncio.run(execute_all_programs(qprogs_with_preferences))
+samples_results = [res[0].value for res in results]
+```
+
+## 4) Analysis
+
+The final step is to analyze the RB data.
+
+While the last two steps were independent of the problem at hand, this part is RB unique.
+
+Start by reordering the data, which is given in a 'batch'.
+
+For RB analysis, match a program to the number of Clifford gates it represents, hence the `clifford_number_mapping` variable. Then, reorder the data according to the hardware, calling the `RBAnalysis` class to present the hardware comparison histograms.
+
+Note: If the backends are not replaced with real hardware, expect the trivial result of 100% fidelity for both backends.
+
+```python
+from classiq.analyzer.rb import RBAnalysis, order_executor_data_by_hardware
+
+mixed_data = tuple(
+    zip(
+        backend_prefs * len(quantum_programs),
+        numbers_of_cliffords * len(backend_names),
+        samples_results,
+    )
+)
+rb_analysis_params = order_executor_data_by_hardware(mixed_data=mixed_data)
+
+multiple_hardware_data = RBAnalysis(experiments_data=rb_analysis_params)
+total_data = asyncio.run(multiple_hardware_data.show_multiple_hardware_data_async())
+fig = multiple_hardware_data.plot_multiple_hardware_results()
+fig.show()
+```

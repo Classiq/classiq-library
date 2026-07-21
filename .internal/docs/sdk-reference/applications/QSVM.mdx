@@ -1,0 +1,180 @@
+---
+title: Qsvm
+icon: "/icons/bulletsharp.svg"
+---
+
+### QSVM
+
+Quantum support vector machine (QSVM) model.
+Classifies classical data into two categories.
+The model is first trained, and fitted. After pre-training,
+the model predicts the labels of new data points.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [train](#train) | Trains an SVM model using a custom precomputed kernel from the training data. |
+| [predict](#predict) | Predicts labels for new data using a precomputed kernel with a trained SVM model. |
+| [test](#test) | Predicts the labels of the test dataset and evaluates the resulting test score using the ground-truth labels. |
+| [get_svm_model](#get_svm_model) | Returns the classical SVM model. |
+| [get_qprog](#get_qprog) | Returns the quantum program for the kernel at ``data_dim`` feature width. |
+
+
+### feature_map
+
+
+`feature_map = feature_map`
+
+
+### num_qubits
+
+
+`num_qubits = num_qubits`
+
+
+### execution_preferences
+
+
+`execution_preferences = execution_preferences`
+
+
+### kernel_eval
+
+
+`kernel_eval = QuantumKernelEvaluator(feature_map=(self.feature_map), num_qubits=(self.num_qubits), execution_preferences=(self.execution_preferences))`
+
+
+### model
+
+
+`model = SVC(kernel='precomputed')`
+
+
+### train_data
+
+
+`train_data: np.ndarray | None = None`
+
+#### train
+
+
+<pre><code>train(
+    self: ,
+    train_data: np.ndarray,
+    train_labels: np.ndarray
+) -> None</code></pre>
+
+
+Trains an SVM model using a custom precomputed kernel from the training data.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `train_data` | `np.ndarray` | Contains the data points (np.ndarray) | *required* |
+| `train_labels` | `np.ndarray` | Contains the labels (0,1). | *required* |
+
+
+
+#### predict
+
+
+<pre><code>predict(
+    self: ,
+    data: np.ndarray
+) -> np.ndarray</code></pre>
+
+
+Predicts labels for new data using a precomputed kernel with a trained SVM model. Evaluates kernel
+matrix elements which are associated with the support vectors (those associated with non-vanishing
+coefficients in the prediction equation).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `data` | `np.ndarray` | List of new data points to predict. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `np.ndarray`
+- np.ndarray: Predicted labels (0,1).
+
+
+#### test
+
+
+<pre><code>test(
+    self: ,
+    data: np.ndarray,
+    data_labels: np.ndarray
+) -> tuple[float, np.ndarray]</code></pre>
+
+
+Predicts the labels of the test dataset and evaluates the resulting test score using the ground-truth labels.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `data` | `np.ndarray` | List of test data points to predict. | *required* |
+| `data_labels` | `np.ndarray` | Contains the test data labels. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `tuple[float, np.ndarray]`
+- containing test score (float) and test labels (np.ndarray[int]).
+
+
+#### get_svm_model
+
+
+<pre><code>get_svm_model(
+    self: 
+) -> SVC</code></pre>
+
+
+Returns the classical SVM model.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+
+
+
+#### get_qprog
+
+
+<pre><code>get_qprog(
+    self: ,
+    data_dim: int = 0
+) -> QuantumProgram</code></pre>
+
+
+Returns the quantum program for the kernel at ``data_dim`` feature width.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `data_dim` | `int` |  | 0 |
+
+
+

@@ -1,0 +1,768 @@
+---
+title: Synthesis
+icon: "/icons/bulletsharp.svg"
+---
+
+### synthesize
+
+
+<pre><code>synthesize(
+    model: SerializedModel | BaseQFunc,
+    auto_show: bool = False,
+    constraints: <a href="#constraints">Constraints</a> | None = None,
+    preferences: <a href="#preferences">Preferences</a> | None = None
+) -> <a href="#quantumprogram">QuantumProgram</a></code></pre>
+
+
+Synthesize a model with the Classiq engine to receive a quantum program.
+[More details](https://docs.classiq.io/latest/sdk-reference/synthesis/#classiq.synthesize)
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `model` | `SerializedModel \| BaseQFunc` | The entry point of the Qmod model - a qfunc named 'main' (or alternatively the output of 'create_model'). | *required* |
+| `auto_show` | `bool` | Whether to 'show' the synthesized model (False by default). | False |
+| `constraints` | [Constraints](#constraints) \| None | Constraints for the synthesis of the model. See Constraints (Optional). | None |
+| `preferences` | [Preferences](#preferences) \| None | Preferences for the synthesis of the model. See Preferences (Optional). | None |
+
+
+
+**Returns:**
+
+- **Type:** [QuantumProgram](#quantumprogram)
+- Quantum program. (See: QuantumProgram)
+### show
+
+
+<pre><code>show(
+    quantum_program: <a href="#quantumprogram">QuantumProgram</a>,
+    display_url: bool = True
+) -> None</code></pre>
+
+
+Displays the interactive representation of the quantum program in the Classiq IDE.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | [QuantumProgram](#quantumprogram) | The quantum program to be displayed. | *required* |
+| `display_url` | `bool` | Whether to print the url | True |
+### assign_parameters
+
+
+<pre><code>assign_parameters(
+    quantum_program: <a href="#quantumprogram">QuantumProgram</a>,
+    parameters: ExecutionParams
+) -> <a href="#quantumprogram">QuantumProgram</a></code></pre>
+
+
+Assign parameters to a parametric quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | [QuantumProgram](#quantumprogram) | The quantum program to be assigned. This is the result of the synthesize method. | *required* |
+| `parameters` | `ExecutionParams` | The parameter assignments. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** [QuantumProgram](#quantumprogram)
+- The quantum program after assigning parameters.
+### export
+
+
+<pre><code>export(
+    quantum_program: <a href="#quantumprogram">QuantumProgram</a>,
+    target_language: <a href="#targetlanguage">TargetLanguage</a> | None = TargetLanguage.QASM2,
+    transpilation_config: <a href="#transpilationconfig">TranspilationConfig</a> | <a href="#faulttoleranttranspilationconfig">FaultTolerantTranspilationConfig</a> | None | Literal[True] = None
+) -> str</code></pre>
+
+
+Export a quantum program as a circuit string in the requested target language.
+
+Non-angle runtime parameters (e.g. integers that affect circuit structure such as
+repeat counts) must be assigned first using `assign_parameters`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | [QuantumProgram](#quantumprogram) | The quantum program to export. This is the result of `synthesize`. | *required* |
+| `target_language` | [TargetLanguage](#targetlanguage) \| None | The target language to export to. Defaults to `TargetLanguage.QASM2`. | TargetLanguage.QASM2 |
+| `transpilation_config` | [TranspilationConfig](#transpilationconfig) \| [FaultTolerantTranspilationConfig](#faulttoleranttranspilationconfig) \| None \| Literal[True] | Transpilation configuration. Pass a `TranspilationConfig` or `FaultTolerantTranspilationConfig` to apply transpilation during export. Pass `True` to reuse the transpilation settings from the quantum program. Pass `None` to skip transpilation and export the circuit as synthesized. Defaults to `None`. | None |
+
+
+
+**Returns:**
+
+- **Type:** `str`
+- The exported circuit code as a string.
+### TargetLanguage
+
+Enum specifying the output format for `export`.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [QASM2](#qasm2) |  |  |
+| [QASM3](#qasm3) |  |  |
+| [QIR](#qir) |  |  |
+| [CIRQ_JSON](#cirq_json) |  |  |
+| [QSHARP](#qsharp) |  |  |
+
+
+### QASM2
+
+
+```python
+QASM2 = 'qasm2'
+```
+
+
+### QASM3
+
+
+```python
+QASM3 = 'qasm3'
+```
+
+
+### QIR
+
+
+```python
+QIR = 'qir'
+```
+
+
+### CIRQ_JSON
+
+
+```python
+CIRQ_JSON = 'cirq_json'
+```
+
+
+### QSHARP
+
+
+```python
+QSHARP = 'qsharp'
+```
+### TranspilationConfig
+
+Configuration for transpiling a quantum program to a target basis gate set and qubit connectivity.
+
+Pass a `TranspilationConfig` to the `transpilation_config` parameter of
+`export` to apply hardware-aware transpilation during export.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `transpilation_level` | `TranspilationOption` | The transpilation strategy to apply. Defaults to `TranspilationOption.AUTO_OPTIMIZE`. |
+| `basis_gates` | `list[str] \| None` | The target gate set to decompose the circuit into. If `None`, defaults to single-qubit gates + `cx`. When a `connectivity_map` is provided, defaults to single-qubit gates + `cx`. |
+| `connectivity_map` | `ConnectivityMap \| None` | Qubit connectivity constraints of the target hardware - a list of allowed qubit-pair connections. If `None`, no routing is applied. |
+| `is_symmetric_connectivity` | `bool` | Whether the connectivity map is symmetric (i.e., if `(i, j)` is allowed then `(j, i)` is also allowed). Defaults to `True`. |
+
+
+### kind
+
+
+`kind: Literal['transpilation'] = 'transpilation'`
+
+
+### basis_gates
+
+
+`basis_gates: list[str] | None = None`
+
+
+### connectivity_map
+
+
+`connectivity_map: ConnectivityMap | None = None`
+
+
+### is_symmetric_connectivity
+
+
+`is_symmetric_connectivity: bool = True`
+### FaultTolerantTranspilationConfig
+
+Configuration for fault-tolerant transpilation using Clifford+T gate approximation.
+
+Pass a `FaultTolerantTranspilationConfig` to the `transpilation_config`
+parameter of `export` to perform fault-tolerant transpilation in two
+stages:
+
+1. The circuit is first decomposed into the Clifford+T+RZ gate set
+   (`h`, `t`, `s`, `tdg`, `cx`, `rz`).
+2. The remaining RZ gates are then approximated using the
+   [gridsynth](https://github.com/quantum-programming/pygridsynth) algorithm,
+   which finds an efficient Clifford+T sequence achieving the target rotation within
+   the specified error bound.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `transpilation_level` | `TranspilationOption` | The transpilation strategy to apply. Defaults to `TranspilationOption.AUTO_OPTIMIZE`. |
+| `clifford_t_approximation_error` | `float` | The maximum total approximation error for the whole circuit. This budget is divided equally across all RZ gates, so each gate is approximated with a per-gate error of `clifford_t_approximation_error / num_rz_gates`. Smaller values yield more accurate circuits at the cost of greater depth. |
+| `keep_hierarchy` | `bool` | When ``True``, each unique RZ-angle decomposition is emitted as a named custom gate (``rz_approx_0``, ``rz_approx_1``, ...) in the target language, and every occurrence of that angle references the gate definition instead of inlining the Clifford+T sequence. When ``False`` (the default), the decomposition is inlined to produce a flat circuit. |
+
+
+### kind
+
+
+`kind: Literal['fault_tolerant'] = 'fault_tolerant'`
+
+
+### clifford_t_approximation_error
+
+
+`clifford_t_approximation_error: float`
+
+
+### keep_hierarchy
+
+
+`keep_hierarchy: bool = False`
+### get_circuit_metrics
+
+
+<pre><code>get_circuit_metrics(
+    quantum_program: <a href="#quantumprogram">QuantumProgram</a>
+) -> CircuitMetrics</code></pre>
+
+
+Get the logical resource estimation (width, depth and gate counts) of a quantum program.
+
+For parametric programs, depth and gate counts may be returned as symbolic
+string expressions (e.g. `"n + 1"`) instead of integers.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | [QuantumProgram](#quantumprogram) | The quantum program to estimate. This is the result of the synthesize method. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `CircuitMetrics`
+- The logical width, depth and gate counts of the quantum program.
+### get_transpiled_circuit_metrics
+
+
+<pre><code>get_transpiled_circuit_metrics(
+    quantum_program: <a href="#quantumprogram">QuantumProgram</a>
+) -> CircuitMetrics</code></pre>
+
+
+Get the hardware resource estimation (width, depth and gate counts) of a transpiled quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | [QuantumProgram](#quantumprogram) | The quantum program to estimate. This should be a transpiled quantum program. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `CircuitMetrics`
+- The width, depth and gate counts of the transpiled program.
+### QuantumProgram
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [to_base_program](#to_base_program) |  |
+| [to_program](#to_program) |  |
+| [save_results](#save_results) | Saves quantum program results as json into a file. |
+| [get_debug_info](#get_debug_info) |  |
+| [raise_warnings](#raise_warnings) | Raises all warnings that were collected during synthesis. |
+
+
+### hardware_data
+
+
+`hardware_data: SynthesisHardwareData`
+
+
+### data
+
+
+`data: GeneratedCircuitData`
+
+
+### model
+
+
+`model: ExecutionModel`
+
+
+### transpiled_circuit
+
+
+`transpiled_circuit: TranspiledCircuitData | None = pydantic.Field(default=None)`
+
+
+### creation_time
+
+
+`creation_time: str = pydantic.Field(default_factory=_get_formatted_utc_current_time)`
+
+
+### compressed_debug_info
+
+
+`compressed_debug_info: bytes | None = pydantic.Field(default=None)`
+
+
+### program_id
+
+
+`program_id: str = pydantic.Field(default_factory=get_uuid_as_str)`
+
+
+### execution_primitives_input
+
+
+`execution_primitives_input: PrimitivesInput | None = pydantic.Field(default=None)`
+
+
+### synthesis_warnings
+
+
+`synthesis_warnings: list[str] | None = pydantic.Field(default=None)`
+
+
+### compressed_compiled_qmod
+
+
+`compressed_compiled_qmod: bytes | None = pydantic.Field(default=None)`
+
+
+### program_circuit
+
+
+`program_circuit: CircuitCodeInterface`
+
+
+### has_compiled_qmod
+
+
+`has_compiled_qmod: bool`
+
+
+### compiled_qmod
+
+
+`compiled_qmod: Model | None`
+
+
+### qasm
+
+
+`qasm: Code | None`
+
+#### save_results
+
+
+<pre><code>save_results(
+    self: ,
+    filename: str | Path | None = None
+) -> None</code></pre>
+
+
+Saves quantum program results as json into a file.
+    Parameters:
+        filename (Union[str, Path]): Optional, path + filename of file.
+                                     If filename supplied add `.json` suffix.
+    Returns:
+          None
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `filename` | `str \| Path \| None` |  | None |
+
+
+
+#### raise_warnings
+
+
+<pre><code>raise_warnings(
+    self: 
+) -> None</code></pre>
+
+
+Raises all warnings that were collected during synthesis.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+### Preferences
+
+Preferences for synthesizing a quantum circuit.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [optimization_timeout_less_than_generation_timeout](#optimization_timeout_less_than_generation_timeout) |  |
+| [make_output_format_list](#make_output_format_list) |  |
+| [validate_output_format](#validate_output_format) |  |
+| [validate_backend_name](#validate_backend_name) |  |
+| [validate_backend](#validate_backend) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `machine_precision` | `int` | Specifies the precision used for quantum operations. Defaults to `DEFAULT_MACHINE_PRECISION`. |
+| `backend_service_provider` | `str` | The provider company or cloud service for the requested backend. Defaults to `None`. |
+| `backend_name` | `str` | The name of the requested backend or target. Defaults to `None`. |
+| `custom_hardware_settings` | `CustomHardwareSettings` | Defines custom hardware settings for optimization. This field is ignored if backend preferences are specified. |
+| `debug_mode` | `bool` | If `True`, debug information is added to the synthesized result, potentially slowing down the synthesis. Useful for executing interactive algorithms. Defaults to `True`. |
+| `optimization_level` | `OptimizationLevel)` | The optimization level used during synthesis (0-3); |
+| `output_format` | `List[QuantumFormat]` | Lists the output format(s) for the quantum circuit. Defaults to `[QuantumFormat.QASM]`. `QuantumFormat` Options: - QASM = "qasm" - QSHARP = "qsharp" - QIR = "qir" - IONQ = "ionq" - CIRQ_JSON = "cirq_json" - QASM_CIRQ_COMPATIBLE = "qasm_cirq_compatible" |
+| `qasm3` | `Optional[bool]` | If `True`, outputs OpenQASM 3.0 in addition to 2.0, applicable to relevant attributes in `GeneratedCircuit`. Defaults to `None`. |
+| `transpilation_option` | `TranspilationOption` | Sets the transpilation option to optimize the circuit. Defaults to `AUTO_OPTIMIZE`. See `TranspilationOption` |
+| `solovay_kitaev_max_iterations` | `Optional[int]` | Specifies the maximum number of iterations for the Solovay-Kitaev algorithm, if used. Defaults to `None`. |
+| `timeout_seconds` | `int` | Timeout setting for circuit synthesis in seconds. Defaults to `300`. |
+| `optimization_timeout_seconds` | `Optional[int]` | Specifies the timeout for optimization in seconds, or `None` for no optimization timeout. This will still adhere to the overall synthesis timeout. Defaults to `None`. |
+| `random_seed` | `int` | Random seed for circuit synthesis. |
+
+
+### machine_precision
+
+
+`machine_precision: PydanticMachinePrecision = DEFAULT_MACHINE_PRECISION`
+
+
+### backend_service_provider
+
+
+`backend_service_provider: Provider | ProviderVendor | str | None = pydantic.Field(default=None, description='Provider company or cloud for the requested backend.')`
+
+
+### backend_name
+
+
+`backend_name: PydanticBackendName | AllBackendsNameByVendor | None = pydantic.Field(default=None, description='Name of the requested backend or target.')`
+
+
+### custom_hardware_settings
+
+
+`custom_hardware_settings: CustomHardwareSettings = pydantic.Field(default_factory=CustomHardwareSettings, description='Custom hardware settings which will be used during optimization. This field is ignored if backend preferences are given.')`
+
+
+### debug_mode
+
+
+`debug_mode: bool = pydantic.Field(default=True, description='Add debug information to the synthesized result. Setting this option to False can potentially speed up the synthesis, and is recommended for executing iterative algorithms.')`
+
+
+### synthesize_all_separately
+
+
+`synthesize_all_separately: bool = pydantic.Field(default=False, description='If true, a heuristic is used to determine if a function should be synthesized separately', deprecated=True)`
+
+
+### optimization_level
+
+
+`optimization_level: OptimizationLevel = pydantic.Field(default=(OptimizationLevel.LIGHT), description='The optimization level used during synthesis; determines the trade-off between synthesis speed and the quality of the results')`
+
+
+### output_format
+
+
+`output_format: PydanticConstrainedQuantumFormatList = pydantic.Field(default=[QuantumFormat.QASM], description='The quantum circuit output format(s). ')`
+
+
+### qasm3
+
+
+`qasm3: bool | None = pydantic.Field(None, description='Output OpenQASM 3.0 instead of OpenQASM 2.0. Relevant only for the `qasm` and `transpiled_circuit.qasm` attributes of `GeneratedCircuit`.')`
+
+
+### transpilation_option
+
+
+`transpilation_option: TranspilationOption = pydantic.Field(default=(TranspilationOption.AUTO_OPTIMIZE), description='If true, the returned result will contain a transpiled circuit and its depth')`
+
+
+### solovay_kitaev_max_iterations
+
+
+`solovay_kitaev_max_iterations: pydantic.PositiveInt | None = pydantic.Field(None, description='Maximum iterations for the Solovay-Kitaev algorithm (if applied).')`
+
+
+### timeout_seconds
+
+
+`timeout_seconds: pydantic.PositiveInt = pydantic.Field(default=300, description='Generation timeout in seconds')`
+
+
+### optimization_timeout_seconds
+
+
+`optimization_timeout_seconds: pydantic.PositiveInt | None = pydantic.Field(default=None, description='Optimization timeout in seconds, or None for no optimization timeout (will still timeout when the generation timeout is over)')`
+
+
+### random_seed
+
+
+`random_seed: int = pydantic.Field(default_factory=create_random_seed, description='The random seed used for the generation')`
+
+
+### symbolic_loops
+
+
+`symbolic_loops: bool = pydantic.Field(default=False)`
+
+
+### compatibility_mode
+
+
+`compatibility_mode: bool = pydantic.Field(default=False)`
+
+
+### backend_preferences
+
+
+`backend_preferences: BackendPreferences | None`
+### set_preferences
+
+
+<pre><code>set_preferences(
+    serialized_model: SerializedModel,
+    preferences: <a href="#preferences">Preferences</a> | None = None,
+    kwargs: Any = {}
+) -> SerializedModel</code></pre>
+
+
+Overrides the preferences of a (serialized) model and returns the updated model.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `serialized_model` | `SerializedModel` | The model in serialized form. | *required* |
+| `preferences` | [Preferences](#preferences) \| None | The new preferences to be set for the model. Can be passed as keyword arguments. | None |
+| `kwargs` | `Any` |  | {} |
+
+
+
+**Returns:**
+
+- **Type:** `SerializedModel`
+- The updated model with the new preferences applied.
+### set_execution_preferences
+
+
+<pre><code>set_execution_preferences(
+    serialized_model: SerializedModel,
+    execution_preferences: ExecutionPreferences | None = None,
+    kwargs: Any = {}
+) -> SerializedModel</code></pre>
+
+
+Overrides the execution preferences of a (serialized) model and returns the updated model.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `serialized_model` | `SerializedModel` | A serialization of the defined model. | *required* |
+| `execution_preferences` | `ExecutionPreferences \| None` | The new execution preferences to be set for the model. Can be passed as keyword arguments. | None |
+| `kwargs` | `Any` |  | {} |
+
+### Constraints
+
+Constraints for the quantum circuit synthesis engine.
+
+This class is used to specify constraints such as maximum width, depth,
+gate count, and optimization parameters for the synthesis engine,
+guiding the generation of quantum circuits that satisfy these constraints.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `max_width` | `int` | Maximum number of qubits allowed in the generated quantum circuit. Defaults to `None`. |
+| `optimization_parameter` | `OptimizationParameterType` | Determines if and how the synthesis engine should optimize the solution. Defaults to `NO_OPTIMIZATION`. See `OptimizationParameterType` |
+
+
+### max_width
+
+
+`max_width: pydantic.PositiveInt | None = pydantic.Field(default=None, description='Maximum number of qubits in generated quantum circuit')`
+
+
+### optimization_parameter
+
+
+`optimization_parameter: OptimizationParameterType = pydantic.Field(default=(OptimizationParameter.NO_OPTIMIZATION), description='If set, the synthesis engine optimizes the solution according to that chosen parameter')`
+### set_constraints
+
+
+<pre><code>set_constraints(
+    serialized_model: SerializedModel,
+    constraints: <a href="#constraints">Constraints</a> | None = None,
+    kwargs: Any = {}
+) -> SerializedModel</code></pre>
+
+
+Overrides the constraints of a (serialized) model and returns the updated model.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `serialized_model` | `SerializedModel` | The model in serialized form. | *required* |
+| `constraints` | [Constraints](#constraints) \| None | The new constraints to be set for the model. Can be passed as keyword arguments. | None |
+| `kwargs` | `Any` |  | {} |
+
+
+
+**Returns:**
+
+- **Type:** `SerializedModel`
+- The updated model with the new constraints applied.
+### create_model
+
+
+<pre><code>create_model(
+    entry_point: QFunc | GenerativeQFunc,
+    constraints: <a href="#constraints">Constraints</a> | None = None,
+    execution_preferences: ExecutionPreferences | None = None,
+    preferences: <a href="#preferences">Preferences</a> | None = None,
+    classical_execution_function: CFunc | None = None,
+    out_file: str | None = None
+) -> SerializedModel</code></pre>
+
+
+Create a serialized model from a given Qmod entry function and additional parameters.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `entry_point` | `QFunc \| GenerativeQFunc` | The entry point function for the model, which must be a QFunc named 'main'. | *required* |
+| `constraints` | [Constraints](#constraints) \| None | Constraints for the synthesis of the model. See Constraints (Optional). | None |
+| `execution_preferences` | `ExecutionPreferences \| None` | Preferences for the execution of the model. See ExecutionPreferences (Optional). | None |
+| `preferences` | [Preferences](#preferences) \| None | Preferences for the synthesis of the model. See Preferences (Optional). | None |
+| `classical_execution_function` | `CFunc \| None` | A function for the classical execution logic, which must be a CFunc (Optional). | None |
+| `out_file` | `str \| None` | File path to write the Qmod model in native Qmod representation to (Optional). | None |
+
+
+
+**Returns:**
+
+- **Type:** `SerializedModel`
+- A serialized model.
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `write_qmod` | Creates a native Qmod file from a serialized model and outputs the synthesis options (Preferences and Constraints) to a file. |
+
+
+### write_qmod
+
+
+<pre><code>write_qmod(
+    model: SerializedModel | QFunc | GenerativeQFunc,
+    name: str,
+    directory: Path | None = None,
+    decimal_precision: int = DEFAULT_DECIMAL_PRECISION,
+    symbolic_only: bool = True
+) -> None</code></pre>
+
+
+Creates a native Qmod file from a serialized model and outputs the synthesis options (Preferences and Constraints) to a file.
+The native Qmod file may be uploaded to the Classiq IDE.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `model` | `SerializedModel \| QFunc \| GenerativeQFunc` | The entry point of the Qmod model - a qfunc named 'main' (or alternatively the output of 'create_model'). | *required* |
+| `name` | `str` | The name to save the file by. | *required* |
+| `directory` | `Path \| None` | The directory to save the files in. If None, the current working directory is used. | None |
+| `decimal_precision` | `int` | The number of decimal places to use for numbers, set to 4 by default. | DEFAULT_DECIMAL_PRECISION |
+| `symbolic_only` | `bool` | If True keep function definitions un-expanded and symbolic (note that Qmod functions with parameters of Python types are not supported in this mode) | True |
+
+
+
+**Returns:**
+
+- **Type:** `None`
+### qasm_to_qmod
+
+
+<pre><code>qasm_to_qmod(
+    qasm: str,
+    qmod_format: QmodFormat
+) -> str</code></pre>
+
+
+Decompiles QASM to Native/Python Qmod.
+
+Returns Qmod code as a string. Native Qmod can be synthesized in the Classiq IDE,
+while Python Qmod can be copy-pasted to a Python file (`.py`) and synthesized by
+calling `synthesize(main)`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qasm` | `str` | QASM 2 or QASM 3 code | *required* |
+| `qmod_format` | `QmodFormat` | The requested output format | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `str`
+- The decompiled Qmod program

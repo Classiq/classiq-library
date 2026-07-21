@@ -1,0 +1,108 @@
+---
+title: "Subtraction"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/subtraction/subtraction_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+Subtraction (denoted as '-') is implemented by negation and addition in 2-complement representation.
+
+$$
+a - b \longleftrightarrow a + (-b) \longleftrightarrow a + \sim{b} + lsb\_value
+$$
+Where '\~' is bitwise not and $lsb\_value$ is the least significant bit value.
+
+Note that integer and fixed-point numbers are represented in a 2-complement method during function evaluation.
+
+The binary number is extended in the case of a register size miss-match.
+
+For example, the positive signed number $(110)_2=6$ is expressed as $(00110)_2$ when operating with a 5-qubit register.
+Similarly, the negative signed number $(110)_2=-2$ is expressed as $(11110)_2$.
+
+Examples:
+
+5 + 3 = 8 , 0101 + 0011 = 1000
+
+5 - 3 = 5 + (-3) = 2, 0101 + 1101 = 0010
+
+-5 + -3 = -8, 1011 + 1101 = 1000
+
+## Examples
+
+#
+
+### Example 1: Subtraction of Two Quantum Variables
+
+This example generates a quantum program that subtracts one quantum variables from the other, both of size 3 qubits.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum], b: Output[QNum], res: Output[QNum]) -> None:
+    a |= 4
+    b |= 5
+    res |= a - b
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+
+result = execute(qprog).result_value()
+print(result.parsed_counts)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 4.0, 'b': 5.0, 'res': -1.0}: 1000]
+  
+
+```
+</Info>
+
+#
+
+### Example 2: Subtraction of a Float from a Register
+
+This example generates a quantum program which subtracts two argument.
+
+The left\_arg is defined to be a fix point number $(11.1)_2$ (3.5).
+
+The right\_arg is defined to be a quantum register of size of three.
+
+```python
+@qfunc
+def main(a: Output[QNum], res: Output[QNum]) -> None:
+    a |= 4
+    res |= a - 3.5
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+
+result = execute(qprog).result_value()
+print(result.parsed_counts)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 4.0, 'res': 0.5}: 1000]
+  
+
+```
+</Info>

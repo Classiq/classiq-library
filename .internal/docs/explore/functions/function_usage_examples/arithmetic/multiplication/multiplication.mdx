@@ -1,0 +1,131 @@
+---
+title: "Multiplication"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/multiplication/multiplication.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The multiplication operation, denoted '$*$', is a series of additions ("long multiplication").
+
+The multiplier has different implementations, depending on the type of adder in use.
+
+Note that integer and fixed-point numbers are represented in a two-complement method during function evaluation.
+
+The binary number is extended in the case of a register size mismatch.
+
+For example, the positive signed number $(110)_2=6$ is expressed as $(00110)_2$ when working with a five-qubit register.
+Similarly, the negative signed number $(110)_2=-2$ is expressed as $(11110)_2$.
+
+## Examples
+
+The calculation of -5 \* 3 = -
+
+1
+
+5. The left arg -5 is represented as 1011 and 3 as 
+
+1
+
+1. The number of digits needed to store the answer is 4+2-1 = 
+
+5. The multiplication is done in the 'regular' manner where each number is extended to five bits and only five digits are kept in the intermediary
+results.
+
+$$
+\begin{equation*}\begin{array}{c}
+\phantom{\times}11011\\
+\underline{\times\phantom{000}11}\\
+\phantom{\times}11011\\
+\underline{\phantom\times1011\phantom9}\\
+\phantom\times10001
+\end{array}\end{equation*}
+$$
+
+## Examples
+
+#
+
+### Example 1: Two Quantum Variables Multiplication
+
+This code example generates a quantum program that multiplies two arguments.
+
+Both of them are defined as quantum variables of size 
+
+3.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum], b: Output[QNum], res: Output[QNum]) -> None:
+    a |= 4
+    b |= 5
+    res |= a * b
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+
+result = execute(qprog).result_value()
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 4.0, 'b': 5.0, 'res': 20.0}: 1000]
+  
+
+```
+</Info>
+
+#
+
+### Example 2: Float and Quantum Variable Multiplication
+
+This code example generates a quantum program that multiplies two arguments.
+Here, the left argument is a fixed-point number $(11.1)_2$ (3.5),
+and the right argument is a quantum variable of size 
+
+2.
+
+```python
+@qfunc
+def main(a: Output[QNum], res: Output[QNum]) -> None:
+    allocate(2, a)
+
+    hadamard_transform(a)
+    res |= 3.5 * a
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+
+result = execute(qprog).result_value()
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 2.0, 'res': 7.0}: 287,
+   {'a': 3.0, 'res': 10.5}: 257,
+   {'a': 1.0, 'res': 3.5}: 230,
+   {'a': 0.0, 'res': 0.0}: 226]
+  
+
+```
+</Info>

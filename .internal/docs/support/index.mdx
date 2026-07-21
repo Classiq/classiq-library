@@ -1,0 +1,146 @@
+---
+title: "Support"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+Welcome to the Classiq Support Center. This page is designed to help you quickly resolve common issues and get additional support if needed.
+
+---
+
+## Frequently Asked Questions (FAQs)
+
+### Getting Started
+
+
+<Accordion title="What is Classiq?">
+  Classiq is quantum-computing software that enables the design, optimization, analysis, and execution of quantum algorithms. Check out how to get started [here](../getting-started/).
+
+</Accordion>
+<Accordion title="I'm new to the platform—what are my first steps?">
+  - Start with [Registration and Installation](../getting-started/registration_installations/) to get access to the platform.
+  - [The Onboarding Tutorial](../getting-started/classiq_tutorial/) will help with your first steps in coding.
+  - When you feel confident, try some of our [real-world applications](../explore/applications/).
+
+</Accordion>
+<Accordion title="Can I execute algorithms on quantum computers using Classiq?">
+  Yes! With Classiq, you can run quantum algorithms on the quantum computers you have access to. Check out our list of [quantum providers](../sdk-reference/providers/).
+
+
+</Accordion>
+### Technical Questions
+
+
+<Accordion title="How can I fix `ClassiqAuthenticationError: Request to Auth0 failed with error code 403`?">
+  This error arises when your authentication credentials are denied. Try overriding your authentication credentials by executing `authenticate(overwrite=True)`.
+
+</Accordion>
+<Accordion title="My Studio cannot reconnect">
+  If you’re experiencing failed attempts to reconnect to the Studio or long loading times, please try closing and reopening your web browser.
+
+</Accordion>
+<Accordion title="I'm having authentication problems in the Studio">
+  Try authenticating again using:
+
+  [comment]: DO_NOT_TEST
+  ```python
+  import classiq
+
+  classiq.authenticate()
+  ```
+  To prevent such problems in the future, it is a good practice to begin code files in the Studio with `authenticate()`.
+
+</Accordion>
+<Accordion title="Example notebooks in the Studio aren’t working">
+  Some example notebooks (e.g., chemistry) require additional packages in the Studio. First, try:
+
+  ```bash
+  pip install "classiq[chemistry]"
+  ```
+
+  If it still doesn’t work, reset the virtual environment by running:
+
+  ```bash
+  reset-user-env
+  ```
+
+  If none of these options work, reach out to us on the [Community Slack](https://short.classiq.io/join-slack).
+
+</Accordion>
+<Accordion title="How do I import a QASM file using the Python SDK?">
+  Use `quantum_program_from_qasm()`.
+
+
+</Accordion>
+### Contributing to the Library
+
+
+<Accordion title="How can I contribute to the Classiq Library?">
+  You can find contribution guidelines on [this page](https://github.com/Classiq/classiq-library/blob/main/CONTRIBUTING.md).
+
+
+</Accordion>
+### Designing Quantum Models
+
+
+<Accordion title="How do I define an observable?">
+  In Classiq, you can define any observable as a linear combination of Pauli strings. To measure a set of observables from a quantum program, see [Execution Session](../user-guide/execution/ExecutionSession/) and the [Execution Tutorial](../explore/tutorials/basic_tutorials/the_classiq_tutorial/execution_tutorial_part2/).
+
+</Accordion>
+<Accordion title="How can I transform a circuit with many gates into a shallower circuit using more qubits?">
+  You can synthesize the quantum circuit using `Constraints`. See [Quantum Program Constraints](../user-guide/synthesis/constraints/).
+
+</Accordion>
+<Accordion title="How do I target a hardware’s native gate set?">
+  You can synthesize the quantum program using hardware-aware synthesis. See [Hardware-Aware Synthesis](../user-guide/synthesis/hardware-aware-synthesis/).
+
+</Accordion>
+<Accordion title="How do I create a multi-control, multi-target gate?">
+  Using `control`, you can define multi-qubit controls and gates. You can also use `if_` for classical control of quantum gates. See [Classical Control Flow](/qmod-reference/language-reference/statements/classical-control-flow/).
+
+</Accordion>
+<Accordion title="How do I use controlled operations on multiple qubits instead of QArrays?">
+  There are two ways to work around this: either bind the qubits you want to a QArray (see [bind](/qmod-reference/language-reference/statements/bind/)) or slice the QArrays (see [Path Operators](/qmod-reference/language-reference/expressions/#relational-operators)).
+
+</Accordion>
+<Accordion title="How do I apply a single-qubit gate to multiple qubits?">
+  Use the `apply_to_all` function. See [Utility functions](/sdk-reference/qmod/functions/open_library/utility_functions).
+
+</Accordion>
+<Accordion title="How can I uncompute a qubit?">
+  You can use the `free()` function. For more information, see [Uncomputation](/qmod-reference/language-reference/uncomputation/).
+
+</Accordion>
+<Accordion title="How do I obtain the width and depth of my quantum program?">
+  Use `qprog.data.width` and `qprog.transpiled_circuit.depth`.
+
+
+</Accordion>
+### Execution
+
+
+<Accordion title="How do I execute a quantum program on hardware?">
+  Use `ExecutionPreferences` and set the backend appropriately. The [Execution Tutorial](../explore/tutorials/basic_tutorials/the_classiq_tutorial/execution_tutorial/) shows this step by step.
+
+</Accordion>
+<Accordion title="How do I convert a combinatorial optimization problem into a problem Hamiltonian?">
+  In Qmod, it is possible to use Pyomo to formulate the optimization problem. See [Problem Formulation](/user-guide/applications/optimization/problem-formulation/).
+
+</Accordion>
+<Accordion title="How can I change the number of shots when executing a quantum program?">
+  Use `ExecutionPreferences` and set the number of shots. See the [Execution Tutorial](../explore/tutorials/basic_tutorials/the_classiq_tutorial/execution_tutorial/).
+
+</Accordion>
+<Accordion title="How do I run a VQA on IBM hardware using `ExecutionSession`?">
+  After defining the quantum program, use `ExecutionSession.minimize()` or `ExecutionSession.estimate()` for VQAs. See [Execution Tutorial 2: Expectation Values and Parameterized Quantum Programs](../explore/tutorials/basic_tutorials/the_classiq_tutorial/execution_tutorial_part2/).
+
+
+</Accordion>
+---
+
+## Need More Help?
+
+If your question is not answered here, please:
+
+-   Reach out in the `#support-and-questions` channel on [our community Slack](https://short.classiq.io/join-slack).
+-   For additional assistance, to report a bug, or to request a feature, submit a ticket via our [Support Center](https://classiq-community.freshdesk.com/support/home).

@@ -1,0 +1,34 @@
+---
+title: Symbolic Functions
+icon: "/icons/bulletsharp.svg"
+---
+
+This is a list of the symbolic functions available in `Qmod` for applying on classical parameters in expressions context.
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `subscript` | Return the element of ``array`` at position ``index`` in an expression. |
+
+
+### subscript
+
+
+<pre><code>subscript(
+    array: list | CArray | np.ndarray,
+    index: Any
+) -> Any</code></pre>
+
+
+Return the element of ``array`` at position ``index`` in an expression.
+
+This is the expression-level form of the ``array[index]`` indexing operator.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `array` | `list \| CArray \| np.ndarray` | The array to index into. May be a Python list, a quantum-variable concatenation, a ``CArray`` parameter, or a numpy array. | *required* |
+| `index` | `Any` | The position to read, as a classical expression. | *required* |

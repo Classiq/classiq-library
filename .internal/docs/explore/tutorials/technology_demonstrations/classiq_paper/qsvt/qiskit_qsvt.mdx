@@ -1,0 +1,137 @@
+---
+title: "Qiskit code for QSVT example"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/classiq_paper/qsvt/qiskit_qsvt.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook shows how to generate data for the QSVT example using `qiskit` 1.
+
+2.
+
+4. Here we provide the codes for block encoding the matrix $A$, as well as the QSVT implementation.
+
+Qiskit does not have an adder by a constant function. Thus, we have modified their adder functions, which is applied between two quantum registers, to include this functionality.
+
+```python
+# import time
+# import numpy as np
+# from qiskit.circuit import QuantumCircuit, QuantumRegister
+# from qiskit.circuit.library import QFT
+# from qiskit import QuantumCircuit, QuantumRegister, transpile
+# from qiskit.circuit.library.standard_gates import XGate, RZGate
+
+# BASIS_GATES = ["u", "cx"]
+# OPT_LEVEL = 3
+
+# class DraperQFTAdderConstant(QuantumCircuit):
+#     def __init__(self, num_state_qubits: int, constant: int, name: str = "DraperQFTAdderConst") -> None:
+#         # Create the quantum register
+#         qr_a = QuantumRegister(num_state_qubits, name="a")
+#         super().__init__(qr_a, name=name)
+
+#         # Apply the QFT
+#         self.append(QFT(num_state_qubits, do_swaps=False).to_gate(), qr_a)
+
+#         # Add the constant by applying controlled rotations
+#         for qubit in range(num_state_qubits):
+#             angle = (constant % (2 ** (qubit + 1))) * np.pi / (2 ** qubit)
+#             self.p(angle, qr_a[qubit])
+
+#         # Apply the inverse QFT
+#         self.append(QFT(num_state_qubits, do_swaps=False).inverse().to_gate(), qr_a)
+```
+```python
+
+# def get_reflect_around_zero(size):
+#     qc = QuantumCircuit(size)
+#     qc.x(0)
+#     qc.h(0)
+#     qc.mcx(control_qubits=[k for k in range(1,size)],ctrl_state="0"*(size-1),target_qubit=[0])
+#     qc.h(0)
+#     qc.x(0)
+
+#     return qc
+
+# def get_cir_be(qc, data, block):
+#     qc.h(block[0])
+#     qc.h(block[2])
+#     qc.append(DraperQFTAdderConstant(num_state_qubits=len(data)+1,
+#                                      constant=2).control(1, ctrl_state=0).to_instruction(),[block[0]]+data[:]+[block[1]])
+#     qc.append(DraperQFTAdderConstant(num_state_qubits=len(data)+1,
+#                                      constant=-1+2**(len(data)+1)).to_instruction(),data[:]+[block[1]])
+
+#     qc.append(get_reflect_around_zero(len(data)).control(1, ctrl_state=0).to_instruction(),[block[2]]+data[:])
+#     qc.h(block[0])
+#     qc.h(block[2])
+#     return qc
+
+
+# def apply_projector_controlled_phase(qc, phase, block_reg, aux_reg):
+#     qc.append(XGate().control(len(block_reg),ctrl_state=0),
+#                                          block_reg[:] + aux_reg[:]
+#                                          )
+#     qc.rz(phase, aux_reg)
+
+#     qc.append(XGate().control(len(block_reg),ctrl_state=0),
+#                                          block_reg[:] + aux_reg[:]
+#                                          )
+
+
+# def apply_qsvt_step(qc, phase1, phase2, u, data, block, qsvt_aux):
+
+#     qc.append(u, data[:] + block[:])
+#     apply_projector_controlled_phase(qc, phase1, block, qsvt_aux)
+#     qc.append(u.inverse(), data[:] + block[:])
+#     apply_projector_controlled_phase(qc, phase2, block, qsvt_aux)
+
+
+# def get_qsvt_circuit(qsvt_phases,
+#             size):
+#     block = QuantumRegister(3, 'block')
+#     data = QuantumRegister(size, 'data')
+#     qsvt_aux = QuantumRegister(1, 'qsvt_aux')
+#     cir_be = QuantumCircuit(data,block)
+#     cir_be = get_cir_be(cir_be,data, block)
+
+#     qsvt_cir = QuantumCircuit(data, block, qsvt_aux)
+#     qsvt_cir.h(qsvt_aux)
+#     apply_projector_controlled_phase(qsvt_cir, qsvt_phases[0], block, qsvt_aux)
+#     for i in range(int(np.floor((len(qsvt_phases) - 1) / 2))):
+#         apply_qsvt_step(qsvt_cir,
+#                         qsvt_phases[(2 * i) + 1], qsvt_phases[(2 * i) + 2],
+#                         cir_be,
+#                         data,
+#                         block,
+#                         qsvt_aux
+#                        )
+#     qsvt_cir.append(cir_be, data[:] + block[:])
+#     apply_projector_controlled_phase(qsvt_cir, qsvt_phases[len(qsvt_phases) - 1], block, qsvt_aux)
+#     qsvt_cir.h(qsvt_aux)
+
+#     return qsvt_cir
+```
+
+## run an example
+
+```python
+# SIZE = 6
+# DEGREE = 3
+# QSVT_PHASES = [1.280311896404252, 8.127145628464149, 1.8439603212845617, -5.002873410775335]
+
+# start_time = time.time()
+# qc_qsvt = get_qsvt_circuit(QSVT_PHASES, SIZE)
+# transpiled_cir = transpile(
+#             qc_qsvt,
+#             basis_gates=BASIS_GATES,
+#             optimization_level=OPT_LEVEL,
+#     )
+# transpilation_time = time.time()-start_time
+# depth = transpiled_cir.depth()
+# cx_counts = transpiled_cir.count_ops()["cx"]
+# width = transpiled_cir.width()
+
+# print(f"==== qiskit for {SIZE}==== time: {transpilation_time}")
+```

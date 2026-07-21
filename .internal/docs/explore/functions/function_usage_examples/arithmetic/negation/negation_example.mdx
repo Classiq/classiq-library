@@ -1,0 +1,53 @@
+---
+title: "Negation"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/negation/negation_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The negation operation receives a quantum register representing some number $x$
+and returns a quantum register containing $-x$.
+
+Integer and fixed point numbers are both supported.
+
+## Example
+
+The following example will show negation of a signed quantum variable.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum], b: Output[QNum]) -> None:
+    allocate(3, SIGNED, 0, a)
+    hadamard_transform(a)
+    b |= -a
+```
+```python
+
+qprog = synthesize(main)
+
+result = execute(qprog).result_value()
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 0.0, 'b': 0.0}: 143,
+   {'a': -2.0, 'b': 2.0}: 136,
+   {'a': -1.0, 'b': 1.0}: 130,
+   {'a': 1.0, 'b': -1.0}: 122,
+   {'a': 2.0, 'b': -2.0}: 121,
+   {'a': 3.0, 'b': -3.0}: 120,
+   {'a': -4.0, 'b': 4.0}: 114,
+   {'a': -3.0, 'b': 3.0}: 114]
+  
+
+```
+</Info>

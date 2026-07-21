@@ -1,0 +1,200 @@
+---
+title: Simulator Noise
+icon: "/icons/bulletsharp.svg"
+---
+
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `DepolarizingNoiseOnGate` | Depolarizing noise applied uniformly to every occurrence of a named gate: the same error statistics on all qubit positions where that gate appears. |
+| `LocalDepolarizingNoiseOnGate` | Depolarizing noise on a named gate only when it acts on a specific ordered tuple of qubit indices (other placements of the same gate name are unaff... |
+| `PauliNoiseTerm` | One Pauli operator and its probability within a mixed Pauli noise channel. |
+| `PauliNoiseOnGate` | A mixed Pauli channel applied uniformly to every occurrence of a named gate (same statistics on all positions). |
+| `ThermalRelaxationNoiseOnGate` | Single-qubit amplitude-and-phase relaxation over the gate duration ``time``. |
+| `LocalReadoutNoise` | Readout confusion for one simulator qubit using a full 2-by-2 assignment matrix (see module docstring). |
+| `ClassiqSimulatorNoiseSpecification` | Complete custom noise description for Classiq noisy simulators. |
+
+
+### DepolarizingNoiseOnGate
+
+Depolarizing noise applied uniformly to every occurrence of a named gate: the same
+error statistics on all qubit positions where that gate appears.
+
+
+### gate
+
+
+`gate: str = Field(..., description="Name of the noisy instruction in the gate set used for simulation (e.g. single-qubit 'x', 'h', 'id'; two-qubit 'cx', 'cz').", min_length=1)`
+
+
+### probability
+
+
+`probability: PydanticProbabilityFloat = Field(..., description='Depolarizing strength in [0, 1] for typical settings; the channel is the identity at probability 0 and strongest at the upper limit allowed for that gate width.')`
+
+
+### num_qubits
+
+
+`num_qubits: Literal[1, 2] = Field(..., description='Number of qubits the named gate acts on (1 or 2).')`
+
+### LocalDepolarizingNoiseOnGate
+
+Depolarizing noise on a named gate only when it acts on a specific ordered tuple of
+qubit indices (other placements of the same gate name are unaffected).
+
+
+### qubits
+
+
+`qubits: list[int] = Field(..., description='Simulator qubit indices; length must equal num_qubits.', min_length=1)`
+
+### PauliNoiseTerm
+
+One Pauli operator and its probability within a mixed Pauli noise channel.
+
+
+### pauli
+
+
+`pauli: str = Field(..., description="Tensor product of Pauli labels I, X, Y, Z -- one character per qubit, left to right in the same order as the gate's qubits. Examples: 'X' or 'Z' for one qubit; 'IX', 'ZZ', 'XY' for two.", min_length=1)`
+
+
+### probability
+
+
+`probability: float = Field(..., ge=0.0, le=1.0)`
+
+### PauliNoiseOnGate
+
+A mixed Pauli channel applied uniformly to every occurrence of a named gate (same
+statistics on all positions). Include an identity Pauli term when you want a fraction
+of executions to stay error-free.
+
+
+### gate
+
+
+`gate: str = Field(..., min_length=1)`
+
+
+### num_qubits
+
+
+`num_qubits: Literal[1, 2] = Field(...)`
+
+
+### pauli_terms
+
+
+`pauli_terms: list[PauliNoiseTerm] = Field(..., min_length=1, description='Non-empty list; all term probabilities must sum to 1.')`
+
+### ThermalRelaxationNoiseOnGate
+
+Single-qubit amplitude-and-phase relaxation over the gate duration ``time``.
+Use only with single-qubit ``gate`` names; the channel acts on one tensor factor.
+
+
+### gate
+
+
+`gate: str = Field(..., min_length=1)`
+
+
+### t1
+
+
+`t1: float = Field(..., gt=0, description='Energy relaxation time constant (T1); use the same unit as ``time``.')`
+
+
+### t2
+
+
+`t2: float = Field(..., gt=0, description='Dephasing time constant (T2); must satisfy T2 <= 2 T1 for a physical Lindblad-type model.')`
+
+
+### time
+
+
+`time: float = Field(..., ge=0, description='Duration the qubit experiences the channel (same unit as T1, T2).')`
+
+
+### excited_state_population
+
+
+`excited_state_population: float = Field(default=0.0, ge=0.0, le=1.0, description='Equilibrium population of the excited `|1&gt;` state (0 to 1).')`
+
+### LocalReadoutNoise
+
+Readout confusion for one simulator qubit using a full 2-by-2 assignment matrix
+(see module docstring).
+
+
+### qubit
+
+
+`qubit: int = Field(..., ge=0, description='Index of the measured qubit in the simulator labeling.')`
+
+
+### assignment_probabilities
+
+
+`assignment_probabilities: list[list[float]] = Field(..., description='2-by-2 row-stochastic matrix: rows `|0&gt;`, `|1&gt;`; columns classical outcomes 0, 1.')`
+
+### ClassiqSimulatorNoiseSpecification
+
+Complete custom noise description for Classiq noisy simulators. Combine any subset
+of the fields; an empty specification means an ideal (noise-free) simulation.
+
+Global readout settings (symmetric bit-flip probability or a shared 2-by-2 assignment
+matrix for every qubit) cannot both be set. Per-qubit readout in
+``local_readout_errors`` uses the same matrix convention as in ``LocalReadoutNoise``.
+
+
+### basis_gates
+
+
+`basis_gates: list[str] | None = Field(default=None, description='Primitive gate names the simulator should treat as native when resolving noise on transpiled circuits. If None, the execution backend uses its default primitive list (often id, rz, sx, cx or an equivalent set).')`
+
+
+### readout_bit_flip_probability
+
+
+`readout_bit_flip_probability: PydanticProbabilityFloat | None = Field(default=None, description='Symmetric classical bit-flip probability on measurement for all qubits: P(wrong outcome|state) = p for both `|0&gt;` and `|1&gt;`. Mutually exclusive with readout_assignment_probabilities.')`
+
+
+### readout_assignment_probabilities
+
+
+`readout_assignment_probabilities: list[list[float]] | None = Field(default=None, description="Single 2-by-2 readout assignment matrix applied to every qubit's measurement (same convention as LocalReadoutNoise). Mutually exclusive with readout_bit_flip_probability.")`
+
+
+### local_readout_errors
+
+
+`local_readout_errors: list[LocalReadoutNoise] = Field(default_factory=list, description='Per-qubit readout matrices; indices refer to simulator qubits.')`
+
+
+### gate_depolarizing_errors
+
+
+`gate_depolarizing_errors: list[DepolarizingNoiseOnGate] = Field(default_factory=list, description='Depolarizing noise on all positions of each listed gate name.')`
+
+
+### local_depolarizing_errors
+
+
+`local_depolarizing_errors: list[LocalDepolarizingNoiseOnGate] = Field(default_factory=list, description='Depolarizing noise only when the gate appears on the given qubits.')`
+
+
+### gate_pauli_errors
+
+
+`gate_pauli_errors: list[PauliNoiseOnGate] = Field(default_factory=list, description='Mixed Pauli noise on all positions of each listed gate name.')`
+
+
+### gate_thermal_relaxation_errors
+
+
+`gate_thermal_relaxation_errors: list[ThermalRelaxationNoiseOnGate] = Field(default_factory=list, description='Thermal relaxation after each listed single-qubit gate.')`

@@ -1,0 +1,150 @@
+---
+title: Classiq
+icon: "/icons/bulletsharp.svg"
+---
+
+### ClassiqBackendPreferences
+
+Represents backend preferences specific to Classiq quantum computing targets.
+
+This class is used to configure the backend options for executing quantum circuits on Classiq's platform.
+The relevant backend names for Classiq targets are specified in `ClassiqSimulatorBackendNames` & `ClassiqNvidiaBackendNames`.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [is_nvidia_backend](#is_nvidia_backend) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `backend_service_provider` | `ProviderTypeVendor.CLASSIQ` | The provider vendor (Classiq). |
+| `backend_name` | `str` | Name of the requested backend or target. |
+| `use_double_precision` | `bool` | When True, Nvidia and Braket Nvidia simulators use double precision; when False (default), they use single precision. Only applies to Nvidia backends; ignored for other Classiq simulators. |
+| `noise_model` | `str \| None` | Optional named preset simulator noise (see ``CLASSIQ_NOISE_MODELS``). Mutually exclusive with ``simulator_noise_spec``. |
+| `simulator_noise_spec` | `ClassiqSimulatorNoiseSpecification \| None` | Optional user-defined noise (see ``ClassiqSimulatorNoiseSpecification`` in ``classiq.interface.backend.simulator_noise`` for field semantics and usage). Mutually exclusive with ``noise_model``. |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.CLASSIQ = pydantic.Field(default=(ProviderVendor.CLASSIQ))`
+
+
+### use_double_precision
+
+
+`use_double_precision: bool = pydantic.Field(default=False, description='Use double precision on Nvidia and Braket Nvidia simulators. Default is False (single precision). Set to True for double precision.')`
+
+
+### noise_model
+
+
+`noise_model: str | None = pydantic.Field(default=None, description='Named preset noise model for Classiq simulators (see CLASSIQ_NOISE_MODELS). Mutually exclusive with simulator_noise_spec.')`
+
+
+### simulator_noise_spec
+
+
+`simulator_noise_spec: ClassiqSimulatorNoiseSpecification | None = pydantic.Field(default=None, description='Custom noise specification for Classiq simulators. Mutually exclusive with noise_model.')`
+### ClassiqSimulatorBackendNames
+
+The simulator backends available in the Classiq provider.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [SIMULATOR](#simulator) |  |  |
+| [SIMULATOR_STATEVECTOR](#simulator_statevector) |  |  |
+| [SIMULATOR_DENSITY_MATRIX](#simulator_density_matrix) |  |  |
+| [SIMULATOR_MATRIX_PRODUCT_STATE](#simulator_matrix_product_state) |  |  |
+
+
+### SIMULATOR
+
+
+```python
+SIMULATOR = 'simulator'
+```
+
+
+### SIMULATOR_STATEVECTOR
+
+
+```python
+SIMULATOR_STATEVECTOR = 'simulator_statevector'
+```
+
+
+### SIMULATOR_DENSITY_MATRIX
+
+
+```python
+SIMULATOR_DENSITY_MATRIX = 'simulator_density_matrix'
+```
+
+
+### SIMULATOR_MATRIX_PRODUCT_STATE
+
+
+```python
+SIMULATOR_MATRIX_PRODUCT_STATE = 'simulator_matrix_product_state'
+```
+### ClassiqNvidiaBackendNames
+
+Classiq's Nvidia simulator backend names.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [is_braket_nvidia_backend](#is_braket_nvidia_backend) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [SIMULATOR](#simulator) |  |  |
+| [SIMULATOR_STATEVECTOR](#simulator_statevector) |  |  |
+| [BRAKET_NVIDIA_SIMULATOR](#braket_nvidia_simulator) |  |  |
+| [BRAKET_NVIDIA_SIMULATOR_STATEVECTOR](#braket_nvidia_simulator_statevector) |  |  |
+
+
+### SIMULATOR
+
+
+```python
+SIMULATOR = 'nvidia_simulator'
+```
+
+
+### SIMULATOR_STATEVECTOR
+
+
+```python
+SIMULATOR_STATEVECTOR = 'nvidia_simulator_statevector'
+```
+
+
+### BRAKET_NVIDIA_SIMULATOR
+
+
+```python
+BRAKET_NVIDIA_SIMULATOR = 'braket_nvidia_simulator'
+```
+
+
+### BRAKET_NVIDIA_SIMULATOR_STATEVECTOR
+
+
+```python
+BRAKET_NVIDIA_SIMULATOR_STATEVECTOR = 'braket_nvidia_simulator_statevector'
+```

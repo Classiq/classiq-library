@@ -1,0 +1,172 @@
+---
+title: Allocation
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `free` | [Qmod core-library function]. |
+| `prepare_state` | [Qmod core-library function]. |
+| `prepare_amplitudes` | [Qmod core-library function]. |
+| `inplace_prepare_state` | [Qmod core-library function]. |
+| `inplace_prepare_amplitudes` | [Qmod core-library function]. |
+| `assign_phase_table` | [Qmod core-library function]. |
+
+
+### free
+
+
+<pre><code>free(
+    in_: Input[QArray[QBit]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Releases the qubits allocated to a quantum variable, allowing them to be reused.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `in_` | `Input[QArray[QBit]]` | The quantum variable that will be freed. Must be initialized before. | *required* |
+
+
+
+### prepare_state
+
+
+<pre><code>prepare_state(
+    probabilities: CArray[CReal],
+    bound: CReal,
+    out: Output[QArray[QBit, Literal[&#x27;log(probabilities.len, 2)&#x27;]]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Initializes a quantum variable in a state corresponding to a given probability distribution:
+
+$$
+    \left|\text{out}\right\rangle = \sum_{i=0}^{\text{len(probabilities)}-1} \sqrt{\text{probabilities}[i]} \left|i\right\rangle
+$$
+
+with $i = 0, 1, 2, ..., \text\{len(amplitudes)\}-1$ corresponding to computational basis states.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `probabilities` | `CArray[CReal]` | The probability distribution to initialize the quantum variable. Must be a valid probability distribution, i.e., a list of non-negative real numbers that sum to 1. Must have a valid length (a power of 2). | *required* |
+| `bound` | `CReal` | An error bound, expressed as the $L^\{2\}$ norm between the expected and actual distributions. A larger bound can reduce the circuit size at the expense of accuracy. Must be a positive real number. | *required* |
+| `out` | `Output[QArray[QBit, Literal['log(probabilities.len, 2)']]]` | The quantum variable that will receive the initialized state. Must be uninitialized. | *required* |
+
+
+
+### prepare_amplitudes
+
+
+<pre><code>prepare_amplitudes(
+    amplitudes: CArray[CReal],
+    bound: CReal,
+    out: Output[QArray[QBit, Literal[&#x27;log(amplitudes.len, 2)&#x27;]]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Initializes a quantum variable in a state corresponding to the given amplitudes:
+
+$$
+    \left|\text{out}\right\rangle = \sum_{i=0}^{\text{len(amplitudes)}-1} \text{amplitudes}[i] \left|i\right\rangle
+$$
+
+with $i = 0, 1, 2, ..., \text\{len(amplitudes)\}-1$ corresponding to computational basis states.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `amplitudes` | `CArray[CReal]` | The amplitudes to initialize the quantum variable. Must be a valid real quantum state vector, i.e., the sum of squares should be 1. Must have a valid length (a power of 2). | *required* |
+| `bound` | `CReal` | An error bound, expressed as the $L^\{2\}$ norm between the expected and actual distributions. A larger bound can reduce the circuit size at the expense of accuracy. Must be a positive real number. | *required* |
+| `out` | `Output[QArray[QBit, Literal['log(amplitudes.len, 2)']]]` | The quantum variable that will receive the initialized state. Must be uninitialized. | *required* |
+
+
+
+### inplace_prepare_state
+
+
+<pre><code>inplace_prepare_state(
+    probabilities: CArray[CReal],
+    bound: CReal,
+    target: QArray[QBit, Literal[&#x27;log(probabilities.len, 2)&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Transforms a given quantum variable in the state `|0>` to the state per the specified probability distribution
+(similar to `prepare_state` but preformed on an initialized variable).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `probabilities` | `CArray[CReal]` | The probability distribution corresponding to the quantum variable state. Must be a valid probability distribution, i.e., a list of non-negative real numbers that sum to 1. Must have a valid length (a power of 2). | *required* |
+| `bound` | `CReal` | An error bound, expressed as the $L^\{2\}$ norm between the expected and actual distributions. A larger bound can reduce the circuit size at the expense of accuracy. Must be a positive real number. | *required* |
+| `target` | `QArray[QBit, Literal['log(probabilities.len, 2)']]` | The quantum variable to act upon. | *required* |
+
+
+
+### inplace_prepare_amplitudes
+
+
+<pre><code>inplace_prepare_amplitudes(
+    amplitudes: CArray[CReal],
+    bound: CReal,
+    target: QArray[QBit, Literal[&#x27;log(amplitudes.len, 2)&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Transforms a given quantum variable in the state `|0>` to the state per the specified amplitudes
+(similar to `prepare_amplitudes` but preformed on an initialized variable).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `amplitudes` | `CArray[CReal]` | The amplitudes to initialize the quantum variable. Must be a valid real quantum state vector, i.e., the sum of squares should be 1. Must have a valid length (a power of 2). | *required* |
+| `bound` | `CReal` | An error bound, expressed as the $L^\{2\}$ norm between the expected and actual distributions. A larger bound can reduce the circuit size at the expense of accuracy. Must be a positive real number. | *required* |
+| `target` | `QArray[QBit, Literal['log(amplitudes.len, 2)']]` | The quantum variable to act upon. | *required* |
+
+
+
+### assign_phase_table
+
+
+<pre><code>assign_phase_table(
+    phases: CArray[CReal],
+    target: Const[QArray[QBit, Literal[&#x27;log(phases.len, 2)&#x27;]]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Transforms a given quantum variable in the state `|n>` to $e^\{i phases[n]\}$ `|n>` for all n, where `|n>` are the computational basis states.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phases` | `CArray[CReal]` | The phases to rotate the quantum variable. Must be a real vector. Must have a valid length (2 to the power of the number of qubits in the target variable). | *required* |
+| `target` | `Const[QArray[QBit, Literal['log(phases.len, 2)']]]` | The quantum variable to act upon. | *required* |

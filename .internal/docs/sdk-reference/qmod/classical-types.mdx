@@ -1,0 +1,303 @@
+---
+title: Classical Types
+icon: "/icons/bulletsharp.svg"
+---
+
+This is a list of the classical types that are built-in in `Qmod`.
+For more information regarding classical types see: [classical types](/qmod-reference/language-reference/classical-types).
+
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `Pauli` | Enumeration for the Pauli matrices used in quantum computing. |
+| `PauliTerm` | A term in a Hamiltonian, represented as a product of single-qubit Pauli matrices. |
+| `IndexedPauli` | A single-qubit Pauli matrix on a specific qubit given by its index. |
+| `SparsePauliTerm` | A term in the Hamiltonian, represented as a sparse product of single-qubit Pauli matrices. |
+| `SparsePauliOp` | Represents a collection of sparse Pauli operators. |
+
+
+### Pauli
+
+Enumeration for the Pauli matrices used in quantum computing.
+
+Represents the four Pauli matrices used in quantum mechanics: Identity (I), X, Y, and Z operators.
+The Pauli matrices are defined as:
+
+$$
+I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}
+$$
+
+$$
+X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}
+$$
+
+$$
+Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}
+$$
+
+$$
+Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}
+$$
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [I](#i) |  |  |
+| [X](#x) |  |  |
+| [Y](#y) |  |  |
+| [Z](#z) |  |  |
+
+
+### I
+
+
+```python
+I = '0'
+```
+
+
+### X
+
+
+```python
+X = '1'
+```
+
+
+### Y
+
+
+```python
+Y = '2'
+```
+
+
+### Z
+
+
+```python
+Z = '3'
+```
+
+### PauliTerm
+
+A term in a Hamiltonian, represented as a product of single-qubit Pauli matrices.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `pauli` | `CArray[Pauli]` | The list of the chosen Pauli operators in the term, corresponds to a product of them. |
+| `coefficient` | `CReal` | The coefficient of the term (floating number). |
+
+
+### pauli
+
+
+`pauli: CArray[Pauli]`
+
+
+### coefficient
+
+
+`coefficient: CReal`
+
+### IndexedPauli
+
+A single-qubit Pauli matrix on a specific qubit given by its index.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `pauli` | `Pauli` | The Pauli operator. |
+| `index` | `CInt` | The index of the qubit being operated on. |
+
+
+### pauli
+
+
+`pauli: Pauli`
+
+
+### index
+
+
+`index: CInt`
+
+### SparsePauliTerm
+
+A term in the Hamiltonian, represented as a sparse product of single-qubit Pauli
+matrices.
+
+   Attributes:
+       paulis (CArray[IndexedPauli]): The list of chosen sparse Pauli operators in the term corresponds to a product of them. (See IndexedPauli)
+       coefficient (CReal): The coefficient of the term (floating number).
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [cmp_paulis](#cmp_paulis) |  |
+
+
+### paulis
+
+
+`paulis: CArray[IndexedPauli]`
+
+
+### coefficient
+
+
+`coefficient: CReal`
+
+### SparsePauliOp
+
+Represents a collection of sparse Pauli operators.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [get_tuples_representation](#get_tuples_representation) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `terms` | `CArray[SparsePauliTerm]` | The list of chosen sparse Pauli terms, corresponds to a product of them. (See: SparsePauliTerm) |
+| `num_qubits` | `CInt` | The number of qubits in the Hamiltonian. |
+
+
+### terms
+
+
+`terms: list[SparsePauliTerm]`
+
+
+### num_qubits
+
+
+`num_qubits: int`
+    options:
+        show_source: false
+        show_if_no_docstring: false
+
+    options:
+        show_source: false
+        show_if_no_docstring: false
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `SparsePauliOp` | Represents a collection of sparse Pauli operators. |
+| `Pauli` | Enumeration for the Pauli matrices used in quantum computing. |
+
+
+### SparsePauliOp
+
+Represents a collection of sparse Pauli operators.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [get_tuples_representation](#get_tuples_representation) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `terms` | `CArray[SparsePauliTerm]` | The list of chosen sparse Pauli terms, corresponds to a product of them. (See: SparsePauliTerm) |
+| `num_qubits` | `CInt` | The number of qubits in the Hamiltonian. |
+
+
+### terms
+
+
+`terms: list[SparsePauliTerm]`
+
+
+### num_qubits
+
+
+`num_qubits: int`
+
+### Pauli
+
+Enumeration for the Pauli matrices used in quantum computing.
+
+Represents the four Pauli matrices used in quantum mechanics: Identity (I), X, Y, and Z operators.
+The Pauli matrices are defined as:
+
+$$
+I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}
+$$
+
+$$
+X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}
+$$
+
+$$
+Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}
+$$
+
+$$
+Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}
+$$
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [I](#i) |  |  |
+| [X](#x) |  |  |
+| [Y](#y) |  |  |
+| [Z](#z) |  |  |
+
+
+### I
+
+
+```python
+I = '0'
+```
+
+
+### X
+
+
+```python
+X = '1'
+```
+
+
+### Y
+
+
+```python
+Y = '2'
+```
+
+
+### Z
+
+
+```python
+Z = '3'
+```
+    options:
+        show_source: false
+        show_if_no_docstring: false

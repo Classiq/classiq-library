@@ -1,0 +1,310 @@
+---
+title: Arithmetic
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `unitary` | [Qmod core-library function]. |
+| `multiply` | [Qmod core-library function]. |
+| `multiply_constant` | [Qmod core-library function]. |
+| `canonical_add` | [Qmod core-library function]. |
+| `canonical_add_constant` | [Qmod core-library function]. |
+| `canonical_multiply` | [Qmod core-library function]. |
+| `canonical_multiply_constant` | [Qmod core-library function]. |
+| `canonical_square` | [Qmod core-library function]. |
+
+
+### unitary
+
+
+<pre><code>unitary(
+    elements: CArray[CArray[CReal]],
+    target: QArray[QBit, Literal[&#x27;log(elements[0].len, 2)&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies a unitary matrix on a quantum state.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `elements` | `CArray[CArray[CReal]]` | A 2d array of complex numbers representing the unitary matrix. This matrix must be unitary. | *required* |
+| `target` | `QArray[QBit, Literal['log(elements[0].len, 2)']]` | The quantum state to apply the unitary on. Should be of corresponding size. | *required* |
+
+
+
+### multiply
+
+
+<pre><code>multiply(
+    left: Const[QNum],
+    right: Const[QNum],
+    result: Output[QNum]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Multiplies two quantum numeric variables:
+
+$$
+    \left|\text{left}\right\rangle \left|\text{right}\right\rangle
+    \mapsto
+    \left|\text{left}\right\rangle \left|\text{right}\right\rangle
+    \left|\text{left} \cdot \text{right} \right\rangle
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `left` | `Const[QNum]` | The first argument for the multiplication. | *required* |
+| `right` | `Const[QNum]` | The second argument for the multiplication. | *required* |
+| `result` | `Output[QNum]` | The quantum variable to hold the multiplication result. | *required* |
+
+
+
+### multiply_constant
+
+
+<pre><code>multiply_constant(
+    left: CReal,
+    right: Const[QNum],
+    result: Output[QNum]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Multiplies a quantum numeric variable with a constant:
+
+$$
+    \left|\text{right}\right\rangle
+    \mapsto
+    \left|\text{right}\right\rangle
+    \left|\text{left} \cdot \text{right} \right\rangle
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `left` | `CReal` | The constant argument for the multiplication. | *required* |
+| `right` | `Const[QNum]` | The variable argument for the multiplication. | *required* |
+| `result` | `Output[QNum]` | The quantum variable to hold the multiplication result. | *required* |
+
+
+
+### canonical_add
+
+
+<pre><code>canonical_add(
+    left: Const[QArray],
+    extend_left: CBool,
+    right: QArray
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Adds two quantum variables representing integers (signed or unsigned), storing the
+result in the second variable (in-place):
+
+$$
+    \left|\text{left}\right\rangle \left|\text{right}\right\rangle
+    \mapsto
+    \left|\text{left}\right\rangle \left|\left(\text{right} +
+    \text{left}\right) \bmod 2^{\text{right.size}} \right\rangle
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `left` | `Const[QArray]` | The out-of-place argument for the addition. | *required* |
+| `extend_left` | `CBool` | Whether to sign-extend the left argument. | *required* |
+| `right` | `QArray` | The in-place argument for the addition, holds the final result. | *required* |
+
+
+
+### canonical_add_constant
+
+
+<pre><code>canonical_add_constant(
+    left: CInt,
+    right: QArray
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Adds an integer constant to a quantum variable representing an integer (signed or
+unsigned):
+
+$$
+    \left|\text{right}\right\rangle
+    \mapsto
+    \left|\left(\text{right} +
+    \text{left}\right) \bmod 2^{\text{right.size}} \right\rangle
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `left` | `CInt` | The constant argument for the addition. | *required* |
+| `right` | `QArray` | The quantum argument for the addition, holds the final result. | *required* |
+
+
+
+### canonical_multiply
+
+
+<pre><code>canonical_multiply(
+    left: Const[QArray],
+    extend_left: CBool,
+    right: Const[QArray],
+    extend_right: CBool,
+    result: QArray,
+    trim_result_lsb: CBool
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Multiplies two quantum variables representing integers (signed or unsigned) into the
+result variable which is assumed to start in the $|0\rangle$ state.
+
+If `trim_result_lsb` is `False`, applies the transformation:
+
+$$
+    \left|\text{left}\right\rangle \left|\text{right}\right\rangle
+    \left|0\right\rangle \mapsto \left|\text{left}\right\rangle
+    \left|\text{right}\right\rangle \left|\left( \text{left} \cdot
+    \text{right} \right) \bmod 2^{\text{result.size}} \right\rangle
+$$
+
+If `trim_result_lsb` is `True`, the function avoids computing the result's LSB and
+applies the transformation:
+
+$$
+    \left|\text{left}\right\rangle \left|\text{right}\right\rangle
+    \left|0\right\rangle \mapsto \left|\text{left}\right\rangle
+    \left|\text{right}\right\rangle \left|\left( \text{left} \cdot
+    \text{right} \right) \gg 1 \bmod 2^{\text{result.size}} \right\rangle
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `left` | `Const[QArray]` | The first argument for the multiplication. | *required* |
+| `extend_left` | `CBool` | Whether to sign-extend the left argument. | *required* |
+| `right` | `Const[QArray]` | The second argument for the multiplication. | *required* |
+| `extend_right` | `CBool` | Whether to sign-extend the right argument. | *required* |
+| `result` | `QArray` | The quantum variable to hold the multiplication result. | *required* |
+| `trim_result_lsb` | `CBool` | Whether to avoid computing the result's LSB. | *required* |
+
+
+
+### canonical_multiply_constant
+
+
+<pre><code>canonical_multiply_constant(
+    left: CInt,
+    right: Const[QArray],
+    extend_right: CBool,
+    result: QArray,
+    trim_result_lsb: CBool
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Multiplies a quantum variable representing an integer (signed or unsigned) with a
+constant, into the result variable which is assumed to start in the $|0\rangle$ state.
+
+If `trim_result_lsb` is `False`, applies the transformation:
+
+$$
+    \left|\text{right}\right\rangle \left|0\right\rangle \mapsto
+    \left|\text{right}\right\rangle \left|\left( \text{left} \cdot
+    \text{right} \right) \bmod 2^{\text{result.size}} \right\rangle
+$$
+
+If `trim_result_lsb` is `True`, the function avoids computing the result's LSB and
+applies the transformation:
+
+$$
+    \left|\text{right}\right\rangle \left|0\right\rangle \mapsto
+    \left|\text{right}\right\rangle \left|\left( \text{left} \cdot
+    \text{right} \right) \gg 1 \bmod 2^{\text{result.size}} \right\rangle
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `left` | `CInt` | The constant argument for the multiplication. | *required* |
+| `right` | `Const[QArray]` | The variable argument for the multiplication. | *required* |
+| `extend_right` | `CBool` | Whether to sign-extend the right argument. | *required* |
+| `result` | `QArray` | The quantum variable to hold the multiplication result. | *required* |
+| `trim_result_lsb` | `CBool` | Whether to avoid computing the result's LSB. | *required* |
+
+
+
+### canonical_square
+
+
+<pre><code>canonical_square(
+    arg: Const[QArray],
+    extend_arg: CBool,
+    result: QArray,
+    trim_result_lsb: CBool
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Squares a quantum variable representing an integer (signed or unsigned), into
+the result variable which is assumed to start in the $|0\rangle$ state.
+
+If `trim_result_lsb` is `False`, applies the transformation:
+
+$$
+    \left|\text{arg}\right\rangle \left|0\right\rangle \mapsto
+    \left|\text{arg}\right\rangle \left|\left( \text{arg}^{2}\right)
+    \bmod 2^{\text{result.size}} \right\rangle
+$$
+
+If `trim_result_lsb` is `True`, the function avoids computing the result's LSB and
+applies the transformation:
+
+$$
+    \left|\text{arg}\right\rangle \left|0\right\rangle \mapsto
+    \left|\text{arg}\right\rangle \left|\left( \text{arg}^{2} \right)
+    \gg 1 \bmod 2^{\text{result.size}} \right\rangle
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `arg` | `Const[QArray]` | The argument to square. | *required* |
+| `extend_arg` | `CBool` | Whether to sign-extend the argument. | *required* |
+| `result` | `QArray` | The quantum variable to hold the squared result. | *required* |
+| `trim_result_lsb` | `CBool` | Whether to avoid computing the result's LSB. | *required* |

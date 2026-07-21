@@ -1,0 +1,38 @@
+---
+title: Amplitude Loading
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `assign_amplitude_table` | [Qmod Classiq-library function]. |
+
+
+### assign_amplitude_table
+
+
+<pre><code>assign_amplitude_table(
+    amplitudes: list[float],
+    index: Const[QArray],
+    indicator: QBit
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Load a specified list of real amplitudes into a quantum variable using an extra indicator qubit:
+\( |i\rangle|0\rangle \rightarrow a(i)\ |i\rangle|1\rangle + \sqrt{1 - a(i)^2}\ |i\rangle|0\rangle \).
+Here, \(a(i)\) is the i-th amplitude, determined by the QNum when the index is in state \(i\).
+A list extracted from a given classical function \(f(x)\), with indexing according to a given QNum, can be obtained via the utility SDK function `lookup_table`.
+This function expects the indicator qubit to be initialized to \(|0\rangle\).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `amplitudes` | `list[float]` | Real values for the amplitudes. Must be between -1 and 1 | *required* |
+| `index` | `Const[QArray]` | The quantum variable used for amplitude indexing | *required* |
+| `indicator` | `QBit` | The quantum indicator qubit | *required* |

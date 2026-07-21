@@ -1,0 +1,53 @@
+---
+title: "Exponential State Preparation"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/classiq_open_library/special_state_preparations/prepare_exponential_state.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The `prepare_exponential_state` function
+creates a state with exponentially decreasing amplitudes. Namely,
+the probability for a state representing an integer $n$ is
+
+$$
+P\left(n\right) = \frac{1}{Z} e^{-\lambda n}
+$$
+where $\lambda$ is the rate, and $Z$ is a normalization factor.
+If $q$ in the number of qubits, then
+
+$$
+Z = \sum_{n=0} ^{n = 2^q - 1} e^{-\lambda n} = \frac{1 - e^{-\lambda 2^q}}{1 - e^{-\lambda}}
+$$
+Function: `prepare_exponential_state`
+
+Arguments:
+
+- `rate: CReal`
+- `q: QArray[QBit]`
+
+Notice that the function acts inplace on the qubits.
+
+## Example
+
+Prepare a state with probabilities:
+
+$$
+P\left(n\right) = \frac{1}{Z} e^{-0.1 n}
+$$
+where  $n$ is in the range $[0, 31]$.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QArray[QBit]]):
+    allocate(5, x)
+    prepare_exponential_state(0.1, x)
+```
+```python
+
+qprog = synthesize(main)
+```

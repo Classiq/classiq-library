@@ -1,0 +1,37 @@
+---
+title: "GHZ State Preparation"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/classiq_open_library/special_state_preparations/prepare_ghz_state.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+Use the `prepare_ghz_state` function to create a Greenberger-Horne-Zeilinger (GHZ) state.
+i.e., a balanced superposition of all ones and all zeros, on an arbitrary number of qubits.
+
+## Syntax
+
+Function: `prepare_ghz_state`
+
+Arguments:
+
+- `size: CInt`
+- `q: Output[QArray[QBit]]`
+
+## Example
+
+`prepare_ghz_state` on 5 qubits
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QArray[QBit]]):
+    prepare_ghz_state(5, x)
+```
+```python
+
+qprog = synthesize(main)
+```

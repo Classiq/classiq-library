@@ -1,0 +1,2231 @@
+---
+title: "Quantum computational finance: quantum algorithm for portfolio optimization"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/finance/portfolio_optimization_hhl/HHL_portfolio.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+In this tutorial, we will work through a concrete example of portfolio optimization.
+
+Our goal is to determine how to allocate capital across several assets so that we control risk while still aiming for good returns. To do this, we use historical stock price data to construct a portfolio, that is, the allocation ratios of the assets.
+
+The approach is motivated by the methods proposed in References \[1,2], where portfolio optimization is identified as a problem that can potentially be accelerated using the HHL algorithm. As a simple practical example, we consider an investment in four major technology stocks and examine how to distribute capital among them in an effective way.
+
+first we need to install some out package to collect stock data.
+
+```python
+# !pip install yfinance
+# !pip install pandas_datareader
+```
+```python
+
+# import datetime
+# import yfinance as yf
+
+
+# codes = ['NVDA', 'AAPL', 'TSLA', 'AMZN']
+
+
+# start = datetime.datetime(2024, 1, 1)
+# end   = datetime.datetime(2024, 12, 31)
+
+# data = yf.download(codes, start=start, end=end, auto_adjust=False, progress=False)
+
+
+# df = data['Adj Close']
+# df.to_csv("asset_data.csv")
+# display(df.head(10))
+```
+```python
+
+import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from classiq import *
+```
+
+## Loading Dataset of Stock
+
+We define csv\_data which was generated from `yfinance`.  We use the data from `2024-01-02` to `2024-12-30`.
+
+```python
+import numpy as np
+import pandas as pd
+
+stock_data = {
+    "Date": [
+        "2024-01-02",
+        "2024-01-03",
+        "2024-01-04",
+        "2024-01-05",
+        "2024-01-08",
+        "2024-01-09",
+        "2024-01-10",
+        "2024-01-11",
+        "2024-01-12",
+        "2024-01-16",
+        "2024-01-17",
+        "2024-01-18",
+        "2024-01-19",
+        "2024-01-22",
+        "2024-01-23",
+        "2024-01-24",
+        "2024-01-25",
+        "2024-01-26",
+        "2024-01-29",
+        "2024-01-30",
+        "2024-01-31",
+        "2024-02-01",
+        "2024-02-02",
+        "2024-02-05",
+        "2024-02-06",
+        "2024-02-07",
+        "2024-02-08",
+        "2024-02-09",
+        "2024-02-12",
+        "2024-02-13",
+        "2024-02-14",
+        "2024-02-15",
+        "2024-02-16",
+        "2024-02-20",
+        "2024-02-21",
+        "2024-02-22",
+        "2024-02-23",
+        "2024-02-26",
+        "2024-02-27",
+        "2024-02-28",
+        "2024-02-29",
+        "2024-03-01",
+        "2024-03-04",
+        "2024-03-05",
+        "2024-03-06",
+        "2024-03-07",
+        "2024-03-08",
+        "2024-03-11",
+        "2024-03-12",
+        "2024-03-13",
+        "2024-03-14",
+        "2024-03-15",
+        "2024-03-18",
+        "2024-03-19",
+        "2024-03-20",
+        "2024-03-21",
+        "2024-03-22",
+        "2024-03-25",
+        "2024-03-26",
+        "2024-03-27",
+        "2024-03-28",
+        "2024-04-01",
+        "2024-04-02",
+        "2024-04-03",
+        "2024-04-04",
+        "2024-04-05",
+        "2024-04-08",
+        "2024-04-09",
+        "2024-04-10",
+        "2024-04-11",
+        "2024-04-12",
+        "2024-04-15",
+        "2024-04-16",
+        "2024-04-17",
+        "2024-04-18",
+        "2024-04-19",
+        "2024-04-22",
+        "2024-04-23",
+        "2024-04-24",
+        "2024-04-25",
+        "2024-04-26",
+        "2024-04-29",
+        "2024-04-30",
+        "2024-05-01",
+        "2024-05-02",
+        "2024-05-03",
+        "2024-05-06",
+        "2024-05-07",
+        "2024-05-08",
+        "2024-05-09",
+        "2024-05-10",
+        "2024-05-13",
+        "2024-05-14",
+        "2024-05-15",
+        "2024-05-16",
+        "2024-05-17",
+        "2024-05-20",
+        "2024-05-21",
+        "2024-05-22",
+        "2024-05-23",
+        "2024-05-24",
+        "2024-05-28",
+        "2024-05-29",
+        "2024-05-30",
+        "2024-05-31",
+        "2024-06-03",
+        "2024-06-04",
+        "2024-06-05",
+        "2024-06-06",
+        "2024-06-07",
+        "2024-06-10",
+        "2024-06-11",
+        "2024-06-12",
+        "2024-06-13",
+        "2024-06-14",
+        "2024-06-17",
+        "2024-06-18",
+        "2024-06-20",
+        "2024-06-21",
+        "2024-06-24",
+        "2024-06-25",
+        "2024-06-26",
+        "2024-06-27",
+        "2024-06-28",
+        "2024-07-01",
+        "2024-07-02",
+        "2024-07-03",
+        "2024-07-05",
+        "2024-07-08",
+        "2024-07-09",
+        "2024-07-10",
+        "2024-07-11",
+        "2024-07-12",
+        "2024-07-15",
+        "2024-07-16",
+        "2024-07-17",
+        "2024-07-18",
+        "2024-07-19",
+        "2024-07-22",
+        "2024-07-23",
+        "2024-07-24",
+        "2024-07-25",
+        "2024-07-26",
+        "2024-07-29",
+        "2024-07-30",
+        "2024-07-31",
+        "2024-08-01",
+        "2024-08-02",
+        "2024-08-05",
+        "2024-08-06",
+        "2024-08-07",
+        "2024-08-08",
+        "2024-08-09",
+        "2024-08-12",
+        "2024-08-13",
+        "2024-08-14",
+        "2024-08-15",
+        "2024-08-16",
+        "2024-08-19",
+        "2024-08-20",
+        "2024-08-21",
+        "2024-08-22",
+        "2024-08-23",
+        "2024-08-26",
+        "2024-08-27",
+        "2024-08-28",
+        "2024-08-29",
+        "2024-08-30",
+        "2024-09-03",
+        "2024-09-04",
+        "2024-09-05",
+        "2024-09-06",
+        "2024-09-09",
+        "2024-09-10",
+        "2024-09-11",
+        "2024-09-12",
+        "2024-09-13",
+        "2024-09-16",
+        "2024-09-17",
+        "2024-09-18",
+        "2024-09-19",
+        "2024-09-20",
+        "2024-09-23",
+        "2024-09-24",
+        "2024-09-25",
+        "2024-09-26",
+        "2024-09-27",
+        "2024-09-30",
+        "2024-10-01",
+        "2024-10-02",
+        "2024-10-03",
+        "2024-10-04",
+        "2024-10-07",
+        "2024-10-08",
+        "2024-10-09",
+        "2024-10-10",
+        "2024-10-11",
+        "2024-10-14",
+        "2024-10-15",
+        "2024-10-16",
+        "2024-10-17",
+        "2024-10-18",
+        "2024-10-21",
+        "2024-10-22",
+        "2024-10-23",
+        "2024-10-24",
+        "2024-10-25",
+        "2024-10-28",
+        "2024-10-29",
+        "2024-10-30",
+        "2024-10-31",
+        "2024-11-01",
+        "2024-11-04",
+        "2024-11-05",
+        "2024-11-06",
+        "2024-11-07",
+        "2024-11-08",
+        "2024-11-11",
+        "2024-11-12",
+        "2024-11-13",
+        "2024-11-14",
+        "2024-11-15",
+        "2024-11-18",
+        "2024-11-19",
+        "2024-11-20",
+        "2024-11-21",
+        "2024-11-22",
+        "2024-11-25",
+        "2024-11-26",
+        "2024-11-27",
+        "2024-11-29",
+        "2024-12-02",
+        "2024-12-03",
+        "2024-12-04",
+        "2024-12-05",
+        "2024-12-06",
+        "2024-12-09",
+        "2024-12-10",
+        "2024-12-11",
+        "2024-12-12",
+        "2024-12-13",
+        "2024-12-16",
+        "2024-12-17",
+        "2024-12-18",
+        "2024-12-19",
+        "2024-12-20",
+        "2024-12-23",
+        "2024-12-24",
+        "2024-12-26",
+        "2024-12-27",
+        "2024-12-30",
+    ],
+    "AAPL": [
+        183.9,
+        182.52,
+        180.2,
+        179.48,
+        183.82,
+        183.4,
+        184.44,
+        183.85,
+        184.18,
+        181.91,
+        180.97,
+        186.86,
+        189.76,
+        192.07,
+        193.35,
+        192.68,
+        192.35,
+        190.61,
+        189.93,
+        186.28,
+        182.67,
+        185.11,
+        184.11,
+        185.92,
+        187.52,
+        187.63,
+        186.55,
+        187.32,
+        185.63,
+        183.54,
+        182.65,
+        182.37,
+        180.83,
+        180.09,
+        180.84,
+        182.87,
+        181.04,
+        179.69,
+        181.15,
+        179.95,
+        179.28,
+        178.2,
+        173.68,
+        168.74,
+        167.75,
+        167.63,
+        169.34,
+        171.35,
+        171.82,
+        169.74,
+        171.6,
+        171.22,
+        172.31,
+        174.65,
+        177.22,
+        169.98,
+        170.88,
+        169.46,
+        168.33,
+        171.9,
+        170.09,
+        168.65,
+        167.47,
+        168.27,
+        167.45,
+        168.2,
+        167.08,
+        168.29,
+        166.42,
+        173.62,
+        175.12,
+        171.29,
+        168.0,
+        166.64,
+        165.68,
+        163.66,
+        164.49,
+        165.54,
+        167.65,
+        168.51,
+        167.93,
+        172.09,
+        168.95,
+        167.93,
+        171.62,
+        181.89,
+        180.23,
+        180.92,
+        181.26,
+        183.07,
+        181.81,
+        185.02,
+        186.16,
+        188.44,
+        188.55,
+        188.58,
+        189.75,
+        191.05,
+        189.61,
+        185.61,
+        188.69,
+        188.7,
+        189.0,
+        189.99,
+        190.95,
+        192.72,
+        193.03,
+        194.54,
+        193.16,
+        195.56,
+        191.81,
+        205.75,
+        211.63,
+        212.79,
+        211.05,
+        215.2,
+        212.84,
+        208.26,
+        206.09,
+        206.73,
+        207.65,
+        211.81,
+        212.65,
+        209.19,
+        215.28,
+        218.78,
+        220.05,
+        224.81,
+        226.28,
+        227.13,
+        231.4,
+        226.03,
+        228.98,
+        232.81,
+        233.23,
+        227.33,
+        222.66,
+        222.79,
+        222.44,
+        223.49,
+        217.06,
+        216.02,
+        216.48,
+        216.76,
+        217.32,
+        220.58,
+        216.88,
+        218.37,
+        207.85,
+        205.83,
+        208.4,
+        211.87,
+        214.78,
+        216.31,
+        220.03,
+        220.47,
+        223.46,
+        224.78,
+        224.62,
+        225.24,
+        225.13,
+        223.27,
+        225.57,
+        225.9,
+        226.75,
+        225.22,
+        228.5,
+        227.71,
+        221.52,
+        219.61,
+        221.13,
+        219.58,
+        219.67,
+        218.87,
+        221.41,
+        221.52,
+        221.25,
+        215.1,
+        215.57,
+        219.45,
+        227.58,
+        226.92,
+        225.2,
+        226.09,
+        225.1,
+        226.24,
+        226.51,
+        231.69,
+        224.94,
+        225.51,
+        224.4,
+        225.53,
+        220.44,
+        224.5,
+        228.25,
+        227.75,
+        226.27,
+        230.0,
+        232.54,
+        230.48,
+        230.85,
+        233.68,
+        235.15,
+        234.54,
+        229.46,
+        229.27,
+        230.11,
+        232.09,
+        232.36,
+        228.81,
+        224.64,
+        221.66,
+        220.76,
+        222.19,
+        221.47,
+        226.2,
+        225.93,
+        223.22,
+        223.22,
+        224.1,
+        227.19,
+        223.98,
+        226.99,
+        227.25,
+        227.96,
+        227.49,
+        228.83,
+        231.82,
+        234.0,
+        233.87,
+        236.26,
+        238.51,
+        241.55,
+        241.91,
+        241.94,
+        241.74,
+        245.63,
+        246.65,
+        245.38,
+        246.84,
+        247.01,
+        249.9,
+        252.33,
+        246.93,
+        248.66,
+        253.34,
+        254.12,
+        257.03,
+        257.85,
+        254.43,
+        251.06,
+    ],
+    "AMZN": [
+        149.92,
+        148.47,
+        144.57,
+        145.24,
+        149.1,
+        151.36,
+        153.72,
+        155.17,
+        154.61,
+        153.16,
+        151.71,
+        153.5,
+        155.33,
+        154.77,
+        156.02,
+        156.86,
+        157.75,
+        159.11,
+        161.25,
+        159.0,
+        155.19,
+        159.27,
+        171.8,
+        170.3,
+        169.14,
+        170.52,
+        169.83,
+        174.44,
+        172.33,
+        168.63,
+        170.97,
+        169.8,
+        169.5,
+        167.08,
+        168.58,
+        174.58,
+        174.99,
+        174.72,
+        173.53,
+        173.16,
+        176.75,
+        178.22,
+        177.58,
+        174.11,
+        173.5,
+        176.82,
+        175.35,
+        171.96,
+        175.38,
+        176.55,
+        178.75,
+        174.41,
+        174.47,
+        175.89,
+        178.14,
+        178.14,
+        178.86,
+        179.71,
+        178.3,
+        179.83,
+        180.38,
+        180.97,
+        180.69,
+        182.41,
+        180.0,
+        185.07,
+        185.19,
+        185.66,
+        185.94,
+        189.05,
+        186.13,
+        183.61,
+        183.32,
+        181.27,
+        179.22,
+        174.63,
+        177.22,
+        179.53,
+        176.58,
+        173.66,
+        179.61,
+        180.96,
+        175.0,
+        179.0,
+        184.72,
+        186.21,
+        188.69,
+        188.75,
+        188.0,
+        189.5,
+        187.47,
+        186.57,
+        187.07,
+        185.99,
+        183.63,
+        184.69,
+        183.53,
+        183.14,
+        183.13,
+        181.05,
+        180.75,
+        182.14,
+        182.02,
+        179.32,
+        176.44,
+        178.33,
+        179.33,
+        181.27,
+        185.0,
+        184.3,
+        187.05,
+        187.22,
+        186.88,
+        183.83,
+        183.66,
+        184.05,
+        182.8,
+        186.1,
+        189.08,
+        185.57,
+        186.33,
+        193.61,
+        197.85,
+        193.25,
+        197.19,
+        200.0,
+        197.58,
+        200.0,
+        199.28,
+        199.33,
+        199.78,
+        195.05,
+        194.49,
+        192.72,
+        193.02,
+        187.92,
+        183.75,
+        183.13,
+        182.55,
+        186.41,
+        180.83,
+        179.85,
+        182.5,
+        183.19,
+        181.71,
+        186.97,
+        184.07,
+        167.89,
+        161.02,
+        161.92,
+        162.77,
+        165.8,
+        166.94,
+        166.8,
+        170.22,
+        170.1,
+        177.58,
+        177.05,
+        178.22,
+        178.88,
+        180.11,
+        176.13,
+        177.03,
+        175.5,
+        173.11,
+        170.8,
+        172.11,
+        178.5,
+        176.25,
+        173.33,
+        177.88,
+        171.38,
+        175.39,
+        179.55,
+        184.52,
+        187.0,
+        186.49,
+        184.88,
+        186.88,
+        186.42,
+        189.86,
+        191.6,
+        193.88,
+        193.96,
+        192.52,
+        191.16,
+        187.97,
+        186.33,
+        185.13,
+        184.75,
+        181.96,
+        186.5,
+        180.8,
+        182.72,
+        185.16,
+        186.64,
+        188.82,
+        187.53,
+        187.69,
+        186.88,
+        187.52,
+        188.99,
+        189.07,
+        189.69,
+        184.71,
+        186.38,
+        187.83,
+        188.38,
+        190.83,
+        192.72,
+        186.39,
+        197.92,
+        195.77,
+        199.5,
+        207.08,
+        210.05,
+        208.17,
+        206.83,
+        208.91,
+        214.1,
+        211.47,
+        202.61,
+        201.69,
+        204.61,
+        202.88,
+        198.38,
+        197.11,
+        201.44,
+        207.86,
+        205.74,
+        207.88,
+        210.71,
+        213.44,
+        218.16,
+        220.55,
+        227.02,
+        226.08,
+        225.03,
+        230.25,
+        228.97,
+        227.46,
+        232.92,
+        231.14,
+        220.52,
+        223.28,
+        224.91,
+        225.05,
+        229.05,
+        227.05,
+        223.75,
+        221.3,
+    ],
+    "NVDA": [
+        48.14,
+        47.54,
+        47.97,
+        49.06,
+        52.22,
+        53.11,
+        54.31,
+        54.79,
+        54.67,
+        56.35,
+        56.02,
+        57.07,
+        59.45,
+        59.62,
+        59.83,
+        61.32,
+        61.58,
+        60.99,
+        62.43,
+        62.73,
+        61.49,
+        62.99,
+        66.12,
+        69.29,
+        68.18,
+        70.05,
+        69.6,
+        72.09,
+        72.2,
+        72.08,
+        73.85,
+        72.61,
+        72.57,
+        69.41,
+        67.43,
+        78.49,
+        78.77,
+        79.04,
+        78.65,
+        77.61,
+        79.06,
+        82.23,
+        85.18,
+        85.92,
+        88.65,
+        92.62,
+        87.48,
+        85.73,
+        91.86,
+        90.84,
+        87.89,
+        87.79,
+        88.4,
+        89.35,
+        90.32,
+        91.38,
+        94.24,
+        94.95,
+        92.51,
+        90.2,
+        90.3,
+        90.31,
+        89.4,
+        88.91,
+        85.86,
+        87.96,
+        87.08,
+        85.31,
+        86.99,
+        90.56,
+        88.14,
+        85.95,
+        87.37,
+        83.99,
+        84.62,
+        76.16,
+        79.47,
+        82.38,
+        79.63,
+        82.58,
+        87.69,
+        87.71,
+        86.35,
+        82.99,
+        85.77,
+        88.74,
+        92.09,
+        90.5,
+        90.36,
+        88.7,
+        89.83,
+        90.35,
+        91.3,
+        94.58,
+        94.31,
+        92.43,
+        94.73,
+        95.33,
+        94.9,
+        103.74,
+        106.41,
+        113.84,
+        114.76,
+        110.44,
+        109.57,
+        114.94,
+        116.37,
+        122.37,
+        120.93,
+        120.82,
+        121.72,
+        120.85,
+        125.14,
+        129.55,
+        131.82,
+        130.92,
+        135.52,
+        130.72,
+        126.51,
+        118.05,
+        126.03,
+        126.34,
+        123.93,
+        123.48,
+        124.24,
+        122.61,
+        128.22,
+        125.77,
+        128.14,
+        131.32,
+        134.85,
+        127.34,
+        129.18,
+        128.38,
+        126.3,
+        117.93,
+        121.03,
+        117.87,
+        123.48,
+        122.53,
+        114.2,
+        112.23,
+        113.01,
+        111.54,
+        103.68,
+        116.96,
+        109.16,
+        107.22,
+        100.4,
+        104.2,
+        98.86,
+        104.92,
+        104.7,
+        108.97,
+        116.09,
+        118.02,
+        122.8,
+        124.52,
+        129.94,
+        127.19,
+        128.44,
+        123.68,
+        129.31,
+        126.4,
+        128.24,
+        125.55,
+        117.53,
+        119.31,
+        107.95,
+        106.16,
+        107.16,
+        102.78,
+        106.42,
+        108.05,
+        116.85,
+        119.09,
+        119.05,
+        116.74,
+        115.55,
+        113.33,
+        117.82,
+        115.96,
+        116.22,
+        120.82,
+        123.46,
+        123.99,
+        121.35,
+        121.39,
+        116.95,
+        118.8,
+        122.8,
+        124.87,
+        127.67,
+        132.84,
+        132.6,
+        134.76,
+        134.75,
+        138.02,
+        131.55,
+        135.67,
+        136.88,
+        137.95,
+        143.66,
+        143.54,
+        139.51,
+        140.36,
+        141.49,
+        140.47,
+        141.2,
+        139.29,
+        132.71,
+        135.35,
+        136.0,
+        139.86,
+        145.56,
+        148.82,
+        147.57,
+        145.21,
+        148.23,
+        146.21,
+        146.7,
+        141.93,
+        140.1,
+        146.95,
+        145.84,
+        146.61,
+        141.9,
+        135.97,
+        136.87,
+        135.29,
+        138.2,
+        138.58,
+        140.21,
+        145.09,
+        145.02,
+        142.4,
+        138.77,
+        135.03,
+        139.27,
+        137.3,
+        134.21,
+        131.96,
+        130.35,
+        128.87,
+        130.64,
+        134.66,
+        139.63,
+        140.18,
+        139.89,
+        136.97,
+        137.45,
+    ],
+    "TSLA": [
+        248.41,
+        238.44,
+        237.92,
+        237.49,
+        240.44,
+        234.96,
+        233.94,
+        227.22,
+        218.88,
+        219.91,
+        215.55,
+        211.88,
+        212.19,
+        208.8,
+        209.13,
+        207.83,
+        182.63,
+        183.25,
+        190.92,
+        191.58,
+        187.28,
+        188.86,
+        187.91,
+        181.05,
+        185.1,
+        187.58,
+        189.55,
+        193.57,
+        188.13,
+        184.02,
+        188.71,
+        200.44,
+        199.94,
+        193.75,
+        194.77,
+        197.41,
+        191.97,
+        199.39,
+        199.72,
+        202.03,
+        201.88,
+        202.63,
+        188.13,
+        180.74,
+        176.53,
+        178.64,
+        175.33,
+        177.77,
+        177.53,
+        169.47,
+        162.5,
+        163.57,
+        173.8,
+        171.32,
+        175.66,
+        172.82,
+        170.83,
+        172.63,
+        177.66,
+        179.83,
+        175.78,
+        175.22,
+        166.63,
+        168.38,
+        171.11,
+        164.89,
+        172.97,
+        176.88,
+        171.75,
+        174.6,
+        171.05,
+        161.47,
+        157.11,
+        155.44,
+        149.92,
+        147.05,
+        142.05,
+        144.67,
+        162.13,
+        170.17,
+        168.28,
+        194.05,
+        183.27,
+        179.99,
+        180.0,
+        181.19,
+        184.75,
+        177.8,
+        174.72,
+        171.97,
+        168.47,
+        171.88,
+        177.55,
+        173.99,
+        174.83,
+        177.46,
+        174.94,
+        186.6,
+        180.11,
+        173.74,
+        179.24,
+        176.75,
+        176.19,
+        178.78,
+        178.08,
+        176.28,
+        174.77,
+        175.0,
+        177.94,
+        177.47,
+        173.78,
+        170.66,
+        177.28,
+        182.47,
+        178.0,
+        187.44,
+        184.86,
+        181.57,
+        183.0,
+        182.58,
+        187.35,
+        196.36,
+        197.41,
+        197.88,
+        209.86,
+        231.25,
+        246.38,
+        251.52,
+        252.94,
+        262.32,
+        263.26,
+        241.02,
+        248.22,
+        252.63,
+        256.55,
+        248.5,
+        249.22,
+        239.19,
+        251.5,
+        246.38,
+        215.99,
+        220.25,
+        219.8,
+        232.1,
+        222.61,
+        232.07,
+        216.86,
+        207.66,
+        198.88,
+        200.63,
+        191.75,
+        198.83,
+        200.0,
+        197.49,
+        207.83,
+        201.38,
+        214.13,
+        216.11,
+        222.72,
+        221.1,
+        223.27,
+        210.66,
+        220.32,
+        213.21,
+        209.21,
+        205.75,
+        206.27,
+        214.11,
+        210.6,
+        219.41,
+        230.16,
+        210.72,
+        216.27,
+        226.16,
+        228.13,
+        229.8,
+        230.28,
+        226.77,
+        227.86,
+        227.19,
+        243.91,
+        238.25,
+        250.0,
+        254.27,
+        257.01,
+        254.22,
+        260.45,
+        261.63,
+        258.01,
+        249.02,
+        240.66,
+        250.08,
+        240.83,
+        244.5,
+        241.05,
+        238.77,
+        217.8,
+        219.16,
+        219.57,
+        221.33,
+        220.88,
+        220.69,
+        218.85,
+        217.97,
+        213.64,
+        260.48,
+        269.19,
+        262.51,
+        259.51,
+        257.54,
+        249.85,
+        248.97,
+        242.83,
+        251.44,
+        288.52,
+        296.91,
+        321.22,
+        350.0,
+        328.48,
+        330.23,
+        311.17,
+        320.72,
+        338.73,
+        346.0,
+        342.02,
+        339.64,
+        352.55,
+        338.58,
+        338.23,
+        332.89,
+        345.16,
+        357.08,
+        351.42,
+        357.92,
+        369.48,
+        389.22,
+        389.79,
+        400.98,
+        424.76,
+        418.1,
+        436.23,
+        463.01,
+        479.85,
+        440.13,
+        436.17,
+        421.05,
+        430.6,
+        462.27,
+        454.13,
+        431.66,
+        417.41,
+    ],
+}
+
+# Create DataFrame from the dictionary
+df = pd.DataFrame(stock_data)
+num_data = len(df)
+
+# Process Date as index (Ensuring 1:1 match with provided data)
+df["Date"] = pd.to_datetime(df["Date"])
+df.set_index("Date", inplace=True)
+print(df.head(10))
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+AAPL    AMZN   NVDA    TSLA
+  Date                                     
+  2024-01-02  183.90  149.92  48.14  248.41
+  2024-01-03  182.52  148.47  47.54  238.44
+  2024-01-04  180.20  144.57  47.97  237.92
+  2024-01-05  179.48  145.24  49.06  237.49
+  2024-01-08  183.82  149.10  52.22  240.44
+  2024-01-09  183.40  151.36  53.11  234.96
+  2024-01-10  184.44  153.72  54.31  233.94
+  2024-01-11  183.85  155.17  54.79  227.22
+  2024-01-12  184.18  154.61  54.67  218.88
+  2024-01-16  181.91  153.16  56.35  219.91
+  
+
+```
+</Info>
+
+## Plot the stock price of selected stock
+
+```python
+df.loc[:, ["NVDA", "AAPL", "TSLA", "AMZN"]].plot()
+```
+<Info>
+  **Output:**
+
+  
+
+```
+<Axes: xlabel='Date'>
+  
+
+```
+</Info>
+
+![output](./HHL_portfolio_files/HHL_portfolio_1.png)
+
+## Conversion to Daily Returns
+
+The daily return (rate of change) $y_t$ of an individual stock is defined as follows, letting $t$ be the date:
+
+$$
+y_t = \frac{P_t - P_{t-1}}{P_{t-1}}
+$$
+It is obtained using `pct_change()` in `pandas`.
+
+```python
+daily_return = df.pct_change().dropna()
+display(daily_return.tail())
+```
+|            | AAPL      | AMZN      | NVDA      | TSLA      |
+| ---------- | --------- | --------- | --------- | --------- |
+| Date       |           |           |           |           |
+| ---        | ---       | ---       | ---       | ---       |
+| 2024-12-23 | 0.003079  | 0.000622  | 0.036908  | 0.022681  |
+| 2024-12-24 | 0.011451  | 0.017774  | 0.003939  | 0.073549  |
+| 2024-12-26 | 0.003190  | -0.008732 | -0.002069 | -0.017609 |
+| 2024-12-27 | -0.013264 | -0.014534 | -0.020874 | -0.049479 |
+| 2024-12-30 | -0.013245 | -0.010950 | 0.003504  | -0.033012 |
+
+## Expected Return
+
+Calculate the expected return $\vec{R}$ for each stock. Here, the arithmetic mean of historical returns is used.
+
+$$
+\vec{R} = \frac{1}{T}\sum_{t=1}^{T}\vec{y}_t
+$$
+
+```python
+expected_return = daily_return.dropna(how="all").mean() * num_data
+print(expected_return)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+AAPL    0.337606
+  AMZN    0.430596
+  NVDA    1.191089
+  TSLA    0.718326
+  dtype: float64
+  
+
+```
+</Info>
+
+## Variance-Covariance Matrix
+
+The sample unbiased variance-covariance matrix of returns, $\Sigma$, is defined as follows:
+
+$$
+\Sigma = \frac{1}{T-1}\sum_{t=1}^{T} (\vec{y}_t - \vec{R})(\vec{y}_t - \vec{R} )^{T}
+$$
+- Let the return of each asset $i$ be the random variable $R_i$.
+
+- The covariance is:
+
+$$
+\mathrm{Cov}(R_i, R_j) = \mathbb{E}\big[(R_i - \mathbb{E}[R_i])(R_j - \mathbb{E}[R_j])\big]
+$$
+- The matrix aggregating this for all assets is $\Sigma$:
+
+$$
+\Sigma =
+\begin{bmatrix}
+\sigma_{00} & \sigma_{01} & \cdots & \sigma_{0n} \\
+\sigma_{10} & \sigma_{11} & \cdots & \sigma_{1n} \\
+\vdots      & \vdots      & \ddots & \vdots      \\
+\sigma_{n0} & \sigma_{n1} & \cdots & \sigma_{nn}
+\end{bmatrix}
+$$
+Where $\sigma_{ij} = \mathrm{Cov}(R_i, R_j)$.
+
+- With $\Sigma$, the "diversification effect" is incorporated into the calculation.
+
+- If assets have a negative correlation with each other, the risk of the entire portfolio decreases.
+
+- Conversely, if there is a strong positive correlation, the risk reduction effect will not be significant even if assets are diversified.
+
+```python
+cov = daily_return.dropna(how="all").cov() * num_data
+display(cov)
+```
+|      | AAPL     | AMZN     | NVDA     | TSLA     |
+| ---- | -------- | -------- | -------- | -------- |
+| AAPL | 0.050204 | 0.021167 | 0.029819 | 0.046741 |
+| AMZN | 0.021167 | 0.078892 | 0.064226 | 0.056531 |
+| NVDA | 0.029819 | 0.064226 | 0.274981 | 0.071096 |
+| TSLA | 0.046741 | 0.056531 | 0.071096 | 0.403576 |
+
+## Portfolio Optimization
+
+Having defined the necessary variables, we now proceed to actual portfolio optimization.
+We represent the portfolio as a $4$-component vector $\mathbf{w} = (w_0,w_1,w_2,w_3)^T$.
+
+This represents the proportion of holdings in each stock; for example, $\mathbf{w}=(1,0,0,0)$ implies a portfolio where $100\%$ of total assets are invested in AAPL stock.
+
+Consider a portfolio that satisfies the following equation:
+
+$$
+\mathcal{O} = {\rm min_{\mathbf{w} }}\frac{1}{2}{\mathbf{w}^T}\Sigma\mathbf{w} = \sum_{i} w_i^2 \sigma_{ii} + \sum_{i\neq j} w_i w_j \sigma_{ij}
+$$
+- The diagonal elements $\sigma_{ii}$ are the variances of each asset (intensity of risk).
+- The off-diagonal elements $\sigma_{ij}$ are the covariances between assets (strength of correlation).
+
+Here, the constraints are as follows:
+
+$$
+{\rm const.1} = \mathbf{R^Tw}=\mu
+$$
+$$
+{\rm const.2} = \mathbf{1^Tw}=1
+$$
+Here, $\mathbf{1}$ represents $(1,1,1,1)^T$.
+
+The meanings of the two constraint equations are:
+
+- The expected return of the portfolio (average value of returns) is $\mu$.
+- The sum of the weights invested in the portfolio is 1 ($\mathbf{1}=(1,1,1,1)^T$).
+
+Under these conditions, we perform the "minimization of the variance of portfolio returns." This means that when desiring a return of $\mu$ in the future, the best portfolio is one that minimizes the fluctuation (risk) associated with it as much as possible.
+
+This type of problem setup is known as the Markowitz Mean-Variance Approach and is one of the foundational concepts of modern financial engineering.
+
+#
+
+## Lagrange Multiplier Method in Mathematical Optimization
+
+The mathematical optimization problem described above is an optimization problem with equality constraints. By solving this using the **Method of Lagrange Multipliers**, we can find candidates for the local optimal solution.
+
+The Method of Lagrange Multipliers is defined as follows:
+
+$$
+\mathcal{L}(x,u) = f(x) + \sum_{i=1}^m u_i g_i(x) \tag{0}
+$$
+Here, $f(x)$ represents the **objective function**, and the second term represents the **constraint functions**. $u\in R_{d}$ are the Lagrange multipliers.
+
+In the case of our portfolio optimization problem, if we introduce Lagrange multipliers $\eta$ and $\theta$, the Lagrangian is given by:
+
+$$
+\mathcal{L}(w,\eta, \theta) = \frac{1}{2}\mathbf{w}^T\Sigma\mathbf{w} + \eta(\mathbf{R}\mathbf{w}-\mu) + \theta(\mathbf{1}^T\mathbf{w}-1) \tag{1}
+$$
+Since the constraints are linear equations, the optimal solution is guaranteed by just the first-order derivatives. Therefore, we differentiate the Lagrangian function above with respect to the variables $\mathbf{w}, \eta, \text{and } \theta$.
+
+#
+
+## First-Order Optimality Conditions (KKT Conditions)
+
+$$
+\frac{\partial \mathcal L}{\partial \vec w}= \Sigma\vec w+\eta\,\vec R+\theta\,\vec 1=\vec 0 \tag{A}
+$$
+$$
+\frac{\partial \mathcal L}{\partial \eta}= \vec R^{\,T}\vec w-\mu=0 \tag{B}
+$$
+$$
+\frac{\partial \mathcal L}{\partial \theta}= \vec 1^{\,T}\vec w-1=0 \tag{C}
+$$
+#
+
+## Organizing as a System of Linear Equations
+
+If we organize (A) through (C) into a linear equation regarding the **unknowns** $(\eta,\theta,\vec w)$, we get:
+
+$$
+\begin{cases}
+\vec R^{\,T}\vec w=\mu\\[2pt]
+\vec 1^{\,T}\vec w=1\\[2pt]
+\Sigma\vec w+\eta\,\vec R+\theta\,\vec 1=\vec 0
+\end{cases}
+\quad\Longleftrightarrow\quad
+\underbrace{\begin{bmatrix}
+0&0&\vec R^{\,T}\\
+0&0&\vec 1^{\,T}\\
+\vec R&\vec 1&\Sigma
+\end{bmatrix}}_{W}
+\begin{bmatrix}\eta\\\theta\\\vec w\end{bmatrix}
+=
+\begin{bmatrix}\mu\\1\\\vec 0\end{bmatrix}
+$$
+Looking at this row by row:
+
+- **1st Row:** $0\cdot\eta+0\cdot\theta+\vec R^{\,T}\vec w=\mu$ (Expected Return Constraint)
+- **2nd Row:** $0\cdot\eta+0\cdot\theta+\vec 1^{\,T}\vec w=1$ (Sum of Weights = 1 Constraint)
+- **3rd Row:** $\vec R\,\eta+\vec 1\,\theta+\Sigma\vec w=\vec 0$ (Stationarity Condition)
+
+This explains why "solving the matrix $W$ satisfies both the objective function and the constraints simultaneously."
+This block matrix $W$ is called the **KKT Matrix** (symmetric and indefinite).
+
+Therefore, based on the results of the Lagrange Multiplier Method described above, we can obtain the optimal weights $\mathbf{w}$ that satisfy the conditions by solving the linear system of equations:
+
+$$
+\mathbf{W}
+\begin{pmatrix}
+\nu\\\theta\\\mathbf{w}
+\end{pmatrix} 
+= \begin{pmatrix}
+\mu\\1\\\mathbf{0}\end{pmatrix}\,,\, 
+W = \begin{bmatrix}
+0&0&\vec R^{\,T}\\
+0&0&\vec 1^{\,T}\\
+\vec R&\vec 1&\Sigma
+\end{bmatrix}
+$$
+using the HHL algorithm.
+
+## Preprocessing for HHL
+
+#
+
+## Construction of matrix $W$
+
+```python
+R = expected_return.values
+```
+```python
+
+Pi = np.ones(4)
+S = cov.values
+
+row1 = np.append(np.zeros(2), R).reshape(1, -1)
+row2 = np.append(np.zeros(2), Pi).reshape(1, -1)
+row3 = np.concatenate([R.reshape(-1, 1), Pi.reshape(-1, 1), S], axis=1)
+W = np.concatenate([row1, row2, row3])
+
+np.set_printoptions(linewidth=200)
+print(W)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[[
+
+0.         0.         0.33760624 0.43059648 1.19108918 0.71832606]
+   [
+
+0.         0.         
+
+1.         1.         
+
+1.         1.        ]
+   [0.33760624 
+
+1.         0.05020389 0.02116691 0.02981871 0.04674084]
+   [0.43059648 
+
+1.         0.02116691 0.07889178 0.06422647 0.05653149]
+   [1.19108918 
+
+1.         0.02981871 0.06422647 0.27498126 0.07109579]
+   [0.71832606 
+
+1.         0.04674084 0.05653149 0.07109579 0.40357553]]
+  
+
+```
+</Info>
+
+#
+
+## Construction of Vector $\begin{pmatrix}\mu\\1\\\mathbf{0}\end{pmatrix}$
+
+```python
+mu = 0.1
+xi = 1.0
+b = np.append(np.array([mu, xi]), np.zeros_like(R)).reshape(-1, 1)
+print(b)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[[0.1]
+   [
+
+1. ]
+   [
+
+0. ]
+   [
+
+0. ]
+   [
+
+0. ]
+   [
+
+0. ]]
+  
+
+```
+</Info>
+
+## Redefining the Matrix
+
+Typically, the matrix formulation for HHL assumes a standard form with the following properties:
+
+1. The right-hand side vector $\vec{b}$ is normalized.
+1. The matrix $A$ has a size of $2^n \times 2^n$.
+1. The matrix $A$ is Hermitian.
+1. The eigenvalues of matrix $A$ lie within the range $(0,1)$.
+
+However, even general problems that do not meet these conditions can be solved using the following methods:
+
+#
+
+## 1) Normalized b
+
+As preprocessing, normalize $\vec{b}$ and then return the normalization factor as postprocessing.
+
+```python
+norm_factor = np.linalg.norm(b)
+b_normalized = b / norm_factor
+```
+#
+
+## 2) Make the Matrix $A$ of Size $2^n\times 2^n $
+
+Complete the matrix dimension to the closest $2^n$ with an identity matrix.
+
+The vector $\vec{b}$ is completed with zeros.
+
+$$
+\begin{pmatrix}
+A & 0 \\
+0 & I
+\end{pmatrix}
+\begin{pmatrix}
+\vec{b}  \\
+0
+\end{pmatrix}
+=
+\begin{pmatrix}
+\vec{x}  \\
+0
+\end{pmatrix}.
+$$
+However, our matrix is already the right size.
+
+```python
+
+## rquired number of qubits for encoding data
+nbit = 3
+N = 2**nbit
+
+# padding
+W = np.block([[W, np.zeros((6, 2))], [np.zeros((2, 6)), np.eye(2)]])
+
+b = np.vstack([b, np.zeros((2, 1))])
+
+print("W_padded:\n", W)
+print("b_padded:\n", b)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+W_padded:
+   [[
+
+0.         0.         0.33760624 0.43059648 1.19108918 0.71832606 
+
+0.         0.        ]
+   [
+
+0.         0.         
+
+1.         1.         
+
+1.         1.         
+
+0.         0.        ]
+   [0.33760624 
+
+1.         0.05020389 0.02116691 0.02981871 0.04674084 
+
+0.         0.        ]
+   [0.43059648 
+
+1.         0.02116691 0.07889178 0.06422647 0.05653149 
+
+0.         0.        ]
+   [1.19108918 
+
+1.         0.02981871 0.06422647 0.27498126 0.07109579 
+
+0.         0.        ]
+   [0.71832606 
+
+1.         0.04674084 0.05653149 0.07109579 0.40357553 
+
+0.         0.        ]
+   [
+
+0.         0.         
+
+0.         0.         
+
+0.         0.         
+
+1.         0.        ]
+   [
+
+0.         0.         
+
+0.         0.         
+
+0.         0.         
+
+0.         1.        ]]
+  b_padded:
+   [[0.1]
+   [
+
+1. ]
+   [
+
+0. ]
+   [
+
+0. ]
+   [
+
+0. ]
+   [
+
+0. ]
+   [
+
+0. ]
+   [
+
+0. ]]
+  
+
+```
+</Info>
+
+#
+
+## 3) Hermitian Matrix
+
+Symmetrize the problem:
+
+$$
+\begin{pmatrix}
+0 & A^T \\
+A & 0
+\end{pmatrix}
+\begin{pmatrix}
+\vec{x}  \\
+0
+\end{pmatrix}
+=
+\begin{pmatrix}
+0  \\
+\vec{b}
+\end{pmatrix}.
+$$
+This increases the number of qubits by 
+
+1.
+
+```python
+def to_hermitian(A):
+    N = A.shape[0]
+    A_hermitian = np.concatenate(
+        [
+            np.concatenate([np.zeros((N, N)), A.transpose().conj()], axis=1),
+            np.concatenate([A, np.zeros((N, N))], axis=1),
+        ]
+    )
+    return A_hermitian
+
+
+N = W.shape[0]
+b_new = np.concatenate([np.zeros((2 * N - len(b_normalized), 1)), b_normalized])
+plt.matshow(b_new.transpose())
+plt.title("Normalized and Padded Vector b")
+plt.show()
+
+W_hermitian = to_hermitian(W)
+plt.matshow(W_hermitian)
+plt.title("Hermitian Matrix W")
+plt.show()
+```
+![output](./HHL_portfolio_files/HHL_portfolio_2.png)
+
+![output](./HHL_portfolio_files/HHL_portfolio_3.png)
+
+#
+
+## 4) Rescaled Matrix
+
+If the eigenvalues of matrix $A$ lie within the interval $[w_{\min}, w_{\max}]$, we can handle this by transforming the matrix and then reverting the result.
+
+The transformation is defined as follows:
+
+$$
+\tilde{A} = (A - w_{\min} I)\left(1 - \frac{1}{2^{m}}\right)\frac{1}{w_{\max} - w_{\min}}.
+$$
+In this case, the eigenvalues of $\tilde{A}$ fall within the interval $[0,1)$.
+
+The relationship with the eigenvalues of the original matrix is given by:
+
+$$
+\lambda = (w_{\max} - w_{\min})\tilde{\lambda}\left[\frac{1}{1 - \frac{1}{2^{m}}}\right] + w_{\min},
+$$
+Where $\tilde{\lambda}$ is the eigenvalue of $\tilde{A}$ obtained by the QPE (Quantum Phase Estimation) algorithm.
+
+This correspondence between eigenvalues is used in the formula for eigenvalue inversion within the `AmplitudeLoading` function.
+
+```python
+def condition_number(A):
+    w, _ = np.linalg.eig(A)
+    return max(np.abs(w)) / min(np.abs(w))
+
+
+QPE_RESOLUTION_SIZE = 6
+
+assert QPE_RESOLUTION_SIZE > np.log2(
+    condition_number(W)
+), "condition number is too big, and QPE resolution cannot hold all eigenvalues"
+
+w, v = np.linalg.eig(W_hermitian)
+w_max = np.max(w)
+w_min = np.min(w)
+mat_shift = -w_min
+# assures eigenvalues in [0,1-1/2^QPE_SIZE]
+mat_rescaling = (1 - 1 / 2**QPE_RESOLUTION_SIZE) / (w_max - w_min)
+# this is the minimal eigenvalue which can be resolved by the QPE
+min_possible_w = (w_max - w_min) / 2**QPE_RESOLUTION_SIZE
+
+W_rescaled = (
+    W_hermitian + mat_shift * np.identity(W_hermitian.shape[0])
+) * mat_rescaling
+W_rescaled = W_rescaled.real
+
+# verifying that the matrix is symmetric and has eigenvalues in [0,1)
+if not np.allclose(W_rescaled, W_rescaled.T, rtol=1e-6, atol=1e-6):
+    raise Exception("The matrix is not symmetric")
+
+w_rescaled, _ = np.linalg.eig(W_rescaled)
+
+for lam in w_rescaled:
+    if lam < -1e-6 or lam >= 1:
+        raise Exception("Eigenvalues are not in (0,1)")
+
+plt.matshow(W_rescaled)
+plt.title("Rescaled Matrix W")
+plt.show()
+```
+![output](./HHL_portfolio_files/HHL_portfolio_4.png)
+
+## Defining HHL Algorithm for the Quantum Solution
+
+This section is based on Classiq HHL in the user guide, [here](https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/hhl/hhl_example.ipynb) and [here](https://github.com/Classiq/classiq-library/blob/main/applications/physical_systems/hhl_lanchester/hhl_lanchester.ipynb).
+
+Note the rescaling in `simple_eig_inv` based on the matrix rescaling.
+
+```python
+from classiq import *
+
+
+@qfunc
+def simple_eig_inv(
+    gamma: float,
+    delta: float,
+    c_param: float,
+    phase: QNum,
+    indicator: Output[QBit],
+):
+    allocate(indicator)
+    assign_amplitude_table(
+        lookup_table(lambda p: np.clip(c_param / ((gamma * p) + delta), -1, 1), phase),
+        phase,
+        indicator,
+    )
+```
+```python
+
+import numpy as np
+import scipy
+
+exponentiation_W_rescaled = scipy.linalg.expm(1j * 2 * np.pi * W_rescaled).tolist()
+b_list = np.concatenate(b_new).tolist()
+```
+```python
+
+@qfunc
+def main(
+    indicator: Output[QBit],
+    res: Output[QNum],
+    rescaled_eig: Output[QNum],
+) -> None:
+    allocate(QPE_RESOLUTION_SIZE, False, QPE_RESOLUTION_SIZE, rescaled_eig)
+    prepare_amplitudes(b_list, 0, res)
+    within_apply(
+        lambda: qpe(
+            unitary=lambda: unitary(exponentiation_W_rescaled, res),
+            phase=rescaled_eig,
+        ),
+        lambda: simple_eig_inv(
+            gamma=mat_rescaling ** (-1),
+            delta=-mat_shift,
+            c_param=min_possible_w,
+            phase=rescaled_eig,
+            indicator=indicator,
+        ),
+    )
+
+
+MAX_WIDTH_BASIC = 18
+constraints = Constraints(max_width=MAX_WIDTH_BASIC)
+# preferences = Preferences(
+#     optimization_level=0, optimization_timeout_seconds=90, transpilation_option="none"
+# )
+backend_preferences = ClassiqBackendPreferences(
+    backend_name=ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR
+)
+execution_preferences = ExecutionPreferences(
+    num_shots=1, backend_preferences=backend_preferences
+)
+
+qmod_hhl_basic = create_model(
+    main,
+    constraints=constraints,
+    # preferences=preferences,
+    execution_preferences=execution_preferences,
+)
+
+qprog = synthesize(qmod_hhl_basic)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/38EbCHhb4OwIspsNgY9Dv5T54JR
+  
+
+```
+</Info>
+
+```python
+execution_job_id = execute(qprog)
+result = execution_job_id.result_value()
+```
+```python
+
+filtered_hhl_statevector = dict()
+for sample in result.parsed_state_vector:
+    if sample.state["indicator"] == 1 and sample.state["rescaled_eig"] == 0:
+        filtered_hhl_statevector[sample.state["res"]] = sample.amplitude
+
+states = sorted(filtered_hhl_statevector)
+raw_qsol = np.array([filtered_hhl_statevector[s] for s in states])
+```
+```python
+
+qsol_hermitian = raw_qsol / (min_possible_w)
+print(qsol_hermitian)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[-2.89639576e-01+5.95742356e-01j  3.08335503e-01-6.34196894e-01j -2.27110910e+00+4.67130877e+00j  2.75233940e+00-5.66112264e+00j -1.44012178e-01+2.96210054e-01j -3.36318572e-01+6.91753598e-01j
+    2.39148259e-14-7.26657302e-14j -7.64513494e-15-3.53183012e-14j  3.90607598e-14-2.45511623e-13j  6.08553768e-15+1.83911091e-13j -6.16524881e-14+1.44844906e-13j  5.18031970e-14-1.22156005e-13j
+    3.10460540e-14+8.93174264e-14j -2.39948943e-14-1.53061828e-13j  2.33085233e-14+1.36384476e-14j -2.52635402e-14+1.00776109e-14j]
+  
+
+```
+</Info>
+
+```python
+x_classical = np.array([s[0] for s in np.linalg.solve(W_hermitian, b_new)])
+x_classical = x_classical[:6].reshape(-1)
+
+
+x_hhl = qsol_hermitian[:6].reshape(-1)
+
+
+alpha = (x_hhl @ x_classical) / (x_hhl @ x_hhl)
+x_hhl_rescaled = alpha * x_hhl
+
+print(
+    "rel error:",
+    np.linalg.norm(x_hhl_rescaled - x_classical) / np.linalg.norm(x_classical),
+)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+rel error: 0.08021847118398923
+  
+
+```
+</Info>
+
+```python
+print("x-HHL", x_hhl_rescaled.real)
+print("x-classical", x_classical.real)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+x-HHL [ -1.27904651   1.36160761 -10.02920324  12.15431315  -0.63595686  -1.48518066]
+  x-classical [ -0.67035649   0.65436901 -10.36202934  12.09472133  -0.98362358  -0.74906842]
+  
+
+```
+</Info>
+
+```python
+x_exact = np.linalg.lstsq(W_hermitian, b_new, rcond=0)[0]
+x_exact = x_exact[:6].reshape(-1)
+```
+```python
+
+import pandas as pd
+
+w_opt_HHL = x_hhl_rescaled.real[2:6]
+w_opt_exact = x_classical[2:6]  # x_exact[2:6]
+w_opt = pd.DataFrame(
+    np.vstack([w_opt_exact, w_opt_HHL]).T,
+    index=["GOOG", "AAPL", "FB", "AMZN"],
+    columns=["exact", "HHL"],
+)
+w_opt.plot.bar()
+```
+<Info>
+  **Output:**
+
+  
+
+```
+<Axes: >
+  
+
+```
+</Info>
+
+![output](./HHL_portfolio_files/HHL_portfolio_5.png)
+
+The next step is to calculate the "total portfolio value for each day."
+This operation involves multiplying the price of each asset by its weight and summing them up.
+
+Expressed as a formula, it looks like this:
+
+$$
+\text{Portfolio Value} = w_{\text{AAPL}} \cdot P_{\text{AAPL}} + w_{\text{AMZN}} \cdot P_{\text{AMZN}} + w_{\text{NVDA}} \cdot P_{\text{NVDA}} + w_{\text{TSLA}} \cdot P_{\text{TSLA}}
+$$
+For example, if we assume:
+
+$$
+w = [0.4, 0.3, 0.2, 0.1]
+
+$$
+Then:
+
+$$
+\text{Portfolio Value} = 0.4A + 0.3B + 0.2C + 0.1D
+$$
+This gives you the general idea.
+
+To perform this calculation automatically for all dates, you can write it in a single line of Python code as follows:
+
+```python
+pf_value = df.values.dot(w_opt)
+pf_value = pd.DataFrame(df.values.dot(w_opt), index=df.index, columns=["exact", "HHL"])
+pf_value.head()
+```
+|            | exact       | HHL         |
+| ---------- | ----------- | ----------- |
+| Date       |             |             |
+| ---        | ---         | ---         |
+| 2024-01-02 | -325.764298 | -421.744540 |
+| 2024-01-03 | -320.943657 | -410.339168 |
+| 2024-01-04 | -344.106605 | -433.974406 |
+| 2024-01-05 | -329.292530 | -418.664555 |
+| 2024-01-08 | -332.896116 | -421.666555 |
+
+```python
+pf_value["exact"] = pf_value["exact"] / pf_value["exact"].iloc[0]
+pf_value["HHL"] = pf_value["HHL"] / pf_value["HHL"].iloc[0]
+
+print(pf_value.tail())
+```
+<Info>
+  **Output:**
+
+  
+
+```
+exact       HHL
+  Date                          
+  2024-12-23  1.139395  1.284214
+  2024-12-24  1.157931  1.350494
+  2024-12-26  1.238676  1.398530
+  2024-12-27  1.191926  1.328773
+  2024-12-30  1.144376  1.269782
+  
+
+```
+</Info>
+
+```python
+pf_value.plot(figsize=(9, 6))
+```
+<Info>
+  **Output:**
+
+  
+
+```
+<Axes: xlabel='Date'>
+  
+
+```
+</Info>
+
+![output](./HHL_portfolio_files/HHL_portfolio_6.png)
+
+## References
+
+- \[1] P. Rebentrost and S. Lloyd, “Quantum computational finance: quantum algorithm for portfolio optimization“, [https://arxiv.org/abs/1811.03975](https://arxiv.org/abs/1811.03975)
+- \[2] 7-3. Portfolio optimization using HHL algorithm: [https://dojo.qulacs.org/en/latest/notebooks/7.3\_application\_of\_HHL\_algorithm.html](https://dojo.qulacs.org/en/latest/notebooks/7.3_application_of_HHL_algorithm.html)

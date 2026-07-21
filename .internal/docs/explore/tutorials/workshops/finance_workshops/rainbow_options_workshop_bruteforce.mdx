@@ -1,0 +1,674 @@
+---
+title: "Rainbow options workshop with the bruteforce methodology"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/workshops/finance_workshops/rainbow_options_workshop_bruteforce.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+In this workshop Notebook we will go through the implementation using Qmod for the rainbow option pricing \[[1](#qalrop)].
+
+## Guidance for the workshop:
+
+**The `# Your code` is there for you to do yourself.**
+**The `# Solution start` and `# Solution end` are only for helping you.
+
+Please delete the `Solution` and try doing it yourself...**
+
+For completing the code, please refer to the [Classiq documentation](https://docs.classiq.io), [Classiq documentation](https://docs.classiq.io/latest/), or [Classiq Library](https://github.com/Classiq/classiq-library/).
+
+Search for the required quantum function to find its corresponding documentation page.
+
+## Introduction and Background
+
+In finance, a crucial aspect of asset pricing pertains to derivatives.
+
+Derivatives are contracts whose value is contingent upon another source, known as the underlying.
+
+The pricing of options, a specific derivative instrument, involves determining the fair market value (discounted payoff) of contracts affording their holders the right, though not the obligation, to buy (call) or sell (put) one or more underlying assets at a predefined strike price by a specified future expiration date (maturity date).
+
+This process relies on mathematical models, considering variables like current asset prices, time to expiration, volatility, and interest rates.
+
+In many financial models we are often interested in calculating the average of a function of a given probability distribution ($E[f(x)]$).
+
+The most popular method to estimate the average is Monte Carlo \[[2](#mcmf)] due to its flexibility and ability to generically handle stochastic parameters.
+
+Classical Monte Carlo methods, however, generally require extensive computational resources to provide an accurate estimation.
+By leveraging the laws of quantum mechanics, a quantum computer may provide novel ways to solve computationally intensive financial problems, such as risk management, portfolio optimization, and option pricing.
+
+The core quantum advantage of several of these applications is the Amplitude Estimation algorithm \[[3](#aea)] which can estimate a parameter with a
+convergence rate of $\Omega(1/M^{2})$, compared to $\Omega(1/M)$ in the classical case, where $M$ is the number of Grover iterations in the quantum case and the number of the Monte Carlo samples in the classical case.
+
+This represents a theoretical quadratic speed-up of the quantum method over classical Monte Carlo methods!
+
+#
+
+## Rainbow Option Pricing
+
+An option is the possibility to buy (call) or sell (put) an item (or share) at a known price - the strike price (K), where the option has a maturity price (S).
+
+The payoff function to describe for example a call option will be:
+
+$$
+f(S) =
+\begin{cases}
+0, & \text{if } K \geq S \\
+S - K, & \text{if } K < S
+\end{cases}
+$$
+The maturity price is unknown. Therefore, it is expressed by a price distribution function, which may be any type of a distribution function.
+
+For example a log-normal distribution: $\mathcal{ln}(S)\sim~\mathcal{N}(\mu,\sigma)$,
+where $\mathcal{N}(\mu,\sigma)$ is the standard normal distribution with mean equal to $\mu$ and standard deviation equal to $\sigma$.
+
+**In the case of a rainbow options**, the payoff function is defined by the maximum of the maturity prices of multiple assets. "Best of",  The best-performing asset is chosen as a reference for payoff calculation.
+
+For call options, the payoff function is defined as follows:
+
+$$
+f(S) = max(S-K, 0)
+
+$$
+Where, in this case, $S=max(\bar{S}_t)$.
+
+There is another type of asset called "worst of", where the worst-performing asset is chosen as a reference for payoff calculation. We will not treat this type of option in this notebook.
+
+#
+
+### To estimate the average option price using a quantum computer, we need to:
+
+- Load the distribution, that is, discretize the distribution using $2^n$ points (n is the number of qubits) and truncate it.
+- Implement the affine transformation to bring the assets to the maturity date.
+- Implement the payoff function for rainbow options and make amplitude loading using control $R_y$ rotations.
+- Evaluate the expected payoff using iterative amplitude estimation.
+
+The algorithmic framework is called Quantum Monte-Carlo Integration.
+
+For a basic example, see [QMCI](https://github.com/Classiq/classiq-library/blob/main/algorithms/amplitude_amplification_and_estimation/qmc_user_defined/qmc_user_defined.ipynb).
+  In the link, we use a simular framework to estimate European call option, where the underlying asset distribution at the maturity data is modeled as log-normal distribution.
+
+## Data Definitions
+
+The problem inputs are:
+
+- `NUM_QUBITS`: the number of qubits representing an underlying asset
+- `NUM_ASSETS`: the number of underlying assets
+- `K`: the strike price
+- `S0`: the arrays of underlying assets prices
+- `dt`: the number of days to the maturity date
+- `COV`: the covariance matrix that correlate the underlying assets
+- `MU_LOG_RET`: the array containing the mean of the log return of each underlying asset
+
+```python
+import numpy as np
+import scipy
+
+from classiq import *
+
+NUM_QUBITS = 2
+NUM_ASSETS = 2
+
+K = 190
+S0 = [193.97, 189.12]  # Initial prices of the assets
+dt = 250
+
+COV = np.array([[0.000335, 0.000257], [0.000257, 0.000418]])
+MU_LOG_RET = np.array([0.00050963, 0.00062552])
+```
+```python
+
+MU = MU_LOG_RET * dt
+CHOLESKY = np.linalg.cholesky(COV) * np.sqrt(dt)
+SCALING_FACTOR = 1 / CHOLESKY[0, 0]
+```
+
+## Gaussian State preparation
+
+Encode the probability distribution of a discrete multivariate random variable $W$ taking values in $\{w_0, .., w_{N-1}\}$ describing the assets' prices at the maturity date.
+
+The number of discretized values, denoted as $N$, depends on the precision of the state preparation module and is consequently connected to the number of qubits $n$ by $N=2^n$.
+
+$$
+\sum_{i=0}^{N-1} \sqrt{p(w_i)}\left|w_i\right\rangle 
+$$
+
+```python
+def gaussian_discretization(num_qubits, mu=0, sigma=1, stds_around_mean_to_include=3):
+    """
+    Discretizes a Gaussian distribution into a set of sample points and their corresponding probabilities for using QNums more accurately.
+    """
+    lower = mu - stds_around_mean_to_include * sigma
+    upper = mu + stds_around_mean_to_include * sigma
+    num_of_bins = 2**num_qubits
+    sample_points = np.linspace(lower, upper, num_of_bins + 1)
+
+    def single_gaussian(x: np.ndarray, _mu: float, _sigma: float) -> np.ndarray:
+        cdf = scipy.stats.norm.cdf(x, loc=_mu, scale=_sigma)
+        return cdf[1:] - cdf[0:-1]
+
+    non_normalized_pmf = (single_gaussian(sample_points, mu, sigma),)
+    real_probs = non_normalized_pmf / np.sum(non_normalized_pmf)
+    return sample_points[:-1], real_probs[0].tolist()
+
+
+grid_points, probabilities = gaussian_discretization(NUM_QUBITS)
+
+STEP_X = grid_points[1] - grid_points[0]
+MIN_X = grid_points[0]
+
+a = STEP_X / SCALING_FACTOR
+```
+#
+
+## SANITY CHECK
+
+```python
+assert K <= max(
+    S0 * np.exp(np.dot(CHOLESKY, [grid_points[-1]] * 2) + MU)
+), "If K always greater than the maximum reachable asset values.
+
+Stop the run, the payoff is 0"
+```
+
+## Maximum Computation
+
+#
+
+## Precision utils for accurate arithmetic operations
+
+```python
+FRAC_PLACES = 1
+
+
+def round_factor(a):
+    precision_factor = 2**FRAC_PLACES
+    return np.floor(a * precision_factor) / precision_factor
+```
+#
+
+## Affine and maximum arithmetic definitions
+
+Considering the time delta between the starting date ($t_0$) and the maturity date ($t$), we can express the return value $R_i$ for the $i$-th asset as $R_i = \mu_i + y_i$. Where:
+
+$\mu_i= (t-t_0)\tilde{\mu}_i$, being $\tilde{\mu}_i$ the expected daily log-return value. It can be estimated by considering the historical time series of log returns for the $i$-th asset.
+
+$y_i$ is obtained through the dot product between the matrix $\mathbf{L}$ and the standard multivariate Gaussian sample:
+
+$$
+y_i = \Delta x \cdot \sum_kl_{ik}d_k + x_{min} \cdot \sum_k l_{ik}
+$$
+$\Delta x$ is the Gaussian discretization step, $x_{min}$ is the lower Gaussian truncation value and $d_k \in [0,2^m-1]$ is the sample taken from the $k$-th standard Gaussian.
+$l_{ik}$ is the $i,k$ entry of the matrix $\mathbf{L}$, defined as $\mathbf{L}=\mathbf{C}\sqrt{(t-t_0)}$, where $\mathbf{C}$ is the lower triangular matrix obtained by applying the Cholesky decomposition to the historical daily log-returns correlation matrix.
+
+```python
+from functools import reduce
+
+from classiq.qmod.symbolic import max as qmax
+
+
+def get_affine_formula(assets, i):
+    """
+    Affine formula for the i-th asset in a compact way.
+    reduce(lambda x, y: x+y, [1, 2, 3, 4, 5]) calculates ((((1+2)+3)+4)+5)
+    assets: list of assets (QNum), hold asset prices
+    """
+    return reduce(
+        lambda x, y: x + y,
+        [
+            assets[j] * round_factor(SCALING_FACTOR * CHOLESKY[i, j])
+            for j in range(NUM_ASSETS)
+            if CHOLESKY[i, j]
+        ],
+    )
+
+
+c = round_factor(
+    a=(1 / a)
+    * (
+        np.log(S0[1])
+        + MU[1]
+        - (np.log(S0[0]) + MU[0])
+        + MIN_X * sum(CHOLESKY[1] 
+
+- CHOLESKY[0])
+    )
+)
+```
+#
+
+### Extra information:
+
+- *permutation*: A quantum operation is a permutation if it maps computational-basis states to computational-basis states (with possible phase shifts).
+
+Such an operation neither introduces nor destroys quantum superpositions, and its computation can be described classically.
+- *const*: A parameter of a quantum operation is constant if it is immutable up to a phase.
+
+That is, the magnitudes of its computational-basis state components remain unchanged, while their phases may shift.
+
+For example:
+
+- `Z` is a permutation and its parameter is const as it merely flips the phase of the $|1\rangle$ state.
+- `X` is a permutation but its parameter is not const as it flips between
+  $|0\rangle$ and $|1\rangle$.
+- `H` is not a permutation and its parameter is not const, as it introduces superposition.
+- `SWAP` is a permutation but its two parameters are not const, as it swaps between $|01\rangle$ and $|10\rangle$.
+
+For more information, see the [Uncomputation](https://docs.classiq.io/latest/qmod-reference/language-reference/uncomputation/) documentation.
+
+#
+
+## Instructions
+
+For the following function, you need to compute the maximum of two affine expressions and assign the result to `res`.
+
+Use the `qmax` function from the `classiq.qmod.symbolic` module to compute the maximum of two expressions, and the [Out-of-place assignment](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/assignment/) operator `|=` to assign the result to `res`.
+
+The `qmax` need to choose the maximum between two expressions:
+
+- The affine formula of the first asset: `get_affine_formula([x1, x2], 0)`
+- The affine formula of the second asset plus the constant `c`: `get_affine_formula([x1, x2], 1) + c`.
+
+```python
+@qperm
+def affine_max(x1: Const[QNum], x2: Const[QNum], res: Output[QNum]):
+    """
+    In rainbow options, we compute the maximum of all assets.
+
+Computes the maximum of two affine expressions and assigns the result to res.
+    """
+
+    # Your code
+
+    # Solution start
+    res |= qmax(
+        x=get_affine_formula([x1, x2], 0), y=get_affine_formula([x1, x2], 1) + c
+    )
+    # Solution end
+```
+
+## Brute-Force Amplitude Loading Method
+
+This type of amplitude loading has an exponential scale, is used for validating result from the direct method and integration method that are part of the paper \[[1](#qalrop)].
+
+We use here the Classiq [amplitude loading](https://docs.classiq.io/latest/qmod-reference/api-reference/functions/open_library/amplitude_loading/) functionality using the `assign_amplitude_table` and `lookup_table` functions to load the normalized payoff function $f(x)$ into the indicator qubit:
+
+$$
+|x\rangle |0\rangle \rightarrow \sqrt{1-f^{2}(x)}|x\rangle |0\rangle + f(x)|x\rangle |1\rangle
+$$
+Using the amplitude loading of the payoff function, we can estimate the expected value of the payoff function $E[f(x)]$ by measuring the indicator qubit and calculating the probability of measuring $|1\rangle$ using the iterative quantum amplitude estimation (IQAE) algorithm \[[4](#iqae)].
+
+First, we will build the amplitude loading of the payoff function $f(x)$.
+
+This is the brute-forced method, in the paper, there two more efficient methods, the direct method and the integration method, which are implemented in the [Classiq library](https://github.com/Classiq/classiq-library).
+Then, we will put that in the iterative quantum amplitude estimation (IQAE) algorithm to estimate the expected value of the payoff function.
+
+#
+
+## The payoff function expression
+
+```python
+def get_payoff_expression(x, size, fraction_digits):
+    """
+    Expression of the payoff for the rainbow option.
+
+Similar to Fig. [1] in the article for calculating in the price space.
+    """
+    payoff = np.sqrt(
+        max(
+            S0[0]
+            * np.exp(
+                a * (2 ** (size - fraction_digits)) * x
+                + (MU[0] + MIN_X * CHOLESKY[0].sum())
+            ),
+            K,
+        )
+    )
+    return payoff
+
+
+# We want the probability of measuring |1> in the indicator qubit (ind_reg), see below.
+# So we create a normalized version of the payoff function.
+def get_payoff_expression_normalized(x: QNum, size, fraction_digits):
+    x_max = 1 - 1 / (2**size)
+    payoff_max = get_payoff_expression(x_max, size, fraction_digits)
+    payoff = get_payoff_expression(x, size, fraction_digits)
+    return payoff / payoff_max
+```
+#
+
+## The amplitude loading of the payoff function
+
+For each value of $|x\rangle$, we want to load the value of $f(x)$ into the amplitude of the indicator qubit $|ind\rangle$.
+
+Therefore, we use the `assign_amplitude_table` function with the `lookup_table` function inside it.
+
+The payoff function (`get_payoff_expression_normalized`) is the heart of the computation, and thus it used inside the lookup table function.
+
+See [example](https://docs.classiq.io/latest/qmod-reference/api-reference/functions/open_library/amplitude_loading/) in the Classiq documentation for more details.
+
+```python
+@qfunc
+def brute_force_payoff(max_reg: Const[QNum], ind_reg: QBit):
+    max_reg_fixed = QNum(
+        size=max_reg.size, is_signed=UNSIGNED, fraction_digits=max_reg.size
+    )
+    # change the QNum register to values between 0 and 1,
+    # it necessary for the amplitude loading
+    bind(source=max_reg, destination=max_reg_fixed)
+
+    def my_amplitude_loading_payoff_function(x: QNum) -> float:
+        return get_payoff_expression_normalized(
+            x=x, size=max_reg.size, fraction_digits=max_reg.fraction_digits
+        )
+
+    # Your code
+    # Build the amplitude loading of the payoff function
+    # Use assign_amplitude_table, lookup_table, my_amplitude_loading_payoff_function, max_reg_fixed, and ind_reg.
+
+    # Then, use the bind function again to change back the max_reg_fixed to max_reg.
+    # It brings back the encoding (number of qubits, the signedness, and the fraction digits) to the original max_reg, so the output of the function stays the same.
+
+    # Solution start
+    assign_amplitude_table(
+        amplitudes=lookup_table(
+            func=my_amplitude_loading_payoff_function,
+            targets=max_reg_fixed,
+        ),
+        index=max_reg_fixed,
+        indicator=ind_reg,
+    )
+    # change back to original values
+    bind(source=max_reg_fixed, destination=max_reg)
+    # Solution end
+```
+#
+
+## Allocation of quantum variables
+
+It is useful to allocate quantum structure `QStruct` to hold the quantum variables used in the algorithm.
+
+```python
+class EstimationVars(QStruct):
+    x1: QNum[NUM_QUBITS, UNSIGNED, 0]
+    x2: QNum[NUM_QUBITS, UNSIGNED, 0]
+```
+
+## Brute Force Method for rainbow options
+
+**We first prepare distribution of the assets and them apply the affine transformation and bring the assets to the maturity date.
+
+Then we apply the amplitude loading using the `brute_force_payoff` function.**
+Then, we uncompute the registers to stay with the correct state using local variable `max_out` inside the function. In the paper \[[1](#qalrop)], it makes the following operation:
+
+$$
+A|0\rangle = \sqrt{1-a^{2}}|\psi_{0}\rangle|0\rangle + a|\psi_{1}\rangle|1\rangle
+$$
+where $A$ is a unitary operator while $|\psi_{1}\rangle$ and $|\psi_{1}\rangle$ are some normalized states. Thus, $a$ is the probability of measuring $|1\rangle$ in the last qubit.
+
+The value $a$ is:
+
+$$
+a=\sum_{i=0}^{N-1} \tilde{f}(w_i)p(w_i) = E[\tilde{f}]
+$$
+Which is estimated later on by the IQAE algorithm.
+
+```python
+@qfunc
+def rainbow_brute_force(qvars: EstimationVars, ind: QBit) -> None:
+    inplace_prepare_state(probabilities, 0, qvars.x1)
+    inplace_prepare_state(probabilities, 0, qvars.x2)
+
+    max_out = QNum()
+
+    affine_max(qvars.x1, qvars.x2, max_out)
+    brute_force_payoff(max_reg=max_out, ind_reg=ind)
+    # Automatically uncompute the max_out register.
+```
+#
+
+## Building the quantum model
+
+In Classiq, we build the quantum model in the `main` function.
+
+```python
+@qfunc
+def main(qvars: Output[EstimationVars], ind: Output[QBit]) -> None:
+    allocate(qvars)
+    allocate(ind)
+    rainbow_brute_force(qvars=qvars, ind=ind)
+```
+#
+
+## Synthesizing the quantum model
+
+```python
+MAX_WIDTH_1 = 14
+qprog = synthesize(
+    model=main,
+    constraints=Constraints(
+        max_width=MAX_WIDTH_1,
+        # optimization_parameter = "depth", "width","cx"
+    ),
+)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3G9AfAKsbCTP3NqnbKXt86nLMzf
+  
+
+```
+</Info>
+
+## IQAE algorithm
+
+The IQAE algorithm estimates $a$ by using the $A$ operation (that uses the `rainbow_brute_force` function) in the grover algorithm. It repeats the Grover operation iteratively until the desired precision is reached according to a certain criteria \[[4](#iqae)]. In each iteration, it repeats the Grover operation with a different number of iterations $k$.
+
+The `IQAE` class allows to easily use the IQAE algorithm.
+
+You are welcome to see how it is built inside.
+
+```python
+from classiq.applications.iqae.iqae import IQAE
+
+?IQAE
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[0;31mInit signature:[0m
+  [0mIQAE[0m[0;34m([0m[0;34m[0m
+  [0;34m[0m    [0mstate_prep_op[0m[0;34m:[0m [0mclassiq[0m[0;34m.[0m[0mqmod[0m[0;34m.[0m[0mquantum_callable[0m[0;34m.[0m[0mQCallable[0m[0;34m[[0m[0;34m([0m[0mclassiq[0m[0;34m.[0m[0mqmod[0m[0;34m.[0m[0mqmod_variable[0m[0;34m.[0m[0mQArray[0m[0;34m[[0m[0;34m([0m[0;34m<[0m[0;32mclass[0m [0;34m'classiq.qmod.qmod_variable.QBit'[0m[0;34m>[0m[0;34m,[0m [0mtyping[0m[0;34m.[0m[0mLiteral[0m[0;34m[[0m[0;34m'problem_vars_size'[0m[0;34m][0m[0;34m)[0m[0;34m][0m[0;34m,[0m [0;34m<[0m[0;32mclass[0m [0;34m'classiq.qmod.qmod_variable.QBit'[0m[0;34m>[0m[0;34m)[0m[0;34m][0m[0;34m,[0m[0;34m[0m
+  [0;34m[0m    [0mproblem_vars_size[0m[0;34m:[0m [0mint[0m[0;34m,[0m[0;34m[0m
+  [0;34m[0m    [0mconstraints[0m[0;34m:[0m [0mclassiq[0m[0;34m.[0m[0minterface[0m[0;34m.[0m[0mgenerator[0m[0;34m.[0m[0mmodel[0m[0;34m.[0m[0mconstraints[0m[0;34m.[0m[0mConstraints[0m [0;34m|[0m [0;32mNone[0m [0;34m=[0m [0;32mNone[0m[0;34m,[0m[0;34m[0m
+  [0;34m[0m    [0mpreferences[0m[0;34m:[0m [0mclassiq[0m[0;34m.[0m[0minterface[0m[0;34m.[0m[0mgenerator[0m[0;34m.[0m[0mmodel[0m[0;34m.[0m[0mpreferences[0m[0;34m.[0m[0mpreferences[0m[0;34m.[0m[0mPreferences[0m [0;34m|[0m [0;32mNone[0m [0;34m=[0m [0;32mNone[0m[0;34m,[0m[0;34m[0m
+  [0;34m[0m[0;34m)[0m [0;34m->[0m [0;32mNone[0m[0;34m[0m[0;34m[0m[0m
+  [0;31mDocstring:[0m     
+  Implementation of Iterative Quantum Amplitude Estimation [1].
+
+Given $A$ s.t. $A|0>_n|0> = \sqrt{1-a}|\psi_0>_n|0> + \sqrt{a}|\psi_1>_n|1>$, the algorithm estimates
+  $a$ by iteratively sampling $Q^kA$, where $Q=AS_0A^{\dagger}S_{\psi_0}$, and $k$ is an integer variable.
+
+For estimating $a$, The algorithm estimates $\theta_a$ which is defined by $a = sin^2(\theta_a)$, so it starts with a
+  confidence interval $(0, \pi/2)$ and narrows down this interval on each iteration according to the sample results.
+
+  References:
+      [1]: Grinko, D., Gacon, J., Zoufal, C., & Woerner, S. (2019).
+
+Iterative Quantum Amplitude Estimation.
+           `arXiv:1912.05559 [https://arxiv.org/abs/1912.05559](https://arxiv.org/abs/1912.05559)`.
+  [0;31mFile:[0m           ~/user_env3.11/lib/python3.11/site-packages/classiq/applications/iqae/iqae.py
+  [0;31mType:[0m           type
+  [0;31mSubclasses:[0m
+  
+
+```
+</Info>
+
+```python
+MAX_WIDTH_2 = 25
+
+iqae = IQAE(
+    state_prep_op=rainbow_brute_force,
+    problem_vars_size=NUM_QUBITS * NUM_ASSETS,
+    constraints=Constraints(max_width=MAX_WIDTH_2),
+)
+```
+```python
+
+iqae_qprog = iqae.get_qprog()
+show(iqae_qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3G9AhkbY5MdtCKCp6uHOLjzz8bB
+  
+
+```
+</Info>
+
+## Executing the IQAE algorithm
+
+Executes the IQAE algorithm iteratively, according to the [IQAE algorithm](https://arxiv.org/abs/1912.05559).
+
+Basically, it is running the quantum program multiple times with different number of Grover iterations $k$ until the desired precision is reached. In each iteration, it adds a different number of Grover repetitions to the quantum circuit based on the results of the previous iterations according to the protocol in the article.
+
+The complexity is similar to the regular QAE but uses less qubits and thus is more appealing for simulations.
+
+```python
+EPSILON_VALUE = 0.05
+ALPHA_VALUE = 0.1
+
+result = iqae.run(
+    epsilon=EPSILON_VALUE,
+    alpha=ALPHA_VALUE,
+    execution_preferences=ExecutionPreferences(num_shots=20000),
+)
+```
+
+## Post Process
+
+We need to add to the post-processing function a term:
+
+$$
+\begin{equation}
+\begin{split}
+&\mathbb{E} \left[\max\left(e^{b \cdot z}, Ke^{-b'}\right) \right] e^{b'} - K \\
+= &\mathbb{E} \left[\max\left(e^{-a\hat{x}}, Ke^{-b'-ax_{max}}\right) \right]e^{b'+ ax_{max}} - K
+\end{split}
+\end{equation}
+$$
+
+```python
+def calculate_max_reg_type():
+    x1 = QNum(size=NUM_QUBITS, is_signed=UNSIGNED, fraction_digits=0)
+    x2 = QNum(size=NUM_QUBITS, is_signed=UNSIGNED, fraction_digits=0)
+    expr = qmax(
+        x=get_affine_formula([x1, x2], 0), y=get_affine_formula([x1, x2], 1) + c
+    )
+    size_in_bits, sign, fraction_digits = get_expression_numeric_attributes(
+        [x1, x2], expr
+    )
+    return size_in_bits, fraction_digits
+
+
+MAX_NUM_QUBITS = calculate_max_reg_type()[0]
+MAX_FRAC_PLACES = calculate_max_reg_type()[1]
+```
+```python
+
+import sympy
+
+payoff_expression = f"sqrt(max([{S0[0]} * exp({STEP_X / SCALING_FACTOR * (2 ** (MAX_NUM_QUBITS 
+
+- MAX_FRAC_PLACES))} * x + ({MU[0]+MIN_X*CHOLESKY[0].sum()})), {K}]))"
+payoff_func = sympy.lambdify(sympy.symbols("x"), payoff_expression)
+payoff_max = payoff_func(1 - 1 / (2**MAX_NUM_QUBITS))
+
+
+def parse_result_bruteforce(iqae_res):
+    option_value = iqae_res.estimation * (payoff_max**2) 
+
+- K
+    confidence_interval = np.array(iqae_res.confidence_interval) * (payoff_max**2) 
+
+- K
+    return (option_value, confidence_interval)
+```
+
+## Run Method
+
+See the IQAE results.
+
+```python
+parsed_result, conf_interval = parse_result_bruteforce(result)
+print(
+    f"raw iqae results: {result.estimation} with confidence interval {result.confidence_interval}"
+)
+print(
+    f"option estimated value: {parsed_result} with confidence interval {conf_interval}"
+)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+raw iqae results: 0.50205 with confidence interval [0.4919327565979882, 0.5121672434020118]
+  option estimated value: 22.12935868344408 with confidence interval [17.85455666 26.4041607 ]
+  
+
+```
+</Info>
+
+```python
+expected_payoff = 23.0238
+ALPHA_ASSERTION = 1e-5
+measured_confidence = conf_interval[1] - conf_interval[0]
+confidence_scale_by_alpha = np.sqrt(
+    np.log(ALPHA_VALUE / ALPHA_ASSERTION)
+)  # based on e^2=(1/2N)*log(2T/alpha) from "Iterative Quantum Amplitude Estimation" since our alpha is low, we want to check within a bigger confidence interval
+
+diff = np.abs(parsed_result - expected_payoff)
+allowed_error = 0.5 * measured_confidence * confidence_scale_by_alpha
+
+if diff <= allowed_error:
+    print("✅ Payoff is within the confidence interval.")
+else:
+    print(
+        f"❌ Payoff result is out of the {ALPHA_ASSERTION*100}% confidence interval: |{parsed_result} - {expected_payoff}| > {0.5*measured_confidence * confidence_scale_by_alpha}"
+    )
+```
+<Info>
+  **Output:**
+
+  
+
+```
+✅ Payoff is within the confidence interval.
+  
+
+```
+</Info>
+
+## References
+
+<a name="QALROP">\[1]</a>: [Francesca Cibrario et al., Quantum Amplitude Loading for Rainbow Options Pricing. Preprint](https://arxiv.org/abs/2402.05574v2)
+<a name="MCMF">\[2]</a>: [Paul Glasserman, Monte Carlo Methods in Financial Engineering. Springer-Verlag New York, 2003, p. 596.](https://link.springer.com/book/10.1007/978-0-387-21617-1)
+<br /><a name="AEA">\[3]</a>: [Gilles Brassard, Peter Hoyer, Michele Mosca, and Alain Tapp, Quantum Amplitude Amplification and Estimation. Contemporary Mathematics 305 (2002)](https://arxiv.org/abs/quant-ph/0005055)
+<b name="IQAE">\[4]</b>: [Grinko, Dmitry, et al. "Iterative quantum amplitude estimation." npj Quantum Information 7.1 (2021): 52.](https://arxiv.org/abs/1912.05559)

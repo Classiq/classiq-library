@@ -1,0 +1,95 @@
+---
+title: "PennyLane code for QSVT example"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/classiq_paper/qsvt/pennylane_cat_qsvt_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook shows how to generate data for QSVT example using `pennylane` 0.39.0 and `pennylane-catalyst` 0.9.
+
+0.
+
+```python
+# import time
+# import pennylane as qml
+# from catalyst import qjit
+# from pennylane import numpy as np
+
+
+# def reflect_around_zero(data):
+#     """Implements the reflection around zero operator."""
+#     def circuit(data):
+#         qml.PauliX(wires=data[0])
+#         qml.Hadamard(wires=data[0])
+#         qml.ctrl(qml.PauliX, control=data[1:len(data)], control_values=[0]*(len(data)-1))(wires=data[0])
+#         qml.Hadamard(wires=data[0])
+#         qml.PauliX(wires=data[0])
+#     return circuit
+
+# def get_cir_be(data, block):
+#     """Constructs the controlled block-encoding circuit."""
+#     def circuit():
+#         qml.Hadamard(wires=block[0])
+#         qml.Hadamard(wires=block[2])
+#         qml.ctrl(qml.Adder,control=block[0], control_values=1)(2, data+[block[1]], 2**(len(data)+1), work_wires=[])
+#         qml.Adder(2**(len(data)+1)-1, data+[block[1]], 2**(len(data)+1), work_wires=[])
+#         qml.ctrl(reflect_around_zero(data), control=block[2])(data)
+#         qml.Hadamard(wires=block[0])
+#         qml.Hadamard(wires=block[2])
+#     return circuit
+
+# def apply_projector_controlled_phase(phase, block_reg, aux_reg):
+#     def circuit():
+#         qml.ctrl(qml.PauliX, control=block_reg, control_values=[0]*len(block_reg))(wires=aux_reg)
+#         qml.RZ(phase, wires=aux_reg)
+#         qml.ctrl(qml.PauliX, control=block_reg, control_values=[0]*len(block_reg))(wires=aux_reg)
+#     return circuit
+
+# def apply_qsvt_step(phase1, phase2, u, data, block, qsvt_aux):
+#     def circuit():
+#         u()
+#         apply_projector_controlled_phase(phase1, block, qsvt_aux)()
+#         qml.adjoint(u)()
+#         apply_projector_controlled_phase(phase2, block, qsvt_aux)()
+#     return circuit
+
+# def get_qsvt_circuit(qsvt_phases, size):
+#     dev = qml.device("lightning.qubit", wires=size + 3)
+
+#     @qml.qnode(dev)
+#     def qsvt_circuit():
+#         block = [size, size+1, size+2]
+#         qsvt_aux = size + 3
+#         data = list(range(size))
+
+#         cir_be = get_cir_be(data, block)
+#         qml.Hadamard(wires=qsvt_aux)
+#         apply_projector_controlled_phase(qsvt_phases[0], block, qsvt_aux)()
+#         for i in range((len(qsvt_phases) - 1) // 2):
+#             apply_qsvt_step(qsvt_phases[2 * i + 1],  qsvt_phases[2 * i + 2], cir_be , data, block, qsvt_aux)()
+
+#         cir_be()
+#         apply_projector_controlled_phase(qsvt_phases[-1], block, qsvt_aux)()
+#         qml.Hadamard(wires=qsvt_aux)
+
+#     return qsvt_circuit
+```
+
+## run an example
+
+```python
+# SIZE = 6
+# DEGREE = 3
+# QSVT_PHASES = [1.280311896404252, 8.127145628464149, 1.8439603212845617, -5.002873410775335]
+
+
+# start_time = time.time()
+# qsvt_cir = get_qsvt_circuit(QSVT_PHASES, SIZE)
+# cir = qml.transforms.decompose(qsvt_cir, gate_set={qml.CNOT, qml.RZ, qml.RY, qml.RX})
+# jitted_cir = qjit(cir)
+# transpilation_time = time.time()-start_time
+# cx_counts = jitted_cir.mlir.count("CNOT")
+# print(f"==== pennylane for {SIZE}==== time: {transpilation_time}")
+```

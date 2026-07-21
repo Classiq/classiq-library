@@ -1,0 +1,92 @@
+---
+title: Path Operators
+icon: "/icons/bulletsharp.svg"
+---
+
+This is a list of the path operators available in `Qmod` for accessing
+elements and sub-arrays of arrays inside quantum expressions.
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `python_value_to_qmod_object` | Translate a Python classical value into a QMod object. |
+| `subscript` | Return the element of ``array`` at position ``index`` in an expression. |
+| `slice_` | Return the ``array[start:stop]`` sub-array in an expression. |
+
+
+### python_value_to_qmod_object
+
+
+<pre><code>python_value_to_qmod_object(
+    value: Any,
+    qmodule: ModelStateContainer
+) -> Any</code></pre>
+
+
+Translate a Python classical value into a QMod object.
+
+numpy values are normalized to native Python, and dataclasses (which are
+always classical structs in QMod) become ``QmodStructInstance``s with their
+declaration registered on ``qmodule``. The result is a QMod object from
+which both an expression string (via ``qmod_val_to_expr_str``) and a
+classical type (via ``infer_classical_type``) can be derived.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `value` | `Any` |  | *required* |
+| `qmodule` | `ModelStateContainer` |  | *required* |
+
+
+
+### subscript
+
+
+<pre><code>subscript(
+    array: list | CArray | np.ndarray,
+    index: Any
+) -> Any</code></pre>
+
+
+Return the element of ``array`` at position ``index`` in an expression.
+
+This is the expression-level form of the ``array[index]`` indexing operator.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `array` | `list \| CArray \| np.ndarray` | The array to index into. May be a Python list, a quantum-variable concatenation, a ``CArray`` parameter, or a numpy array. | *required* |
+| `index` | `Any` | The position to read, as a classical expression. | *required* |
+
+
+
+### slice_
+
+
+<pre><code>slice_(
+    array: list | CArray | np.ndarray,
+    start: Any,
+    stop: Any
+) -> Any</code></pre>
+
+
+Return the ``array[start:stop]`` sub-array in an expression.
+
+This is the expression-level form of the ``array[start:stop]`` slicing operator.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `array` | `list \| CArray \| np.ndarray` | The array to slice. May be a Python list, a quantum-variable concatenation, a ``CArray`` parameter, or a numpy array. | *required* |
+| `start` | `Any` | The index of the first element of the slice, inclusive. | *required* |
+| `stop` | `Any` | The index one past the last element of the slice, exclusive. | *required* |
+    options:
+        show_source: false
+        show_if_no_docstring: false

@@ -1,0 +1,64 @@
+---
+title: Hea
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `full_hea` | [Qmod Classiq-library function]. |
+
+
+### full_hea
+
+
+<pre><code>full_hea(
+    num_qubits: CInt,
+    is_parametrized: CArray[CInt],
+    angle_params: CArray[CReal],
+    connectivity_map: CArray[CArray[CInt]],
+    reps: CInt,
+    operands_1qubit: QCallableList[Annotated[CReal, angle], Annotated[QBit, q]],
+    operands_2qubit: QCallableList[Annotated[CReal, angle], Annotated[QBit, q1], Annotated[QBit, q2]],
+    x: QArray[QBit, Literal[&#x27;num_qubits&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Implements an ansatz on a qubit array `x` with the given 1-qubit and 2-qubit operations.
+
+The number of ansatz layers is given in argument `reps`.
+Each layer applies the 1-qubit operands in `operands_1qubit` to all the qubits in `x`.
+Next, it applies the 2-qubit operands in `operands_2qubit` to qubits (i, j) for each
+pair of indices (i, j) in `connectivity_map`.
+
+The list `is_parametrized` specifies whether the operands in `operands_1qubit` and
+`operands_2qubit` are parametric (expect a classical argument).
+`is_parametrized` is a list of flags (0 and 1 integers) of length
+`len(operands_1qubit) + len(operands_2qubit)`.
+The first `len(operands_1qubit)` flags refer to the `operands_1qubit` operands and
+the next `len(operands_2qubit)` flags refer to the `operands_2qubit` operands.
+
+The classical arguments to the parametric operands are given in argument
+`angle_params`.
+`angle_params` concatenates a set of arguments for each ansatz layer.
+Each set contains an argument for each qubit in `x` times the number
+of parametric operands in `operands_1qubit`.
+These are followed by an argument for each mapping pair in `connectivity_map` times
+the number of parametric operands in `operands_2qubit`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `num_qubits` | `CInt` | The length of qubit array x | *required* |
+| `is_parametrized` | `CArray[CInt]` | A list of 0 and 1 flags | *required* |
+| `angle_params` | `CArray[CReal]` |  | *required* |
+| `connectivity_map` | `CArray[CArray[CInt]]` | A list of pairs of qubit indices | *required* |
+| `reps` | `CInt` | The number of ansatz layers | *required* |
+| `operands_1qubit` | `QCallableList[Annotated[CReal, angle], Annotated[QBit, q]]` | A list of operations on a single qubit | *required* |
+| `operands_2qubit` | `QCallableList[Annotated[CReal, angle], Annotated[QBit, q1], Annotated[QBit, q2]]` | A list of operations on two qubits | *required* |
+| `x` | `QArray[QBit, Literal['num_qubits']]` | The quantum object to be transformed by the ansatz | *required* |

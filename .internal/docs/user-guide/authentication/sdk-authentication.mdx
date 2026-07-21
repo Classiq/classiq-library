@@ -1,0 +1,73 @@
+---
+title: "SDK Authentication"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+The Classiq Python SDK authenticates your device with your Classiq account through an interactive, browser-based confirmation. For unattended, server-to-server contexts where no person can sign in, use the [Client Credentials (M2M) flow](/user-guide/authentication/m2m-authentication) instead.
+
+## Authenticating your device
+
+Make sure the SDK is installed before authenticating; see the [Python SDK installation guide](/getting-started/sdk_installation).
+
+In Python, run:
+
+[comment]: DO_NOT_TEST
+
+```python
+import classiq
+classiq.authenticate()
+```
+
+A confirmation window opens in your web browser. Confirm the authentication:
+
+<Frame>
+    <img src="https://docs.classiq.io/resources/signup_authentication.png" style={{width: "70%"}} />
+</Frame>
+
+Once confirmed, you are ready to use Classiq. The credentials are cached locally and refreshed automatically, so you only need to re-authenticate if they are missing, expired, or revoked.
+
+## Re-authenticating
+
+To replace cached credentials, for example after they expire or when switching accounts, overwrite them:
+
+[comment]: DO_NOT_TEST
+
+```python
+import classiq
+classiq.authenticate(overwrite=True)
+```
+
+## Troubleshooting
+
+<Accordion title="Device is not authenticated">
+
+  Overwrite the cached credentials and authenticate again, as described in [Re-authenticating](#re-authenticating).
+
+</Accordion>
+
+<Accordion title="Auth0 error code 403: access denied">
+
+  This error means your authentication credentials were denied. Overwrite them as described in [Re-authenticating](#re-authenticating).
+
+</Accordion>
+
+<Accordion title="Authentication on headless Linux systems">
+
+  The authentication procedure on headless Linux systems stores the tokens locally in a credentials file. You must still run the authentication once, but it can be done on another system that has a browser, then the credentials file copied over.
+
+</Accordion>
+
+<Accordion title="Confidential information pop-up on Apple computers">
+
+  On some Apple computers, a system pop-up may appear during authentication:
+
+  <Frame>
+    <img src="https://docs.classiq.io/resources/signup_access_mac.png" style={{width: "70%"}} />
+  </Frame>
+
+  Type your device password and click **Always Allow** twice.
+
+</Accordion>
+
+If the problem persists, ask in the [community Slack](https://short.classiq.io/join-slack).

@@ -1,0 +1,118 @@
+---
+title: "Second Quantized Hamiltonian"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/chemistry/second_quantized_hamiltonian/second_quantized_hamiltonian.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+```python
+!pip install -qq "classiq[chemistry]"
+```
+```python
+
+import time
+
+import numpy as np
+from openfermion import FermionOperator
+
+from classiq import *
+from classiq.applications.chemistry.mapping import FermionToQubitMapper
+from classiq.applications.chemistry.op_utils import qubit_op_to_qmod
+from classiq.applications.chemistry.problems import FermionHamiltonianProblem
+```
+```python
+
+op_list = [
+    FermionOperator("0^ 0", 0.2),
+    FermionOperator("0^ 1^ 1 0", -0.1),
+    FermionOperator("2^ 3^ 2 3", -0.3),
+]
+hamiltonian = sum(op_list)
+
+ham_problem = FermionHamiltonianProblem(
+    fermion_hamiltonian=hamiltonian, n_particles=(1, 1)
+)
+
+print(ham_problem.fermion_hamiltonian)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+0.2 [0^ 0] +
+  -0.1 [0^ 1^ 1 0] +
+  -0.3 [2^ 3^ 2 3]
+  
+
+```
+</Info>
+
+```python
+mapper = FermionToQubitMapper()
+vqe_hamiltonian = qubit_op_to_qmod(mapper.map(ham_problem.fermion_hamiltonian))
+num_qubits = mapper.get_num_qubits(ham_problem)
+
+reps = 3
+num_params = reps * num_qubits
+
+
+@qfunc
+def main(params: CArray[CReal, num_params], state: Output[QArray[QBit, num_qubits]]):
+    allocate(state)
+    full_hea(
+        num_qubits=num_qubits,
+        operands_1qubit=[lambda _, q: X(q), lambda theta, q: RY(theta, q)],
+        operands_2qubit=[lambda _, q1, q2: CX(q1, q2)],
+        is_parametrized=[0, 1, 0],
+        angle_params=params,
+        connectivity_map=[(0, 1), (1, 2), (2, 3)],
+        reps=reps,
+        x=state,
+    )
+```
+```python
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3BJuCYipJjnnImYU8PtMloI2wPv
+  
+
+```
+</Info>
+
+```python
+with ExecutionSession(qprog) as es:
+    result = es.minimize(
+        cost_function=vqe_hamiltonian,
+        initial_params={"params": [0.0] * num_params},
+        max_iteration=200,
+    )
+```
+```python
+
+optimizer_res = result[-1][0]
+print("vqe result:", optimizer_res)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+vqe result: 0.0011718750000000186
+  
+
+```
+</Info>

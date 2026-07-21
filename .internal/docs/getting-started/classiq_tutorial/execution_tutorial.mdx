@@ -1,0 +1,292 @@
+---
+title: "Execution Tutorial - Part 1"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/basic_tutorials/the_classiq_tutorial/execution_tutorial.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This tutorial covers the basics of executing a quantum program using Classiq directly through the Python SDK. It is also possible to use the [Classiq Platform](https://platform.classiq.io) to execute quantum algorithms.
+
+For this, we will start by synthesizing the following example from the [synthesis tutorial](https://docs.classiq.io/latest/explore/tutorials/basic_tutorials/the_classiq_tutorial/synthesis_tutorial/):
+
+## Example 1: Sampling Arithmetics and changing number of shots
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3]], y: Output[QNum]) -> None:
+    allocate(x)
+    hadamard_transform(x)
+    y |= x**2 + 1
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJKxJJ639O4HKXMbzBJV92B2vJ
+  
+
+```
+</Info>
+
+This quantum program evaluates the function $y(x) = x^2 + 1$, for all integers $x \in [0,7]$. To execute a quantum program and sample the states, use `sample`:
+
+```python
+results = sample(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/afa2ebcd-8cb9-4f59-8507-94ed94b802dc
+  
+
+```
+</Info>
+
+The output from `sample` is a dataframe with information regarding execution:
+
+```python
+results
+```
+|   | x | y  | counts | probability | bitstring |
+| - | - | -- | ------ | ----------- | --------- |
+| 0 | 7 | 50 | 280    | 0.136719    | 110010111 |
+| 1 | 5 | 26 | 273    | 0.133301    | 011010101 |
+| 2 | 1 | 2  | 266    | 0.129883    | 000010001 |
+| 3 | 0 | 1  | 262    | 0.127930    | 000001000 |
+| 4 | 2 | 5  | 250    | 0.122070    | 000101010 |
+| 5 | 6 | 37 | 243    | 0.118652    | 100101110 |
+| 6 | 3 | 10 | 238    | 0.116211    | 001010011 |
+| 7 | 4 | 17 | 236    | 0.115234    | 010001100 |
+
+The information displayed in the dataframe is:
+
+- `counts` shows the number of times each state was measured.
+- `bitstring` is the bitstring that represents each state measured.
+- `x` and `y` are the numerical representation of the states associated with the measurement.
+- `probability` is the probability associated with each measured state.
+
+By default, the number of executions of the quantum program is $2048$.
+
+This quantity, called the number of shots, can be modified inside `sample`.
+
+For instance, if we want to execute the same circuit with $10{,}000$ shots:
+
+```python
+results_more_shots = sample(qprog, num_shots=10000)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/5cd7b05e-2751-47a6-9d46-50a2e702244b
+  
+
+```
+</Info>
+
+The number of counts for each state will grow proportionally with the number of shots:
+
+```python
+results_more_shots
+```
+|   | x | y  | counts | probability | bitstring |
+| - | - | -- | ------ | ----------- | --------- |
+| 0 | 3 | 10 | 1308   | 0.1308      | 001010011 |
+| 1 | 7 | 50 | 1271   | 0.1271      | 110010111 |
+| 2 | 4 | 17 | 1266   | 0.1266      | 010001100 |
+| 3 | 0 | 1  | 1256   | 0.1256      | 000001000 |
+| 4 | 2 | 5  | 1256   | 0.1256      | 000101010 |
+| 5 | 6 | 37 | 1229   | 0.1229      | 100101110 |
+| 6 | 1 | 2  | 1214   | 0.1214      | 000010001 |
+| 7 | 5 | 26 | 1200   | 0.1200      | 011010101 |
+
+## Example 2: GHZ States and noise
+
+Many simulators provide noise models that approximate the behavior of real quantum hardware. In this example, we create a GHZ state using the Classiq simulator while emulating the noise profile of IBM Pittsburgh, an IBM backend available through Classiq.
+
+We begin by defining the model for the GHZ state:
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QArray[QBit, 3]]):
+    allocate(x)
+    H(x[0])
+    CX(x[0], x[1])
+    CX(x[1], x[2])
+
+
+qprog = synthesize(main)
+```
+
+Next, we configure the simulator to use the noise model associated with the IBM Pittsburgh backend.
+
+This is done by passing a `noise_model` entry through the `config` argument:
+
+```python
+cfg = {"noise_model": "ibm_pittsburgh"}
+res = sample(qprog, backend="simulator", config=cfg)
+res
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/6f56f8a5-1441-450f-b24c-2d4b7232dafc
+  
+
+```
+</Info>
+
+|   | x          | counts | probability | bitstring |
+| - | ---------- | ------ | ----------- | --------- |
+| 0 | \[1, 1, 1] | 1014   | 0.495117    | 111       |
+| 1 | \[0, 0, 0] | 985    | 0.480957    | 000       |
+| 2 | \[0, 0, 1] | 10     | 0.004883    | 100       |
+| 3 | \[1, 1, 0] | 9      | 0.004395    | 011       |
+| 4 | \[0, 1, 1] | 9      | 0.004395    | 110       |
+| 5 | \[0, 1, 0] | 8      | 0.003906    | 010       |
+| 6 | \[1, 0, 1] | 7      | 0.003418    | 101       |
+| 7 | \[1, 0, 0] | 6      | 0.002930    | 001       |
+
+For an ideal, noiseless GHZ state, the only expected measurement outcomes are `[0, 0, 0]` and `[1, 1, 1]`, each occurring with approximately equal probability.
+
+All other basis states should have zero probability.
+
+Here, because the simulation includes a realistic noise model, a small fraction of the measurements appears in other states.
+
+The dominant outcomes are still `[0, 0, 0]` and `[1, 1, 1]`, but the presence of low-probability additional bitstrings reflects the effect of hardware noise on the quantum program execution.
+
+## State vector simulation
+
+A state vector simulator returns the amplitudes of the quantum states produced by a quantum program.
+
+Unlike sampling, which estimates output probabilities from repeated measurements, state vector simulation gives direct access to the simulated quantum state.
+
+On real quantum hardware, these amplitudes are not directly observable.
+
+Reconstructing them requires quantum state tomography, which involves measuring the system in different bases to infer the output state.
+
+In this example, we calculate the state vector of the quantum program using `calculate_state_vector`:
+
+```python
+res_sv = calculate_state_vector(qprog)
+res_sv
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/2eced471-369f-4048-b515-3a8d83988f80
+  
+
+```
+</Info>
+
+|   | x          | amplitude          | magnitude | phase | probability | bitstring |
+| - | ---------- | ------------------ | --------- | ----- | ----------- | --------- |
+| 0 | \[0, 0, 0] | 0.707107+0.000000j | 0.71      | 0.00π | 0.5         | 000       |
+| 1 | \[1, 1, 1] | 0.707107+0.000000j | 0.71      | 0.00π | 0.5         | 111       |
+
+The information displayed in the dataframe is:
+
+- `amplitude` is the complex amplitude associated with each basis state.
+- `magnitude` is the absolute value of the amplitude.
+- `phase` is the phase of the amplitude.
+- `probability` is the probability of measuring the corresponding state.
+- `bitstring` is the bitstring representation of the basis state.
+- `x` is the value of the quantum array. It is displayed as a list of 0s and 1s, with each entry corresponding to one qubit in the array.
+
+In this case, the output corresponds to an ideal GHZ state.
+
+The only states with nonzero probability are `[0, 0, 0]` and `[1, 1, 1]`, each with probability 0.5 and amplitude approximately $1/\sqrt{2}$.
+
+## Backend selection
+
+The backend of an execution is the hardware or simulator where the quantum program is executed. To select a specific backend, it is necessary to know its correct name and provider. To do so, run `get_backend_details()` for a concise list of available backends.
+
+```python
+backend_list = get_backend_details()
+backend_list.head()
+```
+|   | provider   | backend                           | type      | num\_qubits | is\_available | pending\_jobs | queue\_time |
+| - | ---------- | --------------------------------- | --------- | ----------- | ------------- | ------------- | ----------- |
+| 0 | classiq    | nvidia\_simulator                 | simulator | 29          | True          | NaN           | NaT         |
+| 1 | classiq    | simulator                         | simulator | 28          | True          | NaN           | NaT         |
+| 2 | classiq    | simulator\_density\_matrix        | simulator | 28          | True          | NaN           | NaT         |
+| 3 | classiq    | simulator\_matrix\_product\_state | simulator | 28          | True          | NaN           | NaT         |
+| 4 | alice\&bob | LOGICAL\_EARLY                    | simulator | 15          | True          | NaN           | NaT         |
+
+Now, to define a backend, set the backend name following the rule `"provider/backend"` under the execution function used.
+
+For example, you can use the [Classiq simulator](https://docs.classiq.io/user-guide/execution/cloud-providers/classiq-backends#supported-backends) to realize a state vector simulation of the GHZ state, or the [MPS simulator](https://docs.classiq.io/user-guide/execution/cloud-providers/classiq-backends#supported-backends) to sample over the same state:
+
+```python
+default_backend = "classiq/simulator"
+MPS_backend = "classiq/simulator_matrix_product_state"
+
+res_default = calculate_state_vector(qprog, backend=default_backend)
+res_MPS = sample(qprog, MPS_backend)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to classiq/simulator
+  Job: https://platform.classiq.io/jobs/301d33f4-97a4-46bf-8794-aef3e6da2c6e
+  Submitting job to classiq/simulator_matrix_product_state
+  Job: https://platform.classiq.io/jobs/b703a7ac-9e4d-4752-8166-4474c5eb8c66
+  
+
+```
+</Info>
+
+```python
+res_default
+```
+|   | x          | amplitude          | magnitude | phase | probability | bitstring |
+| - | ---------- | ------------------ | --------- | ----- | ----------- | --------- |
+| 0 | \[0, 0, 0] | 0.707107+0.000000j | 0.71      | 0.00π | 0.5         | 000       |
+| 1 | \[1, 1, 1] | 0.707107+0.000000j | 0.71      | 0.00π | 0.5         | 111       |
+
+```python
+res_MPS
+```
+|   | x          | counts | probability | bitstring |
+| - | ---------- | ------ | ----------- | --------- |
+| 0 | \[0, 0, 0] | 1062   | 0.518555    | 000       |
+| 1 | \[1, 1, 1] | 986    | 0.481445    | 111       |

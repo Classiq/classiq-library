@@ -1,0 +1,227 @@
+---
+title: Exponentiation
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `single_pauli_exponent` | [Qmod core-library function]. |
+| `commuting_paulis_exponent` | [Qmod core-library function]. |
+| `suzuki_trotter` | [Qmod core-library function]. |
+| `multi_suzuki_trotter` | [Qmod core-library function]. |
+| `sequential_suzuki_trotter` | [Qmod core-library function]. |
+| `qdrift` | [Qmod core-library function]. |
+| `exponentiate` | [Qmod core-library function]. |
+
+
+### single_pauli_exponent
+
+
+<pre><code>single_pauli_exponent(
+    pauli_string: CArray[Pauli],
+    coefficient: CReal,
+    qbv: QArray[QBit, Literal[&#x27;pauli_string.len&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Exponentiates the specified single Pauli operator multiplied by some coefficient.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `pauli_string` | `CArray[Pauli]` | The Pauli operator to be exponentiated. | *required* |
+| `coefficient` | `CReal` | A coefficient multiplying the Pauli operator. | *required* |
+| `qbv` | `QArray[QBit, Literal['pauli_string.len']]` | The target quantum variable of the exponentiation. | *required* |
+
+
+
+### commuting_paulis_exponent
+
+
+<pre><code>commuting_paulis_exponent(
+    pauli_operator: CArray[PauliTerm],
+    evolution_coefficient: CReal,
+    qbv: QArray[QBit, Literal[&#x27;pauli_operator[0].pauli.len&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Exponentiates the specified commutative Pauli operator.
+As all the Pauli operator's terms commute, the exponential of the whole operator
+is exactly the product of exponentials of each term.
+Calling this funciton with a non-commutative Pauli operator will issue an error.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `pauli_operator` | `CArray[PauliTerm]` | The Pauli operator to be exponentiated. | *required* |
+| `evolution_coefficient` | `CReal` | A global evolution coefficient multiplying the Pauli operator. | *required* |
+| `qbv` | `QArray[QBit, Literal['pauli_operator[0].pauli.len']]` | The target quantum variable of the exponentiation. | *required* |
+
+
+
+### suzuki_trotter
+
+
+<pre><code>suzuki_trotter(
+    pauli_operator: SparsePauliOp,
+    evolution_coefficient: CReal,
+    order: CInt,
+    repetitions: CInt,
+    qbv: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the Suzuki-Trotter decomposition to a Pauli operator.
+
+The Suzuki-Trotter decomposition is a method for approximating the exponential of a sum of operators by a product of exponentials of each operator.
+The Suzuki-Trotter decomposition of a given order nullifies the error of the Taylor series expansion of the product of exponentials up to that order.
+The error of a Suzuki-Trotter decomposition decreases as the order and number of repetitions increase.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `pauli_operator` | `SparsePauliOp` | The Pauli operator to be exponentiated. | *required* |
+| `evolution_coefficient` | `CReal` | A global evolution coefficient multiplying the Pauli operator. | *required* |
+| `order` | `CInt` | The order of the Suzuki-Trotter decomposition. | *required* |
+| `repetitions` | `CInt` | The number of repetitions of the Suzuki-Trotter decomposition. | *required* |
+| `qbv` | `QArray[QBit]` | The target quantum variable of the exponentiation. | *required* |
+
+
+
+### multi_suzuki_trotter
+
+
+<pre><code>multi_suzuki_trotter(
+    hamiltonians: CArray[SparsePauliOp],
+    evolution_coefficients: CArray[CReal, Literal[&#x27;hamiltonians.len&#x27;]],
+    order: CInt,
+    repetitions: CInt,
+    qbv: QArray
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the Suzuki-Trotter decomposition jointly to a sum of Hamiltonians
+(represented as Pauli operators), each with its separate evolution coefficient,
+approximating $\exp\{-i(H_1t_1+H_2t_2+\dots)\}$  with a specified order and number of
+repetitions.
+
+The Suzuki-Trotter decomposition is a method for approximating the exponential of a sum of operators by a product of exponentials of each operator.
+The Suzuki-Trotter decomposition of a given order nullifies the error of the Taylor series expansion of the product of exponentials up to that order.
+The error of a Suzuki-Trotter decomposition decreases as the order and number of repetitions increase.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `hamiltonians` | `CArray[SparsePauliOp]` | The hamiltonians to be exponentiated, in sparse representation. | *required* |
+| `evolution_coefficients` | `CArray[CReal, Literal['hamiltonians.len']]` | The hamiltonian coefficients (can be link-time). | *required* |
+| `order` | `CInt` | The order of the Suzuki-Trotter decomposition. | *required* |
+| `repetitions` | `CInt` | The number of repetitions of the Suzuki-Trotter decomposition. | *required* |
+| `qbv` | `QArray` | The target quantum variable of the exponentiation. | *required* |
+
+
+
+### sequential_suzuki_trotter
+
+
+<pre><code>sequential_suzuki_trotter(
+    hamiltonians: CArray[SparsePauliOp],
+    evolution_coefficients: CArray[CReal, Literal[&#x27;hamiltonians.len&#x27;]],
+    order: CInt,
+    repetitions: CInt,
+    qbv: QArray
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Applies the Suzuki-Trotter decomposition jointly to a sum of Hamiltonians
+(represented as Pauli operators), each with its separate evolution coefficient,
+approximating $\exp\{-i(H_1t_1+H_2t_2+\dots)\}$  with a specified order and number of
+repetitions. Does not reorder the Pauli terms.
+
+The Suzuki-Trotter decomposition is a method for approximating the exponential of a sum of operators by a product of exponentials of each operator.
+The Suzuki-Trotter decomposition of a given order nullifies the error of the Taylor series expansion of the product of exponentials up to that order.
+The error of a Suzuki-Trotter decomposition decreases as the order and number of repetitions increase.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `hamiltonians` | `CArray[SparsePauliOp]` | The hamiltonians to be exponentiated, in sparse representation. | *required* |
+| `evolution_coefficients` | `CArray[CReal, Literal['hamiltonians.len']]` | The hamiltonian coefficients (can be link-time). | *required* |
+| `order` | `CInt` | The order of the Suzuki-Trotter decomposition. | *required* |
+| `repetitions` | `CInt` | The number of repetitions of the Suzuki-Trotter decomposition. | *required* |
+| `qbv` | `QArray` | The target quantum variable of the exponentiation. | *required* |
+
+
+
+### qdrift
+
+
+<pre><code>qdrift(
+    pauli_operator: SparsePauliOp,
+    evolution_coefficient: CReal,
+    num_qdrift: CInt,
+    qbv: QArray[QBit, Literal[&#x27;pauli_operator.num_qubits&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Exponentiates a Pauli operator using the QDrift method. The QDrift method is a stochastic method based on the Trotter decomposition for approximating the exponential of a sum of operators by a product of exponentials of each operator.
+The QDrift method randomizes the order of the operators in the product of exponentials to stochastically reduce the error of the approximation.
+The error of the QDrift method decreases as the number of QDrift steps increases.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `pauli_operator` | `SparsePauliOp` | The Pauli operator to be exponentiated. | *required* |
+| `evolution_coefficient` | `CReal` | A global evolution coefficient multiplying the Pauli operator. | *required* |
+| `num_qdrift` | `CInt` |  | *required* |
+| `qbv` | `QArray[QBit, Literal['pauli_operator.num_qubits']]` | The target quantum variable of the exponentiation. | *required* |
+
+
+
+### exponentiate
+
+
+<pre><code>exponentiate(
+    hamiltonian: SparsePauliOp,
+    evolution_coefficient: CReal,
+    qbv: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod core-library function]
+
+Exponentiates a Pauli operator.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `hamiltonian` | `SparsePauliOp` | The Pauli operator to be exponentiated. | *required* |
+| `evolution_coefficient` | `CReal` | A global coefficient multiplying the Pauli operator. | *required* |
+| `qbv` | `QArray[QBit]` | The target quantum variable of the exponentiation. | *required* |

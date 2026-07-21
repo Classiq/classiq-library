@@ -1,0 +1,40 @@
+---
+title: "Quantum Fourier Transform"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/classiq_open_library/qft/qft.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The quantum Fourier transform (QFT) function is the quantum analog for
+discrete Fourier transform. It is applied on the quantum register state vector.
+
+The state vector `x` is transformed to `y` in the following manner:
+
+$$
+y_{k} = \frac{1}{\sqrt{N}} \sum_{j=0}^{N-1} x_j e^{2\pi i \frac{jk}{N}}
+$$
+Function: `qft`
+
+Arguments:
+
+- `target`: `QArray[QBit]`
+
+The `target` quantum argument is the quantum state on which we apply the QFT.
+
+## Example
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QArray[QBit]]):
+    allocate(4, x)
+    qft(x)
+```
+```python
+
+qprog = synthesize(main)
+```

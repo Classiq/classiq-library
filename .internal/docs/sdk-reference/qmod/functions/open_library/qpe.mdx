@@ -1,0 +1,57 @@
+---
+title: Qpe
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `qpe_flexible` | [Qmod Classiq-library function]. |
+| `qpe` | [Qmod Classiq-library function]. |
+
+
+### qpe_flexible
+
+
+<pre><code>qpe_flexible(
+    unitary_with_power: QCallable[CInt],
+    phase: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Implements the Quantum Phase Estimation (QPE) algorithm,  which estimates the phase (eigenvalue) associated with an eigenstate of a given unitary operator $U$.
+This is a flexible version that allows the user to provide a callable that generates the unitary operator $U^k$ for a given integer $k$, offering greater flexibility in handling different quantum circuits using some powering rule.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `unitary_with_power` | `QCallable[CInt]` | A callable that returns the unitary operator $U^k$ given an integer $k$. This callable is used to control the application of powers of the unitary operator. | *required* |
+| `phase` | `QArray[QBit]` | The quantum variable that represents the estimated phase (eigenvalue), assuming initialized to zero. | *required* |
+
+
+
+### qpe
+
+
+<pre><code>qpe(
+    unitary: QCallable,
+    phase: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Implements the standard Quantum Phase Estimation (QPE) algorithm, which estimates the phase (eigenvalue) associated with an eigenstate of a given unitary operator $U$.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `unitary` | `QCallable` | A callable representing the unitary operator $U$, whose eigenvalue is to be estimated. | *required* |
+| `phase` | `QNum` | The quantum variable that represents the estimated phase (eigenvalue), assuming initialized to zero. | *required* |

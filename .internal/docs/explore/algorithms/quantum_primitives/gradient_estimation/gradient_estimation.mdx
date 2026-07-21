@@ -1,0 +1,1459 @@
+---
+title: "Initialization"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/algorithms/quantum_primitives/gradient_estimation/gradient_estimation.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+```python
+from gradient_estimation_helpers import *
+
+from classiq.execution.functions.util._logging import _logger
+```
+# Fast Quantum Algorithm for Numerical Gradient Estimation
+
+> Given a scalar function of $d$ dimensions, $f(x_1, \ldots, x_d)$, computing its gradient at a specific point is often essential.
+>
+> On a classical computer, this requires at least $d+1$ queries to $f$.
+>
+> This notebook presents a quantum algorithm that computes the gradient with a single query, based on the paper by S. P. Jordan [\[1\]](#original-paper).
+>
+> This represents a dramatic speedup for high-dimensional functions, where function evaluation is typically the dominant computational cost.
+>
+> - **Input:** A black-box function $f$ of $d$ dimensions.
+> - **Promise:** The function is smooth and has bounded gradient: $|\nabla f|<\nabla f_{\text{max}}$.
+> - **Output:** The gradient $\nabla f$ at the origin with $n$ bits of precision, encoded on a quantum register.
+>
+> **Complexity:** In black-box query complexity, the classical algorithm requires at least $d+1$ queries to $f$, while the quantum algorithm requires only one.
+>
+> ***
+>
+> **Keywords:** Foundational quantum algorithms, Gradient, Function evaluation, Oracle problem, Quantum Fourier Transform (QFT)
+
+The core idea is an in-place computation: first, the function is encoded directly into the phases of the coordinate superposition state. Then, an inverse QFT is applied to overwrite that exact same coordinate register with the gradient, extracting it as a measurable outcome without needing a separate output register.
+
+We demonstrate this step by step—first with a simplified version to build intuition, then with refinements for the complete algorithm.
+
+![Quantum Circuit](./quantum_circuit.png)
+
+# Introduction
+
+## Simplified explanation of the algorithm
+
+The algorithm has two main steps:
+
+1. Encode the function into the phases of the coordinate register's superposition
+1. Apply an inverse QFT to transform the coordinate register directly into the measurable gradient state
+
+**In detail:**
+
+1. We define an interval $l$ with $N$ points around the origin where we estimate the gradient, establishing a resolution $\mathrm{dx}=l/N$.
+
+To calculate the gradient at an arbitrary point $x_0$ instead of the origin, we can define an auxiliary function $\tilde{f}(x) = f(x + x_0)$ and evaluate its gradient at the origin.
+
+For each dimension ($x_i$), we create the superposition $|\delta_i\rangle=|-l\rangle+|-l+\mathrm{dx}\rangle+|-l+2\mathrm{dx}\rangle\cdots|l-\mathrm{dx}\rangle$ using Hadamard gates on $|0\rangle^{\otimes n}$.
+
+*The actual encoding on qubits is discussed later.*
+
+For simplicity, we consider a single dimension.
+
+For $d > 1$, the state $|\delta\rangle$ is a tensor product over all dimensions:
+
+$$
+|\delta\rangle=\prod_i|\delta_i\rangle
+$$
+2. Using a phase oracle or the phase kickback technique, we encode the function as phases:
+
+$$
+e^{i\cdot2\pi f(-l)}|-l\rangle + e^{i\cdot2\pi f(-l+\mathrm{dx})}|-l+\mathrm{dx}\rangle + e^{i\cdot2\pi f(-l+2\mathrm{dx})}|-l+2\mathrm{dx}\rangle \cdots e^{i\cdot2\pi f(l-\mathrm{dx})}|l-\mathrm{dx}\rangle
+$$
+![](./step_2.png)
+
+3. For a sufficiently small interval, we approximate $f(x)\approx f(0)+x\cdot f'(0)$, allowing us to factor the state:
+
+$$
+\begin{aligned}
+& e^{i\cdot2\pi f(0)}\left(e^{i\cdot2\pi (-l)\cdot f'(0)}\lvert-l\rangle + e^{i\cdot2\pi (-l+\mathrm{dx})f'(0)}\lvert-l+\mathrm{dx}\rangle + e^{i\cdot2\pi (-l+2\mathrm{dx})f'(0)}\lvert-l+2\mathrm{dx}\rangle \cdots e^{i\cdot2\pi (l-\mathrm{dx})f'(0)}\lvert l-\mathrm{dx}\rangle\right) \\
+&= e^{i\cdot2\pi f(0)}\sum_{-l}^{l-\mathrm{dx}} e^{i\cdot2\pi jf'(0)}|j\rangle
+\end{aligned}
+$$
+![](./step_3.png)
+
+4. This state is exactly the QFT of the computational basis state $|f'(0)\rangle$.
+
+Applying the inverse QFT yields:
+
+$$
+|f'(0)\rangle
+$$
+5. Measure the register to obtain $f'(0)$ (or $\nabla f$ for multi-dimensional functions).
+
+## Full explanation of the algorithm
+
+The simplified explanation captures the key idea but omits two important details: handling negative values and fractional representation.
+
+When estimating the gradient, we analyze an interval $l$ around the origin.
+
+The state $|\delta_i\rangle$ represents $N$ equally spaced points in this interval, normalized as:
+
+$$
+x=\frac{l}{N}\delta
+$$
+With signed $\delta$ ranging from $-N/2$ to $N/2-1$: $\delta=-N/2$ is the leftmost point ($-l/2$), $\delta=0$ is the origin, and $\delta=N/2-1$ is the rightmost point ($l/2$)\*.
+
+We also normalize the output.
+
+Assuming the gradient is bounded between $-m/2$ and $m/2$, we represent those values using the $N$ states:
+
+$$
+\nabla f=\frac{m}{N}\delta_{measured}
+$$
+When applying the algorithm, we choose $l$ and $m$ based on prior knowledge of $f(x)$.
+
+The value $N$ determines the final resolution.
+
+$l$ must be small enough to keep the function approximately linear, and $m$ must exceed the maximum expected gradient magnitude while maintaining sufficient resolution.
+
+Using these two normalizations, we modify the algorithm:
+
+1. In step 2, instead of applying $f(\delta)$, we apply $\frac{N}{ml}f\left(\frac{l}{N}\delta\right)$.
+1. In step 5, the signed measurement directly gives $\frac{N}{m}\nabla f$, so $\nabla f = \frac{m}{N}\delta_{measured}$.
+
+Using a signed register means the measured $\delta_{measured}$ is already the correct signed value with no further adjustment needed.
+
+\* The rightmost point is actually $l/2-l/N$ rather than $l/2$, because the center is at the origin and $N$ must be even. However, this distinction does not affect the conceptual understanding.
+
+## Parameter Selection
+
+We need to select appropriate values for $l$, $m$, and $N$. We use the following notation:
+
+- $\nabla f_{\text{max}}$ — bound on the gradient magnitude: $|\nabla f|<\nabla f_{\text{max}}$
+- $\epsilon$ — desired accuracy: $|\nabla f_{\text{est}}-\nabla f| < \epsilon$
+- $d$ — dimensionality of $f$
+- $D_2$ — bound on the second derivative of $f$ near the origin
+
+#
+
+## Selecting $l$
+
+Choose $l$ to ensure the function remains approximately linear.
+
+Similar to classical numerical differentiation, this interval must be sufficiently small.
+
+To keep gradient variation within accuracy $\epsilon$, we require $\nabla f_{\text{max}} - \nabla f_{\text{min}} \le \epsilon$.
+
+For a single dimension, the second derivative is approximately $f''(x) \approx (\nabla f_{\text{max}} - \nabla f_{\text{min}}) / l$.
+
+This gives $l < \frac{\epsilon}{|f''(x)|}$.
+
+Using $D_2$ as the second derivative bound, we get $l < \frac{\epsilon}{D_2}$.
+
+In multiple dimensions, we sum deviations as root-mean-square across all $d$ dimensions, introducing a factor of $1/\sqrt{d}$.
+
+To improve this bound, we scale by the uniform distribution variance, $\frac{1}{12}$.
+
+The final bound for $l$ is:
+
+$$
+l\leq\frac{2\sqrt{3}\epsilon}{D_2\sqrt{d}}
+$$
+For a one-dimensional quadratic function $f(x)=ax^2+bx+c$, we need $l$ smaller than $\frac{\sqrt{12}\epsilon}{2a}$.
+
+Furthermore, in order to minimize the number of bits of precision to which $f$ must be evaluated, $l$ should be chosen as large as possible, subject to the constraint above. So $l$ should be chosen tightly.
+
+See Jordan's paper [\[1\]](#original-paper) for a full derivation.
+
+#
+
+## Selecting $m$
+
+The parameter $m$ bounds the gradient magnitude.
+
+Since the gradient is signed, we need $m \ge 2\nabla f_{\text{max}}$.
+
+The resolution of the result is $\frac{m}{N}$.
+
+For a given register size and accuracy $\epsilon$, the upper bound is $m \le 2N\epsilon$.
+
+#
+
+## Selecting $n$
+
+$N=2^n$ defines the result resolution.
+
+The step size between possible outcomes is $\frac{m}{N}$.
+
+To achieve accuracy $\epsilon$, we need $N\geq\frac{m}{2\epsilon}$.
+
+Assuming tight $m$ selection, this gives a lower bound for the number of qubits:
+
+$$
+n\geq\log_2\left(\frac{\nabla f_{\text{max}}}{\epsilon}\right)
+$$
+#
+
+## Summary
+
+Given $\nabla f_{\text{max}}$ and desired accuracy $\epsilon$, select parameters as:
+
+| Parameter | Role                | Constraint                                                                      |
+| --------- | ------------------- | ------------------------------------------------------------------------------- |
+| $l$       | Sampling interval   | $l \leq \frac{2\sqrt{3}\epsilon}{D_2\sqrt{d}}$ — keeps $f$ approximately linear |
+| $m$       | Gradient range      | $2\nabla f_{\max} \leq m \leq 2\cdot2^n\epsilon$                                |
+| $n$       | Qubits / resolution | $n \geq \log_2(\nabla f_{\max} / \epsilon)$                                     |
+
+## Outline
+
+This notebook covers:
+
+1. Theoretical foundation and parameter selection
+1. Implementation
+   
+
+- Phase state preparation (phase kickback and direct methods)
+   
+
+- Inverse QFT for gradient extraction
+   
+
+- Examples with linear and non-linear functions
+1. Performance analysis
+1. Multi-dimensional examples ($d > 1$)
+
+# Implementation
+
+## State Preparation
+
+#
+
+## Phase Kickback
+
+The first step is to prepare the state:
+
+$$
+\sum_{\delta}e^{i2\pi\frac{N}{ml}f(\frac{l}{N}\delta)}|\delta\rangle
+$$
+The paper assumes an oracle $|x\rangle \rightarrow |f(x)\rangle$, which we use with the phase kickback technique to create this state.
+
+The next example demonstrates how this works.
+
+The phase kickback has three main steps:
+
+1. Apply Hadamard gates on $|\delta\rangle$ to create a superposition of all sample points
+1. Initialize the ancilla to $|1111...1\rangle$ (in binary) and apply QFT
+1. Add $f(\delta)$ to the ancilla; the function value is "kicked back" as a phase
+
+See the [appendix](#appendix-1---phase-kickback) for details.
+
+```python
+# Set the default values:
+# l = 0.5, m = 2, n = 3, n0 = 3
+p = params()
+
+# Set the function we want to calculate the gradient of:
+# f(x) = 0.5*x + 0.25
+# Gradient: f'(0) = 0.5
+p.set_function(p.linear, (0.5, 0.25))
+
+# Unpack the parameters to global variables for easier use
+p.unpack(globals())
+
+
+@qfunc
+def main(x: Output[QNum[n, SIGNED, 0]]):
+    # 
+
+1. State preparation
+
+    # 
+
+1.
+
+1. Set the coordinates state 
+
+- Apply Hadamard gate on the coordinates register
+    allocate(x)
+    hadamard_transform(x)
+
+    # 
+
+1.
+
+2. Set the ancilla state 
+
+- Apply QFT to |1111...1> state
+    ancilla = QNum("ancilla", n0, SIGNED, n0)
+    prepare_basis_state([True] * n0, ancilla)
+    qft(ancilla)
+
+    # 
+
+1.
+
+3. Apply the function f on the ancilla, to create the phase kickback
+    # Calculate the normalized f and add it to the ancilla
+    val = f_normalized(x)
+    inplace_add(val, ancilla)
+
+    # 
+
+2. Next step in the algorithm: QFT inverse on the coordinates register
+    # invert(lambda: qft(x))
+
+    # 
+
+3. Return the ancilla back to |000...0> state and drop it
+    invert(lambda: qft(ancilla))
+    apply_to_all(X, ancilla)
+    drop(ancilla)
+
+
+# Run using a statevector simulator
+qprog_ancilla = synthesize(main)
+# show(qprog) # Uncomment to see the circuit
+print("Circuit Width:", qprog_ancilla.data.width)
+print("Circuit Depth:", qprog_ancilla.transpiled_circuit.depth)
+print("Gate Counts:", qprog_ancilla.transpiled_circuit.count_ops)
+
+df = calculate_state_vector(qprog_ancilla)
+df.sort_values(by="x")
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Circuit Width: 7
+  Circuit Depth: 47
+  Gate Counts: {'u': 34, 'cx': 28}
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Job: https://platform.classiq.io/jobs/f79b6a72-bc04-4c98-83d3-2af28406d793
+  
+
+```
+</Info>
+
+|   | x  | amplitude   | magnitude | phase  | probability | bitstring |
+| - | -- | ----------- | --------- | ------ | ----------- | --------- |
+| 7 | -4 | -0.25+0.25j | 0.35      | 0.75π  | 0.125       | 0000100   |
+| 4 | -3 | -0.25-0.25j | 0.35      | -0.75π | 0.125       | 0000101   |
+| 5 | -2 | 0.25-0.25j  | 0.35      | -0.25π | 0.125       | 0000110   |
+| 2 | -1 | 0.25+0.25j  | 0.35      | 0.25π  | 0.125       | 0000111   |
+| 6 | 0  | -0.25+0.25j | 0.35      | 0.75π  | 0.125       | 0000000   |
+| 3 | 1  | -0.25-0.25j | 0.35      | -0.75π | 0.125       | 0000001   |
+| 1 | 2  | 0.25-0.25j  | 0.35      | -0.25π | 0.125       | 0000010   |
+| 0 | 3  | 0.25+0.25j  | 0.35      | 0.25π  | 0.125       | 0000011   |
+
+Let's examine the phase compared to the classical function value:
+
+```python
+# Shift the classical function to match the quantum convention
+f_classical = f_normalized(df["x"]) - f_normalized(0)
+# Create a simplified dataframe with the relevant information, and sort it by the x values.
+phases = np.angle(df["amplitude"]).astype(float)
+phases_over_2pi = phases / (2 * np.pi)
+simplified_df = pd.DataFrame(
+    {"f_classical": f_classical, "phase_over_2pi": phases_over_2pi.round(5)}
+)
+simplified_df.index = df["x"]
+simplified_df.sort_index(inplace=True)
+# Unwrap the phase
+simplified_df["phase_over_2pi"] = np.unwrap(simplified_df["phase_over_2pi"], period=1)
+# Get rid of the global phase
+simplified_df["phase_over_2pi"] -= simplified_df["phase_over_2pi"].iloc[N // 2]
+simplified_df["f_classical"] -= simplified_df["f_classical"].iloc[N // 2]
+
+# Plot the results
+plt.figure()
+plot_classical()
+simplified_df.plot(style="o", ax=plt.gca())
+plt.legend()
+plt.show()
+
+# Show the results as a dataframe
+simplified_df
+```
+![output](./gradient_estimation_files/gradient_estimation_1.png)
+
+|     | f\_classical | phase\_over\_2pi |
+| --- | ------------ | ---------------- |
+| x   |              |                  |
+| --- | ---          | ---              |
+| -4  | -1.00        | -1.00            |
+| -3  | -0.75        | -0.75            |
+| -2  | -0.50        | -0.50            |
+| -1  | -0.25        | -0.25            |
+| 0   | 0.00         | 0.00             |
+| 1   | 0.25         | 0.25             |
+| 2   | 0.50         | 0.50             |
+| 3   | 0.75         | 0.75             |
+
+The graph shows the original function (gray), classical values (blue), and quantum phase at sample points (orange).
+
+Results are displayed in both normalized coordinates (black axes) and original values (blue axes).
+
+#
+
+## Direct Phase
+
+While the phase kickback approach is sometimes well-suited for hardware implementations with a state oracle, it requires significant circuit overhead in simulation. A direct approach provides more efficient state preparation for our purposes.
+
+A simpler approach is to directly prepare the desired state:
+
+$$
+\sum_{\delta}e^{i2\pi\frac{N}{ml}f(\frac{l}{N}\delta)}|\delta\rangle
+$$
+The example below demonstrates this method.
+
+Compare the circuit width, depth, and gate counts to see the efficiency gain. In practice, the choice between methods depends on whether you have access to an efficient oracle for the function.
+
+```python
+p = params()
+# f(x) = 0.5*x + 0.25
+# Gradient: f'(0) = 0.5
+p.set_function(p.linear, (0.5, 0.25))
+p.unpack(globals())
+
+
+@qfunc
+def main(x: Output[QNum[n, SIGNED, 0]]):
+    # 
+
+1. State preparation
+    allocate(x)
+    hadamard_transform(x)
+    phase(f_normalized(x), 2 * pi)
+
+    # 
+
+2. Next step in the algorithm: QFT inverse on the coordinates register
+    # invert(lambda: qft(x))
+
+
+# Run using a statevector simulator
+qprog = synthesize(main)
+# show(qprog) # Uncomment to see the circuit
+print("Circuit Width:", qprog.data.width)
+print("Circuit Depth:", qprog.transpiled_circuit.depth)
+print("Gate Counts:", qprog.transpiled_circuit.count_ops)
+
+df = calculate_state_vector(qprog)
+df.sort_values(by="x")
+
+simplified_df = simplify_df(df)
+plot_simplified_df(simplified_df)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Circuit Width: 3
+  Circuit Depth: 1
+  Gate Counts: {'u': 3}
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Job: https://platform.classiq.io/jobs/deb9fbe3-dadb-4f44-b33c-dbcba464e3fb
+  
+
+```
+</Info>
+
+![output](./gradient_estimation_files/gradient_estimation_2.png)
+
+The state is identical to the phase kickback method.
+
+Moving forward, we'll use the direct method for its superior efficiency.
+
+#
+
+## Quadratic Function
+
+Non-linear functions are more interesting. In the next example, we explore a quadratic function.
+
+Note that the critical step occurs in the next phase when we apply the QFT. Here, the phases follow the function exactly without linearization.
+
+The QFT will extract the linear (gradient) component from these phase values.
+
+```python
+p = params()
+# f(x) = 0.5*x^2 + 0.25*x + 0.1
+# Gradient: f'(x) = x + 0.25, so f'(0) = 0.25
+p.set_function(p.quadratic, (0.5, 0.25, 0.1))
+p.l = 2
+p.unpack(globals())
+
+
+@qfunc
+def main(x: Output[QNum[n, SIGNED, 0]]):
+    # 
+
+1. State preparation
+    allocate(x)
+    hadamard_transform(x)
+    phase(f_normalized(x), 2 * pi)
+
+    # 
+
+2. Next step in the algorithm: QFT inverse on the coordinates register
+    # invert(lambda: qft(x))
+
+
+# Run using a statevector simulator
+qprog = synthesize(main)
+# show(qprog) # Uncomment to see the circuit
+print("Circuit Width:", qprog.data.width)
+print("Circuit Depth:", qprog.transpiled_circuit.depth)
+print("Gate Counts:", qprog.transpiled_circuit.count_ops)
+
+df = calculate_state_vector(qprog)
+df.sort_values(by="x")
+
+simplified_df = simplify_df(df)
+plot_simplified_df(simplified_df)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Circuit Width: 3
+  Circuit Depth: 9
+  Gate Counts: {'u': 6, 'cx': 6}
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Job: https://platform.classiq.io/jobs/19028135-c695-4b39-a8a0-a30a04eee106
+  
+
+```
+</Info>
+
+![output](./gradient_estimation_files/gradient_estimation_3.png)
+
+Decreasing $l$ narrows the sampling interval, making the function appear more linear within that region.
+
+```python
+p = params()
+# f(x) = 0.5*x^2 + 0.25*x + 0.1
+# Gradient: f'(x) = x + 0.25, so f'(0) = 0.25
+p.set_function(p.quadratic, (0.5, 0.25, 0.1))
+p.l = 0.2
+p.unpack(globals())
+
+
+@qfunc
+def main(x: Output[QNum[n, SIGNED, 0]]):
+    # 
+
+1. State preparation
+    allocate(x)
+    hadamard_transform(x)
+    phase(f_normalized(x), 2 * pi)
+
+    # 
+
+2. Next step in the algorithm: QFT inverse on the coordinates register
+    # invert(lambda: qft(x))
+
+
+# Run using a statevector simulator
+qprog = synthesize(main)
+# show(qprog) # Uncomment to see the circuit
+print("Circuit Width:", qprog.data.width)
+print("Circuit Depth:", qprog.transpiled_circuit.depth)
+print("Gate Counts:", qprog.transpiled_circuit.count_ops)
+
+df = calculate_state_vector(qprog)
+df.sort_values(by="x")
+
+simplified_df = simplify_df(df)
+plot_simplified_df(simplified_df)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Circuit Width: 3
+  Circuit Depth: 9
+  Gate Counts: {'u': 6, 'cx': 6}
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Job: https://platform.classiq.io/jobs/f5e85e56-5921-4e56-b736-bd7f86101e21
+  
+
+```
+</Info>
+
+![output](./gradient_estimation_files/gradient_estimation_4.png)
+
+## Full Algorithm
+
+#
+
+## Implementation
+
+The final step is to apply the inverse QFT to the coordinates.
+
+This extracts the gradient from the phases and produces a measurable state containing the normalized gradient value.
+
+We will first define a QFunc that preforms the algorithm and calculates the gradient of a given function $f$, for single and multiple dimensions, and another function that transforms a given function (either Callable or QCallable) into a normalized phase oracle.
+
+```python
+@qfunc
+def gradient(f: QCallable[[QNum]], x: QNum) -> None:
+    """
+    Apply the gradient estimation algorithm to estimate the gradient of 1 dimensional function $f$ at $x=0$.
+
+The function $f$ is given as a quantum oracle that applies the phase kickback.
+    """
+    # 
+
+1. State preparation
+    hadamard_transform(x)
+    f(x)
+    # 
+
+2. QFT inverse on the coordinates register
+    invert(lambda: qft(x))
+
+
+@qfunc
+def gradient_nd(f: QCallable[QArray[QNum]], coords: QArray[QNum]) -> None:
+    """
+    Apply the gradient estimation algorithm to estimate the gradient of multi dimensional function $f$ at $\vec{x}=0$.
+
+The function $f$ is given as a quantum oracle that applies the phase kickback.
+    """
+    # 
+
+1. State preparation
+    hadamard_transform(coords)
+    f(coords)
+    # 
+
+2. QFT inverse on the coordinates register
+    repeat(coords.len, lambda i: invert(lambda: qft(coords[i])))
+
+
+def make_phase_oracle(
+    f: Callable,
+    l: float,
+    m: float,
+    N: int,
+    x0: float = 0.0,
+    d: int = 1,
+) -> QCallable:
+    """Return a @qfunc phase oracle that applies phase(f_norm(x), 2*pi).
+
+The oracle encodes the normalized function value as a phase:
+        f_norm(x) = f(l/N * x - x0) * N / (l * m)
+
+    Args:
+        f:   Symbolic Python callable representing the mathematical function.
+        l:   Sampling interval half-width.
+        m:   Gradient magnitude bound (output range).
+        N:   Number of sample points (2^n).
+        x0:  Evaluation point; shifts the sampling window.
+        d:   Dimensionality of the function.
+    """
+    if d == 1:
+
+        @qfunc
+        def phase_oracle(x: QNum) -> None:
+            phase(f(l / N * x - x0) * N / (l * m), 2 * pi)
+
+    else:
+
+        @qfunc
+        def phase_oracle(coords: QArray[QNum]) -> None:
+            args = [l / N * coords[i] - x0 for i in range(d)]
+            phase(f(*args) * N / (l * m), 2 * pi)
+
+    return phase_oracle
+```
+#
+
+## Linear Functions
+
+We will see the first example on a linear function.\
+We switch from statevector simulation to standard simulation, which measures the final result rather than examining phase values directly.
+
+```python
+p = params()
+p.set_function(p.linear, (-0.5, 0.25))
+p.unpack(globals())
+
+
+@qfunc
+def main(x: Output[QNum[n, SIGNED, 0]]):
+    allocate(x)
+    gradient(make_phase_oracle(f, l=l, m=m, N=N, x0=0), x)
+
+
+qprog_linear = synthesize(main)
+# show(qprog_linear) # Uncomment to see the circuit
+df = sample(qprog_linear)
+
+# Translate the majority state to a gradient value
+majority_state = dict(df.iloc[0])
+value = majority_state.get("x")
+# Divide by (N/m) to get the actual gradient value.
+majority_gradient = value / (N / m)
+analytical_gradient = p.analytical_gradient(0)
+
+# Or use the helper function:
+# majority_gradient = state_to_gradient(majority_state.get('x'), p)
+
+# Print the results and compute the majority gradient
+print("Parsed probabilities:", df.set_index("x").to_dict()["probability"])
+print(f"The analytical gradient is: {analytical_gradient}")
+print(f"The majority gradient is: {majority_gradient}")
+
+# Check if the majority result is correct within the resolution of the algorithm
+resolution = m / N
+is_correct = abs(majority_gradient - analytical_gradient) < resolution / 2
+print(f"The majority result is", "correct" if is_correct else "incorrect")
+print("####################################################")
+
+# Compute the success rate of the algorithm, i.e. the percentage of shots that are correct within the resolution of the algorithm.
+success_rate, success_shots, total_shots = compute_success_rate(
+    df, analytic_derivatives={"x": analytical_gradient}, p=p
+)
+print(f"Success rate: {success_rate:.2%} ({success_shots}/{total_shots} shots)")
+show_bar(success_rate)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 7))
+
+x_array = np.arange(-N // 2, N // 2)
+f_classical = f_normalized(x_array)
+f_classical -= f_classical[N // 2]
+
+plt.sca(ax1)
+plot_classical()
+ax1.plot(x_array, f_classical, "o", label="Theoretical values", markersize=8)
+xmin, xmax = -N, N
+ymin, ymax = -N // 2, N // 2
+ax1.set_xlim(xmin, xmax)
+ax1.set_ylim(ymin, ymax)
+ax1.vlines(-N // 2, ymin, ymax, colors="lightgray", linestyles="dashed")
+ax1.vlines(N // 2 - 1, ymin, ymax, colors="lightgray", linestyles="dashed")
+ax1.hlines(-N / 4 + 0.5, xmin, xmax, colors="lightgray", linestyles="dashed")
+ax1.hlines(N / 4, xmin, xmax, colors="lightgray", linestyles="dashed")
+ax1.legend(fontsize=12)
+ax1.set_title("Theoretical Phases", fontsize=14, fontweight="bold")
+ax1.tick_params(labelsize=11)
+ax1.set_xlabel("x (index)", fontsize=12)
+ax1.set_ylabel("f (normalized)", fontsize=12)
+
+plt.sca(ax2)
+percentage = df["counts"] / df["counts"].sum() * 100
+ax2.bar(df["x"], percentage, color="lightblue", label="Measurement counts")
+ax2.set_xlabel("x (index)", fontsize=12)
+ax2.set_ylabel("Percentage of shots (%)", fontsize=12)
+ax2.set_xlim(-N // 2 - 1, N // 2)
+ax2.set_ylim(0, 100)
+ax2.set_title("Measurement Histogram", fontsize=14, fontweight="bold")
+ax2.tick_params(labelsize=11)
+if analytical_gradient is not None:
+    x_analytic = analytical_gradient * (N / m)
+    ax2.axvline(
+        x=x_analytic,
+        color="green",
+        linestyle="dashed",
+        label="Analytical gradient",
+        linewidth=2,
+    )
+ax2.legend(fontsize=12)
+
+plt.tight_layout()
+plt.show()
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/c2584af9-9b57-43d9-991a-70772ca1c7a4
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Parsed probabilities: {-2: 1.0}
+  The analytical gradient is: -0.5
+  The majority gradient is: -0.5
+  The majority result is correct
+  
+
+####################################################
+  Success rate: 100.00% (2048/2048 shots)
+  [[92m██████████████████████████████████████████████████[91m[0m] 100.00%
+  
+
+```
+</Info>
+
+![output](./gradient_estimation_files/gradient_estimation_5.png)
+
+The measured gradient is always a multiple of the resolution $m/N$. In the previous example, the exact gradient -0.5 was a multiple of the resolution 0.25, so the success rate was 100%.
+
+When the gradient is not a multiple of the resolution, the result becomes a superposition of nearby states.
+
+The algorithm still provides a good approximation, as shown in the next example.
+
+```python
+p = params()
+# f(x) = 0.55*x + 0.25
+# Gradient: f'(0) = 0.55
+# Pay attention that 0.55 is not a multiple of m/N = 0.25,
+# so we expect to get a superposition of multiple states around the correct gradient.
+p.set_function(p.linear, (0.55, 0.25))
+p.unpack(globals())
+
+
+@qfunc
+def main(x: Output[QNum[n, SIGNED, 0]]):
+    allocate(x)
+    gradient(make_phase_oracle(f, l=l, m=m, N=N, x0=0), x)
+
+
+qprog_linear_2 = synthesize(main)
+df = sample(qprog_linear_2).sort_values("counts", ascending=False)
+analyze_results(df, p)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/3f1c1fa2-1576-484e-98d3-244f107a2326
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Parsed probabilities: {2: 0.89697265625, 3: 0.044921875, 1: 0.01953125, -4: 0.01171875, 0: 0.00927734375, -3: 0.0068359375, -1: 0.00634765625, -2: 0.00439453125}
+  The analytical gradient is: 0.55
+  The majority gradient is: 0.5
+  The majority result is correct
+  
+
+####################################################
+  Success rate: 89.70% (1837/2048 shots)
+  [[92m█████████████████████████████████████████████[91m-----[0m] 89.70%
+  
+
+```
+</Info>
+
+![output](./gradient_estimation_files/gradient_estimation_6.png)
+
+<Info>
+  **Output:**
+
+  
+
+```
+0.89697265625
+  
+
+```
+</Info>
+
+#
+
+## Quadratic Function
+
+For non-linear functions, the interval $l$ must be chosen carefully.
+
+The algorithm requires the function to be approximately linear over the interval, which means $l$ must be sufficiently small.
+
+The next example demonstrates this dependency.
+
+With appropriate selection of $l$, the function remains nearly linear over the sampling interval, yielding high success rates.
+
+```python
+# In this example we will use the quadratic function
+p = params()
+# f(x) = 0.6*x^2 + 0.25*x + 0.1
+# Gradient: f'(x) = 1.2*x + 0.25, so f'(0) = 0.25
+p.set_function(p.quadratic, (0.6, 0.25, 0.1))
+# Setting l properly, ensuring we are in the linear regime of the function.
+p.l = 0.1
+p.unpack(globals())
+
+
+@qfunc
+def main(x: Output[QNum[n, SIGNED, 0]]):
+    allocate(x)
+    gradient(make_phase_oracle(f, l=l, m=m, N=N, x0=0), x)
+
+
+qprog_quadratic = synthesize(main)
+df = sample(qprog_quadratic).sort_values("counts", ascending=False)
+success_rate = analyze_results(df, p)
+assert success_rate > 0.9, r"The success rate should be above 90% for these parameters."
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/069c0180-ccdd-43f7-bbe3-15f43589d689
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Parsed probabilities: {1: 0.98095703125, 2: 0.00927734375, 0: 0.005859375, -1: 0.00146484375, 3: 0.0009765625, -2: 0.0009765625, -4: 0.00048828125}
+  The analytical gradient is: 0.25
+  The majority gradient is: 0.25
+  The majority result is correct
+  
+
+####################################################
+  Success rate: 98.10% (2009/2048 shots)
+  [[92m█████████████████████████████████████████████████[91m-[0m] 98.10%
+  
+
+```
+</Info>
+
+![output](./gradient_estimation_files/gradient_estimation_7.png)
+
+Conversely, if $l$ is too large and the function deviates significantly from linearity, the success rate drops dramatically.
+
+```python
+# In this example we will use the quadratic function
+p = params()
+# f(x) = 0.6*x^2 + 0.25*x + 0.1
+# Gradient: f'(x) = 1.2*x + 0.25, so f'(0) = 0.25
+p.set_function(p.quadratic, (0.6, 0.25, 0.1))
+# Setting l to be too big, so we are outside of the linear regime of the function.
+p.l = 1
+p.unpack(globals())
+
+
+@qfunc
+def main(x: Output[QNum[n, SIGNED, 0]]):
+    allocate(x)
+    gradient(make_phase_oracle(f, l=l, m=m, N=N, x0=0), x)
+
+
+qprog_quadratic_2 = synthesize(main)
+df = sample(qprog_quadratic_2).sort_values("counts", ascending=False)
+success_rate = analyze_results(df, p)
+assert success_rate < 0.5, r"The success rate should be below 50% for these parameters."
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/7beb5389-94f2-4c79-b189-c67aea24008c
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+
+Parsed probabilities: {1: 0.2568359375, 2: 0.24169921875, 0: 0.23095703125, -1: 0.08935546875, 3: 0.087890625, -2: 0.0341796875, -4: 0.03369140625, -3: 0.025390625}
+  The analytical gradient is: 0.25
+  The majority gradient is: 0.25
+  The majority result is correct
+  
+
+####################################################
+  Success rate: 25.68% (526/2048 shots)
+  [[92m█████████████[91m-------------------------------------[0m] 25.68%
+  
+
+```
+</Info>
+
+![output](./gradient_estimation_files/gradient_estimation_8.png)
+
+# Performance Analysis
+
+We can plot the success rate as a function of parameter choices.
+
+Consider a quadratic function $f(x)=0.6x^2+0.25x+0.1$ with $f'(0)=0.25$, and target accuracy $\epsilon=0.2$.
+
+To determine valid parameter ranges, we need to use:
+
+- $d=1$ (dimensionality)
+- $D_2=1.2$ (second derivative bound)
+- $\nabla f_{\max}$: With $l \approx 0.1$, we have $\nabla f \in [0.19, 0.31]$, so $\nabla f_{\max}=0.31$
+
+From the theory, the parameters must satisfy (with $n=3$):
+
+- $m\geq 2 \cdot 0.31 = 0.62$
+- $m\leq 2 \cdot N \cdot \epsilon = 3.2$
+- $l\leq 0.28$
+
+In the next graph, we plot success rate versus $m$ with $l=0.1$.
+
+The valid range $[0.62, 3.2]$ is highlighted.
+
+```python
+_logger.setLevel(logging.WARNING)  # Disable the logging for the loop
+
+
+def plot_success_rate_vs_m(m_values, function, function_params, l_val=0.1, n_val=3):
+    """
+    Iterate over different m values and plot success rate as a function of m.
+
+    Args:
+        m_values: list of m values to test
+        function: function name ("linear" / "quadratic") or callable
+        function_params: parameters for the function
+        l_val: l parameter (default 0.1)
+        n_val: n parameter (default 3)
+    """
+    success_rates = []
+
+    for m_val in m_values:
+        p = params()
+        p.m = m_val
+        p.l = l_val
+        p.n = n_val
+        p.set_function(function, function_params)
+        p.unpack(globals())
+
+        @qfunc
+        def main(x: Output[QNum[n, SIGNED, 0]]):
+            allocate(x)
+            gradient(make_phase_oracle(f, l=l, m=m, N=N, x0=0), x)
+
+        qprog = synthesize(main)
+        df = sample(qprog).sort_values("counts", ascending=False)
+        analytic_grad = p.analytical_gradient(0)
+        epsilon = 0.2
+        success_rate, _, _ = compute_success_rate(
+            df,
+            analytic_derivatives={"x": analytic_grad},
+            p=p,
+            tolerance=epsilon,
+        )
+        success_rates.append(success_rate)
+        print(f"m={m_val}: Success rate = {success_rate:.2%}")
+
+    # Plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(m_values, success_rates, "o-", linewidth=2, markersize=8)
+    plt.xlabel("m parameter", fontsize=12)
+    plt.ylabel("Success Rate", fontsize=12)
+    plt.title("Success Rate vs m Parameter", fontsize=14)
+    plt.grid(True, alpha=0.3)
+    plt.ylim([0, 1.05])
+    ax = plt.gca()
+    theoretical_range = (0.62, 3.2)
+    ax.axvspan(theoretical_range[0], theoretical_range[1], color="green", alpha=0.15)
+    plt.show()
+    return success_rates
+
+
+# Example usage:
+m_values = [
+    0.05,
+    0.1,
+    0.33,
+    0.5,
+    0.67,
+    1.0,
+    1.33,
+    1.67,
+    2.0,
+    2.33,
+    2.67,
+    3.0,
+    3.33,
+    3.67,
+    4.0,
+    6.0,
+    10.0,
+]
+results = plot_success_rate_vs_m(m_values, "quadratic", (0.6, 0.25, 0.1))
+_logger.setLevel(logging.INFO)  # TEMP
+```
+<Info>
+  **Output:**
+
+  
+
+```
+m=0.05: Success rate = 0.00%
+  m=0.1: Success rate = 0.00%
+  m=0.33: Success rate = 0.68%
+  m=0.5: Success rate = 10.01%
+  m=0.67: Success rate = 93.31%
+  m=1.0: Success rate = 99.22%
+  m=1.33: Success rate = 79.64%
+  m=1.67: Success rate = 95.21%
+  m=2.0: Success rate = 98.58%
+  m=2.33: Success rate = 90.09%
+  m=2.67: Success rate = 77.73%
+  m=3.0: Success rate = 64.55%
+  m=3.33: Success rate = 56.35%
+  
+
+```
+</Info>
+
+Next, we plot success rate versus $l$ with $m=2$.
+
+The valid bound $l\leq 0.28$ is highlighted.
+
+```python
+from classiq.execution.functions.util._logging import _logger
+
+_logger.setLevel(logging.WARNING)  # Disable the logging for the loop
+
+
+def plot_success_rate_vs_l(l_values, function, function_params, m_val=2.0, n_val=3):
+    """
+    Iterate over different l values and plot success rate as a function of l.
+
+    Args:
+        l_values: list of l values to test
+        function: function name ("linear" / "quadratic") or callable
+        function_params: parameters for the function
+        m_val: m parameter (default 1.0)
+        n_val: n parameter (default 3)
+    """
+    success_rates = []
+
+    for l_curr in l_values:
+        p = params()
+        p.m = m_val
+        p.l = l_curr
+        p.n = n_val
+        p.set_function(function, function_params)
+        p.unpack(globals())
+
+        @qfunc
+        def main(x: Output[QNum[n, SIGNED, 0]]):
+            allocate(x)
+            gradient(make_phase_oracle(f, l=l, m=m, N=N, x0=0), x)
+
+        qprog = synthesize(main)
+        df = sample(qprog).sort_values("counts", ascending=False)
+        analytic_grad = p.analytical_gradient(0)
+        success_rate, _, _ = compute_success_rate(
+            df, analytic_derivatives={"x": analytic_grad}, p=p
+        )
+        success_rates.append(success_rate)
+        print(f"l={l_curr}: Success rate = {success_rate:.2%}")
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(l_values, success_rates, "o-", linewidth=2, markersize=8)
+    plt.xlabel("l parameter", fontsize=12)
+    plt.ylabel("Success Rate", fontsize=12)
+    plt.title("Success Rate vs l Parameter", fontsize=14)
+    plt.grid(True, alpha=0.3)
+    plt.ylim([0, 1.05])
+    ax = plt.gca()
+    theoretical_range = (0, 0.28)
+    ax.axvspan(theoretical_range[0], theoretical_range[1], color="green", alpha=0.15)
+
+    plt.show()
+
+    return success_rates
+
+
+# Example usage:
+l_values = [0.1, 0.2, 0.3, 0.4, 0.5, 1, 1.5, 2.0, 3.0]
+results_l = plot_success_rate_vs_l(
+    l_values, "quadratic", (0.6, 0.25, 0.1), m_val=1.0, n_val=3
+)
+_logger.setLevel(logging.INFO)
+```
+# Multi-Dimensional Examples
+
+The algorithm extends to multiple dimensions. In this example we will demonstrate a general quadratic coupled function:
+
+$$
+f(x,y)=ax^2+by^2+cxy+dx+ey+f
+
+$$
+
+```python
+p = params()
+p.l = 0.1
+p.unpack(globals())
+
+
+def f(x, y):
+    a, b, c, d, e, f = 0.6, -0.4, 0.25, 0.25, -0.5, 0.1
+    return a * x**2 + b * y**2 + c * x * y + d * x + e * y + f
+
+
+def f_normalized(x, y):
+    val = f(l / N * x, l / N * y)
+    val *= N / (l * m)
+    return val
+
+
+@qfunc
+def main(coords: Output[QArray[QNum[n, SIGNED, 0], 2]]):
+    allocate(coords)
+    gradient_nd(make_phase_oracle(f, l=l, m=m, N=N, x0=0, d=2), coords)
+
+
+qprog_2d = synthesize(main)
+df = sample(qprog_2d).sort_values("counts", ascending=False)
+print(df)
+
+gradient_analytical = [0.25, -0.5]
+majority_normalized = df.iloc[0]["coords"]
+gradient_measured = state_to_gradient(majority_normalized, p)
+
+print(f"Analytical gradient: (dx, dy) = ({gradient_analytical})")
+print(f"Majority gradient:   (dx, dy) = ({gradient_measured})")
+
+success_rate, success_shots, total_shots = compute_success_rate(
+    df, analytic_derivatives={"coords": gradient_analytical}, p=p
+)
+print(f"Success rate: {success_rate:.2%} ({success_shots}/{total_shots} shots)")
+show_bar(success_rate)
+assert success_rate > 0.9, r"The success rate should be above 90% for these parameters."
+```
+# Summary and Discussion
+
+This notebook demonstrated Jordan's quantum gradient estimation algorithm, which estimates $\nabla f$ at the origin using a **single query** to $f$, compared to the classical lower bound of $d+1$ queries.
+
+## Algorithm
+
+1. Prepare a uniform superposition over $N = 2^n$ sample points using Hadamard gates.
+1. Encode $f$ as phases, either via phase kickback from a state oracle or directly using a phase oracle.
+1. Apply the inverse QFT to map the phase encoding onto a measurable computational basis state containing $\nabla f$.
+
+## Parameter Selection
+
+| Parameter | Role                | Constraint                                                                      |
+| --------- | ------------------- | ------------------------------------------------------------------------------- |
+| $l$       | Sampling interval   | $l \leq \frac{2\sqrt{3}\epsilon}{D_2\sqrt{d}}$ — keeps $f$ approximately linear |
+| $m$       | Gradient range      | $2\nabla f_{\max} \leq m \leq 2\cdot2^n\epsilon$                                |
+| $n$       | Qubits / resolution | $n \geq \log_2(\nabla f_{\max} / \epsilon)$                                     |
+
+## Potential Use Cases
+
+The $d+1 \to 1$ query reduction is most valuable when $d$ is large and each function evaluation is expensive.
+
+Potential applications include: Optimization, Root-finding, Functional minimization and PDEs and more.
+
+## Limitation: Higher-Order Derivatives
+
+The algorithm **cannot be applied recursively** to compute second or higher-order derivatives of $f$.
+
+The method requires a quantum oracle that evaluates $f(x)$ coherently as a phase across all $x$ simultaneously.
+
+After running the circuit and measuring, the output is a single classical value $\nabla f(0)$ — not a new quantum oracle for $\nabla f(x)$ at arbitrary points $x$.
+
+Estimating $\nabla^2 f$ by this approach would require such an oracle for $\nabla f$, which the algorithm does not construct.
+
+In classical finite differences, second derivatives are obtained by calling $f$ at multiple points and differencing the first-derivative estimates.
+
+Replicating this quantumly would require separate oracle queries for each evaluation point, reducing the query complexity back to the classical $O(d^2)$ regime and eliminating the quantum advantage entirely.
+
+# Appendices
+
+## Appendix 1 
+
+- Phase Kickback
+
+We start with the state $|\delta\rangle|0\rangle$ where $|\delta\rangle$ is a superposition created by the Hadamard gate for all the coordinates, hence:
+
+$$
+\sum_{\delta_1=0}^{N-1}\cdots\sum_{\delta_d=0}^{N-1}|\delta_1\rangle\cdots|\delta_d\rangle
+$$
+For convenience we will look at the $d=1$ case, but the same procedure can be used for bigger $d$.
+
+The ancilla starts at the ground state $|a\rangle=|0\rangle$.
+We first apply bitwise X gate to create the state $|111\cdots1\rangle$, which in the signed fractional QNum representation corresponds to the value $-1/N_0$.
+
+Next, we apply QFT on the ancilla.
+
+Using the fact that $e^{i2\pi a} = 1$ for integer $a$, the QFT of $|N_0-1\rangle$ simplifies to:
+
+$$
+\frac{1}{\sqrt{N_0}}\sum_{a=0}^{N_0-1}e^{i2\pi a(N_0-1)/N_0}|a\rangle = \frac{1}{\sqrt{N_0}}\sum_{a=0}^{N_0-1}e^{-i2\pi a/N_0}|a\rangle
+$$
+The full state after both Hadamard (on coordinates) and QFT (on ancilla) is:
+
+$$
+\frac{1}{\sqrt{N \cdot N_0}}\sum_{\delta=0}^{N-1}\sum_{a=0}^{N_0-1} e^{-i2\pi a/N_0}\,|\delta\rangle|a\rangle
+$$
+As discussed before, we assume that we have an oracle $f$ that applies the function on the state $|x\rangle \rightarrow |f(x)\rangle$.
+We apply this function and add the normalized result $f_\mathrm{norm}(\delta) = \frac{N}{ml}f\!\left(\frac{l}{N}\delta\right)$ to the ancilla register, mapping $|a\rangle \to |a + f_\mathrm{norm}(\delta)\rangle$:
+
+$$
+\frac{1}{\sqrt{N \cdot N_0}}\sum_{\delta,\,a} e^{-i2\pi a/N_0}\,|\delta\rangle\,|a + f_\mathrm{norm}(\delta)\rangle
+$$
+Substituting $a' = a + f_\mathrm{norm}(\delta)$, i.e. $a = a' - f_\mathrm{norm}(\delta)$:
+
+$$
+\frac{1}{\sqrt{N \cdot N_0}}\sum_{\delta,\,a'} e^{-i2\pi (a' - f_\mathrm{norm}(\delta))/N_0}\,|\delta\rangle\,|a'\rangle
+$$
+Separating the phase into two factors:
+
+$$
+= \frac{1}{\sqrt{N}}\sum_{\delta=0}^{N-1} e^{i2\pi f_\mathrm{norm}(\delta)/N_0}\,|\delta\rangle \;\otimes\; \underbrace{\frac{1}{\sqrt{N_0}}\sum_{a'=0}^{N_0-1} e^{-i2\pi a'/N_0}\,|a'\rangle}_{\text{original ancilla state}}
+$$
+The ancilla returns to its pre-oracle state and the function value has been "kicked back" as a phase onto the coordinate register.
+
+Since the ancilla is a fractional QNum with $n_0$ fractional bits, dividing by $N_0$ converts from the integer index back to the fractional value, so $f_\mathrm{norm}(\delta)/N_0 \to f_\mathrm{norm}(\delta)$ in the fractional encoding.
+
+The coordinate register is therefore left in the state:
+
+$$
+\sum_{\delta=0}^{N-1} e^{i2\pi f_\mathrm{norm}(\delta)}\,|\delta\rangle = \sum_{\delta=0}^{N-1} e^{i2\pi \frac{N}{ml} f\!\left(\frac{l}{N}\delta\right)}\,|\delta\rangle
+$$
+This is exactly the desired phase state from Step 2 of the algorithm, and the rest of the algorithm proceeds identically to the Direct Phase approach.
+
+# References
+
+<a id="original-paper">\[1]</a>: [Stephen P. Jordan. Fast Quantum Algorithm for Numerical Gradient Estimation. Physical Review Letters 95 (2005)](https://www.researchgate.net/publication/7669221_Fast_Quantum_Algorithm_for_Numerical_Gradient_Estimation)

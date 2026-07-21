@@ -1,0 +1,37 @@
+---
+Description: Template to Create an IAM Role for Braket Access
+Parameters:
+  ExternalId:
+    Description: Your secret customer unique id
+    Type: String
+  TrustedAccount:
+    Description: Enter the Account Number for the Trusted Account
+    Type: String
+Outputs:
+  ExternalId:
+    Value: !Ref ExternalId
+  RoleArn:
+    Value: !GetAtt CrossAccountRoleForBraket.Arn
+Resources:
+  CrossAccountRoleForBraket:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CrossAccountRoleForBraket
+      Description: Role to provide access to Braket
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonBraketFullAccess
+      Path: /
+      Policies: []
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ""
+            Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              AWS: !Sub arn:aws:iam::${TrustedAccount}:root
+            Condition:
+              StringEquals:
+                sts:ExternalId:
+                  Ref: ExternalId

@@ -1,0 +1,34 @@
+---
+title: "Hadamard Transform"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/classiq_open_library/hadamard_transform/hadamard_transform.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The Hadamard transform function applies an H gate on each qubit of the register inputted to the function.
+
+Function: `hadamard_transform`
+
+Arguments:
+
+- `target`: `QArray[QBit]`
+
+The `target` quantum argument is the quantum state on which we apply the Hadamard Transform.
+
+## Example
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QArray[QBit]]):
+    allocate(3, x)
+    hadamard_transform(x)
+```
+```python
+
+qprog = synthesize(main)
+```

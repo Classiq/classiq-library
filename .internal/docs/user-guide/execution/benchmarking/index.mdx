@@ -1,0 +1,36 @@
+---
+title: "Hardware Benchmarking"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+Benchmarking quantum hardware is essential on the path toward practical quantum
+computing. As hardware advances, benchmarking must go beyond standard device-level
+tests such as randomized benchmarking or Quantum Volume to include **algorithmic- and
+application-level** evaluation, which measures what ultimately matters: the
+correctness and usefulness of the final computational outcome.
+
+## Functional-level benchmarks
+
+Classiq provides a functional-level benchmarking suite for this purpose. Each
+benchmark is defined by a quantum model, a **score**, and a problem-size parameter,
+so you can study how performance scales with the task. Hardware constraints such as
+circuit width are handled at the synthesis stage rather than hard-coded into the
+benchmark, keeping the functional definition of a task separate from the capabilities
+of the target device.
+
+## Running across backends
+
+Classiq exposes a wide variety of backends — QPUs, hardware emulators, and simulators
+across many providers — and lets you switch smoothly between them. The platform also
+handles the operational side of a run — managing execution
+budget (including running jobs against your Classiq-allocated budget, or emulating a
+device's noise model without consuming QPU time or credits) and tracking the time
+each job takes to complete, so backends are directly comparable on both accuracy and
+turnaround.
+
+## Next steps
+
+Run a set of predefined benchmarks covering canonical algorithmic and
+application-level tasks, or define your own. See
+[Predefined Benchmarks](./predefined-benchmarks) to get started.
