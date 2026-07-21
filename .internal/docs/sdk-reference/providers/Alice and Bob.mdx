@@ -1,0 +1,112 @@
+---
+title: Alice And Bob
+icon: "/icons/bulletsharp.svg"
+---
+
+### AliceBobBackendPreferences
+
+Backend preferences specific to Alice&Bob for quantum computing tasks.
+
+This class includes configuration options for setting up a backend using Alice&Bob's quantum hardware.
+It extends the base `BackendPreferences` class and provides additional parameters required for working
+with Alice&Bob's cat qubits, including settings for photon dissipation rates, repetition code distance,
+and the average number of photons.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `backend_service_provider` | `ProviderTypeVendor.ALICE_BOB` | The service provider for the backend, which is Alice&Bob. |
+| `distance` | `Optional[int]` | The number of times information is duplicated in the repetition code. - **Tooltip**: Phase-flip probability decreases exponentially with this parameter, bit-flip probability increases linearly. - **Supported Values**: 3 to 300, though practical values are usually lower than 30. - **Default**: None. |
+| `kappa_1` | `Optional[float]` | The rate at which the cat qubit loses one photon, creating a bit-flip. - **Tooltip**: Lower values mean lower error rates. - **Supported Values**: 10 to 10^5. Current hardware is at ~10^3. - **Default**: None. |
+| `kappa_2` | `Optional[float]` | The rate at which the cat qubit is stabilized using two-photon dissipation. - **Tooltip**: Higher values mean lower error rates. - **Supported Values**: 100 to 10^9. Current hardware is at ~10^5. - **Default**: None. |
+| `average_nb_photons` | `Optional[float]` | The average number of photons. - **Tooltip**: Bit-flip probability decreases exponentially with this parameter, phase-flip probability increases linearly. - **Supported Values**: 4 to 10^5, though practical values are usually lower than 30. - **Default**: None. |
+| `api_key` | `str` | The API key required to access Alice&Bob's quantum hardware. - **Required**: Yes. |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.ALICE_BOB = pydantic.Field(default=(ProviderVendor.ALICE_AND_BOB))`
+
+
+### distance
+
+
+`distance: int | None = pydantic.Field(default=None, description='Repetition code distance')`
+
+
+### kappa_1
+
+
+`kappa_1: float | None = pydantic.Field(default=None, description='One-photon dissipation rate (Hz)')`
+
+
+### kappa_2
+
+
+`kappa_2: float | None = pydantic.Field(default=None, description='Two-photon dissipation rate (Hz)')`
+
+
+### average_nb_photons
+
+
+`average_nb_photons: float | None = pydantic.Field(default=None, description='Average number of photons')`
+
+
+### api_key
+
+
+`api_key: pydantic_backend.PydanticAliceBobApiKeyType | None = pydantic.Field(default=None, description='AliceBob API key')`
+
+
+### parameters
+
+
+`parameters: dict[str, Any]`
+### AliceBobBackendNames
+
+Alice & Bob backend names which Classiq Supports running on.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [PERFECT_QUBITS](#perfect_qubits) |  |  |
+| [LOGICAL_TARGET](#logical_target) |  |  |
+| [LOGICAL_EARLY](#logical_early) |  |  |
+| [TRANSMONS](#transmons) |  |  |
+
+
+### PERFECT_QUBITS
+
+
+```python
+PERFECT_QUBITS = 'PERFECT_QUBITS'
+```
+
+
+### LOGICAL_TARGET
+
+
+```python
+LOGICAL_TARGET = 'LOGICAL_TARGET'
+```
+
+
+### LOGICAL_EARLY
+
+
+```python
+LOGICAL_EARLY = 'LOGICAL_EARLY'
+```
+
+
+### TRANSMONS
+
+
+```python
+TRANSMONS = 'TRANSMONS'
+```

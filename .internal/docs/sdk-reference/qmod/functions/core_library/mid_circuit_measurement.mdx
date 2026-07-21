@@ -1,0 +1,30 @@
+---
+title: Mid Circuit Measurement
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `RESET` | Resets the target qubit to the `\|0>` state. |
+
+
+### RESET
+
+
+<pre><code>RESET(
+    target: QBit
+) -> None</code></pre>
+
+
+Resets the target qubit to the `|0>` state.
+
+Performed by measuring the qubit and applying an X gate if necessary.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `QBit` | the qubit to reset | *required* |

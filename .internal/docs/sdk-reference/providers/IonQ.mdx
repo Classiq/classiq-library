@@ -1,0 +1,108 @@
+---
+title: Ionq
+icon: "/icons/bulletsharp.svg"
+---
+
+For **`emulate`** on IonQ (direct API), see [IonQ hardware noise simulation (emulate)](../../user-guide/execution/cloud-providers/ionq-backends#ionq-hardware-noise-simulation-emulate) in the execution user guide.
+
+### IonqBackendPreferences
+
+Represents the backend preferences specific to IonQ services.
+
+Inherits from `BackendPreferences` and adds additional fields and configurations
+specific to IonQ backends
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `backend_service_provider` | `ProviderTypeVendor.IONQ` | Indicates the backend service provider as IonQ. |
+| `api_key` | `PydanticIonQApiKeyType` | The IonQ API key required for accessing IonQ's quantum computing services. |
+| `error_mitigation` | `bool` | A configuration option to enable or disable error mitigation during execution. Defaults to `False`. |
+| `run_via_classiq` | `bool` | Running via Classiq's credentials while using user's allocated budget. |
+| `emulate` | `bool` | If True, run on the IonQ simulator with a noise model derived from the backend name (e.g. qpu.aria-1 -&gt; aria-1). Defaults to `False`. |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.IONQ = pydantic.Field(default=(ProviderVendor.IONQ))`
+
+
+### api_key
+
+
+`api_key: pydantic_backend.PydanticIonQApiKeyType | None = pydantic.Field(default=None, description='IonQ API key')`
+
+
+### error_mitigation
+
+
+`error_mitigation: bool = pydantic.Field(default=False, description='Error mitigation configuration.')`
+
+
+### emulate
+
+
+`emulate: bool = pydantic.Field(default=False, description='If True, run on simulator with noise model derived from backend name.')`
+
+
+### parameters
+
+
+`parameters: dict[str, Any]`
+### IonqBackendNames
+
+IonQ backend names which Classiq Supports running on.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [SIMULATOR](#simulator) |  |  |
+| [HARMONY](#harmony) |  |  |
+| [ARIA_1](#aria_1) |  |  |
+| [ARIA_2](#aria_2) |  |  |
+| [FORTE_1](#forte_1) |  |  |
+
+
+### SIMULATOR
+
+
+```python
+SIMULATOR = 'simulator'
+```
+
+
+### HARMONY
+
+
+```python
+HARMONY = 'qpu.harmony'
+```
+
+
+### ARIA_1
+
+
+```python
+ARIA_1 = 'qpu.aria-1'
+```
+
+
+### ARIA_2
+
+
+```python
+ARIA_2 = 'qpu.aria-2'
+```
+
+
+### FORTE_1
+
+
+```python
+FORTE_1 = 'qpu.forte-1'
+```

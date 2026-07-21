@@ -1,0 +1,59 @@
+---
+title: "Multi-Control-X"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/mcx/mcx_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The multi-control-X applies X gate to one target qubit bit only if the logical AND of all control qubits is satisfied.
+
+The multi-control-X function incorporates numerous implementations for the multi-control-X gate,
+each with a different depth and number of auxiliary qubits.
+
+These implementations generically outperform the Gray-code, V-chain and recursive implementations of Ref. [\[1\]](#1),
+as well as the relative-phase Toffoli implementation of Ref. [\[2\]](#2).
+
+Given a sufficient number of auxiliary qubits, some implementations allow for logarithmic depth and linear CX-count.
+
+The synthesis process selects the appropriate implementation depending on the defined constraints.
+
+Operator: `control`
+
+Arguments:
+
+- `ctrl: Union[QBit, QArray[QBit]]`
+- `stmt_block: QCallable`
+
+Operator `control` takes a qubit array of length one or more as `ctrl`, and applies the `stmt_block` operand if all qubits are in the `1` state
+
+## Example
+
+The following example shows how to use the `control` operator to implement a Multi-Control-X where a 7-qubit quantum variable serves as the control
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(cntrl: Output[QArray[QBit]], target: Output[QBit]) -> None:
+    allocate(7, cntrl)
+    allocate(target)
+    control(ctrl=cntrl, stmt_block=lambda: X(target))
+```
+```python
+
+qprog = synthesize(main)
+```
+
+## References
+
+<a name="1">\[1]</a> A.
+
+Barenco et al, Elementary gates for quantum computation,
+Phys. Rev. A 52 (1995). [https://journals.aps.org/pra/abstract/10.1103/PhysRevA.52.3457](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.52.3457)
+
+<a name="2">\[2]</a> D. Maslov, Advantages of using relative-phase Toffoli gates
+with an application to multiple control Toffoli optimization,
+Phys. Rev. A 93 (2016). [https://journals.aps.org/pra/abstract/10.1103/PhysRevA.93.022311](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.93.022311)

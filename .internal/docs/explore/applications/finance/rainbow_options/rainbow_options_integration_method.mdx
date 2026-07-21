@@ -1,0 +1,412 @@
+---
+title: "Rainbow Options with Integration"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/finance/rainbow_options/rainbow_options_integration_method.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook covers the implementation of the Integration Method for the rainbow option presented in [\[1\]](#qalrop).
+
+In finance, a crucial aspect of asset pricing pertains to derivatives.
+
+Derivatives are contracts whose value is contingent upon another source, known as the underlying.
+
+The pricing of options - a specific derivative instrument - involves determining the fair market value (discounted payoff) of contracts that afford their holders the right, though not the obligation, to buy (call) or sell (put) one or more underlying assets at a predefined strike price by a specified future expiration date (maturity date).
+
+This process relies on mathematical models, considering variables such as current asset prices, time to expiration, volatility, and interest rates.
+
+## Data Definitions
+
+The problem inputs:
+
+- `NUM_QUBITS`: the number of qubits representing an underlying asset
+- `NUM_ASSETS`: the number of underlying assets
+- `K`: the strike price
+- `S0`: the arrays of underlying asset prices
+- `dt`: the number of days to the maturity date
+- `COV`: the covariance matrix that correlate to the underlyings
+- `MU_LOG_RET`: the array containing the mean of the log return of each underlying
+
+```python
+import numpy as np
+import scipy
+
+NUM_QUBITS = 2
+NUM_ASSETS = 2
+
+K = 190
+S0 = [193.97, 189.12]
+dt = 250
+
+COV = np.array([[0.000335, 0.000257], [0.000257, 0.000418]])
+MU_LOG_RET = np.array([0.00050963, 0.00062552])
+```
+```python
+
+MU = MU_LOG_RET * dt
+CHOLESKY = np.linalg.cholesky(COV) * np.sqrt(dt)
+SCALING_FACTOR = 1 / CHOLESKY[0, 0]
+```
+```python
+
+from classiq import *
+
+EPSILON = 0.05
+ALPHA = 0.1
+```
+
+## Gaussian State Preparation
+
+Encode the probability distribution of a discrete multivariate random variable $W$ taking values in $\{w_0, .., w_{N-1}\}$ describing the asset prices at the maturity date.
+
+The number of discretized values, denoted as $N$, depends on the precision of the state preparation module and is consequently connected to the number of qubits ($n=$`NUM_QUBITS`) according to the formula $N=2^n$:
+
+$$
+\sum_{i=0}^{N-1} \sqrt{p(w_i)}\left|w_i\right\rangle 
+$$
+
+```python
+def gaussian_discretization(num_qubits, mu=0, sigma=1, stds_around_mean_to_include=3):
+    lower = mu - stds_around_mean_to_include * sigma
+    upper = mu + stds_around_mean_to_include * sigma
+    num_of_bins = 2**num_qubits
+    sample_points = np.linspace(lower, upper, num_of_bins + 1)
+
+    def single_gaussian(x: np.ndarray, _mu: float, _sigma: float) -> np.ndarray:
+        cdf = scipy.stats.norm.cdf(x, loc=_mu, scale=_sigma)
+        return cdf[1:] - cdf[0:-1]
+
+    non_normalized_pmf = (single_gaussian(sample_points, mu, sigma),)
+    real_probs = non_normalized_pmf / np.sum(non_normalized_pmf)
+    return sample_points[:-1], real_probs[0].tolist()
+
+
+grid_points, probabilities = gaussian_discretization(NUM_QUBITS)
+
+STEP_X = grid_points[1] - grid_points[0]
+MIN_X = grid_points[0]
+```
+#
+
+## Sanity Check
+
+To avoid meaningless results, the process must stop if the strike price $K$ is greater than the maximum value reacheable by the assets during the simulation. In this case, the payoff is $0$, so there is no need to simulate:
+
+```python
+from IPython.display import Markdown
+
+if K >= max(S0 * np.exp(np.dot(CHOLESKY, [grid_points[-1]] * 2) + MU)):
+    display(
+        Markdown(
+            "<font color='red'> K always greater than the maximum asset values.
+
+Stop the run, the payoff is 0</font>"
+        )
+    )
+```
+
+## Maximum Computation
+
+#
+
+## Precision Utils
+
+```python
+FRAC_PLACES = 2
+
+
+def round_factor(a):
+    precision_factor = 2**FRAC_PLACES
+    return round(a * precision_factor) / precision_factor
+
+
+def floor_factor(a):
+    precision_factor = 2**FRAC_PLACES
+    return np.floor(a * precision_factor) / precision_factor
+```
+#
+
+## Affine and Maximum Arithmetic Definitions
+
+```python
+from functools import reduce
+
+from classiq.qmod.symbolic import max as qmax
+
+a = STEP_X / SCALING_FACTOR
+b = np.log(S0[0]) + MU[0] + MIN_X * CHOLESKY[0].sum()
+
+
+def get_affine_formula(assets, i):
+    return reduce(
+        lambda x, y: x + y,
+        [
+            assets[j] * round_factor(SCALING_FACTOR * CHOLESKY[i, j])
+            for j in range(NUM_ASSETS)
+            if CHOLESKY[i, j]
+        ],
+    )
+
+
+c = (
+    SCALING_FACTOR
+    * (
+        np.log(S0[1])
+        + MU[1]
+        - (np.log(S0[0]) + MU[0])
+        + MIN_X * sum(CHOLESKY[1] 
+
+- CHOLESKY[0])
+    )
+    / (STEP_X)
+)
+
+c = round_factor(c)
+
+
+def calculate_max_reg_type():
+    x1 = QNum(size=NUM_QUBITS)
+    x2 = QNum(size=NUM_QUBITS)
+    expr = qmax(get_affine_formula([x1, x2], 0), get_affine_formula([x1, x2], 1) + c)
+    size_in_bits, sign, fraction_digits = get_expression_numeric_attributes(
+        [x1, x2], expr
+    )
+    return size_in_bits, fraction_digits
+
+
+MAX_NUM_QUBITS = calculate_max_reg_type()[0]
+MAX_FRAC_PLACES = calculate_max_reg_type()[1]
+```
+```python
+
+@qperm
+def affine_max(x1: Const[QNum], x2: Const[QNum], res: Output[QNum]):
+    res |= qmax(get_affine_formula([x1, x2], 0), get_affine_formula([x1, x2], 1) + c)
+```
+
+## Integration Method
+
+The comparator collects the probabilities $g(r)$ of $|r\rangle$ state until $|r\rangle$ register is lower than $|x\rangle$:
+
+$$
+\begin{equation}
+\begin{split}
+&\sum_{r=0}^{2^R-1}{\sqrt{g(r)}}|x\rangle|r\rangle|r\leq x\rangle \\
+= &|x\rangle \otimes \left[ \sum_{r=0}^{x}{\sqrt{g(r)}} |r\rangle |1\rangle + \sum_{r=x}^{2^R-1}{\sqrt{g(r)}} |r\rangle |0\rangle \right]
+\end{split}
+\end{equation}
+$$
+Collecting the probability to have $r\leq x$, define the function:
+
+$$
+\begin{equation}
+\tilde{h}(x)=\sum_{r=0}^{x}g(r)
+\end{equation}
+$$
+Evaluating the probability to get a $|1\rangle$ results in $\sum_{x = 0}^{2^R-1}{\tilde{h}(x)}$.
+To obtain a given function $\tilde{h}$, choose a proper function $g(r)$.
+
+The $g(r)$ for $r=0$ value must therefore be:
+$g(0) = \tilde\{h\}(0)$
+and for all the other $r$:
+
+$$
+g(r) = \tilde{h}(r)-\tilde{h}(r-1)
+$$
+
+```python
+@qfunc
+def integrator(x: Const[QNum], ref: QNum, res: QBit) -> None:
+    exp_rate = (1 / (2**x.fraction_digits)) * a
+    prepare_exponential_state(-exp_rate, ref)
+    res ^= x >= ref
+```
+```python
+
+from classiq.qmod.symbolic import asin, exp, sqrt
+
+
+def get_strike_price_theta_integration(x: QNum):
+    exp_rate = (1 / (2**x.fraction_digits)) * a
+    B = (exp((2**x.size) * exp_rate) - 1) / exp(exp_rate)
+    A = 1 / exp(exp_rate)
+    C = S0[0] * exp((MU[0] + MIN_X * CHOLESKY[0].sum()))
+    return 2 * asin(sqrt((K - (C * A)) / (C * B)))
+
+
+# this is not a qfunc, just a utility function
+def is_geq_strike_price(
+    x: Const[QNum],
+) -> None:
+    a = STEP_X / SCALING_FACTOR
+    b = np.log(S0[0]) + MU[0] + MIN_X * CHOLESKY[0].sum()
+    COMP_VALUE = (np.log(K) - b) / a
+    return x > floor_factor(COMP_VALUE)
+
+
+@qfunc
+def integration_payoff(max_reg: Const[QNum], integrator_reg: QNum, ind_reg: QBit):
+    control(
+        is_geq_strike_price(max_reg),
+        lambda: integrator(max_reg, integrator_reg, ind_reg),
+        lambda: RY(get_strike_price_theta_integration(max_reg), ind_reg),
+    )
+```
+```python
+
+class EstimationVars(QStruct):
+    x1: QNum[NUM_QUBITS]
+    x2: QNum[NUM_QUBITS]
+    integrator: QNum[MAX_NUM_QUBITS, False, MAX_FRAC_PLACES]
+
+
+@qfunc
+def rainbow_integration(qvars: EstimationVars, ind: QBit) -> None:
+    inplace_prepare_state(probabilities, 0, qvars.x1)
+    inplace_prepare_state(probabilities, 0, qvars.x2)
+
+    max_out = QNum()
+    affine_max(qvars.x1, qvars.x2, max_out)
+    integration_payoff(max_out, qvars.integrator, ind)
+
+
+@qfunc
+def main(qvars: Output[EstimationVars], ind: Output[QBit]) -> None:
+    allocate(qvars)
+    allocate(ind)
+
+    rainbow_integration(qvars, ind)
+
+
+MAX_WIDTH = 25
+print("Starting synthesis")
+qprog_1 = synthesize(main, constraints=Constraints(max_width=MAX_WIDTH))
+show(qprog_1)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Starting synthesis
+  Quantum program link: https://platform.classiq.io/circuit/3560ShwR9pHLDmG2n4tA0ra7QDu
+  
+
+```
+</Info>
+
+## Iterative Quantum Amplitude Estimation (IQAE) Algorithm
+
+```python
+from classiq.applications.iqae.iqae import IQAE
+
+iqae = IQAE(
+    state_prep_op=rainbow_integration,
+    problem_vars_size=NUM_QUBITS * NUM_ASSETS + MAX_NUM_QUBITS,
+    constraints=Constraints(max_width=MAX_WIDTH),
+    preferences=Preferences(optimization_level=1),
+)
+```
+```python
+
+print("Starting synthesis")
+qprog_2 = iqae.get_qprog()
+show(qprog_2)
+print("Starting execution")
+result = iqae.run(EPSILON, ALPHA)
+print("raw iqae results:", result.estimation, result.confidence_interval)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Starting synthesis
+  Quantum program link: https://platform.classiq.io/circuit/3560YutokLfva7nGAyKraA8CECv
+  Starting execution
+  raw iqae results: 0.05270338444908511 [0.04886018991028241, 0.05654657898788781]
+  
+
+```
+</Info>
+
+## Post-process
+
+Add a term to the post-processing function:
+
+$$
+\begin{equation}
+\begin{split}
+\mathbb{E} \left[\max\left(\frac{e^{a(x+1)} - 1}{e^{a(x_{max} +1)}-1}c + \frac{1}{e^a} , Ke^{-b'}\right)\right]  e^{b'} - K \\
+=\mathbb{E} \left[\max\left(\frac{e^{a(x+1)} - 1}{e^{a(x_{max} +1)}-1}, \frac{Ke^{-b'}}{c} - \frac{e^{-a}}{c}\right)\right]ce^{b'} + e^{b'}e^{-a} - K
+\end{split}
+\end{equation}
+$$
+
+```python
+exp_rate = (1 / (2**MAX_FRAC_PLACES)) * a
+B = (np.exp((2**MAX_NUM_QUBITS) * exp_rate) - 1) / np.exp(exp_rate)
+A = 1 / np.exp(exp_rate)
+C = S0[0] * np.exp((MU[0] + MIN_X * CHOLESKY[0].sum()))
+
+
+def parse_result_integration(result):
+    option_value = (result.estimation * (C * B)) + (C * A) 
+
+- K
+    confidence_interval = (np.array(result.confidence_interval) * (C * B)) + (C * A) 
+
+- K
+    return (option_value, confidence_interval)
+```
+
+## Run Method
+
+```python
+parsed_result, conf_interval = parse_result_integration(result)
+print(
+    f"raw iqae results: {result.estimation} with confidence interval {result.confidence_interval}"
+)
+print(
+    f"option estimated value: {parsed_result} with confidence interval {conf_interval}"
+)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+raw iqae results: 0.05270338444908511 with confidence interval [0.04886018991028241, 0.05654657898788781]
+  option estimated value: 29.49446224830868 with confidence interval [19.5384534 39.4504711]
+  
+
+```
+</Info>
+
+#
+
+## Assertions
+
+```python
+expected_payoff = 23.0238
+ALPHA_ASSERTION = 1e-5
+measured_confidence = conf_interval[1] - conf_interval[0]
+confidence_scale_by_alpha = np.sqrt(
+    np.log(ALPHA / ALPHA_ASSERTION)
+)  # based on e^2=(1/2N)*log(2T/alpha) from "Iterative Quantum Amplitude Estimation" since our alpha is low, we want to check within a bigger confidence interval
+assert (
+    np.abs(parsed_result - expected_payoff)
+    <= 0.5 * measured_confidence * confidence_scale_by_alpha
+), f"Payoff result is out of the {ALPHA_ASSERTION*100}% confidence interval: |{parsed_result} - {expected_payoff}| > {0.5*measured_confidence * confidence_scale_by_alpha}"
+```
+
+## References
+
+<a name="QALROP">\[1]</a> [Francesca Cibrario et al., Quantum Amplitude Loading for Rainbow Options Pricing. Preprint.](https://arxiv.org/abs/2402.05574v2)

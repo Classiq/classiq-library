@@ -1,0 +1,108 @@
+---
+title: "Comparators"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/comparator/comparator_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The following comparators are supported:
+
+- Equal (denoted as '==')
+- NotEqual (denoted as '!=')
+- GreaterThan (denoted as '>')
+- GreaterEqual (denoted as '>=')
+- LessThan (denoted as '\<')
+- LessEqual (denoted as '\<=')
+
+Note that integer and fixed-point numbers are represented in a 2-complement method during function evaluation.
+
+The binary number is extended in the case of a register size miss-match.
+
+For example, the positive signed number $(110)_2=6$ is expressed as $(00110)_2$ when operating with a 5-qubit register.
+Similarly, the negative signed number $(110)_2=-2$ is expressed as $(11110)_2$.
+
+Examples:
+
+(5 \<= 3) = 0
+
+(5 == 5) = 1
+
+($(011)_2$ == $(11)_2$) = 1
+
+(signed $(101)_2$ \< unsigned $(101)_2$) = 1
+
+## Examples
+
+#
+
+### Example 1: Comparing Two Quantum Variables
+
+This example generates a quantum program that performs 'equal' between two variables.
+
+The left arg is a signed variable with 5 qubits and the right arg is an unsigned varialbe with 3 qubits.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum], b: Output[QNum], res: Output[QNum]) -> None:
+    allocate(5, True, 0, a)
+    allocate(3, False, 0, b)
+
+    res |= a == b
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+```
+#
+
+### Example 2: Comparing Integer and Quantum Variable
+
+This example generates a quantum program that performs 'less equal' between a quantum register and an integer.
+
+The left arg is an unsigned quantum variable with 3 qubits, and the right arg is an integer equal to 
+
+2.
+
+```python
+@qfunc
+def main(a: Output[QNum], res: Output[QNum]) -> None:
+    allocate(3, a)
+    hadamard_transform(a)
+    res |= a <= 2
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+
+result = execute(qprog).result_value()
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 4.0, 'res': 0.0}: 150,
+   {'a': 1.0, 'res': 1.0}: 138,
+   {'a': 7.0, 'res': 0.0}: 132,
+   {'a': 2.0, 'res': 1.0}: 126,
+   {'a': 6.0, 'res': 0.0}: 123,
+   {'a': 3.0, 'res': 0.0}: 115,
+   {'a': 5.0, 'res': 0.0}: 110,
+   {'a': 0.0, 'res': 1.0}: 106]
+  
+
+```
+</Info>

@@ -1,0 +1,145 @@
+---
+title: "Grover Operator"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/classiq_open_library/grover_operator/grover_operator.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The Grover operator is a unitary used in amplitude estimation and amplitude
+amplification algorithms [\[1\]](#1).
+
+The Grover operator is given by
+
+$$
+Q = Q(A,\chi) = -AS_0A^{-1}S_\chi
+$$
+where $A$ is a state preparation operator,
+
+$$
+A|0 \rangle= |\psi \rangle
+$$
+$S_\chi$ marks good states and is called an oracle,
+
+$$
+S_\chi\lvert x \rangle = 
+\begin{cases} 
+-\lvert x \rangle & \text{if } \chi(x) = 1 \\
+ \phantom{-} \lvert x \rangle & \text{if } \chi(x) = 0 
+\end{cases}
+$$
+and $S_0$ is a reflection about the zero state.
+
+$$
+S_0 = I - 2|0\rangle\langle0|
+$$
+
+Function: `grover_operator`
+
+Arguments:
+
+- `oracle: QCallable[QArray[QBit]]` 
+
+- Oracle representing $S_{\chi}$, accepting quantum state to apply on.
+- `space_transform: QCallable[QArray[QBit]]` 
+
+- State preparation operator $A$, accepting quantum state to apply on.
+- `packed_vars: QArray[QBit]` 
+
+- Packed form of the variable to apply the grover operator on.
+
+#
+
+## Example
+
+The following example implements a grover search algorithm using the grover operator for a specific oracle, with a uniform superposition over the search space.
+
+The circuit starts with a uniform superposition on the search space, followed by 2 applications of the grover operator.
+
+```python
+from classiq import *
+
+VAR_SIZE = 2
+
+
+class GroverVars(QStruct):
+    x: QNum[VAR_SIZE]
+    y: QNum[VAR_SIZE]
+
+
+@qperm
+def my_predicate(vars: Const[GroverVars], res: QBit) -> None:
+    res ^= (vars.x + vars.y < 4) & ((vars.x * vars.y) % 4 == 2)
+
+
+@qfunc
+def main(vars: Output[GroverVars]):
+    allocate(vars)
+
+    hadamard_transform(vars)
+
+    power(
+        2,
+        lambda: grover_operator(
+            lambda vars: phase_oracle(
+                predicate=my_predicate,
+                target=vars,
+            ),
+            hadamard_transform,
+            vars,
+        ),
+    )
+
+
+qprog = synthesize(
+    main, auto_show=True, constraints=Constraints(optimization_parameter="width")
+)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3FmUIpJrkfaPVo4zCO3c6VT6jUL
+  
+
+```
+</Info>
+
+And the next is a verification of the amplification of the solutions to the oracle:
+
+```python
+result = execute(qprog).result_value()
+df = result.dataframe
+df["predicate"] = (df["vars.x"] + df["vars.y"] < 4) & (
+    (df["vars.x"] * df["vars.y"]) % 4 == 2
+)
+df
+```
+|    | vars.x | vars.y | counts | probability | bitstring | predicate |
+| -- | ------ | ------ | ------ | ----------- | --------- | --------- |
+| 0  | 1      | 2      | 985    | 0.480957    | 1001      | True      |
+| 1  | 2      | 1      | 949    | 0.463379    | 0110      | True      |
+| 2  | 2      | 2      | 13     | 0.006348    | 1010      | False     |
+| 3  | 0      | 3      | 13     | 0.006348    | 1100      | False     |
+| 4  | 3      | 3      | 13     | 0.006348    | 1111      | False     |
+| 5  | 3      | 0      | 10     | 0.004883    | 0011      | False     |
+| 6  | 2      | 3      | 9      | 0.004395    | 1110      | False     |
+| 7  | 1      | 1      | 8      | 0.003906    | 0101      | False     |
+| 8  | 0      | 2      | 8      | 0.003906    | 1000      | False     |
+| 9  | 0      | 0      | 7      | 0.003418    | 0000      | False     |
+| 10 | 1      | 0      | 7      | 0.003418    | 0001      | False     |
+| 11 | 2      | 0      | 6      | 0.002930    | 0010      | False     |
+| 12 | 0      | 1      | 6      | 0.002930    | 0100      | False     |
+| 13 | 3      | 1      | 5      | 0.002441    | 0111      | False     |
+| 14 | 3      | 2      | 5      | 0.002441    | 1011      | False     |
+| 15 | 1      | 3      | 4      | 0.001953    | 1101      | False     |
+
+## References
+
+<a name="1">\[1]</a> G. Brassard, P. Hoyer, M. Mosca, and A. Tapp, “Quantum
+Amplitude Amplification and Estimation,” arXiv:quant-ph/0005055, vol. 305, pp.
+53–74, 2002, doi: 10.1090/conm/305/05215.

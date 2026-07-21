@@ -1,0 +1,448 @@
+---
+title: Modular Arithmetics
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `modular_add_inplace` | [Qmod Classiq-library function]. |
+| `modular_negate_inplace` | [Qmod Classiq-library function]. |
+| `modular_subtract_inplace` | [Qmod Classiq-library function]. |
+| `modular_double_inplace` | [Qmod Classiq-library function]. |
+| `modular_add_constant_inplace` | [Qmod Classiq-library function]. |
+| `modular_multiply` | [Qmod Classiq-library function] Performs the transformation `\|x>``\|y>``\|0>` -&gt; `\|x>``\|y>`|(x*y mod modulus)&gt;. |
+| `modular_square` | [Qmod Classiq-library function] Performs the transformation `\|x>``\|0>` -&gt; `\|x>`|(x^2 mod modulus)&gt;. |
+| `modular_multiply_constant` | [Qmod Classiq-library function] Performs the transformation `\|x>``\|y>` -&gt; `\|x>`|(x * a mod modulus)&gt;. |
+| `modular_multiply_constant_inplace` | [Qmod Classiq-library function] In-place modular multiplication of x by a classical constant modulo a symbolic modulus. |
+| `modular_to_montgomery_inplace` | [Qmod Classiq-library function] Converts a quantum integer `\|x>` into its Montgomery representation modulo modulus in place. |
+| `modular_montgomery_to_standard_inplace` | [Qmod Classiq-library function] Converts quantum integer `\|x>` from Montgomery representation to standard form in place modulo modulus. |
+| `modular_inverse_inplace` | [Qmod Classiq-library function] Computes the modular inverse of a quantum number `\|v>` modulo modulus in place, using the Kaliski algorithm. |
+| `kaliski_iteration` | Single iteration of the Kaliski modular inverse algorithm main loop. |
+| `modular_rsub_inplace` | [Qmod Classiq-library function] Performs the in-place modular right-subtraction `\|x>` -&gt; |(a - x mod modulus)&gt;. |
+
+
+### modular_add_inplace
+
+
+<pre><code>modular_add_inplace(
+    modulus: CInt,
+    x: Const[QNum],
+    y: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Performs the transformation `|x>``|y>` -&gt; `|x>`|(x + y mod modulus)&gt;.
+Note:
+`\|x>` and `\|y>` should have values smaller than `modulus`.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>` and `|y>`.
+
+Implementation based on: https://arxiv.org/pdf/1706.06752 Chapter 3.2 Fig 3
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus (CInt) | *required* |
+| `x` | `Const[QNum]` | 1st quantum number input (unsigned). | *required* |
+| `y` | `QNum` | 2nd quantum number input (unsigned). Will hold the result after the operation. | *required* |
+
+
+
+### modular_negate_inplace
+
+
+<pre><code>modular_negate_inplace(
+    modulus: CInt,
+    x: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Performs the transformation `|x>` -&gt; |(-x mod modulus)&gt;.
+Note:
+`\|x>` should have values smaller than `modulus`.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `x` | `QNum` | Quantum number input (unsigned). Will hold the result after the operation. | *required* |
+
+
+
+### modular_subtract_inplace
+
+
+<pre><code>modular_subtract_inplace(
+    modulus: CInt,
+    x: Const[QNum],
+    y: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Performs the transformation `|x>``|y>` -&gt; `|x>`|(x - y mod modulus)&gt;.
+Note:
+`\|x>` and `\|y>` should have values smaller than `modulus`.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>` and `|y>`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `x` | `Const[QNum]` | 1st quantum number input (unsigned). Const. | *required* |
+| `y` | `QNum` | 2nd quantum number input (unsigned). In-place target, will hold the result after the operation. | *required* |
+
+
+
+### modular_double_inplace
+
+
+<pre><code>modular_double_inplace(
+    modulus: CInt,
+    x: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Performs the transformation `|x>` -&gt; |(2x mod modulus)&gt;.
+Note:
+`\|x>` should have a value smaller than `modulus`.
+The modulus must be a constant odd integer.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>`.
+
+Implementation based on: https://arxiv.org/pdf/1706.06752 Chapter 3.2 Fig 4
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `x` | `QNum` | Quantum number input (unsigned). Will hold the result after the operation. | *required* |
+
+
+
+### modular_add_constant_inplace
+
+
+<pre><code>modular_add_constant_inplace(
+    modulus: CInt,
+    a: CInt,
+    x: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Performs the transformation `|x>` -&gt; |(x + a mod modulus)&gt;.
+Note:
+`\|x>` and `a` should have values smaller than `modulus`.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>`.
+
+Implementation is based on the logic in: https://arxiv.org/pdf/1706.06752 Chapter 3.2 Fig 3
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `a` | `CInt` | constant unsigned number input for the addition. | *required* |
+| `x` | `QNum` | Quantum number input (unsigned). Will hold the result after the operation. | *required* |
+
+
+
+### modular_multiply
+
+
+<pre><code>modular_multiply(
+    modulus: CInt,
+    x: Const[QArray[QBit]],
+    y: Const[QArray[QBit]],
+    z: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+Performs the transformation `|x>``|y>``|0>` -&gt; `|x>``|y>`|(x*y mod modulus)&gt;
+Note:
+`\|x>`, `\|y>` should have the same size and have values smaller than `modulus`.
+The modulus must be a constant odd integer.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>` and `|y>`.
+The output register z must be pre-allocated with the same size as x and y.
+Implementation is based on the logic in: https://arxiv.org/pdf/1706.06752 Chapter 3.2 Fig 5
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `x` | `Const[QArray[QBit]]` | Quantum number input (unsigned), multiplicand. | *required* |
+| `y` | `Const[QArray[QBit]]` | Quantum number input (unsigned), multiplier. | *required* |
+| `z` | `QArray[QBit]` | Quantum number (unsigned), pre-allocated output variable that will hold the result. | *required* |
+
+
+
+### modular_square
+
+
+<pre><code>modular_square(
+    modulus: CInt,
+    x: Const[QArray[QBit]],
+    z: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+Performs the transformation `|x>``|0>` -&gt; `|x>`|(x^2 mod modulus)&gt;.
+Note:
+`\|x>` should have the same size and have values smaller than `modulus`.
+The modulus must be a constant odd integer.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>`.
+The output register z must be pre-allocated with the same size as x.
+Implementation is based on: https://arxiv.org/pdf/1706.06752 Chapter 3.2 Fig 6
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `x` | `Const[QArray[QBit]]` | Quantum number input (unsigned), the input to square. | *required* |
+| `z` | `QArray[QBit]` | Quantum number (unsigned), pre-allocated output variable to hold the result. | *required* |
+
+
+
+### modular_multiply_constant
+
+
+<pre><code>modular_multiply_constant(
+    modulus: CInt,
+    x: Const[QNum],
+    a: CInt,
+    y: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+Performs the transformation `|x>``|y>` -&gt; `|x>`|(x * a mod modulus)&gt;.
+Note:
+`\|x>` and `\|y>` should have values smaller than `modulus`.
+The modulus must be a constant odd integer.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>` and `|y>`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `x` | `Const[QNum]` | Quantum number (unsigned), input variable. | *required* |
+| `a` | `CInt` | Classical number constant | *required* |
+| `y` | `QNum` | Quantum number (unsigned), output variable that will hold the result. | *required* |
+
+
+
+### modular_multiply_constant_inplace
+
+
+<pre><code>modular_multiply_constant_inplace(
+    modulus: CInt,
+    a: CInt,
+    x: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+In-place modular multiplication of x by a classical constant modulo a symbolic modulus.
+Performs `|x>` -&gt; |(x * a mod modulus)&gt;.
+Note:
+`\|x>` should have values smaller than `modulus`.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>`.
+The constant `a` should have an inverse modulo `modulus`, i.e. gcd(a, modulus) = 1.
+The constant `a` should satisfy 0 &lt;= a &lt; modulus.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `a` | `CInt` | Classical number constant | *required* |
+| `x` | `QNum` | Quantum number (unsigned), in-place input/output. | *required* |
+
+
+
+### modular_to_montgomery_inplace
+
+
+<pre><code>modular_to_montgomery_inplace(
+    modulus: CInt,
+    x: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+Converts a quantum integer `|x>` into its Montgomery representation modulo modulus in place.
+The Montgomery factor is R = 2**n, where n = x.size (the number of qubits in `|x>`).
+This function performs the transformation `|x>` -&gt; |(x * R mod modulus)&gt;.
+Note:
+`\|x>` should have values smaller than `modulus`.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>`.
+The modulus must be odd so that R = 2**n is invertible modulo modulus (gcd(R, modulus) = 1).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `x` | `QNum` | Quantum number, in-place operand to convert to Montgomery form. | *required* |
+
+
+
+### modular_montgomery_to_standard_inplace
+
+
+<pre><code>modular_montgomery_to_standard_inplace(
+    modulus: CInt,
+    x: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+Converts quantum integer `|x>` from Montgomery representation to standard form in place modulo modulus.
+The Montgomery factor is R = 2**n, where n = x.size (the number of qubits in `|x>`).
+This function performs the transformation `|x>` -&gt; |(x * R^-1 mod modulus)&gt;.
+Note:
+`\|x>` should have values smaller than `modulus`.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>`.
+The modulus must be odd so that R = 2**n is invertible modulo modulus (gcd(R, modulus) = 1).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `x` | `QNum` | Quantum number, in-place operand to convert from Montgomery form. | *required* |
+
+
+
+### modular_inverse_inplace
+
+
+<pre><code>modular_inverse_inplace(
+    modulus: CInt,
+    v: QNum,
+    m: Output[QArray[QBit]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+Computes the modular inverse of a quantum number `|v>` modulo modulus in place, using the Kaliski algorithm.
+Performs the transformation `|v>` -&gt; |(v^-1 mod modulus)&gt;.
+
+Based on: https://arxiv.org/pdf/2302.06639 Chapter 5
+
+Note:
+`\|v>` should have values smaller than `modulus`.
+If `|v>` = 0, the output will be 0 (although 0 does not have an inverse modulo `modulus`).
+The modulus should be prime OR at least gcd(v, modulus) = 1.
+The modulus must be a constant odd integer.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|v>`.
+The ancilla qubits m are provided as Output, will be allocated to length 2*n.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `v` | `QNum` | Quantum number, in-place operand to compute the modular inverse. | *required* |
+| `m` | `Output[QArray[QBit]]` | Output quantum array (QArray[QBit]) allocated to length 2*n (n = v.size) and used as ancilla during the algorithm. | *required* |
+
+
+
+### kaliski_iteration
+
+
+<pre><code>kaliski_iteration(
+    modulus: CInt,
+    i: CInt,
+    v: QNum,
+    m: QArray[QBit],
+    u: QNum,
+    r: QNum,
+    s: QNum,
+    a: QBit,
+    b: QBit,
+    f: QBit
+) -> None</code></pre>
+
+
+Single iteration of the Kaliski modular inverse algorithm main loop.
+Based on: https://arxiv.org/pdf/2302.06639 Figure 15
+
+Note:
+Assumes the global inversion constraints (odd modulus, 1 &lt; modulus &lt; 2**n).
+Called with 0 &lt;= v &lt; modulus; per-iteration ancilla bit is m[i].
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus (CInt) | *required* |
+| `i` | `CInt` | Loop iteration index. | *required* |
+| `v` | `QNum` | The QNum to invert (quantum number, will be mutated). | *required* |
+| `m` | `QArray[QBit]` | Quantum array of ancilla qubits (QArray[QBit]). | *required* |
+| `u` | `QNum` | QNum (quantum number, auxiliary for algorithm). | *required* |
+| `r` | `QNum` | QNum (quantum number, auxiliary). | *required* |
+| `s` | `QNum` | QNum (quantum number, auxiliary). | *required* |
+| `a` | `QBit` | QBit (ancilla qubit) | *required* |
+| `b` | `QBit` | QBit (ancilla qubit) | *required* |
+| `f` | `QBit` | QBit (ancilla qubit) | *required* |
+
+
+
+### modular_rsub_inplace
+
+
+<pre><code>modular_rsub_inplace(
+    modulus: CInt,
+    a: CInt,
+    x: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+Performs the in-place modular right-subtraction `|x>` -&gt; |(a - x mod modulus)&gt;.
+Note:
+`\|x>` should have values smaller than `modulus`.
+The modulus should satisfy 1 &lt; modulus &lt; 2**n, where n is the size of `|x>`.
+The classical constant `a` should be in the range 0 &lt;= a &lt; modulus.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `modulus` | `CInt` | Classical number modulus | *required* |
+| `a` | `CInt` | Classical constant to subtract from | *required* |
+| `x` | `QNum` | Quantum number, in-place operand to perform the modular right-subtraction. | *required* |

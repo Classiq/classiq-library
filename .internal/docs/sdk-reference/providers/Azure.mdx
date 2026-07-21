@@ -1,0 +1,309 @@
+---
+title: Azure
+icon: "/icons/bulletsharp.svg"
+---
+
+For **`emulate`** on Azure Quantum (IonQ `ionq.qpu.*` targets), see [IonQ hardware noise simulation on Azure Quantum (emulate)](../../user-guide/execution/cloud-providers/azure-backends#ionq-hardware-noise-simulation-on-azure-quantum-emulate) in the execution user guide.
+
+### AzureBackendPreferences
+
+This class inherits from RunViaClassiqBackendPreferences.
+This is where you specify Azure Quantum preferences.
+See usage in the [Azure Backend Documentation](https://docs.classiq.io/latest/sdk-reference/providers/Azure/).
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `location` | `str` | Azure personal resource region. Defaults to `"East US"`. |
+| `credentials` | `Optional[AzureCredential]` | The service principal credential to access personal quantum workspace. Defaults to `None`. |
+| `ionq_error_mitigation_flag` | `Optional[bool]` | Error mitigation configuration upon running on IonQ via Azure. Defaults to `False`. |
+| `emulate` | `bool` | If True, request IonQ hardware noise simulation on Azure Quantum when ``backend_name`` is an IonQ QPU (``ionq.qpu.*``). If the target is not an IonQ QPU (including ``ionq.simulator`` and non-IonQ providers), the flag has no effect. Defaults to `False`. |
+| `run_via_classiq` | `bool` | When omitted, derived from ``credentials`` (``True`` when ``credentials`` is ``None``). |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.AZURE_QUANTUM = pydantic.Field(default=(ProviderVendor.AZURE_QUANTUM))`
+
+
+### location
+
+
+`location: str = pydantic.Field(default='East US', description='Azure personal resource region')`
+
+
+### credentials
+
+
+`credentials: AzureCredential | None = pydantic.Field(default=None, description='The service principal credential to access personal quantum workspace')`
+
+
+### ionq_error_mitigation_flag
+
+
+`ionq_error_mitigation_flag: bool | None = pydantic.Field(default=False, description='Error mitigation configuration upon running on IonQ via Azure.')`
+
+
+### emulate
+
+
+`emulate: bool = pydantic.Field(default=False, description='If True, enable IonQ hardware noise simulation on Azure for IonQ QPU targets (ionq.qpu.*). No effect for ionq.simulator or non-IonQ Azure targets.')`
+
+
+### run_via_classiq
+
+
+`run_via_classiq: bool = pydantic.Field(default=False, description="Run via Classiq's credentials while using user's allocated budget.")`
+### AzureCredential
+
+Represents the credentials and configuration required to authenticate with Azure services.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `tenant_id` | `str` | Azure Tenant ID used to identify the directory in which the application is registered. |
+| `client_id` | `str` | Azure Client ID, also known as the application ID, which is used to authenticate the application. |
+| `client_secret` | `str` | Azure Client Secret associated with the application, used for authentication. |
+| `resource_id` | `pydantic_backend.PydanticAzureResourceIDType` | Azure Resource ID, including the subscription ID, resource group, and workspace, typically used for personal resources. |
+
+
+### tenant_id
+
+
+`tenant_id: str = pydantic.Field(description='Azure Tenant ID')`
+
+
+### client_id
+
+
+`client_id: str = pydantic.Field(description='Azure Client ID')`
+
+
+### client_secret
+
+
+`client_secret: str = pydantic.Field(description='Azure Client Secret')`
+
+
+### resource_id
+
+
+`resource_id: pydantic_backend.PydanticAzureResourceIDType = pydantic.Field(description='Azure Resource ID (including Azure subscription ID, resource group and workspace), for personal resource')`
+
+
+### model_config
+
+
+`model_config = SettingsConfigDict(title='Azure Service Principal Credential', env_prefix='AZURE_', case_sensitive=False, extra='allow')`
+### AzureQuantumBackendNames
+
+AzureQuantum backend names which Classiq Supports running on.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [IONQ_ARIA_1](#ionq_aria_1) |  |  |
+| [IONQ_ARIA_2](#ionq_aria_2) |  |  |
+| [IONQ_QPU](#ionq_qpu) |  |  |
+| [IONQ_QPU_FORTE](#ionq_qpu_forte) |  |  |
+| [IONQ_SIMULATOR](#ionq_simulator) |  |  |
+| [MICROSOFT_ESTIMATOR](#microsoft_estimator) |  |  |
+| [MICROSOFT_FULLSTATE_SIMULATOR](#microsoft_fullstate_simulator) |  |  |
+| [RIGETTI_SIMULATOR](#rigetti_simulator) |  |  |
+| [RIGETTI_ANKAA2](#rigetti_ankaa2) |  |  |
+| [RIGETTI_ANKAA9](#rigetti_ankaa9) |  |  |
+| [QCI_MACHINE1](#qci_machine1) |  |  |
+| [QCI_NOISY_SIMULATOR](#qci_noisy_simulator) |  |  |
+| [QCI_SIMULATOR](#qci_simulator) |  |  |
+| [QUANTINUUM_API_VALIDATOR1_1](#quantinuum_api_validator1_1) |  |  |
+| [QUANTINUUM_API_VALIDATOR1_2](#quantinuum_api_validator1_2) |  |  |
+| [QUANTINUUM_API_VALIDATOR2_1](#quantinuum_api_validator2_1) |  |  |
+| [QUANTINUUM_QPU1_1](#quantinuum_qpu1_1) |  |  |
+| [QUANTINUUM_QPU1_2](#quantinuum_qpu1_2) |  |  |
+| [QUANTINUUM_SIMULATOR1_1](#quantinuum_simulator1_1) |  |  |
+| [QUANTINUUM_SIMULATOR1_2](#quantinuum_simulator1_2) |  |  |
+| [QUANTINUUM_QPU2](#quantinuum_qpu2) |  |  |
+| [QUANTINUUM_SIMULATOR2](#quantinuum_simulator2) |  |  |
+
+
+### IONQ_ARIA_1
+
+
+```python
+IONQ_ARIA_1 = 'ionq.qpu.aria-1'
+```
+
+
+### IONQ_ARIA_2
+
+
+```python
+IONQ_ARIA_2 = 'ionq.qpu.aria-2'
+```
+
+
+### IONQ_QPU
+
+
+```python
+IONQ_QPU = 'ionq.qpu'
+```
+
+
+### IONQ_QPU_FORTE
+
+
+```python
+IONQ_QPU_FORTE = 'ionq.qpu.forte-1'
+```
+
+
+### IONQ_SIMULATOR
+
+
+```python
+IONQ_SIMULATOR = 'ionq.simulator'
+```
+
+
+### MICROSOFT_ESTIMATOR
+
+
+```python
+MICROSOFT_ESTIMATOR = 'microsoft.estimator'
+```
+
+
+### MICROSOFT_FULLSTATE_SIMULATOR
+
+
+```python
+MICROSOFT_FULLSTATE_SIMULATOR = 'microsoft.simulator.fullstate'
+```
+
+
+### RIGETTI_SIMULATOR
+
+
+```python
+RIGETTI_SIMULATOR = 'rigetti.sim.qvm'
+```
+
+
+### RIGETTI_ANKAA2
+
+
+```python
+RIGETTI_ANKAA2 = 'rigetti.qpu.ankaa-2'
+```
+
+
+### RIGETTI_ANKAA9
+
+
+```python
+RIGETTI_ANKAA9 = 'rigetti.qpu.ankaa-9q-1'
+```
+
+
+### QCI_MACHINE1
+
+
+```python
+QCI_MACHINE1 = 'qci.machine1'
+```
+
+
+### QCI_NOISY_SIMULATOR
+
+
+```python
+QCI_NOISY_SIMULATOR = 'qci.simulator.noisy'
+```
+
+
+### QCI_SIMULATOR
+
+
+```python
+QCI_SIMULATOR = 'qci.simulator'
+```
+
+
+### QUANTINUUM_API_VALIDATOR1_1
+
+
+```python
+QUANTINUUM_API_VALIDATOR1_1 = 'quantinuum.sim.h1-1sc'
+```
+
+
+### QUANTINUUM_API_VALIDATOR1_2
+
+
+```python
+QUANTINUUM_API_VALIDATOR1_2 = 'quantinuum.sim.h1-2sc'
+```
+
+
+### QUANTINUUM_API_VALIDATOR2_1
+
+
+```python
+QUANTINUUM_API_VALIDATOR2_1 = 'quantinuum.sim.h2-1sc'
+```
+
+
+### QUANTINUUM_QPU1_1
+
+
+```python
+QUANTINUUM_QPU1_1 = 'quantinuum.qpu.h1-1'
+```
+
+
+### QUANTINUUM_QPU1_2
+
+
+```python
+QUANTINUUM_QPU1_2 = 'quantinuum.qpu.h1-2'
+```
+
+
+### QUANTINUUM_SIMULATOR1_1
+
+
+```python
+QUANTINUUM_SIMULATOR1_1 = 'quantinuum.sim.h1-1e'
+```
+
+
+### QUANTINUUM_SIMULATOR1_2
+
+
+```python
+QUANTINUUM_SIMULATOR1_2 = 'quantinuum.sim.h1-2e'
+```
+
+
+### QUANTINUUM_QPU2
+
+
+```python
+QUANTINUUM_QPU2 = 'quantinuum.qpu.h2-1'
+```
+
+
+### QUANTINUUM_SIMULATOR2
+
+
+```python
+QUANTINUUM_SIMULATOR2 = 'quantinuum.sim.h2-1e'
+```

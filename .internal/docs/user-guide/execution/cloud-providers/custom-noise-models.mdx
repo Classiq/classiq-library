@@ -1,0 +1,337 @@
+---
+title: "Custom noise models on Classiq simulators"
+icon: "/icons/bulletsharp.svg"
+description: "Define depolarizing, Pauli, thermal relaxation, and readout noise for Classiq-hosted simulators."
+---
+
+Classiq-hosted simulators support **user-defined noise** through
+[`ClassiqSimulatorNoiseSpecification`](/sdk-reference/providers/simulator-noise#classiqsimulatornoisespecification).
+Combine any subset of gate and readout channels; an empty specification runs an ideal
+(noise-free) simulation.
+
+Custom noise is available on Classiq Aer simulators (`simulator`, `simulator_density_matrix`,
+`simulator_matrix_product_state`, and related backends) and on Nvidia / Braket Nvidia
+simulators. See [Execution on Classiq simulators](./classiq-backends) for backend names.
+
+<Note>
+**Preset vs custom noise:** [`ClassiqBackendPreferences`](/sdk-reference/providers/Classiq)
+accepts either `noise_model` (a named preset from `CLASSIQ_NOISE_MODELS`, such as
+`ibm_pittsburgh`) **or** `simulator_noise_spec` (custom). Set at most one of them.
+</Note>
+
+## Quick start
+
+Attach a noise specification through backend preferences when you execute a program.
+
+<Tabs>
+<Tab title="sample()">
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import *
+@qfunc
+def main(res: Output[QBit]) -> None:
+    allocate(res)
+    X(res)
+
+qprog = synthesize(main)
+
+noise_spec = ClassiqSimulatorNoiseSpecification(
+    readout_bit_flip_probability=0.02,
+)
+
+df = sample(
+    qprog,
+    backend="simulator",
+    config={"simulator_noise_spec": noise_spec},
+    num_shots=1000,
+)
+```
+
+</Tab>
+<Tab title="ExecutionPreferences">
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import *
+@qfunc
+def main(res: Output[QBit]) -> None:
+    allocate(res)
+    X(res)
+
+qprog = synthesize(main)
+
+execution_preferences = ExecutionPreferences(
+    backend_preferences=ClassiqBackendPreferences(
+        backend_name=ClassiqSimulatorBackendNames.SIMULATOR,
+        simulator_noise_spec=ClassiqSimulatorNoiseSpecification(
+            readout_bit_flip_probability=0.02,
+        ),
+    ),
+    num_shots=1000,
+)
+
+with ExecutionSession(qprog, execution_preferences=execution_preferences) as session:
+    df = session.sample().dataframe
+```
+
+</Tab>
+</Tabs>
+
+## Noise channels
+
+The sections below describe each building block. Every section includes a minimal code
+example you can copy into `ClassiqSimulatorNoiseSpecification(...)`.
+
+### Depolarizing noise on gates
+
+Depolarizing noise mixes the state with the maximally mixed state on the support of the
+gate: with probability $(4^n-1)/4^n \cdot \lambda$ a uniform Pauli error is applied
+(excluding identity), and otherwise the channel leaves the state unchanged, where $n$ is
+the number of qubits the gate acts on and $\lambda$ is the `probability` parameter.
+
+Use [`DepolarizingNoiseOnGate`](/sdk-reference/providers/simulator-noise#depolarizingnoiseongate)
+to apply the same depolarizing channel on **every** occurrence of a named gate.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import ClassiqSimulatorNoiseSpecification, DepolarizingNoiseOnGate
+
+ClassiqSimulatorNoiseSpecification(
+    gate_depolarizing_errors=[
+        DepolarizingNoiseOnGate(gate="x", probability=0.001, num_qubits=1),
+        DepolarizingNoiseOnGate(gate="cx", probability=0.01, num_qubits=2),
+    ],
+)
+```
+
+### Local depolarizing noise on gates
+
+[`LocalDepolarizingNoiseOnGate`](/sdk-reference/providers/simulator-noise#localdepolarizingnoiseongate)
+applies depolarizing noise only when the named gate acts on a **specific ordered tuple**
+of qubit indices. Other placements of the same gate name are unaffected.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import ClassiqSimulatorNoiseSpecification, LocalDepolarizingNoiseOnGate
+
+ClassiqSimulatorNoiseSpecification(
+    local_depolarizing_errors=[
+        LocalDepolarizingNoiseOnGate(
+            gate="cx",
+            num_qubits=2,
+            probability=0.02,
+            qubits=[0, 1],
+        ),
+    ],
+)
+```
+
+### Pauli noise on gates
+
+Pauli noise is a probabilistic mixture: each term is a Pauli product (written as a string
+of `I`, `X`, `Y`, `Z` per qubit, e.g. `X` on one qubit, `IX` or `XY` on two) with an
+associated probability. All term probabilities must sum to 1.
+
+Use [`PauliNoiseTerm`](/sdk-reference/providers/simulator-noise#paulinoiseterm) and
+[`PauliNoiseOnGate`](/sdk-reference/providers/simulator-noise#paulinoiseongate) to attach
+a mixed Pauli channel to every occurrence of a gate. Include an identity (`I`) term when
+you want a fraction of executions to stay error-free.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import (
+    ClassiqSimulatorNoiseSpecification,
+    PauliNoiseOnGate,
+    PauliNoiseTerm,
+)
+
+ClassiqSimulatorNoiseSpecification(
+    gate_pauli_errors=[
+        PauliNoiseOnGate(
+            gate="x",
+            num_qubits=1,
+            pauli_terms=[
+                PauliNoiseTerm(pauli="I", probability=0.99),
+                PauliNoiseTerm(pauli="X", probability=0.01),
+            ],
+        ),
+    ],
+)
+```
+
+### Thermal relaxation on single-qubit gates
+
+Thermal relaxation models energy decay and dephasing over a gate duration. Use coherent
+time constants `t1` (amplitude damping) and `t2` (dephasing) in any consistent unit, the
+same unit for `time` as the gate duration, and optional `excited_state_population` for
+the equilibrium $|1\rangle$ population. For physical consistency, require $T_2 \leq 2 T_1$.
+
+[`ThermalRelaxationNoiseOnGate`](/sdk-reference/providers/simulator-noise#thermalrelaxationnoiseongate)
+is defined for a single computational qubit; attach it only to single-qubit gate names.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import ClassiqSimulatorNoiseSpecification, ThermalRelaxationNoiseOnGate
+
+ClassiqSimulatorNoiseSpecification(
+    gate_thermal_relaxation_errors=[
+        ThermalRelaxationNoiseOnGate(
+            gate="sx",
+            t1=60_000.0,
+            t2=20_000.0,
+            time=100.0,
+        ),
+    ],
+)
+```
+
+### Global readout bit-flip probability
+
+The symmetric one-parameter readout model swaps classical outcomes 0 and 1 with
+probability `p` on **each** qubit, for both $|0\rangle$ and $|1\rangle$ pre-measurement
+states. Set `readout_bit_flip_probability` on
+[`ClassiqSimulatorNoiseSpecification`](/sdk-reference/providers/simulator-noise#classiqsimulatornoisespecification).
+
+This field is mutually exclusive with `readout_assignment_probabilities`.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import ClassiqSimulatorNoiseSpecification
+
+ClassiqSimulatorNoiseSpecification(
+    readout_bit_flip_probability=0.02,
+)
+```
+
+### Global readout assignment matrix
+
+Readout noise can also be specified with a 2-by-2 **assignment matrix**: row index is the
+true pre-measurement computational state (0 or 1), column index is the classical
+outcome (0 or 1); entry $(i,j)$ is the probability of recording outcome $j$ when the
+qubit was in state $|i\rangle$. Each row must be non-negative and sum to 1.
+
+Set `readout_assignment_probabilities` to apply one matrix to **every** qubit's measurement.
+Mutually exclusive with `readout_bit_flip_probability`.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import ClassiqSimulatorNoiseSpecification
+
+ClassiqSimulatorNoiseSpecification(
+    readout_assignment_probabilities=[[0.98, 0.02], [0.03, 0.97]],
+)
+```
+
+### Local readout noise
+
+[`LocalReadoutNoise`](/sdk-reference/providers/simulator-noise#localreadoutnoise) assigns a
+full 2-by-2 assignment matrix to a **single** simulator qubit index. Use
+`local_readout_errors` when different qubits need different readout confusion.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import ClassiqSimulatorNoiseSpecification, LocalReadoutNoise
+
+ClassiqSimulatorNoiseSpecification(
+    local_readout_errors=[
+        LocalReadoutNoise(
+            qubit=0,
+            assignment_probabilities=[[0.9, 0.1], [0.15, 0.85]],
+        ),
+    ],
+)
+```
+
+### Basis gates
+
+`basis_gates` lists optional primitive gate names used when the simulator decomposes
+circuits before attaching noise. If omitted, the backend uses its default primitive set
+(commonly single-qubit rotations and one entangling gate type).
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import ClassiqSimulatorNoiseSpecification
+
+ClassiqSimulatorNoiseSpecification(
+    basis_gates=["id", "rz", "sx", "cx", "x"],
+)
+```
+
+## Combining channels
+
+You can mix gate and readout channels in one specification. Global readout settings
+(`readout_bit_flip_probability` or `readout_assignment_probabilities`) cannot both be set;
+per-qubit readout in `local_readout_errors` uses the same matrix convention.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import (
+    ClassiqSimulatorNoiseSpecification,
+    DepolarizingNoiseOnGate,
+    LocalDepolarizingNoiseOnGate,
+    LocalReadoutNoise,
+    PauliNoiseOnGate,
+    PauliNoiseTerm,
+    ThermalRelaxationNoiseOnGate,
+)
+
+ClassiqSimulatorNoiseSpecification(
+    basis_gates=["id", "rz", "sx", "cx", "x"],
+    gate_depolarizing_errors=[
+        DepolarizingNoiseOnGate(gate="x", probability=0.001, num_qubits=1),
+    ],
+    local_depolarizing_errors=[
+        LocalDepolarizingNoiseOnGate(
+            gate="cx", num_qubits=2, probability=0.02, qubits=[0, 1]
+        ),
+    ],
+    gate_pauli_errors=[
+        PauliNoiseOnGate(
+            gate="h",
+            num_qubits=1,
+            pauli_terms=[
+                PauliNoiseTerm(pauli="I", probability=0.99),
+                PauliNoiseTerm(pauli="Z", probability=0.01),
+            ],
+        ),
+    ],
+    gate_thermal_relaxation_errors=[
+        ThermalRelaxationNoiseOnGate(gate="sx", t1=60_000.0, t2=20_000.0, time=100.0),
+    ],
+    readout_assignment_probabilities=[[0.98, 0.02], [0.03, 0.97]],
+    local_readout_errors=[
+        LocalReadoutNoise(
+            qubit=0,
+            assignment_probabilities=[[0.9, 0.1], [0.15, 0.85]],
+        ),
+    ],
+)
+```
+
+## Validation rules
+
+The SDK validates noise specifications before execution. Common constraints:
+
+| Rule | Applies to |
+| ---- | ---------- |
+| `noise_model` and `simulator_noise_spec` are mutually exclusive | `ClassiqBackendPreferences` |
+| `readout_bit_flip_probability` and `readout_assignment_probabilities` are mutually exclusive | `ClassiqSimulatorNoiseSpecification` |
+| Pauli term probabilities must sum to 1 | `PauliNoiseOnGate` |
+| `len(qubits)` must equal `num_qubits` | `LocalDepolarizingNoiseOnGate` |
+| $T_2 \leq 2 T_1$ | `ThermalRelaxationNoiseOnGate` |
+| Assignment matrices must be 2-by-2, non-negative, row-stochastic | `LocalReadoutNoise`, global readout fields |
+
+For full field-level reference, see
+[Simulator noise (SDK reference)](/sdk-reference/providers/simulator-noise).

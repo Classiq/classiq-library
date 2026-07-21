@@ -1,0 +1,504 @@
+---
+title: "Hybrid Classical-Quantum Simulation of MaxCut using QAOA-in-QAOA"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/optimization/qaoa_in_qaoa/qaoa_in_qaoa.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+## Introduction
+
+The Quantum approximate optimization algorithm (QAOA) is a leading hybrid classical-quantum algorithm for solving complex combinatorial optimization problems. QAOA-in-QAOA (QAOA^2) uses a divide-and-conquer heuristic to solve large-scale Maximum Cut (MaxCut) problems, where many subgraph problems can be solved in parallel. In this work, an implementation of the QAOA2 method for the scalable solution of the MaxCut problem is presented, based on the Classiq platform.
+
+The framework is executed on an HPE-Cray EX supercomputer by means of the Message Passing Interface (MPI) and the SLURM workload manager.
+
+The limits of the Goemans-Williamson (GW) algorithm as a purely classical alternative to QAOA are investigated to understand if QAOA^2 could benefit from solving certain sub-graphs classically.
+
+Results from large-scale simulations of up to 33 qubits are presented, showing the advantage of QAOA in certain cases and the efficiency of the implementation, as well as the adequacy of the workflow in the preparation of real quantum devices.
+
+For the considered graphs, the best choice for the sub-graphs does not significantly improve results and is still outperformed by GW.
+
+## Note
+
+This notebook is not suited for the HPC run, see the original paper for details: [https://arxiv.org/abs/2406.17383](https://arxiv.org/abs/2406.17383)
+
+```python
+import copy
+import random
+from itertools import chain, combinations, product
+from typing import Dict, List, Set, Tuple
+
+import networkx as nx
+import numpy as np
+import pyomo.core as pyo
+from matplotlib import pyplot as plt
+
+from classiq import (
+    Preferences,
+    construct_combinatorial_optimization_model,
+    execute,
+    set_execution_preferences,
+    set_preferences,
+    show,
+    synthesize,
+)
+from classiq.applications.combinatorial_optimization import (
+    OptimizerConfig,
+    QAOAConfig,
+    get_optimization_solution_from_pyo,
+)
+from classiq.execution import ExecutionPreferences
+
+random.seed(246)
+np.random.seed(4812)
+
+
+def random_partition(subgraph: nx.Graph) -> Dict[int, int]:
+    """
+    graph without edges can take random solution
+    :param subgraph:
+    :return: keys are nodes and values random solution
+    """
+    nodes_list = list(subgraph.nodes())
+    random_sol = [random.choice([0, 1]) for _ in range(len(nodes_list))]
+    return dict(list(zip(nodes_list, random_sol)))
+
+
+def random_combination(data, sample_size):
+    combs = list(combinations(data, sample_size))
+    index = np.random.randint(len(combs))
+    return list(combs[index])
+
+
+def random_split(
+    graph: nx.Graph,
+    max_nodes: int,
+) -> List[Set[int]]:
+    # Generate communities list
+    return_comminities = []
+    node_lst = copy.copy(list(graph.nodes))
+    while len(node_lst) > 0:
+        try:
+            community = random.sample(sorted(node_lst), min(len(node_lst), max_nodes))
+        except Exception as e:
+            print(f"An error occurred with random.sample: {e}")
+            print(f"the nodes list which fails in random.sample is: {list(node_lst)}")
+            print(f"The desired sample size is {min(len(node_lst), max_nodes)}")
+            community = random_combination(
+                list(node_lst), min(len(node_lst), max_nodes)
+            )
+        node_lst = list(set(node_lst) - set(community))
+        return_comminities.append(set(community))
+    return return_comminities
+
+
+def split2communities(
+    graph: nx.Graph,
+    max_nodes: int,
+    recursive_level: int = 0,
+    random_split_flag: bool = False,
+) -> List[Set[int]]:
+    """
+    split graph to communities using modularity
+    :param recursive_level: number of recursion
+    :param graph: big graph to split
+    :param max_nodes: max nodes in each community
+    :return: list of nodes division to communities not larger than max_nodes
+    """
+    if random_split_flag:
+        return random_split(graph=graph, max_nodes=max_nodes)
+    # Generate communities list
+    return_comminities = []
+    # try using modularity method
+    try:
+        initial_communities = list(nx.community.greedy_modularity_communities(graph))
+    except Exception as e:
+        print(f"Greedy modularity failed with error: {e}")
+        return random_split(graph=graph, max_nodes=max_nodes)
+
+    # splitting randomly each community with larger nodes than max_nodes
+    for community in initial_communities:
+        if recursive_level > 100 and len(community) > max_nodes:
+            # If community is too large, we randomly split it into smaller communities of size <= max_nodes
+            print("Split randomly needed")
+            while len(community) > 0:
+                if len(community) > max_nodes:
+                    try:
+                        new_community = random.sample(
+                            sorted(community),
+                            min(int(np.ceil(len(community) / 2)), max_nodes),
+                        )
+                    except Exception as e:
+                        print(f"An error occurred with random.sample: {e}")
+                        print(
+                            f"the community which fails in random.sample is {list(community)}"
+                        )
+                        print(
+                            f"the sample size to take from is {min(int(np.ceil(len(community) / 2)), max_nodes)}"
+                        )
+                        new_community = random_combination(
+                            data=list(community),
+                            sample_size=min(
+                                int(np.ceil(len(community) / 2)), max_nodes
+                            ),
+                        )
+                    return_comminities.append(set(new_community))
+                    community -= set(new_community)
+                else:
+                    return_comminities.append(set(copy.copy(community)))
+                    community -= set(copy.copy(community))
+        elif len(community) > max_nodes:
+            sub_communities = split2communities(
+                graph=graph.subgraph(community),
+                max_nodes=max_nodes,
+                recursive_level=recursive_level + 1,
+                random_split_flag=random_split_flag,
+            )
+            return_comminities = return_comminities + sub_communities
+
+        else:
+            return_comminities.append(community)
+
+    return return_comminities
+
+
+# we define a function which returns 1 if two connected nodes are on a different subset, and 0 otherwise
+
+
+def arithmetic_eq(x1: int, x2: int) -> int:
+    return x1 + x2 - 2 * x1 * x2
+
+
+def maxcut(graph: nx.Graph) -> pyo.ConcreteModel:
+    # we define a function which returns the pyomo model for a graph input
+    model = pyo.ConcreteModel()
+    model.x = pyo.Var(graph.nodes, domain=pyo.Binary)
+
+    model.cost = pyo.Objective(
+        expr=sum(
+            graph[node1][node2].get("weight", 1.0)
+            * arithmetic_eq(model.x[node1], model.x[node2])
+            for (node1, node2) in graph.edges
+        ),
+        sense=pyo.maximize,
+    )
+
+    return model
+
+
+def exec_qaoa_classiq_sort_res(
+    subgraph: nx.Graph,
+    pyo_model: pyo.ConcreteModel,
+    qaoa_config: QAOAConfig,
+    optimizer_config: OptimizerConfig,
+) -> dict:
+    if len(subgraph.edges) == 0:
+        print("Subgraph has no edges, qaoa has no meaning")
+        return random_partition(subgraph=subgraph)
+    elif len(subgraph.nodes) > 1:
+        qmod = construct_combinatorial_optimization_model(
+            pyo_model=pyo_model,
+            qaoa_config=qaoa_config,
+            optimizer_config=optimizer_config,
+        )
+        qmod = set_preferences(
+            qmod,
+            Preferences(transpilation_option="none", random_seed=10),
+        )
+        qmod = set_execution_preferences(qmod, ExecutionPreferences(random_seed=10))
+        qprog = synthesize(qmod)
+        show(qprog)
+        subgraph_res = execute(qprog)
+        ordered_solution = get_optimization_solution_from_pyo(
+            pyo_model=pyo_model,
+            vqe_result=subgraph_res.result_value(),
+            penalty_energy=qaoa_config.penalty_energy,
+        )
+        # sort by cost and then by count
+        exec_data = sorted(
+            ordered_solution, key=lambda x: (x["cost"], x["count"]), reverse=True
+        )
+
+        return node2value(subgraph=subgraph, solution=exec_data[0]["solution"])
+    else:
+        return {list(subgraph.nodes())[0]: 0}
+
+
+def node2value(subgraph: nx.Graph, solution: List[int]) -> dict:
+    """
+    keys are the nodes, values QAOA solution
+    :param subgraph:
+    :param solution:
+    :return: {0:1, 1:0, 2:1, 3:0, 33:0}
+    """
+    # TODO: fix ordering
+    # sorted_nodes = sorted(subgraph.nodes())
+    nodes_list = list(subgraph.nodes())
+    nodes_res_list = list(zip(nodes_list, solution))
+    return dict(nodes_res_list)
+
+
+def communities2graph(
+    entire_graph: nx.Graph, communities: List[Set[int]], solution: dict
+) -> nx.Graph:
+    """
+    Build a graph from communities
+    :param entire_graph: entire problem graph
+    :param communities: list of communities
+    :param solution: solution of qaoa, keys are the nodes, value 0,1
+    :return: graph that each node represents a community
+    """
+    # Initialize a new graph for communities
+    community_graph = nx.Graph()
+
+    # Add nodes to the community graph
+    community_graph.add_nodes_from(range(len(communities)))
+
+    # Calculate edges weights between communities and add weighted edges to the community graph
+    for i, j in combinations(range(len(communities)), 2):
+        # Calculate the number of edges between community i and community j
+        weight = 0
+        for a, b in product(communities[i], communities[j]):
+            if entire_graph.has_edge(a, b):
+                # entire_graph[i][j].get('weight', 1.0)
+                # if solution[a] == solution[b]:
+                #     weight += 1
+                # else:
+                #     weight -= 1
+                if solution[a] == solution[b]:
+                    weight += entire_graph[a][b].get("weight", 1.0)
+                else:
+                    weight -= entire_graph[a][b].get("weight", 1.0)
+        if weight != 0:
+            community_graph.add_edge(i, j, weight=weight)
+
+    return community_graph
+
+
+def nodes_in_community(
+    basic_nodes_communities: dict,
+    communities: List,
+) -> Dict[int, list]:
+    """
+    take communities list and put the basic nodes in a list that belong
+    to this community_graph.
+    basic nodes: nodes from the original graph
+    :param basic_nodes_communities: represents basic nodes from previous graph.
+    if empty, the first community graph
+    :param communities: separation of graph into communities
+    :return: dict((community_node, list of basic nodes)
+    """
+    new_basic_nodes_communities = copy.copy(basic_nodes_communities)
+    return_basic_nodes_dict = {}
+    if new_basic_nodes_communities == {}:
+        for node, community in enumerate(communities):
+            # new_basic_nodes_communities[node] = list(community)
+            return_basic_nodes_dict[node] = list(community)
+    else:
+        for new_node, higher_community in enumerate(communities):
+            gather_lst = []
+            for old_node in higher_community:
+                gather_lst.append(basic_nodes_communities[old_node])
+            flat_list = list(chain.from_iterable(gather_lst))
+            # new_basic_nodes_communities[new_node] = flat_list
+            return_basic_nodes_dict[new_node] = flat_list
+
+    # return new_basic_nodes_communities
+    return return_basic_nodes_dict
+
+
+def calc_cut(G: nx.Graph, solution: Dict[int, int]) -> float:
+    """
+    calculated cut of a graph, weighted cut hasn't been checked
+    :param G: entire graph to calculate its maxcut
+    :param solution: keys are node number, values are their boolean solution
+    :return: cut result
+    """
+    cut = 0.0
+    for i, j in G.edges():
+        if solution[i] != solution[j]:
+            cut += G[i][j].get("weight", 1.0)
+    return cut
+```
+```python
+
+np.random.seed(4812)
+random.seed(246)
+
+# parameter
+LOCAL_QISKIT_EXECUTION = False  # args.local_execution
+MAX_NUM_QUBITS = 6
+TOTAL_NODES = 40
+EDGE_PROB = 0.2
+NUM_LAYERS = 2
+ITERATIONS = 20
+RANDOM_GRAPH_SPLIT = False
+
+# quantum functions
+
+qaoa_config = QAOAConfig(num_layers=NUM_LAYERS, penalty_energy=0.0)
+optimizer_config = OptimizerConfig(max_iteration=ITERATIONS, alpha_cvar=1.0)
+
+# Create the initial graph
+G = nx.erdos_renyi_graph(TOTAL_NODES, EDGE_PROB)
+print("number of edges: ", len(G.edges))
+
+# Get the communities
+communities = split2communities(
+    graph=G,
+    max_nodes=MAX_NUM_QUBITS,
+    recursive_level=0,
+    random_split_flag=RANDOM_GRAPH_SPLIT,
+)
+print("number of communities: ", len(communities))
+
+# Initialize a list to store subgraphs and solutions
+community_subgraphs_and_sols = []
+initial_full_sol = {}
+
+# executing qaoa to each subgraph
+for i, community in enumerate(communities):
+    subgraph = G.subgraph(community)
+    print(len(subgraph.nodes))
+    res = exec_qaoa_classiq_sort_res(
+        subgraph=subgraph,
+        pyo_model=maxcut(subgraph),
+        qaoa_config=qaoa_config,
+        optimizer_config=optimizer_config,
+    )
+
+    community_subgraphs_and_sols.append((subgraph, res))
+    initial_full_sol.update(res)
+
+community_graph = communities2graph(
+    entire_graph=G, communities=communities, solution=initial_full_sol
+)
+
+# represent the nodes from initial G that inside each node in community_graph.
+# keeps updating in next loops
+basic_nodes_in_community = nodes_in_community(
+    basic_nodes_communities={}, communities=communities
+)
+
+print(initial_full_sol)
+# (while loop) split the graph if len(communities) > MAX_NUM_QUBITS
+
+iterative_num_communities = len(communities)
+
+if iterative_num_communities > MAX_NUM_QUBITS:
+    while iterative_num_communities > MAX_NUM_QUBITS:
+        # Get the communities from community_graph
+        communities_of_community_graph = split2communities(
+            graph=community_graph,
+            max_nodes=MAX_NUM_QUBITS,
+            recursive_level=0,
+            random_split_flag=RANDOM_GRAPH_SPLIT,
+        )
+
+        iterative_num_communities = len(communities_of_community_graph)
+        intermidiate_sol = {}
+
+        for i, community_of_graphs in enumerate(communities_of_community_graph):
+            subgraph = community_graph.subgraph(community_of_graphs)
+            print(len(subgraph.nodes))
+            # executing qaoa to each subgraph
+
+            res = exec_qaoa_classiq_sort_res(
+                subgraph=subgraph,
+                pyo_model=maxcut(subgraph),
+                qaoa_config=qaoa_config,
+                optimizer_config=optimizer_config,
+            )
+            intermidiate_sol.update(res)
+
+        for k, v in intermidiate_sol.items():
+            if v == 1:
+                for bn in basic_nodes_in_community[k]:
+                    # flipping 0 -> 1 and 1 -> 0
+                    initial_full_sol[bn] = (initial_full_sol[bn] + 1) % 2
+
+        community_graph = communities2graph(
+            entire_graph=community_graph,
+            communities=communities_of_community_graph,
+            solution=intermidiate_sol,
+        )
+
+        basic_nodes_in_community = nodes_in_community(
+            basic_nodes_communities=basic_nodes_in_community,
+            communities=communities_of_community_graph,
+        )
+
+    res = exec_qaoa_classiq_sort_res(
+        subgraph=community_graph,
+        pyo_model=maxcut(community_graph),
+        qaoa_config=qaoa_config,
+        optimizer_config=optimizer_config,
+    )
+    for k, v in res.items():
+        if v == 1:
+            for bn in basic_nodes_in_community[k]:
+                # flipping 0 -> 1 and 1 -> 0
+                initial_full_sol[bn] = (initial_full_sol[bn] + 1) % 2
+else:
+    res = exec_qaoa_classiq_sort_res(
+        subgraph=community_graph,
+        pyo_model=maxcut(community_graph),
+        qaoa_config=qaoa_config,
+        optimizer_config=optimizer_config,
+    )
+    print(res)
+
+    for k, v in res.items():
+        if v == 1:
+            for bn in basic_nodes_in_community[k]:
+                # flipping 0 -> 1 and 1 -> 0
+                initial_full_sol[bn] = (initial_full_sol[bn] + 1) % 2
+
+print(initial_full_sol)
+
+qaoa_squared_cut = calc_cut(G=G, solution=initial_full_sol)
+# gw_cut = SDP_max_cut(G=G)
+greedy_one_exchange = nx.algorithms.approximation.maxcut.one_exchange(G=G)[0]
+random_pratition = nx.algorithms.approximation.maxcut.randomized_partitioning(G=G)[0]
+
+print("CUT OF QAOA SQUARE", qaoa_squared_cut)
+# print("CUT of Goemans-Williamson classical algorithm: ", gw_cut['gw_mean'])
+print("greedy one exchange strategy: ", greedy_one_exchange)
+print("random partition cut: ", random_pratition)
+
+
+pos = nx.spring_layout(G)
+node_colors = ["blue" if initial_full_sol[node] == 0 else "red" for node in G.nodes()]
+edge_colors = []
+for edge in G.edges():
+    if initial_full_sol[edge[0]] == initial_full_sol[edge[1]]:
+        edge_colors.append("black")
+    else:
+        edge_colors.append("orange")
+
+nx.draw(
+    G,
+    pos,
+    node_color=node_colors,
+    edge_color=edge_colors,
+    with_labels=True,
+    width=2,
+    node_size=150,
+)
+# Show the graph
+plt.show()
+```
+<Info>
+  **Output:**
+
+  
+
+```
+number of edges:  158
+  number of communities:  10
+  6
+  
+
+```
+</Info>

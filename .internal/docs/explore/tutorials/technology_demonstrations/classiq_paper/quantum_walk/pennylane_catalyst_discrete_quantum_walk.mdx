@@ -1,0 +1,51 @@
+---
+title: "PennyLane code for discrete quantum walk"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/classiq_paper/quantum_walk/pennylane_catalyst_discrete_quantum_walk.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook shows how to generate data for discrete quantum walk using `pennylane` 0.39.0 and `pennylane-catalyst` 0.9.0
+
+```python
+# import time
+# import pennylane as qml
+# from catalyst import qjit
+```
+```python
+
+# import time
+# import pennylane as qml
+# from catalyst import qjit
+
+# # run an example
+# SIZE = 6
+# start_time = time.time()
+
+# s = SIZE
+# wires_x = list(range(s))
+# coin = [s]
+
+# def shift_op():
+#     for index in range(len(wires_x)-1, 0, -1):
+#         control_values = [1] * index
+#         qml.ctrl(qml.PauliX, control=wires_x[:index], control_values=control_values)(wires=wires_x[index])
+#         qml.PauliX(wires_x[0])
+
+
+# @qml.qnode(qml.device("lightning.qubit", wires=(wires_x + coin)))
+# def circuit():
+#     qml.H(coin)
+#     qml.ctrl(shift_op, control=coin)()
+#     qml.ctrl(qml.adjoint(shift_op), control=coin, control_values=[0])()
+#     return qml.probs(wires=wires_x)
+
+# cir = qml.transforms.decompose(circuit, gate_set={qml.CNOT, qml.RZ, qml.RY, qml.RX})
+# jitted_cir = qjit(cir)
+# transpilation_time = time.time()-start_time
+# cx_counts = jitted_cir.mlir.count("CNOT")
+
+# print(f"==== pennylane for {SIZE}==== time: {transpilation_time}")
+```

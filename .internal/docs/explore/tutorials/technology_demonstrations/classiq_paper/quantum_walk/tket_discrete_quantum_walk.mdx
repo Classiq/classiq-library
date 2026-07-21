@@ -1,0 +1,55 @@
+---
+title: "PyTket code for discrete quantum walk"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/classiq_paper/quantum_walk/tket_discrete_quantum_walk.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook shows how to generate data for discrete quantum walk using `pytket` 1.34.0
+
+```python
+# import time
+# from pytket.circuit import Circuit, CircBox, OpType, QControlBox
+# from pytket.extensions.qiskit import AerBackend
+# from pytket.passes import DecomposeBoxes, SynthesiseTket
+```
+```python
+
+# SIZE = 6
+# backend = AerBackend()
+
+# # mcx from control on X
+# def mcx_gate(num_ctrl_qubits):
+#     my_mcx_gate = QControlBox(CircBox(Circuit(1).X(0)), num_ctrl_qubits)
+#     return my_mcx_gate
+
+# # get increment circuit as an MCX cascade
+# def get_increment_circuit(num_qubits):
+#     increment_circuit = Circuit(num_qubits)
+#     for j in range(num_qubits - 1):
+#         increment_circuit.add_gate(mcx_gate(num_qubits-1-j),[k for k in range(num_qubits-j)])
+#     increment_circuit.X(0)
+
+#     return increment_circuit
+
+# # run an example
+# start_time = time.time()
+# q_walk_step = Circuit(SIZE+1)
+# q_walk_step.H(0)
+# q_walk_step.add_gate(QControlBox(CircBox(get_increment_circuit(SIZE))),
+#     [k for k in range(SIZE+1)])
+# q_walk_step.add_gate(QControlBox(CircBox(get_increment_circuit(SIZE)).dagger,n_controls=1,
+# control_state=[0]),[k for k in range(SIZE+1)])
+
+# DecomposeBoxes().apply(q_walk_step)
+# SynthesiseTket().apply(q_walk_step)
+# compiled_circ = backend.get_compiled_circuit(q_walk_step)
+# transpilation_time = time.time()-start_time
+# depth = compiled_circ.depth()
+# cx_counts = compiled_circ.n_gates_of_type(OpType.CX)
+# width = compiled_circ.n_qubits
+
+# print(f'==== tket for {SIZE}==== time {transpilation_time}')
+```

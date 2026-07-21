@@ -1,0 +1,199 @@
+---
+title: "Observe"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+The `observe(...)` workflow is used when you want the expectation value of an observable rather than a full measurement distribution or the complete state vector.
+
+Related pages:
+- [Execution overview](./index)
+- [Sampling](./sample)
+- [State vectors](./calculate-state-vector)
+
+## When to use observe
+
+Use `observe(...)` when your goal is to compute the expectation value of an observable with respect to the executed quantum state.
+
+**This is especially useful in workflows such as:**
+
+- variational algorithms
+- optimization loops
+- cost-function evaluation
+- repeated evaluation of the same circuit under different parameter values
+
+Unlike sampling, which returns a distribution of measurement outcomes, `observe(...)` returns a single scalar. Unlike state-vector calculation, it does not expose the full quantum state.
+
+## Basic example
+
+```python
+from classiq import *
+
+backend_name = "simulator"
+
+@qfunc
+def main(res: Output[QBit]) -> None:
+    allocate(res)
+    H(res)
+
+qprog = synthesize(main)
+
+#Define your observable using SparsePauliOp
+my_observable = Pauli.Z(0) - Pauli.Y(0)
+
+value = observe(
+    qprog,
+    observable=my_observable,
+    backend=backend_name,
+    num_shots=1000,
+)
+
+value
+```
+
+<Info>
+    **Output:**
+
+    -0.013999999999999999
+</Info>
+
+### Understanding the result
+
+The returned value is a single scalar.
+
+It represents the expectation value of the observable with respect to the state produced by the circuit. 
+In other words, it summarizes the behavior of the circuit relative to the operator you are interested in.
+
+This is useful when you care about one derived quantity rather than the full result space.
+
+### Choosing execution settings
+
+As with the other execution functions, you can configure the execution using standard arguments such as:
+
+* backend
+* config
+* num_shots
+* random_seed
+* parameters
+
+For example:
+
+[comment]: DO_NOT_TEST
+
+```python
+value = observe(
+    qprog,
+    observable=my_observable,
+    backend=backend_name,
+    config={},
+    num_shots=2000,
+    random_seed=42,
+)
+```
+
+## Parameterized execution
+
+Many practical uses of `observe(...)` involve parameterized circuits.
+
+Instead of fixing all values inside the circuit, you define symbolic parameters in the 
+quantum function and provide their values when you execute the program.
+
+### Defining a parameterized quantum program
+
+```python
+from classiq import *
+
+backend_name = "simulator"
+
+@qfunc
+def main(angle_rx: CReal, angle_ry: CReal, x: Output[QBit]):
+    allocate(x)
+    RX(angle_rx, x)
+    H(x)
+    RY(angle_ry, x)
+
+qprog = synthesize(main)
+```
+
+### Supplying parameter values
+
+[comment]: DO_NOT_TEST
+
+```python
+exec_params = {
+    "angle_rx": 0.5,
+    "angle_ry": 0.3
+}
+
+value = observe(
+    qprog,
+    observable=my_observable,
+    backend=backend_name,
+    parameters=exec_params,
+    num_shots=1000,
+)
+value
+```
+<Info>
+    **Output:**
+
+    -0.748
+</Info>
+
+This allows you to evaluate how the expectation value changes as the circuit parameters change.
+
+# Batch of expectation values
+
+A common pattern is to evaluate the same observable for many parameter settings.
+
+Instead of calling `observe(...)` repeatedly, you can pass a list of parameter dictionaries. 
+The function then returns a list of scalar values, one per parameter set.
+
+**Example**
+
+[comment]: DO_NOT_TEST
+
+```python
+rx_angles = [0.1, 0.2, 0.3, 0.4]
+
+exec_params = [
+    {"angle_rx": angle, "angle_ry": 0.3}
+    for angle in rx_angles
+]
+
+values = observe(
+    qprog,
+    observable=my_observable,
+    backend=backend_name,
+    parameters=exec_params,
+    num_shots=1000,
+)
+
+values
+```
+
+<Info>
+    **Output:**
+
+    [-0.396, -0.526, -0.6100000000000001, -0.642]
+</Info>
+
+### Understanding batch results
+
+When `parameters` is a list:
+
+* the output is a list of scalar values
+* each value corresponds to one execution
+* the order matches the order of the provided parameter dictionaries
+
+This makes `observe(...)` a natural fit for optimization and sweep-style workflows, where you want to evaluate the same quantity many times.
+
+## Summary
+
+Use `observe(...)` when you care about the expectation value of an observable.
+
+Observe:
+
+* returns a scalar
+* is ideal for cost functions and iterative algorithms
+* supports both single and batch parameterized execution

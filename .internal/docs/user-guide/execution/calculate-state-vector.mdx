@@ -1,0 +1,150 @@
+---
+title: "Calculate State Vector"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+The `calculate_state_vector(...)` function is used when you want direct access to the quantum state itself, including amplitudes and phases.
+
+Related pages:
+- [Execution overview](./index)
+- [Sampling](./sample)
+- [Observe](./observe)
+
+## When to use state-vector calculation
+
+Use `calculate_state_vector(...)` when you want the full quantum state rather than measurement statistics or a single expectation value.
+
+<Warning>
+    State-vector calculations are only available only on Classiq simulators.
+</Warning>
+
+This is useful when you want to:
+
+- inspect amplitudes directly
+- understand the exact state prepared by the circuit
+- analyze phases and probabilities
+- debug or study a circuit without sampling noise
+
+Unlike sampling, noiseless state-vector calculation is deterministic. It does not rely on repeated measurements, so it does not introduce statistical fluctuations.
+
+## Basic example
+
+```python
+from classiq import *
+
+backend_name = "simulator"
+
+@qfunc
+def main(res: Output[QBit]) -> None:
+    allocate(res)
+    H(res)
+
+qprog = synthesize(main)
+
+df = calculate_state_vector(
+    qprog,
+    backend=backend_name,
+)
+df
+```
+
+**Example output**
+
+| x | amplitude          | magnitude | phase | probability | bitstring |
+| - | ------------------ | --------- | ----- | ----------- | --------- |
+| 0 | 0.707107+0.000000j | 0.71      | 0.00π | 0.5         | 0         |
+| 1 | 0.707107+0.000000j | 0.71      | 0.00π | 0.5         | 1         |
+
+### Understanding the result
+
+The returned object is a DataFrame describing the full state.
+
+Common columns include:
+
+* **quantum variables** - the quantum number values, quantum arrays, and qubits
+* **amplitude** — the complex amplitude of the basis state
+* **magnitude** — the absolute value of the amplitude
+* **phase** — the phase angle
+* **probability** — the squared magnitude
+* **bitstring** — the computational basis state
+
+Because the result is a DataFrame, you can inspect or manipulate it using standard operations.
+
+### Filtering small amplitudes
+
+By default, very small amplitudes are filtered out below a threshold of $10^{-16}$.
+
+You can control this behavior using `amplitude_threshold`:
+
+[comment]: DO_NOT_TEST
+
+```python
+df = calculate_state_vector(
+    qprog,
+    backend=backend_name,
+    amplitude_threshold=0.01
+)
+```
+
+This is useful for reducing numerical noise and simplifying the displayed state, 
+especially for larger systems where many amplitudes may be negligible.
+
+## Parameterized execution
+
+State-vector calculation also supports parameterized quantum programs.
+
+This means you can define symbolic parameters in your circuit and provide their numerical values at execution time.
+
+**Example**
+
+```python
+from classiq import *
+
+backend_name = "simulator"
+
+@qfunc
+def main(angle_rx: CReal, angle_ry: CReal, x: Output[QBit]):
+    allocate(x)
+    RX(angle_rx, x)
+    H(x)
+    RY(angle_ry, x)
+
+qprog = synthesize(main)
+
+exec_params = {
+    "angle_rx": 0.5,
+    "angle_ry": 0.3
+}
+
+df = calculate_state_vector(
+    qprog,
+    backend=backend_name,
+    parameters=exec_params,
+)
+df
+```
+
+| x	| amplitude	          | magnitude	| phase	 | probability | bitstring |
+| - | ------------------- | ----------- | ------ | ----------- | --------- |
+| 1	| 0.779815+0.146834j  |	0.79	    | 0.06π	 | 0.629672	   | 1         |
+| 0	| 0.575048-0.199119j  | 0.61	    | -0.11π | 0.370328	   | 0         |
+
+
+In this workflow:
+
+* the circuit structure stays the same
+* the parameter values are supplied at execution time
+* the returned DataFrame describes the exact state corresponding to those values
+
+## Summary
+
+Use `calculate_state_vector(...)` when you need the full quantum state.
+
+State-vector calculation:
+
+* returns a DataFrame
+* provides amplitudes, phases, and probabilities
+* is deterministic
+* supports parameterized execution
+* only allowed on simulators

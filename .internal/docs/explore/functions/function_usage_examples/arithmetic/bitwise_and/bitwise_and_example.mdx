@@ -1,0 +1,104 @@
+---
+title: "Bitwise And"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/bitwise_and/bitwise_and_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The Bitwise And (denoted as '&') is implemented by applying this truth table between each pair of qubits in register A and B (or qubit and bit).
+
+<center>| a | b | a & b | | :-: | :-: | :---: | | 0 | 0 | 0 | | 0 | 1 | 0 | | 1 | 0 | 0 | | 1 | 1 | 1 |</center>
+
+Note that integer and fixed-point numbers are represented in a two-complement method during function evaluation.
+
+The binary number is extended in the case of a register size mismatch.
+
+For example, the positive signed number $(110)_2=6$ is expressed as $(00110)_2$ when operating with a five-qubit register.
+Similarly, the negative signed number $(110)_2=-2$ is expressed as $(11110)_2$.
+
+Examples:
+
+5 & 3 = 1 since 101 & 011 = 001
+
+5 & -3 = 5 since 0101 & 1101 = 0101
+
+-5 & -3 = -7 since 1011 & 1101 = 1001
+
+## Examples
+
+#
+
+### Example 1: Two Quantum Variables
+
+This example generates a quantum program that performs a bitwise 'and' between two variables, both are unsigned integer
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum], b: Output[QNum], res: Output[QNum]) -> None:
+    a |= 4
+    b |= 5
+    res |= a & b
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+
+result = execute(qprog).result_value()
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 4.0, 'b': 5.0, 'res': 4.0}: 1000]
+  
+
+```
+</Info>
+
+#
+
+### Example 2: Integer and Quantum Variable
+
+This example generates a quantum program that performs a bitwise 'and' between a quantum variable and an integer.
+
+The left arg is an integer equal to 3
+and the right arg is an unsigned quantum variable with three qubits.
+
+```python
+@qfunc
+def main(a: Output[QNum], res: Output[QNum]) -> None:
+    a |= 5
+    res |= 3 & a
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+
+result = execute(qprog).result_value()
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 5.0, 'res': 1.0}: 1000]
+  
+
+```
+</Info>

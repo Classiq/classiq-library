@@ -1,0 +1,1920 @@
+---
+title: Chemistry
+icon: "/icons/bulletsharp.svg"
+---
+
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `FermionHamiltonianProblem` | Defines an electronic-structure problem using a Fermionic operator and electron count. |
+
+
+### FermionHamiltonianProblem
+
+Defines an electronic-structure problem using a Fermionic operator and electron count.
+Can also be constructed from a `MolecularData` object using the `from_molecule`
+method.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [from_molecule](#from_molecule) | Constructs a `FermionHamiltonianProblem` from a molecule data. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `fermion_hamiltonian` | `FermionOperator` | The fermionic hamiltonian of the problem. Assumed to be in the block-spin labeling. |
+| `n_orbitals` | `int` | Number of spatial orbitals. |
+| `n_alpha` | `int` | Number of alpha particles. |
+| `n_beta` | `int` | Number of beta particles. |
+| `n_particles` | `tuple[int, int]` | Number of alpha and beta particles. |
+
+
+### fermion_hamiltonian
+
+
+`fermion_hamiltonian = fermion_hamiltonian`
+
+
+### n_particles
+
+
+`n_particles = n_particles`
+
+
+### n_orbitals
+
+
+`n_orbitals = min_n_orbitals`
+
+
+### occupied_alpha
+
+
+`occupied_alpha: list[int]`
+
+
+### virtual_alpha
+
+
+`virtual_alpha: list[int]`
+
+
+### occupied_beta
+
+
+`occupied_beta: list[int]`
+
+
+### virtual_beta
+
+
+`virtual_beta: list[int]`
+
+
+### occupied
+
+
+`occupied: list[int]`
+
+
+### virtual
+
+
+`virtual: list[int]`
+
+#### from_molecule
+
+
+<pre><code>from_molecule(
+    cls: ,
+    molecule: MolecularData,
+    first_active_index: int = 0,
+    remove_orbitals: Sequence[int] | None = None,
+    op_compression_tol: float = 1e-13
+) -> FermionHamiltonianProblem</code></pre>
+
+
+Constructs a `FermionHamiltonianProblem` from a molecule data.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `cls` | `` |  | *required* |
+| `molecule` | `MolecularData` | The molecule data. | *required* |
+| `first_active_index` | `int` | The first active index, indicates all prior indices are freezed. | 0 |
+| `remove_orbitals` | `Sequence[int] \| None` | Active indices to be removed. | None |
+| `op_compression_tol` | `float` | Tolerance for trimming the fermion operator. | 1e-13 |
+
+
+
+**Returns:**
+
+- **Type:** `FermionHamiltonianProblem`
+- The fermion hamiltonian problem.
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `FermionHamiltonianProblem` | Defines an electronic-structure problem using a Fermionic operator and electron count. |
+| `MappingMethod` | Mapping methods from fermionic operators to qubits operators. |
+| `FermionToQubitMapper` | Mapper between fermionic operators to qubits operators, using one of the supported mapping methods (see `MappingMethod`). |
+
+
+### FermionHamiltonianProblem
+
+Defines an electronic-structure problem using a Fermionic operator and electron count.
+Can also be constructed from a `MolecularData` object using the `from_molecule`
+method.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [from_molecule](#from_molecule) | Constructs a `FermionHamiltonianProblem` from a molecule data. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `fermion_hamiltonian` | `FermionOperator` | The fermionic hamiltonian of the problem. Assumed to be in the block-spin labeling. |
+| `n_orbitals` | `int` | Number of spatial orbitals. |
+| `n_alpha` | `int` | Number of alpha particles. |
+| `n_beta` | `int` | Number of beta particles. |
+| `n_particles` | `tuple[int, int]` | Number of alpha and beta particles. |
+
+
+### fermion_hamiltonian
+
+
+`fermion_hamiltonian = fermion_hamiltonian`
+
+
+### n_particles
+
+
+`n_particles = n_particles`
+
+
+### n_orbitals
+
+
+`n_orbitals = min_n_orbitals`
+
+
+### occupied_alpha
+
+
+`occupied_alpha: list[int]`
+
+
+### virtual_alpha
+
+
+`virtual_alpha: list[int]`
+
+
+### occupied_beta
+
+
+`occupied_beta: list[int]`
+
+
+### virtual_beta
+
+
+`virtual_beta: list[int]`
+
+
+### occupied
+
+
+`occupied: list[int]`
+
+
+### virtual
+
+
+`virtual: list[int]`
+
+#### from_molecule
+
+
+<pre><code>from_molecule(
+    cls: ,
+    molecule: MolecularData,
+    first_active_index: int = 0,
+    remove_orbitals: Sequence[int] | None = None,
+    op_compression_tol: float = 1e-13
+) -> FermionHamiltonianProblem</code></pre>
+
+
+Constructs a `FermionHamiltonianProblem` from a molecule data.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `cls` | `` |  | *required* |
+| `molecule` | `MolecularData` | The molecule data. | *required* |
+| `first_active_index` | `int` | The first active index, indicates all prior indices are freezed. | 0 |
+| `remove_orbitals` | `Sequence[int] \| None` | Active indices to be removed. | None |
+| `op_compression_tol` | `float` | Tolerance for trimming the fermion operator. | 1e-13 |
+
+
+
+**Returns:**
+
+- **Type:** `FermionHamiltonianProblem`
+- The fermion hamiltonian problem.
+
+
+### MappingMethod
+
+Mapping methods from fermionic operators to qubits operators.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [JORDAN_WIGNER](#jordan_wigner) |  |  |
+| [BRAVYI_KITAEV](#bravyi_kitaev) |  |  |
+
+
+### JORDAN_WIGNER
+
+
+```python
+JORDAN_WIGNER = 'jw'
+```
+
+
+### BRAVYI_KITAEV
+
+
+```python
+BRAVYI_KITAEV = 'bk'
+```
+
+### FermionToQubitMapper
+
+Mapper between fermionic operators to qubits operators, using one of the supported
+mapping methods (see `MappingMethod`).
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [map](#map) | Maps the given fermionic operator to a qubits operator using the mapper's configuration. |
+| [get_num_qubits](#get_num_qubits) | Gets the number of qubits after mapping the given problem into qubits space. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `method` | `MappingMethod` | The mapping method. |
+
+
+### method
+
+
+`method = method`
+
+#### map
+
+
+<pre><code>map(
+    self: ,
+    fermion_op: FermionOperator,
+    args: Any = (),
+    kwargs: Any = {}
+) -> QubitOperator</code></pre>
+
+
+Maps the given fermionic operator to a qubits operator using the mapper's
+configuration.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `fermion_op` | `FermionOperator` | A fermionic operator. | *required* |
+| `args` | `Any` |  | () |
+| `kwargs` | `Any` |  | {} |
+
+
+
+**Returns:**
+
+- **Type:** `QubitOperator`
+- The mapped qubits operator.
+
+
+#### get_num_qubits
+
+
+<pre><code>get_num_qubits(
+    self: ,
+    problem: FermionHamiltonianProblem
+) -> int</code></pre>
+
+
+Gets the number of qubits after mapping the given problem into qubits space.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `int`
+- The number of qubits.
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `FermionToQubitMapper` | Mapper between fermionic operators to qubits operators, using one of the supported mapping methods (see `MappingMethod`). |
+| `MappingMethod` | Mapping methods from fermionic operators to qubits operators. |
+| `FermionHamiltonianProblem` | Defines an electronic-structure problem using a Fermionic operator and electron count. |
+| `Z2SymTaperMapper` | Mapper between fermionic operators to qubits operators, using one of the supported mapping methods (see `MappingMethod`), and taking advantage of Z... |
+
+
+### FermionToQubitMapper
+
+Mapper between fermionic operators to qubits operators, using one of the supported
+mapping methods (see `MappingMethod`).
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [map](#map) | Maps the given fermionic operator to a qubits operator using the mapper's configuration. |
+| [get_num_qubits](#get_num_qubits) | Gets the number of qubits after mapping the given problem into qubits space. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `method` | `MappingMethod` | The mapping method. |
+
+
+### method
+
+
+`method = method`
+
+#### map
+
+
+<pre><code>map(
+    self: ,
+    fermion_op: FermionOperator,
+    args: Any = (),
+    kwargs: Any = {}
+) -> QubitOperator</code></pre>
+
+
+Maps the given fermionic operator to a qubits operator using the mapper's
+configuration.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `fermion_op` | `FermionOperator` | A fermionic operator. | *required* |
+| `args` | `Any` |  | () |
+| `kwargs` | `Any` |  | {} |
+
+
+
+**Returns:**
+
+- **Type:** `QubitOperator`
+- The mapped qubits operator.
+
+
+#### get_num_qubits
+
+
+<pre><code>get_num_qubits(
+    self: ,
+    problem: FermionHamiltonianProblem
+) -> int</code></pre>
+
+
+Gets the number of qubits after mapping the given problem into qubits space.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `int`
+- The number of qubits.
+
+
+### MappingMethod
+
+Mapping methods from fermionic operators to qubits operators.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [JORDAN_WIGNER](#jordan_wigner) |  |  |
+| [BRAVYI_KITAEV](#bravyi_kitaev) |  |  |
+
+
+### JORDAN_WIGNER
+
+
+```python
+JORDAN_WIGNER = 'jw'
+```
+
+
+### BRAVYI_KITAEV
+
+
+```python
+BRAVYI_KITAEV = 'bk'
+```
+
+### FermionHamiltonianProblem
+
+Defines an electronic-structure problem using a Fermionic operator and electron count.
+Can also be constructed from a `MolecularData` object using the `from_molecule`
+method.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [from_molecule](#from_molecule) | Constructs a `FermionHamiltonianProblem` from a molecule data. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `fermion_hamiltonian` | `FermionOperator` | The fermionic hamiltonian of the problem. Assumed to be in the block-spin labeling. |
+| `n_orbitals` | `int` | Number of spatial orbitals. |
+| `n_alpha` | `int` | Number of alpha particles. |
+| `n_beta` | `int` | Number of beta particles. |
+| `n_particles` | `tuple[int, int]` | Number of alpha and beta particles. |
+
+
+### fermion_hamiltonian
+
+
+`fermion_hamiltonian = fermion_hamiltonian`
+
+
+### n_particles
+
+
+`n_particles = n_particles`
+
+
+### n_orbitals
+
+
+`n_orbitals = min_n_orbitals`
+
+
+### occupied_alpha
+
+
+`occupied_alpha: list[int]`
+
+
+### virtual_alpha
+
+
+`virtual_alpha: list[int]`
+
+
+### occupied_beta
+
+
+`occupied_beta: list[int]`
+
+
+### virtual_beta
+
+
+`virtual_beta: list[int]`
+
+
+### occupied
+
+
+`occupied: list[int]`
+
+
+### virtual
+
+
+`virtual: list[int]`
+
+#### from_molecule
+
+
+<pre><code>from_molecule(
+    cls: ,
+    molecule: MolecularData,
+    first_active_index: int = 0,
+    remove_orbitals: Sequence[int] | None = None,
+    op_compression_tol: float = 1e-13
+) -> FermionHamiltonianProblem</code></pre>
+
+
+Constructs a `FermionHamiltonianProblem` from a molecule data.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `cls` | `` |  | *required* |
+| `molecule` | `MolecularData` | The molecule data. | *required* |
+| `first_active_index` | `int` | The first active index, indicates all prior indices are freezed. | 0 |
+| `remove_orbitals` | `Sequence[int] \| None` | Active indices to be removed. | None |
+| `op_compression_tol` | `float` | Tolerance for trimming the fermion operator. | 1e-13 |
+
+
+
+**Returns:**
+
+- **Type:** `FermionHamiltonianProblem`
+- The fermion hamiltonian problem.
+
+
+### Z2SymTaperMapper
+
+Mapper between fermionic operators to qubits operators, using one of the supported
+mapping methods (see `MappingMethod`), and taking advantage of Z2 symmetries in
+order to taper off qubits.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [set_sector](#set_sector) | Sets the symmetry sector coefficients. |
+| [map](#map) | Maps the given fermionic operator to qubits operator by using the mapper's method, and subsequently by tapering off qubits according to Z2 symmetries. |
+| [get_num_qubits](#get_num_qubits) | Gets the number of qubits after mapping the given problem into qubits space. |
+| [from_problem](#from_problem) | Initializes a `Z2SymTaperMapper` object from a fermion problem (i.e. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `method` | `MappingMethod` | The mapping method. |
+| `generators` | `tuple[QubitOperator, ...]` | Generators representing the Z2 symmetries. |
+| `x_ops` | `tuple[QubitOperator, ...]` | Single-qubit X operations, such that each operation anti-commutes with its matching generator and commutes with all other generators. |
+
+
+### generators
+
+
+`generators: tuple[QubitOperator, ...]`
+
+
+### x_ops
+
+
+`x_ops: tuple[QubitOperator, ...]`
+
+#### set_sector
+
+
+<pre><code>set_sector(
+    self: ,
+    sector: Sequence[int]
+) -> None</code></pre>
+
+
+Sets the symmetry sector coefficients.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `sector` | `Sequence[int]` | (Sequence[int]): Symmetry sector coefficients, each is 1 or -1. | *required* |
+
+
+
+#### map
+
+
+<pre><code>map(
+    self: ,
+    fermion_op: FermionOperator,
+    args: Any = (),
+    is_invariant: bool = False,
+    kwargs: Any = {}
+) -> QubitOperator</code></pre>
+
+
+Maps the given fermionic operator to qubits operator by using the
+mapper's method, and subsequently by tapering off qubits according to Z2
+symmetries.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `fermion_op` | `FermionOperator` | A fermionic operator. | *required* |
+| `args` | `Any` |  | () |
+| `is_invariant` | `bool` | If `False`, the operator is not necessarily in the symmetry subspace, and thus gets projected onto it before tapering. | False |
+| `kwargs` | `Any` |  | {} |
+
+
+
+**Returns:**
+
+- **Type:** `QubitOperator`
+- The mapped qubits operator.
+
+
+#### get_num_qubits
+
+
+<pre><code>get_num_qubits(
+    self: ,
+    problem: FermionHamiltonianProblem
+) -> int</code></pre>
+
+
+Gets the number of qubits after mapping the given problem into qubits space.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `int`
+- The number of qubits.
+
+
+#### from_problem
+
+
+<pre><code>from_problem(
+    cls: ,
+    problem: FermionHamiltonianProblem,
+    method: MappingMethod = MappingMethod.JORDAN_WIGNER,
+    sector_from_hartree_fock: bool = True,
+    tol: float = 1e-14
+) -> Z2SymTaperMapper</code></pre>
+
+
+Initializes a `Z2SymTaperMapper` object from a fermion problem (i.e. computing
+the Z2 symmetries from the problem definition).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `cls` | `` |  | *required* |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+| `method` | `MappingMethod` | The mapping method. | MappingMethod.JORDAN_WIGNER |
+| `sector_from_hartree_fock` | `bool` | Whether to compute the symmetry sector coefficients according to the Hartree-Fock state. | True |
+| `tol` | `float` | Tolerance for trimming off terms. | 1e-14 |
+
+
+
+**Returns:**
+
+- **Type:** `Z2SymTaperMapper`
+- The Z2 symmetries taper mapper.
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `FermionToQubitMapper` | Mapper between fermionic operators to qubits operators, using one of the supported mapping methods (see `MappingMethod`). |
+| `FermionHamiltonianProblem` | Defines an electronic-structure problem using a Fermionic operator and electron count. |
+| `get_hf_fermion_op` | Constructs a fermion operator that creates the Hartree-Fock reference state in block-spin ordering. |
+| `get_hf_state` | Computes the qubits state after applying the Hartree-Fock operator defined by the given problem and mapper. |
+
+
+### FermionToQubitMapper
+
+Mapper between fermionic operators to qubits operators, using one of the supported
+mapping methods (see `MappingMethod`).
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [map](#map) | Maps the given fermionic operator to a qubits operator using the mapper's configuration. |
+| [get_num_qubits](#get_num_qubits) | Gets the number of qubits after mapping the given problem into qubits space. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `method` | `MappingMethod` | The mapping method. |
+
+
+### method
+
+
+`method = method`
+
+#### map
+
+
+<pre><code>map(
+    self: ,
+    fermion_op: FermionOperator,
+    args: Any = (),
+    kwargs: Any = {}
+) -> QubitOperator</code></pre>
+
+
+Maps the given fermionic operator to a qubits operator using the mapper's
+configuration.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `fermion_op` | `FermionOperator` | A fermionic operator. | *required* |
+| `args` | `Any` |  | () |
+| `kwargs` | `Any` |  | {} |
+
+
+
+**Returns:**
+
+- **Type:** `QubitOperator`
+- The mapped qubits operator.
+
+
+#### get_num_qubits
+
+
+<pre><code>get_num_qubits(
+    self: ,
+    problem: FermionHamiltonianProblem
+) -> int</code></pre>
+
+
+Gets the number of qubits after mapping the given problem into qubits space.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `int`
+- The number of qubits.
+
+
+### FermionHamiltonianProblem
+
+Defines an electronic-structure problem using a Fermionic operator and electron count.
+Can also be constructed from a `MolecularData` object using the `from_molecule`
+method.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [from_molecule](#from_molecule) | Constructs a `FermionHamiltonianProblem` from a molecule data. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `fermion_hamiltonian` | `FermionOperator` | The fermionic hamiltonian of the problem. Assumed to be in the block-spin labeling. |
+| `n_orbitals` | `int` | Number of spatial orbitals. |
+| `n_alpha` | `int` | Number of alpha particles. |
+| `n_beta` | `int` | Number of beta particles. |
+| `n_particles` | `tuple[int, int]` | Number of alpha and beta particles. |
+
+
+### fermion_hamiltonian
+
+
+`fermion_hamiltonian = fermion_hamiltonian`
+
+
+### n_particles
+
+
+`n_particles = n_particles`
+
+
+### n_orbitals
+
+
+`n_orbitals = min_n_orbitals`
+
+
+### occupied_alpha
+
+
+`occupied_alpha: list[int]`
+
+
+### virtual_alpha
+
+
+`virtual_alpha: list[int]`
+
+
+### occupied_beta
+
+
+`occupied_beta: list[int]`
+
+
+### virtual_beta
+
+
+`virtual_beta: list[int]`
+
+
+### occupied
+
+
+`occupied: list[int]`
+
+
+### virtual
+
+
+`virtual: list[int]`
+
+#### from_molecule
+
+
+<pre><code>from_molecule(
+    cls: ,
+    molecule: MolecularData,
+    first_active_index: int = 0,
+    remove_orbitals: Sequence[int] | None = None,
+    op_compression_tol: float = 1e-13
+) -> FermionHamiltonianProblem</code></pre>
+
+
+Constructs a `FermionHamiltonianProblem` from a molecule data.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `cls` | `` |  | *required* |
+| `molecule` | `MolecularData` | The molecule data. | *required* |
+| `first_active_index` | `int` | The first active index, indicates all prior indices are freezed. | 0 |
+| `remove_orbitals` | `Sequence[int] \| None` | Active indices to be removed. | None |
+| `op_compression_tol` | `float` | Tolerance for trimming the fermion operator. | 1e-13 |
+
+
+
+**Returns:**
+
+- **Type:** `FermionHamiltonianProblem`
+- The fermion hamiltonian problem.
+
+
+### get_hf_fermion_op
+
+
+<pre><code>get_hf_fermion_op(
+    problem: FermionHamiltonianProblem
+) -> FermionOperator</code></pre>
+
+
+Constructs a fermion operator that creates the Hartree-Fock reference state in
+block-spin ordering.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. The Hartree-Fock fermion operator depends only on the number of spatial orbitals and the number of alpha and beta particles. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `FermionOperator`
+- The Hartree-Fock fermion operator.
+
+
+### get_hf_state
+
+
+<pre><code>get_hf_state(
+    problem: FermionHamiltonianProblem,
+    mapper: FermionToQubitMapper
+) -> list[bool]</code></pre>
+
+
+Computes the qubits state after applying the Hartree-Fock operator defined by the
+given problem and mapper.
+
+The Qmod function `prepare_basis_state` can be used on the returned value to
+allocate and initialize the qubits array.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+| `mapper` | `FermionToQubitMapper` | The mapper from fermion operator to qubits operator. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `list[bool]`
+- The qubits state, given as a list of boolean values for each qubit.
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `FermionToQubitMapper` | Mapper between fermionic operators to qubits operators, using one of the supported mapping methods (see `MappingMethod`). |
+| `FermionHamiltonianProblem` | Defines an electronic-structure problem using a Fermionic operator and electron count. |
+| `SparsePauliOp` | Represents a collection of sparse Pauli operators. |
+| `get_ucc_hamiltonians` | Computes the UCC hamiltonians of the given problem in the desired excitations, using the given mapper. |
+| `get_excitations` | Gets all the possible excitations of the given problem according to the given number of excitations, preserving the particles spin. |
+
+
+### FermionToQubitMapper
+
+Mapper between fermionic operators to qubits operators, using one of the supported
+mapping methods (see `MappingMethod`).
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [map](#map) | Maps the given fermionic operator to a qubits operator using the mapper's configuration. |
+| [get_num_qubits](#get_num_qubits) | Gets the number of qubits after mapping the given problem into qubits space. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `method` | `MappingMethod` | The mapping method. |
+
+
+### method
+
+
+`method = method`
+
+#### map
+
+
+<pre><code>map(
+    self: ,
+    fermion_op: FermionOperator,
+    args: Any = (),
+    kwargs: Any = {}
+) -> QubitOperator</code></pre>
+
+
+Maps the given fermionic operator to a qubits operator using the mapper's
+configuration.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `fermion_op` | `FermionOperator` | A fermionic operator. | *required* |
+| `args` | `Any` |  | () |
+| `kwargs` | `Any` |  | {} |
+
+
+
+**Returns:**
+
+- **Type:** `QubitOperator`
+- The mapped qubits operator.
+
+
+#### get_num_qubits
+
+
+<pre><code>get_num_qubits(
+    self: ,
+    problem: FermionHamiltonianProblem
+) -> int</code></pre>
+
+
+Gets the number of qubits after mapping the given problem into qubits space.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `int`
+- The number of qubits.
+
+
+### FermionHamiltonianProblem
+
+Defines an electronic-structure problem using a Fermionic operator and electron count.
+Can also be constructed from a `MolecularData` object using the `from_molecule`
+method.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [from_molecule](#from_molecule) | Constructs a `FermionHamiltonianProblem` from a molecule data. |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `fermion_hamiltonian` | `FermionOperator` | The fermionic hamiltonian of the problem. Assumed to be in the block-spin labeling. |
+| `n_orbitals` | `int` | Number of spatial orbitals. |
+| `n_alpha` | `int` | Number of alpha particles. |
+| `n_beta` | `int` | Number of beta particles. |
+| `n_particles` | `tuple[int, int]` | Number of alpha and beta particles. |
+
+
+### fermion_hamiltonian
+
+
+`fermion_hamiltonian = fermion_hamiltonian`
+
+
+### n_particles
+
+
+`n_particles = n_particles`
+
+
+### n_orbitals
+
+
+`n_orbitals = min_n_orbitals`
+
+
+### occupied_alpha
+
+
+`occupied_alpha: list[int]`
+
+
+### virtual_alpha
+
+
+`virtual_alpha: list[int]`
+
+
+### occupied_beta
+
+
+`occupied_beta: list[int]`
+
+
+### virtual_beta
+
+
+`virtual_beta: list[int]`
+
+
+### occupied
+
+
+`occupied: list[int]`
+
+
+### virtual
+
+
+`virtual: list[int]`
+
+#### from_molecule
+
+
+<pre><code>from_molecule(
+    cls: ,
+    molecule: MolecularData,
+    first_active_index: int = 0,
+    remove_orbitals: Sequence[int] | None = None,
+    op_compression_tol: float = 1e-13
+) -> FermionHamiltonianProblem</code></pre>
+
+
+Constructs a `FermionHamiltonianProblem` from a molecule data.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `cls` | `` |  | *required* |
+| `molecule` | `MolecularData` | The molecule data. | *required* |
+| `first_active_index` | `int` | The first active index, indicates all prior indices are freezed. | 0 |
+| `remove_orbitals` | `Sequence[int] \| None` | Active indices to be removed. | None |
+| `op_compression_tol` | `float` | Tolerance for trimming the fermion operator. | 1e-13 |
+
+
+
+**Returns:**
+
+- **Type:** `FermionHamiltonianProblem`
+- The fermion hamiltonian problem.
+
+
+### SparsePauliOp
+
+Represents a collection of sparse Pauli operators.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [get_tuples_representation](#get_tuples_representation) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `terms` | `CArray[SparsePauliTerm]` | The list of chosen sparse Pauli terms, corresponds to a product of them. (See: SparsePauliTerm) |
+| `num_qubits` | `CInt` | The number of qubits in the Hamiltonian. |
+
+
+### terms
+
+
+`terms: list[SparsePauliTerm]`
+
+
+### num_qubits
+
+
+`num_qubits: int`
+
+### get_ucc_hamiltonians
+
+
+<pre><code>get_ucc_hamiltonians(
+    problem: FermionHamiltonianProblem,
+    mapper: FermionToQubitMapper,
+    excitations: int | Sequence[int]
+) -> list[SparsePauliOp]</code></pre>
+
+
+Computes the UCC hamiltonians of the given problem in the desired excitations,
+using the given mapper.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+| `mapper` | `FermionToQubitMapper` | The mapper from fermion to qubits operators. | *required* |
+| `excitations` | `int \| Sequence[int]` | A single desired excitation or an excitations list. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `list[SparsePauliOp]`
+- The UCC hamiltonians.
+
+
+### get_excitations
+
+
+<pre><code>get_excitations(
+    problem: FermionHamiltonianProblem,
+    num_excitations: int
+) -> set[tuple[tuple[int, ...], tuple[int, ...]]]</code></pre>
+
+
+Gets all the possible excitations of the given problem according to the
+given number of excitations, preserving the particles spin.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `problem` | `FermionHamiltonianProblem` | The fermion problem. | *required* |
+| `num_excitations` | `int` | Number of excitations. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `set[tuple[tuple[int, ...], tuple[int, ...]]]`
+- A set of all possible excitations, specified as a pair of source and target indices.
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `DFTState` | Post-DFT handle returned to the user, recording the resolved spin mode, functional, and method. |
+| `EmbeddingCalculator` | User-facing embedding driver, backed by queued backend jobs. |
+| `EmbeddingConfig` | Embedding-method parameters. |
+| `MeanFieldData` | Fragment / environment densities, electron counts, and active-MO basis. |
+| `MoleculeSpec` | User-facing molecular description. |
+| `QuantumData` | Solver-facing bundle: embedded + physical Hamiltonians and scalars. |
+| `SpinMode` | Which mean-field treatment the backend should use. |
+| `ValidationCheck` | Validation diagnostics the embedding pipeline can run. |
+| `embedding_calculator` | User-facing API for projection-based WF-in-DFT embedding. |
+| `chemistry_job` | Detached handle for a long-running chemistry backend job. |
+
+
+### DFTState
+
+Post-DFT handle returned to the user, recording the resolved spin mode,
+functional, and method. Threaded back into later stages.
+
+
+### spin_mode
+
+
+`spin_mode: SpinMode`
+
+
+### xc_functional
+
+
+`xc_functional: str`
+
+
+### method
+
+
+`method: CalculationMethod = CalculationMethod.DFT`
+
+### EmbeddingCalculator
+
+User-facing embedding driver, backed by queued backend jobs.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [run_dft](#run_dft) | Run the full-system mean field and cache the result. |
+| [submit_dft](#submit_dft) | Enqueue the full-system mean field and return a job handle. |
+| [run_dft_embedding](#run_dft_embedding) | Run the full embedding pipeline in one backend call. |
+| [submit_dft_embedding](#submit_dft_embedding) | Enqueue the full embedding pipeline and return a job handle. |
+| [run_validations](#run_validations) | Run a batch of post-hoc validations in a single backend call. |
+
+
+### spec
+
+
+`spec = spec`
+
+
+### spin_mode
+
+
+`spin_mode = spin_mode`
+
+
+### auto_validations
+
+
+`auto_validations: tuple[ValidationCheck, ...] = tuple(auto_validations)`
+
+
+### validation_results
+
+
+`validation_results: ValidationResults = {}`
+
+
+### config
+
+
+`config: EmbeddingConfig | None = None`
+
+
+### effective_spin_mode
+
+
+`effective_spin_mode: SpinMode`
+
+#### run_dft
+
+
+<pre><code>run_dft(
+    self: ,
+    xc_functional: str = &#x27;B3LYP&#x27;,
+    method: CalculationMethod = CalculationMethod.DFT
+) -> DFTState</code></pre>
+
+
+Run the full-system mean field and cache the result.
+
+Blocks until the backend job finishes. For a long run prefer
+:meth:`submit_dft`, which returns a handle you can poll later.
+
+``method`` selects DFT (default, using ``xc_functional``) or Hartree-Fock
+(``xc_functional`` is then ignored).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `xc_functional` | `str` |  | 'B3LYP' |
+| `method` | `CalculationMethod` |  | CalculationMethod.DFT |
+
+
+
+#### submit_dft
+
+
+<pre><code>submit_dft(
+    self: ,
+    xc_functional: str = &#x27;B3LYP&#x27;,
+    method: CalculationMethod = CalculationMethod.DFT
+) -> ChemistryJob[DFTState]</code></pre>
+
+
+Enqueue the full-system mean field and return a job handle.
+
+The non-blocking counterpart to :meth:`run_dft`: the DFT runs
+server-side (it can take hours) while the client is free to exit. Call
+``.result()`` on the returned handle to fetch the :class:`DFTState` once
+ready -- doing so also caches the state for :meth:`run_dft_embedding`,
+exactly as :meth:`run_dft` does.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `xc_functional` | `str` |  | 'B3LYP' |
+| `method` | `CalculationMethod` |  | CalculationMethod.DFT |
+
+
+
+#### run_dft_embedding
+
+
+<pre><code>run_dft_embedding(
+    self: ,
+    config: EmbeddingConfig
+) -> tuple[MeanFieldData, QuantumData]</code></pre>
+
+
+Run the full embedding pipeline in one backend call.
+
+Blocks until the backend job finishes. For a long run prefer
+:meth:`submit_dft_embedding`, which returns a handle you can poll later.
+
+Reuses the cached ``DFTState`` from a prior ``run_dft`` call if present;
+otherwise the backend runs the full-system DFT first using
+``config.xc_functional``. Auto-validations registered at construction are
+computed in the same call and stored on ``self.validation_results``.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `config` | `EmbeddingConfig` |  | *required* |
+
+
+
+#### submit_dft_embedding
+
+
+<pre><code>submit_dft_embedding(
+    self: ,
+    config: EmbeddingConfig
+) -> ChemistryJob[tuple[MeanFieldData, QuantumData]]</code></pre>
+
+
+Enqueue the full embedding pipeline and return a job handle.
+
+The non-blocking counterpart to :meth:`run_dft_embedding`. Call
+``.result()`` on the returned handle to fetch the
+``(MeanFieldData, QuantumData)`` tuple once ready; doing so caches the
+embedding state for subsequent :meth:`run_validations` calls and emits
+any ``n_active_virtuals`` warning, exactly as the blocking method does.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `config` | `EmbeddingConfig` |  | *required* |
+
+
+
+#### run_validations
+
+
+<pre><code>run_validations(
+    self: ,
+    checks: Sequence[ValidationCheck]
+) -> ValidationResults</code></pre>
+
+
+Run a batch of post-hoc validations in a single backend call.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `checks` | `Sequence[ValidationCheck]` |  | *required* |
+
+
+
+### EmbeddingConfig
+
+Embedding-method parameters.
+
+
+### fragment_atoms
+
+
+`fragment_atoms: tuple[int, ...]`
+
+
+### method
+
+
+`method: CalculationMethod = CalculationMethod.DFT`
+
+
+### xc_functional
+
+
+`xc_functional: str = 'B3LYP'`
+
+
+### mu
+
+
+`mu: float = 1000000.0`
+
+
+### w_cut
+
+
+`w_cut: float = 0.3`
+
+
+### sv_tol
+
+
+`sv_tol: float = 0.001`
+
+
+### n_active_virtuals
+
+
+`n_active_virtuals: int | None = None`
+
+
+### freeze_core
+
+
+`freeze_core: bool = False`
+
+### MeanFieldData
+
+Fragment / environment densities, electron counts, and active-MO basis.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [D_A](#d_a) |  |  |
+| [D_B](#d_b) |  |  |
+
+
+### atom_indices
+
+
+`atom_indices: tuple[int, ...]`
+
+
+### n_electrons_A
+
+
+`n_electrons_A: int`
+
+
+### C_active
+
+
+`C_active: np.ndarray | tuple[np.ndarray, np.ndarray]`
+
+
+### E_DFT_fragment
+
+
+`E_DFT_fragment: float`
+
+
+### n_electrons_B
+
+
+`n_electrons_B: int`
+
+
+### D_A
+
+
+`D_A: np.ndarray`
+
+
+### D_B
+
+
+`D_B: np.ndarray`
+
+### MoleculeSpec
+
+User-facing molecular description.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [from_pdb_file](#from_pdb_file) | Build a spec from a local ``.pdb`` file. |
+| [from_xyz_file](#from_xyz_file) | Build a spec from a local ``.xyz`` file. |
+
+
+### atom
+
+
+`atom: str`
+
+
+### basis
+
+
+`basis: str = 'cc-pVDZ'`
+
+
+### charge
+
+
+`charge: int = 0`
+
+
+### spin
+
+
+`spin: int = 0`
+
+
+### unit
+
+
+`unit: str = 'Angstrom'`
+
+#### from_pdb_file
+
+
+<pre><code>from_pdb_file(
+    cls: ,
+    path: str | Path,
+    basis: str = &#x27;cc-pVDZ&#x27;,
+    charge: int = 0,
+    spin: int = 0,
+    unit: str = &#x27;Angstrom&#x27;
+) -> MoleculeSpec</code></pre>
+
+
+Build a spec from a local ``.pdb`` file.
+
+The file is read on the client; only its contents are sent to the
+backend (the backend never opens paths). The remaining arguments mirror
+the ``MoleculeSpec`` fields.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `cls` | `` |  | *required* |
+| `path` | `str \| Path` |  | *required* |
+| `basis` | `str` |  | 'cc-pVDZ' |
+| `charge` | `int` |  | 0 |
+| `spin` | `int` |  | 0 |
+| `unit` | `str` |  | 'Angstrom' |
+
+
+
+#### from_xyz_file
+
+
+<pre><code>from_xyz_file(
+    cls: ,
+    path: str | Path,
+    basis: str = &#x27;cc-pVDZ&#x27;,
+    charge: int = 0,
+    spin: int = 0,
+    unit: str = &#x27;Angstrom&#x27;
+) -> MoleculeSpec</code></pre>
+
+
+Build a spec from a local ``.xyz`` file.
+
+The file is read on the client; only its contents are sent to the
+backend (the backend never opens paths). The remaining arguments mirror
+the ``MoleculeSpec`` fields.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `cls` | `` |  | *required* |
+| `path` | `str \| Path` |  | *required* |
+| `basis` | `str` |  | 'cc-pVDZ' |
+| `charge` | `int` |  | 0 |
+| `spin` | `int` |  | 0 |
+| `unit` | `str` |  | 'Angstrom' |
+
+
+
+### QuantumData
+
+Solver-facing bundle: embedded + physical Hamiltonians and scalars.
+
+
+### hamiltonian_emb
+
+
+`hamiltonian_emb: FermionOperator`
+
+
+### hamiltonian_phys
+
+
+`hamiltonian_phys: FermionOperator`
+
+
+### n_particles
+
+
+`n_particles: tuple[int, int]`
+
+
+### env_correction
+
+
+`env_correction: float`
+
+### SpinMode
+
+Which mean-field treatment the backend should use.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [AUTO](#auto) |  |  |
+| [RESTRICTED](#restricted) |  |  |
+| [UNRESTRICTED](#unrestricted) |  |  |
+
+
+### AUTO
+
+
+```python
+AUTO = 'auto'
+```
+
+
+### RESTRICTED
+
+
+```python
+RESTRICTED = 'restricted'
+```
+
+
+### UNRESTRICTED
+
+
+```python
+UNRESTRICTED = 'unrestricted'
+```
+
+### ValidationCheck
+
+Validation diagnostics the embedding pipeline can run.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [DFT_IN_DFT](#dft_in_dft) |  |  |
+| [FCI_ACTIVE_SPACE](#fci_active_space) |  |  |
+| [PROBABILITY_LEAK](#probability_leak) |  |  |
+| [TRACE_CONSERVATION](#trace_conservation) |  |  |
+| [GEOMETRY_PERTURBATION](#geometry_perturbation) |  |  |
+
+
+### DFT_IN_DFT
+
+
+```python
+DFT_IN_DFT = 'dft_in_dft'
+```
+
+
+### FCI_ACTIVE_SPACE
+
+
+```python
+FCI_ACTIVE_SPACE = 'fci_active_space'
+```
+
+
+### PROBABILITY_LEAK
+
+
+```python
+PROBABILITY_LEAK = 'probability_leak'
+```
+
+
+### TRACE_CONSERVATION
+
+
+```python
+TRACE_CONSERVATION = 'trace_conservation'
+```
+
+
+### GEOMETRY_PERTURBATION
+
+
+```python
+GEOMETRY_PERTURBATION = 'geometry_perturbation'
+```
+
+### embedding_calculator
+
+User-facing API for projection-based WF-in-DFT embedding.
+
+Mirrors the local prototype: users build a :class:`MoleculeSpec` and an
+:class:`EmbeddingConfig`, then drive the pipeline through
+:class:`EmbeddingCalculator`. Under the hood every stage is a queued backend job
+(the heavy pyscf / openfermion chemistry runs server-side and never ships to the
+client). The calculator exchanges the serializable wire models defined in
+``classiq.interface.applications.chemistry.embedding`` with the backend and
+rehydrates the results into the dataclasses below.
+
+The embedded / physical Hamiltonians come back as real
+``openfermion.FermionOperator`` objects, ready to feed into a quantum solver.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [run](#run) |  |
+
+
+### ValidationResults
+
+
+`ValidationResults = dict[ValidationCheck, tuple[bool, dict]]`
+
+### chemistry_job
+
+Detached handle for a long-running chemistry backend job.
+
+``EmbeddingCalculator.submit_*`` returns one of these instead of blocking: a
+chemistry DFT run can take hours, so the SDK hands the user a job id and lets
+them fetch the result later (``result``) -- the job keeps running server-side
+even if the client process exits. ``from_id`` reconnects to a job submitted by
+an earlier process.
+
+The handle is generic over the user-facing return type ``ResultT``: a
+``transform`` callback maps the parsed wire output (``result_type``) to that type
+(and, for the calculator, threads the freshly computed state back into the
+calculator so a later stage can reuse it). Without a transform the parsed wire
+model is returned as-is, which is what ``from_id`` does.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [syncify_function](#syncify_function) |  |
+
+
+### JSONObject
+
+
+`JSONObject = dict[str, Any]`
+
+
+### WireT
+
+
+`WireT = TypeVar('WireT')`
+
+
+### ResultT
+
+
+`ResultT = TypeVar('ResultT')`

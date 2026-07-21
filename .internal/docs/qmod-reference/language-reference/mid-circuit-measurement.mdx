@@ -1,0 +1,70 @@
+---
+title: "Mid-Circuit Measurement"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+<Warning>
+This feature is under development.
+
+
+</Warning>
+## Syntax
+
+<Tabs>
+<Tab title="Python">
+
+**measure** **(** _quantum-var_ **)**
+</Tab>
+<Tab title="Native">
+
+**measure** **(** _quantum-var_ **)**
+</Tab>
+</Tabs>
+
+## Semantics
+
+-   A `measure` call receives a quantum variable of type `QBit` and returns a
+    `CBool` value.
+-   In Qmod Native, when `measure` is called, it must be immediately be assigned
+    to a local classical variable, e.g., `x = measure(q);`.
+-   Measurements are [run-time](/qmod-reference/language-reference/classical-variables#run-time-variables)
+    values. Currently, `if` is the only control flow statements that supports
+    run-time variables.
+-   Following the `measure` operation, any superposition state of its operand
+    collapses to a computational-basis state corresponding to the classical
+    measured result.
+
+## Example
+
+The following function implements the `RESET` gate using a mid-circuit
+measurement.
+
+<Tabs>
+<Tab title="Python">
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import *
+
+
+@qfunc
+def reset(q: QBit):
+    val = measure(q)
+    if_(val, lambda: X(q))
+```
+</Tab>
+<Tab title="Native">
+
+```
+qfunc reset(q: qbit) {
+  val: bool;
+  val = measure(q);
+  if (val) {
+    X(q);
+  }
+}
+```
+</Tab>
+</Tabs>

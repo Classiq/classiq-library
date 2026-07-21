@@ -1,0 +1,233 @@
+---
+title: "State Preparation"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/qmod_core_library/prepare_state_and_amplitudes/prepare_state_and_amplitudes.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+Most quantum applications start with preparing a state in a quantum register.
+
+For example, in finance the state may represent the price distribution of some assets.
+In chemistry, it may be an initial guess for the ground state of a molecule, and in
+a quantum machine learning, a feature vector to analyze.
+
+The state preparation functions creates a quantum program that
+outputs either a probability distribution $p_{i}$ or a real amplitudes
+vector $a_{i}$ in the computational basis, with $i$ denoting the corresponding
+basis state.
+
+The amplitudes take the form of list of float numbers.
+
+The probabilities are a list of positive numbers.
+
+This is the resulting wave function for probability:
+
+$$
+\left|\psi\right\rangle = \sum_{i}\sqrt{p_{i}}
+\left|i\right\rangle,
+$$
+and this is for amplitude:
+
+$$
+\left|\psi\right\rangle = \sum_{i}a_{i}
+\left|i\right\rangle.
+$$
+In general, state preparation is hard.
+
+Only a very small portion
+of the Hilbert space can be prepared efficiently (in $O(poly(n))$
+steps) on a quantum program. Therefore, in practice, an approximation
+is often used to lower the complexity.
+
+The approximation is specified
+by an error bound, using the [$L_2$ norm](https://en.wikipedia.org/wiki/Lp_space).
+
+The higher the specified error tolerance, the smaller the output
+quantum program.
+
+For exact state preparation, specify an error bound of $0$.
+
+The state preparation algorithm can be tuned depending on whether the
+probability distribution is sparse or dense.
+
+The synthesis engine will
+automatically select the parameterization based on the given constraints and
+optimization level.
+
+Function: `prepare_state`
+
+Parameters:
+
+- `probabilities: CArray[CReal]` 
+
+- Probabilities to load.
+
+Should be non-negative and sum to 
+
+1.
+- `bound: CReal` 
+
+- Approximation Error Bound, in the $L_2$ metric (with respect to the given probabilies vector).
+- `out: Output[QArray[QBit]]`
+
+Function: `inplace_prepare_state`
+
+Parameters:
+
+- `probabilities: CArray[CReal]`
+- `bound: CReal`
+- `out: QArray[QBit]` 
+
+- Should of size exactly $\log_2$(\`\`probabilities.len\`)
+
+The `inplace_prepare_state` works the same, but for a given allocated `QArray`.
+
+Function: `prepare_amplitudes`
+
+Parameters:
+
+- `amplitudes: CArray[CReal]` 
+
+- Amplitudes of the loaded state.
+
+Each should be real and the vector norm should be equal to 
+
+1.
+- `bound: CReal` 
+
+- Approximation Error Bound, in the $L_2$ metric (with respect to the given amplitudes vector).
+- `out: Output[QArray[QBit]]`
+
+Function: `inplace_prepare_amplitudes`
+
+Parameters:
+
+- `amplitudes: CArray[CReal]` 
+
+- Amplitudes of the loaded state.
+
+Each should be real and the vector norm should be equal to 
+
+1.
+- `bound: CReal` 
+
+- Approximation Error Bound, in the $L_2$ metric (with respect to the given amplitudes vector).
+- `out: QArray[QBit]` 
+
+- Should of size exactly $\log_2$(`amplitudes.len`)
+
+The `inplace_prepare_amplitudes` works the same, but for a given allocated `QArray`.
+
+## Example 1: Loading Point Mass (PMF) Function
+
+This example generates a quantum program whose output state probabilities are an approximation to the PMF given.
+
+That is, the probability of measuring the state $|000⟩$ is $0.05$, $|001⟩$ is $0.11$,...
+, and the probability to measure $|111⟩$ is $0.06$.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum]):
+    probabilities = [0.05, 0.11, 0.13, 0.23, 0.27, 0.12, 0.03, 0.06]
+    prepare_state(probabilities=probabilities, bound=0.01, out=x)
+
+
+qmod = create_model(main)
+```
+```python
+
+qprog = synthesize(qmod)
+```
+
+Print the resulting probabilities:
+
+```python
+import numpy as np
+
+result = execute(qprog).result_value()
+
+probs = np.zeros(8)
+for sample in result.parsed_counts:
+    probs[int(sample.state["x"])] = sample.shots / result.num_shots
+print("Resulting probabilities:", probs)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Resulting probabilities: [0.032 0.118 0.141 0.217 0.282 0.107 0.031 0.072]
+  
+
+```
+</Info>
+
+## Example 2 
+
+- Preparating Amplitudes
+
+This example loads a normalized linear space between -1 to 
+
+1. The load
+state has an accuracy of 99 present under the L2 norm.
+
+```python
+from classiq.execution import ClassiqBackendPreferences, ExecutionPreferences
+
+
+@qfunc
+def main(x: Output[QNum]):
+    amps = np.linspace(-1, 1, 8)
+    amps = amps / np.linalg.norm(amps)
+    prepare_amplitudes(amplitudes=amps.tolist(), bound=0, out=x)
+
+
+qmod = create_model(main)
+qmod = set_execution_preferences(
+    qmod,
+    num_shots=1,
+    backend_preferences=ClassiqBackendPreferences(backend_name="simulator_statevector"),
+)
+```
+```python
+
+qprog = synthesize(qmod)
+```
+
+Print the resulting amplitudes:
+
+```python
+import numpy as np
+
+result = execute(qprog).result_value()
+
+amps = np.zeros(8, dtype=complex)
+for sample in result.parsed_state_vector:
+    amps[int(sample.state["x"])] = sample.amplitude
+
+# remove global phase
+global_phase = np.angle(amps[0])
+amps = np.real(amps / np.exp(1j * global_phase))
+
+print("Resulting amplitudes:", amps)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Resulting amplitudes: [ 0.54006172  0.38575837  0.23145502  0.07715167 -0.07715167 -0.23145502
+   -0.38575837 -0.54006172]
+  
+
+```
+</Info>

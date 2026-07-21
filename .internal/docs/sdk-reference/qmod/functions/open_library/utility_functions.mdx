@@ -1,0 +1,90 @@
+---
+title: Utility Functions
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `apply_to_all` | [Qmod Classiq-library function]. |
+| `hadamard_transform` | [Qmod Classiq-library function]. |
+| `modular_increment` | [Qmod Classiq-library function]. |
+
+
+### apply_to_all
+
+
+<pre><code>apply_to_all(
+    gate_operand: QCallable[Annotated[QBit, target]],
+    target: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the single-qubit operand `gate_operand` to each qubit in the qubit
+array `target`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `gate_operand` | `QCallable[Annotated[QBit, target]]` | The single-qubit gate to apply to each qubit in the array. | *required* |
+| `target` | `QArray[QBit]` | The qubit array to apply the gate to. | *required* |
+
+
+
+### hadamard_transform
+
+
+<pre><code>hadamard_transform(
+    target: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies Hadamard transform to the target qubits.
+
+Corresponds to the braket notation:
+
+$$
+ H^{\otimes n} |x\rangle = \frac{1}{\sqrt{2^n}} \sum_{y=0}^{2^n - 1} (-1)^{x \\cdot y} |y\rangle
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `QArray[QBit]` | qubits to apply to Hadamard transform to. | *required* |
+
+
+
+### modular_increment
+
+
+<pre><code>modular_increment(
+    a: CInt,
+    x: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Adds $a$ to $x$ modulo the range of $x$, assumed that $x$ is a non-negative integer and $a$ is an integer.
+Mathematically it is described as:
+
+$$
+    x = (x+a)\ \mod \ 2^{x.size}-1
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `a` | `CInt` | A classical integer to be added to x. | *required* |
+| `x` | `QNum` | A quantum number that is assumed to be non-negative integer. | *required* |

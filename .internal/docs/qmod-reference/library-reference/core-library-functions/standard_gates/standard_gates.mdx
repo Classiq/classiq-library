@@ -1,0 +1,336 @@
+---
+title: "Standard Gates"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/qmod_core_library/standard_gates/standard_gates.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The Classiq platform provides many standard gates.
+
+Some key standard gates are shown here in detail. <br />
+All gates are covered in the [reference manual](https://docs.classiq.io/latest/sdk-reference/#classiq.interface.generator.standard_gates).
+
+```python
+from classiq import *
+```
+
+## Single Qubit Gates
+
+An example is given for $X$ gate.
+
+The gates $I$, $X$, $Y$, $Z$, $H$, $T$ are used in the same way.
+
+#
+
+## For example: X
+
+Function: `X`
+
+Arguments:
+
+- `target`: `QBit`
+
+```python
+@qfunc
+def main(q: Output[QBit]):
+    allocate(q)
+
+    X(q)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+
+## Single Qubit Rotation Gates
+
+An example is given for $RZ$ gate.
+
+The gates $RX$, $RY$, $RZ$ are used in the same way except for parameter name.
+
+#
+
+### Parameter names for different rotation gates
+
+- `RX`: `theta`
+- `RY`: `theta`
+- `RZ`: `phi`
+
+#
+
+## For example: RZ
+
+$$
+\begin{split}RZ(\theta) = \begin{pmatrix}
+{e^{-i\frac{\theta}{2}}} & 0 \\
+0 & {e^{i\frac{\theta}{2}}} \\
+\end{pmatrix}\end{split}
+$$
+Function: `RZ`
+
+Arguments:
+
+- `theta`: `CReal`
+- `target`: `QBit`
+
+```python
+@qfunc
+def main(q: Output[QBit]):
+    allocate(q)
+
+    theta = 1.9
+    RZ(theta, q)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+#
+
+## R Gate
+
+Rotation by $\theta$ around the $cos(\phi)X + sin(\phi)Y$ axis.
+
+$$
+\begin{split}R(\theta, \phi) = \begin{pmatrix}
+cos(\frac{\theta}{2}) & -ie^{-i\phi}sin(\frac{\theta}{2}) \\
+-ie^{i\phi}sin(\frac{\theta}{2}) & cos(\frac{\theta}{2}) \\
+\end{pmatrix}\end{split}
+$$
+Parameters:
+
+- `theta`: `CReal`
+- `phi`: `CReal`
+- `target`: `QBit`
+
+```python
+@qfunc
+def main(q: Output[QBit]):
+    allocate(q)
+
+    theta = 1
+    phi = 2
+    R(theta, phi, q)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+#
+
+## Phase Gate
+
+Rotation about the Z axis by $\lambda$ with global phase of $\frac{\lambda}{2}$.
+
+$$
+\begin{split}PHASE(\lambda) = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\lambda} \end{pmatrix}\end{split}
+$$
+Parameters:
+
+- `theta`: `CReal`
+- `target`: `QBit`
+
+```python
+@qfunc
+def main(q: Output[QBit]):
+    allocate(q)
+
+    theta = 1
+    PHASE(theta, q)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+
+## Double Qubits Rotation Gates
+
+An example is given for $RZZ$ gate.
+
+The gates $RXX$, $RYY$, $RZZ$ are used in the same way.
+
+#
+
+## RZZ Gate
+
+Rotation about ZZ.
+
+$$
+\begin{split}RZZ(\theta) = \begin{pmatrix}
+{e^{-i\frac{\theta}{2}}} & 0 & 0 & 0 \\
+0 & {e^{i\frac{\theta}{2}}} & 0 & 0 \\
+0 & 0 & {e^{i\frac{\theta}{2}}} & 0 \\
+0 & 0 & 0 & {e^{-i\frac{\theta}{2}}} \\
+\end{pmatrix}\end{split}
+$$
+Parameters:
+
+- `theta`: `CReal`
+- `target`: `QArray[QBit]`
+
+```python
+@qfunc
+def main(q: Output[QArray]):
+    allocate(2, q)
+
+    theta = 1
+    RZZ(theta, q)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+
+## Controlled Gates
+
+An example is given for $CX$ gate.
+
+The gates $CX$, $CY$, $CZ$, $CH$, $CSX$, $CCX$ are used in a similar way.
+
+In $CCX$ Gate the `ctrl_state` parameter receives a value suitable for 2 control qubits. for example: `"01"`.
+
+#
+
+## CX Gate
+
+The Controlled $X$ gate.
+
+Applies $X$ Gate on the target qubit, based on the state of the control qubit
+(by default if the controlled state is $|1\rangle$).
+
+$$
+\begin{split}CX = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+0 & 0 & 1 & 0 \\
+\end{pmatrix}\end{split}
+$$
+Parameters:
+
+- `control`: `QBit`
+- `target`: `QBit`
+
+```python
+@qfunc
+def main(q_target: Output[QBit], q_control: Output[QBit]):
+    allocate(q_target)
+
+    allocate(q_control)
+
+    CX(q_control, q_target)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+
+## Controlled Rotations
+
+An example is given for $CRX$ gate.
+
+The gates $CRX$, $CRY$, $CRZ$, CPhase are used in the same way.
+
+#
+
+## CRX Gate
+
+Controlled rotation around the X axis.
+
+$$
+\begin{split}CRX(\theta) = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & \cos(\frac{\theta}{2}) & -i\sin(\frac{\theta}{2}) \\
+0 & 0 & -i\sin(\frac{\theta}{2}) & \cos(\frac{\theta}{2}) \\
+\end{pmatrix}\end{split}
+$$
+Parameters:
+
+- `theta`: `CReal`
+- `control`: `QBit`
+- `target`: `QBit`
+
+```python
+@qfunc
+def main(q_target: Output[QBit], q_control: Output[QBit]):
+    allocate(q_target)
+
+    allocate(q_control)
+
+    theta = 1
+    CRX(theta, q_control, q_target)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+
+## Swap Gate
+
+Swaps between two qubit states.
+
+$$
+\begin{split}SWAP = \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{pmatrix}\end{split}
+$$
+Parameters:
+
+- `qbit0`: `QBit`
+- `qbit1`: `QBit`
+
+```python
+@qfunc
+def main(q1: Output[QBit], q2: Output[QBit]):
+    allocate(q1)
+
+    allocate(q2)
+
+    SWAP(q1, q2)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+
+## U Gate
+
+The single-qubit gate applies phase and rotation with three Euler angles.
+
+Matrix representation:
+
+$$
+U(\gamma,\phi,\theta,\lambda) = e^{i\gamma}\begin{pmatrix}
+\cos(\frac{\theta}{2}) & -e^{i\lambda}\sin(\frac{\theta}{2}) \\
+e^{i\phi}\sin(\frac{\theta}{2}) & e^{i(\phi+\lambda)}\cos(\frac{\theta}{2}) \\
+\end{pmatrix}
+$$
+Parameters:
+
+- `theta`: `CReal`
+- `phi`: `CReal`
+- `lam`: `CReal`
+- `gam`: `CReal`
+- `target`: `QBit`
+
+```python
+@qfunc
+def main(q: Output[QBit]):
+    allocate(q)
+
+    theta = 1
+    phi = 2
+    lam = 1.5
+    gam = 1.1
+    U(theta, phi, lam, gam, q)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```

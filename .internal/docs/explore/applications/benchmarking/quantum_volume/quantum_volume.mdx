@@ -1,0 +1,1289 @@
+---
+title: "Quantum Volume"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/benchmarking/quantum_volume/quantum_volume.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+Quantum volume is a measurement of the errors characterizing a chosen quantum hardware.
+
+The quantum volume is a result of running a circuit based on principles of randomness and statistical analysis, which provides a single number to compare different hardware backends.
+
+The scheme of the quantum volume \[[1](#circuit)]:
+
+1. For a number of qubits $n$, a circuit is made of the $n$ quantum layer.
+1. Each layer consists of a unitary operation between pairs of $n$ qubits.
+
+The pairs are chosen at random. If $n$ is odd, one of them does not have an operation.
+1. The unitary operation between each pair is the Haar random matrix; i.e., an SU(4) operation containing a random complex number in such a manner that the probability of measuring a quantum state is kept with uniform distribution.
+1. A single circuit of $n$ qubits is measured and the heavy output probability (i.e., the probability of measuring the states above the median value) is calculated.
+
+Due to the nature of the distribution of random complex numbers, one can evaluate that for an ideal case (no noises), the heavy output probability should be \~
+
+0.
+
+8
+
+5. For an assessment of the quantum volume, the demand subsides to the following inequality: (1) $P_{\rm heavy\_ outputs} \leq 2/3.$
+1. For a given output, to get the quantum volume, repeat Items 1-4 for an increasing number of qubits until the inequality described in Item 4 does not hold. To ensure it, the circuits are created many times and the average and standard deviation are taken into account.
+1. The quantum volume is two to the power of the number of qubits, such that they pass inequality (1) as per the procedure described in Items 1-
+
+5. The heavy output probability is a good measurement of the quality of the circuit, as noise reduces the probabilities of uniform distribution.
+
+While this is so, consider that there are many components to the results of the procedure - not only the hardware noises, but also the connectivity map, the quality of the transpilation, and even the quantum software that translates the circuit into basis gates for the hardware, thus contributing to the circuit depth.
+
+This demonstration shows the code for implementing the steps to calculate the quantum volume using the Classiq platform and an example of such calculations for several quantum simulators and hardware backends.
+
+## Step 1: Create a Haar Random Unitary Matrix
+
+Create a function, generating a (n,n) sized Haar random unitary matrix \[[2](#unitary)].
+
+This matrix contains a random complex number that is distributed evenly in the $2^n$ space of quantum states.
+
+The Haar distribution indicates how to weight the elements of $U(N)$ such that uniform distribution occurs in the parameter space.
+
+```python
+import numpy as np
+from numpy.linalg import qr
+from scipy.stats import unitary_group
+
+
+def haar(n):
+    u1 = unitary_group.rvs(n)
+    u2 = unitary_group.rvs(n)
+    Z = u1 + 1j * u2
+
+    Q, R = qr(Z)
+
+    Lambda = np.diag([R[i, i] / np.abs(R[i, i]) for i in range(n)])
+
+    return np.dot(Q, Lambda)
+```
+
+## Step 2: Create a Quantum Volume Circuit
+
+The `qv_model` function creates the quantum volume model for a given $N$ number of qubits.
+
+For $N$ qubits, the circuit must include $N$ quantum volume layers.
+
+The layers are built using the `qv_layer` function, which creates random pairing between the $N$ qubits. (For an odd number, a randomly chosen qubit is not operational.) Between each pair, a unitary gate operates, consisting of a Haar random unitary matrix of size 
+
+4.
+
+```python
+import math
+import random
+
+from classiq import *
+
+
+@qfunc
+def qv_layer(N: int, target: QArray):
+    # Step 1: start with a shuffle of the qubits
+    qubit_list = list(range(N))
+    random.shuffle(qubit_list)
+
+    for idx in range(math.floor(N / 2)):
+        # Step 2: Isolate the qubit pairs for the layers
+        a = qubit_list[idx]
+        b = qubit_list[math.floor(N / 2) + idx]
+
+        # Step 3: Generate the random matrix (this needs to change for the random matrix when possible)
+        gate_matrix = haar(4).tolist()
+        unitary(gate_matrix, [target[a], target[b]])
+
+
+def qv_model(N):
+    @qfunc
+    def main(target: Output[QArray]):
+        allocate(N, target)
+        repeat(N, lambda _: qv_layer(N, target))
+
+    return main
+```
+
+## Step 3: Execute and Analyze
+
+The execution and analysis part consists of these functions:
+
+- `execute_qv` sends a quantum program for execution on a given quantum hardware with a specified number of shots.
+
+The function returns the results of the execution from the hardware.
+- `heavy_outputs_prob` analyzes the results from execution and returns the heavy output probability; i.e., the probability for a single state in the space to be greater than the median value (median = "middle" of a sorted list of numbers).
+
+The `round_significant` function rounds a number for one significant figure.
+
+```python
+def execute_qv(qprog, num_shots, preferences):
+    execution_prefs = ExecutionPreferences(
+        num_shots=num_shots, backend_preferences=preferences
+    )
+    with ExecutionSession(qprog, execution_prefs) as es:
+        res = es.sample()
+
+    return res
+```
+```python
+
+def heavy_outputs_prob(results):
+    d = list(results.counts.values())
+    med = np.median(d)
+    heavy_outputs_prob = 0
+    # print(med)
+    for count, item in enumerate(d):
+        if item >= med:
+            heavy_outputs_prob = heavy_outputs_prob + item
+    return heavy_outputs_prob
+```
+```python
+
+from math import floor, log10
+
+
+def round_significant(x):
+    return round(x, -int(floor(log10(abs(x)))))
+```
+
+## Step 4: Find the Quantum Volume Algorithm
+
+Using the previously defined functions, `find_qv` finds the quantum volume value for defined parameters including hardware definitions.
+
+The `find_qv` function sends the value of heavy output probability for each number of qubits defined (between `min_qubit` and `max_qubits`).
+
+This repeats `num_trials` times. Then, the heavy output probability is averaged, and the standard deviation is calculated. If the number of qubits chosen for the circuit is less than the number of qubits in the chosen hardware, the qubits are randomly picked to run according to the rules of the hardware provider.
+
+The quantum volume qubits number is defined as the larger number of qubits for which the heavy output probability, decreased by two sigma (twice the standard deviation), is greater than or equal to 2/
+
+3. The quantum volume is two to the power of the number of quantum volume qubits.
+
+Note that if the result given for the log2 of the quantum volume is the same as the chosen `max_qubits`, there is a possibility that the quantum volume is greater than found by the function. In this case, run the program for a greater span.
+
+```python
+from tqdm import tqdm
+
+# For testing, we save all qprogs generated in the notebook
+qprogs = []
+
+
+def find_qv(num_trials, num_shots, min_qubits, max_qubits, preferences):
+    
+
+### initialization
+    qubit_num = range(min_qubits, max_qubits + 1)
+    heavy_list = np.zeros(max_qubits - min_qubits + 1)
+    std_list = np.zeros(max_qubits - min_qubits + 1)
+    qubit_v = 0
+
+    
+
+### calculate the heavy outputs for each number of qubits
+    for num in tqdm(qubit_num):
+        heavy_outputs = 0
+        std = 0
+        heavytostd = np.zeros(num_trials)
+        for idx in tqdm(range(num_trials)):
+            qprog = synthesize(qv_model(num))
+            qprogs.append(qprog)
+            results = execute_qv(qprog, num_shots, preferences)
+            heavy_temp = heavy_outputs_prob(results)
+            heavy_outputs = heavy_outputs + heavy_temp
+            heavytostd[idx] = heavy_temp
+        s = num - min_qubits
+        heavy_list[s] = heavy_outputs / (num_trials * num_shots)
+        temp_hl = heavy_outputs / (num_trials * num_shots)
+        std = np.std(heavytostd) / (num_trials * num_shots)
+        std_list[s] = std
+        temp_std = round_significant(std)
+        print(
+            f"for {num} qubits the heavy outputs probability is: {temp_hl} with {temp_std} standard deviation"
+        )
+
+    
+
+### determine the quantum volume
+    for num in qubit_num:
+        s = num - min_qubits
+        heavy_is = heavy_list[s] - 2 * (std_list[s])
+        if heavy_is >= 2 / 3:
+            qubit_v = num
+        else:
+            break
+
+    qv = 2**qubit_v
+    print(f"
+
+##### The quantum volume is {qv} #####")
+
+    return qv
+```
+
+## Examples
+
+Run the code to find the quantum volume of several quantum simulators and hardware backends.
+
+#
+
+## Running with the Classiq Simulator
+
+```python
+num_trials = 10  # number of times to run the QV circuit for each number of qubits. Best: 200 or more
+num_shots = 100  # number of runs for each execution. Best: 1000 or more
+preferences = ClassiqBackendPreferences(
+    backend_name=ClassiqSimulatorBackendNames.SIMULATOR
+)
+min_qubits = 3
+max_qubits = 6
+
+qv = find_qv(num_trials, num_shots, min_qubits, max_qubits, preferences)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+0%|                                                             | 0/4 [00:00<?, ?it/s]
+    0%|                                                            | 0/10 [00:00<?, ?it/s][A
+   10%|█████▏                                              | 1/10 [00:06<00:57,  6.41s/it][A
+   20%|██████████▍                                         | 2/10 [00:10<00:40,  5.11s/it][A
+   30%|███████████████▌                                    | 3/10 [00:14<00:33,  4.75s/it][A
+   40%|████████████████████▊                               | 4/10 [00:18<00:26,  4.35s/it][A
+   50%|██████████████████████████                          | 5/10 [00:22<00:20,  4.12s/it][A
+   60%|███████████████████████████████▏                    | 6/10 [00:28<00:18,  4.66s/it][A
+   70%|████████████████████████████████████▍               | 7/10 [00:32<00:13,  4.50s/it][A
+   80%|█████████████████████████████████████████▌          | 8/10 [00:36<00:08,  4.39s/it][A
+   90%|██████████████████████████████████████████████▊     | 9/10 [00:40<00:04,  4.24s/it][A
+  100%|███████████████████████████████████████████████████| 10/10 [00:44<00:00,  4.45s/it][A
+   25%|█████████████▎                                       | 1/4 [00:44<02:13, 44.50s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+for 3 qubits the heavy outputs probability is: 0.872 with 0.006 standard deviation
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+0%|                                                            | 0/10 [00:00<?, ?it/s][A
+   10%|█████▏                                              | 1/10 [00:05<00:51,  5.69s/it][A
+   20%|██████████▍                                         | 2/10 [00:11<00:44,  5.51s/it][A
+   30%|███████████████▌                                    | 3/10 [00:16<00:39,  5.62s/it][A
+   40%|████████████████████▊                               | 4/10 [00:22<00:33,  5.51s/it][A
+   50%|██████████████████████████                          | 5/10 [00:28<00:29,  5.80s/it][A
+   60%|███████████████████████████████▏                    | 6/10 [00:34<00:23,  5.79s/it][A
+   70%|████████████████████████████████████▍               | 7/10 [00:39<00:17,  5.69s/it][A
+   80%|█████████████████████████████████████████▌          | 8/10 [00:45<00:11,  5.57s/it][A
+   90%|██████████████████████████████████████████████▊     | 9/10 [00:50<00:05,  5.53s/it][A
+  100%|███████████████████████████████████████████████████| 10/10 [00:56<00:00,  5.63s/it][A
+   50%|██████████████████████████▌                          | 2/4 [01:40<01:42, 51.47s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+for 4 qubits the heavy outputs probability is: 0.871 with 0.007 standard deviation
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+0%|                                                            | 0/10 [00:00<?, ?it/s][A
+   10%|█████▏                                              | 1/10 [00:06<00:57,  6.44s/it][A
+   20%|██████████▍                                         | 2/10 [00:13<00:54,  6.84s/it][A
+   30%|███████████████▌                                    | 3/10 [00:19<00:43,  6.28s/it][A
+   40%|████████████████████▊                               | 4/10 [00:25<00:37,  6.19s/it][A
+   50%|██████████████████████████                          | 5/10 [00:30<00:29,  5.92s/it][A
+   60%|███████████████████████████████▏                    | 6/10 [00:36<00:23,  5.99s/it][A
+   70%|████████████████████████████████████▍               | 7/10 [00:43<00:18,  6.18s/it][A
+   80%|█████████████████████████████████████████▌          | 8/10 [00:48<00:11,  5.99s/it][A
+   90%|██████████████████████████████████████████████▊     | 9/10 [00:54<00:05,  5.90s/it][A
+  100%|███████████████████████████████████████████████████| 10/10 [01:00<00:00,  6.04s/it][A
+   75%|███████████████████████████████████████▊             | 3/4 [02:41<00:55, 55.54s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+for 5 qubits the heavy outputs probability is: 0.906 with 0.002 standard deviation
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+0%|                                                            | 0/10 [00:00<?, ?it/s][A
+   10%|█████▏                                              | 1/10 [00:07<01:04,  7.13s/it][A
+   20%|██████████▍                                         | 2/10 [00:15<01:02,  7.87s/it][A
+   30%|███████████████▌                                    | 3/10 [00:22<00:51,  7.42s/it][A
+   40%|████████████████████▊                               | 4/10 [00:29<00:43,  7.29s/it][A
+   50%|██████████████████████████                          | 5/10 [00:37<00:38,  7.62s/it][A
+   60%|███████████████████████████████▏                    | 6/10 [00:46<00:31,  7.92s/it][A
+   70%|████████████████████████████████████▍               | 7/10 [00:53<00:22,  7.61s/it][A
+   80%|█████████████████████████████████████████▌          | 8/10 [01:00<00:14,  7.44s/it][A
+   90%|██████████████████████████████████████████████▊     | 9/10 [01:07<00:07,  7.38s/it][A
+  100%|███████████████████████████████████████████████████| 10/10 [01:14<00:00,  7.45s/it][A
+  100%|█████████████████████████████████████████████████████| 4/4 [03:55<00:00, 58.92s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+for 6 qubits the heavy outputs probability is: 0.903 with 0.004 standard deviation
+  
+
+##### The quantum volume is 64 
+
+#####
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+40%|████      | 4/10 [00:15<00:23,  3.93s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+50%|█████     | 5/10 [00:19<00:20,  4.19s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+60%|██████    | 6/10 [00:23<00:16,  4.02s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+70%|███████   | 7/10 [00:27<00:11,  3.94s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+80%|████████  | 8/10 [00:32<00:08,  4.19s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+90%|█████████ | 9/10 [00:35<00:03,  4.00s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+100%|██████████| 10/10 [00:39<00:00,  3.85s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+100%|██████████| 10/10 [00:39<00:00,  3.91s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+50%|█████     | 2/4 [01:14<01:15, 37.60s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+for 4 qubits the heavy outputs probability is: 0.846 with 0.004 standard deviation
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+0%|          | 0/10 [00:00<?, ?it/s]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+10%|█         | 1/10 [00:04<00:42,  4.72s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+20%|██        | 2/10 [00:08<00:33,  4.13s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+30%|███       | 3/10 [00:12<00:27,  3.91s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+40%|████      | 4/10 [00:15<00:22,  3.82s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+50%|█████     | 5/10 [00:20<00:20,  4.09s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+60%|██████    | 6/10 [00:25<00:17,  4.31s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+70%|███████   | 7/10 [00:28<00:12,  4.12s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+80%|████████  | 8/10 [00:33<00:08,  4.28s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+90%|█████████ | 9/10 [00:38<00:04,  4.39s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+100%|██████████| 10/10 [00:41<00:00,  4.21s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+100%|██████████| 10/10 [00:41<00:00,  4.18s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+75%|███████▌  | 3/4 [01:56<00:39, 39.54s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+for 5 qubits the heavy outputs probability is: 0.835 with 0.005 standard deviation
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+0%|          | 0/10 [00:00<?, ?it/s]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+10%|█         | 1/10 [00:04<00:44,  4.90s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+20%|██        | 2/10 [00:09<00:38,  4.84s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+30%|███       | 3/10 [00:14<00:33,  4.85s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+40%|████      | 4/10 [00:19<00:28,  4.80s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+50%|█████     | 5/10 [00:23<00:23,  4.76s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+60%|██████    | 6/10 [00:28<00:19,  4.77s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+70%|███████   | 7/10 [00:33<00:14,  4.76s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+80%|████████  | 8/10 [00:38<00:09,  4.96s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+90%|█████████ | 9/10 [00:43<00:04,  4.89s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+100%|██████████| 10/10 [00:48<00:00,  4.78s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+[A
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+100%|██████████| 10/10 [00:48<00:00,  4.82s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+100%|██████████| 4/4 [02:44<00:00, 42.95s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+100%|██████████| 4/4 [02:44<00:00, 41.14s/it]
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+for 6 qubits the heavy outputs probability is: 0.861 with 0.006 standard deviation
+  
+
+##### The quantum volume is 64 
+
+#####
+  
+
+```
+</Info>
+
+Since this is a simulator with no errors, we expect the heavy output probability for any number of qubits to be approximately 0.
+
+85.
+
+#
+
+## Running with Rigetti Aspen M-3
+
+```python
+num_trials = 10  # number of times to run the QV circuit for each number of qubits
+num_shots = 3  # number of runs for each execution
+preferences = AzureBackendPreferences(backend_name="Rigetti.Qpu.Aspen-M-3")
+min_qubits = 2
+max_qubits = 3
+
+# qv = find_qv_trials, num_(numshots, min_qubits, max_qubits, preferences)
+```
+#
+
+## Running with IBM Cloud targets
+
+Run on a few IBM machines:
+
+- ibm\_fez with a reported quantum volume of 8
+- ibm\_marrakesh with a reported quantum volume of 16
+- ibm\_sherbrooke with a reported quantum volume of 32
+
+Refer to the [IBM website](https://quantum.cloud.ibm.com/computers)
+
+```python
+preferences = IBMBackendPreferences(
+    backend_name="ibm_fez",
+    access_token="my-access-token",
+    channel="ibm_cloud",
+    instance_crn="instance-CRN",
+)
+
+num_trials = 5  # number of times to run the QV circuit for each number of qubits
+num_shots = 10  # number of runs for each execution
+min_qubits = 2
+max_qubits = 4
+
+# qv = find_qv(num_trials, num_shots, min_qubits, max_qubits, preferences)
+```
+```python
+
+preferences = IBMBackendPreferences(
+    backend_name="ibm_marrakesh",
+    access_token="my-access-token",
+    channel="ibm_cloud",
+    instance_crn="instance-CRN",
+)
+
+num_trials = 1  # number of times to run the QV circuit for each number of qubits
+num_shots = 10  # number of runs for each execution
+min_qubits = 2
+max_qubits = 3
+
+# qv = find_qv(num_trials, num_shots, min_qubits, max_qubits, preferences)
+```
+```python
+
+preferences = IBMBackendPreferences(
+    backend_name="ibm_sherbrooke",
+    access_token="my-access-token",
+    channel="ibm_cloud",
+    instance_crn="instance-CRN",
+)
+
+num_trials = 1  # number of times to run the QV circuit for each number of qubits
+num_shots = 10  # number of runs for each execution
+min_qubits = 2
+max_qubits = 3
+
+# qv = find_qv(num_trials, num_shots, min_qubits, max_qubits, preferences)
+```
+
+## References
+
+<a id="circuit">\[1]</a> [Andrew W. Cross, Lev S. Bishop, Sarah Sheldon, Paul D. Nation, and Jay M. Gambetta (2019). Validating quantum computers using randomized model circuits.](https://arxiv.org/pdf/1811.12926.pdf)
+
+<a id="unitary">\[2]</a> [Maris Ozols (2009). How to generate a random unitary matrix.](http://home.lu.lv/~sd20008/papers/essays/Random%20unitary%20\[paper].pdf)

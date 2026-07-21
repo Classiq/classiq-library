@@ -1,0 +1,2582 @@
+---
+title: Execution
+icon: "/icons/bulletsharp.svg"
+---
+
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `ProviderConfig` | Provider-specific configuration data for execution, such as API keys and machine-specific parameters. |
+| `ExecutionPreferences` | Represents the execution settings for running a quantum program. |
+| `TranspilationOption` | Transpilation optimization level for quantum circuits. |
+| `ExecutionSession` | A session for executing a quantum program or OpenQASM source text. |
+| `sample` | Sample a quantum program or OpenQASM circuit. |
+
+
+### ProviderConfig
+
+Provider-specific configuration data for execution, such as API keys and
+machine-specific parameters.
+
+### ExecutionPreferences
+
+Represents the execution settings for running a quantum program.
+Execution preferences for running a quantum program.
+
+For more details, refer to:
+ExecutionPreferences example: [ExecutionPreferences](https://docs.classiq.io/latest/user-guide/execution/#execution-preferences)..
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `noise_properties` | `Optional[NoiseProperties]` | Properties defining the noise in the quantum circuit. Defaults to `None`. |
+| `random_seed` | `int` | The random seed used for the execution. Defaults to a randomly generated seed. |
+| `backend_preferences` | `BackendPreferencesTypes` | Preferences for the backend used to execute the circuit. Defaults to the Classiq Simulator. |
+| `num_shots` | `Optional[pydantic.PositiveInt]` | The number of shots (executions) to be performed. |
+| `transpile_to_hardware` | `TranspilationOption` | Option to transpile the circuit to the hardware's basis gates before execution. Defaults to `TranspilationOption.DECOMPOSE`. |
+| `job_name` | `Optional[str]` | The name of the job, with a minimum length of 1 character. |
+
+
+### noise_properties
+
+
+`noise_properties: NoiseProperties | None = pydantic.Field(default=None, description='Properties of the noise in the circuit')`
+
+
+### random_seed
+
+
+`random_seed: int = pydantic.Field(default_factory=create_random_seed, description='The random seed used for the execution')`
+
+
+### backend_preferences
+
+
+`backend_preferences: BackendPreferencesTypes = backend_preferences_field(backend_name=(ClassiqSimulatorBackendNames.SIMULATOR))`
+
+
+### num_shots
+
+
+`num_shots: pydantic.PositiveInt | None = pydantic.Field(default=None)`
+
+
+### transpile_to_hardware
+
+
+`transpile_to_hardware: TranspilationOption = pydantic.Field(default=(TranspilationOption.DECOMPOSE), description='Transpile the circuit to the hardware basis gates before execution', title='Transpilation Option')`
+
+
+### job_name
+
+
+`job_name: str | None = pydantic.Field(min_length=1, description='The job name', default=None)`
+
+
+### include_zero_amplitude_outputs
+
+
+`include_zero_amplitude_outputs: bool = pydantic.Field(default=False, description='In state vector simulation, whether to include zero-amplitude states in the result. When True, overrides amplitude_threshold.')`
+
+
+### amplitude_threshold
+
+
+`amplitude_threshold: float = pydantic.Field(default=0.0, ge=0, description='In state vector simulation, only states with amplitude magnitude strictly greater than this threshold are included in the result. Defaults to 0 (filters exactly zero-amplitude states). Overridden by include_zero_amplitude_outputs=True.')`
+
+### TranspilationOption
+
+Transpilation optimization level for quantum circuits.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [NONE](#none) |  |  |
+| [DECOMPOSE](#decompose) |  |  |
+| [AUTO_OPTIMIZE](#auto_optimize) |  |  |
+| [LIGHT](#light) |  |  |
+| [MEDIUM](#medium) |  |  |
+| [INTENSIVE](#intensive) |  |  |
+| [CUSTOM](#custom) |  |  |
+
+
+### NONE
+
+
+```python
+NONE = 'none'
+```
+
+
+### DECOMPOSE
+
+
+```python
+DECOMPOSE = 'decompose'
+```
+
+
+### AUTO_OPTIMIZE
+
+
+```python
+AUTO_OPTIMIZE = 'auto optimize'
+```
+
+
+### LIGHT
+
+
+```python
+LIGHT = 'light'
+```
+
+
+### MEDIUM
+
+
+```python
+MEDIUM = 'medium'
+```
+
+
+### INTENSIVE
+
+
+```python
+INTENSIVE = 'intensive'
+```
+
+
+### CUSTOM
+
+
+```python
+CUSTOM = 'custom'
+```
+
+### ExecutionSession
+
+A session for executing a quantum program or OpenQASM source text.
+`ExecutionSession` allows to execute the quantum program with different parameters and operations without the need to re-synthesize the model.
+The session must be closed in order to ensure resources are properly cleaned up. It's recommended to use `ExecutionSession` as a context manager for this purpose. Alternatively, you can directly use the `close` method.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [close](#close) | Close the session and clean up its resources. |
+| [get_session_id](#get_session_id) |  |
+| [update_execution_preferences](#update_execution_preferences) | Update the execution preferences for the session. |
+| [sample](#sample) | Samples the quantum program with the given parameters, if any. |
+| [submit_sample](#submit_sample) | Initiates an execution job with the `sample` primitive. |
+| [calculate_state_vector](#calculate_state_vector) | Calculate the state vector of the quantum program. |
+| [submit_calculate_state_vector](#submit_calculate_state_vector) | Initiates an execution job with the ``calculate_state_vector`` primitive. |
+| [batch_sample](#batch_sample) | Samples the quantum program multiple times with the given parameters for each iteration. |
+| [submit_batch_sample](#submit_batch_sample) | Initiates an execution job with the `batch_sample` primitive. |
+| [observe](#observe) | Estimates the expectation value of the given Hamiltonian using the quantum program. |
+| [submit_observe](#submit_observe) | Initiates an execution job with the ``observe`` primitive. |
+| [estimate](#estimate) | Estimates the expectation value of the given Hamiltonian using the quantum program. |
+| [submit_estimate](#submit_estimate) | Initiates an execution job with the ``estimate`` primitive. |
+| [batch_estimate](#batch_estimate) | Estimates the expectation value of the given Hamiltonian multiple times using the quantum program, with the given parameters for each iteration. |
+| [submit_batch_estimate](#submit_batch_estimate) | Initiates an execution job with the `batch_estimate` primitive. |
+| [variational_minimize](#variational_minimize) | Variationally minimizes the given cost function using the quantum program. |
+| [minimize](#minimize) | . |
+| [submit_variational_minimize](#submit_variational_minimize) | Initiates an execution job with the variational minimization primitive. |
+| [submit_minimize](#submit_minimize) | . |
+| [estimate_cost](#estimate_cost) | Estimates circuit cost using a classical cost function. |
+| [set_measured_state_filter](#set_measured_state_filter) | When simulating on a statevector simulator, emulate the behavior of postprocessing by discarding amplitudes for which their states are "undesirable". |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `program` | `QuantumProgram` | The quantum program to execute, or a placeholder when the first constructor argument was OpenQASM source text. |
+
+
+### program
+
+
+`program = _openqasm_session_placeholder_program()`
+
+#### close
+
+
+<pre><code>close(
+    self: 
+) -> None</code></pre>
+
+
+Close the session and clean up its resources.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+
+
+
+#### update_execution_preferences
+
+
+<pre><code>update_execution_preferences(
+    self: ,
+    execution_preferences: <a href="#executionpreferences">ExecutionPreferences</a> | None
+) -> None</code></pre>
+
+
+Update the execution preferences for the session.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `execution_preferences` | [ExecutionPreferences](#executionpreferences) \| None | The execution preferences to update. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `None`
+
+
+#### sample
+
+
+<pre><code>sample(
+    self: ,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> ExecutionDetails | list[ExecutionDetails]</code></pre>
+
+
+Samples the quantum program with the given parameters, if any.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionDetails \| list[ExecutionDetails]`
+- The result of the sampling, or a list of results when
+- ``parameters`` is a list.
+
+
+#### submit_sample
+
+
+<pre><code>submit_sample(
+    self: ,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the `sample` primitive.
+
+This is a non-blocking version of `sample`: it gets the same parameters and initiates the same execution job, but instead
+of waiting for the result, it returns the job object immediately.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### calculate_state_vector
+
+
+<pre><code>calculate_state_vector(
+    self: ,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    filters: dict[str, Any] | None = None,
+    amplitude_threshold: float = 0.0
+) -> DataFrame | list[DataFrame]</code></pre>
+
+
+Calculate the state vector of the quantum program.
+
+The session must be configured with a Classiq simulator
+(``"classiq/simulator"``, ``"classiq/nvidia_simulator"``) or
+``"google/cuquantum"``. The corresponding statevector variant is
+selected automatically; callers do not need to know about the
+``_statevector`` backend names.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. | None |
+| `filters` | `dict[str, Any] \| None` | Only states where the variables match these values will be included in the state vector. | None |
+| `amplitude_threshold` | `float` | If provided, only states whose amplitude magnitude is strictly greater than this value will be included in the result. Defaults to 0 (filters exactly zero-amplitude states). | 0.0 |
+
+
+
+**Returns:**
+
+- **Type:** `DataFrame \| list[DataFrame]`
+- A dataframe containing the state vector, or a list of dataframes when
+- ``parameters`` is a list.
+
+
+#### submit_calculate_state_vector
+
+
+<pre><code>submit_calculate_state_vector(
+    self: ,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    filters: dict[str, Any] | None = None,
+    amplitude_threshold: float = 0.0
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the ``calculate_state_vector`` primitive.
+
+This is a non-blocking version of :meth:`calculate_state_vector`: it gets
+the same parameters and initiates the same execution job, but instead of
+waiting for the result, it returns the job object immediately.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | See :meth:`calculate_state_vector`. | None |
+| `filters` | `dict[str, Any] \| None` | See :meth:`calculate_state_vector`. | None |
+| `amplitude_threshold` | `float` | See :meth:`calculate_state_vector`. | 0.0 |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### batch_sample
+
+
+<pre><code>batch_sample(
+    self: ,
+    parameters: list[ExecutionParams]
+) -> list[ExecutionDetails]</code></pre>
+
+
+Samples the quantum program multiple times with the given parameters for each iteration. The number of samples is determined by the length of the parameters list.
+
+.. deprecated::
+    Pass a list of parameter dicts to :meth:`sample` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `list[ExecutionParams]` | A list of the parameters for each iteration. Each item is a dictionary where each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `list[ExecutionDetails]`
+- List[ExecutionDetails]: The results of all the sampling iterations.
+
+
+#### submit_batch_sample
+
+
+<pre><code>submit_batch_sample(
+    self: ,
+    parameters: list[ExecutionParams]
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the `batch_sample` primitive.
+
+.. deprecated::
+    Pass a list of parameter dicts to :meth:`submit_sample` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `list[ExecutionParams]` | A list of the parameters for each iteration. Each item is a dictionary where each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### observe
+
+
+<pre><code>observe(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> EstimationResult | list[EstimationResult]</code></pre>
+
+
+Estimates the expectation value of the given Hamiltonian using the quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` | The Hamiltonian to estimate the expectation value of. | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `EstimationResult \| list[EstimationResult]`
+- The estimation result, or a list of results when ``parameters``
+- is a list.
+
+
+#### submit_observe
+
+
+<pre><code>submit_observe(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None,
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the ``observe`` primitive.
+
+This is a non-blocking version of :meth:`observe`: it gets the same
+parameters and initiates the same execution job, but instead of waiting
+for the result, it returns the job object immediately.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` | The Hamiltonian to estimate the expectation value of. | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### estimate
+
+
+<pre><code>estimate(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> EstimationResult | list[EstimationResult]</code></pre>
+
+
+Estimates the expectation value of the given Hamiltonian using the quantum program.
+
+.. deprecated::
+    ``estimate`` is deprecated and will no longer be supported starting
+    on 2026-06-22. Use :meth:`observe` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` |  | None |
+| `num_shots` | `int \| None` |  | None |
+| `run_via_classiq` | `bool \| None` |  | None |
+
+
+
+#### submit_estimate
+
+
+<pre><code>submit_estimate(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None,
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the ``estimate`` primitive.
+
+.. deprecated::
+    ``submit_estimate`` is deprecated and will no longer be supported
+    starting on 2026-06-22. Use :meth:`submit_observe` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` |  | None |
+| `num_shots` | `int \| None` |  | None |
+| `run_via_classiq` | `bool \| None` |  | None |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+#### batch_estimate
+
+
+<pre><code>batch_estimate(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: list[ExecutionParams]
+) -> list[EstimationResult]</code></pre>
+
+
+Estimates the expectation value of the given Hamiltonian multiple times using the quantum program, with the given parameters for each iteration. The number of estimations is determined by the length of the parameters list.
+
+.. deprecated::
+    Pass a list of parameter dicts to :meth:`observe` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` | The Hamiltonian to estimate the expectation value of. | *required* |
+| `parameters` | `list[ExecutionParams]` | A list of the parameters for each iteration. Each item is a dictionary where each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `list[EstimationResult]`
+- List[EstimationResult]: The results of all the estimation iterations.
+
+
+#### submit_batch_estimate
+
+
+<pre><code>submit_batch_estimate(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: list[ExecutionParams],
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the `batch_estimate` primitive.
+
+.. deprecated::
+    Pass a list of parameter dicts to :meth:`submit_observe` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` | The Hamiltonian to estimate the expectation value of. | *required* |
+| `parameters` | `list[ExecutionParams]` | A list of the parameters for each iteration. Each item is a dictionary where each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | *required* |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### variational_minimize
+
+
+<pre><code>variational_minimize(
+    self: ,
+    cost_function: Hamiltonian | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    hosted: bool = False,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> list[tuple[float, ExecutionParams]]</code></pre>
+
+
+Variationally minimizes the given cost function using the quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_function` | `Hamiltonian \| QmodExpressionCreator` | The cost function to minimize. It can be one of the following: - A quantum cost function defined by a Hamiltonian. - A classical cost function represented as a callable that returns a Qmod expression. The callable should accept `QVar`s as arguments and use names matching the Model outputs. | *required* |
+| `initial_params` | `ExecutionParams` | The initial parameters for the minimization. Only Models with exactly one execution parameter are supported. This parameter must be of type `CReal` or `CArray`. The dictionary must contain a single key-value pair, where: - The key is the name of the parameter. - The value is either a float or a list of floats. | *required* |
+| `max_iteration` | `int` | The maximum number of iterations for the minimization. | *required* |
+| `quantile` | `float` | The quantile to use for cost estimation. | 1.0 |
+| `tolerance` | `float \| None` | The tolerance for the minimization. | None |
+| `hosted` | `bool` | When ``True`` on an IonQ backend, submit a Classiq execution job that runs the optimization loop on IonQ Hosted Hybrid in the backend. Defaults to ``False``. | False |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `list[tuple[float, ExecutionParams]]`
+- A list of tuples, each containing the estimated cost and the corresponding parameters for that iteration. `cost` is a float, and `parameters` is a dictionary matching the execution parameter format.
+
+
+#### minimize
+
+
+<pre><code>minimize(
+    self: ,
+    cost_function: Hamiltonian | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> list[tuple[float, ExecutionParams]]</code></pre>
+
+
+.. deprecated::
+    Use :meth:`variational_minimize` instead.
+
+This name is kept for backward compatibility and will be removed in a future release.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_function` | `Hamiltonian \| QmodExpressionCreator` |  | *required* |
+| `initial_params` | `ExecutionParams` |  | *required* |
+| `max_iteration` | `int` |  | *required* |
+| `quantile` | `float` |  | 1.0 |
+| `tolerance` | `float \| None` |  | None |
+| `num_shots` | `int \| None` |  | None |
+| `run_via_classiq` | `bool \| None` |  | None |
+
+
+
+#### submit_variational_minimize
+
+
+<pre><code>submit_variational_minimize(
+    self: ,
+    cost_function: Hamiltonian | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    hosted: bool = False,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None,
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the variational minimization primitive.
+
+Non-blocking counterpart of :meth:`variational_minimize`: same parameters and job,
+but returns the :class:`~classiq.execution.jobs.ExecutionJob` immediately.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_function` | `Hamiltonian \| QmodExpressionCreator` | The cost function to minimize. It can be one of the following: - A quantum cost function defined by a Hamiltonian. - A classical cost function represented as a callable that returns a Qmod expression. The callable should accept `QVar`s as arguments and use names matching the Model outputs. | *required* |
+| `initial_params` | `ExecutionParams` | The initial parameters for the minimization. Only Models with exactly one execution parameter are supported. This parameter must be of type `CReal` or `CArray`. The dictionary must contain a single key-value pair, where: - The key is the name of the parameter. - The value is either a float or a list of floats. | *required* |
+| `max_iteration` | `int` | The maximum number of iterations for the minimization. | *required* |
+| `quantile` | `float` | The quantile to use for cost estimation. | 1.0 |
+| `tolerance` | `float \| None` | The tolerance for the minimization. | None |
+| `hosted` | `bool` | When ``True`` on an IonQ backend, submit a Classiq execution job that runs the optimization loop on IonQ Hosted Hybrid in the backend. Defaults to ``False``. | False |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job. When ``hosted=True`` on an IonQ backend, the backend
+- worker submits and polls IonQ Hosted Hybrid while this job tracks
+- progress through the standard Classiq execution API.
+
+
+#### submit_minimize
+
+
+<pre><code>submit_minimize(
+    self: ,
+    cost_function: Hamiltonian | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None,
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+.. deprecated::
+    Use :meth:`submit_variational_minimize` instead.
+
+This name is kept for backward compatibility and will be removed in a future release.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_function` | `Hamiltonian \| QmodExpressionCreator` |  | *required* |
+| `initial_params` | `ExecutionParams` |  | *required* |
+| `max_iteration` | `int` |  | *required* |
+| `quantile` | `float` |  | 1.0 |
+| `tolerance` | `float \| None` |  | None |
+| `num_shots` | `int \| None` |  | None |
+| `run_via_classiq` | `bool \| None` |  | None |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+#### estimate_cost
+
+
+<pre><code>estimate_cost(
+    self: ,
+    cost_func: Callable[[ParsedState], float],
+    parameters: ExecutionParams | None = None,
+    quantile: float = 1.0,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> float</code></pre>
+
+
+Estimates circuit cost using a classical cost function.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_func` | `Callable[[ParsedState], float]` | classical circuit sample cost function | *required* |
+| `parameters` | `ExecutionParams \| None` | execution parameters sent to 'sample' | None |
+| `quantile` | `float` | drop cost values outside the specified quantile | 1.0 |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `float`
+- cost estimation
+
+
+#### set_measured_state_filter
+
+
+<pre><code>set_measured_state_filter(
+    self: ,
+    output_name: str,
+    condition: Callable
+) -> None</code></pre>
+
+
+When simulating on a statevector simulator, emulate the behavior of postprocessing
+by discarding amplitudes for which their states are "undesirable".
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `output_name` | `str` | The name of the register to filter | *required* |
+| `condition` | `Callable` | Filter out values of the statevector for which this callable is False | *required* |
+
+
+
+### sample
+
+
+<pre><code>sample(
+    qprog: QuantumProgram | str,
+    backend: str | None = None,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    config: dict[str, Any] | <a href="#providerconfig">ProviderConfig</a> | None = None,
+    num_shots: int | None = None,
+    random_seed: int | None = None,
+    transpilation_option: TranspilationOption = TranspilationOption.DECOMPOSE,
+    run_via_classiq: bool = False
+) -> DataFrame | list[DataFrame]</code></pre>
+
+
+Sample a quantum program or OpenQASM circuit.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qprog` | `QuantumProgram \| str` | A synthesized ``QuantumProgram``, or OpenQASM **2.0** / **3.0** source as a single string (for example output of ``qiskit.qasm2.dumps`` or ``qiskit.qasm3.dumps``). | *required* |
+| `backend` | `str \| None` | The hardware or simulator on which to run the quantum program. Use ``"simulator"`` for Classiq's default simulator, or specify a backend as ``"provider/device_id"``. Use the ``get_backend_details`` function to see supported devices. | None |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the ``main`` function), and the value should be the value to set for that parameter. **Not supported** when ``qprog`` is an OpenQASM string (use a ``QuantumProgram`` or bind values in QASM before calling ``sample``). | None |
+| `config` | dict[str, Any] \| [ProviderConfig](#providerconfig) \| None | Provider-specific configuration, such as API keys. For full details, see the SDK reference under Providers. | None |
+| `num_shots` | `int \| None` | The number of times to sample. | None |
+| `random_seed` | `int \| None` | The random seed used for transpilation and simulation. | None |
+| `transpilation_option` | `TranspilationOption` | Advanced configuration for hardware-specific transpilation. | TranspilationOption.DECOMPOSE |
+| `run_via_classiq` | `bool` | Run via Classiq's credentials while using your allocated budget. Defaults to ``False``. | False |
+
+
+
+**Returns:**
+
+- **Type:** `DataFrame \| list[DataFrame]`
+- A dataframe containing the histogram, or a list of dataframes when
+- ``parameters`` is a list.
+### calculate_state_vector
+
+
+<pre><code>calculate_state_vector(
+    qprog: QuantumProgram,
+    backend: str | None = None,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    filters: dict[str, Any] | None = None,
+    random_seed: int | None = None,
+    transpilation_option: TranspilationOption = TranspilationOption.DECOMPOSE,
+    amplitude_threshold: float = 0.0
+) -> DataFrame | list[DataFrame]</code></pre>
+
+
+Calculate the state vector of a quantum program.
+
+This function is only available for Classiq simulators
+(e.g. ``"classiq/simulator"``).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qprog` | `QuantumProgram` | The quantum program to be executed. | *required* |
+| `backend` | `str \| None` | The simulator on which to simulate the quantum program. Specified as ``"provider/backend_name"``. Use the ``get_backend_details`` function to see supported backends. Only Classiq simulators are supported. | None |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `filters` | `dict[str, Any] \| None` | Only states where the variables match these values will be included in the state vector. | None |
+| `random_seed` | `int \| None` | The random seed for reproducibility. | None |
+| `transpilation_option` | `TranspilationOption` | Advanced configuration for hardware-specific transpilation. | TranspilationOption.DECOMPOSE |
+| `amplitude_threshold` | `float` | If provided, only states whose amplitude magnitude is strictly greater than this value will be included in the result. Defaults to 0 (filters exactly zero-amplitude states). | 0.0 |
+
+
+
+**Returns:**
+
+- **Type:** `DataFrame \| list[DataFrame]`
+- A dataframe containing the state vector, or a list of dataframes when
+- ``parameters`` is a list.
+### observe
+
+
+<pre><code>observe(
+    qprog: QuantumProgram,
+    observable: SparsePauliOp,
+    backend: str | None = None,
+    estimate: bool = True,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    config: dict[str, Any] | <a href="#providerconfig">ProviderConfig</a> | None = None,
+    num_shots: int | None = None,
+    random_seed: int | None = None,
+    transpilation_option: TranspilationOption = TranspilationOption.DECOMPOSE,
+    run_via_classiq: bool = False
+) -> float | list[float]</code></pre>
+
+
+Get the expectation value of the observable O with respect to the state
+`\|psi>`, which is prepared by the provided quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qprog` | `QuantumProgram` | The quantum program that generates the state \`\|psi>` to be observed. | *required* |
+| `observable` | `SparsePauliOp` | The observable O, a Hermitian operator defined as a ``SparsePauliOp`` (sum of Pauli terms). | *required* |
+| `backend` | `str \| None` | The hardware or simulator on which to run the quantum program. Use ``"simulator"`` for Classiq's default simulator, or specify a backend as ``"provider/backend_name"``. Use the ``get_backend_details`` function to see supported devices. | None |
+| `estimate` | `bool` | Whether to estimate the expectation value by repeatedly measuring the circuit ``num_shots`` times, or calculate the exact expectation value using a simulated statevector. Note that the available options depend on the specified backend. Defaults to ``True``. | True |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `config` | dict[str, Any] \| [ProviderConfig](#providerconfig) \| None | Provider-specific configuration, such as API keys. For full details, see the SDK reference under Providers. | None |
+| `num_shots` | `int \| None` | The number of measurement shots. Only relevant when ``estimate=True``. | None |
+| `random_seed` | `int \| None` | The random seed for reproducibility. | None |
+| `transpilation_option` | `TranspilationOption` | Advanced configuration for hardware-specific transpilation. | TranspilationOption.DECOMPOSE |
+| `run_via_classiq` | `bool` | Run via Classiq's credentials while using your allocated budget. Defaults to ``False``. | False |
+
+
+
+**Returns:**
+
+- **Type:** `float \| list[float]`
+- The expectation value as a float, or a list of floats when
+- ``parameters`` is a list.
+### variational_minimize
+
+
+<pre><code>variational_minimize(
+    qprog: QuantumProgram,
+    cost_function: SparsePauliOp | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    backend: str | None = None,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    hosted: bool = False,
+    config: dict[str, Any] | <a href="#providerconfig">ProviderConfig</a> | None = None,
+    random_seed: int | None = None,
+    transpilation_option: TranspilationOption = TranspilationOption.DECOMPOSE,
+    run_via_classiq: bool = False
+) -> list[tuple[float, ExecutionParams]]</code></pre>
+
+
+Minimize the given cost function over the parameter values of the provided
+quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qprog` | `QuantumProgram` | The parametric quantum program that generates the state (ansatz). Only quantum programs with exactly one execution parameter are supported. | *required* |
+| `cost_function` | `SparsePauliOp \| QmodExpressionCreator` | The cost function to minimize. It can be one of the following: - A quantum cost function defined by a Hamiltonian. - A classical cost function represented as a callable that returns a Qmod expression. The callable should accept ``QVar``s as arguments and use names matching the Model outputs. | *required* |
+| `initial_params` | `ExecutionParams` | The initial parameter values for the minimization. This parameter must be of type ``CReal`` or ``CArray``. The dictionary must contain a single key-value pair, where: - The key is the name of the parameter. - The value is either a float or a list of floats. | *required* |
+| `max_iteration` | `int` | The maximum number of iterations for the minimization. | *required* |
+| `backend` | `str \| None` | The hardware or simulator on which to run the quantum programs. Use ``"simulator"`` for Classiq's default simulator, or specify a backend as ``"provider/backend_name"``. Use the ``get_backend_details`` function to see supported devices. | None |
+| `quantile` | `float` | The quantile to use for cost estimation. | 1.0 |
+| `tolerance` | `float \| None` | The tolerance for the minimization. | None |
+| `hosted` | `bool` | When ``True`` and the configured backend is IonQ, delegate the optimization loop to IonQ's Hosted Hybrid Service instead of running it locally. Defaults to ``False``. | False |
+| `config` | dict[str, Any] \| [ProviderConfig](#providerconfig) \| None | Provider-specific configuration, such as API keys. For full details, see the SDK reference under Providers. | None |
+| `random_seed` | `int \| None` | The random seed for reproducibility. | None |
+| `transpilation_option` | `TranspilationOption` | Advanced configuration for hardware-specific transpilation. | TranspilationOption.DECOMPOSE |
+| `run_via_classiq` | `bool` | Run via Classiq's credentials while using your allocated budget. Defaults to ``False``. | False |
+
+
+
+**Returns:**
+
+- **Type:** `list[tuple[float, ExecutionParams]]`
+- A list of tuples, each containing the estimated cost and the
+- corresponding parameters for that iteration. ``cost`` is a float,
+- and ``parameters`` is a dictionary matching the execution parameter
+- format.
+### BraketConfig
+
+Configuration specific to Amazon Braket.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `braket_access_key_id` | `str \| None` | The access key id of user with full braket access |
+| `braket_secret_access_key` | `str \| None` | The secret key assigned to the access key id for the user with full braket access. |
+| `s3_bucket_name` | `str \| None` | The name of the S3 bucket where results and other related data will be stored. This field should contain a valid S3 bucket name under your AWS account. |
+| `s3_folder` | `pydantic_backend.PydanticS3BucketKey \| None` | The folder path within the specified S3 bucket. This allows for organizing results and data under a specific directory within the S3 bucket. |
+
+
+### braket_access_key_id
+
+
+`braket_access_key_id: str | None = pydantic.Field(default=None, description='Key id assigned to user with credentials to access Braket service')`
+
+
+### braket_secret_access_key
+
+
+`braket_secret_access_key: str | None = pydantic.Field(default=None, description='Secret access key assigned to user with credentials to access Braket service')`
+
+
+### s3_bucket_name
+
+
+`s3_bucket_name: str | None = pydantic.Field(default=None, description='S3 Bucket Name')`
+
+
+### s3_folder
+
+
+`s3_folder: str | None = pydantic.Field(default=None, description='S3 Folder Path Within The S3 Bucket')`
+### IBMConfig
+
+Configuration specific to IBM.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `access_token` | `str \| None` | The IBM Cloud access token to be used with IBM Quantum hosted backends. Defaults to `None`. |
+| `channel` | `str` | Channel to use for IBM cloud backends. Defaults to `"ibm_cloud"`. |
+| `instance_crn` | `str \| None` | The IBM Cloud instance CRN (Cloud Resource Name) for the IBM Quantum service. |
+| `emulate` | `bool` | If True, run on a Classiq-hosted simulator with IBM noise derived from the backend name. Defaults to `False`. |
+
+
+### access_token
+
+
+`access_token: str | None = pydantic.Field(default=None, description='IBM Cloud access token to be used with IBM Quantum hosted backends.')`
+
+
+### channel
+
+
+`channel: str = pydantic.Field(default='ibm_cloud', description='Channel to use for IBM cloud backends.')`
+
+
+### instance_crn
+
+
+`instance_crn: str | None = pydantic.Field(default=None, description='IBM Cloud instance CRN.')`
+
+
+### emulate
+
+
+`emulate: bool = pydantic.Field(default=False, description='If True, run on a Classiq-hosted simulator with an IBM noise model.')`
+### IonQConfig
+
+Configuration specific to IonQ.
+
+ Attributes:
+     api_key (PydanticIonQApiKeyType | None): Key to access IonQ API.
+     error_mitigation (bool): A configuration option to enable or disable error mitigation during execution. Defaults to `False`.
+     emulate (bool): If True, run on IonQ simulator with noise model derived from the backend name. Defaults to `False`.
+
+
+### api_key
+
+
+`api_key: pydantic_backend.PydanticIonQApiKeyType | None = pydantic.Field(default=None, description='IonQ API key.')`
+
+
+### error_mitigation
+
+
+`error_mitigation: bool = pydantic.Field(default=False, description='Enable error mitigation during execution.')`
+
+
+### emulate
+
+
+`emulate: bool = pydantic.Field(default=False, description='If True, run on simulator with noise model derived from backend name.')`
+### AzureConfig
+
+Configuration specific to Azure.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `location` | `str` | Azure region. Defaults to `"East US"`. |
+| `tenant_id` | `str \| None` | Azure Tenant ID used to identify the directory in which the application is registered. |
+| `client_id` | `str \| None` | Azure Client ID, also known as the application ID, which is used to authenticate the application. |
+| `client_secret` | `str \| None` | Azure Client Secret associated with the application, used for authentication. |
+| `resource_id` | `str \| None` | Azure Resource ID, including the subscription ID, resource group, and workspace, typically used for personal resources. |
+| `ionq_error_mitigation` | `bool` | Should use error mitigation when running on IonQ via Azure. Defaults to `False`. |
+| `emulate` | `bool` | When True, request IonQ hardware noise simulation on Azure Quantum for IonQ QPU targets (``ionq.qpu.*``). No effect for ``ionq.simulator`` or non-IonQ targets. Defaults to `False`. |
+
+
+### location
+
+
+`location: str = pydantic.Field(default='East US', description='Azure personal resource region')`
+
+
+### tenant_id
+
+
+`tenant_id: str | None = pydantic.Field(default=None, description='Azure Tenant ID')`
+
+
+### client_id
+
+
+`client_id: str | None = pydantic.Field(default=None, description='Azure Client ID')`
+
+
+### client_secret
+
+
+`client_secret: str | None = pydantic.Field(default=None, description='Azure Client Secret')`
+
+
+### resource_id
+
+
+`resource_id: str | None = pydantic.Field(default=None, description='Azure Resource ID (including Azure subscription ID, resource group and workspace), for personal resource')`
+
+
+### ionq_error_mitigation
+
+
+`ionq_error_mitigation: bool = pydantic.Field(default=False, description='Error mitigation configuration upon running on IonQ via Azure.')`
+
+
+### emulate
+
+
+`emulate: bool = pydantic.Field(default=False, description='If True, enable IonQ hardware noise simulation on Azure for IonQ QPU targets (ionq.qpu.*). Ignored for ionq.simulator and non-IonQ Azure targets.')`
+### AQTConfig
+
+Configuration specific to AQT (Alpine Quantum Technologies).
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `api_key` | `str` | The API key required to access AQT's quantum computing services. |
+| `workspace` | `str` | The AQT workspace where the simulator/hardware is located. |
+
+
+### api_key
+
+
+`api_key: str = pydantic.Field(description='AQT API key')`
+
+
+### workspace
+
+
+`workspace: str = pydantic.Field(description='AQT workspace')`
+### AliceBobConfig
+
+Configuration specific to Alice&Bob.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `distance` | `int \| None` | The number of times information is duplicated in the repetition code. - **Tooltip**: Phase-flip probability decreases exponentially with this parameter, bit-flip probability increases linearly. - **Supported Values**: 3 to 300, though practical values are usually lower than 30. - **Default**: None. |
+| `kappa_1` | `float \| None` | The rate at which the cat qubit loses one photon, creating a bit-flip. - **Tooltip**: Lower values mean lower error rates. - **Supported Values**: 10 to 10^5. Current hardware is at ~10^3. - **Default**: None. |
+| `kappa_2` | `float \| None` | The rate at which the cat qubit is stabilized using two-photon dissipation. - **Tooltip**: Higher values mean lower error rates. - **Supported Values**: 100 to 10^9. Current hardware is at ~10^5. - **Default**: None. |
+| `average_nb_photons` | `float \| None` | The average number of photons. - **Tooltip**: Bit-flip probability decreases exponentially with this parameter, phase-flip probability increases linearly. - **Supported Values**: 4 to 10^5, though practical values are usually lower than 30. - **Default**: None. |
+
+
+### distance
+
+
+`distance: int | None = pydantic.Field(default=None, description='Repetition code distance')`
+
+
+### kappa_1
+
+
+`kappa_1: float | None = pydantic.Field(default=None, description='One-photon dissipation rate (Hz)')`
+
+
+### kappa_2
+
+
+`kappa_2: float | None = pydantic.Field(default=None, description='Two-photon dissipation rate (Hz)')`
+
+
+### average_nb_photons
+
+
+`average_nb_photons: float | None = pydantic.Field(default=None, description='Average number of photons')`
+### ProviderConfig
+
+Provider-specific configuration data for execution, such as API keys and
+machine-specific parameters.
+### execute
+
+
+<pre><code>execute(
+    quantum_program: QuantumProgram
+) -> ExecutionJob</code></pre>
+
+
+Execute a quantum program. The preferences for execution are set on the quantum program using the method `set_execution_preferences`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | `QuantumProgram` | The quantum program to execute. This is the result of the synthesize method. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The result of the execution.
+### estimate_sample_cost
+
+
+<pre><code>estimate_sample_cost(
+    quantum_program: QuantumProgram,
+    execution_options: <a href="#executionpreferences">ExecutionPreferences</a> | str,
+    config: dict[str, Any] | None = None,
+    num_shots: int | None = None,
+    transpilation_option: TranspilationOption = TranspilationOption.DECOMPOSE
+) -> <a href="#costestimateresult">CostEstimateResult</a></code></pre>
+
+
+Estimate the cost for sampling a quantum program.
+
+``execution_options`` may be a full ``ExecutionPreferences`` object, or the same
+**backend specifier string** used by ``sample()`` (for example ``"braket/SV1"`` or
+``"azure/ionq.simulator"``). When it is a string, optional ``config``,
+``num_shots``, and ``transpilation_option`` are applied like the ``sample()`` helpers.
+String backends are always resolved with **run via Classiq** when the provider supports
+it (no user cloud credentials required for cost estimation).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | `QuantumProgram` | The quantum program (output of synthesize). | *required* |
+| `execution_options` | [ExecutionPreferences](#executionpreferences) \| str | Execution preferences or a backend specifier string. | *required* |
+| `config` | `dict[str, Any] \| None` | Passed only for string backends (non-credential options, e.g. Azure ``location``). | None |
+| `num_shots` | `int \| None` | Shots when using a string backend; ignored when using ``ExecutionPreferences``. | None |
+| `transpilation_option` | `TranspilationOption` | Transpilation when using a string backend; ignored otherwise. | TranspilationOption.DECOMPOSE |
+
+
+
+**Returns:**
+
+- **Type:** [CostEstimateResult](#costestimateresult)
+- CostEstimateResult with cost and currency.
+### estimate_sample_batch_cost
+
+
+<pre><code>estimate_sample_batch_cost(
+    quantum_program: QuantumProgram,
+    execution_backend: BackendPreferencesTypes | str,
+    transpilation_level: TranspilationOption = TranspilationOption.DECOMPOSE,
+    shots: int = 1000,
+    params: list[dict] | None = None,
+    config: dict[str, Any] | None = None
+) -> <a href="#costestimateresult">CostEstimateResult</a></code></pre>
+
+
+Estimate the cost for batch sampling a quantum program.
+
+``execution_backend`` may be backend preferences or a ``sample()``-style specifier string.
+With a string backend, pass non-credential options in ``config``; resolution uses **run via
+Classiq** whenever the provider supports it (same rule as ``estimate_sample_cost``).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | `QuantumProgram` | The quantum program (output of synthesize). | *required* |
+| `execution_backend` | `BackendPreferencesTypes \| str` | Backend preferences or specifier string. | *required* |
+| `transpilation_level` | `TranspilationOption` | Transpilation option for the circuit. | TranspilationOption.DECOMPOSE |
+| `shots` | `int` | Number of shots per sample. | 1000 |
+| `params` | `list[dict] \| None` | Optional list of parameter sets for batch. If None, single sample. | None |
+| `config` | `dict[str, Any] \| None` | Non-credential provider options when ``execution_backend`` is a string. | None |
+
+
+
+**Returns:**
+
+- **Type:** [CostEstimateResult](#costestimateresult)
+- CostEstimateResult with cost and currency.
+### ExecutionSession
+
+A session for executing a quantum program or OpenQASM source text.
+`ExecutionSession` allows to execute the quantum program with different parameters and operations without the need to re-synthesize the model.
+The session must be closed in order to ensure resources are properly cleaned up. It's recommended to use `ExecutionSession` as a context manager for this purpose. Alternatively, you can directly use the `close` method.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [close](#close) | Close the session and clean up its resources. |
+| [get_session_id](#get_session_id) |  |
+| [update_execution_preferences](#update_execution_preferences) | Update the execution preferences for the session. |
+| [sample](#sample) | Samples the quantum program with the given parameters, if any. |
+| [submit_sample](#submit_sample) | Initiates an execution job with the `sample` primitive. |
+| [calculate_state_vector](#calculate_state_vector) | Calculate the state vector of the quantum program. |
+| [submit_calculate_state_vector](#submit_calculate_state_vector) | Initiates an execution job with the ``calculate_state_vector`` primitive. |
+| [batch_sample](#batch_sample) | Samples the quantum program multiple times with the given parameters for each iteration. |
+| [submit_batch_sample](#submit_batch_sample) | Initiates an execution job with the `batch_sample` primitive. |
+| [observe](#observe) | Estimates the expectation value of the given Hamiltonian using the quantum program. |
+| [submit_observe](#submit_observe) | Initiates an execution job with the ``observe`` primitive. |
+| [estimate](#estimate) | Estimates the expectation value of the given Hamiltonian using the quantum program. |
+| [submit_estimate](#submit_estimate) | Initiates an execution job with the ``estimate`` primitive. |
+| [batch_estimate](#batch_estimate) | Estimates the expectation value of the given Hamiltonian multiple times using the quantum program, with the given parameters for each iteration. |
+| [submit_batch_estimate](#submit_batch_estimate) | Initiates an execution job with the `batch_estimate` primitive. |
+| [variational_minimize](#variational_minimize) | Variationally minimizes the given cost function using the quantum program. |
+| [minimize](#minimize) | . |
+| [submit_variational_minimize](#submit_variational_minimize) | Initiates an execution job with the variational minimization primitive. |
+| [submit_minimize](#submit_minimize) | . |
+| [estimate_cost](#estimate_cost) | Estimates circuit cost using a classical cost function. |
+| [set_measured_state_filter](#set_measured_state_filter) | When simulating on a statevector simulator, emulate the behavior of postprocessing by discarding amplitudes for which their states are "undesirable". |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `program` | `QuantumProgram` | The quantum program to execute, or a placeholder when the first constructor argument was OpenQASM source text. |
+
+
+### program
+
+
+`program = _openqasm_session_placeholder_program()`
+
+#### close
+
+
+<pre><code>close(
+    self: 
+) -> None</code></pre>
+
+
+Close the session and clean up its resources.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+
+
+
+#### update_execution_preferences
+
+
+<pre><code>update_execution_preferences(
+    self: ,
+    execution_preferences: <a href="#executionpreferences">ExecutionPreferences</a> | None
+) -> None</code></pre>
+
+
+Update the execution preferences for the session.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `execution_preferences` | [ExecutionPreferences](#executionpreferences) \| None | The execution preferences to update. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `None`
+
+
+#### sample
+
+
+<pre><code>sample(
+    self: ,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> ExecutionDetails | list[ExecutionDetails]</code></pre>
+
+
+Samples the quantum program with the given parameters, if any.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionDetails \| list[ExecutionDetails]`
+- The result of the sampling, or a list of results when
+- ``parameters`` is a list.
+
+
+#### submit_sample
+
+
+<pre><code>submit_sample(
+    self: ,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the `sample` primitive.
+
+This is a non-blocking version of `sample`: it gets the same parameters and initiates the same execution job, but instead
+of waiting for the result, it returns the job object immediately.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### calculate_state_vector
+
+
+<pre><code>calculate_state_vector(
+    self: ,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    filters: dict[str, Any] | None = None,
+    amplitude_threshold: float = 0.0
+) -> DataFrame | list[DataFrame]</code></pre>
+
+
+Calculate the state vector of the quantum program.
+
+The session must be configured with a Classiq simulator
+(``"classiq/simulator"``, ``"classiq/nvidia_simulator"``) or
+``"google/cuquantum"``. The corresponding statevector variant is
+selected automatically; callers do not need to know about the
+``_statevector`` backend names.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. | None |
+| `filters` | `dict[str, Any] \| None` | Only states where the variables match these values will be included in the state vector. | None |
+| `amplitude_threshold` | `float` | If provided, only states whose amplitude magnitude is strictly greater than this value will be included in the result. Defaults to 0 (filters exactly zero-amplitude states). | 0.0 |
+
+
+
+**Returns:**
+
+- **Type:** `DataFrame \| list[DataFrame]`
+- A dataframe containing the state vector, or a list of dataframes when
+- ``parameters`` is a list.
+
+
+#### submit_calculate_state_vector
+
+
+<pre><code>submit_calculate_state_vector(
+    self: ,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    filters: dict[str, Any] | None = None,
+    amplitude_threshold: float = 0.0
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the ``calculate_state_vector`` primitive.
+
+This is a non-blocking version of :meth:`calculate_state_vector`: it gets
+the same parameters and initiates the same execution job, but instead of
+waiting for the result, it returns the job object immediately.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | See :meth:`calculate_state_vector`. | None |
+| `filters` | `dict[str, Any] \| None` | See :meth:`calculate_state_vector`. | None |
+| `amplitude_threshold` | `float` | See :meth:`calculate_state_vector`. | 0.0 |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### batch_sample
+
+
+<pre><code>batch_sample(
+    self: ,
+    parameters: list[ExecutionParams]
+) -> list[ExecutionDetails]</code></pre>
+
+
+Samples the quantum program multiple times with the given parameters for each iteration. The number of samples is determined by the length of the parameters list.
+
+.. deprecated::
+    Pass a list of parameter dicts to :meth:`sample` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `list[ExecutionParams]` | A list of the parameters for each iteration. Each item is a dictionary where each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `list[ExecutionDetails]`
+- List[ExecutionDetails]: The results of all the sampling iterations.
+
+
+#### submit_batch_sample
+
+
+<pre><code>submit_batch_sample(
+    self: ,
+    parameters: list[ExecutionParams]
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the `batch_sample` primitive.
+
+.. deprecated::
+    Pass a list of parameter dicts to :meth:`submit_sample` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `parameters` | `list[ExecutionParams]` | A list of the parameters for each iteration. Each item is a dictionary where each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### observe
+
+
+<pre><code>observe(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> EstimationResult | list[EstimationResult]</code></pre>
+
+
+Estimates the expectation value of the given Hamiltonian using the quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` | The Hamiltonian to estimate the expectation value of. | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `EstimationResult \| list[EstimationResult]`
+- The estimation result, or a list of results when ``parameters``
+- is a list.
+
+
+#### submit_observe
+
+
+<pre><code>submit_observe(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None,
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the ``observe`` primitive.
+
+This is a non-blocking version of :meth:`observe`: it gets the same
+parameters and initiates the same execution job, but instead of waiting
+for the result, it returns the job object immediately.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` | The Hamiltonian to estimate the expectation value of. | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` | A dictionary of parameter values, or a list of dictionaries for batch execution. Each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | None |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### estimate
+
+
+<pre><code>estimate(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> EstimationResult | list[EstimationResult]</code></pre>
+
+
+Estimates the expectation value of the given Hamiltonian using the quantum program.
+
+.. deprecated::
+    ``estimate`` is deprecated and will no longer be supported starting
+    on 2026-06-22. Use :meth:`observe` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` |  | None |
+| `num_shots` | `int \| None` |  | None |
+| `run_via_classiq` | `bool \| None` |  | None |
+
+
+
+#### submit_estimate
+
+
+<pre><code>submit_estimate(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: ExecutionParams | list[ExecutionParams] | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None,
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the ``estimate`` primitive.
+
+.. deprecated::
+    ``submit_estimate`` is deprecated and will no longer be supported
+    starting on 2026-06-22. Use :meth:`submit_observe` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` |  | *required* |
+| `parameters` | `ExecutionParams \| list[ExecutionParams] \| None` |  | None |
+| `num_shots` | `int \| None` |  | None |
+| `run_via_classiq` | `bool \| None` |  | None |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+#### batch_estimate
+
+
+<pre><code>batch_estimate(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: list[ExecutionParams]
+) -> list[EstimationResult]</code></pre>
+
+
+Estimates the expectation value of the given Hamiltonian multiple times using the quantum program, with the given parameters for each iteration. The number of estimations is determined by the length of the parameters list.
+
+.. deprecated::
+    Pass a list of parameter dicts to :meth:`observe` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` | The Hamiltonian to estimate the expectation value of. | *required* |
+| `parameters` | `list[ExecutionParams]` | A list of the parameters for each iteration. Each item is a dictionary where each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `list[EstimationResult]`
+- List[EstimationResult]: The results of all the estimation iterations.
+
+
+#### submit_batch_estimate
+
+
+<pre><code>submit_batch_estimate(
+    self: ,
+    hamiltonian: Hamiltonian,
+    parameters: list[ExecutionParams],
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the `batch_estimate` primitive.
+
+.. deprecated::
+    Pass a list of parameter dicts to :meth:`submit_observe` instead.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `hamiltonian` | `Hamiltonian` | The Hamiltonian to estimate the expectation value of. | *required* |
+| `parameters` | `list[ExecutionParams]` | A list of the parameters for each iteration. Each item is a dictionary where each key should be the name of a parameter in the quantum program (parameters of the main function), and the value should be the value to set for that parameter. | *required* |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job.
+
+
+#### variational_minimize
+
+
+<pre><code>variational_minimize(
+    self: ,
+    cost_function: Hamiltonian | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    hosted: bool = False,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> list[tuple[float, ExecutionParams]]</code></pre>
+
+
+Variationally minimizes the given cost function using the quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_function` | `Hamiltonian \| QmodExpressionCreator` | The cost function to minimize. It can be one of the following: - A quantum cost function defined by a Hamiltonian. - A classical cost function represented as a callable that returns a Qmod expression. The callable should accept `QVar`s as arguments and use names matching the Model outputs. | *required* |
+| `initial_params` | `ExecutionParams` | The initial parameters for the minimization. Only Models with exactly one execution parameter are supported. This parameter must be of type `CReal` or `CArray`. The dictionary must contain a single key-value pair, where: - The key is the name of the parameter. - The value is either a float or a list of floats. | *required* |
+| `max_iteration` | `int` | The maximum number of iterations for the minimization. | *required* |
+| `quantile` | `float` | The quantile to use for cost estimation. | 1.0 |
+| `tolerance` | `float \| None` | The tolerance for the minimization. | None |
+| `hosted` | `bool` | When ``True`` on an IonQ backend, submit a Classiq execution job that runs the optimization loop on IonQ Hosted Hybrid in the backend. Defaults to ``False``. | False |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `list[tuple[float, ExecutionParams]]`
+- A list of tuples, each containing the estimated cost and the corresponding parameters for that iteration. `cost` is a float, and `parameters` is a dictionary matching the execution parameter format.
+
+
+#### minimize
+
+
+<pre><code>minimize(
+    self: ,
+    cost_function: Hamiltonian | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> list[tuple[float, ExecutionParams]]</code></pre>
+
+
+.. deprecated::
+    Use :meth:`variational_minimize` instead.
+
+This name is kept for backward compatibility and will be removed in a future release.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_function` | `Hamiltonian \| QmodExpressionCreator` |  | *required* |
+| `initial_params` | `ExecutionParams` |  | *required* |
+| `max_iteration` | `int` |  | *required* |
+| `quantile` | `float` |  | 1.0 |
+| `tolerance` | `float \| None` |  | None |
+| `num_shots` | `int \| None` |  | None |
+| `run_via_classiq` | `bool \| None` |  | None |
+
+
+
+#### submit_variational_minimize
+
+
+<pre><code>submit_variational_minimize(
+    self: ,
+    cost_function: Hamiltonian | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    hosted: bool = False,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None,
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+Initiates an execution job with the variational minimization primitive.
+
+Non-blocking counterpart of :meth:`variational_minimize`: same parameters and job,
+but returns the :class:`~classiq.execution.jobs.ExecutionJob` immediately.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_function` | `Hamiltonian \| QmodExpressionCreator` | The cost function to minimize. It can be one of the following: - A quantum cost function defined by a Hamiltonian. - A classical cost function represented as a callable that returns a Qmod expression. The callable should accept `QVar`s as arguments and use names matching the Model outputs. | *required* |
+| `initial_params` | `ExecutionParams` | The initial parameters for the minimization. Only Models with exactly one execution parameter are supported. This parameter must be of type `CReal` or `CArray`. The dictionary must contain a single key-value pair, where: - The key is the name of the parameter. - The value is either a float or a list of floats. | *required* |
+| `max_iteration` | `int` | The maximum number of iterations for the minimization. | *required* |
+| `quantile` | `float` | The quantile to use for cost estimation. | 1.0 |
+| `tolerance` | `float \| None` | The tolerance for the minimization. | None |
+| `hosted` | `bool` | When ``True`` on an IonQ backend, submit a Classiq execution job that runs the optimization loop on IonQ Hosted Hybrid in the backend. Defaults to ``False``. | False |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+**Returns:**
+
+- **Type:** `ExecutionJob`
+- The execution job. When ``hosted=True`` on an IonQ backend, the backend
+- worker submits and polls IonQ Hosted Hybrid while this job tracks
+- progress through the standard Classiq execution API.
+
+
+#### submit_minimize
+
+
+<pre><code>submit_minimize(
+    self: ,
+    cost_function: Hamiltonian | QmodExpressionCreator,
+    initial_params: ExecutionParams,
+    max_iteration: int,
+    quantile: float = 1.0,
+    tolerance: float | None = None,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None,
+    _check_deprecation: bool = True
+) -> ExecutionJob</code></pre>
+
+
+.. deprecated::
+    Use :meth:`submit_variational_minimize` instead.
+
+This name is kept for backward compatibility and will be removed in a future release.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_function` | `Hamiltonian \| QmodExpressionCreator` |  | *required* |
+| `initial_params` | `ExecutionParams` |  | *required* |
+| `max_iteration` | `int` |  | *required* |
+| `quantile` | `float` |  | 1.0 |
+| `tolerance` | `float \| None` |  | None |
+| `num_shots` | `int \| None` |  | None |
+| `run_via_classiq` | `bool \| None` |  | None |
+| `_check_deprecation` | `bool` |  | True |
+
+
+
+#### estimate_cost
+
+
+<pre><code>estimate_cost(
+    self: ,
+    cost_func: Callable[[ParsedState], float],
+    parameters: ExecutionParams | None = None,
+    quantile: float = 1.0,
+    num_shots: int | None = None,
+    run_via_classiq: bool | None = None
+) -> float</code></pre>
+
+
+Estimates circuit cost using a classical cost function.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `cost_func` | `Callable[[ParsedState], float]` | classical circuit sample cost function | *required* |
+| `parameters` | `ExecutionParams \| None` | execution parameters sent to 'sample' | None |
+| `quantile` | `float` | drop cost values outside the specified quantile | 1.0 |
+| `num_shots` | `int \| None` | Number of shots for this call only; overrides the session default when set. | None |
+| `run_via_classiq` | `bool \| None` | Run via Classiq credentials for this call only; overrides the session default when set. | None |
+
+
+
+**Returns:**
+
+- **Type:** `float`
+- cost estimation
+
+
+#### set_measured_state_filter
+
+
+<pre><code>set_measured_state_filter(
+    self: ,
+    output_name: str,
+    condition: Callable
+) -> None</code></pre>
+
+
+When simulating on a statevector simulator, emulate the behavior of postprocessing
+by discarding amplitudes for which their states are "undesirable".
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+| `output_name` | `str` | The name of the register to filter | *required* |
+| `condition` | `Callable` | Filter out values of the statevector for which this callable is False | *required* |
+### ExecutionPreferences
+
+Represents the execution settings for running a quantum program.
+Execution preferences for running a quantum program.
+
+For more details, refer to:
+ExecutionPreferences example: [ExecutionPreferences](https://docs.classiq.io/latest/user-guide/execution/#execution-preferences)..
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `noise_properties` | `Optional[NoiseProperties]` | Properties defining the noise in the quantum circuit. Defaults to `None`. |
+| `random_seed` | `int` | The random seed used for the execution. Defaults to a randomly generated seed. |
+| `backend_preferences` | `BackendPreferencesTypes` | Preferences for the backend used to execute the circuit. Defaults to the Classiq Simulator. |
+| `num_shots` | `Optional[pydantic.PositiveInt]` | The number of shots (executions) to be performed. |
+| `transpile_to_hardware` | `TranspilationOption` | Option to transpile the circuit to the hardware's basis gates before execution. Defaults to `TranspilationOption.DECOMPOSE`. |
+| `job_name` | `Optional[str]` | The name of the job, with a minimum length of 1 character. |
+
+
+### noise_properties
+
+
+`noise_properties: NoiseProperties | None = pydantic.Field(default=None, description='Properties of the noise in the circuit')`
+
+
+### random_seed
+
+
+`random_seed: int = pydantic.Field(default_factory=create_random_seed, description='The random seed used for the execution')`
+
+
+### backend_preferences
+
+
+`backend_preferences: BackendPreferencesTypes = backend_preferences_field(backend_name=(ClassiqSimulatorBackendNames.SIMULATOR))`
+
+
+### num_shots
+
+
+`num_shots: pydantic.PositiveInt | None = pydantic.Field(default=None)`
+
+
+### transpile_to_hardware
+
+
+`transpile_to_hardware: TranspilationOption = pydantic.Field(default=(TranspilationOption.DECOMPOSE), description='Transpile the circuit to the hardware basis gates before execution', title='Transpilation Option')`
+
+
+### job_name
+
+
+`job_name: str | None = pydantic.Field(min_length=1, description='The job name', default=None)`
+
+
+### include_zero_amplitude_outputs
+
+
+`include_zero_amplitude_outputs: bool = pydantic.Field(default=False, description='In state vector simulation, whether to include zero-amplitude states in the result. When True, overrides amplitude_threshold.')`
+
+
+### amplitude_threshold
+
+
+`amplitude_threshold: float = pydantic.Field(default=0.0, ge=0, description='In state vector simulation, only states with amplitude magnitude strictly greater than this threshold are included in the result. Defaults to 0 (filters exactly zero-amplitude states). Overridden by include_zero_amplitude_outputs=True.')`
+### CostEstimateResult
+
+Result of sample cost estimation.
+
+
+### cost
+
+
+`cost: float = pydantic.Field(description='Estimated cost')`
+
+
+### currency
+
+
+`currency: str = pydantic.Field(default='USD', description='Currency code')`
+### BackendPreferences
+
+Preferences for the execution of the quantum program.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [batch_preferences](#batch_preferences) |  |
+| [is_nvidia_backend](#is_nvidia_backend) |  |
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `backend_service_provider` | `str` | Provider company or cloud for the requested backend. |
+| `backend_name` | `str` | Name of the requested backend or target. |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderVendor = pydantic.Field(..., description='Provider company or cloud for the requested backend.')`
+
+
+### backend_name
+
+
+`backend_name: str = pydantic.Field(..., description='Name of the requested backend or target.')`
+
+
+### hw_provider
+
+
+`hw_provider: Provider`
+Members:
+
+| Name | Description |
+| ---- | ----------- |
+| `program_id_scope` | Within the scope, HTTP spans emitted by Client.request stamp `classiq.program.id`. |
+| `ExecutionJobResults` | Results from ``ExecutionJob.result()``: list-like with job-level metadata. |
+| `SubmittedCircuit` | A quantum circuit that was submitted to the provider. |
+| `ExecutionJobFilters` | Filter parameters for querying execution jobs. |
+| `get_execution_jobs` | Query execution jobs. |
+| `get_execution_actions` | Query execution jobs with optional filters. |
+
+
+### program_id_scope
+
+
+<pre><code>program_id_scope(
+    program_id: str | None
+) -> Generator[None, None, None]</code></pre>
+
+
+Within the scope, HTTP spans emitted by Client.request stamp
+`classiq.program.id`. None = no-op, leaves any outer scope intact.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `program_id` | `str \| None` |  | *required* |
+
+
+
+### ExecutionJobResults
+
+Results from ``ExecutionJob.result()``: list-like with job-level metadata.
+
+
+### hardware_execution_duration_ms
+
+
+`hardware_execution_duration_ms: int | None = hardware_execution_duration_ms`
+
+### SubmittedCircuit
+
+A quantum circuit that was submitted to the provider.
+
+Wraps the circuit in QASM format. Use to_qasm() for the text representation
+or to_qiskit() for a Qiskit QuantumCircuit (requires qiskit).
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [to_qasm](#to_qasm) | Return the circuit as a QASM string (OpenQASM 2.0 or 3.0). |
+| [to_qiskit](#to_qiskit) | Return the circuit as a Qiskit QuantumCircuit. |
+
+#### to_qasm
+
+
+<pre><code>to_qasm(
+    self: 
+) -> str</code></pre>
+
+
+Return the circuit as a QASM string (OpenQASM 2.0 or 3.0).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+
+
+
+#### to_qiskit
+
+
+<pre><code>to_qiskit(
+    self: 
+) -> Any</code></pre>
+
+
+Return the circuit as a Qiskit QuantumCircuit. Requires qiskit.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+
+
+
+### ExecutionJobFilters
+
+Filter parameters for querying execution jobs.
+
+All filters are combined using AND logic: only jobs matching all specified filters are returned.
+Range filters (with _min/_max suffixes) are inclusive.
+Datetime filters are compared against the job's timestamps.
+
+
+**Methods:**
+
+| Name | Description |
+| ---- | ----------- |
+| [format_filters](#format_filters) | Convert filter fields to API kwargs, excluding None values and converting datetimes. |
+
+
+### id
+
+
+`id: str | None = None`
+
+
+### session_id
+
+
+`session_id: str | None = None`
+
+
+### status
+
+
+`status: JobStatus | None = None`
+
+
+### name
+
+
+`name: str | None = None`
+
+
+### provider
+
+
+`provider: str | None = None`
+
+
+### backend
+
+
+`backend: str | None = None`
+
+
+### program_id
+
+
+`program_id: str | None = None`
+
+
+### total_cost_min
+
+
+`total_cost_min: float | None = None`
+
+
+### total_cost_max
+
+
+`total_cost_max: float | None = None`
+
+
+### start_time_min
+
+
+`start_time_min: datetime | None = None`
+
+
+### start_time_max
+
+
+`start_time_max: datetime | None = None`
+
+
+### end_time_min
+
+
+`end_time_min: datetime | None = None`
+
+
+### end_time_max
+
+
+`end_time_max: datetime | None = None`
+
+#### format_filters
+
+
+<pre><code>format_filters(
+    self: 
+) -> dict[str, Any]</code></pre>
+
+
+Convert filter fields to API kwargs, excluding None values and converting datetimes.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `self` | `` |  | *required* |
+
+
+
+### get_execution_jobs
+
+
+<pre><code>get_execution_jobs(
+    offset: int = 0,
+    limit: int = 50
+) -> list[ExecutionJob]</code></pre>
+
+
+Query execution jobs.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `offset` | `int` | Number of results to skip (default: 0) | 0 |
+| `limit` | `int` | Maximum number of results to return (default: 50) | 50 |
+
+
+
+**Returns:**
+
+- **Type:** `list[ExecutionJob]`
+- List of ExecutionJob objects.
+
+
+### get_execution_actions
+
+
+<pre><code>get_execution_actions(
+    offset: int = 0,
+    limit: int = 50,
+    filters: ExecutionJobFilters | None = None
+) -> pd.DataFrame</code></pre>
+
+
+Query execution jobs with optional filters.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `offset` | `int` | Number of results to skip (default: 0) | 0 |
+| `limit` | `int` | Maximum number of results to return (default: 50) | 50 |
+| `filters` | `ExecutionJobFilters \| None` | Optional ExecutionJobFilters object containing filter parameters. | None |
+
+
+
+**Returns:**
+
+- **Type:** `pd.DataFrame`
+- pandas.DataFrame containing execution job information with columns:
+- id, name, start_time, end_time, provider, backend_name, status,
+- num_shots, program_id, error, total_cost, currency_code, runtime_ms
+- (provider-reported hardware execution duration in milliseconds when available).
+### assign_parameters
+
+
+<pre><code>assign_parameters(
+    quantum_program: QuantumProgram,
+    parameters: ExecutionParams
+) -> QuantumProgram</code></pre>
+
+
+Assign parameters to a parametric quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | `QuantumProgram` | The quantum program to be assigned. This is the result of the synthesize method. | *required* |
+| `parameters` | `ExecutionParams` | The parameter assignments. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `QuantumProgram`
+- The quantum program after assigning parameters.
+### transpile
+
+
+<pre><code>transpile(
+    quantum_program: QuantumProgram,
+    preferences: Preferences | None = None
+) -> QuantumProgram</code></pre>
+
+
+Transpiles a quantum program.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `quantum_program` | `QuantumProgram` | The quantum program to transpile. This is the result of the synthesize method. | *required* |
+| `preferences` | `Preferences \| None` | The transpilation preferences. | None |
+
+
+
+**Returns:**
+
+- **Type:** `QuantumProgram`
+- The result of the transpilation (Optional).
+### get_budget
+
+
+<pre><code>get_budget(
+    provider: ProviderVendor | None = None
+) -> UserBudgets</code></pre>
+
+
+Retrieve the user's budget information for quantum computing resources.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `provider` | `ProviderVendor \| None` | (Optional) The quantum backend provider to filter budgets by. If not provided, budgets for all providers will be returned. | None |
+
+
+
+**Returns:**
+
+- **Type:** `UserBudgets`
+- An object containing the user's budget information.
+### set_budget_limit
+
+
+<pre><code>set_budget_limit(
+    provider: ProviderVendor,
+    limit: float
+) -> UserBudgets</code></pre>
+
+
+Set a budget limit for a specific quantum backend provider.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `provider` | `ProviderVendor` | The quantum backend provider for which to set the budget limit. | *required* |
+| `limit` | `float` | The budget limit to set. Must be greater than zero and not exceed the available budget. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `UserBudgets`
+- An object containing the updated budget information.
+### clear_budget_limit
+
+
+<pre><code>clear_budget_limit(
+    provider: ProviderVendor
+) -> UserBudgets</code></pre>
+
+
+Clear the budget limit for a specific quantum backend provider.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `provider` | `ProviderVendor` | The quantum backend provider for which to clear the budget limit. | *required* |
+
+
+
+**Returns:**
+
+- **Type:** `UserBudgets`
+- An object containing the updated budget information.

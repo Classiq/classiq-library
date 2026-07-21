@@ -1,0 +1,43 @@
+---
+title: "qDrift"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/qmod_core_library/hamiltonian_evolution/qdrift/qdrift.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The `qdrift` function implements the qDrift Trotter evolution of Ref.[ \[1\] ](#qdrift).
+
+Function: `qdrift`
+
+Arguments:
+
+- `pauli_operator`: `CArray[PauliTerm]`,
+- `evolution_coefficient`: `CReal`,
+- `num_qdrift`: `CInt`,
+- `qbv`: `QArray[QBit]`,
+
+## Example
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(qba: Output[QArray[QBit]]):
+    allocate(2, qba)
+    qdrift(
+        Pauli.X(0) * Pauli.Y(1) + 0.5 * Pauli.Z(0),
+        evolution_coefficient=2.0,
+        num_qdrift=5,
+        qbv=qba,
+    )
+
+
+qprog = synthesize(main)
+```
+
+## References
+
+<a name="qDrift">\[1]</a> E. Campbell, Random Compiler for Fast Hamiltonian Simulation, (2019). [https://arxiv.org/abs/1811.08017](https://arxiv.org/abs/1811.08017)

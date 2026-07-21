@@ -1,0 +1,372 @@
+---
+title: "Controlled Operations"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+## Introduction
+
+Controlled operations are one of the main ways quantum programs apply operations depending on the state of quantum variables. In classical programming, 
+an `if` statement chooses which instructions run based on a classical Boolean value. In quantum programming, the analogous idea is more subtle: the 
+condition may itself be quantum, meaning it may be in superposition.
+
+In Qmod, controlled quantum behavior is expressed using the `control` statement. The statement applies a unitary operation conditionally, 
+depending on a quantum state, and may optionally apply a different operation if the condition does not hold. The condition can be given 
+either as a single qubit or qubit array, or as a quantum Boolean expression over quantum variables. When the control variable is in 
+superposition, the controlled operation entangles the objects used in the controlled block with the condition.
+
+In this guide, we cover:
+
+- **Controlled operations**: applying quantum operations only on states that satisfy a quantum condition.
+- **Else blocks**: applying one operation when the condition is true and another when it is false.
+- **Operations controlled by expressions**: using Boolean expressions over quantum variables as control conditions.
+
+## Controlled operations
+
+A controlled operation applies a quantum operation subject to a condition satisfied by the quantum state. 
+The simplest case is control by a single qubit. If the control qubit is in state $\vert 1 \rangle$, the operation 
+is applied to the target. If the control qubit is in state $\vert 0 \rangle$, the operation is not applied.
+
+In Qmod, this is written with `control`:
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(ctrl: Output[QBit], target: Output[QBit]):
+    allocate(ctrl)
+    allocate(target)
+
+    H(ctrl)
+    control(ctrl, lambda: Y(target))
+```
+
+<Note>
+In the Python SDK, the controlled statement block is passed as a Python callable, commonly written using `lambda`.
+</Note>
+
+This quantum program:
+
+* Allocates a control qubit `ctrl` and a target qubit `target`.
+* Applies the Hadamard gate, $H$, to `ctrl`, creating the superposition $\vert \text{ctrl} \rangle = \frac{1}{\sqrt{2}}\left( \vert 0 \rangle + \vert 1 \rangle\right)$.
+* Applies the Pauli-Y gate to `target` conditioned on `ctrl == 1`.
+* The resulting state is $\frac{1}{\sqrt{2}}\left( \vert 00 \rangle + i\vert 11 \rangle\right),$ where the first qubit is `ctrl` and the second is `target`.
+
+This means that the target is flipped only in the part of the state where the control qubit is 1. Since the control qubit is in superposition, 
+the result is an entangled state rather than a classical branch selection. This is the same control mechanism underlying gates such as CY, but 
+Qmod generalizes it to arbitrary statement blocks and quantum expressions.
+
+<Note> 
+The `control` statement applies quantum operations coherently. It should not be interpreted as measuring the condition and then choosing a branch. 
+</Note>
+
+
+### Multi-qubit control
+
+The control variable can also be a quantum array. In that case, the controlled block is applied only when all qubits in the control array are in state $\vert 1 \rangle$.
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(ctrl: Output[QArray[QBit]], target: Output[QArray[QBit]]):
+    allocate(3, ctrl)
+    allocate(4, target)
+
+    hadamard_transform(ctrl)
+
+    control(ctrl, lambda: qft(target))
+```
+
+This quantum program:
+
+* Allocates a 3-qubit control array.
+* Puts the control array into a uniform superposition over all 3-bit strings.
+* Applies a Quantum Fourier Transform to `target` only on the basis state `ctrl == 111`.
+
+Because the control array is in superposition, the QFT is applied only to the component corresponding to `ctrl == 111`.
+
+## Else blocks
+
+A control statement may include an `else_block`. The main block is applied for states where the condition is true, and the else block is applied for states where the condition is false.
+When the condition is a qubit array, the condition holds only when all qubits in the control array are in state $\vert 1 \rangle$; otherwise, the else block applies.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(ctrl: Output[QBit], target: Output[QBit]):
+    allocate(ctrl)
+    allocate(target)
+
+    H(ctrl)
+
+    control(
+        ctrl,
+        lambda: X(target),
+        lambda: H(target),
+    )
+```
+
+This quantum program:
+
+* Allocates `ctrl` and `target`.
+* Puts `ctrl` in superposition.
+* Applies the Pauli-X gate to `target` on the branch where `ctrl == 1`.
+* Applies Hadamard gate (H) to `target` on the branch where `ctrl == 0`.
+
+This is analogous to the following classical structure:
+
+[comment]: DO_NOT_TEST
+
+```python
+if ctrl:
+    X(target)
+else:
+    H(target)
+```
+
+However, the quantum version is not a classical branching. If `ctrl` is in superposition, both branches are applied coherently to the corresponding parts 
+of the quantum state.
+
+### Example: choosing between two rotations
+
+The next example uses an else block to apply one rotation when a control qubit is 1 and a different rotation when it is 0.
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(ctrl: Output[QBit], target: Output[QBit]):
+    allocate(ctrl)
+    allocate(target)
+
+    H(ctrl)
+
+    control(
+        ctrl,
+        lambda: RX(pi / 2, target),
+        lambda: RX(pi / 3, target),
+    )
+```
+
+Whose outputs are closer to:
+
+| ctrl | target | counts | probability | bitstring |
+| ---- | ------ | ------ | ----------- | --------- |
+| 1    | 0      |	749	 |	0.245117   |	01     |
+| 0    | 0      |	749  |	0.365723   |	00     |
+| 0	   | 1      |	502  |	0.128906   |    10     |
+| 1	   | 1      |	533  |	0.260254   |    11     |
+
+
+This program creates a state in which the target qubit is rotated differently depending on the value of `ctrl`. Since `ctrl` is in superposition, 
+the two rotations are applied to different components of the full quantum state.
+
+<Note> 
+A `control` statement, like other control-flow statements such as `if_`, `repeat`, `foreach`, and `power`, must preserve the initialization status 
+of variables declared outside its blocks. A variable declared outside the controlled block may be allocated inside the block only if it is also 
+released within that same block. Similarly, variables declared inside a controlled block must be uninitialized by the end of that block.
+</Note>
+
+## Operations controlled by expressions
+
+In Qmod, a control condition may also be a quantum logical expression over quantum variables. Expressions over quantum variables evaluate coherently 
+over superpositions, producing correlated quantum values rather than a single classical value.
+
+Qmod supports arithmetic operators such as +, -, *, **, relational operators such as `==`, `!=`, `<`, `<=`, `>`, `>=`, and logical operators such as 
+`logical_and`/`&`, `logical_or`/`|`, and `logical_not`/ `~` for Boolean expressions.
+
+### Example: Uniformly controlled rotations
+
+The following example applies a sequence of multi-controlled rotations
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+num_qubits = 2
+max_iterations = 2**num_qubits
+min_angle = pi/max_iterations
+
+@qfunc
+def main(x: Output[QNum], target: Output[QBit]):
+    allocate(num_qubits, x)
+    allocate(target)
+
+    hadamard_transform(x)
+
+    repeat(max_iterations, 
+           lambda i: control( x == i, 
+                             lambda: RX(min_angle * i, target)))
+```
+
+This quantum program:
+
+* Allocates `x` as a 2-qubit quantum number.
+* Places `x` in a superposition over the values $\{0, 1, 2, 3\}$.
+* Applies a RX rotation with angle dependent on the numeric value of x.
+
+This can be interpreted as:
+
+| x value | Operation on target |
+| ------- | ------------------- |
+| 0       | No rotation         |
+| 1       | $RX(\pi / 4)$       |
+| 2       | $RX(\pi / 2)$       |
+| 3       | $RX(3\pi / 4)$      |
+
+The target qubit becomes entangled with `x`, because only different rotations occur depending on the values of `x`.
+
+### Example: Arithmetic condition
+
+Control expressions can involve arithmetic over multiple quantum variables. 
+This is useful in search, optimization, and oracle construction, where a state should be marked or modified only if it satisfies a predicate.
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(x: Output[QNum[2]], y: Output[QNum[2]], target: Output[QBit]):
+    allocate(x)
+    allocate(y)
+    allocate(target)
+
+    hadamard_transform(x)
+    hadamard_transform(y)
+
+    control(x + y >= 5, lambda: X(target))
+```
+
+This program:
+
+* Allocates two 2-qubit quantum numbers, `x` and `y`.
+* Places both in uniform superposition.
+* Flips `target` only for basis states satisfying `x + y >= 5`
+
+The satisfying assignments are:
+
+| x | y |
+| - | - |
+| 2 | 3 |
+| 3 | 2 |
+| 3 | 3 |
+
+
+After the controlled operation, the target qubit is entangled with the predicate `x + y >= 5`. If `target` is later measured as 1, 
+the variables `x` and `y` collapse to the subspace of satisfying assignments.
+
+This style is useful for expressing predicates directly in terms of problem variables, without manually decomposing the condition into lower-level gates.
+
+### Example: Controlled phase
+
+A common use of controlled operations is to apply a phase only to selected states. This is central in algorithms such as Grover search, 
+phase oracles, QAOA, and Hamiltonian-inspired constructions.
+
+The `phase` statement applies a fixed or state-dependent phase shift to the quantum state. For example, phase(x**2, pi / 4) 
+applies a phase proportional to the value of x**2. When `x` is initialized over the values 0, 1, 2, and 3, the phase statement rotates each 
+basis state according to the expression value.
+
+A controlled phase applies such a phase only under a control condition.
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(q: Output[QArray[QBit, 2]]):
+    allocate(q)
+    hadamard_transform(q)
+
+    control(q[0], lambda: phase(pi / 4))
+```
+
+This quantum program:
+
+* Allocates two qubits.
+* Places them in a uniform superposition.
+* Applies a fixed phase of $\pi/4$ only when `q[0] == 1`.
+
+The affected states are those whose first qubit is 1:
+
+| q state | Relative phase     |
+| ------- | ------------------ |
+| [0,0]   | unchanged          |
+| [0,1]   | unchanged          |
+| [1,0]   | rotated by $\pi/4$ |
+| [1,1]   | rotated by $\pi/4$ |
+
+
+It is possible to apply `phase` under both single-qubit and multi-qubit controls; the resulting phases accumulate on states satisfying 
+the respective control conditions.
+
+### Example: Phase oracle from an expression
+
+A controlled phase can be used to mark states satisfying a Boolean expression. The following example treats `v` as a selection register 
+over the list `S`. Each basis state of `v` represents a subset of the elements of `S`: if `v[i] == 1`, then `S[i]` is selected. The 
+controlled phase marks states that select exactly three elements whose sum is at most 16.
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+S = [1, 3, 5, 8, 11]
+
+
+@qfunc
+def main(v: Output[QArray]):
+    allocate(5, v)
+
+    hadamard_transform(v)
+    selected_count = sum(v[i] for i in range(v.len))
+    selected_sum = sum(S[i] * v[i] for i in range(v.len))
+
+    condition = (selected_count == 3) & (selected_sum <= 16)
+
+    control(condition, lambda: phase(pi))
+```
+
+This program:
+
+* Prepares `v` in uniform superposition.
+* Applies a relative phase of $\pi$ to states representing three selected elements of `S` whose sum is at most 16.
+* Leaves all other states unchanged.
+
+Since a phase of $\pi$ corresponds to multiplying the selected amplitudes by -1, this implements a phase oracle for the satisfying assignments.
+
+This pattern is common in Grover-style algorithms: rather than writing a result into a separate flag qubit, the oracle marks satisfying states by 
+changing their phase.
+
+## The `control` statement and runtime `if_`
+
+Qmod provides two distinct mechanisms for conditional execution: the `control` statement for quantum conditions, and the `if_` statement for classical conditions. 
+
+| Construct        | Condition type   | Evaluated                | Effect                                                                              |
+| ---------------- | ---------------- | ------------------------ | ----------------------------------------------------------------------------------- |
+| `control`        | Quantum          | Runtime                  | Applies a unitary coherently, conditioned on a quantum state                        |
+| `if_`            | Classical        | Compile time or runtime  | Conditionally executes a branch based on a symbolic or runtime classical value      |
+
+Use `control` when the condition depends on quantum variables such as qubits, quantum arrays, or expressions over quantum numbers. Use `if_` when the condition is a 
+classical Qmod expression — whether symbolic or a runtime value such as a mid-circuit measurement result. Use a Python `if` when the condition is a concrete Python value 
+known at model construction time, including Python-type parameters in [generative functions](/qmod-reference/language-reference/generative-descriptions).
+
+## See also
+
+[Control statement](/qmod-reference/language-reference/statements/control/)
+
+[Phase statement](/qmod-reference/language-reference/statements/phase/)
+
+[Expressions](/qmod-reference/language-reference/expressions)
+
+[Within-apply](/qmod-reference/language-reference/statements/within-apply)
+
+[Quantum Numbers and Arithmetics](/user-guide/modeling/quantum-numbers-arithmetics)

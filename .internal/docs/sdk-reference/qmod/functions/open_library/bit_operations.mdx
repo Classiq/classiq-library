@@ -1,0 +1,68 @@
+---
+title: Bit Operations
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `cyclic_shift_left` | Performs a left shift on the quantum register array `reg` using SWAP gates. |
+| `cyclic_shift_right` | Performs a right shift on the quantum register array `reg` by inverting cyclic_shift_left. |
+| `bitwise_negate` | Negates each bit of the input x. |
+
+
+### cyclic_shift_left
+
+
+<pre><code>cyclic_shift_left(
+    reg: QArray[QBit]
+) -> None</code></pre>
+
+
+Performs a left shift on the quantum register array `reg` using SWAP gates.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `reg` | `QArray[QBit]` |  | *required* |
+
+
+
+### cyclic_shift_right
+
+
+<pre><code>cyclic_shift_right(
+    reg: QArray[QBit]
+) -> None</code></pre>
+
+
+Performs a right shift on the quantum register array `reg` by inverting cyclic_shift_left.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `reg` | `QArray[QBit]` |  | *required* |
+
+
+
+### bitwise_negate
+
+
+<pre><code>bitwise_negate(
+    x: QArray[QBit]
+) -> None</code></pre>
+
+
+Negates each bit of the input x.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `x` | `QArray[QBit]` |  | *required* |

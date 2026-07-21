@@ -1,0 +1,1147 @@
+---
+title: "Quantum Lattice Boltzmann Method"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/CFD/qlbm/qlbm.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The Quantum Lattice Boltzmann Method (QLBM) brings the ideas of the classical lattice Boltzmann method into the quantum computing framework.
+In this notebook, we introduce the background concepts, explain how the classical method works, and motivate why a quantum version can help overcome some of its limitations. A variety of QBLM algorithms have been proposed (see Refs. below). Here, we focus on the collisionless case, including specular reflections. We exemplify the algorithm by analyzing an example inspired by the work of Schalkers and Moller \[1].
+
+## Part I 
+
+- Theory and Framework
+
+#
+
+## Background
+
+Fluid dynamics are commonly well characterized by the famous Navier-Stokes equations - a set of non-linear coupled partial differential equations.
+
+Due to the non-linearity and multiscale nature of the dynamics, a precise solution for practical systems requires substantial numerical resources (for further details see the technical supplementary at the bottom).
+
+Instead of working directly with the macroscopic fluid equations, one can take a microscopic viewpoint: Fluids are modeled as collections of particles and their behavior is described statistically, using the Boltzmann transport equation.
+
+The solution to this equation gives the dynamics for the distribution of particles positions and velocities. A numerical approach for solving the kinetic PDE equation can be obtained by employing the (classical) Lattice Boltzmann Method (LBM).
+
+#
+
+## Lattice Boltzmann Method (LBM)
+
+The Lattice Boltzmann Method simplifies the complex dynamics over the whole of phase space by replacing the velocity distribution with a discrete set of velocities, $\{\mathbf{v}_i\}$.
+
+Each lattice site $\mathbf{x}$  is characterized by a $d$-dimensional vector of distributions $f_i(\mathbf{x})$, representing the number of particles at that point with a velocity $\mathbf{v}_i$.
+
+The distributions evolve according to a discretized version of the Boltzmann transport equation under the Bhatnagar-Gross-Krook (BKG) approximation.
+
+Within the simplified description, the evolution is dictated by three distinct processes:
+
+1. Streaming: distributions move along the velocity directions to neighboring lattice sites
+
+$$
+f_i(\mathbf{x} +\mathbf{v}_{i},t +\Delta t) = f_i (\mathbf{x},t)~~ .
+$$
+2. Collision: distribution of each site relaxes to equilibrium
+
+$$
+f_i(\mathbf{x}, t) = f_i(\mathbf{x},t) - \Gamma (f^{\text{eq}}_i(\mathbf{x},t) - f_i(\mathbf{x},t))~~,
+$$
+where $\Gamma$ is the relaxation rate, and $f^{\text{eq}}(\mathbf{u}(f),\rho(f),T(f))$ is the local Maxwell-Boltzmann distribution.
+3\.
+
+Specular Reflection: particles reaching the boundary walls or obstacles reflect off them.
+
+We can approximate the microscopic dynamics by repeating these steps over small time intervals. Moreover, for sufficiently small lattice spacing the results converge to the hydrodynamic variables of the Navier-Stokes equations for an incompressible isothermal fluid.
+
+For example, the density and velocity density can be expressed as
+
+$$
+\rho(\mathbf{x},t) = \sum_i f_i(\mathbf{x},t)~~~,~~~\rho \mathbf{u}(\mathbf{x},t) = \sum_i f_i(\mathbf{x},t) \mathbf{v}_i ~~,
+$$
+where $\mathbf{u}$ is the (macroscopic) velocity field.
+
+The method enables a local description that can be efficiently parallelized, incorporates complex boundary conditions, and can be extended to other dynamical problems, such as heat transport and magnetohydrodynamics.
+
+#
+
+### Challenges in the classical approach
+
+Despite the simplification, all classical solvers face several fundamental challenges:
+
+- The number of lattice sites required to accurately describe turbulence scales unfavorably. As a result, for realistic turbulence, the cost becomes prohibitive.
+- Numerical instabilities can appear at high resolutions.
+- For 3D systems of interest, the required number of lattice sites may be trillions.
+
+The quantum Boltzmann lattice method is motivated by these challenges.
+
+Quantum computers have the potential to bypass the scaling issues, offering potential exponential or polynomial speedups in simulating fluid dynamics.
+
+This opens the door to study regimes that are entirely out of reach for classical solvers.
+
+#
+
+## Quantum Lattice Boltzmann Method
+
+In the Quantum Lattice Boltzmann Method (QLBM) the distributions $\{f_i\}$ are encoded in the amplitudes $\psi_{\mathbf{x},i}(0)$ of a quantum wavefunction $
+|\{\Psi\}\rangle$, while the streaming, collision and reflections are achieved by application of unitary transformations.
+
+The template of QLBM algorithms is composed of three stages:
+
+1. Initialization - the initial classical distributions and velocities are mapped to separate quantum variables.
+
+The $N$ lattice sites and $V$ velocities are each represented by a quantum variable, composed of $\log(N)$ "positional" qubits and $\log(V)$ "velocity" qubits, respectively.
+
+$$
+|{\Psi(0)}\rangle = \sum_{\mathbf{x},\mathbf{v}} \psi_{\mathbf{xv}}(0) |{\mathbf{x}}\rangle \otimes |{\mathbf{v}}\rangle~~.
+$$
+2. Evolution - repeated operatortion of $U_{\Delta t} = U_{\text{ref}} U_{\text{str}}$ propagates the state in time
+
+$$
+|{\Psi(t = n\Delta t)}\rangle = (U_{\Delta t})^n |{\Psi (0)}\rangle~~.
+$$
+Streaming and reflections are obtained by a conditional shift operator, inducing the mapping: $|{\mathbf{x}}\rangle\otimes |{\mathbf{v}}\rangle\rightarrow |{\mathbf{x} + \mathbf{v}\Delta t}\rangle \otimes |{\mathbf{v}}\rangle$, while collision can be performed by local rotations which mix the velocity states at each site.
+3\.
+
+Readout - measurement of global observables or a restricted number of local observables. In the implemented example, we consider a small number of grid points and measure the full state in the computational basis.
+
+The algorithm has several variants depending on the specific physical scenario.
+
+For instance, reflecting objects may be absent from the medium and are, therefore, excluded from the evolution. In the example presented here, we consider the collisionless case, where the dynamics are governed solely by streaming and reflection.
+
+Repeating the experiment many times allows us to infer statistical averages, corresponding to the macroscopic hydrodynamic variables.
+
+Having established the general form of the QLBM update rule, we now illustrate it using a simplified, collisionless system.
+
+## Part II 
+
+- Explicit Example: Collisionless Quantum Lattice Boltzmann Dynamics with Classiq
+
+As a conceptual example, we consider a collisionless model in which the particle distribution evolves according to repeated streaming and reflection operations.
+
+We begin by defining the encoding of the initial distribution in the quantum register.
+
+#
+
+## State encoding
+
+The set of classical states are encoded in quantum states of the form
+
+$$
+|{\text{grid|velocity}}\rangle=|{g_x g_y| v_{\text{dir},x}  u_x v_{\text{dir},y} u_y}\rangle~~,
+$$
+where
+the grid ($g_x$, $g_y$) and velocity magnitude ($u_x$, $u_y$) variables  are encoded as QNum variables, and the velocity directions ($v_{\text{dir},x}$, $v_{\text{dir},y}$) are encoded as single qubits.
+
+The QNums allow a straightforward implementation of shift operations, while the velocity directional encoding enables flipping the direction in the $j$'th dimension by application of a single NOT operation on $v_{\text{dir},j}$.
+
+For example, a quantum state $|{2}\rangle |{4}\rangle |{2}\rangle |{6}\rangle |{1}\rangle |{3}\rangle$ means that there is a particle on lattice site $(2,4)$ with a left velocity of magnitude $4$ and down velocity of magnitude $3$.
+
+#
+
+## Time evolution:
+
+The time-step is composed of two operations:
+
+1. Streaming: particles move one lattice site if their speed allows it (see below for further details).
+1. Reflection: particles hitting the obstacle are specularly reflected - direction is flipped and pushed back into the domain.
+
+We consider periodic boundary conditions in space, while the obstacle is placed between selected lattice sites, acting as a perfectly reflecting wall.
+
+The obstacle is placed within the lattice forming a barrier around the center of the grid.
+
+![main.png](./qlbm_files/707b125d-b9c2-4fbf-ba83-0aebaa224c46.png)
+
+Figure 
+
+1. Collisionless QLBM algorithm circuit.
+
+The preparation step and the first two iterations of the time-evolution stage.
+
+#
+
+## Initial condition
+
+The quantum state is initialized to be localized at a single grid point positioned to the left of the reflection obstacle.
+
+Velocities along the $y$-axis are initialized uniformly, whereas along the $x$-axis only non-negative velocities are sampled, uniformly distributed over their possible magnitudes.
+
+#
+
+## Observables
+
+After running the quantum circuit, we measure the
+
+- spatial distribution $p(x)$ - probability to find a particle at each site
+- velocity distribution $p(u)$ - propability over velocity magnitudes
+
+Next, we evaluate the scheduling function employed in the streaming and initialize the initial distribution.
+
+```python
+from typing import List, Tuple
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from classiq import *
+```
+#
+
+## Defining model hyperparameters
+
+```python
+# Grid length size
+GRID_LENGTH = 8  # The total number of lattice points is GRID_LENGTH^2
+
+# Velocities
+# The velocities are normalized with respect to the lattice spacing,
+# meaning that unity velocity corresponds to a distance change of one lattice spacing per model unit time-step
+# in the positive direction of the axis.
+VELOCITIES = np.array(
+    [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0]
+)  # in units (lattice spacing)/(model unit time)
+
+# Number of time-steps
+NUM_TIMES_STEPS = 9
+
+# Boundary points of the reflection object
+X_LOW, X_HIGH = 2, 5
+Y_LOW, Y_HIGH = 1, 5
+```
+#
+
+## Scheduling function
+
+A classical time-series function implements a Courant-Friedrichs-Lewy (CFL) counter, tracking the velocity magnitudes streamed at each time-step.
+
+The time steps duration are set such that at each step the distributions $f_i(\mathbf{x})$ will at most transition to a neighboring lattice site. As a consequence, the durations generally vary between time-steps. Note, that in the following example $\mathbf{x}$ represents a two dimensional vector.
+
+To evaluate the streamed velocities we first need to compute the time interval after the $m$'th time-steps, $\Delta t^m$. To this end, consider a distribution $f_i(\mathbf{x})$ at a time-step $m$ at position $x_m$, advancing with a speed $u_i$ away from a lattice site at $x_0$.
+
+The fraction of the distance from the lattice site in the following time-step can be expressed as
+
+$$
+c^{m+1}_i = \frac{x_m + |u_i| \Delta t^m -x_0}{\Delta x} = c^{m}_i + |u_i|\frac{\Delta t^m} {\Delta x}~~,
+$$
+where $\Delta x$ is the lattice spacing.
+
+If particles may only travel to the nearest lattice site during a single time-step, to evaluate $\Delta t^m$, we set $c^{m+1}_k = 1$, leading to
+$ \Delta t^{m} = (1-c^m_i)\frac{\Delta x}{|u_i|}$.
+
+Finally, for multiple possible velocities, the limiting time step is evaluated by minimizing over all velocity magnitudes
+
+$$
+\Delta t^{m} = \min_{i}(1-c^m_i)\frac{\Delta x}{|u_i|}~~.
+$$
+Utilizing $\Delta t^{m}$ we can evaluate $c^{m}_i$ for all velocites and determine which distributions have reached a lattice site.
+
+```python
+def time_series(
+    discrete_velocities: np.ndarray,
+    time: float = 10.0,
+    tolerance: float = 1e-6,
+    max_iters: int = 10**3,
+) -> List[List[int]]:
+    """
+    Implements a CFL counter, evaluating the time series of streaming velocities for a discrete set of velocities
+
+    Parameters:
+        discrete_velocities: list,
+        time: float, simulation time
+        tolerance: float,
+        max_iters: int, maximum number of propagation steps
+
+    Returns:
+        schedule: List[List[int]], each list dictates the velocities streamed at the corresponding time step.
+        accumulated_time: float, total time duration of the simulation
+    """
+
+    num_discrete_velocities = discrete_velocities.shape[0]
+    velocity_magnitudes = np.array(sorted(set((np.abs(discrete_velocities).tolist()))))
+
+    # Assumes that velocity magnitudes are the same in all directions
+    M = discrete_velocities.shape[0] // 2 + (discrete_velocities.shape[0] % 2)
+
+    # Track the "progress" of each distribution towards the next grid point
+    cfl_counter = np.zeros(M)
+    eps = 1e-12  # tolerance for "vanishing"
+    regulated_magnitudes = velocity_magnitudes.copy()
+    regulated_magnitudes[regulated_magnitudes == 0] = eps
+    inverse_velocities = 1 / regulated_magnitudes
+    ones = np.ones(M)
+
+    # Contains the velocities to be streamed at for each time step
+    schedule: List[List[int]] = []
+
+    # Accumulated time
+    accumulated_time = 0
+
+    #
+    for _ in range(max_iters):
+        # The "ground" covered by each velocity magnitude after this step
+        time_intervals = np.multiply(ones - cfl_counter, inverse_velocities)
+
+        # The minimum of time_intervals dictates which velocity limits the time step such that in the next step
+        # the associated distribution will reach the next grid point
+        min_time_interval = time_intervals[np.argmin(time_intervals)]
+
+        # Update the accumulated time
+        accumulated_time += min_time_interval
+
+        # Update the progress of each velocity
+        cfl_counter += min_time_interval * velocity_magnitudes
+
+        # Get the indices of the velocities that have reached the next grid point
+        streamed = np.squeeze(
+            np.argwhere(np.isclose(cfl_counter, 1.0, tolerance)), axis=1
+        )
+
+        # Reset the progress of the velocities streamed at this time step
+        cfl_counter[streamed] = 0.0
+
+        # Track the controlled velocities
+        schedule.append(streamed.tolist())
+
+        n_mag_bits = int(np.ceil(np.log2(M))) if M > 1 else 1
+
+        if accumulated_time >= time:
+            break
+
+    return schedule, accumulated_time
+```
+#
+
+## Initialization
+
+Initializing the model parameters.
+
+```python
+def num_bits(n):
+    """Returns the number of bits required to represent n numbers"""
+    return (n - 1).bit_length()  # int(np.ceil(np.log2(n)))
+
+
+# Grid parameters
+n_g_i_bits = num_bits(GRID_LENGTH)
+
+# Velocity magnitudes
+u = np.unique(np.abs(VELOCITIES))
+n_u_i = u.shape[0]
+n_u_i_bits = num_bits(
+    n_u_i
+)  # number of bits required to represent the magnitudes in the x and y directions
+```
+
+The quantum register is conveniently stored within a QStruct variable.
+
+The customized object will allow simple and direct access the different registers.
+
+```python
+class PhaseSpaceStruct(QStruct):
+    """Wrapping class including all the quantum variables"""
+
+    # Grid variables
+    g_x: QNum[n_g_i_bits]  # x-axis grid register
+    g_y: QNum[n_g_i_bits]  # y-axis grid register
+
+    # Velocity directions
+    v_dir_x: QBit
+    v_dir_y: QBit
+
+    # Velocity magnitudes
+    u_x: QNum[n_u_i_bits]  # velocity magnitude in the x direction
+    u_y: QNum[n_u_i_bits]  # velocity magnitude in the y direction
+```
+#
+
+### Initial state preparation, setting parameters
+
+We initialize the particles at a lattice point on the left-hand side of the lattice with a uniform velocity distribution in the y-direction and a non-negative uniform distribution in the x-direction.
+
+```python
+# Setting the initial spatial and velocity magnitude probabilities
+g_dist_x, g_dist_y = [0] * GRID_LENGTH, [0] * GRID_LENGTH
+g_dist_x[1] = 1
+g_dist_y[2] = 1
+u_dist = list(np.ones(n_u_i) / n_u_i)
+```
+
+State preperation function for the `PhaseSpaceStruct`:
+
+```python
+@qfunc
+def init_state2D(
+    qs: PhaseSpaceStruct,
+    g_dist_x: CArray[CReal],
+    g_dist_y: CArray[CReal],
+    u_dist: CArray[CReal],
+) -> None:
+    """Prepares the initial grid, velocity magnitude, and velocity direction quantum variables"""
+    inplace_prepare_amplitudes(g_dist_x, 0, qs.g_x)
+    inplace_prepare_amplitudes(g_dist_y, 0, qs.g_y)
+    inplace_prepare_amplitudes(u_dist, 0, qs.u_x)
+    inplace_prepare_amplitudes(u_dist, 0, qs.u_y)
+
+    
+
+## Initialize velocity direction register (v_dir) in an equal super position
+    X(qs.v_dir_x)
+    H(qs.v_dir_y)
+```
+#
+
+### Initiating model parameters and CFL schedule
+
+The model is propagated for `max_iters` time-steps (each containing a streaming and reflection operation), and the reflecting object is placed between the corners of `limits`.
+
+```python
+# time-series schedule
+schedule, simulation_time = time_series(VELOCITIES, max_iters=NUM_TIMES_STEPS)
+
+# set boundary points of the reflection object
+limits = [X_LOW, X_HIGH, Y_LOW, Y_HIGH]
+```
+#
+
+### Schematic representation of the considered grid
+
+![model\_scheme.png](./qlbm_files/75f3cde8-1982-46c7-bb6b-8f4bb80e4078.png)
+
+Figure 
+
+2. Schematic representation of the analyzed example. An eight-by-eight grid, with a reflection object located in the center.
+
+```python
+# Visualize which |u| move on each step
+plt.figure(figsize=(6, 2))
+plt.imshow(
+    (pd.Series(schedule).apply(lambda s: np.isin(range(n_u_i), s)).tolist()),
+    aspect="auto",
+)
+plt.xticks(range(len(u)), u)  # place ticks at 0..N-1, label them with magnitudes
+plt.xlabel("Velocity magnitude index")
+plt.ylabel("Time-step")
+plt.title("Streaming schedule (CFL-based)")
+plt.gca().invert_yaxis()
+
+cbar = plt.colorbar(label="Streaming prob.")
+cbar.set_ticks([0, 1])
+plt.show()
+```
+![output](./qlbm_files/qlbm_1.png)
+
+Figure 
+
+3. Streaming schedule.
+
+Each yellow cell indicates that the associated velocity magnitude is propagated in that time step.
+
+The schedule dictates which velocity magnitudes are propagated at each time step.
+
+The time duration of sub-steps is chosen so that distributions do not propagate beyond the neighboring cell per sub-step.
+
+This prevents overshoot and reproduces integer grid walks.
+
+For example, at time step 3, distributions with absolute velocities of 1,2,3 will stream.
+
+#
+
+## Streaming operator
+
+The streaming operation propagates the particles based on the `schedule`, which contains the streamed velocity magnitudes at each time step.
+
+Conditioned on whether the velocity magnitude appears in `schedule[t]`, a sequential modular addition operation is performed on the associated grid variable $ |{\mathbf{x}}\rangle |{\mathbf{v}}\rangle \mapsto |{\mathbf{x}+\Delta \mathbf{x}}\rangle|\mathbf{v}\rangle$.
+
+The operation manifests a conditional translation of a specific set of positional states.
+
+```python
+
+## Stream operator
+
+
+@qfunc
+def stream(qs: PhaseSpaceStruct, indx: int) -> None:
+    control(
+        qs.u_x == indx,
+        lambda: control(
+            qs.v_dir_x,
+            lambda: inplace_add(1, qs.g_x),
+            lambda: inplace_add(-1, qs.g_x),
+        ),
+    )
+    control(
+        qs.u_y == indx,
+        lambda: control(
+            qs.v_dir_y,
+            lambda: inplace_add(1, qs.g_y),
+            lambda: inplace_add(-1, qs.g_y),
+        ),
+    )
+```
+![stream.png](./qlbm_files/1efaa199-9bca-47b7-982c-366975a479aa.png)
+
+Figure 
+
+4. Implementation of the streaming operator in Classiq
+
+#
+
+## Specular Reflection
+
+The boundary reflection operation effectively reflects particles that enter the boundaries.
+
+The boundary surfaces are assumed to be orthogonal to the lattice sites, and located right between two lattice sites.
+
+Each boundary surface is characterized by the lattice site inside the boundary closest to its surface, `position`, and the direction normal to the surface, `direction`.
+
+Two types of reflections can occur:
+(i) reflections from the corners of the reflecting object, and
+(ii) reflections from the bulk of its surface.
+
+(i) For particles colliding with a corner, the velocity components along both the $x$ and $y$ axes are reversed.
+
+(ii) For particles colliding with the flat surface, only the velocity component normal to the surface is reversed, while the tangential component remains unchanged.
+
+Such a reflection scheme enables modeling the reflection process without any ancillas.
+
+This is achieved by ensuring that particles incident from different directions never scatter into the same outgoing direction.
+
+Allowing multiple distinct incoming states to map onto a single outgoing state would correspond to a non-invertible transformation, thereby violating the unitarity condition required by the quantum circuit computation model.
+
+A reflection operation is performed unitarily a controlled operations, effectively reversing the appropriate velocity of a particle colliding with the reflection object's boundary.
+
+The $y$-component  velocities of  particles reaching the upper and lower surfaces of the rectangular object and $x$-component, for particles reaching the left and right surfaces.
+
+A reflection operation is implemented unitarily through controlled operations, effectively reversing the relevant velocity component of a particle upon collision with the boundary of the reflecting object. Specifically, the $y$-component of velocity is reversed for particles striking the upper or lower surfaces, while the $x$-component is reversed for those hitting the left or right surfaces. As a consequence, the velocity of particles reaching the corners is reversed.
+
+![reflection\_scheme.png](./qlbm_files/28a38802-1e07-494a-a361-2b47b91c6ae9.png)
+
+Figure 
+
+5. Schematic representation of the reflection types.
+
+Incoming and reflected particles are indicated by continuous and dashed arrows, respectively.
+
+```python
+@qfunc
+def flip_velocity(
+    change_pos: QNum,
+    fixed_pos: QNum,
+    change_u: QNum,
+    change_v_dir: QBit,
+    mag: int,
+    arr: CArray[CReal],
+) -> None:
+    """flips the velocity of a certain direction "change" for particles in a regime defined by array arr."""
+    change_low, change_high, fixed_low, fixed_high = arr[0], arr[1], arr[2], arr[3]
+    # if the particle entered the object and is on the lattice points closest the surface, flip the associated velocity
+    control(
+        ((change_pos == change_low) | (change_pos == change_high))
+        & (fixed_pos >= fixed_low)
+        & (fixed_pos <= fixed_high)
+        & (change_u == mag),
+        lambda: X(change_v_dir),
+    )
+
+
+@qfunc
+def reflection(qs: PhaseSpaceStruct, mag: int, limits: CArray[CReal]) -> None:
+    """
+    Performs a reflection of the particles reaching lattice sites on the boundary
+    Note that such a reflection limits the initial conditions.
+
+    Parameters:
+        reg:  PhaseSpaceStruct, the complete register of the system
+        mag: int, velocity magnitude
+        limits: list (of QArray[CInt]), defines the limits of the reflecting object
+    """
+
+    X_LOW, X_HIGH, Y_LOW, Y_HIGH = limits[0], limits[1], limits[2], limits[3]
+    # reverse the velocity
+
+    # from the top and bottom of the object
+    top_bottom_arr = [Y_LOW, Y_HIGH, X_LOW, X_HIGH]
+    flip_velocity(
+        change_pos=qs.g_y,
+        fixed_pos=qs.g_x,
+        change_u=qs.u_y,
+        change_v_dir=qs.v_dir_y,
+        mag=mag,
+        arr=top_bottom_arr,
+    )
+    # from the left and right of the object
+    flip_velocity(
+        change_pos=qs.g_x,
+        fixed_pos=qs.g_y,
+        change_u=qs.u_x,
+        change_v_dir=qs.v_dir_x,
+        mag=mag,
+        arr=limits,
+    )
+```
+![stream.png](./qlbm_files/517a2527-5749-4913-b4a0-3d1ab6dbc41a.png)
+
+Figure 
+
+6. Implementation of the reflection operator within the main quantum circuit.
+
+#
+
+## Building the quantum program
+
+```python
+@qfunc
+def main(qs: Output[PhaseSpaceStruct]) -> None:
+    allocate(qs)
+
+    # Prepare the initial register
+    init_state2D(qs, g_dist_x, g_dist_y, u_dist)
+
+    # Number of time steps
+    Nt = len(schedule)
+
+    # Iterate over time steps
+    for t in range(Nt):
+        # Iterate over magnitudes to stream
+        for mag in schedule[t]:
+            # Stream
+            stream(qs, mag)
+
+            # Reflect from boundaries
+            reflection(qs, mag, limits)
+
+
+qprog = synthesize(main)
+job = execute(qprog)
+```
+#
+
+## Execution and results
+
+We run the quantum program on a statevector simulator to retrieve the full solution.
+
+```python
+with ExecutionSession(qprog) as es:
+    results = es.sample()
+table = results.dataframe.to_numpy()
+```
+
+Taking a look at a small part of the results
+
+```python
+results.dataframe.head()
+```
+|   | qs.g\_x | qs.g\_y | qs.v\_dir\_x | qs.v\_dir\_y | qs.u\_x | qs.u\_y | count | probability | bitstring    |
+| - | ------- | ------- | ------------ | ------------ | ------- | ------- | ----- | ----------- | ------------ |
+| 0 | 1       | 1       | 1            | 1            | 0       | 3       | 88    | 0.042969    | 110011001001 |
+| 1 | 6       | 2       | 1            | 1            | 3       | 0       | 77    | 0.037598    | 001111010110 |
+| 2 | 1       | 2       | 1            | 1            | 0       | 0       | 76    | 0.037109    | 000011010001 |
+| 3 | 4       | 7       | 0            | 1            | 3       | 3       | 76    | 0.037109    | 111110111100 |
+| 4 | 1       | 2       | 0            | 1            | 1       | 1       | 74    | 0.036133    | 010110010001 |
+
+Evaluating the spatial and velocity magnitude distribution, $p(x)$ and $p(u)$.
+
+```python
+def get_p(dataframe, jx, jy, n):
+    """
+    Extracts a 2D probability map from the dataframe
+    where columns jx and jy correspond to the x and y indices.
+
+    Parameters:
+        dataframe: pandas.DataFrame, the table containing measurement results.
+        jx, jy: int, column indices for the x and y registers.
+        n: int, number of discrete x and y states (assumes square grid n x n).
+
+    Returns:
+        p: np.ndarray, 2D array of summed probabilities p[x, y].
+    """
+    p = np.zeros((n, n))
+    for x in range(n):
+        for y in range(n):
+            # mask the case of interest
+            mask = (dataframe.iloc[:, jx] == x) & (dataframe.iloc[:, jy] == y)
+            p[y, x] = np.sum(dataframe.loc[mask].to_numpy()[:, 7])
+    return p
+
+
+# 2D distribution
+p_xy = get_p(results.dataframe, jx=0, jy=1, n=GRID_LENGTH)
+p_u_xy = get_p(results.dataframe, jx=4, jy=5, n=n_u_i)
+```
+
+Propagating the dynamics for nine time time-steps, we obtain the following spatial and velocity magnitude distributions:
+
+```python
+plt.figure(figsize=(5, 5))
+plt.imshow(
+    p_xy,
+    cmap="viridis",
+    origin="lower",  # make (0,0) appear bottom-left
+    aspect="equal",
+)
+
+# Add colorbar
+plt.colorbar(label="Probability", shrink=0.7)
+
+# Label axes
+plt.xlabel("x position (grid site)")
+plt.ylabel("y position (grid site)")
+
+# Set tick positions and labels
+plt.xticks(range(p_xy.shape[1]), range(p_xy.shape[1]))
+plt.yticks(range(p_xy.shape[0]), range(p_xy.shape[0]))
+
+plt.title("Spatial Distribution")
+plt.tight_layout()
+plt.show()
+```
+![output](./qlbm_files/qlbm_2.png)
+
+Figure 
+
+7. Spatial distribution.
+
+Probability at each lattice site.
+
+Obtained by summing over all the velocity probabilities at each site.
+
+```python
+plt.imshow(
+    p_u_xy,
+    cmap="viridis",
+    aspect="auto",
+    origin="lower",
+    extent=[u[0], u[-1], u[0], u[-1]],  # x_min, x_max, y_min, y_max
+)
+
+plt.colorbar(label="Probability")
+
+# Tick marks exactly at your u values
+plt.xticks(u, [f"{val:.1f}" for val in u])
+plt.yticks(u, [f"{val:.1f}" for val in u])
+
+plt.title("Velocity Magnitude Distribution")
+plt.xlabel("Velocity Magnitude (x)")
+plt.ylabel("Velocity Magnitude (y)")
+plt.tight_layout()
+plt.show()
+```
+![output](./qlbm_files/qlbm_3.png)
+
+Figure 
+
+8. Velocity magnitude distribution.
+
+Obtained by summing over all the lattice sites for each velocity magnitude.
+
+#
+
+## Analysis
+
+The simulation starts with particles placed at lattice site $(x_0, y_0) = (1,2)$, and their velocities are distributed uniformly - meaning each possible speed is equally likely at the beginning. We apply periodic boundary conditions, so particles that leave the domain on one side re-enter from the other. In addition, a reflecting obstacle is a rectangle with the corners situated at $(2,1)$, $(2,5)$, $(5,1)$, and $(5,5)$.
+
+As the system evolves, particles outside the obstacle move freely, while those reaching the obstacle bounce back.
+
+After several time steps, the particles cover the free space surrounding the reflecting object.
+
+The velocity-magnitude plot shows that all speeds still have roughly the same probability.
+
+This makes sense because no collisions occur in this setup, so the distribution of speeds doesn't change over time, only the direction of the velocities.
+
+The small differences between probabilities come only from statistical fluctuations, since we are working with a finite number of samples from the quantum simulation.
+
+## Part III 
+
+- Technical Background
+
+#
+
+## Classical methods
+
+The dynamics of fluids with low compressibility and  isothermal conditions are described by the small Mach number limit of the Navier--Stokes equations:
+
+$$
+\frac{\partial\rho}{\partial t} + \nabla \cdot \rho\mathbf{u} = 0~~,~~\text{(Continuity eq.)}
+$$
+$$
+\rho
+\left(
+\frac{\partial \mathbf{u}}{\partial t} 
++ \mathbf{u} \cdot \nabla \mathbf{u}
+\right)
+= 
+-\nabla p 
++ \mu \nabla^2 \mathbf{u} 
++ \rho \mathbf{F}~~,~~ \text{(Momentum eq.)}
+$$
+where $\mathbf{u}$ is the velocity field, $\rho$ is the fluid density,
+$p$ is the hydrodynamic pressure, $\mu$ is the dynamic viscosity,
+and $\mathbf{F}$ represents external body forces.
+
+The nonlinear and multiscale nature of these equations imposes substantial computational demands on classical solvers.
+
+For discretization-based approaches, the per-time-step computational complexity scales as $O(N_x^d)$ where $N_x$ is the number of grid points per spatial dimension and $d$ is the dimensionality of the system. However, fully resolving all relevant turbulent scales requires a grid resolution that scales unfavorably with the Reynolds number, approximately as $Re^{9/4}$. Consequently, the overall computational cost of direct numerical simulation grows nearly exponentially with $Re$.
+
+The Reynolds number is a unitless quantity that measures the relative importance of inertial forces to viscous forces in a fluid flow.
+
+Turbulent flows correspond to high Reynolds numbers, where nonlinear interactions between scales dominate the dynamics.
+
+A further challenge lies in parallelization: enforcing incompressibility introduces global constraints that couple the velocity field across the entire domain, hindering the scalability of classical Navier-Stokes solvers and preventing fully local computation.
+
+#
+
+## Kinetic Formulation
+
+An alternative, microscopic viewpoint is provided by the Boltzmann transport equation:
+
+$$
+\frac{\partial f}{\partial t} + \mathbf{v}
+    \cdot \nabla f + \mathbf{F}\cdot\frac{\partial f}{\partial \mathbf p} = Q(f,f)~~,
+$$
+where $f(\mathbf{x}, \mathbf{v}, t)$ is the single-particle distribution function over phase space,
+$\mathbf{F}$ represents external forces, and $Q(f,f)$ is the collision operator describing molecular interactions.
+
+The collision term involves a high-dimensional integral over all pre- and post-collision velocities and scattering angles,
+making its evaluation the dominant computational cost.
+
+For deterministic discretizations, the complexity per time step scales as
+
+$$
+O(N_x^d N_v^{2d})~~,
+
+$$
+where $N_v$ is the number of discrete velocity points per dimension.
+
+#
+
+## BGK Approximation
+
+A major simplification is obtained by replacing the collision operator with a local relaxation term toward equilibrium:
+
+$$
+\frac{\partial f}{\partial t}
++ \mathbf{v} \cdot \nabla f
++ \mathbf{F} \cdot \frac{\partial f}{\mathbf{\partial p}}
+= -\Gamma (f - f^{\text{eq}})~~,
+\tag{1}
+$$
+where $\Gamma$ is the relaxation rate and $f^{\text{eq}}$ is the local Maxwellian equilibrium distribution.
+
+This Bhatnagar--Gross--Krook (BGK) approximation replaces the complex integral operator with a local operation that depends only on a few velocity moments.
+
+Despite this simplification, direct numerical integration of Eq.\~(1) still requires evolving $f(\mathbf{x}, \mathbf{v}, t)$ across both position and velocity grids, leading to a per-time-step complexity of
+
+$$
+O(N_x^d N_v^d)~~.
+
+$$
+#
+
+## Lattice Boltzmann Method (LBM)
+
+The (LBM) offers an efficient and scalable alternative.
+LBM discretizes velocity space into a small set of representative directions, allowing collisions and streaming to be computed locally in time and space.
+
+This locality enables excellent parallelization and simplifies the handling of complex geometries and boundary conditions.
+
+The resulting per-time-step complexity scales as
+
+$$
+O(N_x^d V^d)~~,
+
+$$
+where $V$ is the number of discrete velocity directions per dimension (typically small and fixed).
+
+#
+
+## Figure codes
+
+#
+
+### Figure 2
+
+```python
+import matplotlib.patches as patches
+
+
+def plot_2d_grid_with_obstacle(
+    Lx=4, Ly=4, obs_x_start=X_LOW, obs_x_end=X_HIGH, obs_y_start=Y_LOW, obs_y_end=Y_HIGH
+):
+    """
+    Plot a 2D lattice with a rectangular obstacle.
+
+Parameters
+    ---------
+
+-
+    Lx, Ly : int
+        Number of lattice sites in x and y directions.
+    obs_x_start, obs_x_end : int
+        Left and right faces (inclusive) of the obstacle region in x.
+    obs_y_start, obs_y_end : int
+        Bottom and top faces (inclusive) of the obstacle region in y.
+    """
+    # Basic sanity
+    assert 0 <= obs_x_start <= obs_x_end < Lx, "Obstacle x must be within [0, Lx-1]."
+    assert 0 <= obs_y_start <= obs_y_end < Ly, "Obstacle y must be within [0, Ly-1]."
+
+    # Generate grid coordinates
+    x_sites, y_sites = np.meshgrid(np.arange(Lx), np.arange(Ly))
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+
+    # Draw lattice sites
+    ax.scatter(x_sites, y_sites, marker="x", s=60, zorder=3, color="k")
+
+    # Draw obstacle as shaded rectangle
+    rect = patches.Rectangle(
+        (obs_x_start - 0.1, obs_y_start - 0.1),
+        obs_x_end - obs_x_start + 0.2,
+        obs_y_end - obs_y_start + 0.2,
+        linewidth=1,
+        edgecolor="r",
+        facecolor="tab:red",
+        alpha=0.35,
+        label="Obstacle",
+    )
+    ax.add_patch(rect)
+
+    # Cosmetics
+    ax.set_xlim(-0.5, Lx - 0.5)
+    ax.set_ylim(-0.5, Ly - 0.5)
+    ax.set_xticks(np.arange(Lx))
+    ax.set_yticks(np.arange(Ly))
+    ax.set_aspect("equal")
+    ax.grid(True, which="both", linestyle="--", alpha=0.4)
+    ax.legend(loc="upper right")
+
+    plt.tight_layout()
+    plt.savefig("model_scheme.png")
+    plt.show()
+
+
+# Example usage: 8x8 grid, obstacle in the range x in (x_low, x_high) y in (y_low, y_high)
+# plot_2d_grid_with_obstacle(Lx=8, Ly=8, obs_x_start=x_low, obs_x_end=x_high, obs_y_start=y_low, obs_y_end=y_high)
+```
+#
+
+### Figure 5
+
+```python
+import math
+
+# === Create the figure and axis ===
+fig, ax = plt.subplots()
+
+# === Draw the reflecting object (red square) ===
+# The square is centered in the figure with semi-transparent red fill
+square = plt.Rectangle(
+    (0.25, 0.25), 0.5, 0.5, linewidth=1, edgecolor="r", facecolor="tab:red", alpha=0.35
+)
+ax.add_patch(square)
+
+# === Add first arrow pair (top-left corner reflection) ===
+# Solid arrow: incoming direction (up-right)
+arrow_start = (0.3, 0.8)
+arrow_dx, arrow_dy = (0.1, 0.1)
+ax.arrow(
+    arrow_start[0],
+    arrow_start[1],
+    arrow_dx,
+    arrow_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="black",
+    ec="black",
+)
+
+# Dashed arrow: reflected direction (down-left)
+arrow2_start = (arrow_start[0] + arrow_dx, arrow_start[1] + arrow_dy + 0.05)
+arrow2_dx, arrow2_dy = (-0.1, -0.1)
+ax.arrow(
+    arrow2_start[0],
+    arrow2_start[1],
+    arrow2_dx,
+    arrow2_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="none",
+    ec="black",
+    linestyle="--",
+)
+
+# === Add second arrow pair (upper-left side) ===
+# Solid arrow: incident from top-left toward the object
+arrow3_end = (0.16, 0.84)
+arrow3_start = (arrow3_end[0] - 0.1, arrow3_end[1] + 0.1)
+arrow3_dx = arrow3_end[0] - arrow3_start[0]
+arrow3_dy = arrow3_end[1] - arrow3_start[1]
+ax.arrow(
+    arrow3_start[0],
+    arrow3_start[1],
+    arrow3_dx,
+    arrow3_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="black",
+    ec="black",
+)
+
+# Dashed arrow: reflection opposite to incident direction
+arrow4_start = (arrow3_start[0] + arrow3_dx + 0.01, arrow3_start[1] + arrow3_dy - 0.07)
+arrow4_dx, arrow4_dy = (-0.1, 0.1)
+ax.arrow(
+    arrow4_start[0],
+    arrow4_start[1],
+    arrow4_dx,
+    arrow4_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="none",
+    ec="black",
+    linestyle="--",
+)
+
+# === Define helper for rotation (used below) ===
+angle_rad = math.radians(90)
+
+
+def rotate(dx, dy):
+    """Rotate a vector (dx, dy) 90 degrees counterclockwise."""
+    new_dx = dx * math.cos(angle_rad) - dy * math.sin(angle_rad)
+    new_dy = dx * math.sin(angle_rad) + dy * math.cos(angle_rad)
+    return new_dx, new_dy
+
+
+# === Add third arrow pair (lower-left side, rotated 90° CCW) ===
+arrow5_end = (0.16, 0.64)
+arrow5_start = (arrow5_end[0] - 0.1, arrow5_end[1] + 0.1)
+arrow5_dx, arrow5_dy = rotate(
+    arrow5_end[0] - arrow5_start[0], arrow5_end[1] - arrow5_start[1]
+)
+
+# Solid arrow: incident direction
+ax.arrow(
+    arrow5_start[0] - 0.03,
+    arrow5_start[1] - 0.155,
+    arrow5_dx,
+    arrow5_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="black",
+    ec="black",
+)
+
+# Dashed arrow: reflection (opposite)
+arrow6_start = (arrow5_start[0] + arrow5_dx + 0.02, arrow5_start[1] + arrow5_dy - 0.06)
+arrow6_dx, arrow6_dy = rotate(-0.1, 0.1)
+ax.arrow(
+    arrow6_start[0],
+    arrow6_start[1] - 0.1,
+    arrow6_dx,
+    arrow6_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="none",
+    ec="black",
+    linestyle="--",
+)
+
+# === Add pair of arrows to bottom surface (center reflection) ===
+# Solid arrow: incoming (upward)
+arrow7_start = (0.35, 0.06)
+arrow7_dx, arrow7_dy = (0.1, 0.1)
+ax.arrow(
+    arrow7_start[0],
+    arrow7_start[1],
+    arrow7_dx,
+    arrow7_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="none",
+    ec="black",
+)
+
+# Dashed arrow: reflected (downward)
+arrow8_start = (0.52, 0.2)
+arrow8_dx, arrow8_dy = (0.1, -0.1)
+ax.arrow(
+    arrow8_start[0],
+    arrow8_start[1],
+    arrow8_dx,
+    arrow8_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="none",
+    ec="black",
+    linestyle="--",
+)
+
+# === Add final vertical pair (top reflection) ===
+# Solid: downward arrow from top
+arrow9_start = (0.6, 0.93)
+arrow9_dx, arrow9_dy = (0, -0.1)
+ax.arrow(
+    arrow9_start[0],
+    arrow9_start[1],
+    arrow9_dx,
+    arrow9_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="none",
+    ec="black",
+)
+
+# Dashed: reflected upward
+arrow10_start = (0.64, 0.78)
+arrow10_dx, arrow10_dy = (0, 0.1)
+ax.arrow(
+    arrow10_start[0],
+    arrow10_start[1],
+    arrow10_dx,
+    arrow10_dy,
+    head_width=0.03,
+    head_length=0.05,
+    fc="none",
+    ec="black",
+    linestyle="--",
+)
+
+# === Final plot settings ===
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 1)
+ax.set_aspect("equal")
+
+# Remove all tick marks and labels
+ax.set_xticks([])
+ax.set_yticks([])
+ax.set_xticklabels([])
+ax.set_yticklabels([])
+
+fig.suptitle("Schematic of particle reflections at object surfaces")
+
+# Optionally remove axis spines for a cleaner figure
+for spine in ax.spines.values():
+    spine.set_visible(False)
+plt.savefig("reflection_scheme.png")
+plt.show()
+```
+![output](./qlbm_files/qlbm_4.png)
+
+## References
+
+\[1] [Schalkers, M.A. & Möller. Efficient and fail-safe quantum algorithm for the transport equation. M., Journal of Computational Physics, 502, p.112816](https://www.sciencedirect.com/science/article/pii/S0021999124000652?ref=pdf_download\&fr=RR-2\&rr=984897380e483d7c)
+
+\[2] [Budinski, L.. (2021) Quantum algorithm for the advection–diffusion equation simulated with the lattice Boltzmann method. Quantum Information Processing, 20(2), 57.](https://link.springer.com/article/10.1007/s11128-021-02996-3)
+
+\[3] [Todorova, B. N., & Steijl, R. (2020). Quantum algorithm for the collisionless Boltzmann equation. Journal of Computational Physics, 409, 109347](https://www.sciencedirect.com/science/article/abs/pii/S0021999120301212)
+
+\[4] [Gaitan, Frank. (2020). "Finding flows of a Navier–Stokes fluid through quantum computing." npj Quantum Information 6.1: 61.](https://www.nature.com/articles/s41534-020-00291-0)
+
+\[5] [Itani, Wael, and Sauro Succi. (2022). Analysis of Carleman linearization of lattice Boltzmann. Fluids 7.1: 24.](https://arxiv.org/abs/2111.11327)
+
+\[6] [Wang, Boyuan, et al., (2025). Quantum lattice Boltzmann method for simulating nonlinear fluid dynamics. arXiv:2502.16568.](https://arxiv.org/abs/2502.16568)
+
+\[7] [Kocherla, Sriharsha, et al. (2024). A two-circuit approach to reducing quantum resources for the quantum lattice Boltzmann method. arXiv:2401.12248.](https://arxiv.org/abs/2401.12248)

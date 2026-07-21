@@ -1,0 +1,80 @@
+---
+title: C12
+icon: "/icons/bulletsharp.svg"
+---
+
+### C12BackendPreferences
+
+Represents the backend preferences specific to C12.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `backend_name` | `str` | Name of the requested backend or target. |
+| `result_format` | `str` | Result format of the job; one of "counts", "state_vector", or "density_matrix". Defaults to "counts". |
+| `inilabel` | `str \| None` | Initial state specified using a binary label format (e.g. "00", "01"). Mutually exclusive with inistatevector. |
+| `inistatevector` | `str \| None` | Initial state vector as a comma-separated list of complex values (e.g. "1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j"). Mutually exclusive with inilabel. |
+| `ininoisy` | `bool \| None` | Whether to use noisy initialization of the circuit. |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.C12 = pydantic.Field(default=(ProviderVendor.C12))`
+
+
+### result_format
+
+
+`result_format: str = pydantic.Field(default='counts', description='Result format of the job')`
+
+
+### inilabel
+
+
+`inilabel: str | None = pydantic.Field(default=None, description='Initial label of the initial state.')`
+
+
+### inistatevector
+
+
+`inistatevector: str | None = pydantic.Field(default=None, description='Initial state vector of the job.')`
+
+
+### ininoisy
+
+
+`ininoisy: bool | None = pydantic.Field(default=None, description='Whether the initial state is noisy.')`
+
+
+### parameters
+
+
+`parameters: dict`
+### C12BackendNames
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [SIMULATOR](#simulator) |  |  |
+| [SQUARED](#squared) |  |  |
+
+
+### SIMULATOR
+
+
+```python
+SIMULATOR = 'c12sim-iswap'
+```
+
+
+### SQUARED
+
+
+```python
+SQUARED = 'squared-iswap'
+```

@@ -1,0 +1,305 @@
+---
+title: Qsvt
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `qsvt_step` | [Qmod Classiq-library function]. |
+| `qsvt` | [Qmod Classiq-library function]. |
+| `projector_controlled_phase` | [Qmod Classiq-library function]. |
+| `qsvt_inversion` | [Qmod Classiq-library function]. |
+| `projector_controlled_double_phase` | [Qmod Classiq-library function]. |
+| `qsvt_lcu_step` | [Qmod Classiq-library function]. |
+| `qsvt_lcu` | [Qmod Classiq-library function]. |
+| `gqsp` | Implements Generalized Quantum Signal Processing (GQSP), which realizes a (Laurent) polynomial transformation of degree d on the eigenvalues of the... |
+
+
+### qsvt_step
+
+
+<pre><code>qsvt_step(
+    phase1: CReal,
+    phase2: CReal,
+    proj_cnot_1: QCallable[QBit],
+    proj_cnot_2: QCallable[QBit],
+    u: QCallable,
+    aux: QBit
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies a single QSVT step, composed of 2 projector-controlled-phase rotations, and applications of the block encoding unitary `u` and its inverse:
+
+$$
+\Pi_{\phi_2}U^{\dagger}\tilde{\Pi}_{\phi_{1}}U
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phase1` | `CReal` | 1st rotation phase. | *required* |
+| `phase2` | `CReal` | 2nd rotation phase. | *required* |
+| `proj_cnot_1` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix columns within U. Accepts a qubit that should be set to \`\|1>` when the state is in the block. | *required* |
+| `proj_cnot_2` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix rows within U. Accepts a qubit that should be set to \`\|1>` when the state is in the block. | *required* |
+| `u` | `QCallable` | A block encoding unitary matrix. | *required* |
+| `aux` | `QBit` | A zero auxilliary qubit, used for the projector-controlled-phase rotations. Given as an inout so that qsvt can be used as a building-block in a larger algorithm. | *required* |
+
+
+
+### qsvt
+
+
+<pre><code>qsvt(
+    phase_seq: CArray[CReal],
+    proj_cnot_1: QCallable[QBit],
+    proj_cnot_2: QCallable[QBit],
+    u: QCallable,
+    aux: QBit
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Implements the Quantum Singular Value Transformation (QSVT) - an algorithmic framework, used to apply polynomial transformations of degree `d` on the singular values of a block encoded matrix, given as the unitary `u`.    Given a unitary $U$, a list of phase angles  $\phi_1, \phi_2, ..., \phi_\{d+1\}$ and 2 projector-controlled-not operands $C_\{\Pi\}NOT,C_\{\tilde\{\Pi\}\}NOT$, the QSVT sequence is as follows:
+Given a unitary $U$, a list of phase angles  $\phi_1, \phi_2, ..., \phi_\{d+1\}$ and 2 projector-controlled-not operands $C_\{\Pi\}NOT,C_\{\tilde\{\Pi\}\}NOT$, the QSVT sequence is as follows:
+
+$$
+\tilde{\Pi}_{\phi_{d+1}}U \prod_{k=1}^{(d-1)/2} (\Pi_{\phi_{d-2k}} U^{\dagger}\tilde{\Pi}_{\phi_{d - (2k+1)}}U)\Pi_{\phi_{1}}
+$$
+
+for odd $d$, and:
+
+$$
+\prod_{k=1}^{d/2} (\Pi_{\phi_{d-(2k-1)}} U^{\dagger}\tilde{\Pi}_{\phi_{d-2k}}U)\Pi_{\phi_{1}}
+$$
+
+for even $d$.
+
+Each of the $\Pi$s is a projector-controlled-phase unitary, according to the given projectors.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phase_seq` | `CArray[CReal]` | A sequence of phase angles of length d+1. | *required* |
+| `proj_cnot_1` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix columns within U. Accepts a qubit that should be set to \`\|1>` when the state is in the block. | *required* |
+| `proj_cnot_2` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix rows within U. Accepts a qubit that should be set to \`\|1>` when the state is in the block. | *required* |
+| `u` | `QCallable` | A block encoding unitary matrix. | *required* |
+| `aux` | `QBit` | A zero auxilliary qubit, used for the projector-controlled-phase rotations. Given as an inout so that qsvt can be used as a building-block in a larger algorithm. | *required* |
+
+
+
+### projector_controlled_phase
+
+
+<pre><code>projector_controlled_phase(
+    phase: CReal,
+    proj_cnot: QCallable[QBit],
+    aux: QBit
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Assigns a phase to the entire subspace determined by the given projector. Corresponds to the operation:
+
+$$
+\Pi_{\phi} = (C_{\Pi}NOT) e^{-irac{\phi}{2}Z}(C_{\Pi}NOT)
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phase` | `CReal` | A rotation phase. | *required* |
+| `proj_cnot` | `QCallable[QBit]` | Projector-controlled-not unitary that sets an auxilliary qubit to \`\|1>` when the state is in the projection. | *required* |
+| `aux` | `QBit` | A zero auxilliary qubit, used for the projector-controlled-phase rotation. | *required* |
+
+
+
+### qsvt_inversion
+
+
+<pre><code>qsvt_inversion(
+    phase_seq: CArray[CReal],
+    block_encoding_cnot: QCallable[QBit],
+    u: QCallable,
+    aux: QBit
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Implements matrix inversion on a given block-encoding of a square matrix, using the QSVT framework. Applies a polynomial approximation
+of the inverse of the singular values of the matrix encoded in `u`. The phases for the polynomial should be pre-calculated and passed into the function.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phase_seq` | `CArray[CReal]` | A sequence of phase angles of length d+1, corresponding to an odd polynomial approximation of the scaled inverse function. | *required* |
+| `block_encoding_cnot` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix columns within U. Accepts a quantum variable that should be set to \`\|1>` when the state is in the block. | *required* |
+| `u` | `QCallable` | A block encoding unitary matrix. | *required* |
+| `aux` | `QBit` | A zero auxilliary qubit, used for the projector-controlled-phase rotations. Given as an inout so that qsvt can be used as a building-block in a larger algorithm. | *required* |
+
+
+
+### projector_controlled_double_phase
+
+
+<pre><code>projector_controlled_double_phase(
+    phase_even: CReal,
+    phase_odd: CReal,
+    proj_cnot: QCallable[QBit],
+    aux: QBit,
+    lcu: QBit
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Assigns 2 phases to the entire subspace determined by the given projector, each one is controlled differentely on a given `lcu` qvar.
+Used in the context of the `qsvt_lcu` function. Corresponds to the operation:
+
+$$
+\Pi_{\phi_{odd}, \phi_{even}} = (C_{\Pi}NOT) (C_{lcu=1}e^{-i\frac{\phi_{even}}{2}Z}) (C_{lcu=0}e^{-i\frac{\phi_{odd}}{2}Z}) (C_{\Pi}NOT)
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phase_even` | `CReal` | Rotation phase, corresponds to 'lcu'=0. | *required* |
+| `phase_odd` | `CReal` | Rotation phase, corresponds to 'lcu'=1. | *required* |
+| `proj_cnot` | `QCallable[QBit]` | Projector-controlled-not unitary that sets an auxilliary qubit to \`\|1>` when the state is in the projection. | *required* |
+| `aux` | `QBit` | A zero auxilliary qubit, used for the projector-controlled-phase rotation. Given as an inout so that qsvt can be used as a building-block in a larger algorithm. | *required* |
+| `lcu` | `QBit` | The quantum variable used for controlling the phase assignment. | *required* |
+
+
+
+### qsvt_lcu_step
+
+
+<pre><code>qsvt_lcu_step(
+    phases_even: CArray[CReal],
+    phases_odd: CArray[CReal],
+    proj_cnot_1: QCallable[QBit],
+    proj_cnot_2: QCallable[QBit],
+    u: QCallable,
+    aux: QBit,
+    lcu: QBit
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies a single QSVT-lcu step, composed of 2 double phase projector-controlled-phase rotations, and applications of the block encoding unitary `u` and its inverse:
+
+$$
+(C_{lcu=1}\Pi^{even}_{\phi_2})(C_{lcu=0}\Pi^{odd}_{\phi_2})U^{\dagger}(C_{lcu=1}\tilde{\Pi}^{even}_{\phi_1})(C_{lcu=0}\tilde{\Pi}^{odd}_{\phi_1})U
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phases_even` | `CArray[CReal]` | 2 rotation phases for the even polynomial | *required* |
+| `phases_odd` | `CArray[CReal]` | 2 rotation phases for the odd polynomial | *required* |
+| `proj_cnot_1` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix columns within U. Accepts a qubit that should be set to \`\|1>` when the state is in the block. | *required* |
+| `proj_cnot_2` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix rows within U. Accepts a qubit that should be set to \`\|1>` when the state is in the block. | *required* |
+| `u` | `QCallable` | A block encoding unitary matrix. | *required* |
+| `aux` | `QBit` | A zero auxilliary qubit, used for the projector-controlled-phase rotations. Given as an inout so that qsvt can be used as a building-block in a larger algorithm. | *required* |
+| `lcu` | `QBit` | A qubit used for the combination of 2 polynomials within a single qsvt application | *required* |
+
+
+
+### qsvt_lcu
+
+
+<pre><code>qsvt_lcu(
+    phase_seq_even: CArray[CReal],
+    phase_seq_odd: CArray[CReal],
+    proj_cnot_1: QCallable[QBit],
+    proj_cnot_2: QCallable[QBit],
+    u: QCallable,
+    aux: QBit,
+    lcu: QBit
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Implements the Quantum Singular Value Transformation (QSVT) for a linear combination of odd and even polynomials, so that
+it is possible to encode a polynomial of indefinite parity, such as approximation to exp(i*A) or exp(A). Should work
+for Hermitian block encodings.
+
+The function is equivalent to applying the `qsvt` function for odd and even polynomials with a LCU function, but
+is more efficient as the two polynomials share the same applications of the given unitary.
+
+The function is intended to be called within a context of LCU, where it is called as the SELECT operator, and wrapped
+with initialization of the `lcu` qubit to get the desired combination coefficients.
+The even polynomial corresponds to the case where the $lcu=|0\rangle$, while the odd to $lcu=|1\rangle$.
+
+Note: the two polynomials should have the same degree up to a difference of 1.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `phase_seq_even` | `CArray[CReal]` | A sequence of phase angles of length d+(d+1)%2 for the even polynomial. | *required* |
+| `phase_seq_odd` | `CArray[CReal]` | A sequence of phase angles of length d+(d%2) for the odd polynomial. | *required* |
+| `proj_cnot_1` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix columns within U. Accepts a qubit that should be set to \`\|1>` when the state is in the block. | *required* |
+| `proj_cnot_2` | `QCallable[QBit]` | Projector-controlled-not unitary that locates the encoded matrix rows within U. Accepts a qubit that should be set to \`\|1>` when the state is in the block. | *required* |
+| `u` | `QCallable` | A block encoding unitary matrix. | *required* |
+| `aux` | `QBit` | A zero auxilliary qubit, used for the projector-controlled-phase rotations. Given as an inout so that qsvt can be used as a building-block in a larger algorithm. | *required* |
+| `lcu` | `QBit` | A qubit used for the combination of 2 polynomials within a single qsvt application | *required* |
+
+
+
+### gqsp
+
+
+<pre><code>gqsp(
+    u: QCallable,
+    aux: QBit,
+    phases: CArray[CArray[CReal, Literal[3]]],
+    negative_power: CInt
+) -> None</code></pre>
+
+
+Implements Generalized Quantum Signal Processing (GQSP), which realizes a
+ (Laurent) polynomial transformation of degree d on the eigenvalues of the given
+ signal unitary `u`. The protocol is according to https://arxiv.org/abs/2308.01501
+ Fig.2.
+
+Notes:
+- The user is encouraged to use the function `gqsp_phases` to find `phases` that
+  correspond to the wanted polynomial transformation.
+- Feasibility: the target polynomial must satisfy $|P(e^\{i*theta\})|$ &lt;= 1 for all
+  theta in $[0, 2*pi)$. This ensures a unitary completion exists.
+- Using `negative_power = m` (m &gt;= 0) you can realize Laurent polynomials with
+  negative exponents: the implemented transform is equivalent to applying
+  $z^\{-m\} * P(z)$ (i.e., shift the minimal degree to -m).
+  For ordinary (non-Laurent) polynomials, set `negative_power = 0`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `u` | `QCallable` | The signal unitary. | *required* |
+| `aux` | `QBit` | Auxiliary qubit used for the phase rotations. Should start in \`\|0>`. | *required* |
+| `phases` | `CArray[CArray[CReal, Literal[3]]]` | (d+1) x 3 real array of angles: each element is (theta, phi, lambda). | *required* |
+| `negative_power` | `CInt` | Integer m in [0, d]. Encodes the minimal Laurent power -m of the realized transformation. | *required* |

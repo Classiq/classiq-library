@@ -1,0 +1,222 @@
+---
+title: Encodings
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `binary_to_one_hot` | Conversion of binary encoded value to one-hot encoding. |
+| `binary_to_unary` | Conversion of binary encoded value to unary encoding. |
+| `one_hot_to_unary` | Conversion of one-hot encoded value to unary encoding. |
+| `one_hot_to_binary` | Conversion of one-hot encoded value to binary encoding. |
+| `unary_to_one_hot` | Conversion of unary encoded value to one-hot encoding. |
+| `unary_to_binary` | Conversion of unary encoded value to binary encoding. |
+| `inplace_binary_to_one_hot` | Inplace conversion of binary encoded value to one-hot encoding. |
+| `inplace_one_hot_to_unary` | Inplace conversion of one-hot encoded value to unary encoding. |
+| `pad_zeros` | Pad the input qvar with additional qubits at the end to reach the total_size. |
+
+
+### binary_to_one_hot
+
+
+<pre><code>binary_to_one_hot(
+    binary: Input[QNum],
+    one_hot: Output[QArray]
+) -> None</code></pre>
+
+
+Conversion of binary encoded value to one-hot encoding. The output `one_hot` variable
+is of size 2^n, where n is the number of bits in the binary representation.
+For example, the state `|01>`=`|2>` will be converted to `|0010>` (one-hot for 2).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `binary` | `Input[QNum]` | binary input variable to be converted to one-hot encoding. | *required* |
+| `one_hot` | `Output[QArray]` | one-hot output array. | *required* |
+
+
+
+### binary_to_unary
+
+
+<pre><code>binary_to_unary(
+    binary: Input[QNum],
+    unary: Output[QArray]
+) -> None</code></pre>
+
+
+Conversion of binary encoded value to unary encoding. The output `unary` variable
+is of size 2^n - 1, where n is the number of bits in the binary representation.
+For example, the state `|01>`=`|2>` will be converted to `|110>` (unary for 2).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `binary` | `Input[QNum]` | binary input variable to be converted to unary encoding. | *required* |
+| `unary` | `Output[QArray]` | unary output array. | *required* |
+
+
+
+### one_hot_to_unary
+
+
+<pre><code>one_hot_to_unary(
+    one_hot: Input[QArray],
+    unary: Output[QArray]
+) -> None</code></pre>
+
+
+Conversion of one-hot encoded value to unary encoding. The output `unary` variable
+is smaller in 1 qubit than the input `one_hot` variable.
+For example, the state `|0010>` (one-hot for 2) will be converted to `|110>` (unary for 2).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `one_hot` | `Input[QArray]` | one-hot input array to be converted to unary encoding. | *required* |
+| `unary` | `Output[QArray]` | unary output array. | *required* |
+
+
+
+### one_hot_to_binary
+
+
+<pre><code>one_hot_to_binary(
+    one_hot: Input[QArray],
+    binary: Output[QNum[Literal[&#x27;ceiling(log(one_hot.len, 2))&#x27;]]]
+) -> None</code></pre>
+
+
+Conversion of one-hot encoded value to binary encoding. The output `binary` variable
+is of size log2(one_hot.size) rounded up.
+For example, the state `|0010>` (one-hot for 2) will be converted to `|01>`=`|2>`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `one_hot` | `Input[QArray]` | one-hot input array to be converted to binary encoding. | *required* |
+| `binary` | `Output[QNum[Literal['ceiling(log(one_hot.len, 2))']]]` | binary output variable. | *required* |
+
+
+
+### unary_to_one_hot
+
+
+<pre><code>unary_to_one_hot(
+    unary: Input[QArray],
+    one_hot: Output[QArray]
+) -> None</code></pre>
+
+
+Conversion of unary encoded value to one-hot encoding. The output `one_hot` variable
+is larger in 1 qubit than the input `unary` variable.
+For example, the state `|110>` (unary for 2) will be converted to `|0010>` (one-hot for 2).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `unary` | `Input[QArray]` | unary input array to be converted to one-hot encoding. | *required* |
+| `one_hot` | `Output[QArray]` | one-hot output array. | *required* |
+
+
+
+### unary_to_binary
+
+
+<pre><code>unary_to_binary(
+    unary: Input[QArray],
+    binary: Output[QNum]
+) -> None</code></pre>
+
+
+Conversion of unary encoded value to binary encoding.  The output `binary` variable
+is of size log2(unary.size + 1) rounded up.
+For example, the state `|110>` (unary for 2) will be converted to `|01>`=`|2>`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `unary` | `Input[QArray]` | unary input array to be converted to binary encoding. | *required* |
+| `binary` | `Output[QNum]` | binary output variable. | *required* |
+
+
+
+### inplace_binary_to_one_hot
+
+
+<pre><code>inplace_binary_to_one_hot(
+    qvar: QArray
+) -> None</code></pre>
+
+
+Inplace conversion of binary encoded value to one-hot encoding.
+The implementation is based on https://quantumcomputing.stackexchange.com/questions/5526/garbage-free-reversible-binary-to-unary-decoder-construction.
+The input is assumed to be of size 2^n, where n is the number of bits in the binary representation.
+For example, the state `|01000>`=`|2>` will be converted to `|00100>` (one-hot for 2).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qvar` | `QArray` | binary input array padded with 0's to be converted to one-hot encoding. | *required* |
+
+
+
+### inplace_one_hot_to_unary
+
+
+<pre><code>inplace_one_hot_to_unary(
+    qvar: QArray
+) -> None</code></pre>
+
+
+Inplace conversion of one-hot encoded value to unary encoding.
+The input is assumed to be of size n, where n is the number of bits in the one-hot representation.
+The remaining unary representation will at the higher n-1 bits, where the lsb is cleared to 0.
+For example, the state `|0010>` (one-hot for 2) will be converted to `|0>``|110>` (unary for 2).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `qvar` | `QArray` | one-hot input array to be converted to unary encoding. | *required* |
+
+
+
+### pad_zeros
+
+
+<pre><code>pad_zeros(
+    total_size: int,
+    qvar: Input[QArray],
+    padded: Output[QArray]
+) -> None</code></pre>
+
+
+Pad the input qvar with additional qubits at the end to reach the total_size.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `total_size` | `int` | The desired total size after padding. | *required* |
+| `qvar` | `Input[QArray]` | The input quantum array to be padded. | *required* |
+| `padded` | `Output[QArray]` | The output quantum array after padding. | *required* |

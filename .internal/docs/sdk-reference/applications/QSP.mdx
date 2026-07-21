@@ -1,0 +1,214 @@
+---
+title: Qsp
+icon: "/icons/bulletsharp.svg"
+---
+
+### qsvt_phases
+
+
+<pre><code>qsvt_phases(
+    poly_coeffs: np.ndarray,
+    cheb_basis: bool = True
+) -> np.ndarray</code></pre>
+
+
+Get QSVT phases that will generate the given Chebyshev polynomial.
+The phases are ready to be used in `qsvt` and `qsvt_lcu` functions in the classiq library. The convention
+is the reflection signal operator, and the measurement basis is the hadamard basis (see https://arxiv.org/abs/2105.02859
+APPENDIX A.).
+The current implementation is using the nlft-qsp package.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `poly_coeffs` | `np.ndarray` | Array of polynomial coefficients (Chebyshev\Monomial, depending on cheb_basis). | *required* |
+| `cheb_basis` | `bool` | Whether the poly coefficients are given in Chebyshev (True) or Monomial(False). Defaults to Chebyshev. | True |
+### qsp_approximate
+
+
+<pre><code>qsp_approximate(
+    f_target: Callable[[float], complex],
+    degree: int,
+    parity: int | None = None,
+    interval: tuple[float, float] = (-1, 1),
+    bound: float = 0.99,
+    num_grid_points: int | None = None,
+    plot: bool = False
+) -> tuple[np.ndarray, float]</code></pre>
+
+
+Approximate the target function on the given (sub-)interval of [-1,1], using QSP-compatible chebyshev polynomials.
+The approximating polynomial is enforced to |P(x)| &lt;= bound on all of [-1,1].
+
+Note: scaling f_target by a factor &lt; 1 might help the convergence and also a later qsp phase factor finiding.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `f_target` | `Callable[[float], complex]` | Real function to approximate within the given interval. Should be bounded by [-1, 1] in the given interval. | *required* |
+| `degree` | `int` | Approximating polynomial degree. | *required* |
+| `parity` | `int \| None` | None - full polynomial, 0 - restrict to even polynomial, 1 - odd polynomial. | None |
+| `interval` | `tuple[float, float]` | sub interval of [-1, 1] to approximate the function within. | (-1, 1) |
+| `bound` | `float` | global polynomial bound on [-1,1] (defaults to 0.99). | 0.99 |
+| `num_grid_points` | `int \| None` | sets the number of grid points used for the polynomial approximation (defaults to `max(2 * degree, 1000)`). | None |
+| `plot` | `bool` | A flag for plotting the resulting approximation vs the target function. | False |
+
+
+
+**Returns:**
+
+- **Type:** `tuple[np.ndarray, float]`
+- Array of Chebyshev coefficients. In case of definite parity, still a full coefficients array is returned.
+- (Approximated) maximum error between the target function and the approximating polynomial within the interval.
+### gqsp_phases
+
+
+<pre><code>gqsp_phases(
+    poly_coeffs: np.ndarray,
+    cheb_basis: bool = False
+) -> list[tuple[float, float, float]]</code></pre>
+
+
+Compute GQSP phases for a polynomial in the monomial (power) basis.
+
+The returned phases are compatible with Classiq's `gqsp` function and use the Wz signal
+operator convention.
+
+The current implementation is using the nlft-qsp package, based on techniques in https://arxiv.org/abs/2503.03026.
+
+Notes:
+- The polynomial must be bounded on the unit circle:
+  $|P(e^\{i*theta\})|$ &lt;= 1 for all theta in $[0, 2*pi)$.
+- Laurent polynomials are supported by degree shifting. If
+  $P(z) = sum_\{k=m\}^n c_k * z^k with m < 0, the phases correspond to the$
+  degree-shifted polynomial $z^\{-m\} * P(z)$ (so the minimal degree is zero).
+- The phase finiding works in the monomial basis. If a Chebyshev basis polynomial is provided,
+  it will be converted to the monomial basis (and introduce an additional overhead).
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `poly_coeffs` | `np.ndarray` |  | *required* |
+| `cheb_basis` | `bool` | Whether the poly coefficients are given in Chebyshev (True) or Monomial(False). Defaults to Monomial. | False |
+
+
+
+**Returns:**
+
+- **Type:** `list[tuple[float, float, float]]`
+- list of (theta, phi, lambda) tuples of length d+1, ready to use with `gqsp`.
+### poly_jacobi_anger_cos
+
+
+<pre><code>poly_jacobi_anger_cos(
+    degree: int,
+    t: float
+) -> np.ndarray</code></pre>
+
+
+Gets the Chebyshev polynomial coefficients approximating cos(t*x) using the Jacobi-Anger expansion.
+$$\cos(xt) = J_0(t) + 2\sum_\{k=1\}^\{d/2\} (-1)^k J_\{2k\}(t)\, T_\{2k\}(x) $$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `degree` | `int` | the degree of the approximating polynomial. | *required* |
+| `t` | `float` | the parameter in cos(t*x). Can be negative. | *required* |
+### poly_jacobi_anger_sin
+
+
+<pre><code>poly_jacobi_anger_sin(
+    degree: int,
+    t: float
+) -> np.ndarray</code></pre>
+
+
+Gets the Chebyshev polynomial coefficients approximating sin(t*x) using the Jacobi-Anger expansion.
+$$\sin(xt) = 2\sum_\{k=0\}^\{d/2\} (-1)^k J_\{2k+1\}(t)\, T_\{2k+1\}(x)$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `degree` | `int` | the degree of the approximating polynomial. | *required* |
+| `t` | `float` | the parameter in sin(t*x). | *required* |
+### poly_jacobi_anger_exp_sin
+
+
+<pre><code>poly_jacobi_anger_exp_sin(
+    degree: int,
+    t: float
+) -> np.ndarray</code></pre>
+
+
+Gets the Chebyshev polynomial coefficients approximating exp(i*t*sin(x)) using the Jacobi-Anger expansion:
+$$e^\{it\sin(x)\} = \sum_\{k=-d\}^\{d\} J_\{k\}(t) e^\{ikx\}$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `degree` | `int` | the maximum degree of the approximating polynomial (negative and positive). | *required* |
+| `t` | `float` | the parameter in exp(i*t*sin(x)). | *required* |
+### poly_jacobi_anger_exp_cos
+
+
+<pre><code>poly_jacobi_anger_exp_cos(
+    degree: int,
+    t: float
+) -> np.ndarray</code></pre>
+
+
+Gets the Chebyshev polynomial coefficients approximating exp(i*t*cos(x)) using the Jacobi-Anger expansion:
+$$e^\{it\cos(x)\} = \sum_\{k=-d\}^\{d\} i^k J_\{k\}(t) e^\{ikx\}$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `degree` | `int` | the maximum degree of the approximating polynomial (negative and positive). | *required* |
+| `t` | `float` | the parameter in exp(i*t*cos(x)). | *required* |
+### poly_inversion
+
+
+<pre><code>poly_inversion(
+    degree: int,
+    kappa: float,
+    error_type: str | ErrorType = ErrorType.RELATIVE
+) -> tuple[np.ndarray, float]</code></pre>
+
+
+Gets the Chebyshev odd polynomial p(x) coefficients approximating 1/x on [1/kappa, 1].
+Based on the papers: https://dl.acm.org/doi/pdf/10.1145/3649320 -  for optimal polynomial that minimizes the relative error |xp(x)-1| for
+x in [1/kappa,1]; and https://arxiv.org/pdf/2507.15537- for optimal polynomial that minimizes the uniform error |p(x)-1/x| for x in [1/kappa,1].
+The relative error refers to |xp(x)-1|, whereas the uniform error refers to |p(x)-1/x|, both for x in [1/kappa,1].
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `degree` | `int` | The degree of the approximating polynomial. | *required* |
+| `kappa` | `float` | The number defining the interval [1/kappa, 1], usually represents the condition number in the setting of matrix inversion. | *required* |
+| `error_type` | `str \| ErrorType` | A string specifying the error type to minimize, can be either "relative" (default) or "uniform". | ErrorType.RELATIVE |
+
+
+
+**Returns:**
+
+- **Type:** `tuple[np.ndarray, float]`
+- The Chebyshev polynomial coefficients approximating 1/x on [1/kappa, 1]
+    using the optimal polynomial of given degree.
+- An upper bound on the maximum absolute value of the polynomial on [-1, 1]. The value
+       can be used to scale down the polynomial for the usage within QSVT.

@@ -1,0 +1,587 @@
+---
+title: "Cybersecurity Vertex Cover Patch Management Challenge for Tackling Kill Chains"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/cybersecurity/patching_management/patch_min_vertex_cover.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+*This tutorial is based on work submitted by Mark Carney in November 2022 \[[1](#patch)].*
+
+The Min Vertex Cover (MVC) problem is a classical issue in graph theory and computer science, which aims to find a minimum set of vertices where each edge of the graph is incident to at least one vertex in the set.
+
+Vulnerability graphs (related to attack graphs) showcase a method for solving significant cybersecurity problems with quantum computing using Classiq.
+
+This tutorial suggests a method to prioritize patches by expressing the connectivity of various vulnerabilities on a network with a QUBO, then solving this with Classiq.
+
+Such a solution has the potential to effectively remove significant kill chains (paths to security compromise) within a given network leveraging a quantum computer.
+
+## **Introduction**
+
+Patch management is a common pain point for large-scale enterprises or widely distributed systems such as smartphones or IoT devices. Indeed, the lack of appropriate patching is indicated as a central cause for some high profile cybersecurity breaches. A variety of approaches have been proposed to improve the categorization and management of patches, including deep learning technologies.
+
+This tutorial suggests a method of prioritizing patch management by analyzing vulnerability data on assets as a bipartite graph.
+
+Given that attacks are composed of 'kill chains' - which themselves comprise sequences of exploits leveraging vulnerabilities (that are coincident in our model) - this process suggests disconnecting vulnerability sequences, thereby significantly reducing potential kill chains in a given network.
+
+This challenge, however, involves a known NP-hard problem.
+
+Leveraging quantum computation and optimization methods for vulnerability analysis of this kind opens new avenues of optimization of cybersecurity and related data for consideration.
+
+<Check>
+  The tutorial presents a method of prioritizing the patching of vulnerabilities by considering their connectivity and solving them using Classiq.
+</Check>
+
+## **Bipartite Graph Representation**
+
+The heart of the methodology represents vulnerabilities and assets as nodes in a bipartite graph.
+
+Useful terminology:
+
+#
+
+## Kill Chains
+
+A 'kill chain' is a multi-stage sequence of events that leads to the compromise of a network.
+
+Many of the examples of kill chains involve sequences of vulnerabilities, with the sequence dependent on the assets that intersect these vulnerabilities.
+
+**Vulnerabilities:** Weaknesses in the system that result from an error in the design, implementation, or configuration of the operating system or an application software.
+
+**Assets:** Items with value; for example, data stored in the system.
+
+The availability, consistency, and integrity of assets are to be preserved.
+
+#
+
+## Attack Graphs
+
+'Attack graphs' feature in some interesting approaches to managing and mitigating security threats.
+
+They provide ways of analyzing network-oriented vulnerability data that many cybersecurity information sources generate.
+
+Attack graphs are labeled transition systems that model adversary capabilities within a network and how they can be elevated by transitioning to new states via the exploitation of vulnerabilities (e.g., a weak password, a bug in a software package, or the ability to guess a stack address).
+
+Attack graphs can discover paths that an adversary may use to escalate his privileges to compromise a given target (e.g., customer database or an administrator account).
+
+These sequences of possible vulnerabilities and asset pathways are commonly known as "kill chains." Kill chains depict comprehensive attack scenarios that outline the steps taken to target a specific critical asset.
+
+<center><img src="https://docs.classiq.io/resources/Attack_graph.jpg" width="700" /></center>
+
+<Info>
+  Attack graph example
+</Info>
+
+#
+
+## Vulnerability Graphs
+
+A theoretical way of analyzing vulnerabilities on a computer network uses 'vulnerability graphs', derived from the notion of 'attack graphs'.
+
+A graph $G = (V, E)$; $V(G)$ with a set of vertices and a set of edges $E(G) \in V \times V$, $E$ comprises pairs of elements from $V$.
+
+A bipartite graph $G$ is a graph with a partition of $V(G)$ into two sets $A, B$ such that $\forall(a,b)\in E(G)$, $a\in A$ and $b\in B$.
+
+**A vulnerability graph** $G$ is a bipartite graph where one partition of vertices represents network assets and the other represents vulnerabilities.
+
+The edges of $G$ represent a given asset affected by a detected vulnerability.
+
+**A kill chain** is a sequence of vertices $K = {v1 , v2 , . . . v_n }$ from the vulnerability partition of a vulnerability graph $V$ such that for each $v_i, v_j \in K$ there exists at least one asset $a \in V$ with $(v_i,a),(v_j,a) \in E(G)$.
+
+- Whilst the formulation in utilities directed graphs, for simplicity this tutorial uses undirected simple graphs to represent the same data.
+
+- Note the lack of any information coded about severity ratings for vulnerabilities, e.g., CVSS scores.
+
+This methodology output is not considered as critical vulnerabilities (that should always be patched as soon as possible) but rather aims to find the issues that are widespread and sufficiently well connected to cause potential harm.
+
+#
+
+## Connectivity Dual Graphs
+
+The dual graph $D_G$ is constructed as follows.
+
+For each vulnerability vertex $v_i \in V (G)$ for $1  \leq i \leq|V(G)|$:
+
+1. Add $v_i$ to $V(D_G)$ if $v_i \in V(D_G)$.
+1. Enumerate a list of asset vertices ${a0 , a1 , . . .}$ connected to $v_i$.
+1. Iterating over this list of assets, for each $v_i' $ connected to each host $a_j$:
+   
+
+1. Add $v_i'$ to $V (D_G)$.
+   
+
+1. Add $(v_i,v_i')$ to $E(D_G)$.
+   
+
+1. If $(v_i,v_i')$ already exists, add 1 to the weight of that edge.
+1. Remove $v_i$ from $V (G)$ and continue with $v_i+1$.
+
+The dual $D_G$ represents all of the connections between vulnerabilities on attack graphs.
+
+#
+
+## Removing Kill Chains with Vertex Covers
+
+Removing the vertices in a vertex cover on $D_G$ from $V(G)$ leaves V totally disconnected on the vulnerability partition to itself via the host partition.
+
+Removing every 'vulnerability-host-vulnerability' sub-path in a vulnerability graph $V$ by means of a minimum vertex cover on $D_G$, removes a significant number of kill chains $K$ found in the paths of $G$.
+
+#
+
+## Min Vertex Cover: Mathematical Formulation
+
+The MVC problem can be formulated as an Integer Linear Program (ILP):
+
+Minimize:
+$\sum_{i \in V} x_i$
+
+Subject to
+$(1 - x_i)(1 - x_j)=0 \quad  \forall (i,j) \in E_0$
+
+and
+$x_i \in \{0, 1\} \quad \forall i \in V$
+
+where
+
+- $x_i$ is a binary variable that equals 1 if node $i$ is in the cover and 0 otherwise
+- $E_0$ is the set of all edges (connected and not connected)
+- $V$ is the set of vertices in the graph
+
+<Check>
+  By utilizing a quantum computing setup, you can efficiently solve an NP-hard problem, reducing the time required to find the most at-risk vulnerabilities and patching them with more priority.
+
+You can run iterations over security data more effectively with feedback from new information, thereby improving security.
+</Check>
+
+## Toy Network Example
+
+The following vulnerability graph $V$ has assets $a$ to $g$ and vulnerabilities $1$ through $8$:
+
+```python
+import networkx as nx
+
+edge_dict = {
+    0: ["A", "B", "D", "F"],
+    1: ["A", "B"],
+    2: ["A", "D", "E"],
+    3: ["B", "C", "F"],
+    4: ["G"],
+    5: ["F", "G"],
+    6: ["B", "C", "F"],
+    7: ["C", "D", "G"],
+}
+
+B = nx.Graph()
+B.add_nodes_from([0, 1, 2, 3, 4, 5, 6, 7], bipartite=0)
+B.add_nodes_from(["A", "B", "C", "D", "E", "F", "G"], bipartite=1)
+for u in range(8):
+    for v in edge_dict[u]:
+        B.add_edge(u, v)
+X, Y = nx.bipartite.sets(B)
+nx.draw(B, pos=nx.bipartite_layout(B, X), with_labels=True, font_color="whitesmoke")
+```
+![output](./patch_min_vertex_cover_files/patch_min_vertex_cover_1.png)
+
+<Info>
+  Above is the bipartite graph with vulnerabilities on the left and assets on the right.
+</Info>
+
+An example of a kill chain path incorporated into the venerability graph:
+
+<center><img src="https://docs.classiq.io/resources/Attack_path.png" width="700" /></center>
+
+```python
+import networkx as nx
+
+kill_chain_example_edge_dict = {0: ["B", "F"], 3: ["F", "C"], 7: ["C"]}
+
+B_example = nx.Graph()
+B_example.add_nodes_from([0, 3, 7], bipartite=0)
+B_example.add_nodes_from(["B", "C", "F"], bipartite=1)
+for u in [0, 3, 7]:
+    for v in kill_chain_example_edge_dict[u]:
+        B_example.add_edge(u, v)
+nx.draw(B_example, with_labels=True, font_color="whitesmoke")
+```
+![output](./patch_min_vertex_cover_files/patch_min_vertex_cover_2.png)
+
+```python
+X, Y = nx.bipartite.sets(B_example)
+nx.draw(
+    B_example,
+    pos=nx.bipartite_layout(B_example, X),
+    with_labels=True,
+    font_color="whitesmoke",
+)
+```
+![output](./patch_min_vertex_cover_files/patch_min_vertex_cover_3.png)
+
+This graph leads to the following dual graph $DV$:
+
+```python
+B_dual = nx.Graph()
+
+B_2 = B.copy()
+
+Source, Target = nx.bipartite.sets(B_2)
+
+
+# iterate over one side of the bipartite graph
+# and construct the dual from the paper.
+def gen_dual(B_2, S_=None):
+    B_2c = B_2.copy()
+    DualG = nx.Graph()
+    if not S_:
+        S_, _ = nx.bipartite.sets(B_2c)
+    for s in S_:
+        DualG.add_node(s)
+        # iter over all nodes s talks to
+        for t1 in B_2c.neighbors(s):
+            for t2 in B_2c.neighbors(t1):
+                if t2 != s:
+                    DualG.add_edge(s, t2)
+        B_2c.remove_node(s)
+    return DualG
+
+
+DG = gen_dual(B_2, Source)
+nx.draw(DG, pos=nx.circular_layout(DG), with_labels=True, font_color="whitesmoke")
+```
+![output](./patch_min_vertex_cover_files/patch_min_vertex_cover_4.png)
+
+<Info>
+  Above is the dual graph for solving the MVC.
+</Info>
+
+#
+
+## Building the Optimization Model from Graph Input
+
+To build the optimization model, use Pyomo, which is a Python-based, open-source optimization modeling language with a diverse set of optimization capabilities.
+
+Formalize the QUBO model into a Pyomo model object.
+
+**Classiq seamlessly incorporates the Pyomo object into its model.**
+
+Define the Pyomo model for building a Classiq model using the mathematical formulation defined above:
+
+```python
+import networkx as nx
+import pyomo.core as pyo
+
+
+def mvc(graph: nx.Graph) -> pyo.ConcreteModel:
+    model = pyo.ConcreteModel()
+    model.x = pyo.Var(graph.nodes, domain=pyo.Binary)
+    nodes = list(graph.nodes())
+
+    @model.Constraint(graph.edges)
+    def full_cover(model, i, j):
+        # all sets are covered
+        return ((1 - model.x[i]) * (1 - model.x[j])) == 0
+
+    def obj_expression(model):
+        # number of nodes selected
+        return sum(model.x.values())
+
+    model.cost = pyo.Objective(rule=obj_expression, sense=pyo.minimize)
+
+    return model
+```
+
+The model contains
+
+- a binary variable declaration for each node (model.x) indicating whether the variable is chosen for the set.
+- a constraint rule ensuring that all edges are covered.
+- an objective rule that minimizes the number of selected nodes.
+
+```python
+mvc_model = mvc(DG)
+```
+```python
+
+mvc_model.pprint()
+```
+<Info>
+  **Output:**
+
+  
+
+```
+1 Var Declarations
+      x : Size=8, Index={0, 1, 2, 3, 4, 5, 6, 7}
+          Key : Lower : Value : Upper : Fixed : Stale : Domain
+            0 :     0 :  None :     1 : False :  True : Binary
+            1 :     0 :  None :     1 : False :  True : Binary
+            2 :     0 :  None :     1 : False :  True : Binary
+            3 :     0 :  None :     1 : False :  True : Binary
+            4 :     0 :  None :     1 : False :  True : Binary
+            5 :     0 :  None :     1 : False :  True : Binary
+            6 :     0 :  None :     1 : False :  True : Binary
+            7 :     0 :  None :     1 : False :  True : Binary
+
+  1 Objective Declarations
+      cost : Size=1, Index=None, Active=True
+          Key  : Active : Sense    : Expression
+          None :   True : minimize : x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]
+
+  1 Constraint Declarations
+      full_cover : Size=18, Index={(0, 1), (0, 7), (7, 4), (1, 2), (2, 7), (6, 5), (3, 7), (5, 4), (0, 3), (0, 6), (6, 7), (0, 2), (0, 5), (3, 6), (1, 6), (7, 5), (1, 3), (3, 5)}, Active=True
+          Key    : Lower : Body                  : Upper : Active
+          (0, 1) :   0.0 : (1 - x[0])*(1 - x[1]) :   0.0 :   True
+          (0, 2) :   0.0 : (1 - x[0])*(1 - x[2]) :   0.0 :   True
+          (0, 3) :   0.0 : (1 - x[0])*(1 - x[3]) :   0.0 :   True
+          (0, 5) :   0.0 : (1 - x[0])*(1 - x[5]) :   0.0 :   True
+          (0, 6) :   0.0 : (1 - x[0])*(1 - x[6]) :   0.0 :   True
+          (0, 7) :   0.0 : (1 - x[0])*(1 - x[7]) :   0.0 :   True
+          (1, 2) :   0.0 : (1 - x[1])*(1 - x[2]) :   0.0 :   True
+          (1, 3) :   0.0 : (1 - x[1])*(1 - x[3]) :   0.0 :   True
+          (1, 6) :   0.0 : (1 - x[1])*(1 - x[6]) :   0.0 :   True
+          (2, 7) :   0.0 : (1 - x[2])*(1 - x[7]) :   0.0 :   True
+          (3, 5) :   0.0 : (1 - x[3])*(1 - x[5]) :   0.0 :   True
+          (3, 6) :   0.0 : (1 - x[3])*(1 - x[6]) :   0.0 :   True
+          (3, 7) :   0.0 : (1 - x[3])*(1 - x[7]) :   0.0 :   True
+          (5, 4) :   0.0 : (1 - x[5])*(1 - x[4]) :   0.0 :   True
+          (6, 5) :   0.0 : (1 - x[6])*(1 - x[5]) :   0.0 :   True
+          (6, 7) :   0.0 : (1 - x[6])*(1 - x[7]) :   0.0 :   True
+          (7, 4) :   0.0 : (1 - x[7])*(1 - x[4]) :   0.0 :   True
+          (7, 5) :   0.0 : (1 - x[7])*(1 - x[5]) :   0.0 :   True
+
+  3 Declarations: x full_cover cost
+  
+
+```
+</Info>
+
+**You are set to go!**
+
+## Solving MVC with Classiq and QAOA
+
+Follow the steps of solving the problem with Classiq using the Quantum Approximate Optimization Algorithm (QAOA) \[[2](#qaoa)].
+
+QAOA is a quantum algorithm designed to solve combinatorial optimization problems, making it an ideal candidate for tackling the MVC problem in large scale WSNs.
+
+Apply QAOA to the modeled graph, iteratively adjusting the parameters to navigate the solution space and identify the MVC.
+
+Quantum computing's unique ability to explore multiple solution candidates simultaneously accelerates the optimization process, significantly outperforming classical algorithms for complex problems.
+
+To solve the Patching Prioritization Problem with Classiq:
+
+1. Build a Classiq model
+1. Generate a parameterized quantum circuit
+1. Execute the circuit and optimize the parameters to get the optimal solution
+
+```python
+from classiq import *
+
+# authenticate(overwrite=True)
+```
+#
+
+## 
+
+1. Building a Classiq Model
+
+To solve the Pyomo model defined above, use the Classiq combinatorial optimization engine.
+
+For the quantum part of the QAOA algorithm, define the number of repetitions (`num_layers`):
+
+```python
+from classiq.applications.combinatorial_optimization import CombinatorialProblem
+
+combi = CombinatorialProblem(pyo_model=mvc_model, num_layers=3, penalty_factor=10)
+qmod = combi.get_model()
+```
+**Classiq seamlessly incorporates the classical Pyomo optimization object into its model.**
+
+<Check>
+  That's it! Your Classiq model is all set!!
+</Check>
+
+#
+
+## 
+
+2. Generating a Parameterized Quantum Circuit
+
+This step is simple.
+
+Synthesize your model and view the QAOA circuit (ansatz) used to solve the optimization problem:
+
+```python
+qprog = combi.get_qprog()
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/30mGGurHo3NK20p7cEnQg1FqraJ
+  
+
+```
+</Info>
+
+![image.png](./patch_min_vertex_cover_files/853bd19a-f27d-485a-872d-52d02b29b123.png)
+
+#
+
+## 
+
+3. Executing the Circuit: Optimizing Parameters to Get the Optimal Solution
+
+We now solve the problem by calling the `optimize` method of the `CombinatorialProblem` object.
+
+For the classical optimization part of the QAOA algorithm we define the maximum number of classical iterations (`maxiter`) and the $\alpha$-parameter (`quantile`) for running CVaR-QAOA, an improved variation of the QAOA algorithm \[[3](#cvar)].
+
+```python
+optimized_params = combi.optimize(maxiter=60, quantile=0.9)
+```
+#
+
+## 
+
+4. Analyzing the Execution Results
+
+Check the energy convergence through the iterations:
+
+```python
+import matplotlib.pyplot as plt
+
+plt.plot(combi.cost_trace)
+plt.xlabel("Iterations")
+plt.ylabel("Cost")
+plt.title("Cost convergence")
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Text(0.5, 1.0, 'Cost convergence')
+  
+
+```
+</Info>
+
+![output](./patch_min_vertex_cover_files/patch_min_vertex_cover_5.png)
+
+Examine the optimization results statistics of the algorithm.
+In order to get samples with the optimized parameters, we call the `sample` method:
+
+```python
+optimization_result = combi.sample(optimized_params)
+optimization_result.sort_values(by="cost", ascending=True).head(5)
+```
+|     | solution                          | probability | cost |
+| --- | --------------------------------- | ----------- | ---- |
+| 112 | \{'x': \[1, 1, 0, 1, 0, 1, 0, 1]} | 0.001465    | 5    |
+| 115 | \{'x': \[1, 1, 0, 0, 0, 1, 1, 1]} | 0.001465    | 5    |
+| 55  | \{'x': \[1, 1, 1, 0, 0, 1, 1, 1]} | 0.003906    | 6    |
+| 2   | \{'x': \[1, 0, 1, 1, 1, 1, 1, 0]} | 0.056152    | 6    |
+| 178 | \{'x': \[1, 1, 0, 1, 1, 0, 1, 1]} | 0.000488    | 6    |
+
+View the histogram and compare the optimized results to uniformly sampled results:
+
+```python
+uniform_result = combi.sample_uniform()
+
+optimization_result["cost"].plot(
+    kind="hist",
+    bins=50,
+    edgecolor="black",
+    weights=optimization_result["probability"],
+    alpha=0.6,
+    label="optimized",
+)
+uniform_result["cost"].plot(
+    kind="hist",
+    bins=50,
+    edgecolor="black",
+    weights=uniform_result["probability"],
+    alpha=0.6,
+    label="uniform",
+)
+plt.legend()
+plt.ylabel("Probability", fontsize=16)
+plt.xlabel("cost", fontsize=16)
+plt.tick_params(axis="both", labelsize=14)
+```
+![output](./patch_min_vertex_cover_files/patch_min_vertex_cover_6.png)
+
+Plot the optimal solution:
+
+```python
+best_solution = optimization_result.solution[optimization_result.cost.idxmin()]["x"]
+```
+```python
+
+def draw_solution(graph: nx.Graph, solution: list):
+    solution_nodes = [v for v in graph.nodes if solution[v]]
+    solution_edges = [
+        (u, v) for u, v in graph.edges if u in solution_nodes or v in solution_nodes
+    ]
+    nx.draw_kamada_kawai(graph, with_labels=True)
+    nx.draw_kamada_kawai(
+        graph,
+        nodelist=solution_nodes,
+        edgelist=solution_edges,
+        node_color="r",
+        edge_color="y",
+    )
+
+
+draw_solution(DG, best_solution)
+```
+![output](./patch_min_vertex_cover_files/patch_min_vertex_cover_7.png)
+
+<Check>
+  You obtained a set of vertices that form the minimum vertex cover.
+</Check>
+
+Remove these nodes from the original vulnerability graph $V$:
+
+```python
+check_B = B.copy()
+vc2 = [v for v in DG.nodes if best_solution[v]]
+for v in vc2:
+    check_B.remove_node(v)
+
+nx.draw(
+    check_B,
+    pos=nx.bipartite_layout(check_B, Source),
+    with_labels=True,
+    font_color="whitesmoke",
+)
+```
+![output](./patch_min_vertex_cover_files/patch_min_vertex_cover_8.png)
+
+<Check>
+  Given that the MVCV vulnerability nodes are patched, the rest of the vulnerabilities are disconnected from one other.
+
+This significantly breaks most of the network kill chains.
+</Check>
+
+## Larger Scale Models
+
+TBD
+
+<Check>
+  The leveraging of short term solutions for NP-hard problems that are present in cybersecurity data is a potentially rich vein of exciting possibilities.
+
+The fast and efficient resolution of cybersecurity data problems also helps reduce the analysis and reaction times of security teams.
+</Check>
+
+## References
+
+<a id="patch">\[1]</a> [Cutting Medusa's Path -- Tackling Kill-Chains with Quantum Computing.](https://arxiv.org/abs/2211.13740)
+
+<a id="qaoa">\[2]</a> [Farhi, Edward, Jeffrey Goldstone, and Sam Gutmann. "A quantum approximate optimization algorithm." arXiv preprint arXiv:1411.4028 (2014).](https://arxiv.org/abs/1411.4028)
+
+<a id="cvar">\[3]</a> [Barkoutsos, Panagiotis Kl, et al. "Improving variational quantum optimization using CVaR." Quantum 4 (2020): 256.](https://arxiv.org/abs/1907.04769)

@@ -1,0 +1,160 @@
+---
+title: "Walk-through: `prepare_state`"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/basic_tutorials/prepare_state/prepare_state.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This notebook is the Classiq SDK equivalent of the walkthrough sequence as presented in the Classiq web IDE \[[1](#classiq-ide)].
+
+```python
+from classiq import *
+```
+
+## Build Your Algorithm
+
+**In the IDE:**  To start writing your quantum model, click the `Model` tab.
+
+## Build the Model
+
+**In the IDE:** Here you define the model, function parameters, and more.
+
+See the User Guide \[[2](#user-guide)] for details.
+
+*Below is the SDK representation of the Qmod syntax shown on the IDE page:*
+
+```python
+probabilities = [
+    0,
+    0.002,
+    0.004,
+    0.006,
+    0.0081,
+    0.0101,
+    0.0121,
+    0.0141,
+    0.0161,
+    0.0181,
+    0.0202,
+    0.0222,
+    0.0242,
+    0.0262,
+    0.0282,
+    0.0302,
+    0.0323,
+    0.0343,
+    0.0363,
+    0.0383,
+    0.0403,
+    0.0423,
+    0.0444,
+    0.0464,
+    0.0484,
+    0.0504,
+    0.0524,
+    0.0544,
+    0.0565,
+    0.0585,
+    0.0605,
+    0.0625,
+]
+
+
+@qfunc
+def main(io: Output[QArray]):
+    prepare_state(probabilities=probabilities, bound=0.01, out=io)
+```
+
+## Synthesize the Model
+
+**In the IDE:** Now that you have selected or built a model, click the "Synthesize" button, sit back, and let Classiq do its magic!
+
+*Below is the SDK representation of the Qmod syntax shown on the IDE page:*
+
+```python
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/2zPKuTDqwQAGWvEB299Om2iz6sl
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+gio: https://platform.classiq.io/circuit/2zPKuTDqwQAGWvEB299Om2iz6sl?login=True&version=0.85.0: Operation not supported
+  
+
+```
+</Info>
+
+## Congratulations!
+
+**In the IDE:** This is your first quantum program.
+
+Learn more in the User Guide \[[2](#user-guide)].
+
+## Run on Quantum Hardware or Simulators
+
+**In the IDE:** Click 'Execute' to define the quantum hardware or a quantum simulator to run your synthesized quantum program.
+
+## Define Execution Details
+
+**In the IDE:** Select which quantum program to execute, define the execution parameters, and choose a quantum provider and backend platform.
+
+The Classiq platform is your gateway to all major quantum computing providers.
+
+```python
+preferences = ExecutionPreferences(
+    backend_preferences=ClassiqBackendPreferences(
+        backend_name=ClassiqSimulatorBackendNames.SIMULATOR
+    )
+)
+```
+
+## Run on a Quantum Simulator!
+
+**In the IDE:** Click 'Run' to execute your quantum program on the simulator you chose in the previous step.
+
+*Below is the SDK execution code:*
+
+```python
+with ExecutionSession(qprog, preferences) as es:
+    res = es.sample()
+```
+```python
+
+res.dataframe.head()
+```
+|   | io               | count | probability | bitstring |
+| - | ---------------- | ----- | ----------- | --------- |
+| 0 | \[1, 1, 1, 1, 1] | 136   | 0.066406    | 11111     |
+| 1 | \[1, 0, 1, 1, 1] | 132   | 0.064453    | 11101     |
+| 2 | \[0, 1, 1, 1, 1] | 124   | 0.060547    | 11110     |
+| 3 | \[0, 1, 0, 1, 1] | 114   | 0.055664    | 11010     |
+| 4 | \[0, 0, 0, 1, 1] | 113   | 0.055176    | 11000     |
+
+Look at that cool triangle probability function!
+**In the IDE:** That's it! You ran your first quantum program.
+
+To learn more about the Classiq platform, read the User Guide \[[2](#user-guide)].
+
+## References
+
+<a name="Classiq_IDE">\[1]</a>: [Classiq IDE](https://platform.classiq.io/)
+
+<a name="User_Guide">\[2]</a>: [Classiq User\_Guide](https://docs.classiq.io/latest/)

@@ -1,0 +1,103 @@
+---
+title: "State Vector Filtering"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+Before measurement, a quantum circuit creates a state which can be described
+as a vector of $2^n$ amplitudes, where $n$ is the number of qubits. Though this
+state vector cannot be directly accessed on a quantum computer (as measurement
+destroys the state), certain quantum simulators make this information available.
+Classiq supports two simulators which return the full statevector, both under
+the Classiq provider: `simulator_statevector` and `nvidia_simulator_statevector`.
+
+Since the data size grows exponentially, large circuits cannot be simulated.
+However, in certain applications such as those that use block encoding, not all
+of the $2^n$ amplitudes are of interest. For example, some methods of
+post-processing discard certain results wholesale, and thus the amplitudes
+corresponding to those measured states are irrelevant.
+
+In these instances, filtering out the amplitudes that are not of interest can
+greatly save memory. Use the method
+`ExecutionSession.set_measured_state_filter`, to specify the execution output
+values of interest.
+
+## Example
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QBit], y: Output[QNum], z: Output[QNum]) -> None:
+    allocate(1, x)
+    hadamard_transform(x)
+    prepare_state(probabilities=[0.5, 0, 0.25, 0.25], bound=0.01, out=y)
+    z |= y + 1
+
+
+quantum_program = synthesize(main)
+
+execution_preferences = ExecutionPreferences(
+    backend_preferences=ClassiqBackendPreferences(
+        backend_name=ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR
+    )
+)
+with ExecutionSession(
+    quantum_program, execution_preferences=execution_preferences
+) as session:
+    session.set_measured_state_filter("x", lambda state: state == 1)
+    session.set_measured_state_filter("y", lambda state: state == 2)
+    results = session.sample()
+```
+
+Filtering ensures that `results` will contain only the amplitudes that correspond
+to states where x is 1 and y is 2.
+
+## Amplitude Threshold
+
+By default, state vector simulation filters out states with exactly zero amplitude from the result. You can tighten this filter by setting `amplitude_threshold` in `ExecutionPreferences` to exclude states whose amplitude magnitude is below a given threshold:
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum]) -> None:
+    prepare_state(probabilities=[0.5, 0, 0.25, 0.25], bound=0.01, out=x)
+
+
+quantum_program = synthesize(main)
+
+execution_preferences = ExecutionPreferences(
+    backend_preferences=ClassiqBackendPreferences(
+        backend_name=ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR
+    ),
+    amplitude_threshold=1e-4,
+)
+with ExecutionSession(
+    quantum_program, execution_preferences=execution_preferences
+) as session:
+    results = session.sample()
+```
+
+States with `|amplitude| &lt;= amplitude_threshold` are excluded from `results`. This reduces the size of the result for circuits where most amplitudes are negligibly small (e.g. block-encoded circuits).
+
+
+<Note>
+Setting `include_zero_amplitude_outputs=True` overrides `amplitude_threshold` and includes all states regardless of amplitude.
+
+</Note>
+<Warning>
+Filtering removes states from the returned state vector. As a result, the remaining amplitudes will not sum to a norm of 1. Do not rely on the filtered state vector being normalized.
+
+
+</Warning>
+## Limitations
+
+Currently, filtering is only available on Classiq's `simulator_statevector`
+(`ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR`) and
+`nvidia_simulator_statevector` (`ClassiqNvidiaBackendNames.SIMULATOR_STATEVECTOR`).
+Filtering is only available for quantum scalars (`QuantumBit`s and `QuantumNumeric`s).
+Additionally, only a single value per variable is supported. For example,
+`session.set_measured_state_filter("x", lambda x: x &lt; 5)` is not allowed.

@@ -1,0 +1,55 @@
+---
+title: Ibm
+icon: "/icons/bulletsharp.svg"
+---
+
+For **`emulate`** on IBM Quantum, see [IBM hardware noise simulation (emulate)](../../user-guide/execution/cloud-providers/ibm-backends#ibm-hardware-noise-simulation-emulate) in the execution user guide.
+
+### IBMBackendPreferences
+
+Represents the backend preferences specific to IBM Quantum services.
+
+Inherits from `BackendPreferences` and adds additional fields and validations
+specific to IBM Quantum backends.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `backend_service_provider` | `ProviderTypeVendor.IBM_CLOUD` | Indicates the backend service provider as IBM Cloud. |
+| `access_token` | `Optional[str]` | The IBM Cloud access token to be used with IBM Quantum hosted backends. Defaults to `None`. |
+| `channel` | `str` | Channel to use for IBM cloud backends. Defaults to `"ibm_cloud"`. |
+| `instance_crn` | `str` | The IBM Cloud instance CRN (Cloud Resource Name) for the IBM Quantum service. |
+| `run_via_classiq` | `bool` | Run via Classiq's credentials. Defaults to `False`. |
+| `emulate` | `bool` | If True, run on a Classiq-hosted simulator with a noise model derived from the IBM backend name. Defaults to `False`. |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.IBM_CLOUD = pydantic.Field(default=(ProviderVendor.IBM_QUANTUM))`
+
+
+### access_token
+
+
+`access_token: str | None = pydantic.Field(default=None, description='IBM Cloud access token to be used with IBM Quantum hosted backends')`
+
+
+### channel
+
+
+`channel: str | None = pydantic.Field(default=None, description='Channel to use for IBM cloud backends.')`
+
+
+### instance_crn
+
+
+`instance_crn: str | None = pydantic.Field(default=None, description='IBM Cloud instance CRN.')`
+
+
+### emulate
+
+
+`emulate: bool = pydantic.Field(default=False, description='If True, run on a Classiq-hosted simulator with an IBM noise model derived from backend_name.')`

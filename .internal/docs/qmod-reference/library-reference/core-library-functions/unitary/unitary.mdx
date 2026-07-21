@@ -1,0 +1,51 @@
+---
+title: "Unitary Function"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/qmod_core_library/unitary/unitary.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+Given a $2^{n}\times2^{n}$ unitary matrix, the unitary-gate function constructs an
+equivalent unitary function that acts on $n$ qubits accordingly.
+
+For $n>2$, the
+synthesis process implementation is based on [\[1\]](#1).
+
+Function: `unitary`
+
+Arguments:
+
+- `elements: CArray[CArray[CReal]]` 
+
+- A 2d array of complex numbers representing the unitary matrix.
+- `target: QArray[QBit]` 
+
+- The quantum state to apply the unitary on.
+
+Should be of corresponding size.
+
+## Example
+
+This example shows a $2$-qubit unitary function application in the formed $4$-dimensional space.
+
+```python
+from classiq import *
+
+UNITARY = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1j, 0], [0, 0, 0, 1j]]
+
+
+@qfunc
+def main(x: Output[QArray[QBit]]):
+    allocate(2, x)
+    unitary(UNITARY, x)
+```
+```python
+
+qprog = synthesize(main)
+```
+
+## References
+
+<a name="1">\[1]</a> R. Iten et al, Quantum Circuits for Isometries, Phys. Rev. A 93 (2016). [https://link.aps.org/doi/10.1103/PhysRevA.93.032318](https://link.aps.org/doi/10.1103/PhysRevA.93.032318)

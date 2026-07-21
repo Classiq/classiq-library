@@ -1,0 +1,126 @@
+---
+title: Discrete Sine Cosine Transform
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `qct_qst_type1` | [Qmod Classiq-library function]. |
+| `qct_qst_type2` | [Qmod Classiq-library function]. |
+| `qct_type2` | [Qmod Classiq-library function]. |
+| `qst_type2` | [Qmod Classiq-library function]. |
+
+
+### qct_qst_type1
+
+
+<pre><code>qct_qst_type1(
+    x: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the quantum discrete cosine (DCT) and sine (DST)
+transform of type 1 to the qubit array `x`.
+Corresponds to the matrix (with $n\equiv$`x.len`):
+
+$$
+\left(
+egin{array}{ccc|c}
+{} &{} &{} \
+  {}&{m DCT}^{(1)}(2^{n-1}+1) & {}& 0\
+  {} &{} &{} \
+  \hline
+  {} & 0 & {} & i{m DST}^{(1)}(2^{n-1}-1)
+\end{array}
+ight)
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `x` | `QArray[QBit]` | The qubit array to apply the transform to. | *required* |
+
+
+
+### qct_qst_type2
+
+
+<pre><code>qct_qst_type2(
+    x: QArray[QBit],
+    q: Const[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the quantum discrete cosine (DCT) and sine (DST)
+transform of type 2 to the qubit array `x` concatenated with `q`, with `q` being the MSB.
+Corresponds to the matrix (with $n\equiv$`x.len`+1):
+
+$$
+\left(
+egin{array}{c|c}
+  {m DCT}^{(2)}(2^{n-1}) & 0\
+  \hline
+  0 & -{m DST}^{(2)}(2^{n-1})
+\end{array}
+ight)
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `x` | `QArray[QBit]` | The LSB part of the qubit array to apply the transform to. | *required* |
+| `q` | `Const[QBit]` | The MSB of the qubit array to apply the transform to. | *required* |
+
+
+
+### qct_type2
+
+
+<pre><code>qct_type2(
+    x: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the quantum discrete cosine (DCT)
+transform of type 2, $\{m DCT\}^\{(2)\}$, to the qubit array `x`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `x` | `QArray[QBit]` | The qubit array to apply the transform to. | *required* |
+
+
+
+### qst_type2
+
+
+<pre><code>qst_type2(
+    x: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the quantum discrete sine (DST)
+transform of type 2, $\{m DST\}^\{(2)\}$, to the qubit array `x`.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `x` | `QArray[QBit]` | The qubit array to apply the transform to. | *required* |

@@ -1,0 +1,88 @@
+---
+title: "Arithmetic Expressions"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/arithmetic_expression/arithmetic_expression_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+Use the `Arithmetic` function to write complex mathematical expression in free format.
+
+The notation follows the Python language for math notation.
+
+The function first parses the expression and builds an abstract syntax tree (AST). Then, the Classiq engine finds a
+computation strategy for a specified number of qubits, and compiles the desired quantum program.
+
+As opposed to classical computers, when quantum computers evaluate arithmetic
+expression, the calculations are reversible and are applied on all quantum states in parallel.
+To do so, quantum computers store all intermediate computation results in a quantum variables.
+
+Qubits that are not freed cannot be used later on in the quantum program.
+
+Analogously to the classical world, there is a form of quantum "garbage collection",
+usually referred to as uncomputation, which returns the garbage qubits to their original state.
+
+The computation strategy determines the order in which qubits are released and reused.
+By employing different strategies, you can produce a variety of quantum programs with the same functionality.
+In general, longer quantum programs require less qubits than shorter ones.
+
+Supported operators:
+
+- Add: `+`
+- Subtract: `-` (two arguments)
+- Negate: `-` (a single argument)
+- Multiply: `*`
+- Bitwise Or: `|`
+- Bitwise And: `&`
+- Bitwise Xor: `^`
+- Invert: `~`
+- Equal: `==`
+- Not Equal: `!=`
+- Greater Than: `>`
+- Greater Or Equal: `>=`
+- Less Than: `<`
+- Less Or Equal: `<=`
+- Modulo: `%` limited for power of 2
+- Logical And: `and`
+- Logical Or: `or`
+- Max: `max` (n>=2 arguments)
+- Min: `min` (n>=2 arguments)
+- Power `**` (register base, positive int power)
+
+## Example
+
+This example generates a quantum program that calculates the expression `(a + b + c & 15) % 8 ^ 3 & a ^ 10 == 4`.
+
+Each of the variables `a`,`b`, and `c` is defined as a quantum varialbe with a different size.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum], b: Output[QNum], c: Output[QNum], res: Output[QNum]) -> None:
+    a |= 2
+    b |= 1
+    c |= 5
+
+    res |= (a + b + c & 15) % 8 ^ 3 & a ^ 10 == 4
+```
+```python
+
+qprog = synthesize(main)
+
+result = execute(qprog).result_value()
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'a': 2, 'b': 1, 'c': 5, 'res': 0}: 2048]
+  
+
+```
+</Info>

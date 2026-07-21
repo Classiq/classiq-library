@@ -1,0 +1,309 @@
+---
+title: "Sample"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+Sampling is the most common execution workflow. It is used when you want to simulate or run 
+measurements and inspect the resulting bitstring distribution.
+
+Related pages:
+- [Execution overview](./index)
+- [Observe](./observe)
+- [State vectors](./calculate-state-vector)
+
+## When to use sampling
+
+Use `sample(...)` when you want to perform measurements. This method is typically used to 
+understand the probability distribution over measurement outcomes.
+
+**Sampling is a good choice when:**
+
+- you want to inspect measured bitstrings
+- you want counts and probabilities
+- you want to compare outputs across different parameter values
+- you want behavior that resembles repeated measurements on a quantum device
+
+Unlike state-vector calculation, sampling does not return the full internal quantum state. 
+Instead, it returns the measurement statistics that result from executing the circuit multiple times.
+
+The `sample` function accepts these arguments:
+
+| Argument | Description |
+|---|---|
+| `qprog` | A synthesized `QuantumProgram`, or a string containing **OpenQASM 2.0 or 3.0** source (see [Sampling OpenQASM](#sampling-openqasm)). |
+| `backend` | Backend specifier as `"provider/backend"`. Defaults to `"simulator"`. |
+| `parameters` | A dict of parameter values, or a list of dicts for batch execution. Keys are parameter names of the main function. **Not supported** when `qprog` is an OpenQASM string. |
+| `config` | Provider-specific configuration (API keys, etc.). Accepts a `dict` or a typed config object (e.g. `IBMConfig`, `BraketConfig`). |
+| `num_shots` | Number of shots. Must be ≥ 1 if specified. |
+| `random_seed` | Seed for transpilation and simulation. |
+| `transpilation_option` | Transpilation level. See [`TranspilationOption`](/user-guide/synthesis/quantum-program-transpilation#transpilation-options). |
+| `run_via_classiq` | Run using Classiq's provider credentials against your allocated budget. Defaults to `False`. |
+
+## Basic examples
+
+```python
+from classiq import *
+
+backend_name = "simulator"
+
+@qfunc
+def main(res: Output[QBit]) -> None:
+    allocate(res)
+    H(res)
+
+qprog = synthesize(main)
+
+df = sample(
+    qprog,
+    backend=backend_name,
+    num_shots=1000,
+)
+df
+```
+
+| x  |	counts	| probability	| bitstring   |
+| -- | -------- | ------------- | ----------- | 
+| 1  |	502	    | 0.502	        | 1           |
+| 0  |	498 	| 0.498	        | 0           |
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import *
+
+backend_name = "ibm/fez"
+
+@qfunc
+def main(x: Output[QNum[2, UNSIGNED, 0]], y:Output[QArray[QBit]], res: Output[QBit]) -> None:
+    allocate(3, y)
+    allocate(res)
+    prepare_state([0.5, 0, 0, 0.5], 0.0, x)
+    H(y[1])
+    H(res)
+
+qprog = synthesize(main)
+
+df = sample(
+    qprog,
+    backend=backend_name,
+    num_shots=1000,
+    run_via_classiq=True,
+)
+df
+```
+
+| x  | y           | res | counts	| probability	| bitstring   |
+| -- | ----------  | --- | ------ | ------------- | ----------- | 
+| 0  |	[0, 0, 0]  |  1  | 136	| 0.136	        | 100000      |
+| 3  |	[0, 0, 0]  |  0  | 132	| 0.132	        | 000011      |
+| 0  |	[0, 0, 0]  |  0  | 126	| 0.126	        | 000000      |
+| 0  |	[0, 1, 0]  |  1  | 126	| 0.126	        | 101000      |
+| 3  |	[0, 1, 0]  |  1  | 124	| 0.124	        | 101011      |
+| 3  |	[0, 1, 0]  |  0  | 120	| 0.120	        | 001011      |
+| 0  |	[0, 1, 0]  |  0  | 119	| 0.119	        | 001000      |
+| 3  |	[0, 0, 0]  |  1  | 117	| 0.117	        | 100011      |
+
+### Understanding the result
+
+The returned object is a DataFrame, which makes it easy to analyze using familiar tools.
+
+**Common columns are:**
+
+* **quantum variables** - the quantum number values, quantum arrays, and qubits values measured
+* **bitstring** — the measured computational basis state
+* **counts** — how many times this result was observed
+* **probability** — normalized frequency
+
+## Choosing execution settings
+
+Sampling accepts the same common execution settings used by other high-level execution APIs.
+
+For example:
+
+[comment]: DO_NOT_TEST
+
+```python
+df = sample(
+    qprog,
+    backend=backend_name,
+    config={},
+    num_shots=2000,
+    random_seed=42,
+)
+```
+
+**A few important arguments are:**
+
+* `backend` — the backend on which the program will run
+* `config` — provider-specific configuration
+* `num_shots` — how many times to execute the circuit
+* `random_seed` — useful for reproducibility
+* `parameters` — values for parameterized quantum programs
+
+In most introductory workflows, using the default simulator with a chosen number of shots is enough.
+
+## Parameterized Execution
+
+Many quantum programs are parameterized. Instead of hardcoding values directly into the circuit, 
+you define them as inputs to your quantum function and provide their values at execution time.
+
+**This is useful for:**
+
+* variational algorithms
+* parameter sweeps
+* repeated evaluation of the same circuit structure with different values
+
+<Warning>
+    Execution of parameterized OpenQASM is not supported.
+</Warning>
+
+### Defining a parameterized quantum program
+
+```python
+from classiq import *
+
+backend_name = "simulator"
+
+@qfunc
+def main(angle_rx: CReal, angle_ry: CReal, x: Output[QBit]):
+    allocate(x)
+    RX(angle_rx, x)
+    H(x)
+    RY(angle_ry, x)
+
+qprog = synthesize(main)
+```
+
+**In this example:**
+
+* `angle_rx` and `angle_ry` are symbolic parameters
+* the structure of the quantum program is fixed
+* the actual numerical values are supplied during execution
+
+### Supplying parameter values
+
+To execute the parameterized program, pass a dictionary to `parameters`:
+
+[comment]: DO_NOT_TEST
+
+```python
+exec_params = {
+    "angle_rx": 0.5,
+    "angle_ry": 0.3
+}
+
+df = sample(
+    qprog,
+    backend=backend_name,
+    parameters=exec_params,
+    num_shots=1000,
+)
+df
+```
+Each key in the dictionary must match a parameter name in the quantum function.
+
+**Example output:**
+
+| x | counts | probability | bitstring |
+| - | ------ | ----------- | --------- |
+| 1 | 642    | 0.642       | 1         |
+| 0 | 358    | 0.358       | 0         |
+
+This means the parameter values are first bound to the quantum program, and the resulting instantiated circuit is then sampled.
+
+## Batch sampling
+
+Often, you want to evaluate the same circuit for multiple parameter values.
+
+Instead of calling `sample(...)` repeatedly in a loop, you can pass a list of parameter dictionaries. 
+In that case, the function performs one execution per parameter set and returns a list of DataFrames.
+
+### Example
+
+[comment]: DO_NOT_TEST
+
+```python
+rx_angles = [0.1, 0.2, 0.3, 0.4]
+
+exec_params = [
+    {"angle_rx": angle, "angle_ry": 0.3}
+    for angle in rx_angles
+]
+
+results = sample(
+    qprog,
+    backend=backend_name,
+    parameters=exec_params,
+    num_shots=1000,
+)
+
+results[1]
+```
+
+| x | counts | probability | bitstring |
+| - | ------ | ----------- | --------- |
+| 1 | 639    | 0.639       | 1         |
+| 0 | 361    | 0.361       | 0         |
+
+### Understanding batch results
+
+**When parameters is a list:**
+
+* the output is a list of DataFrames
+* each DataFrame corresponds to one execution
+* the order of the outputs matches the order of the parameter dictionaries you passed in
+
+This is convenient when scanning over parameters and comparing how the sampled distribution changes.
+
+## Sampling OpenQASM
+
+You can pass **OpenQASM 2.0 or 3.0** text as the first argument to `sample` instead of a `QuantumProgram`. The backend runs the circuit the same way as for a synthesized program; the returned DataFrame still includes `bitstring`, `counts`, and related columns.
+
+OpenQASM from anytool is supported as long as you pass a string, for example:
+
+[comment]: DO_NOT_TEST
+
+```python
+from qiskit import QuantumCircuit, qasm2
+
+from classiq.execution import sample
+
+qc = QuantumCircuit(1)
+qc.h(0)
+openqasm = qasm2.dumps(qc)
+
+df = sample(openqasm, backend="simulator", num_shots=500)
+```
+
+Hand-written OpenQASM 3 is also valid:
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq.execution import sample
+
+openqasm = """
+OPENQASM 3;
+include "stdgates.inc";
+qubit[1] q;
+h q[0];
+"""
+
+df = sample(openqasm, backend="simulator", num_shots=500)
+```
+
+Limitations when using a string:
+
+-   Do not pass `parameters` for OpenQASM strings; use a `QuantumProgram` if you need Qmod `main` parameters, or express parameters inside the QASM (e.g. Qiskit `Parameter` and `assign_parameters` before dumping).
+-   Batch sampling with a list of parameter dicts is only defined for `QuantumProgram` execution.
+
+## Summary
+
+Use sampling when your goal is to understand measurement outcomes rather than the full state or a single expectation value.
+
+**Sampling:**
+
+* returns a DataFrame
+* is well suited for measured distributions
+* supports both single and batch parameterized execution

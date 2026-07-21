@@ -1,0 +1,669 @@
+---
+title: "Modeling an HHL Algorithm to Solve a Set of Linear Equations"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/workshops/hhl_workshop/hhl_workshop.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+Guidance for the workshop:
+**The `# TODO` is there for you to do yourself.**
+**The `# Solution start` and `# Solution end` are only for helping you.
+
+Try doing it yourself...**
+
+Solving linear equations appears in many research, engineering, and design fields.
+
+For example, many physical and financial models, from fluid dynamics to portfolio optimization, are described by partial differential equations, which are typically treated by numerical schemes, most of which are eventually transformed to a set of linear equations.
+
+The HHL algorithm \[[1](#hhl)] is a quantum algorithm for solving a set of linear equations. It is one of the fundamental quantum algorithms that is expected to give a speedup over its classical counterpart.
+
+A set of linear equations of size $N$ is represented by an $N\times N$ matrix and a vector $b$ of size $N$, $A\vec{x} = \vec{b}$, where the solution to the problem is designated by the solution variable $\vec{x}$.
+
+For simplicity, the demo below treats a usecase where $\vec{b}$ is a normalized vector $|\vec{b}|=1$, and $A$ is an Hermitian matrix of size $2^n\times 2^n$, whose eigenvalues are in the interval $(0,1)$.
+
+Generalizations to other usecases are discussed at the end of this demo.
+
+## 
+
+1. Defining a Specific Problem
+
+Start by defining the specific problem.
+
+```python
+# !pip install -U classiq
+```
+```python
+
+import numpy as np
+import scipy as scipy
+
+A = np.array(
+    [
+        [0.28, -0.01, 0.02, -0.1],
+        [-0.01, 0.5, -0.22, -0.07],
+        [0.02, -0.22, 0.43, -0.05],
+        [-0.1, -0.07, -0.05, 0.42],
+    ]
+)
+
+b = np.array([1, 2, 4, 3])
+b = b / np.linalg.norm(b)
+
+print("A =", A, "\n")
+print("b =", b, "\n")
+
+# verifying that the matrix is symmetric and has eigenvalues in [0,1)
+if not np.allclose(A, A.T, rtol=1e-6, atol=1e-6):
+    raise Exception("The matrix is not symmetric")
+w, v = np.linalg.eig(A)
+for lam in w:
+    if lam < 0 or lam > 1:
+        raise Exception("Eigenvalues are not in (0,1)")
+
+sol_classical = np.linalg.solve(A, b)
+print("Classical solution: x = ", sol_classical)
+num_qubits = int(np.log2(len(b)))
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+A = [[ 0.28 -0.01  0.02 -0.1 ]
+   [-0.01  0.5  -0.22 -0.07]
+   [ 0.02 -0.22  0.43 -0.05]
+   [-0.1  -0.07 -0.05  0.42]] 
+
+  b = [0.18257419 0.36514837 0.73029674 0.54772256] 
+
+  Classical solution: x =  [1.3814374  2.50585064 3.19890483 2.43147877]
+  
+
+```
+</Info>
+
+## 
+
+2. Building Simple HHL with Classiq
+
+#
+
+## 2.1 Define The Model
+
+This tutorial gives instructions on building an HHL algorithm and presents the theory of the algorithm.
+
+The algorithm consists of 4 steps:
+
+1. State preparation of the RHS vector $\vec{b}$.
+
+1. QPE for the unitary matrix $e^{2\pi iA}$, which encodes eigenvalues on a quantum register of size $m$.
+
+1. An inversion algorithm that loads amplitudes according to the inverse of the eigenvalue registers.
+
+1. An inverse QPE with the parameters in (2).
+
+#
+
+### 2.1.1 State Preparation for the Vector $\vec{b}$
+
+The first stage of the HHL algorithm is to load the normalized RHS vector $\vec{b}$ into a quantum register:
+
+$$
+|0\rangle_n \xrightarrow[{\rm SP}]{} \sum^{2^n-1}_{i=0}b_i|i\rangle_n
+$$
+where $|i\rangle$ are states in the computational basis.
+
+Comments:
+
+- The relevant built-in function is the `prepare_amplitudes` one, which gets $2^n$ values of $\vec{b}$, as well as an upper bound for its functional error through the `bound` parameter.
+
+```python
+from classiq import *
+
+
+@qfunc
+def load_b(b: CArray[CReal], res: Output[QArray]) -> None:
+    # TODO prepare the state |b> in the "res" register - the amplitude of res states correspond to the values of the vector b
+    # Solution start
+    prepare_amplitudes(b, 0.0, res)
+    # Solution end
+```
+
+Let's see the loading of b in a state vector simulator
+
+Update the qmod to have `aer_simulator_statevector` as backend, with one shot
+
+Refer to [Execution Preferences documentation](https://docs.classiq.io/latest/user-guide/execution/#execution-preferences) and to [Classiq backends documentation](https://docs.classiq.io/latest/user-guide/execution/cloud-providers/)
+
+```python
+@qfunc
+def main(res: Output[QArray]):
+    load_b(b.tolist(), res)
+
+
+qmod_b_load = create_model(main)
+# TODO update the qmod to have aer_simulator_statevector as backend, with one shot
+
+# Solution start
+qmod_b_load = set_execution_preferences(
+    qmod_b_load,
+    num_shots=1,
+    backend_preferences=ClassiqBackendPreferences(backend_name="simulator_statevector"),
+)
+# Solution end
+qprog_b_load = synthesize(qmod_b_load)
+show(qprog_b_load)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/2yjDzAXzUnVNMS5hsJGubDIKBR7
+  
+
+```
+</Info>
+
+Take a look at the resulted circuit.
+
+Now let's execute and see if $b$ was built correctly
+
+```python
+job = execute(qprog_b_load)
+job.open_in_ide()
+```
+
+Check if you see a match between the original $b$ to the resulted state vector
+
+```python
+print("The original b is: ", b)
+result = job.result_value()
+print("The resulted state vector :", result.state_vector)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+The original b is:  [0.18257419 0.36514837 0.73029674 0.54772256]
+  The resulted state vector : {'00': (0.18257418583505527+0j), '01': (0.3651483716701124+0j), '10': (0.7302967433402199+0j), '11': (0.5477225575051674+0j)}
+  
+
+```
+</Info>
+
+#
+
+### 2.1.2 Quantum Phase Estimation (QPE) for the Hamiltonian Evolution $U=e^{2\pi i A }$
+
+The QPE function block, which is at the heart of the HHL algorithm, operates as follows: Unitary matrices have eigenvalues of norm 1, and thus are of the form $e^{2\pi i \lambda}$, with $0\leq\lambda<1$.
+
+For a quantum state $|\psi\rangle_n$, prepared in an eigenvalue of some unitary matrix $U$ of size $2^n\times 2^n$, the QPE algorithm encodes the corresponding  eigenvalue into a quantum register:
+
+$$
+|0\rangle_m|\psi\rangle_n \xrightarrow[{\rm QPE}(U)]{} |\lambda\rangle_m|\psi\rangle_n,
+$$
+where $m$ is the precision of the binary representation of $\lambda$, $\lambda=\frac{1}{2^m}\sum^{2^m-1}_{k=0}\lambda^{(k)}2^k$ with $\lambda^{(k)}$ being the state of the $k$-th qubit.
+
+In the HHL algorithm a QPE for the unitary $U=e^{2\pi i A }$ is applied.
+
+The mathematics: First, note that the eigenvectors of $U$ are the ones of the matrix $A$, and that the corresponding eigenvalues $\lambda$ defined for $U=e^{2\pi i A }$ are the eigenvalues of $A$. Second, represent the prepared state in the basis given by the eigenvalues of $A$.
+
+This is merely a mathematical transformation; with no algorithmic considerations here. If the eigenbasis of $A$ is given by the set $\{|\psi_j\rangle_n \}^{2^n-1}_{j=0}$, then
+
+$$
+\sum^{2^n-1}_{i=0}b_i|i\rangle_n = \sum^{2^n-1}_{j=0}\beta_j|\psi_j\rangle_n.
+$$
+Applying the QPE stage gives
+
+$$
+|0\rangle_m \sum^{2^n-1}_{j=0}\beta_j|\psi_j\rangle_n \xrightarrow[{\rm QPE}]{}  \sum^{2^n-1}_{j=0}\beta_j |\lambda_j\rangle_m |\psi_j\rangle_n.
+$$
+Comments:
+
+- Use the built-in `qpe` function.
+
+#
+
+### 2.1.3 Eigenvalue Inversion
+
+The next step in the HHL algorithm is to pass the inverse of the eigenvalue registers into their amplitudes, using the Amplitude Loading (AL) construct.
+
+Given a function $f:[0,1)\rightarrow [-1,1]$, it implements $|0\rangle|\lambda\rangle_m \xrightarrow[{\rm AL}(f)]{} f(\lambda)|1\rangle|\lambda\rangle_m+\sqrt{1-f^2(\lambda)}|0\rangle|\lambda\rangle_m$.
+
+For the HHL algorithm, apply an AL with $f=C/x$ where $C$ is a lower bound for the minimal eigenvalue of $A$.
+
+Applying this AL gives
+
+$$
+\sum^{2^n-1}_{j=0}\beta_j |\lambda_j\rangle_m |\psi_j\rangle_n \xrightarrow[{\rm AL}(C/x)]{}
+|0\rangle\left(\sum^{2^n-1}_{j=0}\sqrt{1-\frac{C^2}{\lambda^2_j}}\beta_j |\lambda_j\rangle_m |\psi_j\rangle_n\right)+
+|1\rangle\left(\sum^{2^n-1}_{j=0}\frac{C}{\lambda_j}\beta_j |\lambda_j\rangle_m |\psi_j\rangle_n\right),
+$$
+where $C$ is a normalization coefficient.
+
+The normalization coefficient $C$, which guarantees that the amplitudes are normalized, can be taken as the lower possible eigenvalue that can be resolved with the QPE:
+
+$$
+C=1/2^{\rm precision}.
+$$
+The built-in construct to define an amplitude loading is the [`assign_amplitude_table`](https://docs.classiq.io/latest/qmod-reference/api-reference/functions/open_library/amplitude_loading/#classiq.open_library.functions.amplitude_loading.assign_amplitude_table) function.
+
+```python
+@qfunc
+def simple_eig_inv(phase: Const[QNum], indicator: Output[QBit]):
+    # TODO allocate 1 qubit for indicator
+    # TODO load its |1> state amplitude to be C/phase using the assign_amplitude_table function
+
+    # Solution start
+    allocate(indicator)
+    assign_amplitude_table(
+        lookup_table(lambda p: 0 if p == 0 else (1 / 2**phase.size) / p, phase),
+        phase,
+        indicator,
+    )
+    # Solution end
+```
+#
+
+### 2.1.4 Inverse QPE
+
+As the final step in the HHL model, clean the QPE register by applying an inverse-QPE. (Note that it is not guaranteed that this register is completely cleaned; namely, that all the qubits in the QPE register return to zero after the inverse-QPE.
+
+Generically they are all zero with very high probability).
+
+In this model we will simply call the QPE function with the same parameters in stage 
+
+2. This is how the quantum state looks now
+
+$$
+ |0\rangle\left(\sum^{2^n-1}_{j=0}\sqrt{1-\frac{C^2}{\lambda^2_j}}\beta_j |\lambda_j\rangle_m |\psi_j\rangle_n\right)+
+|1\rangle\left(\sum^{2^n-1}_{j=0}\frac{C}{\lambda_j}\beta_j |\lambda_j\rangle_m |\psi_j\rangle_n\right)
+\xrightarrow[{\rm inv-QPE}(U)]{}
+ |0\rangle_m|0\rangle\left(\sum^{2^n-1}_{j=0}\sqrt{1-\frac{C^2}{\lambda^2_j}}\beta_j  |\psi_j\rangle_n\right)+
+|0\rangle_m|1\rangle\left(\sum^{2^n-1}_{j=0}\frac{C}{\lambda_j}\beta_j  |\psi_j\rangle_n\right)
+$$
+The state entangled with $|1\rangle$ stores the solution to our problem (up to some normalization problem)
+
+$$
+\sum^{2^n-1}_{j=0} \frac{C}{\lambda_j}\beta_j  \vec{\psi_j} = C\vec{x}.
+$$
+
+#
+
+### 2.1.5 Putting it all together
+
+Let's remind that the entire HHL algorithm is composed of:
+
+1. State preparation of the RHS vector $\vec{b}$.
+
+1. QPE for the unitary matrix $e^{2\pi iA}$, which encodes eigenvalues on a quantum register of size $m$.
+
+1. An inversion algorithm that loads amplitudes according to the inverse of the eigenvalue registers.
+
+1. An inverse QPE with the parameters in (2).
+
+And put all together in `my_hhl` function
+
+You can apply QPE\dagger \* EigenValInv \* QPE using the [within\_apply operator](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/within-apply/)
+
+```python
+@qfunc
+def my_hhl(
+    fraction_digits: int,
+    b: CArray[CReal],
+    unitary_with_matrix: QCallable[QArray],
+    res: Output[QArray],
+    phase: Output[QNum],
+    indicator: Output[QBit],
+) -> None:
+    # TODO Call load_b you created, to load "b" vector into register "res"
+    # Solution start
+    load_b(b, res)
+    # Solution end
+
+    # TODO allocate a qnum register for "phase".
+
+This qnum should be in the range [0,1) with fraction_digits precision
+    # Solution start
+    allocate(fraction_digits, False, fraction_digits, phase)
+    # Solution end
+
+    # TODO refer to applying (QPE\dagger)*(EigenValInv)*(QPE) : we want to apply "simple_eig_inv" within "qpe"
+    # Solution start
+    within_apply(
+        lambda: qpe(unitary=lambda: unitary_with_matrix(res), phase=phase),
+        lambda: simple_eig_inv(phase=phase, indicator=indicator),
+    )
+    # Solution end
+```
+
+The first entry point of any model would be the `main` function.
+
+Since you already have done all the job in `my_hhl` function, all we have to do now is to call it with the relevant inputs
+
+Call `my_hhl` with `QPE_SIZE` digits resolution, on the normalized `b`, where the unitary is based on `unitary_mat`.
+
+```python
+QPE_SIZE = 4
+
+
+@qfunc
+def main(res: Output[QNum], phase: Output[QNum], indicator: Output[QBit]):
+    b_normalized = b.tolist()
+    unitary_mat = scipy.linalg.expm(1j * 2 * np.pi * A).tolist()
+
+    # TODO call my_hhl with QPE_SIZE digits resolution, on the normalized b, where the unitary is based on "unitary_mat"
+
+    # Solution start
+    my_hhl(
+        fraction_digits=QPE_SIZE,
+        b=b_normalized,
+        unitary_with_matrix=lambda target: unitary(elements=unitary_mat, target=target),
+        res=res,
+        phase=phase,
+        indicator=indicator,
+    )
+    # Solution end
+```
+#
+
+## 2.2 Add Execution Preferences
+
+Once we have a model `qmod_hhl` (by creating it from `main`), we would like to add execution details to prepare for the program execution stage.
+
+```python
+backend_preferences = ClassiqBackendPreferences(backend_name="simulator_statevector")
+
+qmod_hhl = create_model(
+    entry_point=main,
+    execution_preferences=ExecutionPreferences(
+        num_shots=1, backend_preferences=backend_preferences
+    ),
+)
+```
+#
+
+## 2.2 Synthesize - from qmod to qprog
+
+Once we have a high level model, we would like to compile and get the actual quantum program.
+
+This is done using the `synthesize` command.
+
+```python
+qprog_hhl = synthesize(qmod_hhl)
+```
+
+Viewing in IDE
+
+```python
+show(qprog_hhl)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/2yjE1722b5qbbACiS9aynC2rmde
+  
+
+```
+</Info>
+
+Details about `qprog` as depth for example, can be seen both in IDE and in Python SDK
+
+```python
+print("depth = ", qprog_hhl.transpiled_circuit.depth)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+depth =  464
+  
+
+```
+</Info>
+
+```python
+print("depth = ", qprog_hhl.transpiled_circuit.get_circuit_metrics())
+```
+<Info>
+  **Output:**
+
+  
+
+```
+depth =  depth=464 count_ops={'u': 267, 'cx': 286}
+  
+
+```
+</Info>
+
+#
+
+## 2.3 Execution
+
+Here we execute the circuit on state vector simulator (the backend for execution is defined before the synthesis stage).
+We can show the results in the IDE and save the state-vector into a variable.
+
+```python
+job = execute(qprog_hhl)
+```
+```python
+
+job.open_in_ide()
+```
+```python
+
+result = job.result_value()
+```
+#
+
+## 2.4 Post-process
+
+We would like to look at the answers that are encoded in the amplitudes of the terms that their indicator qubit value=1
+
+```python
+target_pos = result.physical_qubits_map["indicator"][0]  # position of control qubit
+sol_pos = list(result.physical_qubits_map["res"])  # position of solution
+phase_pos = list(
+    result.physical_qubits_map["phase"]
+)  # position of the “phase” register, and flips for endianness as we will use the indices to read directly from the string
+```
+
+Define a run over all the relevant strings holding the solution.
+
+The solution vector will be inserted into the variable `qsol`.
+
+Factor out $C=1/2^m$.
+
+```python
+qsol = [
+    np.round(parsed_state.amplitude / (1 / 2**QPE_SIZE), 5)
+    for solution in range(2**num_qubits)
+    for parsed_state in result.parsed_state_vector
+    if parsed_state["indicator"] == 1.0
+    and parsed_state["res"] == solution
+    and parsed_state["phase"]
+    == 0.0  # this takes the entries where the “phase” register is at state zero
+]
+print("Quantum Solution: ", np.abs(qsol) / np.linalg.norm(qsol))
+print("Classical Solution: ", sol_classical / np.linalg.norm(sol_classical))
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum Solution:  [0.2840631  0.50843613 0.64683772 0.4923432 ]
+  Classical Solution:  [0.28005009 0.5079953  0.6484938  0.49291836]
+  
+
+```
+</Info>
+
+```python
+fidelity = (
+    np.abs(
+        np.dot(
+            sol_classical / np.linalg.norm(sol_classical),
+            qsol / np.linalg.norm(qsol),
+        )
+    )
+    ** 2
+)
+print("Solution Fidelity:", fidelity)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Solution Fidelity: 0.9999806280936833
+  
+
+```
+</Info>
+
+## 
+
+3. Comparing classical and quantum solutions.
+
+Note that the HHL algorithm returns a statevector result up to some global phase (coming from transpilation or from the quantum functions themselves). Therefore, to compare with the classical solution, correct for this global phase.
+
+```python
+sol_classical = np.linalg.solve(A, b)
+global_phase = np.angle(qsol)
+qsol_corrected = np.real(qsol / np.exp(1j * global_phase))
+print("classical:  ", sol_classical)
+print("HHL:        ", qsol_corrected)
+print(
+    "relative distance:  ",
+    round(
+        np.linalg.norm(sol_classical - qsol_corrected)
+        / np.linalg.norm(sol_classical)
+        * 100,
+        1,
+    ),
+    "%",
+)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+classical:   [1.3814374  2.50585064 3.19890483 2.43147877]
+  HHL:         [1.43559 2.56952 3.26897 2.48819]
+  relative distance:   2.5 %
+  
+
+```
+</Info>
+
+```python
+import matplotlib.pyplot as plt
+
+plt.plot(sol_classical, "bo", label="classical")
+plt.plot(qsol_corrected, "ro", label="HHL")
+plt.legend()
+plt.xlabel("$i$")
+plt.ylabel("$x_i$")
+plt.show()
+```
+![output](./hhl_workshop_files/hhl_workshop_1.png)
+
+## 
+
+4. Generalizations
+
+The usecase treated above is a canonical one, assuming the following properties:
+
+1. The RHS vector $\vec{b}$ is normalized.
+
+1. The matrix $A$ is an Hermitian one.
+
+1. The matrix $A$ is of size $2^n\times 2^n $.
+
+1. The eigenvalues of $A$ are in the range $(0,1)$.
+
+However, any general problem that does not follow these conditions can be resolved as follows:
+
+1. As preprocessing, normalize $\vec{b}$ and then return the normalization factor as a post-processing
+
+1. Symmetrize the problem as follows:
+
+$$
+\begin{pmatrix}
+0 & A^T \\
+A & 0
+\end{pmatrix}
+\begin{pmatrix}
+\vec{b}  \\
+0
+\end{pmatrix}
+=
+\begin{pmatrix}
+0  \\
+\vec{x}
+\end{pmatrix}.
+$$
+This increases the number of qubits by 
+
+1.
+
+3. Complete the matrix dimension to the closest $2^n$ with an identity matrix.
+
+The vector $\vec{b}$ will be completed with zeros.
+
+$$
+\begin{pmatrix}
+A & 0 \\
+0 & I
+\end{pmatrix}
+\begin{pmatrix}
+\vec{b}  \\
+0
+\end{pmatrix}
+=
+\begin{pmatrix}
+\vec{x}  \\
+0
+\end{pmatrix}.
+$$
+4. If the eigenvalues of $A$ are in the range $[-w_{\min},w_{\max}]$ you can employ transformations to the exponentiated matrix that enters into the Hamiltonian simulation, and then undo them for extracting the results:
+
+$$
+\tilde{A}=(A+w_{\min}I)\left(1-\frac{1}{2^{m}}\right)\frac{1}{w_{\min}+w_{\max}}.
+$$
+The eigenvalues of this matrix lie in the interval $[0,1)$, and are related to the eigenvalues of the original matrix via
+
+$$
+\lambda = (w_{\min}+w_{\max})\tilde{\lambda}\left[1/\left(1-\frac{1}{2^{n_{m}}}\right)\right]-w_{\min},
+$$
+with $\tilde{\lambda}$ being an eigenvalue of $\tilde{A}$ resulting from the QPE algorithm.
+
+This relation between eigenvalues is then used for the expression inserted into the eigenvalue inversion, via the `AmplitudeLoading` function.
+
+## References
+
+<a name="HHL">\[1]</a>: [Harrow, A. W., Hassidim, A., & Lloyd, S., Quantum Algorithm for Linear Systems of Equations. Physical Review Letters 103, 150502 (2009)](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.103.150502).

@@ -1,0 +1,302 @@
+---
+title: "Using Quantum Computers to Boost Whitebox Fuzzing"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/cybersecurity/whitebox_fuzzing/whitebox_fuzzing.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This demonstration shows how to harness the power of quantum computers for **enhancing software security**. Specifically, it uses the quantum Grover algorithm to boost the process of whitebox fuzzing.
+
+According to \[[1](#whitebox)], the "killer-app" for whitebox fuzzing is the **testing of file and packet parsers**. As any vulnerability in such a parser might result in a costly security patch, it is worthwhile investing significant effort to protect the code.
+
+## Fuzzing
+
+![image.png](./whitebox_fuzzing_files/f4133cb9-8fe1-4ff8-acd9-6ac79d9d0b0f.png)
+
+Fuzzing is a dynamic code testing technique that provides random data, known as "fuzz," to the inputs of a program.
+
+The goal is to find bugs, security loopholes, or other unexpected behavior in the software. By feeding the program various input combinations, a fuzzer aims to uncover weaknesses that might be exploited maliciously.
+
+#
+
+## Whitebox Fuzzing
+
+Whitebox fuzzing, in particular, involves accessing the internal structure and code of the program. It combines static and dynamic analysis to not only execute the program with random inputs but also to achieve maximum code coverage, ensuring that all possible execution paths are tested.
+
+This allows for more targeted and efficient testing. It usually consists of a "symbolic execution" part: emulating the program to explore various branches and gathering them into a set of constraints.
+
+The constraints are solved by a constraint solver, generating new fuzzing input to the program.
+
+#
+
+## Toy Example
+
+This example emphasizes the importance of whitebox testing. First, trigger all code flows for this function:
+
+```python
+def foo(x: int, y: int):
+    if x == 12:
+        if y > 3:
+            return "a"
+        return "b"
+    if y + x < 9:
+        if (x % 4) * (y % 2) == 1:
+            return "c"
+        return "d"
+    return "e"
+```
+
+Now (due to simulation limitations) say that x, y are six-bit integers, so they are in the range \[0, 63].
+
+Try to get all the outputs of `foo` in a black-box way, e.g., by sampling random inputs:
+
+```python
+from collections import Counter
+
+import numpy as np
+from matplotlib import pyplot as plt
+
+np.random.seed(3)
+x_samples = np.random.randint(0, 63, 500)
+y_samples = np.random.randint(0, 63, 500)
+
+outputs = [foo(x, y) for x, y in zip(x_samples, y_samples)]
+
+
+def plot_outputs(outputs):
+    char_counts = Counter(outputs)
+
+    # Data for plotting
+    chars = ["a", "b", "c", "d", "e"]
+    counts = list(char_counts.values())
+
+    # Plotting
+    plt.bar(char_counts.keys(), char_counts.values())
+    plt.xlabel("Output")
+    plt.ylabel("Occurrences")
+    plt.show()
+
+
+plot_outputs(outputs)
+```
+![output](./whitebox_fuzzing_files/whitebox_fuzzing_1.png)
+
+Note that with 500 inputs, you only reach three of the five different outputs for `foo`.
+
+However, by following the flow of `foo`, you can generate these constraints to the function:
+
+- "a": $(x = 12) \land (y \gt 3)$
+- "b": $(x = 12) \land (y \leq 3)$
+- "c": $ (x + y \lt 9) \land (x \neq 12) \land ((x \mod 4) \times (y \mod 2) = 1)$
+- "d": $ (x + y \lt 9) \land (x \neq 12) \land ((x \mod 4) \times (y \mod 2) \neq 1)$
+- "e": $ (x \neq 12) \land (x + y \lt 9)$
+
+Now, to trigger each of the different outputs, find inputs that satisfy the constraints.
+
+Some constraints might not be satisfiable for any input.
+
+Although this toy example is easy, the general case, which is an instance of the Constraints Satisfaction Problem (CSP), is computationally hard and belongs to the $\text{NP-Complete}$ complexity class.
+
+## Here Comes the Quantum Part!
+
+#
+
+## Grover's Algorithm
+
+The physical nature of a quantum computer can be harnessed to generate inputs to the function. Specifically, you can create a 'superposition' of all different inputs: a physical state that holds all the possible assignments to the function inputs, for which to compute whether the constraints are fulfilled.
+
+The quantum computer allows only a single classical output of the variable.
+
+This is where Grover's algorithm \[[1](#gro97),[2](#growiki)] is useful: it can generate "good" samples with a high probability, achieving a quadratic(!) speedup over a classical brute force approach.
+
+#
+
+## Oracle Function
+
+In the heart of the algorithm, implement an oracle that computes for each state:
+
+$O |x\rangle =
+\begin\{cases\} -|x\rangle & \text\{if \} f(x) = 1 \\
+|x\rangle & \text\{otherwise\}
+\end\{cases\}$
+
+Classiq has a built-in arithmetic engine for computing such oracles. Specifically, take the hardest constraint:
+
+- "c": $ (x + y \lt 9) \land (x \neq 12) \land ((x \mod 4) \times (y \mod 2) = 1)$
+
+Eliminate the $x \neq 12$ as it is already satisfied given the first clause, and create an oracle function for it:
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+VARIABLE_SIZE = 6
+
+
+class OracleVars(QStruct):
+    x: QNum[VARIABLE_SIZE]
+    y: QNum[VARIABLE_SIZE]
+
+
+@qperm
+def my_oracle(vs: Const[OracleVars]) -> None:
+    control((vs.x + vs.y < 9) & ((vs.x % 4) * (vs.y % 2) == 1), lambda: phase(pi))
+```
+
+See how a quantum oracle looks:
+
+```python
+@qfunc
+def main(vs: Output[OracleVars]):
+    allocate(vs)
+    hadamard_transform(vs)
+    my_oracle(vs)
+
+
+MAX_WIDTH_ORACLE = 25
+qprog_oracle = synthesize(main, constraints=Constraints(max_width=MAX_WIDTH_ORACLE))
+show(qprog_oracle)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3DX3GvFMxwwUnx06tjffYzFLSwG
+  
+
+```
+</Info>
+
+![image.png](./whitebox_fuzzing_files/42505391-1ca2-4277-ae76-6a4ed9369ebd.png)
+
+#
+
+## Full Grover's Circuit
+
+Now create the full circuit implementation of Grover's algorithm.
+
+#
+
+### Grover Repetitions
+
+The algorithm includes applying a quantum oracle in repetition, such that the probability to sample a good state "rotates" from low to high.
+
+Without knowing the concentration of solutions beforehand (which is the common case), one might overshoot with too many repetitions and not arrive at a solution.
+
+Fixed Point Amplitude Amplification (FFPA) ([4](#ffpa)), for example, is a modification to the basic Grover algorithm, which does not suffer from the overshoot issue. However, here, for simplicity, use the basic Grover's algorithm.
+
+Assume that this specific state is only satisfied for a specific input, and calculate the number of oracle repetitions required:
+
+```python
+GROVER_REPEATS = np.pi / 4 * np.sqrt(2 ** (2 * VARIABLE_SIZE) / 2)
+GROVER_REPEATS = np.round(GROVER_REPEATS)
+print(GROVER_REPEATS)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+36.0
+  
+
+```
+</Info>
+
+This is indeed \~ the square root of the number of possible assignments: $2^{12}$ in this case!
+
+To save simulation time, simplify even further: use only several Grover repetitions to show that this raises the probability of sampling a "c" input:
+
+```python
+@qfunc
+def main(vs: Output[OracleVars]):
+    allocate(vs)
+    grover_search(10, my_oracle, vs)
+```
+#
+
+## Synthesizing the Model
+
+Synthesize the circuit using the Classiq synthesis engine.
+
+The synthesis takes the high level model definition and creates a quantum circuit implementation within a few seconds:
+
+```python
+MAX_WIDTH_GROVER = 25
+qprog_grover = synthesize(main, constraints=Constraints(max_width=MAX_WIDTH_GROVER))
+```
+#
+
+## Showing the Resulting Circuit
+
+When the Classiq synthesis engine finishes the job, display the resulting circuit in the interactive GUI:
+
+```python
+show(qprog_grover)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3DX3a1j2WpN78zxJ5tV2mGmU2kD
+  
+
+```
+</Info>
+
+#
+
+## Executing the Circuit
+
+Lastly, execute the resulting circuit in the Classiq interface using the `sample` function:
+
+```python
+df = sample(qprog_grover, num_shots=500)
+```
+
+Observe the results of the 500 samples drawn from the circuit, together with each result's `foo` value:
+
+```python
+df["foo"] = df.apply(lambda r: foo(r["vs.x"], r["vs.y"]), axis=1)
+df
+```
+<div><style scoped> .dataframe tbody tr th:only-of-type \{ vertical-align: middle; } .dataframe tbody tr th \{ vertical-align: top; } .dataframe thead th \{ text-align: right; } </style> <table border="1" className="dataframe"> <thead> <tr style={{textAlign: "right"}}> <th /> <th>vs.x</th> <th>vs.y</th> <th>counts</th> <th>probability</th> <th>bitstring</th> <th>foo</th> </tr> </thead> <tbody> <tr> <th>0</th> <td>1</td> <td>1</td> <td>56</td> <td>0.112</td> <td>000001000001</td> <td>c</td> </tr> <tr> <th>1</th> <td>5</td> <td>1</td> <td>49</td> <td>0.098</td> <td>000001000101</td> <td>c</td> </tr> <tr> <th>2</th> <td>1</td> <td>3</td> <td>40</td> <td>0.080</td> <td>000011000001</td> <td>c</td> </tr> <tr> <th>3</th> <td>1</td> <td>5</td> <td>38</td> <td>0.076</td> <td>000101000001</td> <td>c</td> </tr> <tr> <th>4</th> <td>5</td> <td>3</td> <td>34</td> <td>0.068</td> <td>000011000101</td> <td>c</td> </tr> <tr> <th>...</th> <td>...</td> <td>...</td> <td>...</td> <td>...</td> <td>...</td> <td>...</td> </tr> <tr> <th>248</th> <td>58</td> <td>61</td> <td>1</td> <td>0.002</td> <td>111101111010</td> <td>e</td> </tr> <tr> <th>249</th> <td>59</td> <td>61</td> <td>1</td> <td>0.002</td> <td>111101111011</td> <td>e</td> </tr> <tr> <th>250</th> <td>55</td> <td>62</td> <td>1</td> <td>0.002</td> <td>111110110111</td> <td>e</td> </tr> <tr> <th>251</th> <td>0</td> <td>63</td> <td>1</td> <td>0.002</td> <td>111111000000</td> <td>e</td> </tr> <tr> <th>252</th> <td>11</td> <td>63</td> <td>1</td> <td>0.002</td> <td>111111001011</td> <td>e</td> </tr> </tbody> </table> <p>253 rows × 6 columns</p></div>
+
+```python
+plot_outputs(df["foo"].repeat(df["counts"]))
+```
+![output](./whitebox_fuzzing_files/whitebox_fuzzing_2.png)
+
+And "c" is indeed sampled with a higher probability! If you do 36 Grover repetitions, you would expect to get c with a probability of \~
+
+1.
+
+## Notes
+
+- While "black-box" fuzzing can also potentially benefit from quantum computers, a large quantity of quantum resources is generally required to emulate the state of the classical program. On the other hand, the "white-box" case is lower hanging fruit, requiring fewer resources for a hybrid quantum-classical approach.
+- This example shows quadratic improvement in comparison to a classical "brute force" solver. However, in reality, there are much faster classical solvers. As a basic example, a solver can "prune" branches of a search by backtracking if a partial assignment is not satisfiable.
+
+Such modifications are, in general, also feasible on a quantum computer.
+
+For example, see \[[5](#backtrack)] on Quantum Backtracking.
+
+## References
+
+<a name="Whitebox">\[1]</a> [Bounimova, E., Godefroid, P., and Molnar, D. (2013). Billions and billions of constraints: Whitebox fuzz testing in production, 35th International Conference on Software Engineering (ICSE), San Francisco, CA, USA, 2013, pp. 122-131, doi: 10.1109/ICSE.2013.6606558](https://ieeexplore.ieee.org/document/6606558)
+
+<a name="Gro97">\[2]</a> [Grover, Lov K. (1997). Quantum mechanics helps in searching for a needle in a haystack. Physical Review Letters, 79.2: 325.](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.79.325)
+
+<a name="GroWiki">\[3]</a> [Grover's algorithm (Wikipedia)](https://en.wikipedia.org/wiki/Grover%27s_algorithm).
+
+<a name="FPAA">\[4]</a> [Yoder, Theodore J. et al. (2014). Fixed-point quantum search with an optimal number of queries. Physical Review Letters, 113 21: 210501](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.113.210501)
+
+<a name="Backtrack">\[5]</a> [Montanaro, Ashley. (2015). Quantum walk speedup of backtracking algorithms. Theory of Computing. 14. 10.4086/toc.2018.v014a015](https://theoryofcomputing.org/articles/v014a015/)

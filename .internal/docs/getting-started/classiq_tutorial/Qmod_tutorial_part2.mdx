@@ -1,0 +1,836 @@
+---
+title: "Qmod Tutorial - Part 2"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/basic_tutorials/the_classiq_tutorial/Qmod_tutorial_part2.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+In this tutorial, we keep extending our expressive power by introducing more advanced topics:
+
+- Exponentiation and Pauli Operators.
+- Arithmetics and numeric assignment.
+- The `within_apply` statement.
+- The `bind` statement.
+
+Please make sure to go through execises 1-5 of part 1 before continuing with this notebook.
+
+## Exercise 7 
+
+- Exponentiation and Pauli Operators
+
+The Qmod language supports different classical types: scalars, arrays, and structs.
+
+Structs are objects with member variables or fields.
+
+See [classical types](https://docs.classiq.io/latest/qmod-reference/language-reference/classical-types/#structs).
+
+In particular, Qmod offers a specialized syntax for creating [sparse Hamiltonians](https://docs.classiq.io/sdk-reference/qmod/classical-types#sparsepauliop).
+
+For that, simply use the `Pauli` Enum acting in the correct set of qubits.
+
+This exercise uses the Suzuki-Trotter function to find the evolution of `H=0.5XZXX + 0.25YIZI + 0.3 XIZY` (captured as a literal value for the Pauli operator), with the evolution coefficient being 3, the order being 2, and using 4 repetitions.
+
+See [suzuki\_trotter](https://docs.classiq.io/latest/qmod-reference/library-reference/core-library-functions/hamiltonian_evolution/suzuki_trotter/suzuki_trotter/).
+
+To complete this exercise, allocate q and invoke the `suzuki_trotter` quantum function:
+
+<Accordion title="HINT">
+  suzuki\_trotter(<br />
+   ...,<br />
+   evolution\_coefficient=3,<br />
+   repetitions=4,<br />
+   order=2,<br />
+   qbv=q,<br />
+  )
+</Accordion>
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(q: Output[QArray[QBit]]) -> None:
+    allocate(4, q)
+
+    # Your code here:
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD16ju8qGJHOLmv7ceqqH4gDT
+  
+
+```
+</Info>
+
+## Exercise 8 
+
+- Basic Arithmetics
+
+This exercise uses quantum numeric variables and calculates expressions over them.
+
+See details on the syntax of numeric types in [quantum types](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-types/#syntax).
+
+See more on quantum expressions in [numeric assignment](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/assignment/).
+
+#
+
+## Exercise 8a
+
+Create this quantum program:
+
+1. Initialize variables `x=2`, `y=7` and compute `res = x + y`.
+1. Initialize variables `x=2`, `y=7` and compute `res = x * y`.
+1. Initialize variables `x=2`, `y=7`, `z=1` and compute `res = x * y - z`.
+
+Guidance:
+
+- Use the `|=` operators to perform out-of-place assignment of arithmetic expressions.
+- To initialize the variables, use the `|=` to assgin it with a numerical value.
+
+```python
+from classiq import *
+
+# Your code here:
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD1XbzQLEHJGtCnOgoDk2OERL
+  
+
+```
+</Info>
+
+#
+
+## Exercise 8b
+
+1. Declare `x` to be a 2-qubit numeric variable and `y` a 3-qubit numeric variable.
+1. Use `prepare_state` to initialize `x` to an equal superposition of `0` and `2`, and `y` to an equal superposition of `1`, `2`, `3`, and `6` (see [prepare\_state](https://docs.classiq.io/latest/qmod-reference/library-reference/core-library-functions/prepare_state_and_amplitudes/prepare_state_and_amplitudes/)).
+
+You can set the error bound to 
+
+0.
+1. Compute `res = x + y`.
+
+Execute the resulting circuit.
+
+What did you get?
+
+```python
+from classiq import *
+
+# Your code here:
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD1xzkRlXxUfnzro4AwYGBgT8
+  
+
+```
+</Info>
+
+## Exercise 9 
+
+- Within-Apply
+
+The within-apply statement applies the $U^\dagger V U$ pattern that appears frequently in quantum computing.
+It allows you to compute a function `V` within the context of another function `U`, and afterward uncompute `U` to release auxiliary qubits storing intermediate results.
+
+See [within apply](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/within-apply/).
+
+#
+
+## Exercise 9a
+
+This exercise uses `within-apply` to compute an arithmetic expression in steps.
+
+Use the `within_apply` operation to calculate `res = x + y + z` from a two-variable addition building block with these steps:
+
+1. Add `x` and `y`
+1. Add the result to `z`
+1. Uncompute the result of the first operation
+
+For simplicity, initialize the registers to simple integers: `x=3`, `y=5`, `z=2`.
+
+Hints:
+
+- Use a temporary variable.
+- Use the function syntax of numeric assignment.
+
+Execute the circuit and make sure you obtain the expected result.
+
+```python
+from classiq import *
+
+# Your code here:
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD2Xsyx8PJ9ZPFpZoRTqvwskK
+  
+
+```
+</Info>
+
+#
+
+## Exercise 9b
+
+Why use `within-apply` and not just write three concatenated functions?
+To understand the motivation, create another arithmetic circuit.
+
+This time, however, set the Classiq synthesis engine to optimize on the circuit's number of qubits; i.e., its width.
+
+Determine constraints inside synthesis with `Constraints`. (See [here](https://docs.classiq.io/latest/user-guide/synthesis/constraints/)).
+
+Perform the operation `res = w + x + y + z`, where w is initialized to 4 and the rest as before:
+
+1. Add `x` and `y` (as part of the `within_apply` operation)
+1. Add the result to `z` (as part of the `within_apply` operation)
+1. Uncompute the result of the first operation (as part of the `within_apply` operation)
+1. Add the result of the second operation to `w`.
+
+There is no need to perform another uncomputation, as this brings the calculation to an end.
+
+Create the model, optimize on the circuit's width, and run the circuit.
+
+Can you identify where qubits have been released and reused?
+
+```python
+from classiq import *
+
+# Your code here:
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD2kK3AR0gQ8zOhMJl66ditu2
+  
+
+```
+</Info>
+
+#
+
+## Bonus: Use a Single Arithmetic Expression
+
+What happens when you don't manually decompose this expression?
+
+Use the Classiq arithmetic engine to calculate `res |= x + y + z + w` and optimize for width.
+
+Look at the resulting quantum program.
+
+Can you identify the computation and uncomputation blocks? What else do you notice?
+
+```python
+from classiq import *
+
+# Your code here:
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD39TjQ7Ejxzh22iKgSsjFI5E
+  
+
+```
+</Info>
+
+## Exercise 10 
+
+- In-place Arithmetics
+
+#
+
+## Exercise 10a 
+
+- Conditional Computation
+
+This exercise uses quantum numeric variables that represent fixed-point reals. A fixed-point variable `QNum[n, UNSIGNED, f]` uses `n` qubits to represent non-negative values, with `f` of those bits after the binary point - so `QNum[3, UNSIGNED, 3]` covers the range $[0, 1)$ in steps of $\frac{1}{8}$.
+
+The goal is to evaluate the following piecewise function over a superposition of fixed-point inputs:
+
+$$
+f(x) = \begin{cases}
+      2x + 1 & \text{ if } 0 \leq x < 0.5 \\
+      x + 0.5 & \text{ if } 0.5 \leq x < 1
+   \end{cases}
+$$
+The provided code skeleton puts `x` into a uniform superposition of all values in $[0, 1)$ via the Hadamard transform, and pre-allocates `res` to hold the result.
+
+Fill in the body of `main` to evaluate `f(x)` into `res`:
+
+1. Compute a boolean quantum variable representing the condition `x < 0.5`.
+1. Use `control` with `stmt_block` and `else_block` to apply the correct formula to `res` depending on the branch.
+
+To write into `res` inside each branch, use `inplace_xor(expression, res)`.
+
+You will learn in Exercise 10b exactly why this is needed instead of the familiar `|=` operator.
+
+Note: Python does not allow assignment operators (`|=`, `^=`, `+=`) inside lambda expressions.
+
+Factor the in-place computation out to a named `@qfunc` function and call it from the `control` lambda.
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3, UNSIGNED, 3]], res: Output[QNum[5, UNSIGNED, 3]]) -> None:
+    allocate(5, res)
+    allocate(3, x)
+    hadamard_transform(x)
+
+    # Your code here:
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD3VMGVfh3BeIWDlqT51Gmi9j
+  
+
+```
+</Info>
+
+#
+
+## Exercise 10b 
+
+- In-place Assignment
+
+**Why can't we use `|=` inside the `control` block?**
+
+The out-of-place operator `|=` requires its target to be *uninitialized* - it allocates a fresh set of qubits to store the result. In the code above, `res` is pre-allocated *before* the `control` block, so it is already initialized.
+
+Using `res |= expression` inside a branch lambda would fail: Qmod does not allow allocation into an already-initialized variable.
+
+**In-place operators.** The in-place operators write into an *existing* initialized variable without allocating new qubits:
+
+- `inplace_xor(expression, target)` - computes `expression` and XORs it bit-by-bit into `target` (equivalent to `target ^= expression`)
+- `inplace_add(expression, target)` - computes `expression` and adds it arithmetically into `target` (equivalent to `target += expression`)
+
+Both work inside a `control` block because they never try to allocate an uninitialized variable.
+
+They also avoid allocating a separate result register per branch - both branches share the single pre-allocated `res`, saving qubits.
+
+Since `res` is initialized to zero before the `control` block, `inplace_xor` and `inplace_add` produce the same result here (XOR with zero and ADD with zero are equivalent).
+
+They would differ if `res` had a non-zero initial value, or for multi-bit values where carries (ADD) and bit-by-bit XOR diverge.
+
+See [numeric assignment](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/assignment/).
+
+**Exercise:** Modify your Exercise 10a solution to use `inplace_add` instead of `inplace_xor` and verify that you get the same measurement results.
+
+```python
+from classiq import *
+
+# Modify your Exercise 10a solution to use inplace_add instead of inplace_xor.
+
+# Your code here:
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD3rWWB8kXwD8yUVIdqFcH4yG
+  
+
+```
+</Info>
+
+## Exercise 11 
+
+- A State-preparation Algorithm
+
+#
+
+## Binding
+
+The `bind` operation smoothly converts between different quantum types and splits or slices bits when necessary.
+
+Here is an example:
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(res: Output[QArray[QBit]]) -> None:
+    x = QArray()
+    allocate(3, x)
+    ...
+    lsb = QBit()
+    msb = QNum("msb", 2, False, 0)
+    bind(x, [lsb, msb])
+    ...
+    bind([lsb, msb], res)
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD4EohCXx6VVspqiS2QV5jgZo
+  
+
+```
+</Info>
+
+The first `bind` operation splits the 3-qubit variable `x` into the 2-qubit and single-qubit `lsb` and `msb` variables, respectively.
+
+After the `bind` operation:
+
+1. The `lsb` and `msb` variables can be operated on separately.
+1. The `x` variable returns to its uninitialized state and can no longer be used.
+
+The second `bind` operation concatenates the variables back to the `res` output variable.
+
+For this exercise, fill in the missing code parts in the above snippet and use the `control` statement to manually generate the 3-qubit probability distribution: `[1/8, 1/8, 1/8 - sqrt(3)/16, 1/8 + sqrt(3)/16, 1/8, 1/8, 1/8, 1/8]`.
+
+The following sequence of operations generates it:
+
+1. Perform the Hadamard transform on all three qubits.
+1. Apply a `pi/3` rotation on the LSB conditioned by the MSB being $|0\rangle$ and the second-to-last MSB being $|1\rangle$.
+
+How would you write this condition using a QNum?
+
+To validate your results without looking at the full solution, compare them to running using the Classiq built-in `prepare_state` function.
+
+```python
+import numpy as np
+
+from classiq import *
+
+
+@qfunc
+def pre_prepared_state(q: Output[QArray]) -> None:
+    prepare_state(
+        [
+            1 / 8,
+            1 / 8,
+            1 / 8 - np.sqrt(3) / 16,
+            1 / 8 + np.sqrt(3) / 16,
+            1 / 8,
+            1 / 8,
+            1 / 8,
+            1 / 8,
+        ],
+        0.0,
+        q,
+    )
+
+
+# Your code here:
+```
+
+## Solutions
+
+#
+
+## Exercise 7
+
+```python
+# Solution to Exercise 7:
+
+
+from classiq import *
+
+
+@qfunc
+def main(q: Output[QArray[QBit]]) -> None:
+    allocate(4, q)
+    suzuki_trotter(
+        0.5 * Pauli.X(0) * Pauli.X(1) * Pauli.Z(2) * Pauli.X(3)
+        + 0.25 * Pauli.Z(1) * Pauli.Y(3)
+        + 0.3 * Pauli.Y(0) * Pauli.Z(1) * Pauli.X(3),
+        evolution_coefficient=3,
+        repetitions=4,
+        order=2,
+        qbv=q,
+    )
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD4bxC6yg7td6tBOLM6Xflu1k
+  
+
+```
+</Info>
+
+> **Key takeaway:** Qmod supports Pauli operator expressions as a native type for specifying sparse Hamiltonians. `suzuki_trotter` implements time evolution under such a Hamiltonian by interleaving the exponentials of individual Pauli terms approximating $e^{-iHt}$. The `order` and `repetitions` parameters control the accuracy of the approximation.
+
+#
+
+## Exercise 8
+
+```python
+# Solution to Exercise 8a:
+
+
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum], y: Output[QNum], z: Output[QNum], res: Output[QNum]) -> None:
+    x |= 2
+    y |= 7
+    z |= 1
+    # res |= x + y
+    # res |= x * y
+    res |= x * y - z
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD5JXTHRLi4LIhpVJVTToUW9q
+  
+
+```
+</Info>
+
+> **Key takeaway:** The `|=` operator performs *out-of-place* numeric assignment: it allocates a fresh quantum register to store the result of the arithmetic expression. Complex expressions combining `+`, `*`, and `-` are fully supported and evaluated quantum-mechanically.
+
+```python
+# Solution to Exercise 8b:
+
+
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum], y: Output[QNum], res: Output[QNum]) -> None:
+    prepare_state(probabilities=[0.5, 0, 0.5, 0.0], bound=0.0, out=x)
+    prepare_state(
+        probabilities=[0, 0.25, 0.25, 0.25, 0.0, 0.0, 0.25, 0.0], bound=0.0, out=y
+    )
+    res |= x + y
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD5wotnM0pIRbEbVf5gG5uGQ0
+  
+
+```
+</Info>
+
+> **Key takeaway:** Quantum arithmetic operates over superpositions simultaneously. When `x` and `y` each encode a superposition of values, `res |= x + y` produces a superposition of all corresponding sums, being one for each pair of input values. This is the computational parallelism that quantum arithmetic provides.
+
+#
+
+## Exercise 9
+
+```python
+# Solution to Exercise 9:
+
+
+from classiq import *
+
+
+@qfunc
+def main(res: Output[QNum]) -> None:
+    x = QNum()
+    y = QNum()
+    z = QNum()
+    x |= 3
+    y |= 5
+    z |= 2
+
+    temp = QNum()
+    within_apply(
+        within=lambda: assign(x + y, temp), apply=lambda: assign(temp + z, res)
+    )
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD6kxzvd0blHHULXShaKhWbPO
+  
+
+```
+</Info>
+
+> **Key takeaway:** `within_apply` automates the $U^\dagger V U$ uncomputation pattern: it runs the `within` block, then the `apply` block, then automatically reverses the `within` block freeing the qubits held by temporary variables. Without it, temporaries stay initialized for the rest of the circuit, permanently occupying qubits. Note: because `within` and `apply` must be Python lambdas, and expressions, such as `|=`, cannot appear in a lambda, use `assign(expression, target)` as the functional equivalent.
+
+```python
+# Solution to the advanced part of Exercise 9:
+
+
+from classiq import *
+
+
+@qfunc
+def main(res: Output[QNum]) -> None:
+    x = QNum()
+    y = QNum()
+    z = QNum()
+    w = QNum()
+    x |= 3
+    y |= 5
+    z |= 2
+    w |= 4
+
+    temp_xy = QNum()
+    xyz = QNum()
+    within_apply(
+        within=lambda: assign(x + y, temp_xy),
+        apply=lambda: assign(temp_xy + z, xyz),
+    )
+    res |= xyz + w
+
+
+const = Constraints(optimization_parameter=OptimizationParameter.WIDTH)
+qprog = synthesize(main, constraints=const)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD7kXtAkdA9u4Yhddt7ACLElK
+  
+
+```
+</Info>
+
+> **Key takeaway:** Qubit reuse is only possible when temporary variables are properly uncomputed. `within_apply` enables the synthesizer to reclaim freed qubits for subsequent operations. The synthesis optimization on width (`OptimizationParameter.WIDTH`) makes this reuse explicit: the same qubits appear in different logical roles at different points in the circuit.
+
+#
+
+## Exercise 10a
+
+```python
+# Solution to Exercise 10:
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3, UNSIGNED, 3]], res: Output[QNum[5, UNSIGNED, 3]]) -> None:
+    allocate(5, res)
+    allocate(3, x)
+    hadamard_transform(x)
+
+    aux = QBit()
+    aux |= x < 0.5
+    control(
+        aux,
+        stmt_block=lambda: inplace_xor(2.0 * x + 1.0, res),
+        else_block=lambda: inplace_xor(1.0 * x + 0.5, res),
+    )
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD8i2H6PuZsGS4qNnYL87Ak7M
+  
+
+```
+</Info>
+
+> **Key takeaway:** Piecewise quantum functions are implemented by computing a boolean condition into an auxiliary qubit (`aux |= x < 0.5`) and using `control` with `stmt_block` and `else_block` to select the appropriate formula. Because `x` is in a superposition, the model evaluates both branches in parallel: each computational basis state follows the branch dictated by its own value of `x`.
+
+#
+
+## Exercise 10b
+
+```python
+# Solution to Exercise 10b:
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3, UNSIGNED, 3]], res: Output[QNum[5, UNSIGNED, 3]]) -> None:
+    allocate(5, res)
+    allocate(3, x)
+    hadamard_transform(x)
+
+    aux = QBit()
+    aux |= x < 0.5
+    control(
+        aux,
+        stmt_block=lambda: inplace_add(2.0 * x + 1.0, res),
+        else_block=lambda: inplace_add(1.0 * x + 0.5, res),
+    )
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJD9el3okie9bOkxDBmFj9N0QA
+  
+
+```
+</Info>
+
+> **Key takeaway:** In-place operators (`inplace_xor`, `inplace_add`) are necessary when writing into a pre-initialized variable inside a quantum operator like `control`. The out-of-place `|=` cannot be used there because `res` is initialized at the beginning of the quantum program. In-place operators also avoid allocating a separate result register per branch - both branches share the single pre-allocated `res`, saving qubits. When the target starts at zero, `inplace_xor` and `inplace_add` give identical results; they diverge for non-zero initial values or when arithmetic carries differ from bitwise XOR.
+
+#
+
+## Exercise 11
+
+```python
+# Solution to Exercise 11:
+
+
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def main(res: Output[QArray[QBit]]) -> None:
+    x = QArray()
+    allocate(3, x)
+    hadamard_transform(x)
+
+    lsb = QBit()
+    msb = QNum()
+    bind(x, [lsb, msb])
+
+    control(msb == 1, lambda: RY(pi / 3, lsb))
+
+    bind([lsb, msb], res)
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3EJDAESo5jA0QNqhBKdLrgQSQRA
+  
+
+```
+</Info>
+
+> **Key takeaway:** The `bind` operation casts and splits quantum variables into different quantum types. In this example, after the `bind` statement, the variable `x` is split into two different quantum types: a qubit `lsb` and a quantum number `msb`. Since `msb` is a quantum number, it is possible to perform numeric operations with it, such as compare it to an integer,as it is done inside the `control` operation.

@@ -1,0 +1,767 @@
+---
+title: "High-level Algorithm Design with Qmod"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/workshops/algo_design_QCE_tutorial/algo_design_QCE_tutorial_part_I.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+## Workshop Part I 
+
+- Language Concepts
+
+In this workshop we will learn to use high-level quantum programming language concepts to design quantum algorithms. We will use the Qmod language to model the functionality, and the Classiq platform to synthesize it into gate-level descriptions, visualize the circuits, and execute them. We will focus on high-level quantum types and expressions in different evaluation modes.
+
+Part I is a walk through Qmod's structure and constructs, as well as some of its unique high-level concepts. We will look closely at these constructs using small examples. In Part II we will combine some of these concepts in a complete quantum algorithm.
+
+There are 5 code exercises in this notebook, split into two sections, *A* and *B*. In each exercise follow the instructions - complete the code snippet where indicated by a *TODO* comment, execute the code, and try to understand the results.
+
+Solutions are provided at the end of the notebook. Don't continue to the next exercise before you completed the previous one and compared your code and results against the solution.
+
+## Section A *(15 minutes)*
+
+#
+
+## Warmup: A First Qmod Program
+
+Let's start with a simple example to demonstrate the structure of Qmod code, as well as its synthesis and execution flow. We prepare and sample a **Bell state** - one of the most fundamental quantum states.
+
+Further reading:
+[Quantum Functions](https://docs.classiq.io/latest/qmod-reference/language-reference/functions/)
+
+```python
+from classiq import *
+
+
+@qfunc  # This decorator declares a quantum function
+def create_bell_state(pair: QArray[QBit, 2]):
+    H(pair[0])
+    CX(pair[0], pair[1])
+
+
+@qfunc  # Function 'main' is the entry point of our quantum program
+def main(res: Output[QArray[QBit, 2]]):
+    allocate(res)
+    create_bell_state(res)
+```
+<Info>
+  Quantum functions in Qmod are defined using a regular Python function, decorated with **qfunc**, and their parameters must be declared with type hints.
+</Info>
+
+We can now compile with the SDK function `synthesize`. We get back an executable description called *quantum program* which we then execute on any simulation or quantum hardware. To manage the execution flow we use `ExecutionSession`. In our case, a simple sampling (using the default number of shots) of the quantum program will suffice.
+
+```python
+qprog = synthesize(main)
+
+show(qprog)  # Visualize the quantum program for analysis
+
+# Execute and print the results
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    display(res.dataframe)
+```
+<Info>
+  You should see in approximately 50% of the samples the bit vector 00 and in 50% the bit vector 
+
+11.
+</Info>
+
+<Info>
+  Synthesis is the process of compiling a high-level description to a gate-level description.
+
+The reduction is presented graphically.
+
+The executable format can be simulated using various simulation engines, or executed on quantum hardware of choice.
+</Info>
+
+#
+
+## Exercise 1: GHZ State
+
+Based on the Bell state example above, prepare a **GHZ state** with 3 qubits.
+
+The GHZ state creates maximum entanglement between three qubits: (|000⟩ + |111⟩)/√
+
+2.
+
+```python
+from classiq import *
+
+
+@qfunc
+def create_ghz_state(qubits: QArray[QBit, 3]):
+    # TODO: Apply GHZ logic
+    pass
+
+
+@qfunc
+def main(res: Output[QArray[QBit, 3]]):
+    allocate(res)
+    create_ghz_state(res)
+
+
+# TODO: Synthesize the model, show, execute and print results
+# Hint: Follow the same pattern as the demonstration above
+```
+<Info>
+  You should see in approximately 50% of the samples the bit vector 000 and in 50% the bit vector 
+
+111.
+</Info>
+
+#
+
+## Exercise 2: GHZ with Numeric Variables
+
+Define a main function that calls the `create_ghz_state` (as implemented in Exercise 1) with a ***signed*** quantum number and outputs the results.
+
+Synthesize it, analyze the quantum program, execute it and print the results.
+
+What do you expect the resulting value of `x` to be?
+
+Further reading: [Quantum Types](https://docs.classiq.io/latest/qmod-reference/language-reference/quantum-types/)
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3, SIGNED, 0]]):
+    allocate(x)
+    # TODO: Create GHZ state with QNum (gives 0 and -1)
+    # Hint: Is it any different from the previous main implementation?
+    pass
+
+
+qprog = synthesize(main)
+show(qprog)  # Visualize the quantum program for analysis
+
+# Execute and print the results
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    display(res.dataframe)
+```
+<Note>
+  You should see approximately 50% for 0 and 50% for -
+
+1.
+</Note>
+
+<Info>
+  In Qmod function arguments are automatically cast between **QNum** and **QArray\[QBit]** (and also between other quantum types).
+
+The value of quantum variables is interpreted based on their type.
+
+The state $|111\rangle$ represents 7 for an unsigned integer, and -1 as signed integer (in two's complement encoding).
+</Info>
+
+## Section B *(30 minutes)*
+
+#
+
+## Exercise 3: Arithmetic Expressions with Automatic Type Inference
+
+#
+
+### Part A: Numeric type inference
+
+Create and execute a quantum program that assigns a quantum arithmetic expression to a numeric variable:
+
+1. Declare quantum numeric variables `a` and `b` as unsigned integers of size of 
+
+2.
+1. Apply `hadamard_transform` on `a` and `b` (to put them in uniform superposition of all possible states).
+1. Assign the value of `3*a + b` to `c`.
+1. Synthesize, show, execute and print results.
+
+Inspect the printouts - what numeric attributes were inferred for variable `c`? Why?
+
+Further reading: [Numeric Assignment](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/assignment/)
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum[2]], b: Output[QNum[2]], c: Output[QNum]):
+    allocate(a)
+    allocate(b)
+    # TODO: Put a and b in equal superposition
+
+    # TODO: Assign the value of 3*a + b to c
+    allocate(1, c)  # Placeholder - replace with actual assignment
+
+    # Print out c's inferred size in qubits
+    print(f"The size of c is {c.size}")
+
+
+qprog = synthesize(main)
+show(qprog)  # Visualize the quantum program for analysis
+
+# Execute and print the results
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    display(res.dataframe)
+```
+<Note>
+  The expression result ranges between 0 and 
+
+1
+
+2. To represent all values variable `c` must be an unsigned integer of size 4 qubits or more.
+</Note>
+
+<Info>
+  In Qmod the size of numeric variables may be left unspecified. It is then automatically inferred to tightly fit all possible values of the expressions.
+</Info>
+
+#
+
+### Part B: Numeric type inference with fixed-point fractions
+
+Repeat *Part A*, only this time declaring `a` with 1 fraction digit and `b` with 2 fraction digits.
+
+How did the numeric attributes of `c` change? What are the corresponding sampled values for `c` in the result?
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(
+    a: Output[QNum[2, UNSIGNED, 1]], b: Output[QNum[2, UNSIGNED, 2]], c: Output[QNum]
+):
+    allocate(a)
+    allocate(b)
+    # TODO: Put a and b in equal superposition
+
+    # TODO: Assign the value of 3*a + b to c
+    # Hint: Is it any different from the previous main implementation?
+    allocate(1, c)  # Placeholder - replace with actual assignment
+
+    # Print out the numeric attributes of the inferred type
+    print("Numeric attributes of c:")
+    print(
+        f"size={c.size}, is_signed={c.is_signed}, fraction_digits={c.fraction_digits}"
+    )
+
+
+qprog = synthesize(main)
+show(qprog)  # Visualize the quantum program for analysis
+
+# Execute and print the results
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    display(res.dataframe)
+```
+<Note>
+  Variable `c` should be of size 5, unsigend, and with 2 fraction digits.
+
+This is the minimal type that covers the expression's domain.
+</Note>
+
+<Info>
+  In Qmod, numeric variables can represent arbitrary fixed-point values.
+
+Arithemetic expression and type inference also accommodate for different decimal point locations.
+</Info>
+
+#
+
+## Exercise 4: Conditional Operations
+
+Define a main function that initializes a quantum variable `x` (a 3-qubit signed number with 2 binary fraction digits) in an equal superposition of all states, then conditionally flips a single-qubit variable named `flag` when the value of x is less than 
+
+0.
+
+5. Inspect the execution results - how is `flag` entangled with `x`?
+
+Further reading: [Control Statement](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/control/)
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3, SIGNED, 2]], flag: Output[QBit]):
+    allocate(x)
+    hadamard_transform(x)
+
+    allocate(flag)
+    # TODO : Flip the state of flag if x < 0.5
+
+
+qprog = synthesize(main)
+show(qprog)  # Visualize the quantum program for analysis
+
+# Execute and print the results
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    display(res.dataframe)
+```
+<Note>
+  You should see that `x` is evenly distributed across the 8 values, and `flag` is flipped in 6 out of the 8 cases.
+</Note>
+
+<Info>
+  The **control** statement in Qmod is similar to classical **if** statement, where a statement block is applied conditionally, depending on a Boolean expression, and optionally an else-block is applied otherwise.
+
+The difference is that the operations are applied in superposition, corresponding to the condition.
+</Info>
+
+#
+
+## Exercise 5: Grover Algorithm using Quantum Struct and Constant Phase
+
+The Grover search algorithm uses two kinds of conditional phase flips - one reflecting about the "good" states, and the other reflecting about the zero state.
+
+This is easy to express using fixed $\pi$ phase rotation under the required control condition. It is also convenient to encapsulate the problem variables in a quantum struct, so they can be passed around between functional units.
+
+Create a quantum program that finds assignments for $a, b$ and $c \in \{0, 1, 2, 3\}$ that satisfy the equation $3a + b + 2c = 9$.
+
+- Declare the variables as fields of a quantum struct
+- Define the phase oracle in terms of the problem condition
+- Define the zero-reflection in the diffuser
+
+Further reading: [Phase Statement](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/phase/)
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+class MyProblemVars(QStruct):
+    # TODO: Declare the problem variables as quantum numeric fields
+    dummy: QBit  # Placeholder - replace with actual fields
+
+
+@qfunc
+def phase_oracle(v: MyProblemVars):
+    # TODO: Apply a phase flip if the state of v satisfies the equation (use field access in the form `v.a` etc.)
+    pass
+
+
+@qfunc
+def zero_reflection(state: QNum):
+    # TODO: Apply a phase flip if state is |0>
+    pass
+
+
+@qfunc
+def grover_operator(v: MyProblemVars):
+    phase_oracle(v)
+    hadamard_transform(v)
+    zero_reflection(v)
+    hadamard_transform(v)
+
+
+@qfunc
+def main(v: Output[MyProblemVars]):
+    allocate(v)
+    hadamard_transform(v)
+    for i in range(2):
+        grover_operator(v)
+
+
+qprog = synthesize(main)
+show(qprog)  # Visualize the quantum program for analysis
+
+# Execute and print the results
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    display(res.dataframe)
+```
+<Note>
+  There are 6 assignments to `a`, `b`, and `c` that satisfy the equation.
+
+They should be sampled with approximately equal probabilities.
+</Note>
+
+<Info>
+  In Qmod, a fixed-value **phase** (specifically $\pi$) can be introduced under **control** condition.
+
+This can be used to apply a phase-flip to states described with a quantum expressions.
+</Info>
+
+#
+
+## Exercise 6: Phase Arithmetic
+
+#
+
+### Part A
+
+Compute the expression $x * y$ in the phase of their respective states.
+
+Use a coefficient to distribute all possible states over the $2\pi$ phase rotation.
+
+To actually view the phases of the states, simulate the program using state-vector simulation.
+
+Expand the quantum program visualization down to the gate-level implementation.
+
+How is the *phase* statement synthesized? Inspect the resulting phases of the different states in the printout. Do they match the phase expression over `x` and `y`?
+
+Further reading: [Phase Statement](https://docs.classiq.io/latest/qmod-reference/language-reference/statements/phase/)
+
+```python
+import numpy as np
+
+from classiq import *
+from classiq.execution import ClassiqBackendPreferences, ExecutionPreferences
+
+
+@qfunc
+def main(x: Output[QNum[2]], y: Output[QNum[2]]):
+    allocate(x)
+    allocate(y)
+    # TODO: put x and y in uniform superposition
+
+    # TODO: Encode x * y into the phase with a normalization coefficient to 2pi
+
+
+# Synthesize the model and show
+qprog = synthesize(main)
+show(qprog)
+
+# Specify execution preferences for state vector simulation
+preferences = ExecutionPreferences(
+    num_shots=1,
+    backend_preferences=ClassiqBackendPreferences(backend_name="simulator_statevector"),
+)
+
+# Execute and print results:
+with ExecutionSession(qprog, preferences) as es:
+    res = es.sample()
+    display(res.dataframe)
+```
+<Note>
+  The resulting state phases should show x² rotation of the respective computational-state value, modulo 8 (determined by the domain of variable `x`).
+
+The steps are a 1/8 of a full $2\pi$ rotation
+</Note>
+
+<Info>
+  The **phase** statement can operate on an arbitrary polynomials over quantum numeric variables, introducing the corresponding Z rotations on the respective states.
+</Info>
+
+#
+
+### Bonus: Fourier Arithmetic
+
+Create a quantum program that computes $y = x^2$ by computing $x^2$ in the Fourier basis.
+
+Then transform the result back to the computational basis.
+
+Inspect the execution results to validate the correctness of your algorithm.
+
+```python
+import numpy as np
+
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3]], y: Output[QNum[4]]):
+    allocate(x)
+    hadamard_transform(x)
+    allocate(y)
+
+    # TODO: Use within_apply and function qft() to transform into and out of the Fourier basis
+
+
+# Synthesize the model and show
+qprog = synthesize(main)
+# show(qprog)
+
+# Synthesize the model, show, execute and print results
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    display(res.dataframe)
+```
+<Info>
+  The **phase** statement can be used to implement modular arithmetic in the Fourier basis.
+</Info>
+
+## Solutions
+
+#
+
+## Solution 1: GHZ State
+
+```python
+from classiq import *
+
+
+@qfunc
+def create_ghz_state(qubits: QArray[QBit, 3]):
+    # Apply GHZ logic
+    H(qubits[0])
+    CX(qubits[0], qubits[1])
+    CX(qubits[1], qubits[2])
+
+
+@qfunc
+def main(res: Output[QArray[QBit, 3]]):
+    allocate(res)
+    create_ghz_state(res)
+
+
+# Synthesize the model, show, execute and print results
+qprog = synthesize(main)
+show(qprog)
+
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    print("Ex.1 Results:")
+    display(res.dataframe)
+```
+#
+
+## Solution 2: GHZ with Quantum Numbers
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3, SIGNED, 0]]):
+    # Create GHZ state with QNum (gives 0 and -1)
+    allocate(x)
+    create_ghz_state(x)
+
+
+# Synthesize the model, show, execute and print results
+qprog = synthesize(main)
+show(qprog)
+
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    print("Ex.2 Results:")
+    display(res.dataframe)
+```
+#
+
+## Solution 3: Arithmetic Expressions with Automatic Type Inference
+
+#
+
+### Part A: Numeric type inference
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(a: Output[QNum[2]], b: Output[QNum[2]], c: Output[QNum]):
+    allocate(a)
+    allocate(b)
+    # Put a and b in equal superposition
+    hadamard_transform(a)
+    hadamard_transform(b)
+
+    # Assign the value of 3*a + b to c
+    c |= 3 * a + b
+
+    # Print out c's inferred size in qubits
+    print(f"The size of c is {c.size}")
+
+
+# Synthesize the model, show, execute and print results
+qprog = synthesize(main)
+show(qprog)
+
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    print("Ex.3A Results:")
+    display(res.dataframe)
+```
+#
+
+### Part B: Numeric type inference with fixed-point fractions
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(
+    a: Output[QNum[2, UNSIGNED, 1]], b: Output[QNum[2, UNSIGNED, 2]], c: Output[QNum]
+):
+    # Allocate a and b, then put in superposition
+    allocate(a)
+    allocate(b)
+    hadamard_transform(a)
+    hadamard_transform(b)
+
+    # Assign the value of 3*a + b to c
+    c |= 3 * a + b
+
+    # Print out the numeric attributes of the inferred type
+    print("Numeric attributes of c:")
+    print(
+        f"size: {c.size}, is_signed: {c.is_signed}, fraction_digits: {c.fraction_digits}"
+    )
+
+
+# Synthesize the model, show, execute and print results
+qprog = synthesize(main)
+show(qprog)
+
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    print("Ex.3B Results:")
+    display(res.dataframe)
+```
+#
+
+## Solution 4: Conditional Operations
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3, SIGNED, 2]], flag: Output[QBit]):
+    allocate(x)
+    hadamard_transform(x)
+
+    allocate(flag)
+    # Flip the state of flag if x < 0.5
+    control(x < 0.5, lambda: X(flag))  # Flip the state of flag if x < 0.5
+
+
+# Synthesize the model, show, execute and print results
+qprog = synthesize(main)
+show(qprog)
+
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    print("Ex.4 Results:")
+    display(res.dataframe)
+```
+#
+
+## Solution 5: Grover Algorithm using Quantum Struct and Constant Phase
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+class MyProblemVars(QStruct):
+    # Declare the problem variables as quantum numeric fields
+    a: QNum[2]
+    b: QNum[2]
+    c: QNum[2]
+
+
+@qfunc
+def phase_oracle(v: MyProblemVars):
+    # Apply a phase flip if the state of v satisfies the equation (use field access in the form 'v.a' etc.)
+    control(3 * v.a + v.b + 2 * v.c == 9, lambda: phase(pi))
+
+
+@qfunc
+def zero_reflection(state: QNum):
+    # Apply a phase flip if state is |0>
+    control(state == 0, lambda: phase(pi))
+
+
+@qfunc
+def grover_operator(v: MyProblemVars):
+    phase_oracle(v)
+    hadamard_transform(v)
+    zero_reflection(v)
+    hadamard_transform(v)
+
+
+@qfunc
+def main(v: Output[MyProblemVars]):
+    allocate(v)
+    hadamard_transform(v)
+    for i in range(2):
+        grover_operator(v)
+
+
+# Synthesize the model, show, execute and print results
+qprog = synthesize(main)
+show(qprog)
+
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    print("Ex.5 Results:")
+    display(res.dataframe)
+```
+#
+
+## Solution 6: Phase Arithmetic
+
+```python
+import numpy as np
+
+from classiq import *
+from classiq.execution import ClassiqBackendPreferences, ExecutionPreferences
+
+
+@qfunc
+def main(x: Output[QNum[2]], y: Output[QNum[2]]):
+    allocate(x)
+    allocate(y)
+    # Put x and y in uniform superposition
+    hadamard_transform(x)
+    hadamard_transform(y)
+
+    # Encode x * y into the phase with a normalization coefficient to 2pi
+    phase(x * y, np.pi / 8)
+
+
+# Synthesize the model and show
+qprog = synthesize(main)
+show(qprog)
+
+# Specify execution preferences for state vector simulation
+preferences = ExecutionPreferences(
+    num_shots=1,
+    backend_preferences=ClassiqBackendPreferences(backend_name="simulator_statevector"),
+)
+
+# Execute and print results
+with ExecutionSession(qprog, preferences) as es:
+    res = es.sample()
+    print("Ex.6A Results:")
+    display(res.dataframe)
+```
+#
+
+### Bonus
+
+```python
+import numpy as np
+
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum[3]], y: Output[QNum[4]]):
+    allocate(x)
+    hadamard_transform(x)
+    allocate(y)
+
+    # Use within_apply and function qft() to transform into and out of the Fourier basis
+    within_apply(
+        lambda: qft(y),
+        # Evaluates y += x**2  in the Fourier basis
+        lambda: phase(y * (x**2), 2 * np.pi / (2**y.size)),
+    )
+
+
+# Synthesize the model, show, execute and print results
+qprog = synthesize(main)
+# show(qprog)
+
+with ExecutionSession(qprog) as es:
+    res = es.sample()
+    print("Ex.6B Results:")
+    display(res.dataframe)
+```

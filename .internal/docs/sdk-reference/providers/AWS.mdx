@@ -1,0 +1,63 @@
+---
+title: Aws
+icon: "/icons/bulletsharp.svg"
+---
+
+For **`emulate`** on Amazon Braket, see [Device emulation (emulate)](../../user-guide/execution/cloud-providers/amazon-backends#device-emulation-emulate) in the execution user guide.
+
+### AwsBackendPreferences
+
+AWS-specific backend preferences for quantum computing tasks using Amazon Braket.
+
+This class contains configuration options specific to Amazon Braket, including the AWS role
+ARN, S3 bucket details, and the folder path within the S3 bucket. It extends the base
+`BackendPreferences` class to provide additional properties required for interaction with
+Amazon Braket.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `backend_service_provider` | `ProviderTypeVendor.AMAZON_BRAKET` | The service provider for the backend, which is Amazon Braket. |
+| `aws_access_key_id` | `str` | The access key id of AWS user with full braket access |
+| `aws_secret_access_key` | `str` | The secret key assigned to the access key id for the user with full braket access. |
+| `s3_bucket_name` | `str` | The name of the S3 bucket where results and other related data will be stored. This field should contain a valid S3 bucket name under your AWS account. |
+| `s3_folder` | `pydantic_backend.PydanticS3BucketKey` | The folder path within the specified S3 bucket. This allows for organizing results and data under a specific directory within the S3 bucket. |
+| `emulate` | `bool` | Whether to run the job on a simulator instead of a real quantum device. |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.AMAZON_BRAKET = pydantic.Field(default=(ProviderVendor.AMAZON_BRAKET))`
+
+
+### aws_access_key_id
+
+
+`aws_access_key_id: str | None = pydantic.Field(default=None, description='Key id assigned to user with credentials to access Braket service')`
+
+
+### aws_secret_access_key
+
+
+`aws_secret_access_key: str | None = pydantic.Field(default=None, description='Secret access key assigned to user with credentials to access Braket service')`
+
+
+### s3_bucket_name
+
+
+`s3_bucket_name: str | None = pydantic.Field(default=None, description='S3 Bucket Name')`
+
+
+### s3_folder
+
+
+`s3_folder: str | None = pydantic.Field(default=None, description='S3 Folder Path Within The S3 Bucket')`
+
+
+### emulate
+
+
+`emulate: bool = pydantic.Field(default=False, description='Emulate backend')`

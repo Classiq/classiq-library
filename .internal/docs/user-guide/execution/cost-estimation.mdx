@@ -1,0 +1,231 @@
+---
+title: "Cost Estimation"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+Before executing a quantum program, you can estimate the cost using `estimate_sample_cost` and `estimate_sample_batch_cost`. These functions return a `CostEstimateResult` with `cost` (in USD) and `currency` fields.
+
+Cost estimation is supported for all quantum providers that Classiq integrates with. Each provider uses its own pricing model.
+
+## Basic Usage
+
+### Single Sample Cost
+
+Use `estimate_sample_cost` to estimate the cost of sampling a quantum program with given execution preferences:
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import (
+    ClassiqBackendPreferences,
+    ClassiqSimulatorBackendNames,
+    ExecutionPreferences,
+    create_model,
+    estimate_sample_cost,
+    synthesize,
+)
+from classiq.qmod.builtins.operations import allocate
+from classiq.qmod.qfunc import qfunc
+from classiq.qmod.qmod_variable import Output, QBit
+
+
+@qfunc
+def main(res: Output[QBit]) -> None:
+    allocate(1, res)
+
+
+qmod = create_model(main)
+qprog = synthesize(qmod)
+
+execution_preferences = ExecutionPreferences(
+    num_shots=100,
+    backend_preferences=ClassiqBackendPreferences(
+        backend_name=ClassiqSimulatorBackendNames.SIMULATOR
+    ),
+)
+
+result = estimate_sample_cost(qprog, execution_preferences)
+print(f"Estimated cost: {result.cost} {result.currency}")
+```
+
+### Batch Cost Estimation
+
+Use `estimate_sample_batch_cost` to estimate the cost of sampling with multiple parameter sets:
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import (
+    ClassiqBackendPreferences,
+    ClassiqSimulatorBackendNames,
+    estimate_sample_batch_cost,
+    synthesize,
+)
+
+qprog = synthesize(qmod)
+
+result = estimate_sample_batch_cost(
+    qprog,
+    execution_backend=ClassiqBackendPreferences(
+        backend_name=ClassiqSimulatorBackendNames.SIMULATOR
+    ),
+    shots=100,
+    params=[{}, {}],  # Two parameter sets
+)
+print(f"Estimated batch cost: {result.cost} {result.currency}")
+```
+
+## Provider-Specific Usage
+
+Cost estimation works with the same backend preferences you use for execution. Configure the backend for your target provider and pass it to the estimation functions.
+
+### Classiq Simulators
+
+Classiq simulators support cost estimation without provider credentials.
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import (
+    ClassiqBackendPreferences,
+    ClassiqSimulatorBackendNames,
+    ExecutionPreferences,
+    estimate_sample_cost,
+)
+
+# All Classiq simulators are supported
+backends = [
+    ClassiqSimulatorBackendNames.SIMULATOR,
+    ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR,
+    ClassiqSimulatorBackendNames.SIMULATOR_DENSITY_MATRIX,
+    ClassiqSimulatorBackendNames.SIMULATOR_MATRIX_PRODUCT_STATE,
+]
+
+for backend_name in backends:
+    prefs = ExecutionPreferences(
+        num_shots=100,
+        backend_preferences=ClassiqBackendPreferences(backend_name=backend_name),
+    )
+    result = estimate_sample_cost(qprog, prefs)
+    print(f"{backend_name}: {result.cost} {result.currency}")
+```
+
+### Amazon Braket
+
+Cost estimation supports both Braket simulators (SV1, TN1, dm1) and QPUs (e.g., Aspen-11, Lucy).
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import (
+    AwsBackendPreferences,
+    ExecutionPreferences,
+    estimate_sample_cost,
+)
+
+# Braket simulators
+prefs = ExecutionPreferences(
+    num_shots=100,
+    backend_preferences=AwsBackendPreferences(
+        backend_name="SV1",
+        run_via_classiq=True,
+    ),
+)
+result = estimate_sample_cost(qprog, prefs)
+
+# Braket QPU (e.g., Ankaa-3)
+prefs_qpu = ExecutionPreferences(
+    num_shots=1000,
+    backend_preferences=AwsBackendPreferences(
+        backend_name="Ankaa-3",
+        run_via_classiq=True,
+    ),
+)
+result_qpu = estimate_sample_cost(qprog, prefs_qpu)
+```
+
+When using your own AWS credentials, omit `run_via_classiq` and provide `aws_access_key_id`, `aws_secret_access_key`, `s3_bucket_name`, and `s3_folder`.
+
+### IonQ
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import (
+    IonqBackendPreferences,
+    ExecutionPreferences,
+    estimate_sample_cost,
+)
+
+# IonQ simulator
+prefs = ExecutionPreferences(
+    num_shots=100,
+    backend_preferences=IonqBackendPreferences(
+        backend_name="simulator",
+        run_via_classiq=True,
+    ),
+)
+result = estimate_sample_cost(qprog, prefs)
+
+# IonQ QPU (e.g., Forte-1)
+prefs_qpu = ExecutionPreferences(
+    num_shots=1000,
+    backend_preferences=IonqBackendPreferences(
+        backend_name="qpu.Forte-1",
+        run_via_classiq=True,
+    ),
+)
+result_qpu = estimate_sample_cost(qprog, prefs_qpu)
+```
+
+### Azure Quantum
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import (
+    AzureBackendPreferences,
+    ExecutionPreferences,
+    estimate_sample_cost,
+)
+
+# Azure IonQ simulator
+prefs = ExecutionPreferences(
+    num_shots=100,
+    backend_preferences=AzureBackendPreferences(
+        backend_name="ionq.simulator",
+    ),
+)
+result = estimate_sample_cost(qprog, prefs)
+
+# Azure Quantinuum simulator
+prefs_quantinuum = ExecutionPreferences(
+    num_shots=100,
+    backend_preferences=AzureBackendPreferences(
+        backend_name="quantinuum.sim.h1-1e",
+    ),
+)
+result_quantinuum = estimate_sample_cost(qprog, prefs_quantinuum)
+```
+
+When using `run_via_classiq`, omit `credentials`. Otherwise, provide Azure credentials.
+
+## Summary by Provider
+
+| Provider          | Backend examples                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| **Classiq**       | simulator, simulator_statevector, simulator_density_matrix, simulator_matrix_product_state |
+| **Amazon Braket** | SV1, TN1, dm1 (simulators); Aspen-11, Lucy (QPUs)                                          |
+| **IonQ**          | simulator, qpu.aria-1, qpu.forte-1                                                         |
+| **Azure**         | ionq.simulator, quantinuum.sim.h1-1e, rigetti.sim.qvm                                      |
+
+
+<Tip>
+Use `run_via_classiq=True` when available to estimate costs without providing provider credentials. Your allocated budget is used for execution.
+
+
+</Tip>
+## API Reference
+
+See the [execution SDK reference](/sdk-reference/execution) for full details on `estimate_sample_cost`, `estimate_sample_batch_cost`, and `CostEstimateResult`.

@@ -1,0 +1,253 @@
+---
+title: "Ising Model"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/physical_systems/ising_model/ising_model.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The Ising model is an important physical model, which manifest in various applications. Originally, the model was formulated to reflect interactions between magnetic dipole moments of atomic spins in lattices but since, it was found relevant to describe many systems, such as genetic markers\[1], superconducting layered compounds\[2], Majorana fermions\[3], voter model\[4].
+
+The Ising model is essentially a second order interaction Hamiltonian, which describes the state of the system according to the Hamiltonian ground state and thermodynamical properties. As such, the Ising model is also an example of Quadratic unconstrained binary optimization (QUBO) and thus can be mapped to solve NP hard problem.
+
+For example, one can equivalently formulated a graph maximum cut (Max-Cut) to an Ising model.
+
+Using Classiq's platform, we hereby demonstrate how to formulate the Ising model into an optimization problem, which will be sent to solution using Classiq's quantum approximated optimization algorithm (QAOA).
+
+The results of the model are obtained using execution of a quantum simulator, and can be similarly redirected to execution using other simulators or even quantum hardware (see \[5] for execution options).
+
+## 
+
+0. Pre-requirments
+
+The model is using several Classiq's libraries in addition to basic python tools.
+
+```python
+import numpy as np
+import pyomo.core as pyo
+```
+
+## 
+
+1. Define the Optimization Problem
+
+We created a python Pyomo model to describe an Ising model as optimization problem over the configuration of spins. We take a simple manifestation of the 1d Ising model, described as \[6]:
+
+$H(\sigma) = -\sum\limits _{i,j}J\sigma_{i}\sigma_{j}-\sum\limits _{i} h\sigma_{i}$
+
+where for any two adjacent sites $i, j$ there is an interaction $J$, and for any site $i$ there is a contribution of magnetic field $h$. Here, $\sigma$ represent the spin's value, it is discrete and can have value within the set of ${-1,1}$. We use transformation of $\sigma \rightarrow (2*z-1)$, where $z$ is a binary variable.
+
+An option for periodic boundary condition for the 1d spin structure is embedded in the model, which declares whether the first and last spins are interacting in the model (i.e., whether the spin configuration is of closed chain, or open line).
+
+```python
+def ising_model_1d(J: int, h: int, n: int, periodic: str) -> pyo.ConcreteModel:
+    model = pyo.ConcreteModel("ising")
+
+    # Define the variables:
+    model.z = pyo.Var(range(n), domain=pyo.Binary)
+    z_array = np.array(list(model.z.values()))
+
+    E = lambda i, j: -J * (2 * z_array[i] - 1) * (2 * z_array[j] - 1) - (h / 2) * (
+        (2 * z_array[i] - 1) + (2 * z_array[j] - 1)
+    )
+
+    # create the ising Hamiltonian
+    if periodic == "True":
+        model.H = E(0, n - 1)
+    if periodic == "False":
+        model.H = -(h / 2) * ((2 * z_array[0] - 1) + (2 * z_array[n - 1] - 1))
+    for i in range(n - 1):
+        model.H = model.H + E(i, i + 1)
+
+    # setting the objective:
+    model.cost = pyo.Objective(expr=model.H, sense=pyo.minimize)
+
+    return model
+```
+
+## 
+
+2. Create your Ising model
+
+The user choses what parameters of interaction coupling $J$ and magnetic field $h$ to insert, in addition to whether the boundry conditions are periodic.
+
+```python
+ising_model = ising_model_1d(J=10, h=-20, n=6, periodic="True")
+```
+
+## 
+
+3. Optimize Using to Quantum Optimization Algorithm
+
+We will now create a QAOA model for the optimization problem.
+
+The results of the model is the sequance of qubit values giving the minimized energy for the protein. In order to optimize the results, we recommend the user to explore the number of repatitions for the model (`num_layers`) and the number of iterations for the optimizer (`maxiter`).
+
+```python
+from classiq import *
+from classiq.applications.combinatorial_optimization import CombinatorialProblem
+
+combi = CombinatorialProblem(pyo_model=ising_model, num_layers=5, penalty_factor=10)
+
+qmod = combi.get_model()
+```
+
+Now we can create a quantum circuit using the `get_qprog` command and show it
+
+```python
+qprog = combi.get_qprog()
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/38wB1SQoSqgeLy1c9bu4u73zuhZ
+  
+
+```
+</Info>
+
+<Info>
+  **Output:**
+
+  
+
+```
+https://platform.classiq.io/circuit/38wB1SQoSqgeLy1c9bu4u73zuhZ?login=True&version=15
+  
+
+```
+</Info>
+
+We also set the quantum backend we want to execute on:
+
+```python
+from classiq.execution import *
+
+execution_preferences = ExecutionPreferences(
+    backend_preferences=ClassiqBackendPreferences(backend_name="simulator")
+)
+```
+
+We now solve the problem by calling the `optimize` function:
+
+```python
+optimized_params = combi.optimize(execution_preferences, maxiter=100, quantile=0.7)
+```
+
+We can check the convergence of the run:
+
+```python
+import matplotlib.pyplot as plt
+
+plt.plot(combi.cost_trace)
+plt.xlabel("Iterations")
+plt.ylabel("Cost")
+plt.title("Cost convergence")
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Text(0.5, 1.0, 'Cost convergence')
+  
+
+```
+</Info>
+
+![output](./ising_model_files/ising_model_1.png)
+
+## 
+
+4. Present Quantum Results
+
+We call the `sample` method to get samples with the optimzied parameters. We hereby present the optimization results.
+
+Since this is a quantum solution with probabilistic results, there is a defined probability for each result to be obtained by a measurement (presented by an histogram), where the solution is chosen to be the most probable one.
+
+We remind that in the notation of the solution "0" indicate "-1" spin value, and "1" indicates "1" spin value.
+
+```python
+optimization_result = combi.sample(combi.optimized_params)
+optimization_result.sort_values(by="cost").head(5)
+```
+|    | solution                    | probability | cost   |
+| -- | --------------------------- | ----------- | ------ |
+| 0  | \{'z': \[0, 0, 0, 0, 0, 0]} | 0.745117    | -180.0 |
+| 17 | \{'z': \[0, 1, 0, 0, 0, 0]} | 0.004883    | -100.0 |
+| 16 | \{'z': \[0, 0, 1, 0, 0, 0]} | 0.004883    | -100.0 |
+| 15 | \{'z': \[0, 0, 0, 0, 0, 1]} | 0.005371    | -100.0 |
+| 13 | \{'z': \[1, 0, 0, 0, 0, 0]} | 0.007324    | -100.0 |
+
+We will also want to compare the optimized results to uniformly sampled results:
+
+```python
+uniform_result = combi.sample_uniform()
+```
+
+And compare the histograms:
+
+```python
+optimization_result["cost"].plot(
+    kind="hist",
+    bins=30,
+    edgecolor="black",
+    weights=optimization_result["probability"],
+    alpha=0.6,
+    label="optimized",
+)
+uniform_result["cost"].plot(
+    kind="hist",
+    bins=30,
+    edgecolor="black",
+    weights=uniform_result["probability"],
+    alpha=0.6,
+    label="uniform",
+)
+plt.legend()
+plt.ylabel("Probability", fontsize=16)
+plt.xlabel("cost", fontsize=16)
+plt.tick_params(axis="both", labelsize=14)
+```
+![output](./ising_model_files/ising_model_2.png)
+
+Best Solution:
+
+```python
+optimization_result.sort_values(by="cost").iloc[0].solution
+```
+<Info>
+  **Output:**
+
+  
+
+```
+{'z': [0, 0, 0, 0, 0, 0]}
+  
+
+```
+</Info>
+
+## References
+
+\[1] The Ising model in physics and statistical genetics, J. Majewski, H. Li, J. Ott.
+
+\[2] A short introduction to topological quantum computation, Ville T.
+
+Lahtinen and Jiannis K. Pachos.
+
+\[3] Recent progresses in two-dimensional Ising superconductivity, W. Li et al.
+
+\[4] Phase transition and power-law coarsening in Ising-doped voter model, Adam Lipowski, Dorota Lipowska, Antonio L. Ferreira.
+
+\[5] Classiq's user guide, execution options: [https://docs.classiq.io/latest/user-guide/execution/](https://docs.classiq.io/latest/user-guide/execution/)
+
+\[6] The Ising model in wikepidia [https://en.wikipedia.org/wiki/Ising\_model](https://en.wikipedia.org/wiki/Ising_model)

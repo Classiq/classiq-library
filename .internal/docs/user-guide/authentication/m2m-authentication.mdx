@@ -1,0 +1,109 @@
+---
+title: "Client Credentials (M2M) Authentication"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+The Classiq SDK supports a non-interactive, machine-to-machine (M2M) authentication flow built on the OAuth 2.0 client credentials grant. Use this flow when a backend service needs to call the Classiq platform without a person signing in.
+
+## Obtaining credentials
+
+M2M clients are provisioned by Classiq rather than created self-service. To obtain credentials, contact your Classiq account manager or sales representative and request an M2M client for your account.
+
+Once the client is created, Classiq delivers the credentials over a secured channel to avoid exposing the secret in transit:
+
+- You receive an encrypted link to the credential details.
+- Access is protected by a **one-time verification code** sent to your recipient email address when you open the link.
+
+<Warning>
+Treat `CLASSIQ_CLIENT_SECRET` like any other production secret. Do not commit it to source control, embed it in code, or print it in logs.
+</Warning>
+
+## Configuring the environment
+
+First, make sure you have the latest Classiq SDK installed:
+
+```bash
+pip install -U classiq
+```
+
+If you have not yet installed the SDK, follow the [Python SDK installation guide](/getting-started/sdk_installation) first.
+
+The SDK reads the credentials from the process environment at authentication time. When both `CLASSIQ_CLIENT_ID` and `CLASSIQ_CLIENT_SECRET` are present, it authenticates silently and skips the interactive browser login entirely.
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `CLASSIQ_CLIENT_ID` | Yes | The M2M client identifier. |
+| `CLASSIQ_CLIENT_SECRET` | Yes | The client secret paired with the ID. |
+| `CLASSIQ_ORG_ID` | No | Selects an organization when the client has access to several. |
+
+Set these values as environment variables wherever your code runs. On Linux and macOS, export them in your shell session:
+
+```bash
+export CLASSIQ_CLIENT_ID="m2m_client_id"
+export CLASSIQ_CLIENT_SECRET="your_high_entropy_secret"
+```
+
+On Windows, set them with PowerShell for the current session:
+
+```powershell
+$env:CLASSIQ_CLIENT_ID = "m2m_client_id"
+$env:CLASSIQ_CLIENT_SECRET = "your_high_entropy_secret"
+```
+
+Replace the placeholder values with the client ID and secret you received.
+
+Because the SDK reads these from the environment, any mechanism that sets them for the process works. In a CI/CD pipeline, keep the secret in the platform's encrypted secrets store and inject both variables into the job. In GitHub Actions:
+
+```yaml
+env:
+  CLASSIQ_CLIENT_ID: ${{ secrets.CLASSIQ_CLIENT_ID }}
+  CLASSIQ_CLIENT_SECRET: ${{ secrets.CLASSIQ_CLIENT_SECRET }}
+```
+
+When running in a container, pass the variables through from the host environment:
+
+```bash
+docker run \
+  -e CLASSIQ_CLIENT_ID \
+  -e CLASSIQ_CLIENT_SECRET \
+  your-image
+```
+
+## Authenticating with M2M credentials
+
+You call `classiq.authenticate()` exactly as in the interactive flow. With the variables set, it detects the M2M credentials and uses them instead of opening a browser, so the same code runs unattended.
+
+The M2M flow takes priority over any credentials cached from a previous interactive login on the same machine. M2M tokens are held in memory for the lifetime of the process and are not written to disk, so each new process authenticates fresh.
+
+## Troubleshooting
+
+If authentication fails, the SDK raises:
+
+```text
+classiq.interface.exceptions.ClassiqAuthenticationError: Request to Auth0 failed with error code 401: access_denied
+```
+
+<Accordion title="401 access_denied">
+
+A `401 access_denied` response means the credentials were rejected or the SDK version does not support the M2M flow. Work through these checks:
+
+1. **Verify the version.** Confirm you are running an up-to-date Classiq SDK:
+
+   ```bash
+   pip show classiq
+   ```
+
+2. **Verify the variables.** Confirm the client ID is exported in the environment running your code:
+
+   ```bash
+   echo $CLASSIQ_CLIENT_ID
+   ```
+
+   On Windows PowerShell, use `echo $env:CLASSIQ_CLIENT_ID` instead.
+
+   If it prints nothing, the variables are not set in the current session. Re-export them, and make sure your CI/CD job or scheduler passes them through to the process.
+
+</Accordion>
+
+If the problem persists, ask in the [community Slack](https://short.classiq.io/join-slack).

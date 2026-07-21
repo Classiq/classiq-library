@@ -1,0 +1,195 @@
+---
+title: "Measurements, Observables, and Hermitian Operators"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+## Introduction
+
+In quantum computing, measurement defines how information is extracted from a quantum program and made available for classical processing. Depending on the algorithm and execution mode, this information may take the form of sampled quantum states, interpreted output values, or expectation values of observables. These different notions of measurement serve different purposes and are applied through explicit measurement operations within the execution workflow. In many algorithms - especially variational ones - the relevant result is not an individual sample but an expectation value of an observable, for example a Hamiltonian expressed as a linear combination of Pauli strings.
+
+This stems from the realization that many quantum algorithms do not optimize over samples, but over classical quantities derived from quantum states, such as energies or cost functions. In quantum algorithms, measurement is therefore more than a final readout step: it defines the classical quantity that is optimized, compared, or post-processed. In Classiq, this includes sampling-based measurements through execution functions and methods, which return counts of bitstrings or parsed values, as well as expectation-value estimation workflows, which repeatedly evaluate an expectation value such as $\langle H \rangle$ for a given observable $H$ using the same synthesized program under different parameters. In addition, Qmod supports mid-circuit measurement, which collapses a qubit and returns its classical value, enabling limited run-time control flow within a quantum program when needed.
+
+## Measurements in Qmod
+
+In this guide, we cover the concepts:
+
+-   **Measurement**: extracting classical information from qubits.
+-   **Observables**: Hermitian operators whose expectation values are estimated.
+-   **Quantum operators**: unitaries applied to evolve the quantum state.
+
+Quantum variables declared as `Output[...]` in `main` specify what is measured in a quantum program.
+
+When the program is executed using sampling-based execution methods, these output variables are measured in the computational ($Z$) basis on every shot. The results can be accessed as raw bitstring samples and their counts or as parsed values, where the measured bits are interpreted according to the declared [quantum variable types](/user-guide/modeling/quantum-numbers-arithmetics).
+
+
+<Note>
+    Only variables declared as outputs of `main` are reported as execution results.
+</Note>
+
+In many algorithms, the goal is not to analyze individual measurement outcomes but to compute an expectation value of an observable, $\langle H \rangle$, commonly expressed as a linear combination of Pauli strings. In Classiq, expectation values are computed using `estimate`. Rather than returning samples over the computational basis, this function evaluates the expectation value of a specified observable with respect to the quantum state prepared by the program. This is the primary measurement mode in variational and optimization-based algorithms.
+
+The following example illustrates sampling-based measurement in Qmod:
+
+```python
+from classiq import *
+from classiq.qmod.symbolic import pi
+
+
+@qfunc
+def prepare_pair(angle: CReal, a: QBit, b: QBit):
+    RY(angle, a)
+    CX(a, b)
+
+
+@qfunc
+def main(a: Output[QBit], b: Output[QBit]):
+    allocate(a)
+    allocate(b)
+    prepare_pair(pi / 2, a, b)
+```
+
+This quantum program:
+
+1. Allocate two different qubits, `a` and `b`.
+2. Prepare the following state by applying a `prepare_pair`:
+
+$$\vert a, b \rangle = \cos(\theta)\vert 0, 0\rangle + \sin(\theta/2) \vert 1,1\rangle,$$
+
+with $\theta = \pi/2$.
+
+A representative sample output may look like this (each outcome should be measured at a ~$50\%$ probability):
+
+| a   | b   | counts | probability | bitstring |
+| --- | --- | ------ | ----------- | --------- |
+| 0   | 0   | 1047   | 0.511230    | 00        |
+| 1   | 1   | 1001   | 0.488769    | 11        |
+
+Which represents the outcomes of a maximally entangled Bell state.
+
+## Observables as a Pauli string
+
+In the context of quantum mechanics, an observable is represented by a Hermitian operator. In digital quantum computing, these operators are most commonly expressed as a linear combination of Pauli strings. A Pauli operator is a tensor product of single-qubit Pauli matrices $(I, X, Y, Z)$ acting on specific qubits.
+
+In Qmod, it is possible to define these observables using `SparsePauliOp`. This enables specifying the physical quantity to estimate — such as energy in a molecular Hamiltonian or a cost function in a combinatorial optimization problem.
+
+A Pauli operator, when represented using `SparsePauliOp`, consists of:
+
+-   **A list of Pauli terms**: Each term corresponds to a Pauli tensor product (a Pauli “string”) acting on specific qubits.
+-   **A coefficient for each term**: Each Pauli string is associated with a real or complex coefficient, and the full operator is given by the linear combination of these terms.
+
+Mathematically, this means that any observable $H$ can be represented as:
+
+$$H = \sum_i c_i \, P_i,$$
+
+where $\{c_i\}_i$ are real coefficients and $\{P_i\}_i$ are Pauli strings, such as $X \otimes Y \otimes Z$.
+
+To construct these observables in Python, use `SparsePauliOp` objects (Check [Classical Types](/qmod-reference/language-reference/classical-types/#hamiltonians)). In particular, using a SparsePauliOp is an efficient way to define a sparse observable. Where “sparse” refers to the structure of each Pauli string—specifically, that many qubits are acted on by the identity operator $I$, and only a relatively small number have non-identity Pauli matrices. This representation compactly encodes such strings while storing only the terms that actually appear in the operator.
+
+[comment]: DO_NOT_TEST
+
+```python
+# Define the same observable, but using a SparsePauliOp: 0.5 * Z0 * Z1 + 0.8 * X0
+my_sparse_observable = 0.5 * Pauli.Z(0) * Pauli.Z(1) + 0.8 * Pauli.X(0)
+```
+
+## Expectation value estimation
+
+Once an observable is defined, it is possible to evaluate its expectation value from a quantum program. For this, use [`observe`](../execution/observe).
+
+[comment]: DO_NOT_TEST
+
+```python
+qprog = synthesize(main)
+
+observe(
+    qprog, 
+    observable=my_sparse_observable,
+    num_shots=1000
+    )
+
+res.value
+```
+
+`(0.49531250000000004+0j)`
+
+When the quantum program is parameterized, the observable can be estimated as a function of the program parameters. Parameters correspond to classical arguments of main (for example `CReal`), and values are provided at execution time using a dictionary keyed by the parameter name. More information about it can be obtained from the [Execution Tutorial](/getting-started/classiq_tutorial/execution_tutorial_part2).
+
+## Pauli operators as quantum operators
+
+Beyond their role in defining observables for expectation-value estimation, Pauli operators can also be interpreted as quantum operators that generate unitary evolution. In this context, a Pauli operator represents a Hermitian operator that can be exponentiated to form a unitary of the form
+
+$$U = e^{-i t H },$$
+
+where $P$ is a Pauli operator and $t$ is a real-valued parameter.
+
+This interpretation is central when simulating time evolution under a Hamiltonian or when constructing circuits that implement operator exponentials derived from physical models.
+
+### Hamiltonian evolution and operator decomposition
+
+Consider a Hamiltonian expressed as a linear combination of Pauli strings,
+
+$$H = \sum_i c_i \, P_i$$
+
+In general, the Pauli terms $P_i$ do not commute, which means the unitary evolution $U(t) = e^{-i t H },$ cannot be implemented exactly as a single operation. Instead, it is approximated by decomposing the evolution into a sequence of exponentials of individual Pauli strings.
+
+This decomposition turns Pauli operators into building blocks of quantum dynamics, rather than merely objects to be measured.
+
+**Example: Suzuki–Trotter decomposition**
+
+One widely used approach for approximating Hamiltonian evolution is the Suzuki–Trotter decomposition. In its first-order form, the time evolution under $H$ is approximated as:
+
+$$e^{-i H t} \approx \prod_i e^{-it c_i P_i}$$
+
+with the approximation improving as the evolution is split into more, smaller time steps.
+From a modeling perspective, the same Pauli operator structure used to define observables naturally extends to defining operator evolution, making Pauli operators a unifying representation for both measurement and dynamics. We can see an example of it when using the `suzuki_trotter` function, as in the example below.
+
+```python
+from classiq import *
+
+quantum_operator = (
+    Pauli.X(0) * Pauli.Y(1) + Pauli.Z(1) + Pauli.Z(2) + Pauli.Y(3) * Pauli.X(2)
+)
+measured_observable = Pauli.X(0) + Pauli.Y(1) + Pauli.Z(2) + Pauli.X(3)
+
+
+@qfunc
+def main(x: Output[QArray]):
+    allocate(4, x)
+    suzuki_trotter(
+        quantum_operator, evolution_coefficient=1.0, order=1, repetitions=1, qbv=x
+    )
+
+
+qprog = synthesize(main)
+
+res = observe(
+    qprog, 
+    observable=measured_observable,
+    num_shots=1000
+    )
+
+res
+```
+
+`(-0.4814453125+0j)`
+
+This code:
+
+-   Synthesizes the quantum program defined in main, which prepares the quantum state and applies the Suzuki–Trotter evolution generated by the specified Pauli operator Hamiltonian.
+-   Uses `observe` to execute the synthesized program.
+-   Estimates the expectation value of `measured_observable`, computing a classical quantity derived from the final quantum state rather than returning raw measurement samples.
+
+This demonstrates that the same Pauli operator formalism underlies both quantum dynamics and measurement in Qmod: Pauli operators define the operators that evolve the state, while observables define the quantities extracted from it. Understanding this distinction clarifies why Pauli operators play a dual role in quantum programs, motivating the discussion that follows on how observables and operators are treated differently despite sharing the same mathematical representation.
+
+Although Pauli operators appear in both operator evolution and observable definitions, their roles are distinct:
+
+-   As **observables**, Pauli operators specify what quantity is measured or estimated from a quantum state.
+
+-   As **operators**, Pauli operators define unitary transformations applied to the quantum state during execution.
+
+## See also
+
+The [Execution page](../execution/index).
+
+Definitions for [SparsePauliOp](/sdk-reference/qmod/classical-types#sparsepauliop), [observe](../execution/observe), and [suzuki_trotter](/sdk-reference/qmod/functions/core_library/exponentiation#suzuki_trotter).

@@ -1,0 +1,53 @@
+---
+title: Oqc
+icon: "/icons/bulletsharp.svg"
+---
+
+### OQCBackendPreferences
+
+This class inherits from `BackendPreferences`.
+This is where you specify OQC preferences.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `username` | `str` | OQC username |
+| `password` | `str` | OQC password |
+
+
+### backend_service_provider
+
+
+`backend_service_provider: ProviderTypeVendor.OQC = pydantic.Field(default=(ProviderVendor.OQC))`
+
+
+### username
+
+
+`username: str = pydantic.Field(description='OQC username')`
+
+
+### password
+
+
+`password: str = pydantic.Field(description='OQC password')`
+### OQCBackendNames
+
+OQC backend names which Classiq Supports running on.
+
+
+**Attributes:**
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [LUCY](#lucy) |  |  |
+
+
+### LUCY
+
+
+```python
+LUCY = 'Lucy'
+```

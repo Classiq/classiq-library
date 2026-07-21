@@ -1,0 +1,52 @@
+---
+title: "Bell State Preparation"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/classiq_open_library/special_state_preparations/prepare_bell_state.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The `prepare_bell_state` function creates one of the four Bell states
+
+$$
+\phi_{+} = \frac{1}{2} \left(|00\rangle + |11\rangle \right)
+$$
+$$
+\phi_{-} = \frac{1}{2} \left(|00\rangle - |11\rangle \right)
+$$
+$$
+\psi_{+} = \frac{1}{2} \left(|01\rangle + |10\rangle \right)
+$$
+$$
+\psi_{-} = \frac{1}{2} \left(|01\rangle - |10\rangle \right)
+$$
+
+Function: `prepare_bell_state`
+
+Arguments:
+
+- `state_num: CInt`
+- `q: Output[QArray[QBit]]`
+
+## Example
+
+The `prepare_bell_state` function creates
+
+$$
+\psi_{+} = \frac{1}{2} \left(|01\rangle + |10\rangle \right)
+$$
+`state_num` is set to 2
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QArray[QBit]]):
+    prepare_bell_state(2, x)
+```
+```python
+
+qprog = synthesize(main)
+```

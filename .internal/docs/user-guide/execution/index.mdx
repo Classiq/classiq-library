@@ -1,0 +1,172 @@
+---
+title: "Execution"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+Classiq lets you execute quantum programs on a variety of backends, including simulators and real quantum hardware.
+
+Execution operates on synthesized `QuantumProgram` (see [Quantum Program Synthesis](/user-guide/synthesis/index)) and, for sampling, also OpenQASM 2.0 or 3.0. 
+Once you have defined the format of input for execution, 
+you can run it using a set of high-level APIs designed to be consistent and easy to use.
+
+## Quick workflow
+
+Execution typically consists of four steps:
+
+1. Choose the execution function based on the desired result type:
+
+    * `sample(...)` for shot-based measurement results
+    * `calculate_state_vector(...)` for amplitudes and basis-state information
+    * `observe(...)` for expectation values
+2. Choose a backend
+    
+    Use `get_backend_details()` to inspect the available providers and devices.
+
+<Note>
+Not all result types are available on all backends. For example, state vector results cannot be obtained from QPUs.
+</Note>
+
+3. Pass execution settings in one place
+    
+    Use `config=` for provider-specific configuration, together with common execution arguments such as `num_shots`, `random_seed`, and `transpilation_option`.
+4. Inspect the returned result
+    * `sample(...)` returns a DataFrame
+    * `calculate_state_vector(...)` returns a DataFrame
+    * `observe(...)` returns a scalar
+    * If `parameters` is a list, the returned value is a list of results of the corresponding type
+
+## Step 1 — Choose the type of result you want
+
+Before running your program, it is important to decide what kind of information you want to extract.
+
+There are three common execution functions:
+
+| Function                   | When to use                     | Output    |
+| ------------------------ | ------------------------------- | --------- |
+| `sample`                 | You want measurement statistics | DataFrame |
+| `calculate_state_vector` | You want amplitudes and phases  | DataFrame |
+| `observe`                | You want an expectation value   | float     |
+
+
+Each function exposes a different level of information about your quantum program:
+
+* Use [sample](./sample) when you want to see the outcomes that would be obtained by measuring the circuit many times.
+* Use [calculate_state_vector](./calculate-state-vector) when you want the full quantum state, including amplitudes and phases.
+* Use [observe](./observe) when you want to evaluate an observable and obtain a single expectation value.
+
+For a detailed walkthrough of each function, continue to the relevant page:
+
+[Sampling](./sample)
+[State vectors](./calculate-state-vector)
+[Expectation values](./observe)
+
+## Step 2 — Inspect available backends
+
+Before executing, you should inspect which backends are available.
+
+```python
+from classiq import *
+
+backends = get_backend_details()
+backends
+```
+
+This returns a table containing:
+
+* provider (e.g., classiq, azure, braket)
+* backend (device name)
+* type (simulator / hardware)
+* num_qubits
+* is_available
+* queue_time
+
+## Provider-specific configuration
+
+All execution functions ([sample](./sample), [observe](./observe), and [calculate_state_vector](./calculate-state-vector)) accept 
+a config argument that allows you to pass provider-specific configuration.
+
+This is the main mechanism for customizing how your program is executed on a given backend.
+
+### When to use config
+
+Use config when you need to:
+
+* Provide authentication details (e.g., API keys or credentials)
+* Configure execution settings specific to a provider
+* Enable features such as noise models on simulators
+* Control advanced backend behavior that is not exposed through the common execution arguments
+
+### Basic usage
+
+The config argument can be passed as either:
+
+* A plain Python dictionary, or
+* a provider-specific configuration object (for example, IBMConfig, BraketConfig, etc.)
+
+In the following examples, we enable `emulate` on an Azure backend to enable IonQ hardware noise simulation in 
+two different ways: First, using config as a dict, and then using config as a provider-specific object.
+
+**Example: Using config as a dict**
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import *
+
+backend_name = "azure/ionq.simulator"
+
+azure_config = {"emulate": True}
+
+@qfunc
+def main(x: Output[QBit]):
+    allocate(x)
+    H(x)
+
+qprog = synthesize(main)
+
+res = sample(qprog,
+            backend=backend_name,
+            num_shots=1000,
+            config = azure_config,
+            run_via_classiq= True)
+```
+
+**Example: Using config as a provider-specific object**
+
+[comment]: DO_NOT_TEST
+
+```python
+from classiq import *
+
+backend_name = "azure/ionq.simulator"
+
+azure_preferences = AzureBackendPreferences(
+    emulate = True
+)
+
+@qfunc
+def main(x: Output[QBit]):
+    allocate(x)
+    H(x)
+
+qprog = synthesize(main)
+
+res = sample(qprog,
+            backend=backend_name,
+            num_shots=1000,
+            config = azure_preferences,
+            run_via_classiq= True)
+```
+
+
+## Key takeaways
+
+* Execution always follows the same pattern:
+    1. Choose result type
+    2. Choose backend
+    3. Configure in one place
+    4. Analyze result
+* Data is returned in ready-to-use structures
+    * DataFrames for sampling and state vector
+    * Scalars for observables
+    * Batch execution is automatic when passing a list of parameters

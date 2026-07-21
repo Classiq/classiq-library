@@ -1,0 +1,87 @@
+---
+title: "Modular Exponentiation"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/modular_exp/modular_exp_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The `modular_exp` function raises a classical integer `a` to the power of a quantum number `power` modulo classical integer `n`, times a quantum number `x`.
+
+The function performs:
+
+$$
+|x\rangle |power\rangle = |(a^{power} \mod n)\cdot x\rangle | power\rangle
+$$
+Specifically if at the input $x=1$, at the output $x=a^{power} \mod n$.
+
+## Example
+
+This example generates a quantum program that initializes a `power` variable with a uniform superposition, and exponentiate the classical value `A` with `power` as the exponent, in superposition.
+
+The result is calculated inplace to the variable `x` module `N`.
+
+Notice that `x` should have size of at least $\lceil(log_2(N) \rceil$, so it is first allocated with a fixed size, then initialized with the value '1'.
+
+```python
+import numpy as np
+
+from classiq import *
+from classiq.qmod.symbolic import ceiling, log
+
+# constants
+N = 5
+A = 4
+
+
+@qfunc
+def main(power: Output[QNum], x: Output[QNum]) -> None:
+    allocate(ceiling(log(N, 2)), x)
+    x ^= 1
+
+    # initialize a uniform superposition of powers
+    allocate(3, power)
+    hadamard_transform(power)
+
+    modular_exp(n=N, a=A, x=x, power=power)
+
+
+qmod = create_model(main)
+qmod = create_model(main)
+qprog = synthesize(qmod)
+```
+```python
+
+result = execute(qprog).result_value()
+result.parsed_counts
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[{'power': 3, 'x': 4}: 136,
+   {'power': 1, 'x': 4}: 135,
+   {'power': 7, 'x': 4}: 130,
+   {'power': 5, 'x': 4}: 124,
+   {'power': 2, 'x': 1}: 124,
+   {'power': 4, 'x': 1}: 123,
+   {'power': 6, 'x': 1}: 117,
+   {'power': 0, 'x': 1}: 111]
+  
+
+```
+</Info>
+
+Verify all results are as expected:
+
+```python
+assert np.all(
+    [
+        count.state["x"] == (A ** count.state["power"] % N)
+        for count in result.parsed_counts
+    ]
+)
+```

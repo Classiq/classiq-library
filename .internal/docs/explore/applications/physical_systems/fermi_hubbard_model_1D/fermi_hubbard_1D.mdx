@@ -1,0 +1,1419 @@
+---
+title: "One-Dimensional Fermi-Hubbard Model"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/applications/physical_systems/fermi_hubbard_model_1D/fermi_hubbard_1D.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+## Overview
+
+This notebook implements a quantum simulation of the one-dimensional Fermi-Hubbard model using Classiq's quantum programming framework.
+
+The simulation proceeds in three stages:
+
+1. **Initial state preparation** 
+
+- The ground state of a non-interacting Hamiltonian with a spin-dependent attractive potential is prepared as a Slater determinant via Givens rotations.
+
+This creates an initial state with localized charge and spin densities.
+
+1. **Time evolution** 
+
+- The system is quenched to the interacting Fermi-Hubbard Hamiltonian and propagated using a first-order Trotterized circuit, where each Trotter step is decomposed into hopping and interaction layers using the Jordan-Wigner transformation.
+
+1. **Measurement and analysis** 
+
+- Charge and spin densities are measured at each time step to observe the dynamics, testing the phenomenon of spin-charge separation at intermediate interaction strengths.
+
+Finally, the results are validated against exact analytical solutions in two limiting cases: the non-interacting limit ($U=0$), where the dynamics reduce to single-particle evolution, and the vanishing hopping limit ($J=0$), where the Trotter decomposition becomes exact and all densities are frozen.
+
+The simulation closely follows the experimental and algorithmic procedure desribed in \[[1](#google-paper)]
+
+## Introduction
+
+The Fermi-Hubbard model is a fundamental corner step of condensed matter physics, describing the interplay between kinetic energy and repulsion interaction between electrons in a solid.
+
+Although very simple, in certain parameter regimes, the model showcases a variety strongly correlated phenomena, such as the metal-insulator transition (Mott physics), antiferromagnetism, inhomogeneous phases, and unconventional Fermi liquids.
+
+In order to motivate or conceptually derive the model, consider of a metalic material composed of atoms organized in a regular pattern, i.e., a lattice. We assume the temperature is sufficiently low, so the that the vibrations of the atoms can be neglected and the atoms are essentially held in a fix position in the  lattice sites. Moreover, typically each atom has a handful of relevant energy levels, however, in order to simplify the problem we will consider only a single energy level at each lattice site (one energy level per atom). In the  metal, valance electrons move freely between the metal atoms, leading to the expected conductive behaviour.
+
+The movement of the electrons between the sites is dictated by the overlap of the spatial wave function on different sites.
+
+Since the atomic wave-functions decay exponentially with the distance to the nuclei, we consider only the dominant contribution, giving rise to hopping of electrons only between adjacent lattice sites.
+
+These consideration lead to the first the hopping term, constituting the kinetic energy contribution: $-J \sum_{\langle i,j \rangle, \sigma} \left ( c_{i\sigma}^\dagger c_{j\sigma} + c_{i\sigma}^\dagger c_{j\sigma}\right)$, where $c_{i\sigma}$ is the fermionic annihilation operator on the $i$'th lattice site and $\sigma =
+\uparrow, \downarrow$ spin. In addition, $\langle i,j\rangle$ designates that the sum is only over nearest-neighbors.
+
+A second contribution arises from the repulsive Coulomb interaction between two electrons.
+
+Such interaction is strongest between electrons on the same atom. We consider only this dominant contribution, adding an energy penalty of $U$, for two-electrons on the same site. In addition, Pauli's exclusion principle dictates that two electrons cannot be in the same quantum state, therefore the repulsive interaction can only be between electrons with different spins: $U \sum_{j} c_{j \uparrow}^\dagger c_{j \uparrow}  c_{j\downarrow}^\dagger c_{j\downarrow}$.
+
+Overall, the Fermi-Hubbard Hamiltonian is given by:
+
+$$
+H_{HF} = -J \sum_{\langle i,j \rangle, \sigma} \left ( c_{i\sigma}^\dagger c_{j\sigma} + c_{i\sigma}^\dagger c_{j\sigma}\right) + U \sum_{j} n_{j \uparrow}  n_{j\downarrow}~~,~~~~~~ (1)
+$$
+where $ n_{j \sigma}= c_{j \sigma}^\dagger c_{j \sigma}$ is the number operator.
+
+The model constitutes a key tool in the investigation of transition metal oxides, organic conductors  and cuprates, which exhibit high-temperature superconductivity and exotic quantum magnetism properties and unconventional symmetry breaking.
+
+Despite its apparent simplicity, the model is notoriously challenging, in 1D the Fermi-Hubbard model is solvable via Bethe ansatz \[[2](#liebwu)], while the 2D and 3D cases have not exact solution (for general hopping and interaction coefficients, $J$ and $U$). However, in 3D quantum phenomena are suppressed and the model typically exhibit classical behaviour, well described by mean-field theories.
+
+Numerical studies are also limited beyond specific doping regimes (doping modifies the fraction of electrons/lattice sites).
+
+Perturbation theory becomes invalid when strong correlations between the electron emerge, while Monte-Carlo methods are restricted by the sign problem away from half filling (at half filling the number of electrons equals the number lattice sites).
+
+The physics of the model are conveniently analysed by measuring the evolution of the spin densities
+
+$$
+\rho_j^{\pm}(t) = \langle n_{j,\uparrow}\rangle \pm \langle n_{j,\downarrow} \rangle~~.
+$$
+We consider a simplified model consisting of a lattice of $N=4$ sites, and study the dynamics for an intermediate interaction strength, $U/J = 3$.
+
+## Classiq Implementation
+
+We implement the Hamiltonian simulation in three steps, utilizing Classiq's built-in functions.
+
+1. Initial state-preparation: Efficiently prepare the ground state of a non-interacting FH system in the presence of an external spin dependent potential.
+
+The ground state is a Gaussian Fermionic state, creating a localized density peak, acting as a wavepacket source.
+1. Time-evolution: Abruptly turn on the two-electron repulsion interaction and turn off the external potential, leading to dynamics governed by Hamiltonian (1).
+
+Utilizing a first-order Trotter expansion, the system is evolved in time.
+1. Measurement: The spin densities are evaluated.
+
+Repetition of these three steps many times produces the evolution of expectation values of spin-density in time, $\{\rho^{\pm}_{j}(t)\}$.
+
+We begin by importing the required software packages and defining global constants
+
+```python
+!pip install -u -qq "classiq[chemistry]"
+```
+<Info>
+  **Output:**
+
+  
+
+```
+[optparse.groups]Usage:[/]   
+    pip install \[options] <requirement specifier> \[package-index-options] ...
+    pip install \[options] -r <requirements file> \[package-index-options] ...
+    pip install \[options] [-e] <vcs project url> ...
+    pip install \[options] [-e] <local project path> ...
+    pip install \[options] <archive url/path> ...
+
+  no such option: -u
+  
+
+```
+</Info>
+
+```python
+import numpy as np
+from openfermion.circuits.slater_determinants import (
+    slater_determinant_preparation_circuit,
+)
+from openfermion.linalg.givens_rotations import (
+    fermionic_gaussian_decomposition,
+    givens_decomposition,
+)
+from openfermion.ops import QuadraticHamiltonian
+
+from classiq import *
+```
+```python
+
+N = 4  # number of lattice sites
+a = 1  # lattice spacing
+L = N * a  # length of the lattice
+M = 2 * N  # total number of fermionic modes
+NUM_ITERS = 10
+J = 1  # hopping strength
+tau = 0.1 / J  # Trotter step time interval
+T = NUM_ITERS * tau
+```
+#
+
+## Initial State Preperation
+
+We begin by desribing a general algorithm to prepare Slater determinant states.
+
+Following, the algorithm is benchmarked on a simple example involving a four-by-four single particle hamiltonian.
+
+The state preperation algorithm is then utilized to prepare the ground state of the non-interacting Fermi-Hubbard Hamiltonian for the case of a single electron.
+
+This is then benchmarked against an analitical solution.
+
+Finally, we prepare on the initial state of the dynamic simulation, a ground state of the Fermi-Hubbard model for a quater-filling.
+
+#
+
+### Preparation of a Slater Determinant State
+
+A Slater-Determinant is the ground state of a quadratic Fermionic Hamiltonian which conserves the number of particles.
+
+We begin by discussing an efficient algorithm to construct the initial non-interacting state.
+
+As all ground states of non-interacting fermionic Hamiltonian, the ground state is a fermionic Gaussian state, which can be prepared in a worst-case circuit depth of $O(N^2)$ \[[3](#fermionic-gaussian-state)]. Specifically, for a quadratic Hamiltonian which conserves the number of particles, the fermionic Gaussian state can be expressed as a Slater determinant.
+
+For a general number conserving quadratic fermionic Hamiltonian
+
+$$
+H = \sum_{\mu\nu}c_\mu^\dagger h_{\mu\nu}c_\nu~~,~~~~(2)
+$$
+where $h$ is known as the **one-body Hamiltonian**.
+
+Using the anti-commutation relations and the Heisenberg equation ($\frac{dO(t)}{dt} = i\left[H, O(t) \right]$), we have
+
+$$
+\frac{dc_\lambda^\dagger}{dt} = i\left[H, c_\lambda^\dagger \right]= i \sum_{\mu\nu} h_{\mu\nu}[c_\mu^\dagger c_\nu,c_\lambda]
+$$
+$$
+= i \sum_{\mu\nu} h_{\mu\nu}[c_\mu^\dagger c_\nu,c_\lambda^\dagger] = i \sum_{\mu\nu} h_{\mu\nu}c_\mu^\dagger \delta_{\nu \lambda} = i \sum_{\mu} h_{\mu\lambda}c_\mu^\dagger  ~~,
+$$
+where the the time-dependence is suppressed for concisness.
+
+The dynamics in the Heisenberg representation can therefore be expressed as
+
+$$
+\mathbf{c}^\dagger (t) = e^{i H t} \mathbf{c}^\dagger e^{-i H t}  = e^{i h^T }\mathbf{c}^\dagger~~,
+$$
+where $\mathbf{c}^\dagger = \{c_1^\dagger,\dots,c_M^\dagger\}^T$ and $M$ is the total number of fermionic modes. Remarkably, this implies that the diagonalization of $h$, (an $M$ by $M$ matrix) provides the dynamics in the $2^M$ Hilbert space.
+
+Diagonalizing the single particle Hamiltonian $M= \bar{Q} D \bar{Q}^\dagger$, where $\bar{Q}$ is and $M$-by-$M$ unitary matrix and $D = \text{diag}(\epsilon_1,...,\epsilon_M)$, we obtain $H=\sum_{k=1}^M \epsilon_k d_k^\dagger d_k$, where
+
+$$
+d_\eta^\dagger= \sum_{\mu=1}^{M} \bar{Q}_{\mu \eta}c_\mu^\dagger~~. \tag{3}
+$$
+Alternatively, the basis transformation can be expressed in terms of the single-particle transformation, $U\mathbf{c}^\dagger = \mathbf{d}^\dagger~,$ where we collected the creation operators to form an operator valued vector: $\mathbf{c}^\dagger = \{c_1^\dagger,\dots,c_M^\dagger\}^T$ and similarly for $\mathbf{d}^\dagger$.
+
+For a fixed particle number $N_{\text{elec}}$ the ground state is given by
+
+$$
+|\psi_{g.s}\rangle =\Pi_{k} {\cal U}c_k^\dagger |0^M\rangle =  \Pi_{k=1}^{N_{\text{elec}}} d_k^\dagger |0^M\rangle ~~,
+$$
+where $i$ iterates over the occupied fermionic modes and ${\cal U} c_j^\dagger {\cal U}^\dagger = U_{[j,:]} \mathbf{d}^\dagger =  d_j^\dagger$.
+
+The diagonalization of $h$ scales only polynomially with the number of lattice sites, $O(L^3)$ and can be efficiently done on a classical computer.
+
+In order to prepare the desired ground state we focus on a part of $\bar{Q}$ which corresponds to the occupied modes, and denote the  $N_{\text{elec}}$ by $M$ matrix describing these modes by $Q = (\bar{Q}^T)_{[{\text{occupied modes}},:]}$.
+
+This identification leads to an alternative form for Eq. (3), for the occupied modes we have
+
+$$
+d_\eta^\dagger= \sum_{\mu=1}^{M} {Q}_{\eta \mu}c_\mu^\dagger~~.
+$$
+
+An efficient quantum circuit for the ground state preparation can be obtained by a modified QR decomposition of $Q$, using a product of elementary two-mode rotations, called Given rotations.
+
+Each rotation can be expressed as
+
+$$$
+\begin{pmatrix}
+\mathcal{G}c_k^\dagger\mathcal{G}\\
+\mathcal{G}c_j^\dagger\mathcal{G}
+\end{pmatrix}
+=
+G(\theta,\varphi)\,
+\begin{pmatrix}
+c_k\\
+c_j
+\end{pmatrix}~~,
+$
+and the form of a Given rotation is  $$G_\{jk\}(\theta,\varphi) = \begin\{pmatrix\}
+\cos(\theta) & -e^\{i\varphi\}\sin(\theta)\\
+\sin(\theta) & e^\{i\varphi\}\cos(\theta)
+\end\{pmatrix\}~~.
+$$$
+To simplify the decomposition we begin by utilizing the invariance of the Slater determinant (up to a global phase) under the mapping ${Q}\rightarrow V{Q}$, where $V$ is a unitary transformation. For the transformation of basis to be valid we require that the first $N_{\text{elec}}$ rows of $VQ$ are equal to $U$, or alternatively
+
+$$
+V\{Q\}U^\dagger = (I_\{N_\{\text\{elec\}\}\}, \boldsymbol\{0\})~~.
+$$
+Each Given transformation operates only on two columns and it's parameters, $\theta$ and $\phi$ are set so to nullify elements in the upper right part of the matrix. Due to the orthogonality of the rows of $Q$, some transformations nullify more than a single matrix element. As a result, the total number of required Given transformations are $N_G = N_{\text{elec}}(M-N_\text{elec})$, where $N_\text{elec}$ is the number of electrons and $M$ is the number of fermionic modes. The diagonalization procedure results in a product of Given rotations
+
+$$
+U = G_\{N_G\}\cdots G_2 G_1~~.
+$$
+After the Jordan-Wigner transformation, each two-mode ($j,k$) rotations correspond to a rotation in the single particle subspace of the two qubits $j$ and $k$ ($|01\rangle$ and $|10\rangle$). This completely, defines the state preparation circuit in terms of a sequence two-qubit rotations.
+The gate complexity is $O(N_G) = O(N_{\text{elec}}^2)$ (worst case achieved for $N_\text{elec}=M/2$), and parallelization leads to a circuit depth of $M-1$.
+
+#### Given Rotations Example
+
+In order to understand the state preparation algorithm, we first show how Given rotations are utilized to diagonalize a simple one-body Hamiltonian.
+
+Consider a simple $4$-by-$4$ Hermitian matrix, representing a one-body Hamiltonian:
+
+$$
+h =
+\begin\{pmatrix\}
+\varepsilon_0 & t_\{01\} & 0 & t_\{03\} \\
+t_\{01\} & \varepsilon_1 & t_\{12\} & 0 \\
+0 & t_\{12\} & \varepsilon_2 & t_\{23\} \\
+t_\{03\} & 0 & t_\{23\} & \varepsilon_3
+\end\{pmatrix\}
+$
+$$
+
+```python
+## Defining the single-body Hamiltonian
+# Onsite energies
+eps0, eps1, eps2, eps3 = 0.8, -0.4, 0.3, -0.1
+
+# Hopping amplitudes (real for simplicity)
+t01 = 0.25
+t12 = -0.35
+t23 = 0.20
+t03 = 0.15
+
+# 4x4 Hermitian one-body matrix h_{pq}
+h = np.array(
+    [
+        [eps0, t01, 0.0, t03],
+        [t01, eps1, t12, 0.0],
+        [0.0, t12, eps2, t23],
+        [t03, 0.0, t23, eps3],
+    ],
+    dtype=complex,
+)
+```
+
+We employ the methods of OpenFermion's `QuadraticHamiltonian` class in order to extract the Given rotations.
+The number conserving quadratic Hamiltonian is then diagonalized utilizing a Bogoliubov transformation, leading to the `orbital_energies` and a `transformation_matrix`.
+
+```python
+# Number-conserving quadratic Hamiltonian (no pairing term)
+qh = QuadraticHamiltonian(h, constant=0.0)
+orbital_energies, transformation_matrix, constant = (
+    qh.diagonalizing_bogoliubov_transform()
+)
+# Taking the number of electrons to be equal to be two
+occupied_orbitals = np.where(orbital_energies < 0.0)[0]
+slater_determinant_matrix = transformation_matrix[occupied_orbitals]
+
+E, Qbar = np.linalg.eigh(h)
+
+# Sanity check: the transformation matrix from the Bogoliubov transform should diagonalize the one-body Hamiltonian
+assert np.allclose(transformation_matrix, Qbar.T)
+assert np.allclose(orbital_energies, E)
+assert np.allclose(Qbar.T @ h @ Qbar, np.diag(E))
+```
+
+We extract the given rotations utilizing OpenFermion's `given_decomposition`, returning a list of tuples: `[(G_1,G_2),(G_3,),...]`. Each tuple includes the Given rotations which can be operated in parallel. The Given rotations are encoded as a tuple: $G_k = (i_k,j_k,\theta_k,\phi_k)$, where $i_k$ and $i_k$ are the columns of $U^\dagger$ which the Given rotation $G_k^\dagger$ is operated on from the right (see calculation below).
+
+```python
+rotations, V, diag = givens_decomposition(slater_determinant_matrix)
+```
+
+We introduce two utility functions to demonstrate the decomposition, `givens_gate` implements the two-by-two matrix and `build_U_from_rotations`, gathers all the Given rotations to create $U$.
+
+```python
+def givens_gate(theta: float, phi: float) -> np.ndarray:
+    """
+    Givens rotation:
+     G(i,j,theta, phi) =    [[ cos(theta), -e^{i phi} sin(theta)],
+                            [ sin(theta),  e^{i phi} cos(theta)]]
+    """
+    c = np.cos(theta)
+    s = np.sin(theta)
+    e = np.exp(1j * phi)
+    return np.array([[c, -e * s], [s, e * c]], dtype=complex)
+
+
+def build_U_from_rotations(M: int, rotations) -> np.ndarray:
+    """
+    Reconstruct U (M x M) from OpenFermion 'givens_rotations' list.
+
+    OpenFermion applies these to columns during decomposition; updating columns
+    by right-multiplying with G^\dagger reproduces the same effect.
+    """
+    U_dagger = np.eye(M, dtype=complex)
+    for parallel_ops in rotations:
+        for i, j, theta, phi in parallel_ops:
+            G = givens_gate(theta, phi)
+            cols = U_dagger[:, [i, j]]
+            U_dagger[:, [i, j]] = cols @ G.conj().T
+    return U_dagger.conj().T
+
+
+def build_state_from_rotations(M: int, N: int, circuit_description: list) -> np.ndarray:
+    v = np.zeros((M,), dtype=complex)
+    v[:N] = np.ones_like(v[:N])
+    for parallel_ops in circuit_description:
+        for i, j, theta, phi in parallel_ops:
+            G = givens_gate(theta, phi)
+            v[[i, j]] = G @ v[[i, j]]
+    return v
+```
+
+Next, we decompose $U$ into Given rotations:
+
+$$
+U = G_{N_G},\dots,G_1
+$$
+and verify that $V Q U^\dagger = (I,\mathbf{0})$.
+
+```python
+tol = 1e-8
+Q = np.asarray(slater_determinant_matrix, dtype=complex)
+n, m = Q.shape
+
+U = build_U_from_rotations(m, rotations)
+
+# Check V Q.T U^\dagger = D  where D has diag entries in first m columns and zeros elsewhere
+D = np.zeros((n, m), dtype=complex)
+D[np.arange(n), np.arange(n)] = diag
+
+A = V @ Q @ U.conj().T
+
+# Normalize to (I,0) by removing the diagonal unitary on the left:
+# Let Dm = diag(diag) (m x m). Then Dm^\dagger (V Q U^\dagger) = (I,0).
+# So define V' = Dm^\dagger V.
+Dm_dag = np.diag(
+    np.conjugate(diag)
+)  # Dm^\dagger since diag entries are unit-modulus in theory
+
+Vprime = Dm_dag @ V
+
+I0 = np.zeros((n, m), dtype=complex)
+I0[:, :n] = np.eye(n, dtype=complex)
+
+B = Vprime @ Q @ U.conj().T
+assert np.allclose(A, D, atol=tol, rtol=tol)
+assert np.allclose(B, I0, atol=tol, rtol=tol)
+```
+
+State preparation check
+
+```python
+# State preparation check for the single excitation subspace
+slater_determinant_matrix = transformation_matrix[[0]]
+rotations, V, diag = givens_decomposition(slater_determinant_matrix)
+circuit_description = reversed(rotations)
+ground_state = build_state_from_rotations(m, n, circuit_description)
+assert np.allclose(h @ Qbar[:, 0], E[0] * Qbar[:, 0], atol=tol, rtol=tol)
+```
+
+#### Initial State Preparation of the Fermi Hubbard Model
+
+The initial state is chosen to be the ground state of the non-interacting (i.e, quadratic in the fermionic creation/annihilation operators) Hamiltonian
+
+$$
+H_{0} =-J \sum_{j, \sigma} \left ( c_{j,\sigma}^\dagger c_{j+1,\sigma} + c_{j+1,\sigma}^\dagger c_{j,\sigma}\right) + \sum_{j,\sigma}\epsilon_{j,\sigma}n_{j,\sigma} ~~,
+$$
+where the spin-up fermions feel a Gaussian attractive potential
+
+$$
+\epsilon_{j,\uparrow} = -\lambda \exp \left[ -\frac{(j-m)^2}{2 w^2}\right]~~,
+$$
+where spin-down fermions feel no potential, $\epsilon_{j,\downarrow}$. The parameters $\lambda$, $m$ and $w$ dictate the precise shape and strength of the potential.
+Such potential creates a localized density peak of spin-up fermions and a flatter distribution for the spin-down fermions. As a result, the simulation begins with localized charge and spin densities. This state is generally not an eigenstate of the interacting Hamiltonian, constituting a highly excited (non-equilibrium) of the interacting system.
+
+We begin by defining a function mapping lattice and spin degrees of freedom to qubit number, these will assist us to associate fermionic degrees of freedom to the corresponding qubits in the quantum variables.
+
+```python
+def qubit_idx(site: int, spin: int):
+    """
+    Maps lattice site and spin to qubit indices.
+    Non-interleaved layout: spin-up modes occupy qubits 0..N-1,
+    spin-down modes occupy qubits N..2N-1.
+    This ensures same-spin hopping acts on adjacent JWT qubits.
+
+    Args:
+        site (int): Lattice site index, the range [0,N-1]
+        spin (int): Spin index, either 0 or 1
+
+    Returns:
+        qubit_idx (int): qubit index
+    """
+    return site + spin * N
+
+
+def qubit_idx_to_site_and_spin(qubit_idx: int):
+    """
+    Maps qubit index to site and spin indices.
+
+    Args:
+        qubit_idx (int): qubit index
+
+    Returns:
+        site (int): site index
+        spin (int): spin index
+    """
+    spin = qubit_idx // N
+    site = qubit_idx % N
+    return site, spin
+```
+
+The Givens rotation matrix $G(\theta, \varphi)$ used in [\[2\]](#fermionic-gaussian-state) acts on the single-particle subspace of two fermionic modes $i$ and $j$ as
+
+$$
+G(\theta, \varphi) = \begin{pmatrix} \cos\theta & -e^{i\varphi}\sin\theta \\ \sin\theta & e^{i\varphi}\cos\theta \end{pmatrix}~~,
+$$
+where the first (second) row/column corresponds to mode $i$ ($j$). When this $2\times 2$ block is embedded in a two-qubit unitary, the mapping between matrix indices and qubit states depends on the qubit ordering convention of the quantum framework.
+
+OpenFermion's `givens_decomposition` returns rotation parameters $(i, j, \theta, \varphi)$ assuming the standard (little-endian) convention where the first qubit in the register is the least significant bit:
+$|01\rangle \to$ mode $i$ occupied, $|10\rangle \to$ mode $j$ occupied.
+
+Classiq's `unitary` gate, however, uses **big-endian** ordering where the first qubit in the list is the most significant bit:
+$|01\rangle \to$ mode $j$ occupied, $|10\rangle \to$ mode $i$ occupied.
+
+Under the big-endian convention, the $G$ matrix as written above effectively implements $G^{-1}$ (the inverse rotation) in the single-particle picture, introducing alternating sign errors $(-1)^j$ in the prepared state amplitudes. To compensate, we **swap the qubit order** in the call to `G`, passing `[qba[j], qba[i]]` instead of `[qba[i], qba[j]]`. This restores the correct mode-to-index mapping so that the circuit faithfully implements the Givens rotations from the decomposition.
+
+```python
+@qfunc
+def G(theta: float, phi: float, qba: QArray[QBit, 2]):
+    """
+    Implements a Given rotation on two qubits.
+    """
+    c = np.cos(theta)
+    s = np.sin(theta)
+    e = np.exp(1j * phi)
+    U = [
+        [1, 0, 0, 0],
+        [0, c, -e * s, 0],
+        [0, s, e * c, 0],
+        [0, 0, 0, 1],
+    ]
+    unitary(U, qba)
+
+
+@qfunc
+def given_rotation(gate: list[int, int, float, float], qba: QArray[QBit, M]) -> None:
+    """
+    Implements a Given rotation on two specific qubits, i and j, from an M-qubit quantum array, qba.
+    Note: the qubit order is swapped ([qba[j], qba[i]]) to account for Classiq's
+    big-endian qubit ordering in the unitary gate (see markdown cell above).
+    """
+    i, j, theta, phi = gate
+    G(theta, phi, [qba[j], qba[i]])
+
+
+@qfunc
+def prepare_slater_det(h: list[list[float, M], M], Nelec: int, qba: QArray[QBit, M]):
+    """
+    Prepares the ground state associated with the single electron matrix h.
+    The Hamiltonian satisfies H = \sum_{\mu,\nu}c_{\mu}^\dagger h_{\mu,\nu} c_{\nu}
+
+    Args:
+        h (ndarray): single electron matrix
+        Nelec (int): number of electrons
+        qba (list[QBit]): list of qubits
+    """
+    # preparing the reference state, as the state with the first Nelec qubits in state |1> and the rest in state |0>.
+    repeat(Nelec, lambda i: X(qba[i]))
+
+    # diagonalizing h
+    D, Qbar = np.linalg.eigh(h)
+    Q = (Qbar.T)[:Nelec, :]  # occupying the N lowest energy states
+    rotations, _, _ = givens_decomposition(Q)
+    # U = build_U_from_rotations(M, rotations)
+    circuit_description = list(reversed(rotations))
+    # ground_state = build_state_from_rotations(M, N, circuit_description)
+    for parallel_ops in circuit_description:
+        for gate in parallel_ops:
+            given_rotation(list(gate), qba)
+```
+
+The circuit can be verified by considering the single excitation subspace and comparing the compared state to the analytical result.
+
+The ground state of the single excitation subspace is up to a global phase just
+
+$$
+d_1^\dagger | 0^M\rangle =\sum_\mu Q_{1,\mu} c^{\dagger}_\mu | 0^M\rangle ~~,
+$$
+which after the Jordan-Wigner transformation corresponds to the quibt state with amplitudes
+
+$$
+[Q_{1,1},Q_{1,2},\dots, Q_{1,M}]~~.
+$$
+
+In order to prepare the initial state, we begin by constructing the initial Hamiltonian. Utility functions are defined and the Hamiltonian parameters are set.
+
+```python
+def sym(A):
+    """
+    Symmetrizes the matrix A
+    """
+    return (A + A.T) / 2
+
+
+def kinetic_energy(N: int, J: float) -> np.ndarray:
+    """
+    Builds single electron matrix of nearest-neighbor hopping term,
+    hopping strength J, for an N-site open chain (no periodic boundary).
+    """
+    K = np.zeros((2 * N, 2 * N), dtype=float)
+    for site in range(N - 1):
+        for spin in range(2):
+            mu = qubit_idx(site, spin)
+            nu = qubit_idx(site + 1, spin)
+            K[mu, nu] = -J
+    K = 2 * sym(K)
+    return K
+
+
+def spin_potential(N: int, spin=0, parameters: tuple[float] = (1, 1, 1)) -> np.ndarray:
+    """
+    Builds single electron matrix associated with the external potential.
+    Associated with an N site lattice.
+    """
+    lam, mean, std = parameters
+    V = np.zeros((2 * N, 2 * N), dtype=float)
+    for site in range(N):
+        mu = qubit_idx(site, spin)
+        V[mu, mu] = -lam * np.exp(-((site - mean) ** 2) / (2 * std**2))
+    return V
+
+
+def construct_single_electron_hamiltonian(
+    N: int, J: float, parameters: tuple
+) -> np.ndarray:
+    return kinetic_energy(N, J) + spin_potential(N, spin=0, parameters=parameters)
+```
+
+```python
+lam = 3.0
+mean = (L - 1) / 2
+std = 0.5
+h = construct_single_electron_hamiltonian(L, J=1, parameters=(lam, mean, std))
+Nelec = 1
+```
+
+```python
+@qfunc
+def main(qba: Output[QArray[QBit, M]]) -> None:
+    allocate(M, qba)
+    prepare_slater_det(h, Nelec, qba)
+
+
+qprog = synthesize(main)
+```
+
+The state preparation quantum circuit. The Given rotation, operating on two qubits, is decomposed into the basis gates.
+
+![State preparation circuit](./fermi_hubbard_1D_files/gaussian_state_preperation.png)
+
+#### Single State Excitation Subspace Verification
+
+For the single excitation subspace we can easily compare the preparation of the quantum state with the exact diagonalization. To compare between the two we normalize the quantum solution so to cancel the difference in the global phase with respect to the classical result.
+
+```python
+backend_preferences = ClassiqBackendPreferences(
+    backend_name=ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR
+)
+
+
+# Construct a representation of HHL model
+def state_check_model(main, backend_preferences):
+    qmod_state_check = create_model(
+        main,
+        execution_preferences=ExecutionPreferences(
+            num_shots=1, backend_preferences=backend_preferences
+        ),
+    )
+    return qmod_state_check
+```
+
+```python
+# Construct the quantum program
+qmod_state_check = state_check_model(main, backend_preferences)
+qprog_state_check = synthesize(qmod_state_check)
+
+print("Circuit depth = ", qprog_state_check.transpiled_circuit.depth)
+res_state_check = execute(qprog_state_check).result_value()
+```
+
+<Info>
+  **Output:**
+
+  ```
+  Circuit depth =  13
+  ```
+</Info>
+
+```python
+import matplotlib.pyplot as plt
+
+
+def get_quantum_amplitudes(result):
+    df = result.dataframe
+    mask = np.abs(df["amplitude"]) > 1e-12
+    filtered = df.loc[mask, ["bitstring", "amplitude"]].copy()
+    amps = filtered["amplitude"].to_numpy()
+    bitstring = filtered["bitstring"].tolist()  # must be integers
+    # mapping the bitstrings to qubit indices in the array
+    qubit_index = [[i for i, b in enumerate(s[::-1]) if b == "1"] for s in bitstring]
+    qubit_index = np.array([i[0] for i in qubit_index])
+    idx = np.argsort(qubit_index)
+    qubit_index = qubit_index[idx]
+    amps = amps[idx]
+    amps = amps / np.linalg.norm(amps)
+
+    qsol = np.zeros(M, dtype=complex)
+    qsol[qubit_index] = amps
+    return qsol
+```
+
+```python
+# Compare quantum amplitudes with exact diagonalization (Nelec=1)
+qsol = get_quantum_amplitudes(res_state_check)
+
+# Exact ground state: lowest eigenvector of h
+E_exact, Qbar_exact = np.linalg.eigh(h)
+exact_state = Qbar_exact[:, 0]
+
+# Align global phase: multiply qsol by phase so that it matches exact_state
+overlap = np.dot(exact_state.conj(), qsol)
+phase_global = overlap / np.abs(overlap)
+qsol_aligned = qsol / phase_global
+
+fig, ax = plt.subplots(figsize=(6, 4))
+
+# Real part
+ax.bar(np.arange(M) - 0.15, np.real(exact_state), width=0.3, label="Exact", alpha=0.8)
+ax.bar(
+    np.arange(M) + 0.15, np.real(qsol_aligned), width=0.3, label="Quantum", alpha=0.8
+)
+ax.set_xlabel("Qubit index", fontsize=12)
+ax.set_ylabel("Amplitude (real)", fontsize=12)
+ax.set_title("Real Part", fontsize=14)
+ax.set_xticks(np.arange(M))
+ax.legend()
+
+plt.suptitle("State Preparation vs Exact Ground State ($N_{elec}=1$)", fontsize=16)
+plt.tight_layout()
+plt.show()
+
+# Fidelity check
+fidelity = np.abs(np.dot(exact_state.conj(), qsol)) ** 2
+print(f"Fidelity |<exact|quantum>|^2 = {fidelity:.10f}")
+assert fidelity > 0.95, f"Fidelity too low: {fidelity}"
+```
+
+![output](./fermi_hubbard_1D_files/fermi_hubbard_1D_1.png)
+
+<Info>
+  **Output:**
+
+  ```
+  Fidelity |<exact|quantum>|^2 = 1.0000000000
+  ```
+</Info>
+
+#### Initial State at Quater-Filling
+
+At quater-filling the number of electrons $N_{\text{elec}}$ equals to half number of lattice sites $N$ (quater of the $M=2N$ fermionic modes). The one-body potential strength $\lambda$ is set such that the two electrons will have different spins ($N_{\downarrow} = N_{\uparrow}=1$)
+
+```python
+Nelec = N // 2  # quater-filling
+```
+
+```python
+@qfunc
+def main(qba: Output[QArray[QBit, M]]) -> None:
+    allocate(M, qba)
+    prepare_slater_det(h, Nelec, qba)
+
+
+qprog = synthesize(main)
+```
+
+To image the ground state, we measure the charge and spin densities: $\rho_j^{\pm} = \langle n_{j,\uparrow}\rangle \pm \langle n_{j,\downarrow} \rangle$. The charge density, $\rho_j^{+}$, corresponds to the average number of electrons on the $j$'th site, while the spin density, $\rho_j^{-}$, is the net spin on the same site.
+
+The number operator $n_\mu = c^\dagger_\mu c_\mu$ maps under the Jordan-Wigner transformation to
+
+$$
+n_\mu \rightarrow \frac{I-Z_{\mu}}{2}~~.
+$$
+Therefore, the charge density maps to
+
+$$
+\rho_j^{+} = 1 - (\langle Z_{j,\uparrow}\rangle + \langle Z_{j,\downarrow}\rangle)/2~~,
+$$
+while the spin density corresponds to
+
+$$
+\rho_j^{-} =  (\langle Z_{j,\downarrow}\rangle - \langle Z_{j,\uparrow}\rangle)/2 ~~.
+$$
+We introduce the functions `charge_density` and `spin_density` which allow measuring the corresponding observables.
+
+```python
+def charge_density(site: int, M: int) -> SparsePauliOp:
+    s = SparsePauliOp([], M)
+    for spin in (0, 1):
+        idx = qubit_idx(site=site, spin=spin)
+        s += (Pauli.I(idx) - Pauli.Z(idx)) * 0.5
+    return s
+
+
+def spin_density(site: int, M: int) -> SparsePauliOp:
+    s_up, s_down = SparsePauliOp([], M), SparsePauliOp([], M)
+    idx_up, idx_down = qubit_idx(site=site, spin=0), qubit_idx(site=site, spin=1)
+    s_up += Pauli.Z(idx_up)
+    s_down += Pauli.Z(idx_down)
+    return (s_down - s_up) * 0.5
+```
+
+Next, we execute the quantum program and measure the spin and change densities
+
+```python
+initial_charge_density = np.zeros(L)
+initial_spin_density = np.zeros(L)
+
+with ExecutionSession(qprog) as es:
+    for site in range(L):
+        initial_charge_density[site] = np.real(
+            es.estimate(charge_density(site, M)).value
+        )
+        initial_spin_density[site] = np.real(es.estimate(spin_density(site, M)).value)
+```
+
+```python
+sites = np.arange(0, L)
+plt.figure()
+plt.title("Initial Densities", fontsize=18)
+plt.plot(sites, initial_charge_density, "o", label="charge density")
+plt.plot(sites, initial_spin_density, "+", markersize=10, label="spin density")
+plt.xlabel("Site", fontsize=12)
+plt.ylabel("Density", fontsize=12)
+plt.xticks(sites)
+plt.legend()
+plt.show()
+```
+
+![output](./fermi_hubbard_1D_files/fermi_hubbard_1D_2.png)
+
+The attractive potential is centered around `mean` = $1.5$, therefore the initial charge and spin densities form a peak around that site.
+
+### Time-Evolution
+
+The propagation stage approximates the time-evolution operator $U = \exp(-i H t)$, where
+
+$$
+H =-J \sum_{j, \sigma} \left ( c_{j,\sigma}^\dagger c_{j+1,\sigma} + c_{j,\sigma}^\dagger c_{j+1,\sigma}\right) + U \sum_{j} n_{j \uparrow}  n_{j\downarrow}  \tag{4}
+$$
+is the 1D version of Eq. (1).
+
+The propagation of the initial state with respect to Eq. (4), simulates an effective quench of the system at initial time, abruptly changing the Hamiltonian $H_0\rightarrow H$. As a consequence, the initial state is a highly excited state of $H$.
+
+In order to minimize the circuit depth of the quantum circuit it is beneficial to decompose the Hamiltonian into four sets of terms, where all the operators in a set commute with one another. The terms correspond to an even and odd edge hopping terms and even and odd site interaction terms:
+
+$$
+H = H_{\text{hop-even}} +H_{\text{hop-odd}} +H_{\text{int-even}}+ H_{\text{int-odd}} ~~.
+$$
+The odd hopping Hamiltonian term includes the hopping terms between $1\leftrightarrow
+2$ and $3\leftrightarrow
+4$ neighbouring sites ($j$ is odd in Eq. (3)), while the odd hopping term includes the odd edge pairs ($2\leftrightarrow
+3$, $4\leftrightarrow
+1$, even $j$).
+
+The evolution operator $U$ is approximated by a first-order Trotter expansion, where each Trotter step consists of five stages.
+
+$$
+U = e^{-i H t} \approx \left(e^{-i H \tau}\right)^{t/\tau}~~,
+$$
+with
+
+$$
+e^{-i H \tau}  \approx e^{-i H_{\text{hop-even}}\tau} e^{-i H_{\text{int-even}}\tau} e^{-i H_{\text{int-odd}}\tau} e^{-i H_{\text{hop-odd}}\tau}.
+$$
+Each component in the Trotter step can be achieved by simultaneous application (circuit depth of one) of simple two-qubit gates.
+
+An additional algorithmic trick simplifying the circuit and reducing the circuit depth even further. Between the even and odd interaction terms a fermionic mode swap operation is conducted,  effectively performing a cyclic shifting of the fermionic modes. Crucially, this operation swaps the logical ordering of the qubits, while preserving the fermionic parity sign (using an iSWAP gates). Alternatively, the operation modifies the mapping between physical qubits and logical fermionic. As a result, the Hamiltonian terms are interpreted relative to the new ordering, effectively swapping the odd and even edge.
+The incorporation of the swap mode operation, allows parallelism, locality (only nearest neighbor gates, bypassing the need for long Jordan Wigner strings).
+After the application of $\exp(-i H_{\text{hop-even}}\tau)$ an inverse fermionic mode swap is needed to swap the even and odd edges back, allowing application of the consecutive Trotter step. Since the even edge hopping term commutes with the inverse fermionic mod swap, these operations are merged to a single stage.
+
+Overall, the time-evolution involves iteration (each iteration corresponds to a single Trotter step) of a five-step procedure:
+
+1. Hopping operation on odd edges.
+1. Interaction on odd sites
+1. Fermionic mode swap
+1. Interaction on even sites
+1. Hopping operation on even sites + inverse fermionic mode swap
+
+Setting the Hamiltonian parameters
+
+```python
+U = 3 * J  # J is set to unity in the beginning of the notebook
+```
+
+We begin by defining utility functions
+
+```python
+## Elementary gates
+
+
+# K(theta) = exp(-i*(theta/2)*(XX + YY))
+@qfunc
+def K(theta: float, qba: QArray[QBit, 2]):
+    suzuki_trotter(
+        pauli_operator=0.5 * (Pauli.X(0) * Pauli.X(1) + Pauli.Y(0) * Pauli.Y(1)),
+        evolution_coefficient=theta,
+        order=1,
+        repetitions=1,
+        qbv=qba,
+    )
+
+
+# P(phi) = CPHASE(phi) = diag(1, 1, 1, e^{-i*phi})
+# Implements exp(-i*phi * n_up * n_down) up to global phase
+@qfunc
+def P(phi: float, target: QArray[QBit, 2]) -> None:
+    phase(phi * target[0] * target[1])
+```
+
+To propagate the system state we transform the fermion Hamilotonian to a qubit representation utilizing the Jordan-Wigner transformation.
+
+A single hopping term transforms as
+
+$$
+c_{\mu}^{\dagger} c_{\nu} + c_{\mu}^{\dagger} c_{\nu}  \xrightarrow{\text{JW}} \frac{1}{2} \left( X_{\mu}X_{\nu} + Y_{\mu}Y_{\nu} \right)~~,
+$$
+while an interaction term gives
+
+$$
+n_{\mu}n_{\nu}  \xrightarrow{\text{JW}} = \frac{1}{4}\left(I -Z_\mu -Z_\nu + Z_\mu Z_\nu \right)~~.
+$$
+As a consequence, the five stages can be performed by implementation of the basic unitaries $K(\theta)= \exp\left(-i \frac{\theta}{2}\left(XX + YY \right)\right)$ and $P(\phi) = \exp\left(-i \frac{\phi}{2}\left(I-Z_{\mu}-Z_{\nu}+Z_{\mu}Z_{\nu} \right)\right)$. The functions `K` and `P` above implement the corresponding unitary transformations.
+
+The first stage, including odd hopping terms, is obtained by simultaneous application of $K(\theta = -\tau J)$ on different paris of qubits. Similarly, the second and fourth stages, involving the odd and even interactions are achieved with simultaneous application of $P(\phi = \tau U/2)$ on the corresponding pairs of qubits. The third stage, constituting the fermionic mode swap, is implemented by simultaneous iSWAP gates which is equivalent to $K(\theta = -\pi/2)$. The last stage includes a merge of even-edge hopping operation, and an inverse fermionic mode swap operation. Naturally, since these operation commute, the transformation is obtained by $K(\theta = -\tau J + \pi/2)$ two-qubit gates.
+
+We implement the simultaneous operations on the qubit array utilizing Classiq's built-in `repeat` function within the `hop` and `interact` functions.
+
+```python
+def hop(pairs: list[tuple[int, int]], theta: float, qba: QArray[QBit, M]) -> None:
+    for spin in (0, 1):
+        for pair in pairs:
+            site1, site2 = pair
+            K(
+                theta,
+                [
+                    qba[qubit_idx(site=site1, spin=spin)],
+                    qba[qubit_idx(site=site2, spin=spin)],
+                ],
+            )
+
+
+def interact(sites: list[int], phi: float, qba: QArray[QBit, M]) -> None:
+    for site in sites:
+        P(
+            phi,
+            [qba[qubit_idx(site=site, spin=0)], qba[qubit_idx(site=site, spin=1)]],
+        )
+```
+
+Defining the odd and even pairs and sites, to account for the finite chane we evaluate which sites are really swapped.
+
+```python
+ODD_PAIRS = [(i, i + 1) for i in range(0, L - 1, 2)]
+EVEN_PAIRS = [(i, i + 1) for i in range(1, L - 1, 2)]
+ODD_SITES = list(range(0, L, 2))
+EVEN_SITES = list(range(1, L, 2))
+
+# After iSWAP on EVEN_PAIRS, compute where even sites end up
+_perm = list(range(L))
+for i, j in EVEN_PAIRS:
+    _perm[i], _perm[j] = _perm[j], _perm[i]
+_inv_perm = [0] * L
+for pos, site in enumerate(_perm):
+    _inv_perm[site] = pos
+SWAPPED_EVEN_SITES = sorted([_inv_perm[s] for s in EVEN_SITES])
+```
+
+Gathering all the stages together to form the Trotter step
+
+```python
+def trotter_step(tau: float, J: float, U: float, qba: QArray[QBit, M]) -> None:
+
+    # stage 1 - hopping on odd-edge pairs
+    hop(pairs=ODD_PAIRS, theta=-tau * J, qba=qba)
+
+    # stage 2 - interaction on odd sites
+    interact(sites=ODD_SITES, phi=tau * U, qba=qba)
+
+    # stage 3 - fermionic mode swap
+    hop(pairs=EVEN_PAIRS, theta=-np.pi / 2, qba=qba)
+    # stage 4 - interaction on even sites (at their swapped positions)
+    interact(sites=SWAPPED_EVEN_SITES, phi=tau * U, qba=qba)
+
+    # stage 5 - hopping on even-edge pairs and inverse fermionic mode swap
+    hop(pairs=EVEN_PAIRS, theta=-tau * J + np.pi / 2, qba=qba)
+```
+
+### Propagation and Execution ("Measurement")
+
+```python
+@qfunc
+def main(qba: Output[QArray[QBit, M]], num_iter: CInt) -> None:
+    allocate(M, qba)
+    prepare_slater_det(h, Nelec, qba)
+    power(num_iter, lambda: trotter_step(tau, J, U, qba))
+
+
+qprog = synthesize(main)
+show(qprog)
+```
+
+<Info>
+  **Output:**
+
+  ```
+  Quantum program link: https://platform.classiq.io/circuit/3BhmprAOCkSPptCBxO3TT71oX0i
+  ```
+</Info>
+
+The physics of the model are analyzed by measuring the charge and spin densities and the spin spreads $\kappa^{\pm}(t)$, defined above.
+The number operators map to local Pauli operators $n_{\mu} = c^\dagger_{\mu}c_{\mu} = (1-Z_\mu)/2$, where $\mu=(j,\sigma)$ encodes a site, spin pair.
+
+```python
+def spread(density: list, L: int) -> float:
+    s = 0
+    for site in range(L):
+        s += np.abs(site - (L - 1) / 2) * density[site]
+    return s
+```
+
+```python
+charge_density_mat = np.zeros((L, NUM_ITERS))
+spin_density_mat = np.zeros((L, NUM_ITERS))
+
+
+with ExecutionSession(qprog) as es:
+    iter_params = [{"num_iter": iter} for iter in range(NUM_ITERS)]
+
+    for site in range(L):
+        charge_results = es.batch_estimate(charge_density(site, M), iter_params)
+        spin_results = es.batch_estimate(spin_density(site, M), iter_params)
+
+        charge_density_mat[site, :] = [np.real(r.value) for r in charge_results]
+        spin_density_mat[site, :] = [np.real(r.value) for r in spin_results]
+```
+
+```python
+sites = np.arange(0, N)
+time_indices = [0, 4, 9]
+time_labels = [f"$t = {tau * i:.1f}/J$" for i in time_indices]
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 4), sharey=True)
+for ax, t_idx, t_label in zip(axes, time_indices, time_labels):
+    ax.plot(sites, charge_density_mat[:, t_idx], "o-", label=r"Charge $\rho^+$")
+    ax.plot(sites, spin_density_mat[:, t_idx], "s--", label=r"Spin $\rho^-$")
+    ax.set_title(t_label, fontsize=14)
+    ax.set_xlabel("Site", fontsize=12)
+    ax.set_xticks(sites)
+    ax.legend(fontsize=9)
+
+axes[0].set_ylabel("Density", fontsize=12)
+plt.suptitle("Charge and Spin Density Dynamics", fontsize=16)
+plt.tight_layout()
+plt.show()
+```
+
+![output](./fermi_hubbard_1D_files/fermi_hubbard_1D_3.png)
+
+## Analysis - Spin-Charge Separation
+
+In order to quantify the spin-charge seperation, we evaluate the spin and charge spread:
+
+$$
+\kappa^{\pm}(t) = \sum_{j=1}^N |j - j_c| \rho^{\pm}_j(t)~~,
+$$
+where $j_c = (N+1)/2$.
+Different values between the spin and charge spreads, signifies spin-charge seperation.
+
+```python
+def spread(density: list, N: int) -> float:
+    s = 0
+    for site in range(N):
+        s += np.abs(site - (N + 1) / 2) * density[site]
+    return s
+
+
+times = np.array([tau * i for i in range(NUM_ITERS)])
+
+
+charge_spread_vec = np.array(
+    [spread(charge_density_mat[:, i], L) for i in range(NUM_ITERS)]
+)
+spin_spread_vec = np.array(
+    [spread(spin_density_mat[:, i], L) for i in range(NUM_ITERS)]
+)
+
+plt.figure(figsize=(7, 5))
+plt.plot(times * J, charge_spread_vec, "o-", label=r"Charge spread $\kappa^+$")
+plt.plot(times * J, spin_spread_vec, "s--", label=r"Spin spread $\kappa^-$")
+plt.xlabel(r"$t \cdot J$", fontsize=14)
+plt.ylabel(r"Spread $\kappa$", fontsize=14)
+plt.title("Charge and Spin Spread vs. Time", fontsize=16)
+plt.legend(fontsize=12)
+plt.tight_layout()
+plt.show()
+```
+
+![output](./fermi_hubbard_1D_files/fermi_hubbard_1D_4.png)
+
+The lack of agreement between the spin and charge spreads indicates spin-charge seperation.
+
+## Comparison with Analytical Results
+
+In order to validate the results, we compare the model prediction with the analytical solutions.
+
+There are two natural physical limits, where the model can be solved exactly and efficiently utilizing classical methods:
+
+1. The non-interacting limit the on-site interaction vanishes $U = 0$ (alternatively $U\ll J$).
+1. Vanishing hopping limit, $J=0$ (alternatively $U\gg J$).
+
+### Non-interacting Particles
+
+In the non-interacting limit of $U=0$, the FH Hamiltonian is a quadratic Hamiltonian. As a consequence, even in the case of site-dependent hopping or hopping between non-adjacent sites, the state dynamics can be solved classically in polynomial time in the number of fermionic modes $M$, utilizing standard matrix exponentiation methods.
+In the case of the FH model on an open chain of $L$ sites, the non-interacting Hamiltonian becomes
+
+$$
+H^{\text{n.i}} =\sum_{\mu, \nu} c_{\mu}^\dagger M_{\mu\nu}c_{\nu} =    -J \sum_{j=1}^{L-1} \sum_{\sigma} \left ( c_{j,\sigma}^\dagger c_{j+1,\sigma} + c_{j+1,\sigma}^\dagger c_{j,\sigma}\right) ~~,
+$$
+where n.i denotes "non-interacting". The commutativity of the spin-up and spin-down terms allows them to be treated independently. For an open chain (no periodic boundary), the eigenstates are standing waves rather than plane waves. The single-particle eigenstates are
+
+$$
+\phi_{n}(j) = \sqrt{\frac{2}{L+1}}\sin\!\left(\frac{\pi n j}{L+1}\right)~~, \quad n=1,2,\dots,L~~,
+$$
+with corresponding energies
+
+$$
+\omega_n = -2J\cos\!\left(\frac{\pi n}{L+1}\right)~~.
+$$
+Each eigenstate is doubly degenerate (spin-up and spin-down). The ground state of an $N_{\text{elec}}$-electron system is obtained by filling the lowest-energy single-particle states one by one.
+
+The time-dependent expectation values of the charge and spin densities, $\langle\rho^{\pm}_j(t)\rangle$, can readily obtained by employing the Heisenberg representation of quantum mechanics. In this representation, an operator's, $O(t)$, dynamics is generated by the Heisenberg equation
+
+$$
+\frac{dO(t)}{dt} = i \left[ H^{\text{n.i}}, O(t) \right]  ~~,
+$$
+where $O(t) = U(t)^\dagger O U(t)$, where $U(t) = \exp(-i H^{\text{n.i}} t)$.
+Substituting the diagonal form of $H^{\text{n.i}}$ and utilizing the fermionic anti-commutation relations
+
+$$
+\{c^\dagger_{\mu}, c_\nu\} = \delta_{\mu,\nu}~~, ~~\{c_{\mu}, c_\nu\} = \{c_{\mu}^\dagger, c_\nu^\dagger\} = 0~~,
+$$
+(the Fourier fermionic operators satisfy similar commutation relations) we obtain $\dot\{c\}_\mu^\dagger = i M_\{\nu \mu\} c_\{
+\nu\}^\dagger$, therefore $\dot\{\mathbf\{c\}\}^\dagger = i M^T \mathbf\{c\}^\dagger$, leading to
+
+$$
+\mathbf{c}^\dagger(t) = e^{i M^T t}\mathbf{c}^\dagger(0)
+$$
+The dynamics can be evaluated by introducing the matrices ${\cal U}(t) = e^{i M^T t}~~,$ and ${\cal N}$ with elements $\{\cal N_\{
+\mu \nu\}\} = \langle c_\{\mu\}^\dagger c_\nu\rangle$, this allows writting the dynamics of a second order correlation as
+
+$$
+\langle c_{\mu}^\dagger c_{\nu} \rangle =  \left[ {\cal{U}} (t){\cal{N}} {\cal{U}}^\dagger (t)\right]_{\mu \nu}~~.
+$$
+In the one-excitation subspace, the ground state reads $|\psi_{\text{g.s}} \rangle = \sum_{\mu} V_{0,\mu}c_{\mu}^\dagger|\text{vacc}\rangle$, where $\{V_{0\mu}\}$ are the elements of the eigenstate of $M$, i.e. $M V_0 = \epsilon_0 V_0$, where $\epsilon_0$ is the ground state energy.
+
+#### Numerical Evaluation on a small model.
+
+Defining parameters
+
+```python
+L = 4  # number of lattice sites
+M = 2 * L  # total number of fermionic modes
+NUM_ITERS = 10
+J = 1  # hopping strength
+tau = 0.1 / J  # smaller Trotter step for better agreement with analytical U=0 result
+T = NUM_ITERS * tau
+U = 0
+Nelec = 1  # single electron subspace
+```
+
+```python
+import matplotlib.pyplot as plt
+
+## Check eigenvalues vs analytical dispersion (open chain)
+# For open BC, E_n = -2J cos(pi*n/(N+1)), n = 1..N
+M0 = construct_single_electron_hamiltonian(L, J=J, parameters=(0.0, 0, 1))
+E, V = np.linalg.eigh(M0)
+
+n_vals = np.arange(1, N + 1)
+E_analytical = -2 * J * np.cos(np.pi * n_vals / (N + 1))
+E_analytical_full = np.sort(np.tile(E_analytical, 2))  # doubly degenerate (spin)
+assert np.allclose(
+    E, E_analytical_full
+), f"Mismatch: numerical {E} vs analytical {E_analytical_full}"
+
+## Single-electron dynamics: electron starts at site 0, spin-up
+psi_0 = np.zeros(2 * L)
+psi_0[qubit_idx(0, 0)] = 1.0
+
+t_max = 4.0 / J
+t_vec = np.linspace(0, t_max, 400)
+
+# Numerical time evolution via eigendecomposition
+coeffs = V.conj().T @ psi_0
+phases = np.exp(-1j * np.outer(t_vec, E))
+psi_t = (phases * coeffs) @ V.conj().T
+
+spin_up_idx = np.array([qubit_idx(site, 0) for site in range(N)])
+occ_numerical = np.abs(psi_t[:, spin_up_idx]) ** 2
+
+# Analytical: standing waves on the open chain
+# phi_n(j) = sqrt(2/(L+1)) * sin(pi*n*j/(L+1)),  j = 1..L (1-indexed)
+# <j|psi(t)> = sum_n phi_n(j) * phi_n(1) * e^{-i E_n t}
+sites_1indexed = np.arange(1, N + 1)
+phi = np.sqrt(2 / (N + 1)) * np.sin(
+    np.pi * np.outer(n_vals, sites_1indexed) / (N + 1)
+)  # (N, N): phi[n, j]
+phi_at_start = phi[:, 0]  # phi_n(j=1), the starting site
+phases_analytical = np.exp(-1j * np.outer(t_vec, E_analytical))
+psi_analytical = (phases_analytical * phi_at_start) @ phi
+occ_analytical = np.abs(psi_analytical) ** 2
+
+# Plot
+fig, axes = plt.subplots(2, 2, figsize=(8, 5), sharey=True)
+for site in range(L):
+    ax = axes[site // 2, site % 2]
+    ax.plot(t_vec, occ_numerical[:, site], label="Numerical")
+    ax.plot(t_vec, occ_analytical[:, site], "--", label="Analytical")
+    ax.set_title(f"Site {site}")
+    ax.set_xlabel("$t$")
+    if site % 2 == 0:
+        ax.set_ylabel("Occupation")
+    ax.legend(fontsize=7)
+plt.suptitle(
+    r"Single electron dynamics (open chain): $|\psi(0)\rangle = |j{=}0,\uparrow\rangle$"
+)
+plt.tight_layout()
+plt.show()
+```
+
+![output](./fermi_hubbard_1D_files/fermi_hubbard_1D_5.png)
+
+```python
+NUM_ITERS = 10  # more steps for better resolution of Trotter dynamics
+tau_trotter = 0.1 / J  # time step for Trotter evolution
+n_steps_list = list(range(0, NUM_ITERS + 1, 1))
+t_trotter = np.array(n_steps_list) * tau_trotter
+t_max = t_trotter[-1]
+t_vec = np.linspace(0, t_max, 400)
+
+# Numerical time evolution via eigendecomposition
+coeffs = V.conj().T @ psi_0
+phases = np.exp(-1j * np.outer(t_vec, E))
+psi_t = (phases * coeffs) @ V.conj().T
+
+spin_up_idx = np.array([qubit_idx(site, 0) for site in range(N)])
+occ_numerical = np.abs(psi_t[:, spin_up_idx]) ** 2
+
+
+## Trotter dynamics via Classiq
+# Initial state: single electron at site 0, spin-up
+h_loc = np.zeros((2 * N, 2 * N))
+h_loc[qubit_idx(0, 0), qubit_idx(0, 0)] = -1.0
+
+
+@qfunc
+def main(qba: Output[QArray[QBit, M]], num_iter: CInt) -> None:
+    allocate(M, qba)
+    prepare_slater_det(h_loc, Nelec, qba)
+    power(num_iter, lambda: trotter_step(tau_trotter, J, 0, qba))
+
+
+qprog = synthesize(main)
+
+occ_trotter = np.zeros((len(n_steps_list), N))
+
+
+def spin_up_occ(site: int, M: int) -> SparsePauliOp:
+    s = SparsePauliOp([], M)
+    idx = qubit_idx(site=site, spin=0)
+    s += (Pauli.I(idx) - Pauli.Z(idx)) * 0.5
+    return s
+
+
+with ExecutionSession(qprog) as es:
+    step_params = [{"num_iter": n_step} for n_step in n_steps_list]
+
+    for site in range(L):
+        results = es.batch_estimate(spin_up_occ(site, M), step_params)
+        occ_trotter[:, site] = [np.real(r.value) for r in results]
+
+## Plot: exact vs Trotter
+fig, axes = plt.subplots(2, 2, figsize=(8, 5), sharey=True)
+for site in range(L):
+    ax = axes[site // 2, site % 2]
+    ax.plot(t_vec, occ_numerical[:, site], label="Exact")
+    ax.plot(
+        t_trotter,
+        occ_trotter[:, site],
+        "o--",
+        ms=3,
+        label=f"Trotter ($\\tau={tau_trotter:.2f}$)",
+    )
+    ax.set_title(f"Site {site}")
+    ax.set_xlabel("$t$")
+    if site % 2 == 0:
+        ax.set_ylabel("Occupation")
+    ax.legend(fontsize=7)
+plt.suptitle(
+    r"Exact vs Trotter ($U=0$, open chain): $|\psi(0)\rangle = |j{=}0,\uparrow\rangle$"
+)
+plt.tight_layout()
+plt.show()
+```
+
+![output](./fermi_hubbard_1D_files/fermi_hubbard_1D_6.png)
+
+**Why the quantum and analytical results don't match exactly:** The quantum circuit uses a first-order Trotter decomposition of the time evolution. Even for $U=0$, the odd- and even-edge hopping terms do not commute, so each step approximates $\exp(-i H \tau)$ and Trotter error accumulates (roughly $\propto \tau^2$ per step). For a closer match, use a smaller Trotter step, while keeping the total propagation time.
+
+### Vanishing hopping limit
+
+The other extreme is obtained when the onsite interactions is much larger than the hopping constant. In this regime interaction dominate the physics and supress hopping between adjacent sites, allowing us to take $J=0$.
+The FH Hamiltonian then becomes a sum of local commuting terms, diagonal in the Fock basis (eigenstates of the number operators $\{n_{\mu}\}$).
+The Hamiltonian reduces to
+
+$$
+H^{\text{n.h}} =  U \sum_{j} n_{j \uparrow}  n_{j\downarrow}~~,
+$$
+where n.h denotes "no hopping".
+As a consequence the local number operators are a constant of motion $\langle n_{j} (t)\rangle  = \langle n_{j} (0)\rangle$, and we expect the charges to freeze in time.
+
+Since all terms in $H^{\text{n.h}}$ commute with one another, i.e., $[n_{i\uparrow}n_{i\downarrow},\, n_{j\uparrow}n_{j\downarrow}] = 0$ for all $i,j$, the first-order Trotter decomposition is **exact**:
+
+$$
+e^{-i H^{\text{n.h}} \tau} = \prod_j e^{-i U \tau\, n_{j\uparrow}n_{j\downarrow}}~~.
+$$
+This means the Trotter circuit reproduces the exact time evolution with no approximation error, regardless of the step size $\tau$.
+
+To verify this, we prepare an initial state that is **not** an eigenstate of $H^{\text{n.h}}$ - specifically, the ground state of the non-interacting Hamiltonian with an attractive potential (a Slater determinant with non-uniform charge distribution). We then compare the Trotter dynamics with the exact analytical prediction: frozen charge and spin densities.
+
+#
+
+### Numerical Evaluation
+
+```python
+# Parameters
+N = 4  # number of lattice sites
+L = N * a  # length of the lattice
+M = 2 * N  # total number of fermionic modes
+J = 0  # vanishing hopping
+U = 2.0  # on-site interaction strength
+Nelec_vh = N  # half-filling
+NUM_ITERS_vh = 10
+tau_vh = 0.3  # deliberately large Trotter step — still exact since terms commute
+T = NUM_ITERS_vh * tau_vh
+
+# Initial state: ground state of the non-interacting Hamiltonian with attractive potential
+# This is NOT an eigenstate of H^{n.h.}, making the test non-trivial
+lam = 10.0
+mean = (L - 1) / 2
+std = L / 6
+h_vh = construct_single_electron_hamiltonian(N, J=1, parameters=(lam, mean, std))
+
+
+@qfunc
+def main(qba: Output[QArray[QBit, M]], num_iter: CInt) -> None:
+    allocate(M, qba)
+    prepare_slater_det(h_vh, Nelec_vh, qba)
+    power(num_iter, lambda: trotter_step(tau=tau_vh, J=J, U=U, qba=qba))
+
+
+qprog_vh = synthesize(main)
+```
+```python
+
+# Measure initial charge and spin densities (at num_iter=0),
+# then measure at each Trotter step
+n_steps_vh = list(range(0, NUM_ITERS_vh + 1))
+t_trotter_vh = np.array(n_steps_vh) * tau_vh
+
+charge_density_vh = np.zeros((N, len(n_steps_vh)))
+spin_density_vh = np.zeros((N, len(n_steps_vh)))
+
+with ExecutionSession(qprog_vh) as es:
+    step_params = [{"num_iter": n_step} for n_step in n_steps_vh]
+
+    for site in range(N):
+        charge_results = es.batch_estimate(charge_density(site, M), step_params)
+        spin_results = es.batch_estimate(spin_density(site, M), step_params)
+
+        charge_density_vh[site, :] = [np.real(r.value) for r in charge_results]
+        spin_density_vh[site, :] = [np.real(r.value) for r in spin_results]
+```
+```python
+
+# Exact analytical result: charge and spin densities are constants of motion
+# for J=0, so the exact values at all times equal the initial (t=0) values.
+initial_charge_vh = charge_density_vh[:, 0]
+initial_spin_vh = spin_density_vh[:, 0]
+
+# Verify Trotter matches exact solution.
+# Note: es.estimate() uses finite-shot sampling, so we allow for statistical noise.
+charge_error = np.max(np.abs(charge_density_vh - initial_charge_vh[:, None]))
+spin_error = np.max(np.abs(spin_density_vh - initial_spin_vh[:, None]))
+print(f"Max charge density deviation from exact: {charge_error:.2e}")
+print(f"Max spin density deviation from exact:   {spin_error:.2e}")
+assert charge_error < 0.2, f"Charge density deviation too large: {charge_error}"
+assert spin_error < 0.2, f"Spin density deviation too large: {spin_error}"
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Max charge density deviation from exact: 4.25e-02
+  Max spin density deviation from exact:   3.32e-02
+  
+
+```
+</Info>
+
+```python
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+sites = np.arange(N)
+
+# Charge density: final Trotter step vs exact (initial = frozen)
+ax = axes[0]
+ax.plot(
+    sites,
+    charge_density_vh[:, -1],
+    "o",
+    label=f"Trotter ($t = {t_trotter_vh[-1]:.1f}$)",
+)
+ax.plot(sites, initial_charge_vh, "x", ms=10, label="Exact (frozen)")
+ax.set_title("Charge Density ($J=0$)", fontsize=14)
+ax.set_xlabel("Site", fontsize=12)
+ax.set_ylabel("$\\rho^+_j$", fontsize=12)
+ax.set_xticks(sites)
+ax.legend()
+
+# Spin density: final Trotter step vs exact (initial = frozen)
+ax = axes[1]
+ax.plot(
+    sites, spin_density_vh[:, -1], "o", label=f"Trotter ($t = {t_trotter_vh[-1]:.1f}$)"
+)
+ax.plot(sites, initial_spin_vh, "x", ms=10, label="Exact (frozen)")
+ax.set_title("Spin Density ($J=0$)", fontsize=14)
+ax.set_xlabel("Site", fontsize=12)
+ax.set_ylabel("$\\rho^-_j$", fontsize=12)
+ax.set_xticks(sites)
+ax.legend()
+
+plt.suptitle(
+    "Vanishing hopping limit: Trotter vs Exact at final time\n"
+    "Trotter is exact since all terms commute",
+    fontsize=12,
+)
+plt.tight_layout()
+plt.show()
+```
+![output](./fermi_hubbard_1D_files/fermi_hubbard_1D_7.png)
+
+## References
+
+<a id="google-paper">\[1] </a> [Arute, F., Arya, K., Babbush, R., Bacon, D., Bardin, J. C., Barends, R., ... & Zanker, S. (2020). Observation of separated dynamics of charge and spin in the Fermi-Hubbard model. arXiv:2010.07965](https://arxiv.org/abs/2010.07965).
+
+<a id="lieb">\[2] </a> [Lieb, E. H., & Wu, F. Y. (2003). The one-dimensional Hubbard model: a reminiscence. Physica A: statistical mechanics and its applications, 321(1-2), 1-27. arXiv:0207529](https://arxiv.org/abs/cond-mat/0207529)
+
+<a id="fermionic-gaussian-state"> \[3] </a> [Jiang, Z., Sung, K. J., Kechedzhi, K., Smelyanskiy, V. N., & Boixo, S. (2018). Quantum algorithms to simulate many-body physics of correlated fermions. Physical Review Applied, 9(4), 044036](https://arxiv.org/abs/1711.05395).

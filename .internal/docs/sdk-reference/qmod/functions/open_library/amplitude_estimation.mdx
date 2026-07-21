@@ -1,0 +1,39 @@
+---
+title: Amplitude Estimation
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `amplitude_estimation` | [Qmod Classiq-library function]. |
+
+
+### amplitude_estimation
+
+
+<pre><code>amplitude_estimation(
+    oracle: QCallable[QArray[QBit]],
+    space_transform: QCallable[QArray[QBit]],
+    phase: QNum,
+    packed_vars: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Estimate the probability of a state being marked by the operand `oracle` as a "good state."
+
+The algorithm prepares the state in the `packed_vars` register and estimates the probability of this state being marked by the oracle as a "good state."
+This is done using the Quantum Phase Estimation (QPE) algorithm, where the unitary for QPE is the Grover operator, which is composed of the `oracle` and `space_transform` operators.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `oracle` | `QCallable[QArray[QBit]]` | The oracle operator that marks the "good" state. This operator should flip the sign of the amplitude of the "good" state. | *required* |
+| `space_transform` | `QCallable[QArray[QBit]]` | The space transform operator (which is known also the state preparation operator), which is first applied to prepare the state before the QPE, and then used inside the Grover operator. | *required* |
+| `phase` | `QNum` | Assuming this variable starts from the zero state -this variable output holds the $phase=\theta$ result in the [0,1] domain, which relates to the estimated probability $a$ through $a=\sin^2(\pi \theta)$. | *required* |
+| `packed_vars` | `QArray[QBit]` | The variable that holds the state to be estimated. Assumed to be in the zero state at the beginning of the algorithm. | *required* |

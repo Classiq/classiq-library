@@ -1,0 +1,147 @@
+---
+title: "Classiq Documentation"
+description: ""
+mode: "custom"
+---
+
+
+<div className="relative w-full flex items-center justify-center" style={{ minHeight: '20rem', overflow: 'visible', paddingBottom: '2rem', paddingTop: '2rem'}}>
+
+<div id="background-div" className="absolute inset-0 h-full bg-[#00000000] bg-cover bg-center"></div>
+
+<div
+  id="background-div"
+  className="absolute inset-0 h-full bg-cover bg-center"
+>
+</div>
+
+<div
+  style={{
+    position: 'absolute',
+    textAlign: 'center',
+    padding: '0 1rem',
+    width: '100%',   
+    left: 0,      
+  }}
+>
+  <div
+    className="text-5xl font-bold w-full mt-12 text-[#119DA4] dark:text-[#39CCD3] leading-[1.2]"
+  >
+   <h1>Classiq Documentation</h1>
+  </div>
+
+    <p className="text-xl" style={{  fontWeight: '500' , maxWidth: '40rem', margin: '0 auto', marginTop: '0.5rem'}}>
+     Your guide to high-level quantum programming. Code faster, implement better, run anywhere. 
+    </p>
+
+    <div className="flex items-center justify-center" style={{margin: '0 auto' }}>
+      <div
+        className="flex items-center justify-center"
+        style={{
+          width: '100%',          // ← allow full width
+          maxWidth: '900px',      // ← control final size
+          margin: '0 auto',
+          marginTop: '2rem',
+          gap: '0.75rem',
+        }}
+      >
+        {/* Search bar */}
+        <button
+          type="button"
+          className="flex items-center text-base py-4 pl-4 pr-4 rounded-full 
+          bg-gray-100 dark:bg-[#2A2A2A] 
+          border border-gray-200 dark:border-white/20
+          shadow-none"
+          id="home-search-entry"
+          style={{
+            flex: 1,
+            maxWidth: '400px',
+            cursor: 'pointer',
+          }}
+          onClick={() => document.getElementById('search-bar-entry')?.click()}
+        >
+          <svg
+            className="h-4 w-4 ml-1.5"
+            style={{
+              marginRight: '0.5rem',
+              background: '#39CCD3',
+              maskImage:
+                'url("https://mintlify.b-cdn.net/v6.5.1/solid/magnifying-glass.svg")',
+              maskRepeat: 'no-repeat',
+              maskPosition: 'center',
+            }}
+          />
+          <span style={{ flex: 1, textAlign: 'left' }}>
+            Search in the documentation…
+          </span>
+        </button>
+
+        {/* AI circular button */}
+        <button
+          type="button"
+          onClick={() => document.getElementById('assistant-entry')?.click()}
+          className="ai-button flex items-center text-base py-4 pl-4 pr-4 rounded-full 
+          bg-gray-100 dark:bg-[#2A2A2A] 
+          text-gray-600 dark:text-gray-300
+          border border-gray-200 dark:border-white/20
+          shadow-none"
+        >
+          <svg
+            className="h-5 w-5"
+            style={{
+              background: '#39CCD3',
+              maskImage:
+                'url("https://mintlify.b-cdn.net/v6.5.1/solid/sparkles.svg")',
+              maskRepeat: 'no-repeat',
+              maskPosition: 'center',
+            }}
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  style={{marginTop: '2rem', marginBottom: '8rem', maxWidth: '70rem', marginLeft: 'auto',
+  marginRight: 'auto', paddingLeft: '1.25rem',
+  paddingRight: '1.25rem' }}
+>
+
+<CardGroup cols={3}>
+  <Card icon="/icons/rocket.svg" >
+  <h3 className="text-xl font-semibold">
+  Getting Started
+  </h3>
+  <div className="mt-3 mb-4 text-2xs text-gray-400">
+    Learn the fundamentals and begin your quantum journey with Classiq.
+  </div>
+    <p className='mt-3 mb-1'><a href="/getting-started/">Hello World</a></p>
+    <p className='mt-1 mb-3'><a href="/getting-started/classiq_tutorial">Onboarding Tutorial</a></p>
+  </Card>
+
+  <Card icon="/icons/book.svg">
+  <h3 className="text-xl font-semibold">
+  Build Applications
+  </h3>
+  <div className="mt-3 mb-4 text-2xs text-gray-400">
+  Explore features, workflows, and advanced guides.
+  </div>
+   <p className='mt-3 mb-1'><a href="/user-guide/">Classiq User Guide</a></p>
+   <p className='mt-1 mb-3'><a href="/explore/">Classiq Library</a></p>
+  </Card>
+
+  <Card icon="/icons/sdk.svg">
+    <h3 className="text-xl font-semibold">
+    Reference Materials
+    </h3>
+  <div className="mt-3 mb-4 text-2xs text-gray-400">
+  Detailed technical documentation for quantum programming.
+  </div>
+<p className='mt-3 mb-1'><a href="/qmod-reference/">Qmod Reference</a></p>
+<p className='mt-1 mb-3'><a href="/sdk-reference/">SDK Reference</a></p>
+  </Card>
+</CardGroup>
+<div className='mb-12 py-8'>
+</div>
+</div>

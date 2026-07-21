@@ -1,0 +1,121 @@
+---
+title: "HW-aware Synthesis of MCX"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/hardware_aware_mcx/hardware_aware_mcx.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This example shows that implementation of multiple control-x (MCX) logic, using the Classiq synthesis engine, yields different circuit results for different quantum hardware.
+
+The fictitious hardware created here demonstrates how to insert your own custom-designed machine.
+
+For comparison, create two types of hardware with `cx, u` basis gates.
+
+The difference between them manifests in the connectivity map: one has linear connectivity while the other has all-to-all connectivity.
+
+```python
+from classiq import *
+
+# define the hardware parameters
+max_width = 18
+
+linear_connectivity = [[qubit, qubit + 1] for qubit in range(max_width - 1)]
+
+
+# define the MCX parameters within the quantum 'main' function
+@qfunc
+def main(cntrl: Output[QArray], target: Output[QBit]) -> None:
+    allocate(15, cntrl)
+    allocate(target)
+    control(cntrl, lambda: X(target))
+
+
+# build a model
+qmod = create_model(main)
+# define synthesis engine constraints
+qmod = set_constraints(qmod, optimization_parameter="depth", max_width=max_width)
+
+# define models with different preferences
+qmod_linear = set_preferences(
+    qmod,
+    custom_hardware_settings=CustomHardwareSettings(
+        basis_gates=["cx", "u"],
+        connectivity_map=linear_connectivity,
+    ),
+    random_seed=-1,
+)
+qmod_all_to_all = set_preferences(
+    qmod,
+    custom_hardware_settings=CustomHardwareSettings(basis_gates=["cx", "u"]),
+    random_seed=-1,
+)
+
+# write models to files
+
+
+# synthesize to create quantum programs and view circuits:
+qprog_linear = synthesize(qmod_linear)
+show(qprog_linear)
+
+qprog_all_to_all = synthesize(qmod_all_to_all)
+show(qprog_all_to_all)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/30ekINlCUBv3lqPtafJ4KJGE0wX
+  Quantum program link: https://platform.classiq.io/circuit/30ekJtDZ1ine1W4cRUpaqJm9uGS
+  
+
+```
+</Info>
+
+Comparison of the two circuits shows that applying MCx using different connectivity maps yields different implementation.
+
+Using "all-to-all" connectivity, the synthesis engine chooses as the best implementation a recourse based on "Maslov2015" \[[1](#maslov)] that was written on the Classiq platform.
+
+Using that, the manufactured circuit has 18 qubits; i.e., it uses two auxiliary qubits.
+
+The total depth of the circuit is:
+
+```python
+print(qprog_all_to_all.transpiled_circuit.depth)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+378
+  
+
+```
+</Info>
+
+When using linear connectivity, the best implementation chosen by the synthesis engine is, in fact, different: an algorithm developed by Classiq, which is better suited for this map. Here, the manufactured circuit uses 18 qubits with only one auxiliary and has a depth of:
+
+```python
+print(qprog_linear.transpiled_circuit.depth)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+781
+  
+
+```
+</Info>
+
+## References
+
+<a id="maslov">\[1]</a>: [Maslov, D., 2016. Advantages of using relative-phase Toffoli gates with an application to multiple control Toffoli optimization. Physical Review A, 93(2), p.022311.](https://arxiv.org/pdf/1508.03273.pdf)

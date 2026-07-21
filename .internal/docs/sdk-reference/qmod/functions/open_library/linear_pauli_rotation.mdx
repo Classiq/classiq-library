@@ -1,0 +1,54 @@
+---
+title: Linear Pauli Rotation
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `linear_pauli_rotations` | [Qmod Classiq-library function]. |
+
+
+### linear_pauli_rotations
+
+
+<pre><code>linear_pauli_rotations(
+    bases: CArray[Pauli],
+    slopes: CArray[CReal],
+    offsets: CArray[CReal],
+    x: QArray[QBit],
+    q: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Performs a rotation on a series of $m$ target qubits,
+where the rotation angle is a linear function of an $n$-qubit
+control register.
+
+Corresponds to the braket notation:
+
+$$
+\left|x\right\rangle _{n}\left|q\right\rangle
+_{m}\rightarrow\left|x\right\rangle
+_{n}\prod_{k=1}^{m}\left(\cos\left(\frac{a_{k}}{2}x+\frac{b_{k}}{2}\right)-
+i\sin\left(\frac{a_{k}}{2}x+\frac{b_{k}}{2}\right)P_{k}\right)\left|q_{k}\right\rangle
+$$
+
+where $\left|x\right\rangle$ is the control register,
+$\left|q\right\rangle$ is the target register, each $P_\{k\}$ is one of
+the three Pauli matrices $X$, $Y$, or $Z$, and $a_\{k\}$, $b_\{k\}$ are
+the user given slopes and offsets, respectively.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `bases` | `CArray[Pauli]` | List of Pauli Enums. | *required* |
+| `slopes` | `CArray[CReal]` | Rotation slopes for each of the given Pauli bases. | *required* |
+| `offsets` | `CArray[CReal]` | Rotation offsets for each of the given Pauli bases. | *required* |
+| `x` | `QArray[QBit]` | Quantum state to apply the rotation based on its value. | *required* |
+| `q` | `QArray[QBit]` | List of indicator qubits for each of the given Pauli bases. | *required* |

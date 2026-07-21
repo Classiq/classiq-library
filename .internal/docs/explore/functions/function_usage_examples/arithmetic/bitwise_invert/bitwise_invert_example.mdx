@@ -1,0 +1,42 @@
+---
+title: "Bitwise Invert"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/function_usage_examples/arithmetic/bitwise_invert/bitwise_invert_example.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The bitwise inversion operation receives a quantum register representing some number $x$,
+and inverts its binary representation, namely, replaces $1$s by $0$s and vice versa.
+
+## Example
+
+```python
+from classiq import *
+
+
+@qfunc
+def main(x: Output[QNum], y: Output[QNum]) -> None:
+    x |= 6
+
+    y |= ~x
+```
+```python
+
+qprog = synthesize(main)
+
+result = execute(qprog).result_value()
+print(result.counts_of_multiple_outputs(["x", "y"]))
+```
+<Info>
+  **Output:**
+
+  
+
+```
+{('011', '100'): 1000}
+  
+
+```
+</Info>

@@ -1,0 +1,112 @@
+---
+title: "Exponentiation and Hamiltonian Simulation"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/basic_tutorials/exponentiation/example_exponentiation.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This tutorial demonstrates how to use the Classiq platform exponentiation function to solve Hamiltonian simulation problems, thereby demonstrating the strength of the Classiq exponentiation module.
+
+## 
+
+1. Chemical Simulation
+
+Chemical simulation is one of the most exciting applications for quantum computers.
+
+When precise simulations of electron-electron interactions are necessary, it is sometimes possible to use a classical computer, but classical computers struggle to simulate more complex molecular interactions. It is best to simulate these particle interactions at the quantum level, and an excellent way to do this is with a quantum computer.
+
+The ability to accurately simulate molecular interactions will have extensive applications.
+
+When used for drug discovery, it will allow for the rapid development of vaccines and new cures for diseases. In materials research, we can hope to discover materials with higher strength-to-weight ratios and environmentally friendly building materials.
+
+## 
+
+2. The H<sub>2</sub>O Hamiltonian Simulation Problem
+
+Generate a circuit that approximates the unitary $e^{-iH}$ where $H$ is the qubit Hamiltonian of a H<sub>2</sub>O (water) molecule.
+
+The H<sub>2</sub>O Hamiltonian is composed of 551 Pauli strings on twelve qubits.
+
+```python
+!pip install -qq "classiq[chemistry]"
+```
+```python
+
+from openfermion.chem import MolecularData
+from openfermionpyscf import run_pyscf
+
+from classiq import *
+from classiq.applications.chemistry.mapping import FermionToQubitMapper
+from classiq.applications.chemistry.op_utils import qubit_op_to_qmod
+from classiq.applications.chemistry.problems import FermionHamiltonianProblem
+
+molecule_H2O_geometry = [
+    ("O", (0.0, 0.0, 0.0)),
+    ("H", (0, 0.586, 0.757)),
+    ("H", (0, 0.586, -0.757)),
+]
+molecule = MolecularData(molecule_H2O_geometry, "sto-3g", 1, 0)
+
+molecule = run_pyscf(molecule)
+
+problem = FermionHamiltonianProblem.from_molecule(molecule, first_active_index=1)
+mapper = FermionToQubitMapper()
+hamiltonian = qubit_op_to_qmod(mapper.map(problem.fermion_hamiltonian))
+```
+```python
+
+@qfunc
+def main(state: Output[QArray]) -> None:
+    allocate(hamiltonian.num_qubits, state)
+    suzuki_trotter(
+        hamiltonian,
+        evolution_coefficient=1,
+        order=1,
+        repetitions=1,
+        qbv=state,
+    )
+
+
+preferences = Preferences(
+    custom_hardware_settings=CustomHardwareSettings(basis_gates=["cx", "u"])
+)
+
+
+qprog = synthesize(main, preferences=preferences)
+
+print(f"Classiq's exponentiation depth is {qprog.transpiled_circuit.depth}")
+print(
+    f"Classiq's exponentiation CX-count is {qprog.transpiled_circuit.count_ops['cx']}"
+)
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Classiq's exponentiation depth is 1464
+  Classiq's exponentiation CX-count is 1536
+  Quantum program link: https://platform.classiq.io/circuit/3BJxddWkXBhvWUiTHbPYSeqlZ9f
+  
+
+```
+</Info>
+
+These impressive results can be compared to the naive exponentiation modules often found in the literature, see comprehensive comparison in the  [Hamiltonian Evolution](https://github.com/Classiq/classiq-library/blob/main/tutorials/technology_demonstrations/hamiltonian_evolution/hamiltonian_evolution.ipynb) notebook.
+
+## 
+
+3. Conclusion
+
+Classiq packages the domain expertise of dozens of scientists and quantum software engineers into the software platform.
+
+The result: a system that can automatically generate efficient quantum circuits for complex problems, making it faster and easier than ever to solve real-life problems with quantum computing.
+
+When the circuits are of manageable size, Classiq creates solutions that are on par with the best manually created circuits.
+
+When the circuits are larger than those a human can reasonably create, Classiq allows you to progress farther because of its powerful capabilities.

@@ -1,0 +1,433 @@
+---
+title: State Preparation
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `prepare_uniform_trimmed_state` | [Qmod Classiq-library function]. |
+| `prepare_uniform_interval_state` | [Qmod Classiq-library function]. |
+| `prepare_ghz_state` | [Qmod Classiq-library function]. |
+| `prepare_exponential_state` | [Qmod Classiq-library function]. |
+| `prepare_bell_state` | [Qmod Classiq-library function]. |
+| `inplace_prepare_int` | [Qmod Classiq-library function]. |
+| `prepare_int` | [Qmod Classiq-library function]. |
+| `prepare_complex_amplitudes` | [Qmod Classiq-library function]. |
+| `inplace_prepare_complex_amplitudes` | [Qmod Classiq-library function]. |
+| `prepare_dicke_state` | [Qmod Classiq-library function]. |
+| `prepare_dicke_state_unary_input` | [Qmod Classiq-library function]. |
+| `prepare_basis_state` | [Qmod Classiq-library function]. |
+| `prepare_linear_amplitudes` | [Qmod Classiq-library function]. |
+| `prepare_sparse_amplitudes` | [Qmod Classiq-library function]. |
+| `inplace_prepare_sparse_amplitudes` | [Qmod Classiq-library function]. |
+
+
+### prepare_uniform_trimmed_state
+
+
+<pre><code>prepare_uniform_trimmed_state(
+    m: CInt,
+    q: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes a quantum variable in a uniform superposition of the first `m` computational basis states:
+
+$$
+    \left|\text{q}\right\rangle = \frac{1}{\sqrt{m}}\sum_{i=0}^{m-1}{|i\rangle}
+$$
+
+The number of allocated qubits would be $\left\lceil\log_2\{m\}\right\rceil$.
+The function is especially useful when `m` is not a power of 2.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `m` | `CInt` | The number of states to load in the superposition. | *required* |
+| `q` | `QArray[QBit]` | The quantum variable that will receive the initialized state. Must be uninitialized. | *required* |
+
+
+
+### prepare_uniform_interval_state
+
+
+<pre><code>prepare_uniform_interval_state(
+    start: CInt,
+    end: CInt,
+    q: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes a quantum variable in a uniform superposition of the specified interval in the computational basis states:
+
+$$
+    \left|\text{q}\right\rangle = \frac{1}{\sqrt{\text{end} - \text{start}}}\sum_{i=\text{start}}^{\text{end}-1}{|i\rangle}
+$$
+
+The number of allocated qubits would be $\left\lceil\log_2\{\left(\text\{end\}\right)\}\right\rceil$.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `start` | `CInt` | The lower bound of the interval to load (inclusive). | *required* |
+| `end` | `CInt` | The upper bound of the interval to load (exclusive). | *required* |
+| `q` | `QNum` | The quantum variable that will receive the initialized state. Must be uninitialized. | *required* |
+
+
+
+### prepare_ghz_state
+
+
+<pre><code>prepare_ghz_state(
+    size: CInt,
+    q: Output[QArray[QBit]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes a quantum variable in a Greenberger-Horne-Zeilinger (GHZ) state. i.e., a balanced superposition of all ones and all zeros, on an arbitrary number of qubits..
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `size` | `CInt` | The number of qubits in the GHZ state. Must be a positive integer. | *required* |
+| `q` | `Output[QArray[QBit]]` | The quantum variable that will receive the initialized state. Must be uninitialized. | *required* |
+
+
+
+### prepare_exponential_state
+
+
+<pre><code>prepare_exponential_state(
+    rate: CInt,
+    q: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Prepares a quantum state with exponentially decreasing amplitudes. The state is prepared in the computational basis, with the amplitudes of the states decreasing exponentially with the index of the state:
+
+$$
+    P(n) = \frac{1}{Z} e^{- \text{rate} \cdot n}
+$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `rate` | `CInt` | The rate of the exponential decay. | *required* |
+| `q` | `QArray[QBit]` | The quantum register to prepare. | *required* |
+
+
+
+### prepare_bell_state
+
+
+<pre><code>prepare_bell_state(
+    state_num: CInt,
+    qpair: Output[QArray[QBit, Literal[2]]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes a quantum array of size 2 in one of the four Bell states.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `state_num` | `CInt` | The number of the Bell state to be prepared. Must be an integer between 0 and 3. | *required* |
+| `qpair` | `Output[QArray[QBit, Literal[2]]]` | The quantum variable that will receive the initialized state. Must be uninitialized. | *required* |
+
+
+
+### inplace_prepare_int
+
+
+<pre><code>inplace_prepare_int(
+    value: CInt,
+    target: QNum
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+This function is **deprecated**. Use in-place-xor assignment statement in the form _target-var_ **^=** _quantum-expression_ or **inplace_xor(**_quantum-expression_**,** _target-var_**)** instead.
+
+Transitions a quantum variable in the zero state $|0\rangle$ into the computational basis state $|\text\{value\}\rangle$.
+In the general case, the function performs a bitwise-XOR, i.e. transitions the state $|\psi\rangle$ into $|\psi \oplus \text\{value\}\rangle$.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `value` | `CInt` | The value to assign to the quantum variable. | *required* |
+| `target` | `QNum` | The quantum variable to act upon. | *required* |
+
+
+
+### prepare_int
+
+
+<pre><code>prepare_int(
+    value: CInt,
+    out: Output[QNum[Literal[&#x27;floor(log(value, 2)) + 1&#x27;]]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+This function is **deprecated**. Use assignment statement in the form _target-var_ **|=** _quantum-expression_ or **assign(**_quantum-expression_**,** _target-var_**)** instead.
+
+Initializes a quantum variable to the computational basis state $|\text\{value\}\rangle$.
+The number of allocated qubits is automatically computed from the value, and is the minimal number required for representation in the computational basis.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `value` | `CInt` | The value to assign to the quantum variable. | *required* |
+| `out` | `Output[QNum[Literal['floor(log(value, 2)) + 1']]]` | The allocated quantum variable. Must be uninitialized. | *required* |
+
+
+
+### prepare_complex_amplitudes
+
+
+<pre><code>prepare_complex_amplitudes(
+    magnitudes: CArray[CReal],
+    phases: list[float],
+    out: Output[QArray[QBit, Literal[&#x27;log(magnitudes.len, 2)&#x27;]]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes and prepares a quantum state with amplitudes and phases for each state according to the given parameters, in polar representation.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `magnitudes` | `CArray[CReal]` | Absolute values of the state amplitudes. | *required* |
+| `phases` | `list[float]` | phases of the state amplitudes. should be of the same size as `amplitudes`. | *required* |
+| `out` | `Output[QArray[QBit, Literal['log(magnitudes.len, 2)']]]` | The allocated quantum variable. Must be uninitialized. | *required* |
+
+
+
+### inplace_prepare_complex_amplitudes
+
+
+<pre><code>inplace_prepare_complex_amplitudes(
+    magnitudes: CArray[CReal],
+    phases: list[float],
+    target: QArray[QBit, Literal[&#x27;log(magnitudes.len, 2)&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Prepares a quantum state with amplitudes and phases for each state according to the given parameters, in polar representation.
+Expects to act on an initialized zero state $|0\rangle$.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `magnitudes` | `CArray[CReal]` | Absolute values of the state amplitudes. | *required* |
+| `phases` | `list[float]` | phases of the state amplitudes. should be of the same size as `amplitudes`. | *required* |
+| `target` | `QArray[QBit, Literal['log(magnitudes.len, 2)']]` | The quantum variable to act upon. | *required* |
+
+
+
+### prepare_dicke_state
+
+
+<pre><code>prepare_dicke_state(
+    k: int,
+    qvar: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Prepares a Dicke state with k excitations over the provided quantum register.
+
+A Dicke state of n qubits with k excitations is an equal superposition of all basis states
+with exactly k qubits in the $|1\rangle$ state and $(n - k)$ qubits in the $|0\rangle$ state.
+For example, $\mathrm\{Dicke\}(2, 1) = (|01\rangle + |10\rangle) / \sqrt(2)$.
+
+In the general case it is defined to be:
+
+$$\mathrm\{Dicke\}(n, k) = \frac\{1\}\{\sqrt\{\binom\{n\}\{k\}\}\} \sum_\{x \in \\{0,1\\}^n,\, |x| = k\} |x\rangle$$
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `k` | `int` | The number of excitations (i.e., number of qubits in state $\|1\rangle$). | *required* |
+| `qvar` | `QArray[QBit]` | The quantum register (array of qubits) to initialize. Must be uninitialized and have length &gt;= k. | *required* |
+
+
+
+### prepare_dicke_state_unary_input
+
+
+<pre><code>prepare_dicke_state_unary_input(
+    max_k: int,
+    qvar: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Prepares a Dicke state with a variable number of excitations based on a unary-encoded input.
+
+The Dicke state is defined to be:
+
+$$\mathrm\{Dicke\}(n, k) = \frac\{1\}\{\sqrt\{\binom\{n\}\{k\}\}\} \sum_\{x \in \\{0,1\\}^n,\, |x| = k\} |x\rangle$$
+
+The input register `qvar` is expected to already be initialized in a unary encoding:
+the value k is represented by a string of k ones followed by zeros, e.g., k = 3 -&gt; |11100...0&gt;.
+The function generates a Dicke state with k excitations over a new quantum register,
+where 0 &lt;= k &lt; max_k.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `max_k` | `int` | The maximum number of allowed excitations (upper bound for k). | *required* |
+| `qvar` | `QArray[QBit]` | Unary-encoded quantum input register of length &gt;= max_k. Must be pre-initialized. | *required* |
+
+
+
+### prepare_basis_state
+
+
+<pre><code>prepare_basis_state(
+    state: list[bool],
+    arr: Output[QArray]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes a quantum array in the specified basis state.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `state` | `list[bool]` |  | *required* |
+| `arr` | `Output[QArray]` | The quantum array to prepare. | *required* |
+
+
+
+### prepare_linear_amplitudes
+
+
+<pre><code>prepare_linear_amplitudes(
+    x: QArray
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes a quantum variable in a state with linear amplitudes:
+$$|\psiangle = rac\{1\}\{Z\}\sum_\{x=0\}^\{2^n-1\}\{x|xangle\}$$
+Where $Z$ is a normalization constant.
+
+Based on the paper https://quantum-journal.org/papers/q-2024-03-21-1297/pdf/
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `x` | `QArray` | The quantum register to prepare. | *required* |
+
+
+
+### prepare_sparse_amplitudes
+
+
+<pre><code>prepare_sparse_amplitudes(
+    states: list[int],
+    amplitudes: list[complex],
+    out: Output[QArray]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes and prepares a quantum state with the given (complex) amplitudes. The input is given sparse format, as a list of non-zero states and their corresponding amplitudes.
+Notice that the function is only suitable sparse states. Inspired by https://arxiv.org/abs/2310.19309.
+
+For example, `prepare_sparse_amplitudes([1, 8], [np.sqrt(0.5), np.sqrt(0.5)], out)` will and allocate it to be of size 4 qubits, and
+prepare it in the state sqrt(0.5)`|1>` + sqrt(0.5)`|8>`.
+
+Complexity: Asymptotic gate complexity is $O(dn)$ where d is the number of states and n is the required number of qubits.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `states` | `list[int]` | A list of distinct computational basis indices to populate. Each integer corresponds to the basis state in the computational basis. | *required* |
+| `amplitudes` | `list[complex]` | A list of complex amplitudes for the corresponding entries in `states`. Must have the same length as `states`. | *required* |
+| `out` | `Output[QArray]` | The allocated quantum variable. | *required* |
+
+
+
+### inplace_prepare_sparse_amplitudes
+
+
+<pre><code>inplace_prepare_sparse_amplitudes(
+    states: list[int],
+    amplitudes: list[complex],
+    target: QArray
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Prepares a quantum state with the given (complex) amplitudes. The input is given sparse format, as a list of non-zero states and their corresponding amplitudes.
+Notice that the function is only suitable sparse states. Inspired by https://arxiv.org/abs/2310.19309.
+
+For example, `inplace_prepare_sparse_amplitudes([1, 8], [np.sqrt(0.5), np.sqrt(0.5)], target)` will prepare the state sqrt(0.5)`|1>` + sqrt(0.5)`|8>`
+on the target variable, assuming it starts in the `|0>` state.
+
+Complexity: Asymptotic gate complexity is $O(dn)$ where d is the number of states and n is the target number of qubits.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `states` | `list[int]` | A list of distinct computational basis indices to populate. Each integer corresponds to the basis state in the computational basis. | *required* |
+| `amplitudes` | `list[complex]` | A list of complex amplitudes for the corresponding entries in `states`. Must have the same length as `states`. | *required* |
+| `target` | `QArray` | The quantum variable on which the state is to be prepared. Its size must be sufficient to represent all states in `states`. | *required* |

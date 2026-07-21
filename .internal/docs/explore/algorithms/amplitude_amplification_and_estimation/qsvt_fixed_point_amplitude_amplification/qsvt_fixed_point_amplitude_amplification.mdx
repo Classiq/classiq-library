@@ -1,0 +1,270 @@
+---
+title: "Using QSVT for Fixed-point Amplitude Amplification"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/algorithms/amplitude_amplification_and_estimation/qsvt_fixed_point_amplitude_amplification/qsvt_fixed_point_amplitude_amplification.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+This demo shows how to use the QSVT framework for search problems; specifically, implementing fixed-point amplitude amplification (FPAA).
+
+With FPAA, we do not know in advance the concentration of solutions for the search problem, but we want to sample a solution with high probability. In contrast, for the original Grover search algorithm, too many iterations might 'overshoot' the mark.
+
+The demo is based on the paper [Grand unification of quantum algorithms](#grand).
+
+Given $|s\rangle$ the initial state and $|t\rangle$ the 'good' states, we get an effective block encoding of a one-dimensional matrix $A=|t\rangle\langle s|$.
+
+Given that  $a = \langle s|t\rangle\gt0$, we want to amplify $a$.
+
+The signal operator $U$ here is $I$ (and also $U^\dagger$).
+
+Now we implement two projector-rotations: one in the '$|s\rangle$' space and one in the '$|t\rangle$' space; each one around the given state, giving phase to the specific state.
+
+```python
+!pip install -qq "classiq[qsp]" -U
+```
+
+## Defining the QSVT Circuit for the Problem
+
+```python
+import numpy as np
+
+from classiq import *
+```
+![image.png](./qsvt_fixed_point_amplitude_amplification_files/38c474a1-2027-4603-aa95-0fec73f3e4db.png)
+
+We start with the general QSVT framework definition. It accepts a unitary that block-encodes a matrix together with projector-controlled phase functions, which rotate the state around each of the subspaces where the matrix is encoded.
+
+The `qsvt` function accepts 3 different functions:
+
+1. **Block Encoding function**: the one for which the singular values are transformed. In this case, the block encoding is trivial, and is just the Identity.
+1. **Domain projector-controlled-CNot**: a function that identifies subspace in the domain of the block encoding (i.e the columns of the block encoding). In our case it is an identifier for the initial state $|s\rangle$.
+1. **Image projector-controlled-CNot**: a function that identifies subspace in the image of the block encoding (i.e the rows of the block encoding). In our case it is an identifier for the target state $|t\rangle$.
+
+So we get a 1x1 block encoded matrix, which will be transformed using a polynomial that approximates the sign function, so that all inputs will be amplified to approximately 
+
+1. We need an even degree polynomial since we need to "finish" our sequence in the image space of our unitary.
+
+## Domain State Projector: identify the $|s\rangle$ state
+
+```python
+@qfunc
+def initial_state_projector(state: QNum, aux: QBit):
+    within_apply(
+        lambda: hadamard_transform(state), lambda: inplace_xor(state == 0, aux)
+    )
+```
+
+## Image States Projector: identify the $|t\rangle$ state
+
+```python
+@qfunc
+def target_state_projector(
+    arith_oracle: QCallable[QArray, QBit],
+    state: QArray,
+    aux: QBit,
+):
+    arith_oracle(state, aux)
+```
+
+## Defining the Arithmetic Oracle
+
+We implement the following equation:
+`(a + b) == 3 and (c - a) == 2`
+with `a, b, c` in sizes 2, 1, 3:
+
+```python
+from classiq.qmod.symbolic import logical_and
+
+
+class OracleVars(QStruct):
+    a: QNum[2]
+    b: QNum[1]
+    c: QNum[3]
+
+
+@qperm
+def arith_equation(state: OracleVars, res: QBit):
+    res ^= logical_and((state.a + state.b) == 3, (state.c - state.a) == 2)
+```
+
+## Wrapping Everything for the FPAA Case
+
+In the FPAA case, the provided unitary is just the Identity matrix! In addition, we provide defined projector functions:
+
+```python
+@qfunc
+def qsvt_fpaa(
+    phase_seq: list[float],
+    arith_oracle: QCallable[Const[OracleVars], QBit],
+    state: OracleVars,
+    aux: Output[QBit],
+):
+    allocate(aux)
+
+    qsvt(
+        phase_seq,
+        proj_cnot_1=lambda _aux: initial_state_projector(state, _aux),
+        proj_cnot_2=lambda _aux: target_state_projector(arith_oracle, state, _aux),
+        u=lambda: IDENTITY(state),
+        aux=aux,
+    )
+```
+
+## Getting the Phase Sequence for the Sign Function
+
+Here for demonstration purpose we assume that the initial state has at least `MIN_OVERLAP=0.1` with the target state (in probability). So we approximate the constant function (a scale of 0.95 is used for stability), and we only care about the interval \[`MIN_OVERLAP`, 1].
+
+```python
+from classiq.applications.qsp import qsp_approximate, qsvt_phases
+
+DEGREE = 25
+SCALE = 0.95
+MIN_OVERLAP = 0.1
+
+
+def target_function(x):
+    return SCALE * np.sign(x)
+
+
+pcoefs, max_err = qsp_approximate(
+    target_function, degree=DEGREE, parity=1, interval=[MIN_OVERLAP, 1], plot=True
+)
+print(max_err)
+phases = qsvt_phases(pcoefs)
+```
+![output](./qsvt_fixed_point_amplitude_amplification_files/qsvt_fixed_point_amplitude_amplification_1.png)
+
+<Info>
+  **Output:**
+
+  
+
+```
+0.03252868313167301
+  
+
+```
+</Info>
+
+## Creating the Full QSVT Model
+
+```python
+@qfunc
+def main(state: Output[OracleVars], aux: Output[QBit]):
+    allocate(state)
+    hadamard_transform(state)
+
+    qsvt_fpaa(
+        phase_seq=phases,
+        arith_oracle=arith_equation,
+        state=state,
+        aux=aux,
+    )
+```
+
+## Synthesizing and Executing on a Simulator
+
+We use the Classiq synthesis engine to translate the model to a quantum circuit, and execute on the Classiq simulator:
+
+```python
+qprog = synthesize(
+    main,
+    constraints=Constraints(optimization_parameter="width"),
+)
+
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3FmYG5K1jLoHl7FZBmMzplXsQyl
+  
+
+```
+</Info>
+
+Execute the circuit:
+
+```python
+result = execute(qprog).result_value()
+```
+```python
+
+def equation(a, b, c):
+    return ((a + b) == 3) and ((c - a) == 2)
+
+
+measured_good_shots = 0
+
+for r in result.parsed_counts:
+    a, b, c, aux = (
+        r.state["state"]["a"],
+        r.state["state"]["b"],
+        r.state["state"]["c"],
+        r.state["aux"],
+    )
+    if equation(a, b, c) and (aux == 0):
+        print(
+            f"a: {a}, b: {b}, c: {c}, aux: {aux}, equation_result: {equation(a, b, c)}, counts={r.shots}"
+        )
+        measured_good_shots += r.shots
+
+print("Measured good shots:", measured_good_shots)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+a: 2, b: 1, c: 4, aux: 0, equation_result: True, counts=953
+  a: 3, b: 0, c: 5, aux: 0, equation_result: True, counts=925
+  Measured good shots: 1878
+  
+
+```
+</Info>
+
+What do we expect?
+
+We need to substitute the amplitude of $|s\rangle\langle t|$ in $P(x)$:
+
+```python
+poly_cheb = np.polynomial.Chebyshev(pcoefs)
+p_good_shot = poly_cheb(np.sqrt(2 / 2**6)) ** 2
+print("Expected good shots:", result.num_shots * p_good_shot)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Expected good shots: 1878.189404991538
+  
+
+```
+</Info>
+
+Indeed, we received the expected result according to the polynomial we created with the QSVT sequence:
+
+```python
+import scipy
+
+assert np.isclose(
+    measured_good_shots,
+    result.num_shots * p_good_shot,
+    atol=5 * scipy.stats.binom.std(result.num_shots, p_good_shot),
+)
+```
+
+## References
+
+<a id="grand">\[1]</a>: [Martyn JM, Rossi ZM, Tan AK, Chuang IL. Grand unification of quantum algorithms. PRX Quantum. 2021 Dec 3;2(4):040203.](https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.2.040203)

@@ -1,0 +1,173 @@
+---
+title: "Classiq Overview Tutorial"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/tutorials/basic_tutorials/the_classiq_tutorial/classiq_overview_tutorial.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+In this notebook we introduce a typical workflow with Classiq:
+
+- **Designing a quantum model** using the Qmod language and it's accompanied function library.
+- **Synthesizing the model** into a concrete circuit implementation.
+- **Executing the program** on a chosen simulator or quantum hardware.
+- **Post-processing** the results.
+
+Later tutorials dive into each of the above stages, providing hands-on interactive guides that go from the very basics to advanced usage.
+
+To get started, run:
+
+```python
+from classiq import *
+```
+
+If this `import` doesn't work for you, please try `pip install classiq` in your terminal, or refer to [Registration and Installation](https://docs.classiq.io/latest/getting-started/registration_installations/).
+
+## Designing a Quantum Model
+
+Here we will define a quantum function `main` that calculates a simple arithmetic expression:
+
+```python
+@qfunc
+def main(x: Output[QNum], y: Output[QNum]) -> None:
+    allocate(3, x)
+    hadamard_transform(x)
+    y |= x**2 + 1
+```
+
+Explaining the code step-by-step:
+
+1. Allocate 3 qbits for the quantum number `x`, so that it can represent $2^3$ different numbers, from 0 to 7 (for example, the bitstring '010' represents the number 2).
+1. Apply `hadamard_transform` to `x`, creating an equal superposition of all these values.
+1. Assign the desired arithmetic expression's result to the quantum number `y`.
+
+A moment before measurement, we expect the output variables `x` and `y` to be in an equal superposition of the states $|x_i\rangle |y_i=x_i^2+1\rangle$ for $x_is$ from 0 to 
+
+7. In other words, we have designed our quantum model to calculate $x^2 +1$.
+
+## Synthesizing The Model
+
+The function `main` describes the model in a high-level manner: "calculate $x^2+1$ and assign in into `y`". However, it does not specify **how** to implement this calculation - it does not map it to an executable quantum circuit, in terms of elementary quantum gates applied to specific qubits.
+In order to do so, we use Classiq's synthesis engine.
+To do so, simply pass `main` to the synthesis engine to obtain a concrete quantum program `qprog`.
+
+Here we simply call the function `synthesize`.
+
+Later on we will learn to provide configuration details (e.g. which elementary gates are allowed, or what resources we are trying to optimize).
+
+```python
+qprog = synthesize(main)
+```
+
+We can analyze the resulting implementation using Classiq's visualization tool:
+
+```python
+show(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Quantum program link: https://platform.classiq.io/circuit/3DuELJ8DVHRQscHrzbO4x13aoiE
+  
+
+```
+</Info>
+
+This should pop up a web page with something like this:
+
+<center><img src="https://docs.classiq.io/resources/visualization_classiq_workflow.png" alt="vis" /></center>
+
+By clicking the `+` icons on the blocks' top-left corner, we can inspect the gate-level implementation of each functional block.
+
+For example, inspect the complex combination of `H`, `CPHASE`, `CX` and `U` gates that implements the `Power` block.
+
+## Executing The Quantum Program
+
+Now that we have a concrete circuit implementation of the desired model, we can execute it and sample the resulting states of the output variables.
+
+Here we will simply call the function `sample`, which uses Classiq's quantum simulator by default to sample the multiple executions of the quantum program (the default `n_shots` is 2048):
+
+```python
+res = sample(qprog)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+
+Submitting job to simulator
+  Job: https://platform.classiq.io/jobs/3da66afe-a388-44e3-b9a6-34fc7872c2cf
+  
+
+```
+</Info>
+
+Later on we will learn how to execute on hardwares and simulators of our choice and manage advanced executions (for example, hybrid execution that uses classical logic to alter the circuit between runs).
+
+## Post-processing The Results
+
+Having executed the quantum program multiple times (`n_shots`=2048) we can now inspect the possible pairs `x`,`y` that our arithmetic expression allows ($y=x^2+1$).
+
+This can be done by looking into `res` - a `dataframe` that contain all the states that were measured on the output variables, ordered by the number of counts that they were measured.
+
+```python
+res
+```
+|   | x | y  | counts | probability | bitstring |
+| - | - | -- | ------ | ----------- | --------- |
+| 0 | 4 | 17 | 270    | 0.131836    | 010001100 |
+| 1 | 3 | 10 | 266    | 0.129883    | 001010011 |
+| 2 | 7 | 50 | 265    | 0.129395    | 110010111 |
+| 3 | 6 | 37 | 261    | 0.127441    | 100101110 |
+| 4 | 0 | 1  | 258    | 0.125977    | 000001000 |
+| 5 | 2 | 5  | 251    | 0.122559    | 000101010 |
+| 6 | 1 | 2  | 242    | 0.118164    | 000010001 |
+| 7 | 5 | 26 | 235    | 0.114746    | 011010101 |
+
+As expected, all possible values of `x` (integers from 0 to 7) were measured roughly similar number of times, and with each `x` measured, the measurement of `y` satisfies $y=x^2+1$.
+
+Alternatively, you can inspect the histogram of sampled states in the [Classiq IDE](https://platform.classiq.io/jobs).
+
+<center><img src="https://docs.classiq.io/resources/hist_classiq_workflow.png" alt="vis" /></center>
+
+Hovering above each of the histogram bars shows its bitstring and its parsed variables values.
+
+For example, the bitstring '010001100' is parsed as `x`=4, `y`=17, because the first 3 qubits (counting from the right) correspond to `x` and were measured as '100'=4 (in binary), and the other 6 qubits which correspond to `y` were measured as '010001'=
+
+17.
+
+## Summary
+
+In this tutorial, we have gone through a typical workflow using Classiq:
+
+1. Designing a quantum model: the problem we wanted to solve is calculating an arithmetic expression for a given domain of `x` values. We used `hadamard_transform` and arithmetic assignment as our modeling building blocks.
+1. Synthesizing the model into a concrete circuit implementation: we called `synthesize` to let Classiq's synthesis engine take our high-level description and implement it in an executable way.
+1. Executing the program: we called `execute` to run our quantum program multiple times on Classiq's simulator.
+1. Post-processing: We inspected the measured states of `x` and `y` - for each `x` and assured ourselves that they satisfy the desired arithmetic expression.
+
+#
+
+## Food for Thought
+
+You might have noticed that the model discussed here does not truly harness the power of quantum computers: a moment before sampling the qubits, `x` and `y` indeed hold "the answers to all questions" simultaneously (all the pairs `x` and `y` that satisfy the equation), but we cannot access these answers until we measure the qubits, which collapses the superposition and leaves only a single (and randomly chosen) pair of `x` and `y`.
+
+Having said that, we have no choice but to run multiple times (many more than $2^3$ in our case) to make sure that we measure all `x`s of interest. A classical computer could obtain the same information in exactly $2^3$ runs.
+
+Then, why bother?
+
+While pure arithmetic alone may never be a primary task for quantum computers, quantum arithmetic plays a crucial role in many quantum algorithms that do exploit quantum speedup.
+
+For example, it is widely used in oracle functions within Grover's search algorithm and in quantum cryptographic protocols.
+
+## Practice
+
+Edit the arithmetic expression inside `main`, using the `+`, `-`, `**` operators as well as literal numbers of your choice.
+
+Validate that the sampled states of `x` and `y` satsify your arithmetic expression.

@@ -1,0 +1,47 @@
+---
+title: "AI with Classiq"
+icon: "/icons/bulletsharp.svg"
+description: ""
+---
+
+Classiq supports AI-powered quantum development across IDEs and environments. AI agents can model, synthesize, execute, and analyze quantum programs — all in natural language.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Quantum Engineer Plugin" icon="puzzle-piece" href="/user-guide/ai/quantum-engineer-plugin">
+    Enterprise plugin for Claude Code and Cursor. Includes skills for every development phase — modeling, synthesis, execution, analysis — plus live reference lookup.
+  </Card>
+  <Card title="AI Agent in Studio" icon="wand-magic-sparkles" href="/user-guide/ai/studio-agent">
+    Built-in AI assistant in the Classiq Studio. No additional setup — configure your LLM API key and start coding.
+  </Card>
+</CardGroup>
+
+## Local Development Setup
+
+For AI-assisted development outside the Studio, set up the Classiq Library locally so agents have access to examples and documentation.
+
+### Prerequisites
+
+- Python >=3.9, &lt;3.13
+- Git
+- An IDE with an AI assistant (VS Code + Claude Code, Cursor, etc.)
+
+### Setup
+
+1. **Clone the library**
+
+    ```bash
+    git clone https://github.com/Classiq/classiq-library.git
+    cd classiq-library
+    ```
+
+2. **Install the SDK**
+
+    ```bash
+    pip install classiq
+    ```
+
+3. **Open in your IDE** and point it at the `classiq-library` directory.
+
+For the full AI-in-IDE experience — skills, live doc lookup, and Classiq conventions baked in — see the [Quantum Engineer Plugin](/user-guide/ai/quantum-engineer-plugin).

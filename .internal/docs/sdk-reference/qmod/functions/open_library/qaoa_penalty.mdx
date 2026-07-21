@@ -1,0 +1,154 @@
+---
+title: Qaoa Penalty
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `qaoa_mixer_layer` | [Qmod Classiq-library function]. |
+| `qaoa_cost_layer` | [Qmod Classiq-library function]. |
+| `qaoa_layer` | [Qmod Classiq-library function]. |
+| `qaoa_init` | [Qmod Classiq-library function]. |
+| `qaoa_penalty` | [Qmod Classiq-library function]. |
+
+
+### qaoa_mixer_layer
+
+
+<pre><code>qaoa_mixer_layer(
+    b: CReal,
+    target: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the mixer layer for the QAOA algorithm.
+The mixer layer is a sequence of `X` gates applied to each qubit in the target quantum
+array variable.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `b` | `CReal` | The rotation parameter for the mixer layer. | *required* |
+| `target` | `QArray[QBit]` | The target quantum array. | *required* |
+
+
+
+### qaoa_cost_layer
+
+
+<pre><code>qaoa_cost_layer(
+    g: CReal,
+    hamiltonian: CArray[PauliTerm],
+    target: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the cost layer to the QAOA model.
+
+This function integrates the problem-specific cost function into the QAOA model's objective function.
+The cost layer represents the primary objective that the QAOA algorithm seeks to optimize, such as
+minimizing energy or maximizing profit, depending on the application.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `g` | `CReal` | The rotation parameter for the cost layer (prefactor). | *required* |
+| `hamiltonian` | `CArray[PauliTerm]` | The Hamiltonian terms for the QAOA model. | *required* |
+| `target` | `QArray[QBit]` | The target quantum array variable. | *required* |
+
+
+
+### qaoa_layer
+
+
+<pre><code>qaoa_layer(
+    g: CReal,
+    b: CReal,
+    hamiltonian: CArray[PauliTerm],
+    target: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the QAOA layer, which concatenates the cost layer and the mixer layer.
+
+The `qaoa_layer` function integrates both the cost and mixer layers, essential components of the
+Quantum Approximate Optimization Algorithm (QAOA). The cost layer encodes the problem's objective,
+while the mixer layer introduces quantum superposition and drives the search across the solution space.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `g` | `CReal` | The rotation parameter for the cost layer. | *required* |
+| `b` | `CReal` | The rotation parameter for the mixer layer. | *required* |
+| `hamiltonian` | `CArray[PauliTerm]` | The Hamiltonian terms for the QAOA model. | *required* |
+| `target` | `QArray[QBit]` | The target quantum array variable. | *required* |
+
+
+
+### qaoa_init
+
+
+<pre><code>qaoa_init(
+    target: QArray[QBit]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Initializes the QAOA circuit by applying the Hadamard gate to all qubits.
+
+In the Quantum Approximate Optimization Algorithm (QAOA), the initial state is a uniform superposition
+created by applying the Hadamard gate to each qubit. This function prepares the qubits for the subsequent
+application of the cost and mixer layers by preparing them in an equal superposition state.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `target` | `QArray[QBit]` | The target quantum array variable. | *required* |
+
+
+
+### qaoa_penalty
+
+
+<pre><code>qaoa_penalty(
+    num_qubits: CInt,
+    params_list: CArray[CReal],
+    hamiltonian: CArray[PauliTerm],
+    target: QArray[QBit, Literal[&#x27;num_qubits&#x27;]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Applies the penalty layer to the QAOA model.
+
+This function adds a penalty term to the objective function of the QAOA model to
+enforce certain constraints (e.g., binary or integer variables) during the
+optimization process.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `num_qubits` | `CInt` | The number of qubits in the quantum circuit. | *required* |
+| `params_list` | `CArray[CReal]` |  | *required* |
+| `hamiltonian` | `CArray[PauliTerm]` | The Hamiltonian terms for the QAOA model. | *required* |
+| `target` | `QArray[QBit, Literal['num_qubits']]` | The target quantum array variable. | *required* |

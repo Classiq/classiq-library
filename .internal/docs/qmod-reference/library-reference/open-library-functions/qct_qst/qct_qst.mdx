@@ -1,0 +1,429 @@
+---
+title: "Quantum Sine and Cosine Transforms"
+icon: "/icons/bulletsharp.svg"
+---
+
+<Card title="View on GitHub" icon="github" href="https://github.com/Classiq/classiq-library/blob/main/functions/qmod_library_reference/classiq_open_library/qct_qst/qct_qst.ipynb">
+  Open this notebook in GitHub to run it yourself
+</Card>
+
+The quantum Sine and Cosine transforms functions are the quantum analog for the discrete Sine and Cosine transforms.
+
+The **unitary** versions of the type I and type II transforms are defined as follows:
+
+$$
+{\rm DCT}^{(1)}_{jk}(N) = \alpha_{jk}\sqrt{\frac{2}{N-1}} \cos\left(\frac{\pi j k}{N-1}\right), \qquad 
+\alpha_{jk} = \left\{ \begin{array}{l l}
+\frac{1}{\sqrt{2}} & j = 0,N-1 ,\\
+\frac{1}{\sqrt{2}} & k = 0,N-1 ,\\
+1 & \text{else}
+\end{array}
+\right.,
+\qquad j,k = 0\dots,N-1 
+$$
+$$
+{\rm DST}^{(1)}_{jk}(N) = \sqrt{\frac{2}{N+1}} \sin\left(\frac{\pi j k}{N+1}\right), \qquad j,k = 0\dots,N-1 
+$$
+$$
+{\rm DCT}^{(2)}_{jk}(N) = \alpha_{jk}\sqrt{\frac{2}{N}} \cos\left(\frac{\pi (j+1/2) k }{N}\right), \qquad 
+\alpha_{jk} = \left\{ \begin{array}{l l}
+\frac{1}{\sqrt{2}} & k = 0 ,\\
+1 & \text{else}
+\end{array}
+\right.,
+\qquad j,k = 0\dots,N-1 
+$$
+$$
+{\rm DST}^{(2)}_{jk}(N) = \alpha_{jk} \sqrt{\frac{2}{N}} \sin\left(\frac{\pi (j+1/2) (k+1)}{N}\right), \qquad 
+\alpha_{jk} = \left\{ \begin{array}{l l}
+\frac{1}{\sqrt{2}} & k = N-1 ,\\
+1 & \text{else}
+\end{array}
+\right.,
+\qquad j,k = 0\dots,N-1 
+$$
+The open library includes four functions, following the implementation in Ref. \[[1](#qcst)]:
+
+## QCT and QST of type I
+
+Function: `qct_qst_type1`
+
+Arguments:
+
+- `x`: `QArray[QBit]`
+
+The `x` quantum argument is the quantum state on which we apply the transforms, according to the following  unitary on $n\equiv$`x.len` qubits:
+
+$$
+\left(
+\begin{array}{ccc|c}
+{} &{} &{} \\ 
+  {}&{\rm DCT}^{(1)}(2^{n-1}+1) & {}& 0\\
+  {} &{} &{} \\ 
+  \hline
+  {} & 0 & {} & i{\rm DST}^{(1)}(2^{n-1}-1)
+\end{array}
+\right)
+$$
+
+#
+
+## Example
+
+```python
+import numpy as np
+
+from classiq import *
+
+NUM_QUBITS = 4
+execution_preferences = ExecutionPreferences(
+    num_shots=1,
+    backend_preferences=ClassiqBackendPreferences(
+        backend_name=ClassiqSimulatorBackendNames.SIMULATOR_STATEVECTOR
+    ),
+)
+
+
+np.random.seed(123)
+cos_data = np.random.rand(2 ** (NUM_QUBITS - 1) + 1)
+cos_data = cos_data / np.linalg.norm(cos_data)
+sin_data = np.random.rand(2 ** (NUM_QUBITS - 1) - 1)
+sin_data = sin_data / np.linalg.norm(sin_data)
+
+combined_data = np.append(cos_data / np.sqrt(2), sin_data / np.sqrt(2))
+```
+```python
+
+@qfunc
+def main(x: Output[QNum]):
+    prepare_amplitudes(combined_data.tolist(), 0.0, x)
+    qct_qst_type1(x)
+
+
+qmod = create_model(main, execution_preferences=execution_preferences)
+```
+```python
+
+qprog = synthesize(qmod)
+```
+```python
+
+result = execute(qprog).result_value()
+```
+```python
+
+qct_data = np.zeros(2 ** (NUM_QUBITS - 1) + 1).astype(complex)
+qst_data = np.zeros(2 ** (NUM_QUBITS - 1) - 1).astype(complex)
+for sample in result.parsed_state_vector:
+    value = int(sample.state["x"])
+    if value < 2 ** (NUM_QUBITS - 1) + 1:
+        qct_data[value] += sample.amplitude
+    else:
+        qst_data[int(value - 2 ** (NUM_QUBITS - 1) - 1)] += sample.amplitude
+```
+```python
+
+def dct1(n):
+    dct = np.array(
+        [
+            [
+                np.cos(np.pi * j * k / (n - 1))
+                * (np.sqrt(1 / 2) if j == 0 or j == n - 1 else 1)
+                * (np.sqrt(1 / 2) if k == 0 or k == n - 1 else 1)
+                for j in range(n)
+            ]
+            for k in range(n)
+        ]
+    ) / np.sqrt((n - 1) / 2)
+    return dct
+
+
+def dst1(n):
+    dst = np.array(
+        [
+            [np.sin(np.pi * (j + 1) * (k + 1) / (n + 1)) for j in range(n)]
+            for k in range(n)
+        ]
+    ) / np.sqrt((n + 1) / 2)
+
+    return dst
+```
+```python
+
+global_phase = np.exp(1j * np.angle(qct_data[0]))
+measured_cos_res = np.real(qct_data / global_phase)
+expected_cos_res = (dct1(2 ** (NUM_QUBITS - 1) + 1) @ cos_data) / np.sqrt(2)
+print("measured result:", measured_cos_res)
+print("expected result:", expected_cos_res)
+
+assert np.allclose(measured_cos_res, expected_cos_res, atol=0.01)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+measured result: [ 0.64936034 -0.13662084  0.02159456  0.08089956  0.06722088  0.18669631
+    0.02254746 -0.01198615  0.1123771 ]
+  expected result: [ 0.64936034 -0.13662084  0.02159456  0.08089956  0.06722088  0.18669631
+    0.02254746 -0.01198615  0.1123771 ]
+  
+
+```
+</Info>
+
+```python
+global_phase = np.exp(1j * np.angle(qst_data[0]))
+measured_sin_res = np.real(qst_data / global_phase)
+expected_sin_res = (dst1(2 ** (NUM_QUBITS - 1) - 1) @ sin_data) / np.sqrt(2)
+print("measured result:", measured_sin_res)
+print("expected result:", expected_sin_res)
+
+assert np.allclose(measured_sin_res, expected_sin_res, atol=0.01)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+measured result: [ 0.57556991  0.04712138  0.22433696 -0.27513447  0.17796799  0.07685908
+    0.05378552]
+  expected result: [ 0.57556991  0.04712138  0.22433696 -0.27513447  0.17796799  0.07685908
+    0.05378552]
+  
+
+```
+</Info>
+
+## QCT and QST of type II
+
+Function: `qct_qst_type2`
+
+Arguments:
+
+- `x`: `QArray[QBit]`,
+- `q`: `QBit`
+
+The `x` quantum argument is the quantum state on which we apply the transforms, whereas the single `q` qubit indicates the block, according to the following unitary on $n+1\equiv$ `x.len` $+1$ qubits:
+
+$$
+\left(
+\begin{array}{c|c}
+  {\rm DCT}^{(2)}(2^{n-1}) & 0\\
+  \hline
+  0 & -{\rm DST}^{(2)}(2^{n-1})
+\end{array}
+\right)
+$$
+Function: `qct_type2`
+
+Arguments:
+
+- `x`: `QArray[QBit]`: the quantum state on which we apply ${\rm DCT}^{(2)}$.
+
+Function: `qst_type2`
+
+Arguments:
+
+- `x`: `QArray[QBit]`: the quantum state on which we apply ${\rm DST}^{(2)}$.
+
+#
+
+## Example
+
+```python
+NUM_QUBITS = 4
+cos_sin_data = np.random.rand(2 ** (NUM_QUBITS - 1))
+cos_sin_data = cos_sin_data / np.linalg.norm(cos_sin_data)
+```
+```python
+
+@qfunc
+def main(x: Output[QNum], q: Output[QBit]):
+    prepare_amplitudes(cos_sin_data.tolist(), 0.0, x)
+    allocate(q)
+    H(q)
+    qct_qst_type2(x, q)
+
+
+qmod = create_model(main, execution_preferences=execution_preferences)
+```
+```python
+
+qprog = synthesize(qmod)
+```
+```python
+
+result = execute(qprog).result_value()
+```
+```python
+
+qct_data = np.zeros(2 ** (NUM_QUBITS - 1)).astype(complex)
+qst_data = np.zeros(2 ** (NUM_QUBITS - 1)).astype(complex)
+for sample in result.parsed_state_vector:
+    if sample.state["q"] == 0:
+        qct_data[int(sample.state["x"])] += sample.amplitude
+    else:
+        qst_data[int(sample.state["x"])] += sample.amplitude
+```
+```python
+
+def dct2(n):
+    dct = np.array(
+        [
+            [
+                np.cos(np.pi * j * (k + 1 / 2) / n) * (np.sqrt(1 / 2) if j == 0 else 1)
+                for j in range(n)
+            ]
+            for k in range(n)
+        ]
+    ) / np.sqrt(n / 2)
+    return dct.T
+
+
+def dst2(n):
+    dst = np.array(
+        [
+            [
+                np.sin(np.pi * (j + 1) * (k + 1 / 2) / n)
+                * (np.sqrt(1 / 2) if j == n - 1 else 1)
+                for j in range(n)
+            ]
+            for k in range(n)
+        ]
+    ) / np.sqrt(n / 2)
+    return dst.T
+```
+```python
+
+global_phase = np.exp(1j * np.angle(qct_data[0]))
+measured_cos_res = np.real(qct_data / global_phase)
+expected_cos_res = (dct2(2 ** (NUM_QUBITS - 1)) @ cos_sin_data) / np.sqrt(2)
+print("measured result:", measured_cos_res)
+print("expected result:", expected_cos_res)
+
+assert np.allclose(measured_cos_res, expected_cos_res, atol=0.01)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+measured result: [ 0.65104654 -0.23305325 -0.11473439  0.02595719 -0.04930425  0.03323495
+    0.06553173  0.01252819]
+  expected result: [ 0.65104654 -0.23305325 -0.11473439  0.02595719 -0.04930425  0.03323495
+    0.06553173  0.01252819]
+  
+
+```
+</Info>
+
+```python
+global_phase = np.exp(1j * np.angle(qst_data[0]))
+measured_sin_res = np.real(qst_data / global_phase)
+expected_sin_res = (dst2(2 ** (NUM_QUBITS - 1)) @ cos_sin_data) / np.sqrt(2)
+print("measured result:", measured_sin_res)
+print("expected result:", expected_sin_res)
+
+assert np.allclose(measured_sin_res, expected_sin_res, atol=0.01)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+measured result: [ 0.63981132 -0.2180174   0.13530848 -0.08552637  0.02796936 -0.03450769
+    0.12370004 -0.01455965]
+  expected result: [ 0.63981132 -0.2180174   0.13530848 -0.08552637  0.02796936 -0.03450769
+    0.12370004 -0.01455965]
+  
+
+```
+</Info>
+
+```python
+@qfunc
+def main(x: Output[QNum]):
+    prepare_amplitudes(cos_sin_data.tolist(), 0.0, x)
+    qct_type2(x)
+
+
+qmod = create_model(main, execution_preferences=execution_preferences)
+
+qprog = synthesize(qmod)
+
+result = execute(qprog).result_value()
+qct_data = np.zeros(2 ** (NUM_QUBITS - 1)).astype(complex)
+
+for sample in result.parsed_state_vector:
+    qct_data[int(sample.state["x"])] += sample.amplitude
+
+global_phase = np.exp(1j * np.angle(qct_data[0]))
+measured_cos_res = np.real(qct_data / global_phase)
+expected_cos_res = dct2(2 ** (NUM_QUBITS - 1)) @ cos_sin_data
+print("measured result:", measured_cos_res)
+print("expected result:", expected_cos_res)
+
+assert np.allclose(measured_cos_res, expected_cos_res, atol=0.01)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+measured result: [ 0.92071884 -0.32958707 -0.16225893  0.03670901 -0.06972674  0.04700132
+    0.09267587  0.01771754]
+  expected result: [ 0.92071884 -0.32958707 -0.16225893  0.03670901 -0.06972674  0.04700132
+    0.09267587  0.01771754]
+  
+
+```
+</Info>
+
+```python
+@qfunc
+def main(x: Output[QNum]):
+    prepare_amplitudes(cos_sin_data.tolist(), 0.0, x)
+    qst_type2(x)
+
+
+qmod = create_model(main, execution_preferences=execution_preferences)
+
+qprog = synthesize(qmod)
+result = execute(qprog).result_value()
+qst_data = np.zeros(2 ** (NUM_QUBITS - 1)).astype(complex)
+
+for sample in result.parsed_state_vector:
+    qst_data[int(sample.state["x"])] += sample.amplitude
+
+global_phase = np.exp(1j * np.angle(qst_data[0]))
+measured_sin_res = np.real(qst_data / global_phase)
+expected_sin_res = dst2(2 ** (NUM_QUBITS - 1)) @ cos_sin_data
+print("measured result:", measured_sin_res)
+print("expected result:", expected_sin_res)
+
+assert np.allclose(measured_sin_res, expected_sin_res, atol=0.01)
+```
+<Info>
+  **Output:**
+
+  
+
+```
+measured result: [ 0.90482984 -0.30832317  0.19135509 -0.12095255  0.03955464 -0.04880124
+    0.17493827 -0.02059046]
+  expected result: [ 0.90482984 -0.30832317  0.19135509 -0.12095255  0.03955464 -0.04880124
+    0.17493827 -0.02059046]
+  
+
+```
+</Info>
+
+## References
+
+<a id="qcst">\[1]</a>: [Klappenecker, A., & Rotteler M., "Discrete Cosine Transforms on Quantum Computers".](https://arxiv.org/abs/quant-ph/0111038)

@@ -1,0 +1,61 @@
+---
+title: Variational
+icon: "/icons/bulletsharp.svg"
+---
+
+Functions:
+
+| Name | Description |
+| ---- | ----------- |
+| `encode_in_angle` | [Qmod Classiq-library function]. |
+| `encode_on_bloch` | [Qmod Classiq-library function]. |
+
+
+### encode_in_angle
+
+
+<pre><code>encode_in_angle(
+    data: CArray[CReal],
+    qba: Output[QArray[QBit]]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Creates an angle encoding of n data points on n qubits.
+
+Applies RY($\pi$data[i]) on qba[i].
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `data` | `CArray[CReal]` | A classical array representing the data to encode. | *required* |
+| `qba` | `Output[QArray[QBit]]` | The array of qubits on which the data is encoded. | *required* |
+
+
+
+### encode_on_bloch
+
+
+<pre><code>encode_on_bloch(
+    data: CArray[CReal],
+    qba: Output[QArray]
+) -> None</code></pre>
+
+
+[Qmod Classiq-library function]
+
+Creates a dense angle encoding of n data points on n//2 qubits.
+
+Encodes pairs of data points on a Bloch sphere, via RX($\pi$data[2*i])RZ($\pi$data[2*i+1]) on qba[i].
+If the length of the data is odd then RX($\pi$data[i]) is applied on the last qubit.
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+| `data` | `CArray[CReal]` | A classical array representing the data to encode. | *required* |
+| `qba` | `Output[QArray]` | The QArray of QBits on which the data is encoded. | *required* |
