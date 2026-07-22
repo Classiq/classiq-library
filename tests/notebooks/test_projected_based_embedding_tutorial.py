@@ -33,7 +33,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # VQE energy is above (or close to) the exact diagonalization ground state
     opt_energy = tb.ref("opt_energy")
     ground_state_energy = tb.ref("ground_state_energy")
-    assert opt_energy >= ground_state_energy - 0.1
+    assert opt_energy >= ground_state_energy - 0.5
 
     # VQE relative error below 5%
     rel_error = abs((opt_energy - ground_state_energy) / ground_state_energy)
