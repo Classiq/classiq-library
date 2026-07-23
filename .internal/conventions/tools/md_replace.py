@@ -23,6 +23,7 @@ made, exits 1 (no write) only if nothing matched at all.
 Writes JSON-aware (indent=1, ensure_ascii=False) so the diff stays minimal and
 unicode is preserved literally; pre-commit canonicalises afterward.
 """
+
 import json
 import re
 import sys

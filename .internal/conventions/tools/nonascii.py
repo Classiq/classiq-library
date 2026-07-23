@@ -5,6 +5,7 @@ should be preserved) and whether each char sits inside a code span (left alone).
 
     python3 nonascii.py <notebook.ipynb>
 """
+
 import json, re, sys, unicodedata
 from collections import Counter
 

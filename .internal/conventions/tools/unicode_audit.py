@@ -7,6 +7,7 @@ A `grep [^\\x00-\\x7f]`-style sweep, but notebook-aware: it separates
 and groups by character with name, counts, and an example — so we can see what
 remains and decide what's fine vs. what to also normalize.
 """
+
 import glob, json, re, sys, unicodedata
 from collections import defaultdict
 
