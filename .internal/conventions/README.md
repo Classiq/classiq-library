@@ -9,9 +9,9 @@ voice across the ~217 notebooks. Run everything from the **repo root**.
   notebooks, runs every point, and scores coverage:
 
   ```bash
-  python3 .internal/conventions/report.py                    # detailed cards (default)
-  python3 .internal/conventions/report.py --table            # compact status table
-  python3 .internal/conventions/report.py --table --full     # + a legend for the jargon
+  python3 .internal/conventions/report.py                    # compact status table (default)
+  python3 .internal/conventions/report.py --cards            # detailed per-point cards
+  python3 .internal/conventions/report.py --full             # + a legend for the jargon
   python3 .internal/conventions/report.py --rule math --list # offending paths only
   ```
 

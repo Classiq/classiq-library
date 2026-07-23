@@ -64,6 +64,7 @@ class Point:
     detect: Callable[[Notebook], list[str]]  # offenders; [] means it conforms
     fix: Optional[Callable[[list], bool]] = None  # static in-place fix, or None
     enforced: bool = False  # wired into the pre-commit hook?
+    status: str = "active"  # lifecycle: "active" | "outdated" | "dropped"
     exceptions: tuple = field(default_factory=tuple)  # (path_fragment, reason)
 
     def tags(self) -> list[str]:

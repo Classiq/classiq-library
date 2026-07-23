@@ -22,5 +22,6 @@ POINT = Point(
     "df / dfs (DataFrame) — by what the variable holds.",
     static=False,
     detect=detect,
+    status="outdated",
     exceptions=(("qaoa_in_qaoa", "vqe_result is a keyword-argument name"),),
 )

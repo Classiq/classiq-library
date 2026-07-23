@@ -30,5 +30,6 @@ POINT = Point(
     static=True,
     detect=detect,
     fix=fix,
-    enforced=True,
+    enforced=True,  # still auto-fixed by the hook, though the rule is now superseded
+    status="outdated",
 )
