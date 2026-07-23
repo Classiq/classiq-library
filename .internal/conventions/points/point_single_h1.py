@@ -39,5 +39,5 @@ POINT = Point(
     static=True,
     detect=detect,
     fix=fix,
-    enforced=False,  # fix() is ready, but not yet wired into the hook (PR #1642)
+    enforced=True,  # wired into the pre-commit hook via PR #1642
 )
