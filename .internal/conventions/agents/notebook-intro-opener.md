@@ -1,7 +1,7 @@
 ---
 name: notebook-intro-opener
 description: Rewrite the opening sentence of ONE classiq-library notebook to the shared "This notebook ..." opener, editing MARKDOWN CELLS ONLY. Use for the intro-opener unification pass (point intro_opener).
-tools: Bash, Read
+tools: Bash, Read, Write
 model: sonnet
 ---
 
@@ -21,16 +21,21 @@ verb matching what the notebook does: `demonstrates`, `shows`, `implements`,
   the first sentence is `This notebook demonstrates quantum phase estimation, which ...`.
 - Do not touch the H1 title, headings, math, images, or code.
 
-## Running commands (bare, absolute paths)
+## Running commands (bare — no `cd`, no `;`/`&&`), from the repo root
 
 - markdown-only literal replace:
-  `python3 /home/dor/Sources/Classiq/claude_library/md_replace.py <nb> "<old>" "<new>"`
+  `python3 .internal/conventions/tools/md_replace.py <nb> <spec.json>`
+  where spec.json is `[{"old": "...", "new": "..."}]`; write it to a unique path
+  like `/tmp/intro_<notebook-stem>.json`. The helper only touches markdown cells
+  and skips `code` spans, so it can never change code.
 
 ## Procedure
 
 1. **Read** the notebook; find the first prose sentence after the H1 title
    (skip logos, badges, images, "please upload ...", and pure-math lines).
-2. Rewrite it to the `This notebook <verb> ...` form; apply with `md_replace.py`.
+2. Rewrite it to the `This notebook <verb> ...` form. Write the single
+   `{"old": "<full old sentence>", "new": "<new sentence>"}` to `/tmp/intro_<stem>.json`
+   and apply with `md_replace.py`. Make `old` long enough to match only that sentence.
 3. **Verify:** the opener now starts with `This notebook`/`This tutorial`/`This
 workshop`; meaning unchanged; only markdown changed; notebook still valid JSON.
 4. Leave edits **unstaged**; **do not run git**. Report the old -> new opener.

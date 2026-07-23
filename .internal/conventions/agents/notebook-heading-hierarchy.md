@@ -21,11 +21,11 @@ not `cd somewhere && sed ...`.
 1. Get the heading outline (fence-aware `grep ^#`, with cell indices):
 
    ```bash
-   python3 heading_outline.py <notebook-path>
+   python3 .internal/conventions/tools/heading_outline.py <notebook-path>
    ```
 
-   Run it from the primary working directory; the path may be given relative to
-   that directory or to the `classiq-library/` repo — the script resolves both.
+   Run it from the repo root; the notebook path may be absolute or relative to the
+   repo — the script resolves both.
 
 2. Judge whether the hierarchy is **reasonable**. Reasonable means:
 
