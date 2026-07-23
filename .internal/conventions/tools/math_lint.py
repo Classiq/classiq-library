@@ -9,6 +9,7 @@ Checks per markdown cell:
   - no [$$...$$](  — a markdown link-label wrongly turned into math
   - no leftover \\[ or \\] that became unbalanced
 """
+
 import glob, json, re, sys
 
 
