@@ -10,7 +10,7 @@ You standardize the **execution-result variable name** in a single notebook. Edi
 
 ## Running commands (bare — no `cd`, no `;`/`&&`), absolute paths:
 
-- rename: `python3 /home/dor/Sources/Classiq/claude_library/rename_var.py <nb> <old> <new>`
+- rename: `python3 .internal/conventions/tools/rename_var.py <nb> <old> <new>`
   (whole-word, code-cells-only, refuses on collision so two vars never merge)
 
 ## The rule
