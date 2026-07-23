@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Rename a variable in a notebook's CODE CELLS ONLY (whole-word), json-aware.
 
-    python3 rename_var.py <notebook.ipynb> <old_var> <new_var>
+    python3 rename_var.py <notebook.ipynb> <old_var> <new_var> [--in-cells-with=SUBSTR]
 
 - Whole-word `old_var` -> `new_var` in code cells only (markdown untouched).
+- `--in-cells-with=SUBSTR` scopes the rename (and the collision check) to code
+  cells whose source contains SUBSTR — for a name overloaded across cells (e.g.
+  `res` is an execution result in one cell and a register param in another).
 - Refuses (collision) if `new_var` already appears as a word in the code cells,
   so two distinct variables are never merged.
 - Reports the replacement count; NO-OP (exit 1) if `old_var` isn't found.
@@ -11,15 +14,26 @@
 Writes JSON-aware (indent=1, ensure_ascii=False) for a minimal diff; pre-commit
 canonicalises afterward.
 """
+
 import json
 import re
 import sys
 
 
 def main() -> int:
-    path, old, new = sys.argv[1], sys.argv[2], sys.argv[3]
+    args = [a for a in sys.argv[1:] if not a.startswith("--in-cells-with=")]
+    marker = next(
+        (a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--in-cells-with=")),
+        None,
+    )
+    path, old, new = args[0], args[1], args[2]
     nb = json.load(open(path))
     code_cells = [c for c in nb.get("cells", []) if c.get("cell_type") == "code"]
+    # `--in-cells-with=SUBSTR` scopes the rename (and its collision check) to code
+    # cells containing SUBSTR — used when a name is overloaded (e.g. `res` is both an
+    # execution result and a quantum-register param in a different cell).
+    if marker is not None:
+        code_cells = [c for c in code_cells if marker in "".join(c["source"])]
     joined = "\n".join("".join(c["source"]) for c in code_cells)
 
     # A real collision is `new` used as an identifier. Ignore attribute access
