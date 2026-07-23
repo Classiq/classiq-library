@@ -13,6 +13,7 @@ notebooks, runs each point's `detect()`, and renders the status.
 import argparse
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -106,7 +107,16 @@ def main() -> None:
         print("\n".join(files))
         return
 
-    print(f"NOTEBOOK CONVENTIONS  —  {len(nbs)} notebooks, {len(points)} points")
+    groups = Counter(_group(nb.rel) for nb in nbs)
+    print(
+        f"NOTEBOOK CONVENTIONS  —  {len(nbs)} notebooks "
+        f"(main {groups['main']}, community {groups['community']}, other {groups['other']})"
+        f"  ·  {len(points)} points"
+    )
+    print(
+        "  main = algorithms+applications+tutorials (the CI-tested core); "
+        "community + functions are not"
+    )
     for point in points:
         render(point, nbs, args.short)
 

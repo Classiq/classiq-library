@@ -2,7 +2,7 @@
 """Pre-commit hook: auto-fix simple notebook-uniformity conventions.
 
 This is the enforcement counterpart to the read-only audit in
-``.internal/notebook_uniformity_report.py`` — a home for the uniformity rules
+``.internal/conventions/report.py`` — a home for the uniformity rules
 that are simple and safe enough to fix automatically.
 
 Each rule edits the notebook in place when ``auto_fix`` is set and returns a
