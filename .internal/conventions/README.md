@@ -9,10 +9,14 @@ voice across the ~217 notebooks. Run everything from the **repo root**.
   notebooks, runs every point, and scores coverage:
 
   ```bash
-  python3 .internal/conventions/report.py            # full view
-  python3 .internal/conventions/report.py --short    # one line per point
-  python3 .internal/conventions/report.py --rule math --list   # offending paths only
+  python3 .internal/conventions/report.py                    # detailed cards (default)
+  python3 .internal/conventions/report.py --table            # compact status table
+  python3 .internal/conventions/report.py --table --full     # + a legend for the jargon
+  python3 .internal/conventions/report.py --rule math --list # offending paths only
   ```
+
+  Add `--files` to list every offender (the card view shows a short preview),
+  and `--color`/`--no-color` to override the auto terminal detection.
 
 - **`STATUS.md`** — every point: done / open / enforced, the caveats, and how to resume it.
 - **`agents/`** — subagent mission docs for the judgement-heavy points: heading
