@@ -20,4 +20,5 @@ POINT = Point(
     description="The first sentence opens with 'This notebook ...' (or tutorial/workshop). (approximate)",
     static=False,
     detect=detect,
+    status="dropped",
 )

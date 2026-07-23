@@ -24,4 +24,5 @@ POINT = Point(
     static=True,
     detect=detect,
     fix=None,  # migration reshapes cells; done by the team's migration, not a regex
+    status="outdated",
 )

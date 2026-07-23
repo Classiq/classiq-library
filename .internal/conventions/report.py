@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Notebook-convention status — one small file per point, collected here.
 
-    python3 .internal/conventions/report.py                      # detailed cards (default)
-    python3 .internal/conventions/report.py --table              # compact status table
-    python3 .internal/conventions/report.py --full               # spell out the jargon
+    python3 .internal/conventions/report.py                      # compact status table (default)
+    python3 .internal/conventions/report.py --cards              # detailed per-point cards
+    python3 .internal/conventions/report.py --full               # spell out the jargon (legend)
     python3 .internal/conventions/report.py --files              # list every offender
     python3 .internal/conventions/report.py --rule math --list   # offender paths only
 
@@ -34,6 +34,20 @@ GROUPS = ("main", "community", "other")
 PREVIEW = 5  # offender paths shown per point in the card view
 GOOD_PCT = 80  # >= this (but < 100) renders yellow; below, red; 100 is green
 
+# presentation order, top to bottom; points not listed fall to the end (alphabetical)
+ORDER = [
+    # title & headings
+    "opens_h1", "single_h1", "headings", "title_case", "section_vocab",
+    # prose & notation
+    "math", "unicode", "references",
+    # code & circuit
+    "def_main", "synthesize_main", "qprog_var", "show",
+    # parked — superseded by the execution-API refactor
+    "execution_interface", "result_value", "result_var",
+    # parked — decided against
+    "intro_opener",
+]  # fmt: skip
+
 # short tag -> the sentence `--full` expands it into
 TAG_HELP = {
     "static": "detected by a script",
@@ -41,6 +55,15 @@ TAG_HELP = {
     "enforced": "wired into the pre-commit hook",
     "check": "detect-only — no safe automatic fix",
     "auto-fix": "the hook fixes it automatically",
+}
+# a point's lifecycle status (other than "active") -> its (short, long) label,
+# shown dimmed in place of the score
+PARKED = {
+    "outdated": (
+        "old",
+        "superseded by the execution-API refactor; kept for the record",
+    ),
+    "dropped": ("dropped", "decided not to pursue this convention"),
 }
 APPROX = "(approximate)"
 APPROX_FULL = (
@@ -53,7 +76,9 @@ APPROX_FULL = (
 
 def load_points() -> list[Point]:
     mods = sorted((HERE / "points").glob("point_*.py"))
-    return [importlib.import_module(f"points.{m.stem}").POINT for m in mods]
+    points = [importlib.import_module(f"points.{m.stem}").POINT for m in mods]
+    rank = {title: i for i, title in enumerate(ORDER)}
+    return sorted(points, key=lambda p: (rank.get(p.title, len(ORDER)), p.title))
 
 
 def load_notebooks() -> list[Notebook]:
@@ -68,6 +93,10 @@ def load_notebooks() -> list[Notebook]:
 def _group(rel: str) -> str:
     top = rel.split("/")[0]
     return "main" if top in MAIN else ("community" if top == "community" else "other")
+
+
+def _active(point: Point) -> bool:
+    return point.status == "active"
 
 
 # --- analysis -------------------------------------------------------------
@@ -151,7 +180,9 @@ def _glyph(r: PointResult) -> str:
     return "✓" if r.conforms else "→"
 
 
-def _mark(r: PointResult) -> str:  # the colored glyph (conforming <=> 100% <=> green)
+def _mark(r: PointResult) -> str:  # parked = neutral dot; else colored ✓/→ by percent
+    if not _active(r.point):
+        return Ansi.paint("·", Ansi.DIM)
     return Ansi.paint(_glyph(r), _pct_color(r.pct))
 
 
@@ -163,6 +194,11 @@ def _tags(point: Point, full: bool) -> str:
     if not full:
         return " · ".join(point.tags())
     return " · ".join(f"{t} — {TAG_HELP[t]}" for t in point.tags())
+
+
+def _status_label(point: Point, full: bool) -> str:
+    short, long = PARKED[point.status]
+    return long if full else short
 
 
 def _description(point: Point, full: bool) -> str:
@@ -180,11 +216,15 @@ def _print_paths(offenders: list[Notebook], indent: str, cap: int | None) -> Non
 
 
 def _print_legend(results: list[PointResult]) -> None:
-    used = {t for r in results for t in r.point.tags()}
+    used_tags = {t for r in results for t in r.point.tags()}
+    parked = {r.point.status for r in results if not _active(r.point)}
     print(Ansi.paint("\n  legend", Ansi.BOLD))
     for tag, help_text in TAG_HELP.items():  # keep declaration order
-        if tag in used:
+        if tag in used_tags:
             print(Ansi.paint(f"    {tag:11} {help_text}", Ansi.DIM))
+    for status, (short, long) in PARKED.items():
+        if status in parked:
+            print(Ansi.paint(f"    {short:11} {long}", Ansi.DIM))
     if any(_is_approx(r.point) for r in results):
         print(Ansi.paint(f"    {'approximate':11} {APPROX_FULL}", Ansi.DIM))
 
@@ -218,44 +258,47 @@ def render_cards(
     for r in results:
         p = r.point
         detail = p.detail if p.static else f"agent: {p.detail}"
-        split = " · ".join(f"{g} {ok}/{tot}" for g, (ok, tot) in r.counts.items())
-        pct = Ansi.paint(f"{r.pct}%", _pct_color(r.pct))
         print(f"\n{_mark(r)} {Ansi.paint(p.title, Ansi.BOLD)}   [{_tags(p, full)}]")
         print(Ansi.paint(f"      {detail}", Ansi.DIM))
         print(f"      {_description(p, full)}")
+        if not _active(p):  # parked: a dim status line, no score, no offenders
+            print(Ansi.paint(f"      {_status_label(p, full)}", Ansi.DIM))
+            continue
+        split = " · ".join(f"{g} {ok}/{tot}" for g, (ok, tot) in r.counts.items())
+        pct = Ansi.paint(f"{r.pct}%", _pct_color(r.pct))
         print(f"      {r.ok}/{r.total} ({pct})    {Ansi.paint(split, Ansi.DIM)}")
         if show_files is not False and r.offenders:  # False hides; None caps; True all
             _print_paths(r.offenders, " " * 9, cap=None if show_files else PREVIEW)
 
 
+def _table_row(r: PointResult) -> tuple[tuple, list[str | None]]:
+    p = r.point
+    fracs = tuple(_frac(r.counts[g]) for g in GROUPS) + (_frac((r.ok, r.total)),)
+    kind = " · ".join(p.tags())
+    if not _active(p):  # a dim row; the score column carries the status label
+        cells = ("·", p.title, *fracs, _status_label(p, full=False), kind)
+        return cells, [Ansi.DIM] * len(cells)
+    cells = (_glyph(r), p.title, *fracs, f"{r.pct}%", kind)
+    colors: list[str | None] = [None] * len(cells)
+    colors[0] = colors[6] = _pct_color(r.pct)  # the mark and the % column
+    return cells, colors
+
+
 def render_table(results: list[PointResult], show_files: bool | None) -> None:
     head = ("", "point", "main", "community", "other", "all", "%", "kind")
-    rows = [
-        (
-            _glyph(r),
-            r.point.title,
-            _frac(r.counts["main"]),
-            _frac(r.counts["community"]),
-            _frac(r.counts["other"]),
-            _frac((r.ok, r.total)),
-            f"{r.pct}%",
-            " · ".join(r.point.tags()),
-        )
-        for r in results
-    ]
+    built = [_table_row(r) for r in results]
+    rows = [cells for cells, _ in built]
     widths = [max(map(len, col)) for col in zip(head, *rows)]
 
     print()
     _emit_row(head, widths, [Ansi.BOLD] * len(head))
     print("  " + Ansi.paint("─" * (sum(widths) + 2 * (len(widths) - 1)), Ansi.DIM))
-    for r, row in zip(results, rows):
-        colors: list[str | None] = [None] * len(row)
-        colors[0] = colors[6] = _pct_color(r.pct)  # the mark and the % column
-        _emit_row(row, widths, colors)
+    for cells, colors in built:
+        _emit_row(cells, widths, colors)
 
-    if show_files:  # --files: the full offender list per point, below the table
+    if show_files:  # --files: the full offender list per active point, below the table
         for r in results:
-            if r.offenders:
+            if _active(r.point) and r.offenders:
                 print(f"\n{_mark(r)} {Ansi.paint(r.point.title, Ansi.BOLD)}")
                 _print_paths(r.offenders, " " * 4, cap=None)
 
@@ -273,12 +316,12 @@ def main() -> None:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     ap.add_argument(
-        "--table", action="store_true", help="compact one-row-per-point table"
+        "--cards", action="store_true", help="detailed per-point cards (default: table)"
     )
     ap.add_argument(
         "--full",
         action="store_true",
-        help="expand the jargon (tags, 'approximate') with a legend and explanations",
+        help="expand the jargon (tags, statuses, 'approximate') with a legend",
     )
     ap.add_argument(
         "--files",
@@ -305,22 +348,26 @@ def main() -> None:
     _setup_color(args.color)
     nbs, points = load_notebooks(), load_points()
     if args.rule:
-        points = [p for p in points if p.title == args.rule]
-        if not points:
-            titles = ", ".join(sorted(p.title for p in load_points()))
-            sys.exit(f"unknown rule '{args.rule}'. available: {titles}")
+        chosen = [p for p in points if p.title == args.rule]
+        if not chosen:
+            sys.exit(
+                f"unknown rule '{args.rule}'. "
+                f"available: {', '.join(sorted(p.title for p in points))}"
+            )
+        points = chosen
 
     results = [evaluate(p, nbs) for p in points]
 
-    if args.list:  # bare paths, for `... --list | xargs fixer`
-        print("\n".join(sorted({nb.rel for r in results for nb in r.offenders})))
+    if args.list:  # bare paths, for `... --list | xargs fixer`; parked points skipped
+        src = results if args.rule else [r for r in results if _active(r.point)]
+        print("\n".join(sorted({nb.rel for r in src for nb in r.offenders})))
         return
 
     _print_header(nbs, points)
-    if args.table:
-        render_table(results, show_files=args.files)
-    else:
+    if args.cards:
         render_cards(results, full=args.full, show_files=args.files)
+    else:
+        render_table(results, show_files=args.files)
     if args.full:
         _print_legend(results)
 
