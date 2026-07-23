@@ -37,7 +37,7 @@ GOOD_PCT = 80  # >= this (but < 100) renders yellow; below, red; 100 is green
 # presentation order, top to bottom; points not listed fall to the end (alphabetical)
 ORDER = [
     # title & headings
-    "opens_h1", "single_h1", "headings", "title_case", "section_vocab",
+    "opens_h1", "single_h1", "headings", "title_case",
     # prose & notation
     "math", "unicode", "references",
     # code & circuit
@@ -47,6 +47,11 @@ ORDER = [
     # parked — decided against
     "intro_opener",
 ]  # fmt: skip
+# `section_vocab` was intentionally removed (not parked): its detector flagged long /
+# sentence-like headings, but most were good, specific titles (e.g. "The Elliptic Curve
+# Discrete Logarithm Problem") that a fixed vocabulary would only flatten — a high
+# false-positive rate and the same over-correction risk as title_case, but worse (it
+# rewrites whole headings, not just casing). Kept this note so it isn't naively re-added.
 
 # short tag -> the sentence `--full` expands it into
 TAG_HELP = {
