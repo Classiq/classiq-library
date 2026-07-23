@@ -1,7 +1,7 @@
 # Notebook convention tooling
 
 The kit for keeping the library's notebooks reading as **one entity** — a single
-voice across the ~217 notebooks. Run everything from the **repo root**.
+voice across the ~219 notebooks. Run everything from the **repo root**.
 
 - **`report.py`** + **`points/`** — the read-only audit. Each convention is one
   small `points/point_*.py` (a title, a before/after example, a `detect()`, and
@@ -20,8 +20,8 @@ voice across the ~217 notebooks. Run everything from the **repo root**.
 
 - **`STATUS.md`** — every point: done / open / enforced, the caveats, and how to resume it.
 - **`agents/`** — subagent mission docs for the judgement-heavy points: heading
-  hierarchy, math notation, unicode cleanup, title case, section vocabulary, intro
-  opener, variable names.
+  hierarchy, math notation, unicode cleanup, title case, intro opener, and
+  variable names.
 - **`tools/`** — helpers the agents and audits call: `md_replace`, `rename_var`,
   `nonascii`, `math_lint`, `heading_outline`, `heading_stats`, `unicode_audit`.
 - **`one_off_fixes/`** — throwaway transform/analysis scripts from past passes,
@@ -29,4 +29,4 @@ voice across the ~217 notebooks. Run everything from the **repo root**.
 
 The simple, safe rules are also **enforced** in the pre-commit hook at
 `.internal/pre_commit_tools/notebook_uniformity.py` (currently: references plural,
-`result_value`, `show(qprog)`, and opens-with-an-H1-title).
+`result_value`, `show(qprog)`, opens-with-an-H1-title, and single-H1).
