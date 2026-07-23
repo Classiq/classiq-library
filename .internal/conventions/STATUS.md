@@ -5,7 +5,7 @@ The live audit is `python3 .internal/conventions/report.py` (from the repo
 root) — **trust it for current coverage**, not the prose below.
 
 Scope: unless noted, a point was applied to the **`main` folders** only
-(`algorithms/`, `applications/`, `tutorials/`, ~161 notebooks). `community/`,
+(`algorithms/`, `applications/`, `tutorials/`, ~163 notebooks). `community/`,
 `functions/`, and `benchmarking/` are reached by re-running the same agent/tool.
 
 > **Parked as _old_ — execution-API refactor.** `execution_interface`,
@@ -17,13 +17,13 @@ Scope: unless noted, a point was applied to the **`main` folders** only
 > **`intro_opener` was dropped** — we decided not to pursue the "This notebook …"
 > opener convention. It stays in the report marked _dropped_.
 >
+> **`section_vocab` was removed** (not just parked) — its heuristic mostly flagged
+> good, specific headings, so folding them into a fixed vocabulary lost information.
+> See the note in `report.py`.
+>
 > **`math` is on hold by design.** The pass is largely done, but finalizing it
 > waits on confirming the `$$` / LaTeX changes don't break LaTeX rendering
 > _elsewhere_ (e.g. the docs site).
->
-> **Not on `main` yet, by design.** Whether this internal tooling is published
-> publicly is still being decided, so `report.py` + `points/` live on the
-> `update_notebook_convention__conventions_kit` branch, not `main`.
 
 Rows below follow the report's own order (skeleton → prose → code → parked).
 
@@ -33,7 +33,6 @@ Rows below follow the report's own order (skeleton → prose → code → parked
 | `single_h1`           | exactly one H1 (the title)                            | ✅ done · **enforced** (auto-fix)                          | `point_single_h1.fix()`; `one_off_fixes/fix_single_h1.py`                           |
 | `headings`            | heading hierarchy (levels & nesting)                  | ✅ main pass done (see report for residuals)               | agent `notebook-heading-hierarchy` + `tools/heading_outline.py`, `heading_stats.py` |
 | `title_case`          | headings in Title Case                                | ⛔ open (agent doc added)                                  | agent `notebook-title-case` + `tools/heading_outline.py`                            |
-| `section_vocab`       | shared section-heading vocabulary                     | ⛔ open                                                    | agent `notebook-section-vocab` + `tools/md_replace.py`                              |
 | `math`                | display → `$$`; unicode math → LaTeX                  | ⏸ on hold by design                                        | agent `notebook-math-notation` + `tools/md_replace.py`, `math_lint.py`              |
 | `unicode`             | stray unicode typography → ASCII/LaTeX                | ✅ main pass done (see report for residuals)               | agent `notebook-unicode-cleanup` + `tools/nonascii.py`, `unicode_audit.py`          |
 | `references`          | `## References` (plural)                              | ✅ done · **enforced** (auto-fix)                          | hook                                                                                |
