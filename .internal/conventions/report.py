@@ -3,7 +3,7 @@
 
     python3 .internal/conventions/report.py                      # compact status table (default)
     python3 .internal/conventions/report.py --cards              # detailed per-point cards
-    python3 .internal/conventions/report.py --full               # spell out the jargon (legend)
+    python3 .internal/conventions/report.py --full               # per-point summary + legend
     python3 .internal/conventions/report.py --files              # list every offender
     python3 .internal/conventions/report.py --rule math --list   # offender paths only
 
@@ -215,6 +215,14 @@ def _print_paths(offenders: list[Notebook], indent: str, cap: int | None) -> Non
         print(Ansi.paint(f"{indent}… (+{len(offenders) - cap} more)", Ansi.DIM))
 
 
+def _print_point_summary(results: list[PointResult]) -> None:
+    width = max(len(r.point.title) for r in results)
+    print(Ansi.paint("\n  what each point checks", Ansi.BOLD))
+    for r in results:
+        title = Ansi.paint(f"{r.point.title:{width}}", Ansi.BOLD)
+        print(f"    {title}  {_description(r.point, full=False)}")
+
+
 def _print_legend(results: list[PointResult]) -> None:
     used_tags = {t for r in results for t in r.point.tags()}
     parked = {r.point.status for r in results if not _active(r.point)}
@@ -321,7 +329,7 @@ def main() -> None:
     ap.add_argument(
         "--full",
         action="store_true",
-        help="expand the jargon (tags, statuses, 'approximate') with a legend",
+        help="spell it out: a per-point summary plus a legend for tags/statuses",
     )
     ap.add_argument(
         "--files",
@@ -369,6 +377,8 @@ def main() -> None:
     else:
         render_table(results, show_files=args.files)
     if args.full:
+        if not args.cards:  # cards already print each description inline
+            _print_point_summary(results)
         _print_legend(results)
 
 
