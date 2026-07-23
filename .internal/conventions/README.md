@@ -1,12 +1,28 @@
 # Notebook convention tooling
 
-The kit for keeping the library's notebooks reading as **one entity**. Each
-convention "point" (its status and how to resume it) is tracked in `STATUS.md`.
-Run the agents/tools from the **repo root**.
+The kit for keeping the library's notebooks reading as **one entity** — a single
+voice across the ~217 notebooks. Run everything from the **repo root**.
 
-- **`STATUS.md`** — every convention point: done / open, on which branch, and how to resume it
-- **`agents/`** — reusable subagent definitions: heading-hierarchy, math-notation, unicode-cleanup, variable-names
-- **`tools/`** — helpers used by the agents & audits: `md_replace`, `rename_var`, `nonascii`, `math_lint`, `heading_outline`, `heading_stats`, `unicode_audit`
-- **`one_off_fixes/`** — throwaway transform/analysis scripts from past passes (kept for reference, not maintained)
+- **`report.py`** + **`points/`** — the read-only audit. Each convention is one
+  small `points/point_*.py` (a title, a before/after example, a `detect()`, and
+  either a static `fix()` or a pointer to its agent); `report.py` loads the
+  notebooks, runs every point, and scores coverage:
 
-The read-only audit that scores every point lives at `.internal/notebook_uniformity_report.py`.
+  ```bash
+  python3 .internal/conventions/report.py            # full view
+  python3 .internal/conventions/report.py --short    # one line per point
+  python3 .internal/conventions/report.py --rule math --list   # offending paths only
+  ```
+
+- **`STATUS.md`** — every point: done / open / enforced, the caveats, and how to resume it.
+- **`agents/`** — subagent mission docs for the judgement-heavy points: heading
+  hierarchy, math notation, unicode cleanup, title case, section vocabulary, intro
+  opener, variable names.
+- **`tools/`** — helpers the agents and audits call: `md_replace`, `rename_var`,
+  `nonascii`, `math_lint`, `heading_outline`, `heading_stats`, `unicode_audit`.
+- **`one_off_fixes/`** — throwaway transform/analysis scripts from past passes,
+  kept for reference and not maintained.
+
+The simple, safe rules are also **enforced** in the pre-commit hook at
+`.internal/pre_commit_tools/notebook_uniformity.py` (currently: references plural,
+`result_value`, `show(qprog)`, and opens-with-an-H1-title).
