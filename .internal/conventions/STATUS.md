@@ -1,7 +1,7 @@
 # Convention points — status & how to resume
 
 This `.internal/conventions/` kit is the home of the notebook-uniformity effort.
-The live audit is `python3 .internal/conventions/report.py --short` (from the repo
+The live audit is `python3 .internal/conventions/report.py --table` (from the repo
 root) — **trust it for current coverage**, not the prose below.
 
 Scope: unless noted, a point was applied to the **`main` folders** only
