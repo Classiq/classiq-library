@@ -310,6 +310,7 @@ qfunc main(output res: qnum){
 ```
 
 2. Press Synthesize:
+
 <center>
 
 ![Model_Screenshot_3_plus_5.png](.internal/README_resources/Model_Screenshot_3_plus_5.png)
@@ -317,6 +318,7 @@ qfunc main(output res: qnum){
 </center>
 
 3. Press Execute:
+
 <center>
 
 ![Program_Screenshot_3_plus_5.png](.internal/README_resources/Program_Screenshot_3_plus_5.png)
@@ -324,6 +326,7 @@ qfunc main(output res: qnum){
 </center>
 
 4. Press Run:
+
 <center>
 
 ![Execution_Screenshot_3_plus_5.png](.internal/README_resources/Execution_Screenshot_3_plus_5.png)
@@ -331,6 +334,7 @@ qfunc main(output res: qnum){
 </center>
 
 5. View Results:
+
 <center>
 
 ![Jobs_Screenshot_3_plus_5.png](.internal/README_resources/Jobs_Screenshot_3_plus_5.png)
