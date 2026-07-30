@@ -6,6 +6,8 @@ import json
 
 from _common import is_tested
 
+NO_ERROR = ""
+
 
 def main() -> bool:
     result = True
@@ -20,7 +22,7 @@ def _iterate_markdown_cells(notebook: dict):
     )
 
 
-def _does_cell_has_inline_image(cell) -> bool:
+def _does_cell_has_image_error(cell) -> str:
     if isinstance(cell["source"], str):
         source_lines = [cell["source"]]
     elif isinstance(cell["source"], list):
@@ -29,19 +31,24 @@ def _does_cell_has_inline_image(cell) -> bool:
         raise ValueError(f"Invalid markdown source detected: {type(cell['source'])}")
 
     for line in source_lines:
-        if '<img src="data:image/png;base64,' in line:
-            return True
-        if '<img src="data:image/jpg;base64,' in line:
-            return True
-        if '<img src="data:image/jpeg;base64,' in line:
-            return True
-        if "<img" in line and "src=" in line and ";base64," in line:
-            return True
+        # IF there is a src image, AND it's pointing to a file, THEN make sure the path has '/'
 
-        # if re.search(".*\\b<img\\b[^>]+\\bsrc=[^>]+\\bbase64\\b", line):
-        #     return True
+        # IF there is a src image, AND it's base64, THEN don't allow
+        if (
+            ('<img src="data:image/png;base64,' in line)
+            or ('<img src="data:image/jpg;base64,' in line)
+            or ('<img src="data:image/jpeg;base64,' in line)
+            or ("<img" in line and "src=" in line and ";base64," in line)
+        ):
+            return "Inline base64 image found - Please attach the image as a separate file (e.g. 'something.png' in the same folder as that notebook)"
 
-    return False
+        if "<img src=" in line:
+            if path_match := re.search("<img\\s+[^>]*?src=(['\"])(.*?)\\1", line):
+                path = path_match.group(2)
+                if "/" not in path:
+                    return "Relative img-src paths need to start with './'"
+
+    return NO_ERROR
 
 
 def forbid_inline_image(notebook_path: str) -> bool:
@@ -50,10 +57,10 @@ def forbid_inline_image(notebook_path: str) -> bool:
 
     result = True
     for index, cell in enumerate(_iterate_markdown_cells(notebook)):
-        if _does_cell_has_inline_image(cell):
+        if error := _does_cell_has_image_error(cell):
             result = False
             print(
-                f"Inline base64 image found in notebook '{notebook_path}' in markdown cell number {index}.\nPlease attach the image as a separate file (e.g. 'something.png' in the same folder as that notebook)"
+                f"Error in notebook '{notebook_path}' in markdown cell number {index} : {error}"
             )
 
     return result
