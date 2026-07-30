@@ -76,7 +76,7 @@ jobs:
     steps:
       # We Checkout twice, once from main to get the latest actions, and second from dev to get QMODs
       - name: Checkout actions
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           lfs: "false"
           sparse-checkout: ".github"
@@ -89,7 +89,7 @@ jobs:
           mask-aws-account-id: true
 
       - name: Checkout qmod
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           lfs: "false"
           path: qmod
