@@ -1,13 +1,8 @@
-import os
 import pytest
-from contextlib import contextmanager
 
 from testbook import testbook  # type: ignore[import]
-from tests.utils_for_tests import (
-    iterate_notebooks,
-    ROOT_DIRECTORY,
-    resolve_notebook_path,
-)
+from tests.utils_for_tests import iterate_notebooks
+from tests.utils_for_testbook import NotebookEdit, _build_cd_decorator
 
 TIMEOUT: int = 60 * 15  # 15 minutes
 
@@ -19,25 +14,16 @@ def _should_test_notebook(notebook_path: str) -> bool:
     return "/functions/" in notebook_path or "/community/" in notebook_path
 
 
-@contextmanager
-def cwd(path):
-    oldpwd = os.getcwd()
-    os.chdir(ROOT_DIRECTORY)
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(oldpwd)
+def noop(*args, **kwargs):
+    pass
 
 
 @pytest.mark.parametrize(
     "notebook_path", list(filter(_should_test_notebook, iterate_notebooks()))
 )
 def test_notebooks(notebook_path: str) -> None:
-    with cwd(os.path.dirname(notebook_path)):
-        with testbook(
-            os.path.basename(notebook_path),
-            execute=True,
-            timeout=TIMEOUT,
-        ):
-            pass  # we simply wish it to run without errors
+    test = noop  # we simply wish it to run without errors
+    with NotebookEdit(notebook_path) as nr:
+        test = testbook(notebook_path, execute=True, timeout=TIMEOUT)(test)
+        test = _build_cd_decorator(notebook_path)(test)
+    test()

@@ -103,8 +103,8 @@ _DEFAULT_CODE_INJECTIONS = field(default_factory=lambda: DEFAULT_CODE_INJECTIONS
 @dataclass
 class NotebookEdit:
     file_path: str
-    replacements_regex: list[tuple[str, str]] | None
-    replacements_variables: list[tuple[str, str]] | None
+    replacements_regex: list[tuple[str, str]] | None = None
+    replacements_variables: list[tuple[str, str]] | None = None
     code_injection_at_start: list[str] = _DEFAULT_CODE_INJECTIONS
 
     def __post_init__(self):
