@@ -6,35 +6,41 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-case-conflict
+        name: forbid    case conflict
       - id: check-executables-have-shebangs
+        name: validate  shebangs
       - id: check-merge-conflict
+        name: forbid    merge conflict
       - id: check-symlinks
+        name: validate  symlinks
       - id: check-json
+        name: validate  json
       - id: check-yaml
+        name: validate  yaml
       - id: end-of-file-fixer
-        name: format end of file
+        name: format    end of file
       - id: trailing-whitespace
-        name: format trailing whitespace
+        name: format    trailing whitespace
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.9.6
     hooks:
       - id: prettier
-        name: format prettier
+        name: format    prettier
   - repo: https://github.com/psf/black
     rev: 26.5.1
     hooks:
       - id: black-jupyter
-        name: format notebook black
+        name: format    notebook black
   - repo: https://github.com/nbQA-dev/nbQA
     rev: 1.9.1
     hooks:
       - id: nbqa-isort
-        name: format notebook isort
+        name: format    notebook isort
 
   - repo: local
     hooks:
       - id: upgrade-nbformat
-        name: format nbformat upgrade
+        name: format    nbformat upgrade
         entry: .internal/pre_commit_tools/set_nbformat.py
         language: python
         files: \.ipynb$
@@ -42,7 +48,7 @@ repos:
           - "nbformat"
         require_serial: true
       - id: extra-nbstripout
-        name: format nbformat strip
+        name: format    nbformat strip
         entry: .internal/pre_commit_tools/extra_nbstripout.py
         language: python
         files: \.ipynb$
@@ -50,7 +56,7 @@ repos:
           - "nbformat"
         require_serial: true
       - id: verify-notebook-format-execution-count
-        name: format nbformat execution-count
+        name: forbid    negative execution-count
         language: pygrep
         files: \.ipynb$
         entry: '"execution_count": -'
@@ -59,7 +65,7 @@ repos:
     rev: 0.9.1
     hooks:
       - id: nbstripout
-        name: format nbformat nbstripout
+        name: format    nbformat nbstripout
         args:
           [
             --keep-output,
@@ -71,54 +77,54 @@ repos:
   - repo: local
     hooks:
       - id: verify-platform-links-nightly
-        name: Forbid links to nightly.platform
+        name: forbid    nightly-platform links
         language: pygrep
         files: \.ipynb$
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: https://nightly\.platform\.classiq\.io
       - id: verify-platform-links-dev
-        name: Forbid links with dev version
+        name: forbid    dev-version links
         language: pygrep
         files: \.ipynb$
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: '[?&]version=[^ \t\n]*\.dev'
       - id: verify-platform-links-old
-        name: Forbid links from older versions
+        name: forbid    older-version links
         language: pygrep
         files: \.ipynb$
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: '"Opening:\s+https://'
 
       - id: notebook-pre-commit
-        name: Validate naming notebooks
+        name: validate  notebook names
         description: Ensure notebooks conventions
         entry: .internal/pre_commit_tools/notebook_pre_commit_collection.py
         language: python
         files: \.ipynb$
         require_serial: true
       - id: qmod-pre-commit
-        name: Validate naming qmods
+        name: validate  qmod names
         description: Ensure qmods conventions
         entry: .internal/pre_commit_tools/qmod_pre_commit_collection.py
         language: python
         files: \.qmod$
         require_serial: true
       - id: validate-metadata-file
-        name: Validate Metadata file
+        name: validate  metadata
         description: Add file if non existant and validate value otherwise
         entry: .internal/pre_commit_tools/metadata_validate.py
         language: python
         files: \.(qmod|ipynb)$
         require_serial: true
       - id: auto-add-tests
-        name: Auto add test
+        name: format    add tests
         description: Automatically adding a test to new notebooks
         entry: .internal/pre_commit_tools/auto_add_tests.py
         language: python
         files: \.ipynb$
         require_serial: true
       - id: notebook-uniformity
-        name: Enforce notebook uniformity
+        name: format    uniformity
         description: Auto-fix simple uniformity conventions (e.g. plural "References" heading)
         entry: .internal/pre_commit_tools/notebook_uniformity.py
         language: python
