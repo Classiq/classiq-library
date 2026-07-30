@@ -26,8 +26,21 @@ Every heading (the H1 title and all `##`+ sections) reads in **Title Case**:
 This is judgement work (which tokens are proper nouns/acronyms); when unsure,
 keep the original and note it.
 
+## Known edge cases
+
+Watch for these — `title_case.py` catches some automatically, but always verify:
+
+- `4x4` → `4X4` — dimension notation; the `x` stays lowercase
+- `5a`, `10b` → `5A`, `10B` — exercise sub-labels; the letter stays lowercase
+- `(i)`, `(ii)` → `(I)`, `(II)` — roman numeral markers stay as-is
+- `<a id="...">` — HTML attributes must not be re-cased
+- `t-SNE`, `QAOA-in-QAOA` — proper names with unconventional hyphenation
+- Single lowercase math variables (`b`, `x`, `n`) used as words in headings
+
 ## Running commands (bare — no `cd`, no `;`/`&&`), from the repo root
 
+- automated: `python3 .internal/conventions/tools/title_case.py <nb>` (dry-run)
+  `python3 .internal/conventions/tools/title_case.py <nb> --apply`
 - list headings: `python3 .internal/conventions/tools/heading_outline.py <nb>`
 - apply: `python3 .internal/conventions/tools/md_replace.py <nb> <spec.json>`
   where spec.json is `[{"old": "## old heading", "new": "## New Heading"}, ...]`;
