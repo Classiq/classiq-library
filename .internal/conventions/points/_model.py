@@ -69,6 +69,6 @@ class Point:
 
     def tags(self) -> list[str]:
         if not self.static:
-            return ["agent"]
+            return ["agent", "enforced"] if self.enforced else ["agent"]
         kind = "auto-fix" if self.fix else "check"
         return ["static", "enforced", kind] if self.enforced else ["static", kind]
