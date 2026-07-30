@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
+"""Auto-create a placeholder test for each new CI-tested notebook.
+
+The generated test asserts on `tb.ref_pydantic("qprog")`; it is a *starting
+point* the notebook author is expected to fill in (a notebook without a `qprog`
+will fail until the author writes a real test — that is intentional).
+"""
 
 import sys
 from pathlib import Path
 from typing import Iterable
-import subprocess
 
-PROJECT_ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
+from _common import PROJECT_ROOT, is_tested
 
 DEFAULT_TIMEOUTS_SECONDS = 60
 
@@ -19,43 +24,27 @@ def main() -> bool:
 
     result = True
     for notebook_file_path in _get_all_notebooks():
-        if not does_test_exist(notebook_file_path) and should_notebook_be_tested(
-            notebook_file_path
-        ):
+        if is_tested(notebook_file_path) and not does_test_exist(notebook_file_path):
             result = False
             auto_create_test(notebook_file_path)
     return result
 
 
 def _get_all_notebooks() -> Iterable[Path]:
-    all_notebooks: Iterable[Path]
-
     if "--all-files" in sys.argv:
-        all_notebooks = PROJECT_ROOT.rglob("*.ipynb")
-    else:
-        all_notebooks = [
-            Path(file)
-            for file in sys.argv[1:]
-            if (file.endswith(".ipynb") and (".ipynb_checkpoint" not in file))
-        ]
+        return PROJECT_ROOT.rglob("*.ipynb")
 
-        all_notebooks = [
-            p if p.is_absolute() else PROJECT_ROOT / p for p in all_notebooks
-        ]
-
-    return all_notebooks
+    notebooks = [
+        Path(file)
+        for file in sys.argv[1:]
+        if file.endswith(".ipynb") and ".ipynb_checkpoint" not in file
+    ]
+    return [p if p.is_absolute() else PROJECT_ROOT / p for p in notebooks]
 
 
 def does_test_exist(notebook_file_path: Path) -> bool:
     expected_test_name = f"test_{notebook_file_path.stem}.py"
     return bool(list(PROJECT_ROOT.rglob(expected_test_name)))
-
-
-def should_notebook_be_tested(notebook_file_path: Path) -> bool:
-    return not (
-        "functions" in notebook_file_path.parts
-        or "community" in notebook_file_path.parts
-    )
 
 
 def auto_create_test(notebook_file_path: Path) -> None:

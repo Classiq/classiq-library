@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-import json
 import nbformat
 
 VERSION_MAJOR = 4
@@ -99,7 +98,7 @@ def strip_single_notebook(notebook_path: str) -> bool:
             nbformat.write(nb, notebook_path)
     except Exception as exc:
         result = False
-        print(f"Upgrading version failed for '{notebook_path}'. Error: {exc}")
+        print(f"Stripping metadata failed for '{notebook_path}'. Error: {exc}")
     return result
 
 
