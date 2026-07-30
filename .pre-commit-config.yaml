@@ -1,6 +1,5 @@
 default_language_version:
   python: python3.11
-exclude: '^\.internal/docs/.*' # exclude docs from pre-commit hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -94,6 +93,12 @@ repos:
         files: \.ipynb$
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: '"Opening:\s+https://'
+      - id: forbid-inline-images
+        name: forbid    inline images
+        entry: .internal/pre_commit_tools/notebook_forbid_inline_image.py
+        language: python
+        files: \.ipynb$
+        require_serial: true
 
       - id: notebook-pre-commit
         name: validate  notebook names
