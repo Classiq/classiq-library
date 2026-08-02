@@ -32,3 +32,10 @@ Knapsack, XORSAT, and other discrete optimization problems.
   while its approximation quality can be systematically improved by increasing the number of alternating layers (depth).
   We illustrate the method through the Max-Cut and Knapsack problems, representing unconstrained and constrained optimization
   settings, respectively.
+- **Quantum Likelihood Estimation (QLE)** - A hybrid quantum–classical algorithm for Hamiltonian learning
+  that frames the problem as Bayesian inference over a discrete set of candidate Hamiltonians.
+  At each iteration, the system is evolved for a chosen time and measured, and the posterior weights are updated.
+  This notebook implements both the standard QLE approach and the information-based optimal variant
+  proposed by Levi et al. (Quantum Sci. Technol., 2025), which jointly optimizes all circuit parameters
+  at each step to maximize the mutual information between the measurement outcome and the unknown Hamiltonian,
+  converging in roughly an order of magnitude fewer iterations.
