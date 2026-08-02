@@ -13,11 +13,11 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
 
     ## width-optimized
-    # classiq depths: [419, 749, 1195, 1773, 2499, 3389, 4099]
-    expected_depths = [500, 1000, 1500, 2000, 2750, 3500, 4500]
-    # classiq cx_counts: [274, 514, 850, 1298, 1874, 2594, 3194]
-    expected_cx_counts = [500, 1000, 1500, 2000, 2750, 3500, 4500]
-    # classiq widths: [6, 7, 8, 9, 10, 11, 13]
+    # classiq depths: [407, 727, 1161, 1725, 2435, 3307, 4357]
+    expected_depths = [500, 900, 1400, 2000, 2800, 3800, 5000]
+    # classiq cx_counts: [272, 512, 848, 1296, 1872, 2592, 3472]
+    expected_cx_counts = [350, 650, 1050, 1550, 2200, 3000, 4000]
+    # classiq widths: [6, 7, 8, 9, 10, 11, 12]
 
     for qprog, num_qubits, expected_depth, expected_cx_count in zip(
         tb.ref_pydantic("qprogs_width"),
@@ -31,17 +31,12 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
             expected_depth=expected_depth,
             expected_cx_count=expected_cx_count,
         )
-    """
-    classiq depths: [193, 245, 335, 419, 509, 602, 704]
-    classiq cx_counts: [120, 152, 200, 260, 352, 436, 552]
-    classiq widths: [8, 9, 11, 12, 14, 15, 17]
-    """
     ## cx-optimized
-    # classiq depths: [193, 245, 335, 419, 509, 602, 704]
-    expected_depths = [250, 350, 450, 500, 550, 650, 750]
-    # classiq cx_counts: [120, 152, 200, 260, 352, 436, 552]
-    expected_cx_counts = [150, 200, 250, 300, 400, 500, 600]
-    # classiq widths: [8, 9, 11, 12, 14, 15, 17]
+    # classiq depths: [183, 269, 345, 481, 557, 681, 761]
+    expected_depths = [230, 330, 420, 580, 680, 820, 920]
+    # classiq cx_counts: [108, 168, 216, 318, 366, 504, 552]
+    expected_cx_counts = [140, 210, 270, 390, 450, 610, 670]
+    # classiq widths: [7, 9, 10, 12, 13, 15, 16]
 
     for qprog, num_qubits, expected_depth, expected_cx_count in zip(
         tb.ref_pydantic("qprogs_cx"),
