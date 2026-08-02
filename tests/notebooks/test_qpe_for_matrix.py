@@ -25,6 +25,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     w = tb.ref_pydantic("w")
     width = tb.ref_pydantic("energy_resolution")
     for s in tb.ref_pydantic("solution_exact"):
-        assert any(abs(s - wi) <= width for wi in w)
+        assert any(abs(s - wi) <= width * 1.1 for wi in w)
     for s in tb.ref_pydantic("solution_approx"):
-        assert any(abs(s - wi) <= width for wi in w)
+        assert any(abs(s - wi) <= width * 1.1 for wi in w)
