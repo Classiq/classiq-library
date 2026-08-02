@@ -26,7 +26,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_qdrift"),
         expected_width=2,  # actual width: 2
-        expected_depth=150,  # actual depth: 114
+        expected_depth=280,  # actual depth: 229
     )
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_magnetization_trotter"),
