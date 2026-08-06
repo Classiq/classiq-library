@@ -18,12 +18,12 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
         expected_depth=None,  # no transpilation
     )
     validate_quantum_program_size(
-        tb.ref_pydantic("matrix_inverse_qprog"),
+        tb.ref_pydantic("qprog_matrix_inverse"),
         expected_width=16,  # actual width: 11
         expected_depth=None,  # no transpilation
     )
     validate_quantum_program_size(
-        tb.ref_pydantic("dummy_qprog"),
+        tb.ref_pydantic("qprog_dummy"),
         expected_width=16,  # actual width: 11
         expected_depth=None,  # no transpilation
     )
