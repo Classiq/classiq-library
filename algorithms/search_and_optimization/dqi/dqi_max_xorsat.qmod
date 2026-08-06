@@ -1,24 +1,25 @@
-qperm inplace_binary_to_one_hot_expanded___0(qvar: qbit[4]) {
+qperm inplace_binary_to_one_hot_expanded___0(input source: qbit[4], output target: qbit[4]) {
   x0: qbit;
   x1: qbit;
   x2: qbit;
   x3: qbit;
-  qvar -> {x0, x1, x2, x3};
-  {x2, x0, x3, x1} -> qvar;
-  X(qvar[0]);
-  CX(qvar[1], qvar[0]);
-  control (qvar[3]) {
-    SWAP(qvar[0], qvar[2]);
+  source -> {x0, x1, x2, x3};
+  {x2, x0, x3, x1} -> target;
+  X(target[0]);
+  CX(target[1], target[0]);
+  control (target[3]) {
+    SWAP(target[0], target[2]);
   }
-  CX(qvar[2], qvar[3]);
-  CX(qvar[3], qvar[1]);
+  CX(target[2], target[3]);
+  CX(target[3], target[1]);
 }
 
 qperm binary_to_one_hot_expanded___0(input binary: qnum<2, False, 0>, output one_hot: qbit[4]) {
   extension: qbit[2];
   allocate(2, extension);
-  {binary, extension} -> one_hot;
-  inplace_binary_to_one_hot_expanded___0(one_hot);
+  padded: qbit[4];
+  {binary, extension} -> padded;
+  inplace_binary_to_one_hot_expanded___0(padded, one_hot);
 }
 
 qperm inplace_one_hot_to_unary_expanded___0(qvar: qbit[4]) {
