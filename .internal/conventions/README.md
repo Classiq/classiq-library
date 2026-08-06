@@ -30,3 +30,6 @@ voice across the ~219 notebooks. Run everything from the **repo root**.
 The simple, safe rules are also **enforced** in the pre-commit hook at
 `.internal/pre_commit_tools/notebook_uniformity.py` (currently: references plural,
 `result_value`, `show(qprog)`, opens-with-an-H1-title, and single-H1).
+
+**Note:** Some fixes (e.g. variable renames) may also require updating the
+corresponding test file at `tests/notebooks/test_<notebook_name>.py`.
