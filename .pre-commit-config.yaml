@@ -98,6 +98,8 @@ repos:
         entry: .internal/pre_commit_tools/notebook_forbid_inline_image.py
         language: python
         files: \.ipynb$
+        additional_dependencies:
+          - "nbformat"
         require_serial: true
 
       - id: validate-latex
@@ -108,19 +110,18 @@ repos:
         files: \.ipynb$
         additional_dependencies:
           - "latex2mathml"
+          - "nbformat"
         require_serial: true
 
-      - id: notebook-pre-commit
+      - id: validate-notebook-names
         name: validate  notebook names
-        description: Ensure notebooks conventions
-        entry: .internal/pre_commit_tools/notebook_pre_commit_collection.py
+        entry: .internal/pre_commit_tools/notebook_validate_names.py
         language: python
         files: \.ipynb$
         require_serial: true
-      - id: qmod-pre-commit
+      - id: validate-qmod-names
         name: validate  qmod names
-        description: Ensure qmods conventions
-        entry: .internal/pre_commit_tools/qmod_pre_commit_collection.py
+        entry: .internal/pre_commit_tools/qmod_validate_names.py
         language: python
         files: \.qmod$
         require_serial: true

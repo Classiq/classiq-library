@@ -1,106 +1,90 @@
 #!/usr/bin/env python3
 
-import sys
-import nbformat
+from _common import get_cell_source, load_notebook, report, run_precommit, save_notebook
 
-VERSION_MAJOR = 4
+_STRIP_KEYS = [
+    "id",
+    "scrolled",
+    "jp-MarkdownHeadingCollapsed",
+    "editable",
+    "is_executing",
+    "pycharm",
+    "vscode",
+    "lines_to_next_cell",
+    "executionInfo",
+]
 
+_STRIP_KEY_VALUES = [
+    ("tags", []),
+]
 
-def main() -> bool:
-    result = True
-    for file in sys.argv[1:]:
-        result &= strip_single_notebook(file)
-    return result
+_STRIP_NESTED_KEYS = [
+    ("jupyter", "outputs_hidden"),
+    ("slideshow", "slide_type"),
+]
+
+_STRIP_NESTED_KEY_VALUES = [
+    ("jupyter", "source_hidden", False),
+]
 
 
 def strip_single_notebook(notebook_path: str) -> bool:
-    result = True
     try:
-        nb = nbformat.read(notebook_path, as_version=VERSION_MAJOR)
+        nb = load_notebook(notebook_path)
         did_nb_change = False
 
         for index, cell in enumerate(nb.cells):
-            for key in [
-                "id",
-                # collapse/scroll
-                "scrolled",
-                "jp-MarkdownHeadingCollapsed",
-                # kept from a notebook that was abruptly closed
-                "editable",
-                "is_executing",
-                # other
-                "pycharm",
-                "vscode",
-                # I think these are not actually used
-                "lines_to_next_cell",
-                # metadata we don't need
-                "executionInfo",
-            ]:
-                if key in cell.get("metadata", {}):
+            meta = cell.get("metadata", {})
+
+            for key in _STRIP_KEYS:
+                if key in meta:
                     nb.cells[index]["metadata"].pop(key)
                     did_nb_change = True
 
-            for key, value in [
-                # remove empty tags
-                ("tags", [])
-            ]:
-                if cell.get("metadata", {}).get(key, None) == value:
+            for key, value in _STRIP_KEY_VALUES:
+                if meta.get(key, None) == value:
                     nb.cells[index]["metadata"].pop(key)
                     did_nb_change = True
 
-            for key, sub_key in [
-                ("jupyter", "outputs_hidden"),
-                ("slideshow", "slide_type"),
-            ]:
+            for key, sub_key in _STRIP_NESTED_KEYS:
                 if (
-                    key in cell.get("metadata", {})
-                    and isinstance(key_value := cell["metadata"][key], dict)
+                    key in meta
+                    and isinstance(key_value := meta[key], dict)
                     and sub_key in key_value
                 ):
                     nb.cells[index]["metadata"][key].pop(sub_key)
                     did_nb_change = True
-                    # check if the parent key is now empty
                     if not nb.cells[index]["metadata"][key]:
                         nb.cells[index]["metadata"].pop(key)
 
-            for key, sub_key, value in [
-                ("jupyter", "source_hidden", False),
-            ]:
+            for key, sub_key, value in _STRIP_NESTED_KEY_VALUES:
                 if (
-                    key in cell.get("metadata", {})
-                    and isinstance(key_value := cell["metadata"][key], dict)
+                    key in meta
+                    and isinstance(key_value := meta[key], dict)
                     and sub_key in key_value
                     and key_value.get(sub_key, None) == value
                 ):
                     nb.cells[index]["metadata"][key].pop(sub_key)
                     did_nb_change = True
-                    # check if the parent key is now empty
                     if not nb.cells[index]["metadata"][key]:
                         nb.cells[index]["metadata"].pop(key)
 
-            # keys that were intentionally kept:
-            # - colab
-
-        # Normalize the opening markdown cell: a leading blank line hides the H1
-        # title (the notebook then reads as having no title), so strip the
-        # surrounding whitespace and let the title render first.
+        # A leading blank line hides the H1 title in the notebook UI
         if nb.cells and nb.cells[0].get("cell_type") == "markdown":
-            source = nb.cells[0]["source"]
-            text = "".join(source) if isinstance(source, list) else source
+            text = get_cell_source(nb.cells[0])
             if (stripped := text.strip()) != text:
                 nb.cells[0]["source"] = stripped.splitlines(keepends=True)
                 did_nb_change = True
 
         if did_nb_change:
-            result = False
-            print(f"Rewriting '{notebook_path}'")
-            nbformat.validate(nb)
-            nbformat.write(nb, notebook_path)
+            report(notebook_path, "stripped unwanted metadata", fixed=True)
+            save_notebook(notebook_path, nb)
+            return False
     except Exception as exc:
-        result = False
-        print(f"Stripping metadata failed for '{notebook_path}'. Error: {exc}")
-    return result
+        report(notebook_path, f"stripping metadata failed: {exc}")
+        return False
+    return True
 
 
 if __name__ == "__main__":
-    sys.exit(not main())
+    run_precommit(strip_single_notebook)

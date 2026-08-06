@@ -6,40 +6,21 @@ point* the notebook author is expected to fill in (a notebook without a `qprog`
 will fail until the author writes a real test — that is intentional).
 """
 
-import sys
 from pathlib import Path
-from typing import Iterable
 
-from _common import PROJECT_ROOT, is_tested
+from _common import PROJECT_ROOT, is_tested, report, run_precommit
 
 DEFAULT_TIMEOUTS_SECONDS = 60
 
 
-def main() -> bool:
-    if len(sys.argv) == 1:
-        print(
-            f"Usage: `{sys.argv[0]} <file path> <file path> ...` or `{sys.argv[0]} --all-files`"
-        )
-        sys.exit(1)
-
-    result = True
-    for notebook_file_path in _get_all_notebooks():
-        if is_tested(notebook_file_path) and not does_test_exist(notebook_file_path):
-            result = False
-            auto_create_test(notebook_file_path)
-    return result
-
-
-def _get_all_notebooks() -> Iterable[Path]:
-    if "--all-files" in sys.argv:
-        return PROJECT_ROOT.rglob("*.ipynb")
-
-    notebooks = [
-        Path(file)
-        for file in sys.argv[1:]
-        if file.endswith(".ipynb") and ".ipynb_checkpoint" not in file
-    ]
-    return [p if p.is_absolute() else PROJECT_ROOT / p for p in notebooks]
+def check_and_create_test(notebook_path: str) -> bool:
+    path = Path(notebook_path)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+    if does_test_exist(path):
+        return True
+    auto_create_test(path)
+    return False
 
 
 def does_test_exist(notebook_file_path: Path) -> bool:
@@ -52,13 +33,16 @@ def auto_create_test(notebook_file_path: Path) -> None:
         PROJECT_ROOT / "tests" / "notebooks" / f"test_{notebook_file_path.stem}.py"
     )
     if test_file_name.is_file():
-        print(
-            f"There's a collision - the test `{test_file_name}` already exists, somehow. Automatic creation will skip it"
+        report(
+            str(notebook_file_path),
+            f"collision — test '{test_file_name}' already exists, skipping",
         )
         return
 
-    print(
-        f"Adding test '{notebook_file_path.name}' in file '{test_file_name.relative_to(PROJECT_ROOT)}'"
+    report(
+        str(notebook_file_path),
+        f"created test '{test_file_name.relative_to(PROJECT_ROOT)}'",
+        fixed=True,
     )
     with open(test_file_name, "w") as f:
         f.write(create_test_content(notebook_file_path))
@@ -88,5 +72,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
 
 if __name__ == "__main__":
-    if not main():
-        sys.exit(1)
+    run_precommit(check_and_create_test, filter_file=is_tested)
