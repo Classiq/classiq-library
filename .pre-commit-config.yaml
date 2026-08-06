@@ -100,6 +100,16 @@ repos:
         files: \.ipynb$
         require_serial: true
 
+      - id: validate-latex
+        name: validate  notebook LaTeX
+        description: Ensure LaTeX math expressions in markdown cells are valid
+        entry: .internal/pre_commit_tools/notebook_validate_latex.py
+        language: python
+        files: \.ipynb$
+        additional_dependencies:
+          - "latex2mathml"
+        require_serial: true
+
       - id: notebook-pre-commit
         name: validate  notebook names
         description: Ensure notebooks conventions
