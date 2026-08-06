@@ -11,7 +11,10 @@ import re
 from ._model import Notebook, Point
 
 _NON_DOLLAR_MATH = re.compile(
-    r"\\\(|\\\["
+    r"\\\("  # \(  inline-math open
+    # \[  display-math open — but NOT `\\[6pt]` line-break spacing (preceded by \)
+    # nor a `[\[1\]]` citation-link label (preceded by [)
+    r"|(?<![\\\[])\\\["
     r"|\\begin\{(?:equation|align|gather|multline|eqnarray|alignat|flalign)\*?\}"
 )
 
