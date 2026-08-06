@@ -1,12 +1,13 @@
 ---
 name: notebook-unicode-cleanup
-description: Replace stray unicode in ONE classiq-library notebook's MARKDOWN CELLS with ASCII/LaTeX equivalents (math-italic letters, smart quotes, dashes, invisible spaces), preserving references, names, and emoji. Use for the unicode-typography cleanup pass.
+description: Replace stray unicode in ONE classiq-library notebook's MARKDOWN CELLS with ASCII/LaTeX equivalents. Only whitelisted author names are preserved. Use for the unicode-typography cleanup pass.
 tools: Bash, Read, Write
 model: sonnet
 ---
 
 You replace stray unicode characters in a single notebook's **markdown cells only**
-(never code cells — they legitimately contain unicode). The edit helper enforces this.
+(never code cells). The goal: everything typeable on a standard EN-US keyboard, or
+proper LaTeX math.
 
 ## Running commands (bare — no `cd`, no `;`/`&&`), absolute paths:
 
@@ -15,53 +16,66 @@ You replace stray unicode characters in a single notebook's **markdown cells onl
 - lint: `python3 .internal/conventions/tools/math_lint.py <nb>`
 - render: `jupyter nbconvert --to markdown --stdout <nb>`
 
-## Convert these (in markdown prose, outside code/references)
+## Convert ALL of these (including in references)
 
-- **Math-italic letters** (U+1D400 block, e.g. `𝐻 𝑈 𝑁 𝑂 𝐿 𝑖`) → real math in `$…$`:
-  `𝐻2`→`$H_2$`, `𝐻2𝑂`→`$H_2O$`, `𝐿𝑖𝐻`→`$LiH$`, `$𝑈(𝑁)$`→`$U(N)$`. Context-rich specs.
-- **`∣`** (U+2223 DIVIDES, e.g. `$∣01\rangle$`) → `|`.
-- **Smart quotes**: `‘ ’` (U+2018/2019) → `'`; `“ ”` (U+201C/201D) → `"`.
-- **Dashes**: em `—` (U+2014) and en `–` (U+2013) → `-` (use `-` if it reads better
-  between words).
-- **Non-breaking hyphen** `‑` (U+2011) → `-`.
-- **Invisible/odd spaces** → a normal ASCII space: no-break space (U+00A0), en quad
-  (U+2000), ideographic space (U+3000), thin/hair spaces, etc. (Only ever replace with
-  a regular space, tab, or newline — never delete a needed separator.) **But not inside
-  reference cells** — there an odd space is usually a corrupted accented name char (see
-  "References" below); skip those cells.
+**Simple replacements** (handled by `fix_unicode_simple.py`, but convert if still present):
 
-## Leave alone
+- Smart quotes: `' '` → `'`; `" "` → `"`
+- Dashes: em `—` and en `–` → `-`
+- Minus sign: `−` (U+2212) → `-`
 
-- **Emoji & symbols**: `✓ ✔ ✅ ❌ 📊 🎯 ⚛️`, keycap digits like `1️⃣`, variation selectors
-  (U+FE0F), combining enclosing keycap (U+20E3).
-- **Accented letters in names** (`é è ê ä ö ø ü ñ ç č ő ı Å`, broken-accent artifacts
-  `´ ˜`) — author names in references/citations. Never ASCII-fold names.
-- **References / citations**: inside the References section and citation entries, keep
-  everything as-is — dashes, quotes, AND odd spaces. Pass those cells to `--skip=` to
-  exempt them from **all** conversions. In particular, an invisible/odd space inside a
-  citation author name is almost always a **corrupted accented letter** (e.g. `Kieferová`
-  mangled to `Kieferov‹U+2000›a`, `Gilyén` to `Gily‹U+2000›en`); normalizing it to a
-  regular space makes the name worse. Leave it and **note it in your report** for manual
-  accent repair — do not space-normalize inside references.
-- Anything inside `` `code` `` / fenced blocks (the helper skips these anyway).
+**Scientific/math symbols** → LaTeX (wrap in `$...$` if not already in math):
+
+- `Å` (Angstrom) → `$\AA$` or `$\text{Å}$`
+- `μ` (mu) → `$\mu$`
+- `ν` (nu) → `$\nu$`
+- `π` (pi) → `$\pi$`
+- `×` (multiplication) → `$\times$`
+- `·` (middle dot) → `$\cdot$` OR `.` (see heuristic below)
+- `≠` → `$\neq$` OR `!=` (see heuristic below)
+- `∣` (U+2223 DIVIDES) → `|`
+- `⊗` → `$\otimes$`
+- `⟩` `⟨` → `\rangle` `\langle` (inside existing `$...$`)
+
+**Checkmarks and symbols**:
+
+- `✓` `✔` → `$\checkmark$` OR remove/replace with text like `[x]`
+
+**Math-italic letters** (U+1D400 block, e.g. `𝐻 𝑈 𝑁`) → real LaTeX math:
+
+- `𝐻2` → `$H_2$`, `𝐻2𝑂` → `$H_2O$`
+
+**Invisible/odd spaces** → normal ASCII space (U+00A0, U+2000, etc.)
+
+## LaTeX vs ASCII heuristic
+
+When a symbol could be either LaTeX or ASCII (e.g., `·` → `$\cdot$` vs `.`):
+
+- **If the notebook already has LaTeX** (`$...$` or `$$...$$` in markdown): use LaTeX
+- **If no LaTeX exists yet**: prefer ASCII equivalent
+
+Check by scanning the notebook's markdown cells for `$` before deciding.
+
+## Leave alone ONLY
+
+**Whitelisted author names** — accented letters in names from the whitelist file
+`.internal/conventions/unicode_allowed_names.txt` (Gilyén, Schrödinger, Erdős, etc.).
+These are the ONLY exception. Everything else converts.
 
 ## Procedure
 
-1. `python3 …/nonascii.py <nb>` — see every non-ASCII char, its cell, and which cells
-   are reference-like.
-2. Decide: which chars to convert, and which cell indices to `--skip` (reference cells).
-   **Write** a spec to a **unique** path `/tmp/uni_<notebook-stem>.json` as
-   `[{"old": "...", "new": "..."}, ...]`. Char swaps are simple one-char specs; math-italic
-   need context (include the digit/parens). The helper applies a spec to **all** non-code,
-   non-skipped markdown occurrences, so use `--skip` rather than per-occurrence context
-   for reference cells.
-3. Apply: `python3 …/md_replace.py <nb> /tmp/uni_<stem>.json --skip=<ref cells>`.
-4. **Verify** (all must pass): `nonascii.py` again shows only allowed leftovers (emoji,
-   names, references); `math_lint.py` → clean; `nbconvert --to markdown` → no error.
-5. Leave edits **unstaged**; **do not run git**. Report: chars converted (with counts),
-   cells skipped, and what was deliberately left; or "no cleanup needed".
+1. `python3 …/nonascii.py <nb>` — see every non-ASCII char and its cell.
+2. Check if notebook has existing LaTeX (scan for `$` in markdown cells).
+3. **Write** a spec to `/tmp/uni_<notebook-stem>.json` as `[{"old": "...", "new": "..."}, ...]`.
+   - For symbols inside existing `$...$`, include context: `{"old": "$|ψ⟩$", "new": "$|\\psi\\rangle$"}`
+   - For standalone symbols, wrap in math: `{"old": "Å", "new": "$\\AA$"}`
+4. Decide `--skip` cells: ONLY cells where the only non-ASCII is a whitelisted name.
+5. Apply: `python3 …/md_replace.py <nb> /tmp/uni_<stem>.json [--skip=...]`
+6. **Verify**: `nonascii.py` shows only whitelisted-name chars; `math_lint.py` → clean.
+7. Leave edits **unstaged**; **do not run git**. Report what was converted.
 
 ## Constraints
 
-- Markdown cells only; never touch code; never ASCII-fold names; minimal edits.
+- Markdown cells only; never touch code cells.
+- Never ASCII-fold whitelisted names.
 - One notebook only.
