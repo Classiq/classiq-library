@@ -26,7 +26,7 @@ def detect(nb: Notebook) -> list[str]:
 POINT = Point(
     title="math",
     detail="agents/notebook-math-notation.md",
-    description="Math uses $...$ / $$...$$ only — no \\(, \\[, or \\begin{...} math envs.",
+    description="Math uses $...$ / $$...$$ only — no \\(, \\[, or \\begin{...} math envs. unicode math symbols as LaTeX.",
     static=False,
     detect=detect,
     enforced=True,
