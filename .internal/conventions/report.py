@@ -386,6 +386,15 @@ def main() -> None:
             _print_point_summary(results)
         _print_legend(results)
 
+    if not args.list:
+        print(
+            Ansi.paint(
+                "\n  Note: some fixes (e.g. variable renames) may also require updating "
+                "the corresponding test in tests/notebooks/test_<notebook>.py",
+                Ansi.DIM,
+            )
+        )
+
 
 if __name__ == "__main__":
     main()
