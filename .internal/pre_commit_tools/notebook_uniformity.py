@@ -11,13 +11,10 @@ To add or change an enforced rule, edit its point file; nothing here changes.
 """
 
 import importlib
-import sys
-from collections.abc import Iterable
+from functools import partial
 from pathlib import Path
 
-import nbformat
-
-from _common import PROJECT_ROOT
+from _common import PROJECT_ROOT, load_notebook, report, run_precommit, save_notebook
 from points._model import Notebook
 
 _POINTS_DIR = Path(__file__).resolve().parent / "points"
@@ -31,7 +28,6 @@ class Config:
 
 
 def enforced_points() -> list:
-    """Every `enforced` Point, discovered from the points/ directory."""
     points = []
     for module_path in sorted(_POINTS_DIR.glob("point_*.py")):
         point = importlib.import_module(f"points.{module_path.stem}").POINT
@@ -44,35 +40,29 @@ def _is_documented(nb: Notebook, point) -> bool:
     return any(fragment in nb.rel for fragment, _reason in point.exceptions)
 
 
-def main(full_file_paths: Iterable[str], auto_fix: bool) -> bool:
-    if Config.IS_DISABLED:
-        return True
-    points = enforced_points()
-    return all([check_notebook(path, points, auto_fix) for path in full_file_paths])
-
-
 def check_notebook(notebook_path: str, points: list, auto_fix: bool) -> bool:
     abs_path = PROJECT_ROOT / notebook_path
-    nb = nbformat.read(str(abs_path), as_version=4)
+    nb = load_notebook(str(abs_path))
 
     fixed = [p.title for p in points if p.fix and auto_fix and p.fix(nb.cells)]
     if fixed:
-        nbformat.write(nb, str(abs_path))
+        save_notebook(str(abs_path), nb)
 
     model = Notebook.load(abs_path, PROJECT_ROOT)
     unfixed = [
         p.title for p in points if p.detect(model) and not _is_documented(model, p)
     ]
 
-    if not fixed and not unfixed:
-        return True
-    print(f"{notebook_path}:")
     for title in fixed:
-        print(f"\tformat {title}: auto-fixed — please `git add`")
+        report(notebook_path, f"{title}: auto-fixed — please `git add`", fixed=True)
     for title in unfixed:
-        print(f"\tcheck  {title}: needs a manual fix")
+        report(notebook_path, f"{title}: needs a manual fix")
     return not (fixed or unfixed)
 
 
 if __name__ == "__main__":
-    sys.exit(not main(sys.argv[1:], Config.SHOULD_AUTO_FIX))
+    if not Config.IS_DISABLED:
+        points = enforced_points()
+        run_precommit(
+            partial(check_notebook, points=points, auto_fix=Config.SHOULD_AUTO_FIX)
+        )

@@ -1,39 +1,30 @@
 #!/usr/bin/env python3
 
-import sys
-import nbformat
+from _common import load_notebook, report, run_precommit, save_notebook
 
 VERSION_MAJOR = 4
 VERSION_MINOR = 9
 
 
-def main() -> bool:
-    result = True
-    for file in sys.argv[1:]:
-        result &= update_single_notebook(file)
-    return result
-
-
 def update_single_notebook(notebook_path: str) -> bool:
-    result = True
     try:
-        nb = nbformat.read(notebook_path, as_version=VERSION_MAJOR)
+        nb = load_notebook(notebook_path)
 
         if (nb.nbformat, nb.nbformat_minor) != (VERSION_MAJOR, VERSION_MINOR):
-            result = False  # this file required change
-            print(
-                f"Updating notebook version from {(nb.nbformat, nb.nbformat_minor)} to {(VERSION_MAJOR, VERSION_MINOR)} for '{notebook_path}'"
-            )
-
             nb.nbformat = VERSION_MAJOR
             nb.nbformat_minor = VERSION_MINOR
-            nbformat.validate(nb)
-            nbformat.write(nb, notebook_path)
+            save_notebook(notebook_path, nb)
+            report(
+                notebook_path,
+                f"updated nbformat version to ({VERSION_MAJOR}, {VERSION_MINOR})",
+                fixed=True,
+            )
+            return False
     except Exception as exc:
-        result = False
-        print(f"Upgrading version failed for '{notebook_path}'. Error: {exc}")
-    return result
+        report(notebook_path, f"upgrading version failed: {exc}")
+        return False
+    return True
 
 
 if __name__ == "__main__":
-    sys.exit(not main())
+    run_precommit(update_single_notebook)

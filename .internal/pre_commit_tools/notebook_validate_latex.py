@@ -1,32 +1,20 @@
 #!/usr/bin/env python3
 
-import json
 import re
-import sys
 
 import latex2mathml.converter
+
+from _common import get_cell_source, iter_cells, load_notebook, report, run_precommit
 
 _LATEX_PATTERN = re.compile("(?<!\\\\)(\\${1,2})(.*?)\\1", re.DOTALL)
 
 
-def main() -> bool:
-    result = True
-    for filepath in sys.argv[1:]:
-        if filepath.endswith(".ipynb"):
-            result &= validate_latex(filepath)
-    return result
-
-
 def validate_latex(filepath: str) -> bool:
-    with open(filepath, encoding="utf-8") as f:
-        notebook = json.load(f)
+    nb = load_notebook(filepath)
 
     result = True
-    for cell_idx, cell in enumerate(notebook.get("cells", [])):
-        if cell.get("cell_type") != "markdown":
-            continue
-
-        source = "".join(cell.get("source", []))
+    for cell_idx, cell in iter_cells(nb, "markdown"):
+        source = get_cell_source(cell)
         for match in _LATEX_PATTERN.finditer(source):
             math_str = match.group(2)
             if not math_str.strip():
@@ -36,12 +24,10 @@ def validate_latex(filepath: str) -> bool:
                 latex2mathml.converter.convert(math_str)
             except Exception as e:
                 result = False
-                snippet = math_str.strip()[:50]
-                print(f"{filepath} | cell {cell_idx}: invalid LaTeX: {snippet}...")
-                print(f"  {e}")
+                report(filepath, f"invalid LaTeX: {e}", cell_idx, math_str)
 
     return result
 
 
 if __name__ == "__main__":
-    sys.exit(not main())
+    run_precommit(validate_latex)

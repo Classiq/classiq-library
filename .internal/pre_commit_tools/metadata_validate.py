@@ -3,17 +3,15 @@
 
 import os
 import re
-import json
-import sys
-from collections.abc import Iterable
+from functools import partial
 from pathlib import Path
 
+from _common import report, run_precommit
 from metadata_utils import (
     PROJECT_ROOT,
     ALL_FIELDS,
     ALL_FIELDS_BY_NAME,
     file_name_to_metadata_file_name,
-    NO_ERROR,
     METADATA_FILE_JSON_SUFFIX,
     is_dir_empty,
     generate_empty_metadata_file,
@@ -29,121 +27,98 @@ from metadata_consts import (
 )
 
 
-def main(full_file_paths: Iterable[str], auto_fix: bool) -> bool:
-    if Config.IS_DISABLED:
-        return True
-
-    result = validate_all_files(full_file_paths, auto_fix)
-    if Config.SHOULD_CLEAN_LEFTOVER_METADATA:
-        result &= clean_leftover_metadata_files(auto_fix)
+def check_single_file(file: str, auto_fix: bool) -> bool:
+    result = validate_file(file, auto_fix)
+    if (
+        Config.SHOULD_VALIDATE_SAME_NAME
+        and file.endswith(".ipynb")
+        and not validate_same_name(file)
+    ):
+        result = False
     return result
 
 
-def validate_all_files(full_file_paths: Iterable[str], auto_fix: bool) -> bool:
-    errors = []
-
-    for file in full_file_paths:
-        if should_exclude_file(file):
-            continue
-        if error := validate_file(file, auto_fix):
-            errors.append(error)
-        if (
-            Config.SHOULD_VALIDATE_SAME_NAME
-            and file.endswith(".ipynb")
-            and (error := validate_same_name(file))
-        ):
-            errors.append(error)
-
-    if errors:
-        print("\n".join(errors))
-
-    return not errors  # if not errors, return True = all is good
-
-
-def validate_file(file: str, auto_fix: bool) -> str:
-    if error := _validate_metadata_file_exists(file, auto_fix):
-        return error
+def validate_file(file: str, auto_fix: bool) -> bool:
+    if not _validate_metadata_file_exists(file, auto_fix):
+        return False
 
     if not Config.SHOULD_VALIDATE_METADATA_CONTENT:
-        return NO_ERROR
+        return True
 
-    errors = []
+    result = True
     metadata = load_metadata(file)
 
-    # remove extra fields
-    if error := _validate_no_extra_fields(metadata, auto_fix, file):
-        errors.append(error)
+    if not _validate_no_extra_fields(metadata, auto_fix, file):
+        result = False
         metadata = load_metadata(file)
 
-    # add missing fields
-    if error := _validate_no_missing_fields(metadata, auto_fix, file):
-        errors.append(error)
+    if not _validate_no_missing_fields(metadata, auto_fix, file):
+        result = False
         metadata = load_metadata(file)
 
-    # validate field type and value
-    if error := _validate_metadata_fields(metadata, auto_fix, file):
-        errors.append(error)
-        metadata = load_metadata(file)
+    if not _validate_metadata_fields(metadata, auto_fix, file):
+        result = False
 
-    if errors:
-        errors.insert(0, f"File {file} contains {len(errors)} errors")
-    return "\n\t".join(errors)
+    return result
 
 
-def _validate_metadata_file_exists(file: str, auto_fix: bool) -> str:
+def _validate_metadata_file_exists(file: str, auto_fix: bool) -> bool:
     metadata_file = file_name_to_metadata_file_name(file)
-    if not os.path.exists(metadata_file):
-        if auto_fix:
-            error = f"File '{file}' is missing a metadata file. Adding it. Please `git add` the new file '{metadata_file}'"
-            if extra_error := generate_empty_metadata_file(file):
-                error = f"{error}\n\t{extra_error}"
-        else:
-            error = f"File '{file}' is missing a metadata file. (Expecting '{metadata_file}')"
+    if os.path.exists(metadata_file):
+        return True
+
+    if auto_fix:
+        report(
+            file,
+            f"missing metadata file — adding '{metadata_file}', please `git add`",
+            fixed=True,
+        )
+        if extra_error := generate_empty_metadata_file(file):
+            report(file, extra_error)
     else:
-        error = NO_ERROR
+        report(file, f"missing metadata file (expecting '{metadata_file}')")
+    return False
 
-    return error
 
-
-def _validate_no_extra_fields(metadata: dict, auto_fix: bool, file: str) -> str:
+def _validate_no_extra_fields(metadata: dict, auto_fix: bool, file: str) -> bool:
     if Config.SHOULD_ALLOW_EXTRA_FIELDS:
-        return NO_ERROR
+        return True
 
     extra_fields = [field for field in metadata if field not in ALL_FIELDS_BY_NAME]
     if not extra_fields:
-        return NO_ERROR
+        return True
 
     if auto_fix:
         for field in extra_fields:
             metadata.pop(field)
         dump_metadata(file, metadata)
-        return f"Removed extra metadata fields ({extra_fields})"
+        report(file, f"removed extra metadata fields ({extra_fields})", fixed=True)
     else:
-        return f"Metadata contains extra fields: ({extra_fields})"
+        report(file, f"metadata contains extra fields: ({extra_fields})")
+    return False
 
 
-def _validate_no_missing_fields(metadata: dict, auto_fix: bool, file: str) -> str:
+def _validate_no_missing_fields(metadata: dict, auto_fix: bool, file: str) -> bool:
     if Config.SHOULD_SKIP_MISSING_FIELDS:
-        return NO_ERROR
+        return True
 
     missing_fields = [field for field in ALL_FIELDS if field.name not in metadata]
     if not missing_fields:
-        return NO_ERROR
+        return True
 
     if auto_fix:
         for field in missing_fields:
             metadata[field.name] = field.generate_default_value(file)
         dump_metadata(file, metadata)
-        return f"Added missing metadata fields ({missing_fields})"
+        report(file, f"added missing metadata fields ({missing_fields})", fixed=True)
     else:
-        return f"Metadata has missing fields: ({missing_fields})"
+        report(file, f"metadata has missing fields: ({missing_fields})")
+    return False
 
 
-def _validate_metadata_fields(metadata: dict, auto_fix: bool, file: str) -> str:
-    errors = []
-    # we may edit the dict while iterating it.
-    #   our edits will alter the value, so that's a safe edit
-    #   nontheless, we create a copy to iterate the copy
+def _validate_metadata_fields(metadata: dict, auto_fix: bool, file: str) -> bool:
+    result = True
+    # iterating a copy because auto_fix may edit the dict
     metadata_copy = metadata.copy()
 
     for field_name, value in metadata_copy.items():
@@ -155,27 +130,26 @@ def _validate_metadata_fields(metadata: dict, auto_fix: bool, file: str) -> str:
         field = ALL_FIELDS_BY_NAME[field_name]
 
         if not field.verify_type(value):
-            errors.append(
-                f"Field type error: {field_name} expects '{field._expected_type}', but got '{type(value)}'"
+            report(
+                file,
+                f"field type error: {field_name} expects '{field._expected_type}', got '{type(value)}'",
             )
+            result = False
             continue
 
         if not field.verify_value(value):
             if isinstance(field, FieldStr):
-                errors.append(
-                    f"Field value error: {field_name} expects non-empty string"
+                report(
+                    file, f"field value error: {field_name} expects non-empty string"
                 )
             elif isinstance(field, FieldList):
-                errors.append(
-                    f"Field value error: {field_name} expects the value to be one of {field.allowed_values}"
+                report(
+                    file,
+                    f"field value error: {field_name} expects one of {field.allowed_values}",
                 )
+            result = False
 
-    if errors:
-        return f"Metadata fields has {len(errors)} errors:\n\t\t" + "\n\t\t".join(
-            errors
-        )
-    else:
-        return NO_ERROR
+    return result
 
 
 def should_exclude_file(file_path: str) -> bool:
@@ -187,20 +161,23 @@ def should_exclude_file(file_path: str) -> bool:
     )
 
 
-def validate_same_name(file_path_ipynb: str) -> str:
+def validate_same_name(file_path_ipynb: str) -> bool:
     if os.path.basename(file_path_ipynb) in FILES_TO_IGNORE_SAME_NAME:
-        return NO_ERROR
+        return True
 
     notebook_path = Path(file_path_ipynb)
     folder = notebook_path.parent
     qmods = list(folder.rglob("*.qmod"))
 
-    error = NO_ERROR
     if len(qmods) == 1:
         expected_qmod_path = file_path_ipynb[: -len("ipynb")] + "qmod"
-        if not str(qmods[0]) == expected_qmod_path:
-            error = f"Notebook {file_path_ipynb} has a single qmod file. The qmod file sits in {qmods[0]}, but is expected to sit in {expected_qmod_path}"
-    return error
+        if str(qmods[0]) != expected_qmod_path:
+            report(
+                file_path_ipynb,
+                f"single qmod file sits in {qmods[0]}, expected {expected_qmod_path}",
+            )
+            return False
+    return True
 
 
 def clean_leftover_metadata_files(auto_fix: bool) -> bool:
@@ -219,19 +196,28 @@ def clean_leftover_metadata_files(auto_fix: bool) -> bool:
         ):
             result = False
             if auto_fix:
-                print(f"Deleting orphan metadata file: {file}")
+                report(str(file), "orphan metadata file — deleting", fixed=True)
                 file.unlink()
 
                 if is_dir_empty(folder):
-                    print(f"Deleting its folder: {folder}")
+                    report(str(folder), "empty folder — deleting", fixed=True)
                     folder.rmdir()
             else:
-                print(
-                    f"A metadata file with no `.qmod` or `.ipynb` files was found ({file})"
+                report(
+                    str(file),
+                    "orphan metadata file — no matching .qmod or .ipynb",
                 )
     return result
 
 
 if __name__ == "__main__":
-    if not main(sys.argv[1:], Config.SHOULD_AUTO_FIX):
-        sys.exit(1)
+    if not Config.IS_DISABLED:
+        run_precommit(
+            partial(check_single_file, auto_fix=Config.SHOULD_AUTO_FIX),
+            filter_file=lambda f: not should_exclude_file(f),
+            verify_all=(
+                partial(clean_leftover_metadata_files, Config.SHOULD_AUTO_FIX)
+                if Config.SHOULD_CLEAN_LEFTOVER_METADATA
+                else None
+            ),
+        )
