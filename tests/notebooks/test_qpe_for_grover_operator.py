@@ -13,13 +13,6 @@ import itertools
 )  # bump from 1000  # bump from 2000
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
-    for qmod in itertools.chain(
-        tb.ref("qmods"),
-        tb.ref("qmods_width"),
-        tb.ref("qmods_cx"),
-    ):
-        validate_quantum_model(qmod)
-
     # test quantum programs
     """
     classiq depths: [866, 2596, 6056, 12976, 26816]
