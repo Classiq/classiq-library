@@ -6,7 +6,7 @@ from tests.utils_for_testbook import (
 from testbook.client import TestbookNotebookClient
 
 
-@wrap_testbook("max_flow_panhandle", timeout_seconds=12000)
+@wrap_testbook("max_flow_panhandle", timeout_seconds=10000)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
     validate_quantum_model(tb.ref("qmod"))
