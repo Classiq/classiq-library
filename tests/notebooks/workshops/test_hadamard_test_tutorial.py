@@ -12,6 +12,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test models
     validate_quantum_model(tb.ref("qmod"))
+    validate_quantum_model(tb.ref("qmod_with_execution_preferences"))
 
     # test quantum programs
     validate_quantum_program_size(

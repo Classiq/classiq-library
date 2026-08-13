@@ -9,17 +9,17 @@ from testbook.client import TestbookNotebookClient
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog_small_3sat"),
+        tb.ref_pydantic("one_rep_qprog_small_3sat"),
         expected_width=15,  # actual 12
         expected_depth=600,  # actual 362
     )
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog_large_3sat"),
+        tb.ref_pydantic("one_rep_qprog_large_3sat"),
         expected_width=24,  # actual 20
         expected_depth=1200,  # actual 921
     )
     validate_quantum_program_size(
-        tb.ref_pydantic("qprog_max_cut"),
+        tb.ref_pydantic("one_rep_qprog_max_cut"),
         expected_width=15,  # actual 13
         expected_depth=1100,  # actual 880
     )
