@@ -2,7 +2,6 @@ import numpy as np
 
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
-    validate_quantum_model,
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
@@ -30,8 +29,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 def _get_fraction_of_good_results(
     tb: TestbookNotebookClient, result_name: str
 ) -> float:
-    block_sum = tb.ref(
-        f'sum([d.shots for d in {result_name}.parsed_counts if d.state["block"] == 0])'
-    )
-    num_shots = tb.ref(f"{result_name}.num_shots")
-    return block_sum / num_shots
+    return tb.ref(f"{result_name}[{result_name}.block == 0].probability.sum()")

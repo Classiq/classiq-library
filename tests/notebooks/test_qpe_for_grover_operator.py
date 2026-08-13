@@ -1,6 +1,5 @@
 from tests.utils_for_testbook import (
     validate_quantum_program_size,
-    validate_quantum_model,
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient
@@ -12,7 +11,6 @@ import itertools
     "qpe_for_grover_operator", timeout_seconds=3600
 )  # bump from 1000  # bump from 2000
 def test_notebook(tb: TestbookNotebookClient) -> None:
-    # test models
     # test quantum programs
     """
     classiq depths: [866, 2596, 6056, 12976, 26816]

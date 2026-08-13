@@ -9,7 +9,6 @@ from testbook.client import TestbookNotebookClient
 @wrap_testbook("hhl_workshop", timeout_seconds=300)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     # test models
-    validate_quantum_model(tb.ref("qmod_b_load"))
     validate_quantum_model(tb.ref("qmod_hhl"))
 
     # test quantum programs

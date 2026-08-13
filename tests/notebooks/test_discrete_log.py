@@ -31,29 +31,25 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     actual_values = _get_distribution(df)
     expected_values = _get_uniform_distribution(df)
     # check that the distribution we got is close to even distribution
-    distance = rel_entr(actual_values, expected_values)  # 1.8, 3.01, 1.7, 3.1, 0.6, 4.4
+    distance = rel_entr(actual_values, expected_values)
     assert distance.sum() < 10
 
 
 def _get_result_as_dataframe(tb: TestbookNotebookClient) -> pd.DataFrame:
-    parsed_counts = tb.ref("[res.dict() for res in result_Z5.parsed_counts]")
-    data_list = [
-        (sample_state.state["func_res"], sample_state.shots)
-        for sample_state in parsed_counts
-    ]
-    df = pd.DataFrame(data_list).rename(columns={0: "func_res", 1: "shots"})
-    return df
+    func_res = tb.ref("result_Z5['func_res'].tolist()")
+    probability = tb.ref("result_Z5['probability'].tolist()")
+    return pd.DataFrame({"func_res": func_res, "probability": probability})
 
 
 def _get_distribution(df: pd.DataFrame) -> np.ndarray:
-    grouped = df.groupby("func_res").sum()
+    grouped = df.groupby("func_res")["probability"].sum()
     values = grouped.values.flatten()
     return values
 
 
 def _get_uniform_distribution(df: pd.DataFrame) -> np.ndarray:
-    total_num_shots = df["shots"].sum()
+    total_probability = df["probability"].sum()
     num_func_res_options = len(df["func_res"].unique())
 
-    expected_values = [total_num_shots / num_func_res_options] * num_func_res_options
+    expected_values = [total_probability / num_func_res_options] * num_func_res_options
     return expected_values
