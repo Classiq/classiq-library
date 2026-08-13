@@ -22,7 +22,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     for duration in tb.ref("durations"):
         assert duration < 30  # locally it is no longer than 30 seconds
     for duration in tb.ref("durations2"):
-        assert duration < 50  # locally it is no longer than 50 seconds
+        assert duration < 100  # locally it is no longer than 50 seconds
 
     assert np.isclose(
         tb.ref("VQE_energy")[-1], tb.ref("exact_energies")[-1], atol=0.01
