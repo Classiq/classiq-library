@@ -1,5 +1,12 @@
 {
   "constraints": {
-    "optimization_parameter": "width"
+    "max_width": 12,
+    "optimization_parameter": "cx"
+  },
+  "preferences": {
+    "custom_hardware_settings": {
+      "basis_gates": ["cx", "u"]
+    },
+    "transpilation_option": "custom"
   }
 }
