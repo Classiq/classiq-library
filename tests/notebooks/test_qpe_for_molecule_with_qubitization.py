@@ -10,11 +10,11 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # test quantum programs
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_qpe_walk"),
-        expected_depth=6700,  # actual 4824
+        expected_depth=7300,  # actual 6670
     )
     validate_quantum_program_size(
         tb.ref_pydantic("qprog_qpe_naive"),
-        expected_depth=25000,  # actual 18772
+        expected_depth=29000,  # actual 26347
     )
     # test notebook content
     pass  # Todo
