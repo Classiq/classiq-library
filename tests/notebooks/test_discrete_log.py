@@ -36,8 +36,8 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
 
 def _get_result_as_dataframe(tb: TestbookNotebookClient) -> pd.DataFrame:
-    func_res = tb.ref("result_Z5['func_res'].tolist()")
-    probability = tb.ref("result_Z5['probability'].tolist()")
+    func_res = tb.ref("df_Z5['func_res'].tolist()")
+    probability = tb.ref("df_Z5['probability'].tolist()")
     return pd.DataFrame({"func_res": func_res, "probability": probability})
 
 
