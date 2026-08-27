@@ -266,6 +266,7 @@ def _patch_testbook() -> None:
 
     TestbookNotebookClient.ref_numpy = ref_pickle
     TestbookNotebookClient.ref_pydantic = ref_pickle
+    TestbookNotebookClient.ref_df = ref_pickle  # alias for DataFrame results
 
     original_repr = TestbookNotebookClient.__repr__
 
