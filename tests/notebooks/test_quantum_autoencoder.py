@@ -31,7 +31,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    for data, res in zip(tb.ref("input_data"), tb.ref_pydantic("results_validator")):
+    for data, res in zip(tb.ref("input_data"), tb.ref_pydantic("dfs_validator")):
         df = res
         output = df.loc[df["probability"].idxmax(), "decoded"]
         assert data == output, "autoencoder failed to encode"
