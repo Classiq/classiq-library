@@ -5,7 +5,6 @@ from openfermion.utils.operator_utils import count_qubits
 from sympy import fwht
 from classiq import *
 import numpy as np
-from classiq.open_library.functions.state_preparation import apply_phase_table
 
 
 # TODO: remove after bug fix
@@ -261,7 +260,7 @@ def lcu_paulis_graycode(terms: list[SparsePauliTerm], data: QArray, block: QArra
         for i in range(n_qubits):
             multiplex_ra(0, 1, table_z[i, :], block, data[i])
             multiplex_ra(1, 0, table_y[i, :], block, data[i])
-        apply_phase_table(
+        assign_phase_table(
             [p1 - p2 for p1, p2 in zip(hamiltonian_coeffs, accumulated_phase)], block
         )
 
