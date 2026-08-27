@@ -25,4 +25,4 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    assert tb.ref('int(df["y"].apply(sum).sum())') == 0, "the y vector is not clean"
+    assert tb.ref('int(res["y"].apply(sum).sum())') == 0, "the y vector is not clean"
