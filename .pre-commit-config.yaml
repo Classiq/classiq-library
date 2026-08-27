@@ -35,6 +35,8 @@ repos:
     hooks:
       - id: nbqa-isort
         name: format    notebook isort
+        additional_dependencies:
+          - isort<9
 
   - repo: local
     hooks:
