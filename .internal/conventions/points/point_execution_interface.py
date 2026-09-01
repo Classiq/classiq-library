@@ -1,28 +1,29 @@
-"""Use the new execution interface, not the old execute() call.
+"""Use the new execution interface, not the old one.
 
-The SDK is moving from `execute(qprog).result_value()` to the ExecutionSession
-API (`es.sample()` / `.run()` / `.estimate()`) and `calculate_state_vector()`.
-This point tracks that migration; it supersedes `result_value` over time.
+This is not a single rule but a *family* of signals — the SDK moved from
+`execute(qprog).result_value()` and nested `ExecutionPreferences` to free
+`sample()` / `observe()` (and a flat `ExecutionSession` only for deliberate
+multi-call reuse), plus a DataFrame-shaped result. The individual signals live
+in `_exec_signals.py`; this point unions them and the report shows a per-family
+breakdown underneath it.
 """
 
-import re
-
+from . import _exec_signals
 from ._model import Notebook, Point
-
-_OLD_EXECUTE = re.compile(r"(?<![\w.])execute\(")
 
 
 def detect(nb: Notebook) -> list[str]:
-    return _OLD_EXECUTE.findall(nb.code)
+    return _exec_signals.detect(nb)
 
 
 POINT = Point(
     title="execution_interface",
-    detail="execute(qprog).result_value()  ->  ExecutionSession / calculate_state_vector",
-    description="Use the new execution interface (ExecutionSession, calculate_state_vector), "
-    "not execute(). Tracks the ongoing SDK migration.",
+    detail="execute() / ExecutionPreferences / .estimate / batch_*  ->  sample() / observe() / variational_minimize",
+    description="Use the new execution interface: free sample()/observe(), no nested "
+    "ExecutionPreferences, observe not .estimate, variational_minimize not .minimize, "
+    "no batch_*, and a DataFrame-shaped result (no .parsed_counts / .dataframe).",
     static=True,
     detect=detect,
-    fix=None,  # migration reshapes cells; done by the team's migration, not a regex
-    status="outdated",
+    fix=None,  # migration reshapes cells; handled per-family (script or agent), not one regex
+    subsignals=_exec_signals.SIGNALS,
 )
