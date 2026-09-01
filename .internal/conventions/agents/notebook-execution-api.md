@@ -96,6 +96,31 @@ count_0 = df[df["output_var"] == 0]["counts"].sum()
 total = df["counts"].sum()
 ```
 
+### 5b. estimate / minimize migration
+
+`observe` replaces `estimate`; `variational_minimize` replaces `minimize`.
+
+```python
+# OLD: standalone estimate on a session
+with ExecutionSession(qprog) as es:
+    value = es.estimate(hamiltonian).value
+
+# NEW: free observe() returns the float directly (no .value)
+value = observe(qprog, hamiltonian)
+
+# with parameters
+value = observe(qprog, hamiltonian, parameters={"params": p})
+```
+
+When the session is **kept** (in a loop — see rule 2), rename the methods in
+place; the signatures are unchanged:
+
+- `es.estimate(...)` → `es.observe(...)`
+- `es.minimize(...)` → `es.variational_minimize(...)`
+
+Note: SciPy's `optimize.minimize(...)` is unrelated — leave it alone. Only a
+session's `.minimize(` is migrated.
+
 ### 6. Imports to remove
 
 Remove these imports when no longer used:
@@ -124,6 +149,9 @@ Rename inconsistent shot count variables to `NUM_SHOTS`:
    - `ExecutionSession` usage
    - `set_execution_preferences()` calls
    - `ExecutionPreferences` imports
+   - `.estimate(` / `.minimize(` on a session (not SciPy's `optimize.minimize`)
+   - `batch_sample` / `batch_estimate` / `batch_observe` (pass a list of params
+     to the regular method instead)
    - Result access patterns (`parsed_counts`, `.dataframe`, `.counts`)
 
 2. **Plan** the changes:
