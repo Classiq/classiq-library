@@ -8,11 +8,26 @@ Scope: unless noted, a point was applied to the **`main` folders** only
 (`algorithms/`, `applications/`, `tutorials/`, ~163 notebooks). `community/`,
 `functions/`, and `benchmarking/` are reached by re-running the same agent/tool.
 
-> **Parked as _old_ — execution-API refactor.** `execution_interface`,
-> `result_value`, and `result_var` were shaped _before_ the execution API was
-> refactored, which superseded them. They stay in the report marked _old_ (for
-> the record), not as active work — `result_value` is still auto-enforced by the
-> pre-commit hook.
+> **`execution_interface` is now the active detector for the execution-API
+> migration.** It was reshaped (Sep 2026) into an _umbrella_ point over a family
+> of sub-signals (`points/_exec_signals.py`) — `execute(`, nested
+> `ExecutionPreferences(`, `ExecutionSession`, `parsed_counts`, `.dataframe`,
+> `set_*_preferences`, `.estimate(`, `.minimize(`, `batch_*`. The report shows the
+> umbrella score plus one indented sub-row per family (each with its own fraction
+> and %), so per-pattern scope is visible at a glance. Target interface follows
+> PR #1643 + the migration ticket: free `sample()` / `observe()` (a flat
+> `ExecutionSession` only for deliberate multi-call reuse), `observe` over
+> `.estimate`, `variational_minimize` over `.minimize`, no `batch_*`, and a
+> DataFrame-shaped result. **The ticket's `calculate_statevector` is a typo** —
+> the real SDK function is `calculate_state_vector` (verified against classiq
+> 1.27.0), which is current/correct, so it is deliberately _not_ a signal.
+>
+> **`result_value` / `result_var` stay parked as _old_.** They were shaped before
+> the exec-API refactor. `result_value` is still auto-enforced by the hook. The
+> result-variable naming they encode is being _superseded_ by a return-type split:
+> DataFrame results → `df` / `df_1` / `df_something` (prefix form, never
+> `something_df`); non-DataFrame → `result` / `job` (same prefix rule). That split
+> will land as its own point later.
 >
 > **`intro_opener` was dropped** — we decided not to pursue the "This notebook …"
 > opener convention. It stays in the report marked _dropped_.
@@ -27,23 +42,23 @@ Scope: unless noted, a point was applied to the **`main` folders** only
 
 Rows below follow the report's own order (skeleton → prose → code → parked).
 
-| Point                 | Convention                                            | Status                                                     | Resume / extend with                                                                |
-| --------------------- | ----------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `opens_h1`            | opens with an H1 title                                | ✅ done · **enforced** (check — a title can't be invented) | hook `pre_commit_tools/notebook_uniformity.py`                                      |
-| `single_h1`           | exactly one H1 (the title)                            | ✅ done · **enforced** (auto-fix)                          | `point_single_h1.fix()`; `one_off_fixes/fix_single_h1.py`                           |
-| `headings`            | heading hierarchy (levels & nesting)                  | ✅ main pass done (see report for residuals)               | agent `notebook-heading-hierarchy` + `tools/heading_outline.py`, `heading_stats.py` |
-| `title_case`          | headings in Title Case                                | ⛔ open (agent doc added)                                  | agent `notebook-title-case` + `tools/heading_outline.py`                            |
-| `math`                | display → `$$`; unicode math → LaTeX                  | ⏸ on hold by design                                        | agent `notebook-math-notation` + `tools/md_replace.py`, `math_lint.py`              |
-| `unicode`             | stray unicode typography → ASCII/LaTeX                | ✅ main pass done (see report for residuals)               | agent `notebook-unicode-cleanup` + `tools/nonascii.py`, `unicode_audit.py`          |
-| `references`          | `## References` (plural)                              | ✅ done · **enforced** (auto-fix)                          | hook                                                                                |
-| `def_main`            | builds a circuit (`def main` / known wrapper)         | 🔎 investigate-only; comparison notebooks are exceptions   | `report.py --rule def_main`                                                         |
-| `synthesize_main`     | `synthesize(main)`, not `create_model()+synthesize()` | 🟡 partial — trivial cases scripted; rest manual           | `one_off_fixes/collapse_synthesize.py`                                              |
-| `qprog_var`           | synth-output var `qprog` / `qprog_<suffix>`           | ✅ done                                                    | agent `notebook-variable-names` + `tools/rename_var.py`                             |
-| `show`                | `show(qprog)`, not `qprog.show()`                     | ✅ done · **enforced** (auto-fix)                          | hook                                                                                |
-| `execution_interface` | new execution-API usage                               | 🗄 old — superseded by the exec-API refactor                | `report.py --rule execution_interface --list`                                       |
-| `result_value`        | `.result_value()`, not `.result()[0].value`           | 🗄 old — superseded (still hook-enforced)                   | hook; `one_off_fixes/fix_result_value.py`                                           |
-| `result_var`          | exec-result var `result` / `job` (by type)            | 🗄 old — superseded by the exec-API refactor                | agent `notebook-variable-names` + `tools/rename_var.py`                             |
-| `intro_opener`        | "This notebook …" opener                              | 🗄 dropped — decided not to pursue                          | agent `notebook-intro-opener` + `tools/md_replace.py`                               |
+| Point                 | Convention                                              | Status                                                     | Resume / extend with                                                                   |
+| --------------------- | ------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `opens_h1`            | opens with an H1 title                                  | ✅ done · **enforced** (check — a title can't be invented) | hook `pre_commit_tools/notebook_uniformity.py`                                         |
+| `single_h1`           | exactly one H1 (the title)                              | ✅ done · **enforced** (auto-fix)                          | `point_single_h1.fix()`; `one_off_fixes/fix_single_h1.py`                              |
+| `headings`            | heading hierarchy (levels & nesting)                    | ✅ main pass done (see report for residuals)               | agent `notebook-heading-hierarchy` + `tools/heading_outline.py`, `heading_stats.py`    |
+| `title_case`          | headings in Title Case                                  | ⛔ open (agent doc added)                                  | agent `notebook-title-case` + `tools/heading_outline.py`                               |
+| `math`                | display → `$$`; unicode math → LaTeX                    | ⏸ on hold by design                                        | agent `notebook-math-notation` + `tools/md_replace.py`, `math_lint.py`                 |
+| `unicode`             | stray unicode typography → ASCII/LaTeX                  | ✅ main pass done (see report for residuals)               | agent `notebook-unicode-cleanup` + `tools/nonascii.py`, `unicode_audit.py`             |
+| `references`          | `## References` (plural)                                | ✅ done · **enforced** (auto-fix)                          | hook                                                                                   |
+| `def_main`            | builds a circuit (`def main` / known wrapper)           | 🔎 investigate-only; comparison notebooks are exceptions   | `report.py --rule def_main`                                                            |
+| `synthesize_main`     | `synthesize(main)`, not `create_model()+synthesize()`   | 🟡 partial — trivial cases scripted; rest manual           | `one_off_fixes/collapse_synthesize.py`                                                 |
+| `qprog_var`           | synth-output var `qprog` / `qprog_<suffix>`             | ✅ done                                                    | agent `notebook-variable-names` + `tools/rename_var.py`                                |
+| `show`                | `show(qprog)`, not `qprog.show()`                       | ✅ done · **enforced** (auto-fix)                          | hook                                                                                   |
+| `execution_interface` | new execution-API usage (umbrella over a signal family) | 🟢 active — 54/163 main still on old API (detect done)     | `report.py --rule execution_interface [--cards]`; signals in `points/_exec_signals.py` |
+| `result_value`        | `.result_value()`, not `.result()[0].value`             | 🗄 old — superseded (still hook-enforced)                   | hook; `one_off_fixes/fix_result_value.py`                                              |
+| `result_var`          | exec-result var `result` / `job` (by type)              | 🗄 old — superseded by the exec-API refactor                | agent `notebook-variable-names` + `tools/rename_var.py`                                |
+| `intro_opener`        | "This notebook …" opener                                | 🗄 dropped — decided not to pursue                          | agent `notebook-intro-opener` + `tools/md_replace.py`                                  |
 
 Not a point: **sidecar files** (`.qmod` / `.synth` / `.metadata`) — out of scope here.
 

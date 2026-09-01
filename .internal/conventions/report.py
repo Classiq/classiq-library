@@ -18,7 +18,7 @@ import os
 import subprocess
 import sys
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -41,9 +41,9 @@ ORDER = [
     # prose & notation
     "math", "unicode", "references",
     # code & circuit
-    "def_main", "synthesize_main", "qprog_var", "show",
+    "def_main", "synthesize_main", "qprog_var", "show", "execution_interface",
     # parked — superseded by the execution-API refactor
-    "execution_interface", "result_value", "result_var",
+    "result_value", "result_var",
     # parked — decided against
     "intro_opener",
 ]  # fmt: skip
@@ -107,46 +107,88 @@ def _active(point: Point) -> bool:
 # --- analysis -------------------------------------------------------------
 
 
+# --- counts shared by a point and its sub-signals -------------------------
+
+Counts = dict[str, tuple[int, int]]  # group -> (conforming, total)
+
+
+def _ok(counts: Counts) -> int:
+    return sum(ok for ok, _ in counts.values())
+
+
+def _total(counts: Counts) -> int:
+    return sum(total for _, total in counts.values())
+
+
+def _pct(counts: Counts) -> int:
+    # floor, never round up: 100% must mean truly complete, not 216/217
+    return 100 * _ok(counts) // _total(counts) if _total(counts) else 100
+
+
+def _counts_by_group(bad: set[str], nbs: list[Notebook]) -> Counts:
+    """(conforming, total) per group, given the set of offending paths."""
+    counts = {}
+    for g in GROUPS:
+        group = [nb for nb in nbs if _group(nb.rel) == g]
+        counts[g] = (sum(nb.rel not in bad for nb in group), len(group))
+    return counts
+
+
+@dataclass
+class SubResult:
+    name: str  # a family signal under an umbrella point (e.g. "execute(")
+    counts: Counts
+
+    @property
+    def pct(self) -> int:
+        return _pct(self.counts)
+
+
 @dataclass
 class PointResult:
     point: Point
     offenders: list[Notebook]  # notebooks that violate the point (exceptions excluded)
-    counts: dict[str, tuple[int, int]]  # group -> (conforming, total)
+    counts: Counts
+    subs: list[SubResult] = field(default_factory=list)  # per-family breakdown, if any
 
     @property
     def ok(self) -> int:
-        return sum(ok for ok, _ in self.counts.values())
+        return _ok(self.counts)
 
     @property
     def total(self) -> int:
-        return sum(total for _, total in self.counts.values())
+        return _total(self.counts)
 
     @property
     def pct(self) -> int:
-        # floor, never round up: 100% must mean truly complete, not 216/217
-        return 100 * self.ok // self.total if self.total else 100
+        return _pct(self.counts)
 
     @property
     def conforms(self) -> bool:
         return not self.offenders
 
 
+def _excepted(point: Point, nb: Notebook) -> bool:
+    return any(frag in nb.rel for frag, _ in point.exceptions)
+
+
 def _offenders(point: Point, nbs: list[Notebook]) -> list[Notebook]:
-    return [
-        nb
-        for nb in nbs
-        if point.detect(nb) and not any(frag in nb.rel for frag, _ in point.exceptions)
-    ]
+    return [nb for nb in nbs if point.detect(nb) and not _excepted(point, nb)]
 
 
 def evaluate(point: Point, nbs: list[Notebook]) -> PointResult:
     offenders = _offenders(point, nbs)
-    bad = {nb.rel for nb in offenders}
-    counts = {}
-    for g in GROUPS:
-        group = [nb for nb in nbs if _group(nb.rel) == g]
-        counts[g] = (sum(nb.rel not in bad for nb in group), len(group))
-    return PointResult(point=point, offenders=offenders, counts=counts)
+    counts = _counts_by_group({nb.rel for nb in offenders}, nbs)
+    subs = [
+        SubResult(
+            name,
+            _counts_by_group(
+                {nb.rel for nb in nbs if det(nb) and not _excepted(point, nb)}, nbs
+            ),
+        )
+        for name, det in point.subsignals.items()
+    ]
+    return PointResult(point=point, offenders=offenders, counts=counts, subs=subs)
 
 
 def _is_approx(point: Point) -> bool:
@@ -280,6 +322,11 @@ def render_cards(
         split = " · ".join(f"{g} {ok}/{tot}" for g, (ok, tot) in r.counts.items())
         pct = Ansi.paint(f"{r.pct}%", _pct_color(r.pct))
         print(f"      {r.ok}/{r.total} ({pct})    {Ansi.paint(split, Ansi.DIM)}")
+        for s in r.subs:  # per-family breakdown, each with its own frac + %
+            name = Ansi.paint(f"{s.name:22}", Ansi.DIM)
+            spct = Ansi.paint(f"{s.pct}%", _pct_color(s.pct))
+            frac = f"{_ok(s.counts)}/{_total(s.counts)}"
+            print(f"        {name} {frac:>7} ({spct})")
         if show_files is not False and r.offenders:  # False hides; None caps; True all
             _print_paths(r.offenders, " " * 9, cap=None if show_files else PREVIEW)
 
@@ -297,9 +344,23 @@ def _table_row(r: PointResult) -> tuple[tuple, list[str | None]]:
     return cells, colors
 
 
+def _sub_row(s: SubResult) -> tuple[tuple, list[str | None]]:
+    fracs = tuple(_frac(s.counts[g]) for g in GROUPS) + (
+        _frac((_ok(s.counts), _total(s.counts))),
+    )
+    cells = ("", f"  {s.name}", *fracs, f"{s.pct}%", "")
+    colors: list[str | None] = [Ansi.DIM] * len(cells)
+    colors[6] = _pct_color(s.pct)  # keep the % readable even in a dimmed sub-row
+    return cells, colors
+
+
 def render_table(results: list[PointResult], show_files: bool | None) -> None:
     head = ("", "point", "main", "community", "other", "all", "%", "kind")
-    built = [_table_row(r) for r in results]
+    built = []
+    for r in results:
+        built.append(_table_row(r))
+        if _active(r.point):  # indented per-family sub-rows, each with its own frac + %
+            built.extend(_sub_row(s) for s in r.subs)
     rows = [cells for cells, _ in built]
     widths = [max(map(len, col)) for col in zip(head, *rows)]
 

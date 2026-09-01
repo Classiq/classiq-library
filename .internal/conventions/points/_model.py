@@ -67,6 +67,12 @@ class Point:
     status: str = "active"  # lifecycle: "active" | "outdated" | "dropped"
     exceptions: tuple = field(default_factory=tuple)  # (path_fragment, reason)
 
+    # Optional per-family breakdown: name -> detect(nb) for a sub-signal. When set,
+    # the point's own detect() is the union of these, and the report renders one
+    # indented sub-row (with its own fraction and %) per family. Used by
+    # `execution_interface`, whose migration is really a family of signals.
+    subsignals: dict = field(default_factory=dict)
+
     def tags(self) -> list[str]:
         if not self.static:
             return ["agent", "enforced"] if self.enforced else ["agent"]
