@@ -1,16 +1,22 @@
 import numpy as np
 
+from classiq import calculate_state_vector
 
-def get_projected_state_vector(res) -> np.ndarray:
-    """
-    Returns a reduced statevector from execution results.
-    Expects a 'data' variable, and a 'block' variable to be filtered out when not in the |0> state.
-    """
-    state_size = 2 ** len(res.output_qubits_map["data"])
-    proj_statevector = np.zeros(state_size).astype(complex)
 
-    df = res.dataframe
-    filtered_st = df[(df.block == 0) & (np.abs(df.amplitude) > 1e-12)]
+def get_projected_state_vector(qprog, data_size: int) -> np.ndarray:
+    """
+    Returns a reduced statevector from a quantum program.
+
+    Simulates ``qprog`` on the Classiq statevector simulator via
+    ``calculate_state_vector``, keeps only the amplitudes where the 'block'
+    register is in the |0> state, and scatters them into a dense vector indexed
+    by the 'data' register. ``data_size`` is the number of qubits in the 'data'
+    register.
+    """
+    proj_statevector = np.zeros(2**data_size).astype(complex)
+
+    df = calculate_state_vector(qprog, filters={"block": 0})
+    filtered_st = df[np.abs(df.amplitude) > 1e-12]
     proj_statevector[filtered_st.data] = filtered_st.amplitude
     return proj_statevector
 
