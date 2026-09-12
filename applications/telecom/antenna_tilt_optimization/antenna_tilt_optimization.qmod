@@ -1,0 +1,14 @@
+qstruct TiltVars {
+  tilts: qnum<2>[6];
+}
+
+qfunc main(params: real[2], output t: TiltVars) {
+  allocate(t);
+  hadamard_transform(t);
+  repeat (i: 1) {
+    phase ((((((((((((((((((((((((((((((((((((0 + ((1.35 * t.tilts[0]) * t.tilts[1])) + ((1.35 * t.tilts[0]) * t.tilts[2])) + ((0.1807 * t.tilts[0]) * t.tilts[3])) + ((0.1807 * t.tilts[0]) * t.tilts[4])) + ((0.1807 * t.tilts[0]) * t.tilts[5])) + ((-0.9225) * t.tilts[0])) + ((1.35 * t.tilts[1]) * t.tilts[0])) + ((1.35 * t.tilts[1]) * t.tilts[2])) + ((0.1851 * t.tilts[1]) * t.tilts[3])) + ((0.1851 * t.tilts[1]) * t.tilts[4])) + ((0.1851 * t.tilts[1]) * t.tilts[5])) + ((-0.948) * t.tilts[1])) + ((1.35 * t.tilts[2]) * t.tilts[0])) + ((1.35 * t.tilts[2]) * t.tilts[1])) + ((0.1741 * t.tilts[2]) * t.tilts[3])) + ((0.1741 * t.tilts[2]) * t.tilts[4])) + ((0.1741 * t.tilts[2]) * t.tilts[5])) + ((-0.9225) * t.tilts[2])) + ((0.1807 * t.tilts[3]) * t.tilts[0])) + ((0.1851 * t.tilts[3]) * t.tilts[1])) + ((0.1741 * t.tilts[3]) * t.tilts[2])) + ((1.35 * t.tilts[3]) * t.tilts[4])) + ((1.35 * t.tilts[3]) * t.tilts[5])) + ((-0.9) * t.tilts[3])) + ((0.1807 * t.tilts[4]) * t.tilts[0])) + ((0.1851 * t.tilts[4]) * t.tilts[1])) + ((0.1741 * t.tilts[4]) * t.tilts[2])) + ((1.35 * t.tilts[4]) * t.tilts[3])) + ((1.35 * t.tilts[4]) * t.tilts[5])) + ((-0.9) * t.tilts[4])) + ((0.1807 * t.tilts[5]) * t.tilts[0])) + ((0.1851 * t.tilts[5]) * t.tilts[1])) + ((0.1741 * t.tilts[5]) * t.tilts[2])) + ((1.35 * t.tilts[5]) * t.tilts[3])) + ((1.35 * t.tilts[5]) * t.tilts[4])) + ((-0.9) * t.tilts[5]), params[2 * i]);
+    apply_to_all(lambda(q) {
+      RX(params[(2 * i) + 1], q);
+    }, t);
+  }
+}
