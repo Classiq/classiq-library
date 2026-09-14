@@ -19,6 +19,7 @@ from tests.utils_for_tests import (
     resolve_notebook_path,
     should_skip_notebook,
 )
+from tests.utils_for_error_silencing import create_hooks, ALLOWED_ERRORS
 
 from classiq.interface.generator.quantum_program import QuantumProgram
 
@@ -46,6 +47,11 @@ adding this property must come after the testbook decorator
 since before the decorator, the function takes 0 arguments
 and after the decorator, it takes 1 - `tb`.
 
+5 - if the notebook raised an error we wish to ignore then skip the test
+more documentation in the decorator implementation
+note that this decorator can be placed pretty much everywhere post `testbook`
+as it only requires it's inner function to be run after the notebook was executed
+
 Other - replacements
 We allow running "regex replace" on the ipynb file, in order to ease the load on the tests.
 """
@@ -62,12 +68,26 @@ def wrap_testbook(
 
         notebook_path = resolve_notebook_path(notebook_name)
 
+        (
+            my_on_cell_error,
+            my_on_cell_start,
+            maybe_skip_the_entire_test_if_an_expected_error_we_want_to_silence_was_raised,
+        ) = create_hooks(notebook_name)
+
         with NotebookEdit(
             notebook_path, replacements_regex, replacements_variables
         ) as nr:
             for decorator in [
+                maybe_skip_the_entire_test_if_an_expected_error_we_want_to_silence_was_raised,
                 _build_patch_testbook_client_decorator(notebook_name),
-                testbook(notebook_path, execute=True, timeout=timeout_seconds),
+                testbook(
+                    notebook_path,
+                    execute=True,
+                    timeout=timeout_seconds,
+                    allow_error_names=[i[0] for i in ALLOWED_ERRORS],
+                    on_cell_error=my_on_cell_error,
+                    on_cell_start=my_on_cell_start,
+                ),
                 _build_cd_decorator(notebook_path),
                 _build_skip_decorator(notebook_path),
             ]:
