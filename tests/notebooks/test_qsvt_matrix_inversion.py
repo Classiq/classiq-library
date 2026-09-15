@@ -13,11 +13,11 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     A notebook for a hybrid classical quantum neural network.
     The test verifies that the pre-trained model is indeed well trained.
     """
-    # test quantum programs
+    # test quantum programs - using BlockEncoding.from_matrix with LCU
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
-        expected_width=5,  # actual width: 4
-        expected_depth=3200,  # actual depth: 2150
+        expected_width=10,  # LCU block encoding uses more ancilla qubits
+        expected_depth=15000,  # QSVT polynomial approximation
     )
 
     computed_x = tb.ref_pydantic("computed_x")
