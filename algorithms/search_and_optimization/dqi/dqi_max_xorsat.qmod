@@ -251,7 +251,7 @@ qfunc dqi_max_xor_sat_expanded___0(output y: qbit[6], output solution: qbit[6]) 
   binary_to_unary_expanded___0(k_num_errors, k_unary);
   pad_zeros_expanded___0(k_unary, y);
   prepare_dicke_state_unary_input_expanded___4(y);
-  vector_product_phase_expanded___0([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], y);
+  vector_product_phase_expanded___0([1, 1, 1, 1, 1, 1], y);
   matrix_vector_product_expanded___0(y, solution);
   syndrome_decode_lookuptable_expanded___0(solution, y);
   hadamard_transform_expanded___0(solution);
