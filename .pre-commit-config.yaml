@@ -150,3 +150,10 @@ repos:
         additional_dependencies:
           - "nbformat"
         require_serial: true
+      - id: random-seed-0
+        name: format    random seed
+        description: Auto-fix random seed to be 0.
+        entry: perl -pi -e 's/(random\.seed\(|random_seed\s*=\s*)-?\d+/${1}0/g'
+        language: system
+        files: \.ipynb$
+        require_serial: true
