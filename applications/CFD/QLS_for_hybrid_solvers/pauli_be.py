@@ -2,8 +2,8 @@ from openfermion import QubitOperator
 from classiq import SparsePauliOp
 from typing import cast
 from openfermion.utils.operator_utils import count_qubits
-from sympy import fwht
 from classiq import *
+from classiq.applications.block_encoding import BlockEncoding
 import numpy as np
 
 
@@ -49,9 +49,7 @@ def binary_diff_to_elementary(b1: str, b2: str) -> np.ndarray:
     return 2 * np.array(list(b1), dtype=int) + np.array(list(b2), dtype=int)
 
 
-def initialize_paulis_from_csr(
-    rowstt: np.ndarray, col: np.ndarray, nq: int, to_symmetrize: bool = True
-):
+def initialize_paulis_from_csr(rowstt: np.ndarray, col: np.ndarray, nq: int):
     transform_matrix: list[list[complex]] = list()
     coe_size = rowstt[-1::][0]
     terms_list: list[tuple()] = list()
@@ -83,21 +81,7 @@ def initialize_paulis_from_csr(
 
             scr_entry += 1
 
-    if not to_symmetrize:
-        return terms_list.copy(), transform_matrix.copy()
-
-    else:
-        paulis_sym_list = list()
-        transform_matrix_sym = list()
-        for term, coe in zip(terms_list, transform_matrix):
-            if [p[1] for p in term].count("Y") % 2 == 0:
-                paulis_sym_list.append(((nq, "X"),) + tuple((p[0], p[1]) for p in term))
-                transform_matrix_sym.append((np.real(coe)).tolist())
-            else:
-                paulis_sym_list.append(((nq, "Y"),) + tuple((p[0], p[1]) for p in term))
-                transform_matrix_sym.append((np.imag(coe)).tolist())
-
-        return paulis_sym_list.copy(), transform_matrix_sym.copy()
+    return terms_list.copy(), transform_matrix.copy()
 
 
 # This function returns an evaluation of a symbolic pauli decomposition given a csr entries
@@ -188,125 +172,23 @@ def trim_hamiltonian(hamiltonian, relative_threshold, jump_threshold=1.1):
     return trimmed_hamiltonian
 
 
-ANGLE_THRESHOLD = 1e-13
-
-
-def get_graycode(size, i) -> int:
-    if i == 2**size:
-        return get_graycode(size, 0)
-    return i ^ (i >> 1)
-
-
-def get_graycode_angles_wh(size, angles):
-    transformed_angles = fwht(np.array(angles) / 2**size)
-    return [transformed_angles[get_graycode(size, j)] for j in range(2**size)]
-
-
-def get_graycode_ctrls(size):
-    return [
-        (get_graycode(size, i) ^ get_graycode(size, i + 1)).bit_length() - 1
-        for i in range(2**size)
-    ]
-
-
-@qfunc
-def multiplex_ra(a_y: float, a_z: float, angles: list[float], qba: QArray, ind: QBit):
-    assert a_y**2 + a_z**2 == 1
-    # TODO support general (0,a_y,a_z) rotation
-    assert (
-        a_z == 1.0 or a_y == 1.0
-    ), "currently only strict y or z rotations are supported"
-    size = max(1, (len(angles) - 1).bit_length())
-    extended_angles = angles + [0] * (2**size - len(angles))
-    transformed_angles = get_graycode_angles_wh(size, extended_angles)
-    controllers = get_graycode_ctrls(size)
-
-    for k in range(2**size):
-        if np.abs(transformed_angles[k]) > ANGLE_THRESHOLD:
-            if a_z == 0.0:
-                RY(transformed_angles[k], ind)
-            else:
-                RZ(transformed_angles[k], ind)
-
-        skip_control(lambda: CX(qba[controllers[k]], ind))
-
-
-@qfunc
-def lcu_paulis_graycode(terms: list[SparsePauliTerm], data: QArray, block: QArray):
-    n_qubits = data.len
-    n_terms = len(terms)
-    table_z = np.zeros([n_qubits, n_terms])
-    table_y = np.zeros([n_qubits, n_terms])
-    probs = [abs(term.coefficient) for term in terms] + [0.0] * (2**block.len - n_terms)
-    hamiltonian_coeffs = np.angle([term.coefficient for term in terms]).tolist() + [
-        0.0
-    ] * (2**block.len - n_terms)
-    accumulated_phase = np.zeros(2**block.len).tolist()
-
-    for k in range(n_terms):
-        for pauli in terms[k].paulis:
-            if pauli.pauli == Pauli.Z:
-                table_z[pauli.index, k] = -np.pi
-                accumulated_phase[k] += np.pi / 2
-            elif pauli.pauli == Pauli.Y:
-                table_y[pauli.index, k] = -np.pi
-                accumulated_phase[k] += np.pi / 2
-            elif pauli.pauli == Pauli.X:
-                table_z[pauli.index, k] = -np.pi
-                table_y[pauli.index, k] = np.pi
-                accumulated_phase[k] += np.pi / 2
-
-    def select_graycode(block: QArray, data: QArray):
-        for i in range(n_qubits):
-            multiplex_ra(0, 1, table_z[i, :], block, data[i])
-            multiplex_ra(1, 0, table_y[i, :], block, data[i])
-        assign_phase_table(
-            [p1 - p2 for p1, p2 in zip(hamiltonian_coeffs, accumulated_phase)], block
-        )
-
-    within_apply(
-        lambda: inplace_prepare_state(probs, 0.0, block),
-        lambda: select_graycode(block, data),
-    )
-
-
 def get_pauli_be(mat_raw_scr, pauli_trim_rel_tol=0.1):
     """
-    Get relevant block-encoding properties for `lcu_paulis_graycode` block encoding,
+    Get a `BlockEncoding` for the matrix `mat_raw_scr`, via its Pauli decomposition.
 
     Parameters
     ----------
     mat_raw_scr : scipy.sparse.spmatrix
         Square sparse matrix of shape (N, N), real or complex, to be block-encoded.
-
-    Returns
-    -------
-    data_size : int
-       Size of the data variable.
-    block_size : int
-        Size of the block variable.
-    be_scaling_factor : float
-        The scaling factor of the block-encoding unitary
-    BlockEncodedState : QStruct
-        QSVT-compatible QStruct holding the quantum variables, with fields:
-          - data  : QNum[data_size]
-          - block : QNum[block_size]
-    be_qfunc : qfunc
-        Quantum function that implements the block encoding. Signature:
-        be_qfunc(be: BlockEncodedState) → None
     """
     rval = mat_raw_scr.data
     col = mat_raw_scr.indices
     rowstt = mat_raw_scr.indptr
-    nr = mat_raw_scr.shape[0]
 
     raw_size = mat_raw_scr.shape[0]
     data_size = max(1, (raw_size - 1).bit_length())
 
-    # Set to_symmetrize=False, since we are working with QSVT
-    paulis_list, transform_matrix = initialize_paulis_from_csr(
-        rowstt, col, data_size, to_symmetrize=False
-    )
+    paulis_list, transform_matrix = initialize_paulis_from_csr(rowstt, col, data_size)
 
     qubit_op = eval_pauli_op(paulis_list, transform_matrix, rval)
     qubit_op.compress(1e-12)
@@ -315,19 +197,8 @@ def get_pauli_be(mat_raw_scr, pauli_trim_rel_tol=0.1):
         hamiltonian, pauli_trim_rel_tol, jump_threshold=1.1
     )
 
-    be_scaling_factor = sum(
-        [np.abs(term.coefficient) for term in hamiltonian_trimmed.terms]
-    )
-    block_size = max(1, (len(hamiltonian_trimmed.terms) - 1).bit_length())
-
-    hamiltonian_trimmed = hamiltonian_trimmed * (1 / be_scaling_factor)
-
     print(
         f"number of Paulis before/after trimming {len(hamiltonian.terms)}/{len(hamiltonian_trimmed.terms)}"
     )
 
-    @qfunc
-    def be_qfunc(block: QNum, data: QNum):
-        lcu_paulis_graycode(hamiltonian_trimmed.terms, data, block)
-
-    return data_size, block_size, be_scaling_factor, be_qfunc
+    return BlockEncoding.from_sparse_pauli_op(hamiltonian_trimmed, graycode=True)
