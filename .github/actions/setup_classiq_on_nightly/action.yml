@@ -29,6 +29,11 @@ runs:
       with:
         python-version: "3.11"
 
+    - name: Propagate env-var for nightly
+      run: |
+        echo 'CLASSIQ_IDE="https://nightly.platform.classiq.io"' >> $GITHUB_ENV
+        echo 'CLASSIQ_HOST="https://nightly.platform.classiq.io"' >> $GITHUB_ENV
+
     # Configure AWS credentials
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4.0.2
