@@ -84,9 +84,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-venv-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
 
-      - name: Enter venv
-        run: echo "$PWD/${{ env.VENV_PATH }}/bin" >> $GITHUB_PATH
-
       - name: Install dependencies
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
