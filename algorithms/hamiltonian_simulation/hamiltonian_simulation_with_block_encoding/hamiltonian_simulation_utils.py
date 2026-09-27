@@ -43,7 +43,9 @@ def compare_quantum_classical_states(
     renormalized_state : the `resulted_state` after global-phase alignment and
         multiplication by `post_selection_factor`.
     overlap : The absolute value of the normalized inner product between
-        `renormalized_state` and `expected_state`.
+        `renormalized_state` and `expected_state`, rounded to 6 decimal places
+        (bounded by 1 up to floating-point noise; rounding avoids displaying
+        values like 1.0000000003).
     """
     relative_phase = np.angle(expected_state[0] / resulted_state[0])
     resulted_state = resulted_state * np.exp(1j * relative_phase)
@@ -55,4 +57,4 @@ def compare_quantum_classical_states(
         / np.linalg.norm(expected_state)
     )
 
-    return renormalized_state, abs(overlap)
+    return renormalized_state, round(abs(overlap), 6)

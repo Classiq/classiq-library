@@ -42,5 +42,5 @@ def fit_linear_coeffs_for_cheb(cheb_coefs):
     fitted_cheb_coeffs = np.array(
         [(-1) ** k * (b + k * m) for k in range(len(coeffs_to_fit))]
     )
-    print(f"linear fit parameters: slope = {m}, b= {b}")
+    print(f"linear fit parameters: slope = {m:.6g}, b= {b:.6g}")
     return fitted_cheb_coeffs
