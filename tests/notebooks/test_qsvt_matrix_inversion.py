@@ -7,17 +7,17 @@ from testbook.client import TestbookNotebookClient
 import numpy as np
 
 
-@wrap_testbook("qsvt_matrix_inversion", timeout_seconds=180)
+@wrap_testbook("qsvt_matrix_inversion", timeout_seconds=300)
 def test_notebook(tb: TestbookNotebookClient) -> None:
     """
-    A notebook for a hybrid classical quantum neural network.
-    The test verifies that the pre-trained model is indeed well trained.
+    QSVT matrix inversion via a by-hand QSVT inverse built on BlockEncoding,
+    verified against the classical solution.
     """
-    # test quantum programs - using BlockEncoding.from_matrix with LCU
+    # `qprog` is the by-hand QSVT inverse driven by BlockEncoding.from_matrix.
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
-        expected_width=10,  # LCU block encoding uses more ancilla qubits
-        expected_depth=33000,  # QSVT inversion (kappa~8.1, eps=5e-2); actual ~30751
+        expected_width=10,  # data + block-encoding ancillas + QSVT auxiliary
+        expected_depth=43000,  # by-hand QSVT (kappa_eff~12.9, eps=1e-4); actual ~41049
     )
 
     computed_x = tb.ref_pydantic("computed_x")
