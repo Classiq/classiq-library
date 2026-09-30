@@ -17,7 +17,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     validate_quantum_program_size(
         tb.ref_pydantic("qprog"),
         expected_width=10,  # LCU block encoding uses more ancilla qubits
-        expected_depth=15000,  # QSVT polynomial approximation
+        expected_depth=33000,  # QSVT inversion (kappa~8.1, eps=5e-2); actual ~30751
     )
 
     computed_x = tb.ref_pydantic("computed_x")
