@@ -124,7 +124,7 @@ repos:
         require_serial: true
 
       - id: validate-classiq-imports
-        name: forbid    from classiq import *
+        name: forbid    from classiq import stuff (use `import *`)
         language: pygrep
         files: \.ipynb$
         # This file has `from classiq import A as B`
