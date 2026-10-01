@@ -20,6 +20,14 @@ repos:
         name: format    end of file
       - id: trailing-whitespace
         name: format    trailing whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.9
+    hooks:
+      - id: ruff-check
+        name: format    notebook unused imports
+        types_or: [jupyter]
+        args: [--select, F401, --fix]
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.9.6
     hooks:
