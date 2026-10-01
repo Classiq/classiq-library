@@ -25,6 +25,7 @@ jobs:
 
     env:
       VENV_PATH: .venv
+      PYTHON_VERSION: "3.13"
       # Previosly we had:
       #   if workflow_dispatch: True
       #   if pull_request_target: False
@@ -55,7 +56,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Get latest classiq version for cache key
         id: classiq-version
@@ -82,7 +83,7 @@ jobs:
           path: ${{ env.VENV_PATH }}
           key: ${{ runner.os }}-venv-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}-requirements-${{ hashFiles('**/requirements*.txt') }}
           restore-keys: |
-            ${{ runner.os }}-venv-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
+            ${{ runner.os }}-venv-${{ env.PYTHON_VERSION }}-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
 
       - name: Enter venv
         run: echo "$PWD/${{ env.VENV_PATH }}/bin" >> $GITHUB_PATH
