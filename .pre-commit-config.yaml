@@ -115,6 +115,14 @@ repos:
           - "nbformat"
         require_serial: true
 
+      - id: validate-classiq-imports
+        name: forbid    from classiq import *
+        language: pygrep
+        files: \.ipynb$
+        # This file has `from classiq import A as B`
+        exclude: (^|/)qaoa_demonstration\.ipynb$
+        entry: "from classiq import [^*]"
+
       - id: validate-notebook-names
         name: validate  notebook names
         entry: .internal/pre_commit_tools/notebook_validate_names.py
