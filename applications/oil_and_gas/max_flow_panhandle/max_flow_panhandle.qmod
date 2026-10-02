@@ -1,0 +1,35 @@
+qperm graph_direction_control_qubits(y: qnum<3, UNSIGNED, 0>[5], output controls: qbit[]) {
+  allocate(4, controls);
+  controls[0] ^= (y[2] - y[0]) < 0;
+  controls[1] ^= (y[1] - y[0]) < 0;
+  controls[2] ^= (y[4] - y[1]) < 0;
+  controls[3] ^= (y[3] - y[1]) < 0;
+}
+
+qfunc cost_layer(gamma: real, y: qnum<3, UNSIGNED, 0>[5]) {
+  graph_direction_controller: qnum<4>;
+  within {
+    graph_direction_control_qubits(y, graph_direction_controller);
+  } apply {
+    control (graph_direction_controller == 15) {
+    } else {
+      phase (1.85 * gamma);
+    }
+  }
+  phase (((0.75 * ((1318.6913 - (((0.0 + (1.0 * (23.4851 * ((((-0.0173) * ((y[0] - y[2]) ** 2)) + (0.4179 * (y[0] - y[2]))) + 0.6289)))) + (3.0 * (75.1369 * ((((-0.0173) * ((y[1] - y[4]) ** 2)) + (0.4179 * (y[1] - y[4]))) + 0.6289)))) + (2.0 * (138.9884 * ((((-0.0173) * ((y[1] - y[3]) ** 2)) + (0.4179 * (y[1] - y[3]))) + 0.6289))))) / 791.8188)) + (0.125 * (((((((251.5296 * ((((-0.0173) * ((8 - y[0]) ** 2)) + (0.4179 * (8 - y[0]))) + 0.6289)) - (23.4851 * ((((-0.0173) * ((y[0] - y[2]) ** 2)) + (0.4179 * (y[0] - y[2]))) + 0.6289))) - (476.5009 * ((((-0.0173) * ((y[0] - y[1]) ** 2)) + (0.4179 * (y[0] - y[1]))) + 0.6289))) ** 2) - 0.0) / 368020.7306) + ((((((476.5009 * ((((-0.0173) * ((y[0] - y[1]) ** 2)) + (0.4179 * (y[0] - y[1]))) + 0.6289)) - (138.9884 * ((((-0.0173) * ((y[1] - y[3]) ** 2)) + (0.4179 * (y[1] - y[3]))) + 0.6289))) - (75.1369 * ((((-0.0173) * ((y[1] - y[4]) ** 2)) + (0.4179 * (y[1] - y[4]))) + 0.6289))) ** 2) - 0.0) / 321830.1876)))) + (-1.0), 1.85 * gamma);
+}
+
+qfunc mixer_layer(beta: real, y: qnum<3, UNSIGNED, 0>[5]) {
+  apply_to_all(lambda(q) {
+    RX(0.1 * beta, q);
+  }, y);
+}
+
+qfunc main(params: real[60], output y: qnum<3, UNSIGNED, 0>[5]) {
+  allocate(y);
+  hadamard_transform(y);
+  repeat (i: 30) {
+    cost_layer(params[2 * i], y);
+    mixer_layer(params[(2 * i) + 1], y);
+  }
+}
