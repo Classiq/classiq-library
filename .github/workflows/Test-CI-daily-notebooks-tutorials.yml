@@ -23,13 +23,6 @@ jobs:
 
       - name: Setup python and classiq and nightly aws
         uses: ./.github/actions/setup_classiq_on_nightly
-        with:
-          aws-role: ${{ secrets.AWS_ROLE }}
-          codeartifact-domain: ${{ secrets.CODEARTIFACT_DOMAIN }}
-          codeartifact-owner: ${{ secrets.CODEARTIFACT_OWNER }}
-          codeartifact-region: ${{ secrets.CODEARTIFACT_REGION }}
-          nightly-m2m-secret-arn: ${{ secrets.NIGHTLY_M2M_SECRET_ARN }}
-          pypi-nightly-name: ${{ secrets.PYPI_NIGHTLY_NAME }}
 
       - name: Get notebooks to tests
         id: list-files
