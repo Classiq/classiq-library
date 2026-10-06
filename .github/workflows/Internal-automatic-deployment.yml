@@ -21,3 +21,28 @@ jobs:
     with:
       deploy-mode: staging
     secrets: inherit
+
+  # Parallel (dual-write) uploads to the new-account buckets (dev, pre-release,
+  # prod), alongside the existing jobs above. Non-blocking: the called workflow
+  # soft-fails so it can't fail the deploy. All three target buckets are kept in
+  # sync on every merge (release_candidate included, unlike the old upload).
+  deploy-staging-new-accounts:
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
+    with:
+      deploy-mode: staging
+    secrets: inherit
+
+  deploy-release-candidate-new-accounts:
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
+    with:
+      deploy-mode: release_candidate
+    secrets: inherit
+
+  deploy-prod-new-accounts:
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
+    with:
+      deploy-mode: production
+    secrets: inherit
