@@ -28,6 +28,9 @@ jobs:
   # sync on every merge (release_candidate included, unlike the old upload).
   deploy-staging-new-accounts:
     if: github.event.pull_request.merged == true
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
     with:
       deploy-mode: staging
@@ -35,6 +38,9 @@ jobs:
 
   deploy-release-candidate-new-accounts:
     if: github.event.pull_request.merged == true
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
     with:
       deploy-mode: release_candidate
@@ -42,6 +48,9 @@ jobs:
 
   deploy-prod-new-accounts:
     if: github.event.pull_request.merged == true
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
     with:
       deploy-mode: production

@@ -34,11 +34,12 @@ on:
 jobs:
   get-config:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     outputs:
       environment: ${{ steps.get-config.outputs.environment }}
       qmod-bucket: ${{ steps.get-config.outputs.qmod-bucket }}
       aws-region: ${{ steps.get-config.outputs.aws-region }}
-      branch: ${{ steps.get-config.outputs.branch }}
     steps:
       - id: get-config
         name: "Get Configuration from deploy-mode"
@@ -52,19 +53,16 @@ jobs:
               ENVIRONMENT=prod
               AWS_REGION="us-east-1"
               QMOD_BUCKET="classiq-prod-us-east-1-ide-qmod-library-origin"
-              BRANCH="main"
               ;;
             release_candidate)
               ENVIRONMENT=prod
               AWS_REGION="us-west-2"
               QMOD_BUCKET="classiq-pre-release-ide-qmod-library-origin"
-              BRANCH="main"
               ;;
             staging)
               ENVIRONMENT=staging
               AWS_REGION="us-east-1"
               QMOD_BUCKET="classiq-dev-ide-qmod-library-origin"
-              BRANCH="main"
               ;;
             *)
               echo unknown
@@ -76,7 +74,6 @@ jobs:
             echo "environment=${ENVIRONMENT}"
             echo "aws-region=${AWS_REGION}"
             echo "qmod-bucket=${QMOD_BUCKET}"
-            echo "branch=${BRANCH}"
           } >>"$GITHUB_OUTPUT"
 
   main:
@@ -107,12 +104,14 @@ jobs:
           aws-region: ${{ needs.get-config.outputs.aws-region }}
           mask-aws-account-id: true
 
+      # Always deploy main's qmods (hardcoded trusted ref; this reusable workflow
+      # is invoked from a pull_request_target caller after merge).
       - name: Checkout qmod
         uses: actions/checkout@v7
         with:
           lfs: "false"
           path: qmod
-          ref: ${{ needs.get-config.outputs.branch }}
+          ref: main
 
       - name: Join QMOD Metadata
         run: |
