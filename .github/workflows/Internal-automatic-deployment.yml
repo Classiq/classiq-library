@@ -22,10 +22,7 @@ jobs:
       deploy-mode: staging
     secrets: inherit
 
-  # Parallel (dual-write) uploads to the new-account buckets (dev, pre-release,
-  # prod), alongside the existing jobs above. Non-blocking: the called workflow
-  # soft-fails so it can't fail the deploy. All three target buckets are kept in
-  # sync on every merge (release_candidate included, unlike the old upload).
+  # Dual-write to the new-account buckets, alongside the jobs above. Non-blocking.
   deploy-staging-new-accounts:
     if: github.event.pull_request.merged == true
     permissions:
