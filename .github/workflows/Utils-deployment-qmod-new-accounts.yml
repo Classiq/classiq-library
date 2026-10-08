@@ -95,8 +95,9 @@ jobs:
           aws-region: ${{ needs.get-config.outputs.aws-region }}
           mask-aws-account-id: true
 
-      # Hardcoded trusted ref (always deploys main's qmods; avoids the
-      # pull_request_target untrusted-checkout alert).
+      # Pin to main, not a variable: CodeQL requires a hardcoded trusted ref in
+      # this pull_request_target context (untrusted-checkout alert). Also ensures
+      # we always deploy main's qmods.
       - name: Checkout qmod
         uses: actions/checkout@v7
         with:
