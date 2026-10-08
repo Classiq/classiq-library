@@ -1,16 +1,7 @@
 name: "(Internal) Qmod Deployment (new accounts)"
 
-# Parallel (dual-write) upload of the qmod library to the S3 buckets in the new
-# AWS accounts, running alongside the existing Utils-deployment-qmod.yml upload.
-# Role/region/bucket are resolved per deploy-mode. This job is non-blocking
-# (continue-on-error on the AWS steps) so a failure here never fails the deploy.
-# Follow-up ticket removes the old upload once consumers move to the new buckets.
-#
-# deploy-mode + GitHub environment match the existing workflow (staging,
-# release_candidate, production); only the target buckets/regions/roles differ:
-#   staging           -> dev account,  us-east-1, classiq-dev-ide-qmod-library-origin
-#   release_candidate -> dev account,  us-west-2, classiq-pre-release-ide-qmod-library-origin
-#   production        -> prod account, us-east-1, classiq-prod-us-east-1-ide-qmod-library-origin
+# Dual-write of the qmod library to the new-account origin buckets, alongside
+# Utils-deployment-qmod.yml. Non-blocking (AWS steps are continue-on-error).
 
 on:
   workflow_dispatch:
@@ -96,7 +87,7 @@ jobs:
           sparse-checkout: ".github"
           sparse-checkout-cone-mode: false
 
-      # production -> prod account role; staging and release_candidate -> dev account role
+      # production -> prod account role; staging/release_candidate -> dev account role
       - uses: aws-actions/configure-aws-credentials@v4.0.2
         continue-on-error: true
         with:
@@ -104,8 +95,8 @@ jobs:
           aws-region: ${{ needs.get-config.outputs.aws-region }}
           mask-aws-account-id: true
 
-      # Always deploy main's qmods (hardcoded trusted ref; this reusable workflow
-      # is invoked from a pull_request_target caller after merge).
+      # Hardcoded trusted ref (always deploys main's qmods; avoids the
+      # pull_request_target untrusted-checkout alert).
       - name: Checkout qmod
         uses: actions/checkout@v7
         with:
