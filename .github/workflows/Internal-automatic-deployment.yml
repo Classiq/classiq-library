@@ -21,3 +21,34 @@ jobs:
     with:
       deploy-mode: staging
     secrets: inherit
+
+  # Dual-write to the new-account buckets, alongside the jobs above. Non-blocking.
+  deploy-staging-new-accounts:
+    if: github.event.pull_request.merged == true
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
+    with:
+      deploy-mode: staging
+    secrets: inherit
+
+  deploy-release-candidate-new-accounts:
+    if: github.event.pull_request.merged == true
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
+    with:
+      deploy-mode: release_candidate
+    secrets: inherit
+
+  deploy-prod-new-accounts:
+    if: github.event.pull_request.merged == true
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/Utils-deployment-qmod-new-accounts.yml
+    with:
+      deploy-mode: production
+    secrets: inherit
