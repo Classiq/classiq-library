@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 210" width="100%" height="100%" style="background:#090D16; border-radius:8px; border:1px solid rgba(0,240,255,0.25);">
+  <defs>
+    <linearGradient id="gradCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.4"/>
+    </linearGradient>
+    <filter id="glowCyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Title Badge -->
+  <rect x="20" y="14" width="220" height="22" rx="4" fill="rgba(0,240,255,0.12)" stroke="rgba(0,240,255,0.35)"/>
+  <text x="30" y="29" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#00F0FF">SWAP-TEST OVERLAP CIRCUIT</text>
+  <text x="440" y="29" font-family="'Inter', sans-serif" font-size="11" fill="#94A3B8">D_Q = 1 - |⟨ψ|c⟩|² = 2·P(|1⟩)</text>
+
+  <!-- Wires -->
+  <!-- Ancilla Wire -->
+  <text x="25" y="68" font-family="'JetBrains Mono', monospace" font-size="12" fill="#38BDF8">|0⟩_anc</text>
+  <line x1="85" y1="64" x2="510" y2="64" stroke="#1E293B" stroke-width="2"/>
+  <line x1="85" y1="64" x2="510" y2="64" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="none"/>
+
+  <!-- State Psi Wire -->
+  <text x="30" y="118" font-family="'JetBrains Mono', monospace" font-size="12" fill="#E2E8F0">|ψ⟩_task</text>
+  <line x1="85" y1="114" x2="510" y2="114" stroke="#1E293B" stroke-width="2"/>
+  <line x1="85" y1="114" x2="510" y2="114" stroke="#64748B" stroke-width="1.5"/>
+
+  <!-- Centroid c Wire -->
+  <text x="30" y="168" font-family="'JetBrains Mono', monospace" font-size="12" fill="#E2E8F0">|c⟩_hub</text>
+  <line x1="85" y1="164" x2="510" y2="164" stroke="#1E293B" stroke-width="2"/>
+  <line x1="85" y1="164" x2="510" y2="164" stroke="#64748B" stroke-width="1.5"/>
+
+  <!-- H Gate 1 -->
+  <rect x="130" y="46" width="36" height="36" rx="6" fill="url(#gradCyan)" stroke="#00F0FF" stroke-width="1.5" filter="url(#glowCyan)"/>
+  <text x="142" y="69" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#FFFFFF">H</text>
+
+  <!-- Controlled-SWAP Section -->
+  <!-- Control point on Ancilla -->
+  <circle cx="280" cy="64" r="5.5" fill="#00F0FF" filter="url(#glowCyan)"/>
+  <line x1="280" y1="64" x2="280" y2="164" stroke="#00F0FF" stroke-width="2"/>
+
+  <!-- SWAP cross on Psi -->
+  <rect x="264" y="98" width="32" height="32" rx="4" fill="#0F172A" stroke="#38BDF8" stroke-width="1.2"/>
+  <line x1="272" y1="106" x2="288" y2="122" stroke="#38BDF8" stroke-width="2.5"/>
+  <line x1="288" y1="106" x2="272" y2="122" stroke="#38BDF8" stroke-width="2.5"/>
+
+  <!-- SWAP cross on c -->
+  <rect x="264" y="148" width="32" height="32" rx="4" fill="#0F172A" stroke="#38BDF8" stroke-width="1.2"/>
+  <line x1="272" y1="156" x2="288" y2="172" stroke="#38BDF8" stroke-width="2.5"/>
+  <line x1="288" y1="156" x2="272" y2="172" stroke="#38BDF8" stroke-width="2.5"/>
+
+  <!-- H Gate 2 -->
+  <rect x="390" y="46" width="36" height="36" rx="6" fill="url(#gradCyan)" stroke="#00F0FF" stroke-width="1.5" filter="url(#glowCyan)"/>
+  <text x="402" y="69" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#FFFFFF">H</text>
+
+  <!-- Meter / Measure -->
+  <rect x="470" y="46" width="38" height="36" rx="6" fill="#1E293B" stroke="#94A3B8" stroke-width="1.2"/>
+  <path d="M 478 72 A 12 12 0 0 1 500 72" fill="none" stroke="#E2E8F0" stroke-width="1.5"/>
+  <line x1="489" y1="72" x2="497" y2="56" stroke="#00F0FF" stroke-width="1.8"/>
+
+  <!-- Output probability label -->
+  <text x="520" y="68" font-family="'JetBrains Mono', monospace" font-size="11" fill="#00F0FF">P(|1⟩) = D_Q / 2</text>
+  <text x="520" y="118" font-family="'Inter', sans-serif" font-size="10" fill="#64748B">Target QReg A</text>
+  <text x="520" y="168" font-family="'Inter', sans-serif" font-size="10" fill="#64748B">Target QReg B</text>
+</svg>

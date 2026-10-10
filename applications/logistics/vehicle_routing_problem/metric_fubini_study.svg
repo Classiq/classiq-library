@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 210" width="100%" height="100%" style="background:#090D16; border-radius:8px; border:1px solid rgba(56,189,248,0.25);">
+  <defs>
+    <radialGradient id="sphereGrad" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.8"/>
+      <stop offset="70%" stop-color="#0F172A" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#020617" stop-opacity="1"/>
+    </radialGradient>
+    <filter id="glowBlue" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Title Badge -->
+  <rect x="20" y="14" width="250" height="22" rx="4" fill="rgba(56,189,248,0.12)" stroke="rgba(56,189,248,0.35)"/>
+  <text x="30" y="29" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#38BDF8">FUBINI-STUDY GEODESIC MANIFOLD</text>
+  <text x="420" y="29" font-family="'Inter', sans-serif" font-size="11" fill="#94A3B8">θ_FS = arccos(|⟨ψ|c⟩|) on CP^n</text>
+
+  <!-- Sphere / Projective Space Representation -->
+  <g transform="translate(180, 115)">
+    <!-- Sphere background -->
+    <circle cx="0" cy="0" r="72" fill="url(#sphereGrad)" stroke="rgba(56,189,248,0.35)" stroke-width="1.5"/>
+    
+    <!-- Equator Ellipse -->
+    <ellipse cx="0" cy="0" rx="72" ry="24" fill="none" stroke="rgba(56,189,248,0.25)" stroke-dasharray="3,3" stroke-width="1"/>
+    
+    <!-- Center Axis -->
+    <line x1="0" y1="-72" x2="0" y2="72" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="2,2"/>
+
+    <!-- State |psi> Point -->
+    <circle cx="-38" cy="-28" r="4.5" fill="#00F0FF" filter="url(#glowBlue)"/>
+    <text x="-65" y="-34" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#00F0FF">|ψ⟩</text>
+
+    <!-- Centroid |c> Point -->
+    <circle cx="44" cy="8" r="4.5" fill="#38BDF8" filter="url(#glowBlue)"/>
+    <text x="52" y="12" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#38BDF8">|c⟩</text>
+
+    <!-- Geodesic Arc (Riemannian Shortest Curved Path) -->
+    <path d="M -38 -28 Q 0 -40 44 8" fill="none" stroke="#38BDF8" stroke-width="3" filter="url(#glowBlue)"/>
+
+    <!-- Euclidean Chord (Short cut straight through interior) -->
+    <line x1="-38" y1="-28" x2="44" y2="8" stroke="#F43F5E" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+    <!-- Geodesic Arc Label -->
+    <rect x="-15" y="-55" width="46" height="18" rx="3" fill="#090D16" stroke="rgba(56,189,248,0.5)" stroke-width="1"/>
+    <text x="-10" y="-42" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#38BDF8">θ_FS</text>
+  </g>
+
+  <!-- Legend & Formulas on Right -->
+  <g transform="translate(350, 65)">
+    <rect x="0" y="0" width="225" height="110" rx="6" fill="#111827" stroke="rgba(255,255,255,0.08)"/>
+    <circle cx="16" cy="22" r="4" fill="#38BDF8"/>
+    <text x="28" y="26" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#F8FAFC">Riemannian Geodesic (Curved)</text>
+    <text x="28" y="42" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#38BDF8">D_Q = arccos(|⟨ψ|c⟩|)</text>
+
+    <line x1="12" y1="62" x2="22" y2="62" stroke="#F43F5E" stroke-width="1.8" stroke-dasharray="3,2"/>
+    <text x="28" y="66" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#F8FAFC">Euclidean Chord (Interior)</text>
+    <text x="28" y="82" font-family="'JetBrains Mono', monospace" font-size="10.5" fill="#FDA4AF">|| |ψ⟩ - |c⟩ || = √(2 - 2|⟨ψ|c⟩|)</text>
+    <text x="12" y="100" font-family="'Inter', sans-serif" font-size="9.5" fill="#64748B">Preserves Fubini-Study curvature metric</text>
+  </g>
+</svg>
