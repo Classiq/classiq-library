@@ -19,6 +19,9 @@ jobs:
 
   deploy-prod:
     needs: on-merge
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/Utils-deployment-qmod.yml
     with:
       deploy-mode: production
@@ -26,6 +29,9 @@ jobs:
 
   deploy-staging:
     needs: on-merge
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/Utils-deployment-qmod.yml
     with:
       deploy-mode: staging
