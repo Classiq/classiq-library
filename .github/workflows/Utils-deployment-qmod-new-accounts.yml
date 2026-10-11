@@ -18,7 +18,7 @@ on:
   workflow_call:
     inputs:
       deploy-mode:
-        description: "Deploy mode"
+        description: "Deploy mode: staging, release_candidate, or production"
         type: string
         required: true
 
@@ -37,7 +37,7 @@ jobs:
         env:
           INPUTS_BUILD_MODE: ${{ inputs.deploy-mode }}
         run: |
-          set -ex
+          set -euo pipefail
 
           case "$INPUTS_BUILD_MODE" in
             production)
@@ -56,7 +56,7 @@ jobs:
               QMOD_BUCKET="classiq-dev-ide-qmod-library-origin"
               ;;
             *)
-              echo unknown
+              echo "Unknown deploy-mode '${INPUTS_BUILD_MODE}' (expected: staging, release_candidate, production)" >&2
               exit 1
               ;;
           esac
@@ -67,7 +67,7 @@ jobs:
             echo "qmod-bucket=${QMOD_BUCKET}"
           } >>"$GITHUB_OUTPUT"
 
-  main:
+  upload-qmod:
     needs: get-config
     env:
       QMOD_DIR: qmod
