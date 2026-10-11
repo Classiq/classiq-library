@@ -8,15 +8,24 @@ on:
       - closed
 
 jobs:
-  deploy-prod:
+  # Single gate: only proceed when the PR was merged (not just closed).
+  # Jobs below depend on this, so they are skipped on a non-merge close.
+  on-merge:
     if: github.event.pull_request.merged == true
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - run: echo "PR merged into main - running deployments"
+
+  deploy-prod:
+    needs: on-merge
     uses: ./.github/workflows/Utils-deployment-qmod.yml
     with:
       deploy-mode: production
     secrets: inherit
 
   deploy-staging:
-    if: github.event.pull_request.merged == true
+    needs: on-merge
     uses: ./.github/workflows/Utils-deployment-qmod.yml
     with:
       deploy-mode: staging
@@ -24,7 +33,7 @@ jobs:
 
   # Dual-write to the new-account buckets, alongside the jobs above. Non-blocking.
   deploy-new-accounts:
-    if: github.event.pull_request.merged == true
+    needs: on-merge
     permissions:
       id-token: write
       contents: read
