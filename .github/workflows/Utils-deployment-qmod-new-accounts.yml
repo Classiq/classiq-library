@@ -31,6 +31,7 @@ jobs:
       environment: ${{ steps.get-config.outputs.environment }}
       qmod-bucket: ${{ steps.get-config.outputs.qmod-bucket }}
       aws-region: ${{ steps.get-config.outputs.aws-region }}
+      cf-alias: ${{ steps.get-config.outputs.cf-alias }}
     steps:
       - id: get-config
         name: "Get Configuration from deploy-mode"
@@ -44,16 +45,19 @@ jobs:
               ENVIRONMENT=prod
               AWS_REGION="us-east-1"
               QMOD_BUCKET="classiq-prod-us-east-1-ide-qmod-library-origin"
+              CF_ALIAS="platform.us1.classiq.io"
               ;;
             release_candidate)
               ENVIRONMENT=prod
               AWS_REGION="us-west-2"
               QMOD_BUCKET="classiq-pre-release-ide-qmod-library-origin"
+              CF_ALIAS="platform.pre-release.classiq.io"
               ;;
             staging)
               ENVIRONMENT=staging
               AWS_REGION="us-east-1"
               QMOD_BUCKET="classiq-dev-ide-qmod-library-origin"
+              CF_ALIAS="platform.dev.classiq.io"
               ;;
             *)
               echo "Unknown deploy-mode '${INPUTS_BUILD_MODE}' (expected: staging, release_candidate, production)" >&2
@@ -65,6 +69,7 @@ jobs:
             echo "environment=${ENVIRONMENT}"
             echo "aws-region=${AWS_REGION}"
             echo "qmod-bucket=${QMOD_BUCKET}"
+            echo "cf-alias=${CF_ALIAS}"
           } >>"$GITHUB_OUTPUT"
 
   upload-qmod:
@@ -117,3 +122,16 @@ jobs:
           set -e
           aws s3 sync "$QMOD_DIR" "s3://${QMOD_BUCKET}/latest" \
           --delete --exclude "*" --include "qmod_metadata.json" --include "*.qmod" --include "*.synthesis_options.json"
+
+      # Invalidate the IDE distribution's /qmods cache so the new upload is served.
+      # Resolves the distribution by its platform.* alias (CLS-9320 primary cache layer).
+      - name: "Invalidate /qmods cache"
+        continue-on-error: true
+        env:
+          CF_ALIAS: ${{ needs.get-config.outputs.cf-alias }}
+        run: |
+          set -euo pipefail
+          CF_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items[?starts_with(@, '${CF_ALIAS}')]].Id" \
+            --output text)
+          aws cloudfront create-invalidation --distribution-id "$CF_ID" --paths '/qmods/*'
