@@ -51,4 +51,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
 
     # test notebook content
     for cl_time in tb.ref("cl_times"):
-        assert cl_time < 30  # actual time is less than 15 sec for all models
+        # Largest instances (~67-68 qubits) take ~45-50s to generate, and server-side
+        # synthesis time varies run-to-run; 90s tolerates the size growth + CI variance.
+        assert cl_time < 90
