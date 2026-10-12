@@ -20,6 +20,7 @@ from tests.utils_for_tests import (
     should_skip_notebook,
 )
 
+from classiq.interface.exceptions import ClassiqError
 from classiq.interface.generator.quantum_program import QuantumProgram
 
 _PATCHED = False
@@ -307,7 +308,14 @@ def validate_quantum_program_size(
     actual_width = quantum_program.data.width
     _validate_size(actual_width, expected_width, "width", allow_zero_size)
 
-    if quantum_program.transpiled_circuit is not None:
+    try:
+        transpiled_circuit = quantum_program.transpiled_circuit
+    except ClassiqError:
+        # Accessing transpiled_circuit raises when transpilation_option is NONE;
+        # treat it the same as having no transpiled circuit.
+        transpiled_circuit = None
+
+    if transpiled_circuit is not None:
         _metrics = classiq.get_transpiled_circuit_metrics(
             quantum_program
         ).circuit_metrics
