@@ -80,7 +80,7 @@ See the [Classiq documentation](https://docs.classiq.io/latest/user-guide/ai/) t
 
 # Create Quantum Programs with Classiq
 
-The simplest quantum circuit has 1 qubit and has a single `X` gate.
+The simplest quantum circuit has 1 qubit and a single `X` gate.
 
 Using Classiq's SDK, it would look like this:
 
@@ -172,13 +172,13 @@ For more, see this repository :)
 ## 2) Synthesis : Logic to Quantum Program
 
 This is where the magic happens.
-Taking a the `main` function, which is a set of logical operations, and synthesizing it into physical qubits and the gates entangling them, is not an easy task.
+Taking the `main` function, which is a set of logical operations, and synthesizing it into physical qubits and the gates entangling them, is not an easy task.
 
 Classiq's synthesis engine is able to optimize this process, whether by requiring the minimal amount of physical qubits, thus reusing as many qubits as possible, or by requiring minimal circuit width, thus lowering execution time and possible errors.
 
 ## 3) Execution
 
-Classiq provides an easy-to-use way to execute quantum programs, and provides various insights of the execution results together with a familiar interface: `pandas.DataFrame`.
+Classiq provides an easy-to-use way to execute quantum programs, and provides various insights into the execution results together with a familiar interface: `pandas.DataFrame`.
 
 ## Diagrams
 
@@ -276,7 +276,7 @@ For some pre-built state preparations, read [here](https://docs.classiq.io/lates
 
 Every example found in this repository can also be accessed via [Classiq's platform](https://platform.classiq.io/), in the [`model`](https://platform.classiq.io/dsl-synthesis) tab, under the same folder structure.
 
-Additionally, one may write their own model in the model editor (highlighted in green) or upload his own model (highlighted in red)
+Additionally, one may write their own model in the model editor (highlighted in green) or upload their own model (highlighted in red)
 
 ![writing_models.png](.internal/README_resources/writing_models.png)
 
