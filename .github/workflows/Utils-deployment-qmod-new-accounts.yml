@@ -41,7 +41,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # ide-multi-tenant parent distribution for /qmods tenant invalidation (prod only; empty = skip)
+          # ide-multi-tenant parent distribution for /qmods tenant invalidation (empty = skip; release_candidate has none)
           CF_MT_DISTRIBUTION_ID=""
 
           case "$INPUTS_BUILD_MODE" in
@@ -63,6 +63,7 @@ jobs:
               AWS_REGION="us-east-1"
               QMOD_BUCKET="classiq-dev-ide-qmod-library-origin"
               CF_ALIAS="platform.dev.classiq.io"
+              CF_MT_DISTRIBUTION_ID="E1YP1T40DA3FPE"
               ;;
             *)
               echo "Unknown deploy-mode '${INPUTS_BUILD_MODE}' (expected: staging, release_candidate, production)" >&2
@@ -142,7 +143,7 @@ jobs:
             --output text)
           aws cloudfront create-invalidation --distribution-id "$CF_ID" --paths '/qmods/*'
 
-      # Primary invalidation above skips ide-multi-tenant tenants; invalidate /qmods per tenant (prod only, CLS-11629)
+      # Primary invalidation above skips ide-multi-tenant tenants; invalidate /qmods per tenant (CLS-11629)
       - name: "Invalidate /qmods cache (multi-tenant)"
         continue-on-error: true
         env:
