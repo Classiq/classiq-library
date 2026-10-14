@@ -140,7 +140,7 @@ jobs:
             --output text)
           aws cloudfront create-invalidation --distribution-id "$CF_ID" --paths '/qmods/*'
 
-      # Per-tenant /qmods invalidation; the primary step above does not reach tenants (CLS-11629)
+      # The primary invalidation above does not cover ide-multi-tenant tenants; invalidate /qmods per tenant
       - name: "Invalidate /qmods cache (multi-tenant)"
         continue-on-error: true
         env:
