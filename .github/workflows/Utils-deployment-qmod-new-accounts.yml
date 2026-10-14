@@ -41,7 +41,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # ide-multi-tenant parent distribution for /qmods tenant invalidation (empty = skip; release_candidate has none)
+          # ide-multi-tenant parent distribution; empty = skip (release_candidate has none)
           CF_MT_DISTRIBUTION_ID=""
 
           case "$INPUTS_BUILD_MODE" in
@@ -143,7 +143,7 @@ jobs:
             --output text)
           aws cloudfront create-invalidation --distribution-id "$CF_ID" --paths '/qmods/*'
 
-      # Primary invalidation above skips ide-multi-tenant tenants; invalidate /qmods per tenant (CLS-11629)
+      # Per-tenant /qmods invalidation; the primary step above does not reach tenants (CLS-11629)
       - name: "Invalidate /qmods cache (multi-tenant)"
         continue-on-error: true
         env:
@@ -161,7 +161,7 @@ jobs:
             echo "No tenants for ${MT_DISTRIBUTION_ID}; nothing to invalidate"
             exit 0
           fi
-          # tenant invalidation needs a batch (no --paths); unique CallerReference avoids de-dup
+          # batch form (no --paths); unique CallerReference avoids de-dup
           BATCH="{\"Paths\":{\"Quantity\":1,\"Items\":[\"/qmods/*\"]},\"CallerReference\":\"qmods-$(date +%s%N)-${RANDOM}\"}"
           for T in $TENANTS; do
             echo "Invalidating tenant ${T}"
