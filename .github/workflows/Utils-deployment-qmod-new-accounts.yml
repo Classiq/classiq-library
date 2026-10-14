@@ -32,6 +32,7 @@ jobs:
       qmod-bucket: ${{ steps.get-config.outputs.qmod-bucket }}
       aws-region: ${{ steps.get-config.outputs.aws-region }}
       cf-alias: ${{ steps.get-config.outputs.cf-alias }}
+      cf-mt-distribution-id: ${{ steps.get-config.outputs.cf-mt-distribution-id }}
     steps:
       - id: get-config
         name: "Get Configuration from deploy-mode"
@@ -40,12 +41,17 @@ jobs:
         run: |
           set -euo pipefail
 
+          # ide-multi-tenant parent distribution for per-tenant /qmods invalidation.
+          # Production only: it is the sole env with customer-facing tenants. Empty = skip.
+          CF_MT_DISTRIBUTION_ID=""
+
           case "$INPUTS_BUILD_MODE" in
             production)
               ENVIRONMENT=prod
               AWS_REGION="us-east-1"
               QMOD_BUCKET="classiq-prod-us-east-1-ide-qmod-library-origin"
               CF_ALIAS="platform.us1.classiq.io"
+              CF_MT_DISTRIBUTION_ID="E13W68EOFZRX2S"
               ;;
             release_candidate)
               ENVIRONMENT=prod
@@ -70,6 +76,7 @@ jobs:
             echo "aws-region=${AWS_REGION}"
             echo "qmod-bucket=${QMOD_BUCKET}"
             echo "cf-alias=${CF_ALIAS}"
+            echo "cf-mt-distribution-id=${CF_MT_DISTRIBUTION_ID}"
           } >>"$GITHUB_OUTPUT"
 
   upload-qmod:
@@ -135,3 +142,32 @@ jobs:
             --query "DistributionList.Items[?Aliases.Items[?starts_with(@, '${CF_ALIAS}')]].Id" \
             --output text)
           aws cloudfront create-invalidation --distribution-id "$CF_ID" --paths '/qmods/*'
+
+      # The primary distribution above does not cover ide-multi-tenant tenants
+      # (enterprise customers). Invalidate /qmods per tenant of the parent
+      # distribution. Production only (CLS-11629); empty id -> skip.
+      - name: "Invalidate /qmods cache (multi-tenant)"
+        continue-on-error: true
+        env:
+          MT_DISTRIBUTION_ID: ${{ needs.get-config.outputs.cf-mt-distribution-id }}
+        run: |
+          set -euo pipefail
+          if [ -z "$MT_DISTRIBUTION_ID" ]; then
+            echo "No multi-tenant distribution for this deploy-mode; skipping"
+            exit 0
+          fi
+          TENANTS=$(aws cloudfront list-distribution-tenants \
+            --association-filter DistributionId="$MT_DISTRIBUTION_ID" \
+            --query 'DistributionTenantList[].Id' --output text)
+          if [ -z "$TENANTS" ]; then
+            echo "No tenants for ${MT_DISTRIBUTION_ID}; nothing to invalidate"
+            exit 0
+          fi
+          # create-invalidation-for-distribution-tenant takes a batch, not --paths.
+          # Unique CallerReference so same-second runs are not de-duplicated.
+          BATCH="{\"Paths\":{\"Quantity\":1,\"Items\":[\"/qmods/*\"]},\"CallerReference\":\"qmods-$(date +%s%N)-${RANDOM}\"}"
+          for T in $TENANTS; do
+            echo "Invalidating tenant ${T}"
+            aws cloudfront create-invalidation-for-distribution-tenant \
+              --id "$T" --invalidation-batch "$BATCH"
+          done
