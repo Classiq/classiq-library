@@ -130,6 +130,11 @@ repos:
         # This file has `from classiq import A as B`
         exclude: (^|/)qaoa_demonstration\.ipynb$
         entry: "from classiq import [^*]"
+      - id: validate-classiq-raw-import
+        name: forbid    import classiq (use `from classiq import *`)
+        language: pygrep
+        files: \.ipynb$
+        entry: "\"\\s*import classiq(?!\\.)"
 
       - id: validate-notebook-names
         name: validate  notebook names
