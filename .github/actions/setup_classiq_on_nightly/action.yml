@@ -30,6 +30,7 @@ runs:
         python-version: "3.13"
 
     - name: Propagate env-var for nightly
+      shell: bash
       run: |
         echo 'CLASSIQ_IDE="https://nightly.platform.classiq.io"' >> $GITHUB_ENV
         echo 'CLASSIQ_HOST="https://nightly.platform.classiq.io"' >> $GITHUB_ENV
