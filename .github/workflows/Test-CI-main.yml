@@ -25,7 +25,6 @@ jobs:
 
     env:
       VENV_PATH: .venv
-      PYTHON_VERSION: "3.13"
       # Previosly we had:
       #   if workflow_dispatch: True
       #   if pull_request_target: False
@@ -56,7 +55,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version-file: .github/.python-version
 
       - name: Get latest classiq version for cache key
         id: classiq-version
@@ -69,11 +68,15 @@ jobs:
           url = 'https://pypi.org/pypi/classiq/json'
           with urllib.request.urlopen(url) as response:
               data = json.loads(response.read())
-              version = data['info']['version']
+              classiq_version = data['info']['version']
+
+          with open(".github/.python-version") as f:
+              requested_python_version = f.read().strip()
 
           output_file = os.environ['GITHUB_OUTPUT']
           with open(output_file, 'a') as f:
-              f.write(f"LATEST_CLASSIQ_VERSION={version}\n")
+              f.write(f"LATEST_CLASSIQ_VERSION={classiq_version}\n")
+              f.write(f"REQUESTED_PYTHON_VERSION={requested_python_version}\n")
 
       # The caching we do follows from
       #   https://stackoverflow.com/questions/59127258/how-can-i-use-pip-cache-in-github-actions
@@ -81,9 +84,13 @@ jobs:
         id: cache-venv
         with:
           path: ${{ env.VENV_PATH }}
-          key: ${{ runner.os }}-venv-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}-requirements-${{ hashFiles('**/requirements*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-venv-${{ env.PYTHON_VERSION }}-classiq-${{steps.classiq-version.outputs.LATEST_CLASSIQ_VERSION}}
+          key: "${{ runner.os }}-venv\
+            -python-${{ steps.versions.outputs.REQUESTED_PYTHON_VERSION }}\
+            -classiq-${{ steps.versions.outputs.LATEST_CLASSIQ_VERSION }}\
+            -requirements-${{ hashFiles('**/requirements*.txt') }}"
+          restore-keys: "${{ runner.os }}-venv\
+            -python-${{ steps.versions.outputs.REQUESTED_PYTHON_VERSION }}\
+            -classiq-${{ steps.versions.outputs.LATEST_CLASSIQ_VERSION }}"
 
       - name: Enter venv
         run: echo "$PWD/${{ env.VENV_PATH }}/bin" >> $GITHUB_PATH
