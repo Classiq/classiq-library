@@ -1,25 +1,9 @@
 name: "Setup classiq nightly"
 description: "setup python ; install classiq nighyly from aws ; install quenne ; setup M2M token"
 
-inputs:
-  aws-role:
-    required: true
-    description: "AWS_ROLE"
-  codeartifact-domain:
-    required: true
-    description: "CODEARTIFACT_DOMAIN"
-  codeartifact-owner:
-    required: true
-    description: "CODEARTIFACT_OWNER"
-  codeartifact-region:
-    required: true
-    description: "CODEARTIFACT_REGION"
-  nightly-m2m-secret-arn:
-    required: true
-    description: "NIGHTLY_M2M_SECRET_ARN"
-  pypi-nightly-name:
-    required: true
-    description: "PYPI_NIGHTLY_NAME"
+defaults:
+  run:
+    shell: bash
 
 runs:
   using: "composite"
@@ -38,29 +22,31 @@ runs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4.0.2
       with:
-        role-to-assume: ${{ inputs.aws-role }}
+        role-to-assume: arn:aws:iam::392220832072:role/PublicGithubCIRole
         aws-region: us-east-1
         mask-aws-account-id: true
 
     - name: Install dependencies
-      shell: bash
       run: |
         set -e
+
         python -m pip install -U pip \
             --extra-index-url https://pypi.org/simple
+
         # Install "classiq" separately
-        export CODEARTIFACT_AUTH_TOKEN="$( \
-            aws codeartifact get-authorization-token \
-            --domain ${{ inputs.codeartifact-domain }} \
-            --domain-owner ${{ inputs.codeartifact-owner }} \
-            --region ${{ inputs.codeartifact-region }} \
-            --query authorizationToken \
-            --output text \
+        export CODEARTIFACT_AUTH_TOKEN="$(              \
+            aws codeartifact get-authorization-token    \
+            --domain ${{ secrets.CODEARTIFACT_DOMAIN }} \
+            --domain-owner 392220832072                 \
+            --region us-east-1                          \
+            --query authorizationToken                  \
+            --output text                               \
         )"
         python -m pip install -U --pre \
-            --extra-index-url "https://aws:$CODEARTIFACT_AUTH_TOKEN@${{ inputs.codeartifact-domain }}-${{ inputs.codeartifact-owner }}.d.codeartifact.${{ inputs.codeartifact-region }}.amazonaws.com/pypi/${{ inputs.pypi-nightly-name }}/simple/" \
+            --extra-index-url "https://aws:$CODEARTIFACT_AUTH_TOKEN@${{ secrets.CODEARTIFACT_DOMAIN }}-392220832072.d.codeartifact.us-east-1.amazonaws.com/pypi/Pypi-Classiq-Non-Prod/simple/" \
             --extra-index-url https://pypi.org/simple \
             classiq
+
         # Install everything from the requirements, other than "classiq".
         python -m pip install -U $(grep -ivE "classiq" requirements.txt) \
             --extra-index-url https://pypi.org/simple
@@ -68,7 +54,6 @@ runs:
             --extra-index-url https://pypi.org/simple
 
     - name: Install couenne solver
-      shell: bash
       env:
         COIN_DIST_URL: https://github.com/ampl/coin/releases/download/v20191215/coin-linux64.tar.gz
         LOCAL_BIN: ${{ runner.temp }}/.local/bin
@@ -86,4 +71,4 @@ runs:
       run: .github/scripts/get_m2m_token.sh
       env:
         IS_DEV: "true"
-        M2M_SECRET_ARN: "${{ inputs.nightly-m2m-secret-arn }}"
+        M2M_SECRET_ARN: "${{ secrets.NIGHTLY_M2M_SECRET_ARN }}"
