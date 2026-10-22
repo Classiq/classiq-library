@@ -32,8 +32,8 @@ runs:
     - name: Propagate env-var for nightly
       shell: bash
       run: |
-        echo 'CLASSIQ_IDE="https://nightly.platform.classiq.io"' >> $GITHUB_ENV
-        echo 'CLASSIQ_HOST="https://nightly.platform.classiq.io"' >> $GITHUB_ENV
+        echo 'CLASSIQ_IDE=https://nightly.platform.classiq.io' >> $GITHUB_ENV
+        echo 'CLASSIQ_HOST=https://nightly.platform.classiq.io' >> $GITHUB_ENV
 
     # Configure AWS credentials
     - name: Configure AWS Credentials
