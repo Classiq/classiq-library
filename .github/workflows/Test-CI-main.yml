@@ -126,24 +126,6 @@ jobs:
           chmod ugo+x "${LOCAL_BIN}/couenne"
 
       #
-      # Setup Environment
-      #
-      # Configure AWS credentials
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: us-east-1
-          mask-aws-account-id: true
-
-      # Set authentication with M2M token
-      - name: Set authentication
-        run: .github/scripts/get_m2m_token.sh
-        env:
-          IS_DEV: "false"
-          M2M_SECRET_ARN: "${{ secrets.PROD_M2M_SECRET_ARN }}"
-
-      #
       # Propagate CI information to python tests
       #
       - name: Get changed files
@@ -198,6 +180,24 @@ jobs:
           done
 
           echo "list=${kept[*]}" >> "$GITHUB_OUTPUT"
+
+      #
+      # Setup Environment
+      #
+      # Configure AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+
+      # Set authentication with M2M token
+      - name: Set authentication
+        run: .github/scripts/get_m2m_token.sh
+        env:
+          IS_DEV: "false"
+          M2M_SECRET_ARN: "${{ secrets.PROD_M2M_SECRET_ARN }}"
 
       # Run Tests
       - name: Run Notebooks (quick tests)
