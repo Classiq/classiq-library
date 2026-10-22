@@ -134,6 +134,8 @@ repos:
         name: forbid    import classiq (use `from classiq import *`)
         language: pygrep
         files: \.ipynb$
+        # This file has `import classiq ; classiq.__version__`
+        exclude: (^|/)stateprep_guassian_using_qsvt\.ipynb$
         entry: "\"\\s*import classiq(?!\\.)"
 
       - id: validate-notebook-names
