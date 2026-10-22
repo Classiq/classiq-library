@@ -20,6 +20,14 @@ repos:
         name: format    end of file
       - id: trailing-whitespace
         name: format    trailing whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.9
+    hooks:
+      - id: ruff-check
+        name: format    notebook unused imports
+        types_or: [jupyter]
+        args: [--select, F401, --fix]
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.9.6
     hooks:
@@ -116,12 +124,19 @@ repos:
         require_serial: true
 
       - id: validate-classiq-imports
-        name: forbid    from classiq import *
+        name: forbid    from classiq import stuff (use `import *`)
         language: pygrep
         files: \.ipynb$
         # This file has `from classiq import A as B`
         exclude: (^|/)qaoa_demonstration\.ipynb$
         entry: "from classiq import [^*]"
+      - id: validate-classiq-raw-import
+        name: forbid    import classiq (use `from classiq import *`)
+        language: pygrep
+        files: \.ipynb$
+        # This file has `import classiq ; classiq.__version__`
+        exclude: (^|/)stateprep_guassian_using_qsvt\.ipynb$
+        entry: "\"\\s*import classiq(?!\\.)"
 
       - id: validate-notebook-names
         name: validate  notebook names
