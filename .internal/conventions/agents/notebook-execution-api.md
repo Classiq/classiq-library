@@ -134,13 +134,11 @@ qprog = synthesize(create_model(main))
 df = sample(qprog, num_shots=1000)
 ```
 
-**QNN exception (`execute_qnn` / `QLayer`):** these bake shots into the qprog at
-synthesis and take no `num_shots` at call time. Use the flat helper on the qmod:
+**QNN (`QLayer`):** pass `num_shots` to the layer, not to the qprog:
 
 ```python
-qmod = create_model(main)
-qmod = update_execution_preferences(qmod, num_shots=NUM_SHOTS)
-qprog = synthesize(qmod)
+qprog = synthesize(create_model(main))
+qlayer = QLayer(qprog, observables=..., num_shots=NUM_SHOTS)
 ```
 
 **`CombinatorialProblem` is a live high-level API — do NOT treat it as old.**
