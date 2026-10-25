@@ -167,12 +167,6 @@ POINT = Point(
             "run it (a sampling backend, or a calculate_state_vector-based gradient rewrite) would "
             "change the exact/deterministic gradients the ADAPT-VQE notebook depends on — deferred",
         ),
-        (
-            "QML/quantum_autoencoder/quantum_autoencoder",
-            "kept upstream (execute_qnn + set_quantum_program_execution_preferences): the migrated "
-            "QNN path would not regenerate on the current backend (reproducible server-side "
-            "execution error 133000), so it could not be validated — deferred",
-        ),
         # --- Legacy construct_combinatorial_optimization_model + VQE. Most were rewritten to
         # the CombinatorialProblem API; these three do not map mechanically. ---
         (

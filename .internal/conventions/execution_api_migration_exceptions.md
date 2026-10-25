@@ -18,7 +18,7 @@ uses `sample(qprog, backend="simulator")` with commented `backend="ibm/…"` +
 because "the flat API can't express it".
 
 The convention report shows `execution_interface` at **219/219 (100%)**: every
-notebook is either migrated or one of the **29 reviewed exceptions** registered
+notebook is either migrated or one of the **28 reviewed exceptions** registered
 in `.internal/conventions/points/point_execution_interface.py`. They are grouped
 below by reason.
 
@@ -84,7 +84,7 @@ run_via_classiq=True)` but deliberately keeps the async
   runs QASM on a Qiskit Aer (AMD GPU) simulator; `parsed_counts` belongs to a custom
   shim, not the SDK. Left entirely as upstream.
 
-## 6. Reverted to upstream — not regenerable on the current SDK/backend (2)
+## 6. Reverted to upstream — not regenerable on the current SDK/backend (1)
 
 Migrated in an earlier wave but they cannot be re-executed on the current stack, so we
 ship the upstream (old-API) version + outputs rather than a half-migrated notebook with
@@ -94,8 +94,6 @@ stale/broken outputs:
   a `SIMULATOR_STATEVECTOR` backend, which classiq 1.28 rejects on `ExecutionSession`; the
   only fixes (sampling backend, or a `calculate_state_vector` gradient rewrite) change the
   exact/deterministic behavior. Deferred.
-- `QML/quantum_autoencoder/quantum_autoencoder` — the migrated QNN path fails to regenerate
-  (reproducible server-side error 133000), so it could not be validated. Deferred.
 
 ## 7. Legacy combinatorial VQE — 3 of 7 kept
 
