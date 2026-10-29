@@ -99,7 +99,7 @@ jobs:
           sparse-checkout-cone-mode: false
 
       # production -> prod account role; staging/release_candidate -> dev account role
-      - uses: aws-actions/configure-aws-credentials@v4.0.2
+      - uses: aws-actions/configure-aws-credentials@v6.3.0
         continue-on-error: true
         with:
           role-to-assume: ${{ inputs.deploy-mode == 'production' && secrets.AWS_ROLE_PROD || secrets.AWS_ROLE_DEV }}

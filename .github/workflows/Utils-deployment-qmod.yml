@@ -82,7 +82,7 @@ jobs:
           sparse-checkout: ".github"
           sparse-checkout-cone-mode: false
 
-      - uses: aws-actions/configure-aws-credentials@v4.0.2
+      - uses: aws-actions/configure-aws-credentials@v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: "us-east-1"

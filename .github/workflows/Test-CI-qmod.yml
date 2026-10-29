@@ -23,7 +23,7 @@ jobs:
 
       - name: Check for changed QMOD files
         id: changed-files
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             **/*.qmod
@@ -46,7 +46,7 @@ jobs:
       # Setup Python
       #
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
@@ -62,7 +62,7 @@ jobs:
       #
       # Configure AWS credentials
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+        uses: aws-actions/configure-aws-credentials@v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: us-east-1
