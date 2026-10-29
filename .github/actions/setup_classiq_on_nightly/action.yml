@@ -25,7 +25,7 @@ runs:
   using: "composite"
   steps:
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version-file: .github/.python-version
 
@@ -37,7 +37,7 @@ runs:
 
     # Configure AWS credentials
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4.0.2
+      uses: aws-actions/configure-aws-credentials@v6.3.0
       with:
         role-to-assume: ${{ inputs.aws-role }}
         aws-region: us-east-1
