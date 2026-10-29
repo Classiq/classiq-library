@@ -26,12 +26,14 @@ def mode_distribution(fhat):
     return k_array, 2 * a / A, A
 
 
-def draw_shots_partition(rng, k_array, p_k, M):
+def draw_shots_partition(k_array, p_k, M):
     """Draw M indices J ~ p_k and count how often each k appears: n_k[i] = number of draws of k_array[i]."""
-    return np.bincount(rng.choice(len(k_array), size=M, p=p_k), minlength=len(k_array))
+    return np.bincount(
+        np.random.choice(len(k_array), size=M, p=p_k), minlength=len(k_array)
+    )
 
 
-def restore_samples(rng, n_k, mean, S):
+def restore_samples(n_k, mean, S):
     """Restore the samples from a pool of i.i.d. +-1 shots.  At each k the pool holds S shots (scalar or one value per k)
     with mean `mean`; the n_k shots the samples need are a uniformly random subset of it, i.e. a hypergeometric draw
     from the pool's number of +1's.  Returns sums[i] = sum of the n_k[i] +-1 outcomes at k_array[i].
@@ -42,7 +44,7 @@ def restore_samples(rng, n_k, mean, S):
         if n == 0:
             continue
         n_plus = int(round(S[i] * (1 + mean[i]) / 2))
-        plus = rng.hypergeometric(n_plus, int(S[i]) - n_plus, n)
+        plus = np.random.hypergeometric(n_plus, int(S[i]) - n_plus, n)
         sums[i] = 2 * plus - n
     return sums
 
