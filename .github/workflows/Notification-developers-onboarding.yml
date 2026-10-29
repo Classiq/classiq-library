@@ -1,111 +1,74 @@
+name: "Congratulate on merged PR"
+
 on:
   pull_request_target:
     types: [closed]
 
-permissions:
-  pull-requests: write
-
 jobs:
-  comment_on_merged_pull_request:
+  comment-on-merged-pull-request:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v7
-
-      - name: Set Environment Variables
-        env:
-          AUTHOR: ${{ github.event.pull_request.user.login }}
-          REPO: ${{ github.event.repository.name }}
-          OWNER: ${{ github.event.repository.owner.login }}
-        run: |
-          echo "AUTHOR=${AUTHOR}" >> $GITHUB_ENV
-          echo "REPO=${REPO}" >> $GITHUB_ENV
-          echo "OWNER=${OWNER}" >> $GITHUB_ENV
-
-      - name: Count Merged Pull Requests
-        id: count_merged_pull_requests
-        uses: actions/github-script@v6
+      - name: Comment on the merged PR
+        uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            try {
-              const author = process.env.AUTHOR;
-              const repo = process.env.REPO;
-              const owner = process.env.OWNER;
-              const { data } = await github.rest.search.issuesAndPullRequests({
-                q: `repo:${owner}/${repo} type:pr state:closed author:${author}`,
-                per_page: 1000
-              });
-              const prCount = data.items.filter(pr => pr.pull_request.merged_at).length;
-              core.exportVariable('PR_COUNT', prCount);
-            } catch (error) {
-              core.setFailed(`Error counting merged pull requests: ${error.message}`);
-            }
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+            const repo = context.repo.repo;
 
-      - name: Comment on the Merged Pull Request
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            try {
-              const prCount = parseInt(process.env.PR_COUNT);
-              const author = process.env.AUTHOR;
-              const mention = 'amir-naveh';
-              const prNumber = context.payload.pull_request.number;
-              const repo = process.env.REPO;
+            // Count the author's merges *before* this one, then add this one
+            // (right after merging, search may not see this PR as merged yet)
+            const { data } = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${repo} type:pr is:merged author:${author} merged:<${pr.merged_at}`,
+            });
+            const count = data.total_count + 1;
 
-              function getRandomEmoji() {
-                const emojis = ['🎉', '🚀', '💪', '🌟', '🏆', '🎊', '🔥', '👏', '🌈', '🚂'];
-                return emojis[Math.floor(Math.random() * emojis.length)];
-              }
+            const emojis = ['🎉', '🚀', '💪', '🌟', '🏆', '🎊', '🔥', '👏', '🌈', '🚂'];
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const ordinal = (n) =>
+              n + ({ 11: 'th', 12: 'th', 13: 'th' }[n % 100] ?? { 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] ?? 'th');
 
-              function getMessage(count) {
-                const emoji = getRandomEmoji();
-                switch(count) {
-                  case 1:
-                    return `${emoji} **Fantastic work @${author}!** Your very first PR to ${repo} has been merged! 🎉🥳\n\n` +
-                           `If you're feeling adventurous, why not dive into another issue and keep contributing? The Classiq community would love to see more from you! 🚀\n\n` +
-                           `Happy coding! 👩‍💻👨‍💻`;
-                  case 2:
-                    return `${emoji} **Well done @${author}!** Two PRs merged already! 🎉🥳\n\n` +
-                           `With your second PR, you're on a roll, and your contributions are already making a difference. 🌟\n` +
-                           `Looking forward to seeing even more contributions from you. Keep up the great work! 🚀`;
-                  case 3:
-                    return `${emoji} **You're on fire, @${author}!** Three PRs merged and counting! 🔥🎉\n\n` +
-                           `Your consistent contributions are truly impressive. You're becoming a valued member of our community! 💖\n` +
-                           `Have you considered taking on some more challenging issues? We'd love to see what you can do! 💪\n\n`;
-                  case 5:
-                    return `${emoji} **High five, @${author}!** You've hit the incredible milestone of 5 merged PRs! 🖐️✨\n\n` +
-                           `Your dedication to ${repo} is outstanding. You're not just contributing code; you're shaping the future of quantum computing! 🌠\n` +
-                           `We'd love to hear your thoughts on the project. Any ideas for new features or improvements? 🤔\n\n` +
-                           `You're a superstar! 🌟`;
-                  case 10:
-                    return `${emoji} **Double digits, @${author}!** 10 merged PRs is a massive achievement! 🏆🎊\n\n` +
-                           `Your impact on ${repo} is undeniable. You've become a pillar of our community! 🏛️\n` +
-                           `You're a quantum hero! 🦸‍♀️🦸‍♂️`;
-                  default:
-                    if (count > 10) {
-                      return `${emoji} **Incredible, @${author}!** You've merged your ${count}th PR! 🎯🎊\n\n` +
-                             `Your ongoing commitment to ${repo} is truly remarkable. You're a driving force in our community! 🚀\n` +
-                             `Your contributions are helping to shape the future of quantum computing! What exciting features or improvements do you envision next? 🔮\n\n` +
-                             `We are grateful for your dedication! 💫`;
-                    } else {
-                      return `${emoji} **Great job, @${author}!** You've merged your ${count}th PR! 🎊\n\n` +
-                             `Your contributions to ${repo} are making a real difference. Keep up the fantastic work! 💪\n` +
-                             `Remember, every PR counts and helps improve the project. What will you tackle next? 🤔\n\n`;
-                    }
-                }
-              }
+            const milestones = {
+              1:
+                `${emoji} **Fantastic work @${author}!** Your very first PR to ${repo} has been merged! 🎉🥳\n\n` +
+                `If you're feeling adventurous, why not dive into another issue and keep contributing? The Classiq community would love to see more from you! 🚀\n\n` +
+                `Happy coding! 👩‍💻👨‍💻`,
+              2:
+                `${emoji} **Well done @${author}!** Two PRs merged already! 🎉🥳\n\n` +
+                `With your second PR, you're on a roll, and your contributions are already making a difference. 🌟\n` +
+                `Looking forward to seeing even more contributions from you. Keep up the great work! 🚀`,
+              3:
+                `${emoji} **You're on fire, @${author}!** Three PRs merged and counting! 🔥🎉\n\n` +
+                `Your consistent contributions are truly impressive. You're becoming a valued member of our community! 💖\n` +
+                `Have you considered taking on some more challenging issues? We'd love to see what you can do! 💪\n\n`,
+              5:
+                `${emoji} **High five, @${author}!** You've hit the incredible milestone of 5 merged PRs! 🖐️✨\n\n` +
+                `Your dedication to ${repo} is outstanding. You're not just contributing code; you're shaping the future of quantum computing! 🌠\n` +
+                `We'd love to hear your thoughts on the project. Any ideas for new features or improvements? 🤔\n\n` +
+                `You're a superstar! 🌟`,
+              10:
+                `${emoji} **Double digits, @${author}!** 10 merged PRs is a massive achievement! 🏆🎊\n\n` +
+                `Your impact on ${repo} is undeniable. You've become a pillar of our community! 🏛️\n` +
+                `You're a quantum hero! 🦸‍♀️🦸‍♂️`,
+            };
+            const fallback =
+              count > 10
+                ? `${emoji} **Incredible, @${author}!** You've merged your ${ordinal(count)} PR! 🎯🎊\n\n` +
+                  `Your ongoing commitment to ${repo} is truly remarkable. You're a driving force in our community! 🚀\n` +
+                  `Your contributions are helping to shape the future of quantum computing! What exciting features or improvements do you envision next? 🔮\n\n` +
+                  `We are grateful for your dedication! 💫`
+                : `${emoji} **Great job, @${author}!** You've merged your ${ordinal(count)} PR! 🎊\n\n` +
+                  `Your contributions to ${repo} are making a real difference. Keep up the fantastic work! 💪\n` +
+                  `Remember, every PR counts and helps improve the project. What will you tackle next? 🤔\n\n`;
+            const message = milestones[count] ?? fallback;
 
-              const message = getMessage(prCount);
-
-              await github.rest.issues.createComment({
-                owner: process.env.OWNER,
-                repo: process.env.REPO,
-                issue_number: prNumber,
-                body: message
-              });
-            } catch (error) {
-              core.setFailed(`Error creating comment: ${error.message}`);
-            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo,
+              issue_number: pr.number,
+              body: message
+            });
