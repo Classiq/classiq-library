@@ -35,9 +35,6 @@ jobs:
       - name: Run Notebooks
         run: python -m pytest -c tests/config_weekly.ini tests/notebooks/test__community_and_functions.py tests/notebooks/workshops tests/notebooks/classiq_paper
         env:
-          # to disable a warning in Jupyter notebooks
-          JUPYTER_PLATFORM_DIRS: "1"
-          # Passing which notebooks changed
           SHOULD_TEST_ALL_FILES: "true"
 
       # Summarize results for Slack copy-paste
