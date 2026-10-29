@@ -73,6 +73,7 @@ runs:
         python -m pip install -U -r requirements_tests.txt \
             --extra-index-url https://pypi.org/simple
 
+    # Note: once github will move `ubuntu:latest` from `24.04` to `26.04`, this step may break. We'll fix it if that'll happen
     - name: Install couenne solver
       shell: bash
       env:
