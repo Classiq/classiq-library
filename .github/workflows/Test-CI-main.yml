@@ -28,7 +28,7 @@ jobs:
       # to disable a warning in Jupyter notebooks
       JUPYTER_PLATFORM_DIRS: "1"
 
-    concurency:
+    concurrency:
       # workflow  : the workflow name
       # event_name: "pull_request" / "pull_request_target" / "workflow_dispatch" / ...
       # number    : the PR number
@@ -63,7 +63,7 @@ jobs:
           python-version-file: .github/.python-version
 
       - name: Get latest classiq version for cache key
-        id: classiq-version
+        id: versions
         shell: python
         run: |
           import urllib.request
@@ -112,7 +112,7 @@ jobs:
 
           python -m pip install -U pip
           # Install the lighter version of torch for the CI. We don't have a GPU anyway, and it saves ~2GB
-          python -m pip install -U torch torchvision --index-url https://downloads.pytorch.org/whl/cpu
+          python -m pip install -U torch torchvision --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -U -r requirements.txt -r requirements_tests.txt
 
       - name: Install couenne solver
@@ -136,9 +136,9 @@ jobs:
         with:
           files_yaml: |
             notebooks:
-              - **/*.ipynb
+              - "**/*.ipynb"
             tests:
-              - **/notebooks/**/test_*.py
+              - "**/notebooks/**/test_*.py"
 
       # Narrow the changed-notebook list down to notebooks whose *code* cells changed,
       # so a markdown-only edit no longer triggers the (expensive) notebook execution.
