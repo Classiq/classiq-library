@@ -57,7 +57,8 @@ def partition_hamiltonian(ham, num_qubits, n_deterministic):
     identity_coeff = 0.0
     terms = []
     for term in ham.terms:
-        if len(term.paulis) == 0:
+        # the identity may come as an empty list or as explicit I's (e.g., [I(0)])
+        if all(p.pauli == PauliEnum.I for p in term.paulis):
             identity_coeff += float(np.real(term.coefficient))
         else:
             terms.append(
