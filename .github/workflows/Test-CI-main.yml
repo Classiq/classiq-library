@@ -69,6 +69,7 @@ jobs:
       # Setup Python
       #
       - name: Set up Python
+        id: setup-python
         uses: actions/setup-python@v7
         with:
           python-version-file: .github/.python-version
@@ -86,13 +87,9 @@ jobs:
               data = json.loads(response.read())
               classiq_version = data['info']['version']
 
-          with open(".github/.python-version") as f:
-              requested_python_version = f.read().strip()
-
           output_file = os.environ['GITHUB_OUTPUT']
           with open(output_file, 'a') as f:
               f.write(f"LATEST_CLASSIQ_VERSION={classiq_version}\n")
-              f.write(f"REQUESTED_PYTHON_VERSION={requested_python_version}\n")
 
       # The caching we do follows from
       #   https://stackoverflow.com/questions/59127258/how-can-i-use-pip-cache-in-github-actions
@@ -101,11 +98,11 @@ jobs:
         with:
           path: ${{ env.VENV_PATH }}
           key: "${{ runner.os }}-venv\
-            -python-${{ steps.versions.outputs.REQUESTED_PYTHON_VERSION }}\
+            -python-${{ steps.setup-python.outputs.python-version }}\
             -classiq-${{ steps.versions.outputs.LATEST_CLASSIQ_VERSION }}\
             -requirements-${{ hashFiles('**/requirements*.txt') }}"
           restore-keys: "${{ runner.os }}-venv\
-            -python-${{ steps.versions.outputs.REQUESTED_PYTHON_VERSION }}\
+            -python-${{ steps.setup-python.outputs.python-version }}\
             -classiq-${{ steps.versions.outputs.LATEST_CLASSIQ_VERSION }}"
 
       - name: Enter venv
