@@ -3,5 +3,5 @@ qfunc main(output power: qnum, output x: qnum) {
   x ^= 1;
   allocate(3, power);
   hadamard_transform(power);
-  modular_exp(5, 4, x, power);
+  modular_exponentiate(5, 4, x, power);
 }
