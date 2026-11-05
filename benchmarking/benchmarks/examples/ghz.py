@@ -68,7 +68,7 @@ class GHZExample(BenchmarkExample):
 
     async def submit(self, qprog: QuantumProgram) -> str:
         with ExecutionSession(qprog) as es:
-            job = es.submit_batch_sample(
+            job = es.submit_sample(
                 [{"theta": 0, "phi": np.pi}]
                 + [{"theta": -np.pi / 2, "phi": p} for p in self.phis]
             )

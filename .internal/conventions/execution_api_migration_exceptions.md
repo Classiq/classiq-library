@@ -65,7 +65,7 @@ purely to keep the original shot count (behavior fidelity):
   `sample()`; the IonQ hardware path (behind `RUN_ON_HARDWARE`, default `False`) was
   **modernized** to `ExecutionSession(backend="ionq/…", config=IonQConfig(...),
 run_via_classiq=True)` but deliberately keeps the async
-  `submit_batch_sample → ExecutionJob.from_id → get_batch_sample_result` workflow.
+  `submit_sample → ExecutionJob.from_id → get_batch_sample_result` workflow.
 - `benchmarking/randomized_benchmarking` — async batch multi-backend orchestration
   (`execute_async` + `asyncio.gather` over many (qprog, backend) pairs, feeding
   `ExecutionDetails.counts` to `RBAnalysis`). Backends are simulators (no credential
