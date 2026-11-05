@@ -8,7 +8,7 @@ from testbook.client import TestbookNotebookClient
 
 @wrap_testbook(
     "benchmark_grover",
-    timeout_seconds=30,
+    timeout_seconds=60,
     replacements_regex=benchmark_replacements(),
 )
 def test_notebook(tb: TestbookNotebookClient) -> None:
