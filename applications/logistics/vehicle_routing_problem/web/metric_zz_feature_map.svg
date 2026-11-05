@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 210" width="100%" height="100%" style="background:#090D16; border-radius:8px; border:1px solid rgba(244,63,94,0.25);">
+  <defs>
+    <linearGradient id="gradRose" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F43F5E" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#BE123C" stop-opacity="0.45"/>
+    </linearGradient>
+    <filter id="glowRose" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Title Badge -->
+  <rect x="20" y="14" width="240" height="22" rx="4" fill="rgba(244,63,94,0.12)" stroke="rgba(244,63,94,0.35)"/>
+  <text x="30" y="29" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#F43F5E">ENTANGLED ZZ-FEATURE MAP</text>
+  <text x="430" y="29" font-family="'Inter', sans-serif" font-size="11" fill="#94A3B8">Non-Linear Kernel U_Φ(x)</text>
+
+  <!-- Qubit Wires -->
+  <text x="25" y="80" font-family="'JetBrains Mono', monospace" font-size="12" fill="#FDA4AF">q_0</text>
+  <line x1="65" y1="76" x2="520" y2="76" stroke="#FDA4AF" stroke-width="1.5"/>
+
+  <text x="25" y="148" font-family="'JetBrains Mono', monospace" font-size="12" fill="#FDA4AF">q_1</text>
+  <line x1="65" y1="144" x2="520" y2="144" stroke="#FDA4AF" stroke-width="1.5"/>
+
+  <!-- Layer 1: H Gates -->
+  <rect x="100" y="58" width="32" height="36" rx="5" fill="url(#gradRose)" stroke="#F43F5E" stroke-width="1.5"/>
+  <text x="110" y="81" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#FFFFFF">H</text>
+
+  <rect x="100" y="126" width="32" height="36" rx="5" fill="url(#gradRose)" stroke="#F43F5E" stroke-width="1.5"/>
+  <text x="110" y="149" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#FFFFFF">H</text>
+
+  <!-- Layer 2: Single Qubit Rz rotations -->
+  <rect x="155" y="58" width="56" height="36" rx="5" fill="#1E293B" stroke="#F43F5E" stroke-width="1.5"/>
+  <text x="162" y="80" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="600" fill="#FDA4AF">R_z(2x₀)</text>
+
+  <rect x="155" y="126" width="56" height="36" rx="5" fill="#1E293B" stroke="#F43F5E" stroke-width="1.5"/>
+  <text x="162" y="148" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="600" fill="#FDA4AF">R_z(2x₁)</text>
+
+  <!-- Layer 3: Entangling CNOT 1 -->
+  <circle cx="250" cy="76" r="5" fill="#F43F5E" filter="url(#glowRose)"/>
+  <line x1="250" y1="76" x2="250" y2="144" stroke="#F43F5E" stroke-width="2"/>
+  <circle cx="250" cy="144" r="10" fill="none" stroke="#F43F5E" stroke-width="2"/>
+  <line x1="250" y1="136" x2="250" y2="152" stroke="#F43F5E" stroke-width="2"/>
+  <line x1="242" y1="144" x2="258" y2="144" stroke="#F43F5E" stroke-width="2"/>
+
+  <!-- Layer 4: Cross-Phase R_z(2(π-x₀)(π-x₁)) -->
+  <rect x="290" y="126" width="94" height="36" rx="5" fill="url(#gradRose)" stroke="#F43F5E" stroke-width="1.5" filter="url(#glowRose)"/>
+  <text x="298" y="148" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#FFFFFF">R_z(2ΔΦ₀₁)</text>
+
+  <!-- Layer 5: Entangling CNOT 2 (Uncompute) -->
+  <circle cx="420" cy="76" r="5" fill="#F43F5E" filter="url(#glowRose)"/>
+  <line x1="420" y1="76" x2="420" y2="144" stroke="#F43F5E" stroke-width="2"/>
+  <circle cx="420" cy="144" r="10" fill="none" stroke="#F43F5E" stroke-width="2"/>
+  <line x1="420" y1="136" x2="420" y2="152" stroke="#F43F5E" stroke-width="2"/>
+  <line x1="412" y1="144" x2="428" y2="144" stroke="#F43F5E" stroke-width="2"/>
+
+  <!-- End Annotation -->
+  <text x="455" y="80" font-family="'JetBrains Mono', monospace" font-size="11" fill="#FDA4AF">|ψ(x)⟩</text>
+  <text x="455" y="148" font-family="'Inter', sans-serif" font-size="10" fill="#94A3B8">Entangled State</text>
+</svg>

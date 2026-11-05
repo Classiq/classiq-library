@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 210" width="100%" height="100%" style="background:#090D16; border-radius:8px; border:1px solid rgba(16,185,129,0.25);">
+  <defs>
+    <linearGradient id="gradEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#059669" stop-opacity="0.45"/>
+    </linearGradient>
+    <filter id="glowEmerald" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Title Badge -->
+  <rect x="20" y="14" width="250" height="22" rx="4" fill="rgba(16,185,129,0.12)" stroke="rgba(16,185,129,0.35)"/>
+  <text x="30" y="29" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#10B981">HADAMARD INTERFERENCE KERNEL</text>
+  <text x="430" y="29" font-family="'Inter', sans-serif" font-size="11" fill="#94A3B8">D_Q = 1 - Re⟨ψ|c⟩ (Depth ≈ 28)</text>
+
+  <!-- Wires -->
+  <!-- Ancilla Wire -->
+  <text x="25" y="80" font-family="'JetBrains Mono', monospace" font-size="12" fill="#10B981">|0⟩_anc</text>
+  <line x1="85" y1="76" x2="510" y2="76" stroke="#10B981" stroke-width="1.5"/>
+
+  <!-- Target Wire -->
+  <text x="30" y="148" font-family="'JetBrains Mono', monospace" font-size="12" fill="#E2E8F0">|ψ⟩_task</text>
+  <line x1="85" y1="144" x2="510" y2="144" stroke="#64748B" stroke-width="1.5"/>
+
+  <!-- H Gate 1 -->
+  <rect x="140" y="58" width="36" height="36" rx="6" fill="url(#gradEmerald)" stroke="#10B981" stroke-width="1.5" filter="url(#glowEmerald)"/>
+  <text x="152" y="81" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#FFFFFF">H</text>
+
+  <!-- Controlled Unitary U_c -->
+  <circle cx="280" cy="76" r="5.5" fill="#10B981" filter="url(#glowEmerald)"/>
+  <line x1="280" y1="76" x2="280" y2="124" stroke="#10B981" stroke-width="2"/>
+
+  <!-- Unitary block U_c -->
+  <rect x="252" y="124" width="56" height="40" rx="6" fill="#0F172A" stroke="#10B981" stroke-width="1.8" filter="url(#glowEmerald)"/>
+  <text x="264" y="149" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#6EE7B7">U_c</text>
+
+  <!-- H Gate 2 -->
+  <rect x="380" y="58" width="36" height="36" rx="6" fill="url(#gradEmerald)" stroke="#10B981" stroke-width="1.5" filter="url(#glowEmerald)"/>
+  <text x="392" y="81" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#FFFFFF">H</text>
+
+  <!-- Meter / Measure -->
+  <rect x="460" y="58" width="38" height="36" rx="6" fill="#1E293B" stroke="#94A3B8" stroke-width="1.2"/>
+  <path d="M 468 84 A 12 12 0 0 1 490 84" fill="none" stroke="#E2E8F0" stroke-width="1.5"/>
+  <line x1="479" y1="84" x2="487" y2="68" stroke="#10B981" stroke-width="1.8"/>
+
+  <!-- Labels -->
+  <text x="515" y="80" font-family="'JetBrains Mono', monospace" font-size="11" fill="#10B981">Re⟨ψ|c⟩ = 1 - 2·P(|1⟩)</text>
+  <text x="515" y="148" font-family="'Inter', sans-serif" font-size="10" fill="#64748B">Controlled Shift U_c</text>
+</svg>
