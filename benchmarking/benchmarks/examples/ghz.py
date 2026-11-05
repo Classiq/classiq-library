@@ -44,7 +44,7 @@ def fit_coherence(phases, parities, n_qubits):
 
 
 class GHZExample(BenchmarkExample):
-    """
+    r"""
     Currently, this example is defined with problem_size=3, and 6 different samples of \phi for
     extracting the coherence. For the general case one should defined the number of samples as a function of problem_size.
     """
