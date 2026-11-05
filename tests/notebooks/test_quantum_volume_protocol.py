@@ -11,7 +11,7 @@ RESULTS_DIR = tempfile.mkdtemp()
 
 @wrap_testbook(
     "quantum_volume_protocol",
-    timeout_seconds=900,
+    timeout_seconds=180,
     replacements_regex=[
         ("num_trials=10", f"num_trials={NUM_TRIALS}"),
         # Store the results in a new directory
