@@ -63,10 +63,12 @@ runs:
             --query authorizationToken \
             --output text \
         )"
-        python -m pip install -U --pre \
+        # `0.0.0.dev0` is the lowest pre-release version, thus telling pip to install classiq's latest version, pre-releases included
+        #   (unlike `--pre`, which also allows pre-releases for all of classiq's dependencies)
+        python -m pip install -U \
             --extra-index-url "https://aws:$CODEARTIFACT_AUTH_TOKEN@${{ inputs.codeartifact-domain }}-${{ inputs.codeartifact-owner }}.d.codeartifact.${{ inputs.codeartifact-region }}.amazonaws.com/pypi/${{ inputs.pypi-nightly-name }}/simple/" \
             --extra-index-url https://pypi.org/simple \
-            classiq
+            "classiq>=0.0.0.dev0"
         # Install everything from the requirements, other than "classiq".
         python -m pip install -U $(grep -ivE "classiq" requirements.txt) \
             --extra-index-url https://pypi.org/simple
