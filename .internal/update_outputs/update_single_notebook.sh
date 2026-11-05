@@ -55,8 +55,7 @@ else
 fi
 
 # hook edit notebook
-"$current_folder/hook_add_random_seed.py" "$notebook_copy_path"
-"$current_folder/hook_logs_to_stdout.py" add "$notebook_copy_path"
+"$current_folder/injected_cells.py" add "$notebook_copy_path"
 
 #
 # Executing
@@ -91,9 +90,7 @@ printf "[*] Ended    at %s : \"%s\" : took %s\n" "$(date)" "$notebook_path" "$du
 # Post execution
 #
 
-# in reverse order of the hooks, since each one removes the first cell
-"$current_folder/hook_logs_to_stdout.py" remove "$notebook_copy_path"
-"$current_folder/hook_remove_random_seed.py" "$notebook_copy_path"
+"$current_folder/injected_cells.py" remove "$notebook_copy_path"
 
 #
 # if links-only - then merge the diff
