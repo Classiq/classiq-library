@@ -12,17 +12,10 @@ import json
 import re
 import subprocess
 import sys
-from collections import defaultdict
 from datetime import datetime
 
 REPO = "Classiq/classiq-library"
-WORKFLOWS = {
-    "Test-CI-daily-internal.yml": "internal",
-    "Test-CI-daily-notebooks-other.yml": "other",
-    "Test-CI-daily-notebooks-algorithms.yml": "algorithms",
-    "Test-CI-daily-notebooks-applications.yml": "applications",
-    "Test-CI-daily-notebooks-tutorials.yml": "tutorials",
-}
+WORKFLOW = "Test-CI-weekly.yml"
 RUNS_TO_FETCH = 5
 
 _TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T[\d:.]+Z\s?")
@@ -60,40 +53,44 @@ def _extract_summary(log_text: str) -> str | None:
     return "\n".join(summary_lines).rstrip() if summary_lines else None
 
 
-def _fetch_runs() -> dict[str, list[dict]]:
-    by_date: dict[str, list[dict]] = defaultdict(list)
-    for workflow_file, name in WORKFLOWS.items():
-        raw = _gh(
-            "run",
-            "list",
-            "--repo",
-            REPO,
-            "--workflow",
-            workflow_file,
-            "--limit",
-            str(RUNS_TO_FETCH),
-            "--json",
-            "databaseId,createdAt,conclusion",
-        )
-        for run in json.loads(raw):
-            run["name"] = name
-            by_date[run["createdAt"][:10]].append(run)
-    return by_date
+def _fetch_runs() -> list[dict]:
+    raw = _gh(
+        "run",
+        "list",
+        "--repo",
+        REPO,
+        "--workflow",
+        WORKFLOW,
+        "--limit",
+        str(RUNS_TO_FETCH),
+        "--json",
+        "databaseId,createdAt,conclusion",
+    )
+    return json.loads(raw)
 
 
-def _fetch_summary(run_id: int, name: str) -> str:
+def _fetch_summary(job_id: int, name: str) -> str:
     try:
-        job_id = _gh(
+        log = _gh(
             "api",
-            f"repos/{REPO}/actions/runs/{run_id}/jobs",
-            "--jq",
-            ".jobs[0].id",
-        ).strip()
-        log = _gh("api", f"repos/{REPO}/actions/jobs/{job_id}/logs")
+            "--allow-escape-sequences",
+            f"repos/{REPO}/actions/jobs/{job_id}/logs",
+        )
     except subprocess.CalledProcessError:
         return f"- {name}: failed to fetch logs"
 
     return _extract_summary(log) or f"- {name}: summary not found in logs"
+
+
+# Each job of the run is one suite (internal, other, algorithms, ...)
+def _fetch_summaries(run_id: int) -> list[str]:
+    raw = _gh(
+        "api",
+        f"repos/{REPO}/actions/runs/{run_id}/jobs",
+        "--jq",
+        "[.jobs[] | {id, name}]",
+    )
+    return [_fetch_summary(job["id"], job["name"]) for job in json.loads(raw)]
 
 
 def main() -> None:
@@ -107,10 +104,9 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    by_date = _fetch_runs()
-    dates = sorted(by_date, reverse=True)
+    runs = _fetch_runs()  # most recent first
 
-    if not dates:
+    if not runs:
         print("No workflow runs found.", file=sys.stderr)
         sys.exit(1)
 
@@ -118,22 +114,19 @@ def main() -> None:
         idx = args.n - 1
     else:
         print("Found the following weekly runs:", file=sys.stderr)
-        for i, date in enumerate(dates, 1):
+        for i, run in enumerate(runs, 1):
+            date = run["createdAt"][:10]
             day = datetime.strptime(date, "%Y-%m-%d").strftime("%a")
-            workflows = sorted(r["name"] for r in by_date[date])
-            print(f"  {i}) {date} ({day}) — {', '.join(workflows)}", file=sys.stderr)
+            status = run["conclusion"] or "in progress"
+            print(f"  {i}) {date} ({day}) — {status}", file=sys.stderr)
 
-        choice = input(f"\nChoose [1-{len(dates)}, default=1]: ").strip()
+        choice = input(f"\nChoose [1-{len(runs)}, default=1]: ").strip()
         idx = (int(choice) - 1) if choice else 0
 
-    date = dates[idx]
-    runs = by_date[date]
-    order = list(WORKFLOWS.values())
-    runs.sort(key=lambda r: order.index(r["name"]))
+    run = runs[idx]
+    print(f"Fetching summaries for {run['createdAt'][:10]}...", file=sys.stderr)
 
-    print(f"Fetching summaries for {date}...", file=sys.stderr)
-
-    summaries = [_fetch_summary(r["databaseId"], r["name"]) for r in runs]
+    summaries = _fetch_summaries(run["databaseId"])
     print("\n".join(summaries))
 
 
