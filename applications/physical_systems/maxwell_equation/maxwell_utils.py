@@ -113,7 +113,6 @@ def get_block_encoding(
 
     qprog = synthesize(
         main,
-        preferences=Preferences(optimization_level=0),
         constraints=Constraints(optimization_parameter="width"),
         auto_show=show,
     )
