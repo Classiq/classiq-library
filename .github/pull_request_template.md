@@ -6,12 +6,10 @@
 
 - [ ] Please make sure that the notebook runs successfully with the latest Classiq version.
 
-- [ ] Please make sure that you placed the files in an appropriate folder
+- [ ] Please make sure that you placed the files in an appropriate folder, with clear and descriptive names that match the notebook content.
+  - [ ] Plus, please make sure that all the auto-generated files are included: `.qmod`, `.synthesis_options.json`, `.metadata.json`, and test files if generated.
 
-  - [ ] And that the file names are clear, descriptive, and match the notebook content.
-    - [ ] Note that we require the file names of `.ipynb` and `.qmod` to be unique across this repository.
-  - [ ] Plus, please make sure that all required files are included: `.qmod`, `.synthesis_options.json`, `.metadata.json`
-  - [ ] And that images are embedded inside the notebook, not added as external files
+- [ ] Images are separate files next to the notebook (e.g. `./my_image.png`), not embedded in it
 
 - [ ] If applicable, please include link to the paper on which the notebook is based, in the notebook itself.
 
