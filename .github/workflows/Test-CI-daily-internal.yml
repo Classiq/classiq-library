@@ -1,8 +1,8 @@
-name: "Test CI (weekly) (internal)"
+name: "Test CI (weekly)"
 
 on:
   schedule:
-    - cron: "30 01 * * 6" # Saturday, 01:30 UTC
+    - cron: "00 01 * * 6" # Saturday, 01:00 UTC
   workflow_dispatch:
 
 defaults:
@@ -10,12 +10,33 @@ defaults:
     shell: bash
 
 jobs:
-  nightly-test:
+  weekly-test:
+    name: ${{ matrix.name }}
+
     permissions:
       id-token: write
       contents: read
 
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false # a failing suite shouldn't cancel the others
+      max-parallel: 1 # one suite at a time, like the old staggered schedules
+      matrix:
+        include:
+          - name: internal
+            tests: tests/internal tests/test_*.py
+          - name: other
+            tests: tests/notebooks/test__community_and_functions.py tests/notebooks/workshops tests/notebooks/classiq_paper
+          - name: algorithms
+            tests: tests/notebooks
+            notebooks: algorithms
+          - name: applications
+            tests: tests/notebooks
+            notebooks: applications
+          - name: tutorials
+            tests: tests/notebooks
+            notebooks: tutorials
 
     steps:
       - name: Checkout repository
@@ -31,13 +52,23 @@ jobs:
           nightly-m2m-secret-arn: ${{ secrets.NIGHTLY_M2M_SECRET_ARN }}
           pypi-nightly-name: ${{ secrets.PYPI_NIGHTLY_NAME }}
 
+      # Only for suites with a `notebooks` folder (algorithms, applications, tutorials)
+      - name: Get notebooks to test
+        if: matrix.notebooks
+        id: list-files
+        run: |
+          shopt -s globstar
+          echo "files=$(echo ${{ matrix.notebooks }}/**/*.ipynb)" >> $GITHUB_OUTPUT
+
       # Run Notebook Tests
       - name: Run Notebooks
-        run: python -m pytest -c tests/config_weekly.ini tests/internal tests/test_*.py
+        run: python -m pytest -c tests/config_weekly.ini ${{ matrix.tests }}
         env:
-          SHOULD_TEST_ALL_FILES: "true"
+          # Suites without a `notebooks` folder test all their files
+          SHOULD_TEST_ALL_FILES: ${{ !matrix.notebooks }}
+          LIST_OF_IPYNB_CHANGED: "${{ steps.list-files.outputs.files }}"
 
       # Summarize results for Slack copy-paste
       - name: Summarize test results
         if: always()
-        run: python .github/scripts/summarize_test_results.py --workflow-name "internal"
+        run: python .github/scripts/summarize_test_results.py --workflow-name "${{ matrix.name }}"
