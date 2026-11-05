@@ -4,10 +4,20 @@ on:
   push:
     branches:
       - main
+
+  # PRs (including forks)
+  # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
   pull_request_target:
-    # Note: `pull_request_target` ensures that the tests run in the context of the `main` branch, not in the user's fork.
     branches:
       - main
+
+  # Self-test for PRs that change this file
+  # Note: the job skips forks (see `if` below).
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/Test-CI-main.yml
 
   workflow_dispatch:
 
@@ -17,6 +27,9 @@ defaults:
 
 jobs:
   test:
+    # Forks run only through `pull_request_target`, since they get no secrets under `pull_request`
+    if: ${{ !github.event.pull_request.head.repo.fork || github.event_name == 'pull_request_target' }}
+
     permissions:
       id-token: write
       contents: read
@@ -39,11 +52,11 @@ jobs:
       # Setup Repository
       #
       - name: Checkout (push / workflow_dispatch)
-        if: github.event_name != 'pull_request_target'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v7
 
-      - name: Checkout PR head (pull_request_target)
-        if: github.event_name == 'pull_request_target'
+      - name: Checkout PR head (pull_request_target / pull_request)
+        if: github.event_name == 'pull_request_target' || github.event_name == 'pull_request'
         uses: actions/checkout@v7
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
