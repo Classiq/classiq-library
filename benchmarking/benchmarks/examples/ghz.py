@@ -44,7 +44,7 @@ def fit_coherence(phases, parities, n_qubits):
 
 
 class GHZExample(BenchmarkExample):
-    """
+    r"""
     Currently, this example is defined with problem_size=3, and 6 different samples of \phi for
     extracting the coherence. For the general case one should defined the number of samples as a function of problem_size.
     """
@@ -68,7 +68,7 @@ class GHZExample(BenchmarkExample):
 
     async def submit(self, qprog: QuantumProgram) -> str:
         with ExecutionSession(qprog) as es:
-            job = es.submit_batch_sample(
+            job = es.submit_sample(
                 [{"theta": 0, "phi": np.pi}]
                 + [{"theta": -np.pi / 2, "phi": p} for p in self.phis]
             )

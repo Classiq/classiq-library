@@ -37,7 +37,7 @@ class QSMExample(BenchmarkExample):
 
     async def submit(self, qprog: QuantumProgram) -> str:
         with ExecutionSession(qprog) as es:
-            job = es.submit_batch_sample([{"num_kicks": 2}, {"num_kicks": 3}])
+            job = es.submit_sample([{"num_kicks": 2}, {"num_kicks": 3}])
             return job.id
 
     async def score(self, job_id):
