@@ -133,7 +133,7 @@ POINT = Point(
             "simulator run migrated to free sample(); the IonQ hardware path (behind "
             "RUN_ON_HARDWARE, default False) was modernized to ExecutionSession(backend='ionq/...', "
             "config=IonQConfig(...), run_via_classiq=True) but deliberately keeps the async "
-            "submit_batch_sample -> ExecutionJob.from_id -> get_batch_sample_result "
+            "submit_sample -> ExecutionJob.from_id -> get_batch_sample_result "
             "submit-now/retrieve-later workflow (ExecutionSession + .dataframe on the retrieved batch)",
         ),
         (
