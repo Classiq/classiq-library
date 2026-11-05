@@ -222,10 +222,6 @@ jobs:
       - name: Run Notebooks (executing notebooks and testing content)
         run: python -m pytest -c tests/config_notebook_execute_tests.ini --rootdir=.
         env:
-          # Previosly we had:
-          #   if workflow_dispatch: True
-          #   if pull_request_target: False
-          #   if push: nothing, which translates to False
           SHOULD_TEST_ALL_FILES: ${{ github.event_name == 'workflow_dispatch' }}
           LIST_OF_IPYNB_CHANGED: "${{ steps.code-changed.outputs.list }}"
           LIST_OF_IPYNB_TESTS_CHANGED: "${{ steps.changed-files.outputs.tests_all_changed_files }}"
