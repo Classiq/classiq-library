@@ -26,9 +26,7 @@ qfunc be_amat0(data: qbit[], block: qbit[]) {
     {data, del_qubit} -> packed;
     hadamard_transform(select);
   } apply {
-    control (select) {
-      IDENTITY(packed);
-    } else {
+    control (select == 0) {
       packed += 2;
     }
     packed += -1;

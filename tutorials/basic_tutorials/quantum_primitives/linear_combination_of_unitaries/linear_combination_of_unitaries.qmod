@@ -28,7 +28,7 @@ qfunc prepare(controller: qnum) {
 qfunc select(controller: qnum, psi: qnum) {
   // Coherently apply U_j conditioned on the controller value j.
   control (controller == 0) {
-    IDENTITY(psi);
+    // U_0 is the identity, so there is nothing to apply.
   }
   control (controller == 1) {
     qft(psi);
