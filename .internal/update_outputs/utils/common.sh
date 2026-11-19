@@ -72,6 +72,15 @@ silence_if() {
   fi
 }
 
+# usage: relative_to_cwd <absolute path>  ->  the path relative to the current folder, if it's inside it
+relative_to_cwd() {
+  if [[ "$1" == "$PWD" ]]; then
+    echo "."
+  else
+    echo "${1#"$PWD"/}"
+  fi
+}
+
 # usage: format_duration <seconds>  ->  hh:mm:ss
 format_duration() {
   local elapsed=$1

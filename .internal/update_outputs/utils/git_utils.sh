@@ -9,14 +9,16 @@ create_branch_from_main() {
     git checkout -b "$1"
 }
 
+# note: the patterns are git pathspecs, so `*` matches across folders, and gitignored files (like .ipynb_checkpoints) are skipped
+
 # usage: git_restore_by_name <file name pattern>
 git_restore_by_name() {
-  find . -name "$1" -exec git restore {} +
+  git restore -- "$1"
 }
 
 # usage: git_add_by_name <file name pattern>
 git_add_by_name() {
-  find . -name "$1" -exec git add {} +
+  git add -- "$1"
 }
 
 # usage: commit_by_name <file name pattern> <message>

@@ -20,6 +20,17 @@ assert_python3_kernel_exists() {
   fi
 }
 
+# usage: is_notebook <path>  - jupyter's checkpoints aren't counted as notebooks
+is_notebook() {
+  [[ "$1" == *.ipynb && "$1" != *.ipynb_checkpoints/* ]]
+}
+
+# usage: find_notebooks <folder> [name pattern, default: *.ipynb]  ->  prints the notebooks, NUL-separated
+# skips jupyter's checkpoints
+find_notebooks() {
+  find "$1" -name .ipynb_checkpoints -prune -o -type f -name "${2:-*.ipynb}" -print0
+}
+
 # usage: copy_notebook <notebook path>  ->  prints the path of the copy (next to the original)
 copy_notebook() {
   local copy_path="$1.temp.ipynb"
