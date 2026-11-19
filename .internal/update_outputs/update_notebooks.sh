@@ -8,33 +8,86 @@ source "$SCRIPT_DIR/utils/common.sh"
 source "$SCRIPT_DIR/utils/git_utils.sh"
 source "$SCRIPT_DIR/utils/python_utils.sh"
 
-MAX_THREADS=${UPDATER_MAX_THREADS:-3} # note: there's a max of 3 running jobs per user, so we limit the threads to 3
-MODE=${UPDATER_MODE:-}
+# the configuration - taken from the environment variables, and overridden by the arguments (see `parse_args`)
 FOLDER=${UPDATER_FOLDER:-}
+MODE=${UPDATER_MODE:-}
+MAX_THREADS=${UPDATER_MAX_THREADS:-3} # note: there's a max of 3 running jobs per user, so we limit the threads to 3
 IS_LINKS_ONLY=$(as_bool is_true "$UPDATER_LINKS_ONLY" true)
+SHOULD_TRACK_TIME=$(as_bool is_true "$UPDATER_TRACK_TIME" true)
 SHOULD_SILENCE_GIT=$(as_bool is_true "$UPDATER_SILENCE_GIT" false)
 SHOULD_SILENCE_PIP=$(as_bool is_true "$UPDATER_SILENCE_PIP" false)
 
 print_help() {
   cat <<EOF
-usage: $0
-  plus, there are some environment variables which you can set
-    UPDATER_FOLDER      - can be set to a folder, on which we run 'find <that folder>'
-    UPDATER_MODE        - can be set to 'test_small', 'test_algorithms', 'test_all'
-    UPDATER_MAX_THREADS - any number (recommending 1, 2, or 3). default: 3
-    UPDATER_LINKS_ONLY  - only update the platform links, keeping the rest of the outputs. default: true
-    UPDATER_TRACK_TIME  - print when 'pip install' and each notebook start and end. default: true
-    UPDATER_SILENCE_GIT - silence git while creating the branch. default: false
-    UPDATER_SILENCE_PIP - silence 'pip install'. default: false
-  booleans can be set to '1' / 'true' or '0' / 'false' (case-insensitive)
+usage: $0 [options]
 
-example usage:
-UPDATER_MAX_THREADS=1 UPDATER_SILENCE_PIP=1 UPDATER_FOLDER=algorithms/algebraic .internal/update_outputs/update_notebooks.sh
+executes notebooks, and opens a PR with their updated outputs
 
-UPDATER_MAX_THREADS=1 UPDATER_SILENCE_PIP=true UPDATER_TRACK_TIME=false UPDATER_MODE=test_small .internal/update_outputs/update_notebooks.sh
+which notebooks (one is required):
+  --folder <dir>          [UPDATER_FOLDER]       all the notebooks under <dir> (relative to the repo root)
+  --mode <mode>           [UPDATER_MODE]         'test_small' / 'test_algorithms' / 'test_all'
 
-UPDATER_MAX_THREADS=1 UPDATER_SILENCE_PIP=1 UPDATER_LINKS_ONLY=0 UPDATER_FOLDER=algorithms/algebraic .internal/update_outputs/update_notebooks.sh
+options:
+  -j, --max-threads <n>   [UPDATER_MAX_THREADS]  how many notebooks to execute in parallel. default: 3
+  --[no-]links-only       [UPDATER_LINKS_ONLY]   only update the platform links, keeping the rest of the outputs. default: on
+  --[no-]track-time       [UPDATER_TRACK_TIME]   print when 'pip install' and each notebook start and end. default: on
+  --[no-]silence-git      [UPDATER_SILENCE_GIT]  silence git while creating the branch. default: off
+  --[no-]silence-pip      [UPDATER_SILENCE_PIP]  silence 'pip install'. default: off
+  -h, --help
+
+boolean flags also accept a value, e.g. '--links-only=false'.
+each option can also be set by its environment variable (in brackets), and the arguments take precedence.
+boolean environment variables can be set to '1' / 'true' or '0' / 'false' (case-insensitive).
+
+examples:
+  $0 --folder algorithms/algebraic -j 1 --silence-pip
+  $0 --mode test_small --no-track-time
+  $0 --folder=algorithms/algebraic --no-links-only
+  UPDATER_SILENCE_PIP=1 UPDATER_FOLDER=algorithms/algebraic $0
 EOF
+}
+
+# overrides the configuration by the arguments
+# prints an error for each unknown argument, and returns non-zero if there were any
+parse_args() {
+  local is_valid=true
+  local options_with_value="--folder|--mode|-j|--max-threads"
+
+  while [[ $# -gt 0 ]]; do
+    # normalize `--option=value` into `--option value`
+    if [[ "$1" =~ ^($options_with_value)=(.*)$ ]]; then
+      set -- "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${@:2}"
+    fi
+
+    if [[ "$1" =~ ^($options_with_value)$ && $# -lt 2 ]]; then
+      echo "Error: '$1' requires a value (see --help)" >&2
+      is_valid=false
+      break
+    fi
+
+    case "$1" in
+      -h | --help)
+        print_help
+        exit 0
+        ;;
+      --folder) FOLDER=$2; shift ;;
+      --mode) MODE=$2; shift ;;
+      -j | --max-threads) MAX_THREADS=$2; shift ;;
+      -j?*) MAX_THREADS=${1#-j} ;;
+      # boolean flags - `--flag`, `--no-flag`, or `--flag=<bool>`
+      --links-only | --no-links-only | --links-only=*) IS_LINKS_ONLY=$(parse_boolean_flag "$1") || is_valid=false ;;
+      --track-time | --no-track-time | --track-time=*) SHOULD_TRACK_TIME=$(parse_boolean_flag "$1") || is_valid=false ;;
+      --silence-git | --no-silence-git | --silence-git=*) SHOULD_SILENCE_GIT=$(parse_boolean_flag "$1") || is_valid=false ;;
+      --silence-pip | --no-silence-pip | --silence-pip=*) SHOULD_SILENCE_PIP=$(parse_boolean_flag "$1") || is_valid=false ;;
+      *)
+        echo "Error: unknown argument '$1' (see --help)" >&2
+        is_valid=false
+        ;;
+    esac
+    shift
+  done
+
+  [[ "$is_valid" == true ]]
 }
 
 # sets `search_root` and `name_pattern`, by which we `find` the notebooks to update
@@ -58,11 +111,34 @@ resolve_notebooks_scope() {
       search_root="."
       name_pattern="*.ipynb"
       ;;
+    "")
+      echo "Error: either --folder or --mode must be set (see --help)" >&2
+      return 1
+      ;;
     *)
-      echo "Error: Either UPDATER_FOLDER must be set or UPDATER_MODE must be one of: test_small, test_algorithms, test_all." >&2
+      echo "Error: invalid mode '$MODE'. it must be one of: test_small, test_algorithms, test_all" >&2
       return 1
       ;;
   esac
+}
+
+# prints an error for each invalid option, and returns non-zero if there were any
+validate_config() {
+  local is_valid=true
+
+  if [[ ! "$MAX_THREADS" =~ ^[1-9][0-9]*$ ]]; then
+    echo "Error: max threads must be a positive number, but got '$MAX_THREADS'" >&2
+    is_valid=false
+  fi
+
+  if [[ -n "$FOLDER" && ! -d "$FOLDER" ]]; then
+    echo "Error: folder '$FOLDER' doesn't exist (note: it's relative to the repo root)" >&2
+    is_valid=false
+  fi
+
+  resolve_notebooks_scope || is_valid=false
+
+  [[ "$is_valid" == true ]]
 }
 
 list_notebooks() {
@@ -93,19 +169,23 @@ print_failed_notebooks() {
 }
 
 main() {
-  if has_flag --help "$@"; then
-    print_help
-    exit 0
-  fi
+  local is_valid=true
+  parse_args "$@" || is_valid=false
 
   #
   # 1) Initialization - validations, `git pull` + create-new-branch, update pip
   #
   print_section "Init"
   cd "$(git rev-parse --show-toplevel)" || exit 1
-  # validate before making any changes
-  assert_inside_venv || exit 1
-  resolve_notebooks_scope || exit 1
+  # validate before making any changes, reporting all the errors at once
+  validate_config || is_valid=false
+  assert_inside_venv || is_valid=false
+  if [[ "$is_valid" != true ]]; then
+    exit 1
+  fi
+
+  # read by `time_it`, both here and in update_single_notebook.sh
+  export UPDATER_TRACK_TIME="$SHOULD_TRACK_TIME"
 
   silence_if "$SHOULD_SILENCE_GIT" create_branch_from_main "updating_notebooks_$(date '+%Y.%m.%d_%H.%M')" || exit 1
   time_it "Updating pip" silence_if "$SHOULD_SILENCE_PIP" pip_install_requirements requirements.txt requirements_notebooks.txt

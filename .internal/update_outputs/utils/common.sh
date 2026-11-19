@@ -12,6 +12,28 @@ is_true() {
   esac
 }
 
+# usage: is_bool <value>  - whether `is_true` recognizes <value> (rather than falling back to the default)
+is_bool() {
+  [[ "${1,,}" =~ ^(true|1|false|0)$ ]]
+}
+
+# usage: parse_boolean_flag <arg>  ->  prints true / false
+# "--flag" is true, "--no-flag" is false, and "--flag=<bool>" is <bool>
+parse_boolean_flag() {
+  case "$1" in
+    --no-*) echo false ;;
+    *=*)
+      local value=${1#*=}
+      if ! is_bool "$value"; then
+        echo "Error: invalid value in '$1'. it must be one of: true, false, 1, 0" >&2
+        return 1
+      fi
+      as_bool is_true "$value" false
+      ;;
+    *) echo true ;;
+  esac
+}
+
 # usage: has_flag <flag> <args...>
 has_flag() {
   local flag=$1
