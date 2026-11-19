@@ -238,6 +238,7 @@ main() {
   # validate before making any changes, reporting all the errors at once
   validate_config || is_valid=false
   assert_inside_venv || is_valid=false
+  assert_python3_kernel_exists || is_valid=false
   if [[ "$is_valid" != true ]]; then
     exit 1
   fi
@@ -267,8 +268,7 @@ main() {
     print_section "Creating PR"
     # discard the changes to the .synthesis_options.json files
     git restore -- "*.synthesis_options.json"
-    commit_files "*.ipynb" "Updating notebooks output"
-    open_pr "Updating output"
+    commit_files "*.ipynb" "Updating notebooks output" && open_pr "Updating output"
   fi
 
   print_failed_notebooks
