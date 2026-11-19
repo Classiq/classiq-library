@@ -118,9 +118,10 @@ def run_statevector_simulation(
     if show_circuit:
         show(qprog)
     if print_circuit_info:
+        circuit_metrics = get_transpiled_circuit_metrics(qprog)
         print("Circuit Width:", qprog.data.width)
-        print("Circuit Depth:", qprog.transpiled_circuit.depth)
-        print("Gate Counts:", qprog.transpiled_circuit.count_ops)
+        print("Circuit Depth:", circuit_metrics.depth)
+        print("Gate Counts:", circuit_metrics.count_ops)
 
     if filter_ancilla:
         df = calculate_state_vector(qprog, filters={"ancilla": 0})
