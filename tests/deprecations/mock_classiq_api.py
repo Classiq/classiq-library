@@ -5,9 +5,12 @@
   a state vector, expectation values, ...), so the notebook runs to its end and reaches
   all of its API calls. Nothing is sent to the Classiq platform: an API call without
   a fake raises `MockedClassiqApiCall`.
+- The fakes can't reproduce real results, so the notebook's `assert` statements are
+  skipped, like with `python -O`.
 - Every deprecation warning is recorded. `report()` returns them.
 """
 
+import ast
 import datetime
 import math
 import random
@@ -37,6 +40,7 @@ class MockedClassiqApiCall(Exception):
 def install() -> None:
     global _first_cell
     _first_cell = get_ipython().execution_count
+    get_ipython().ast_transformers.append(_SkipAsserts())
     warnings.showwarning = _record_warning
     warnings.simplefilter("always")
     _mock_client()
@@ -45,6 +49,11 @@ def install() -> None:
 
 def report() -> list[dict]:
     return list(_warnings.values())
+
+
+class _SkipAsserts(ast.NodeTransformer):
+    def visit_Assert(self, node: ast.Assert) -> ast.Pass:
+        return ast.copy_location(ast.Pass(), node)
 
 
 #
