@@ -40,6 +40,8 @@ copy_notebook() {
 # usage: execute_notebook_inplace <notebook path>
 # nbconvert runs the kernel in the notebook's folder, so relative paths in the notebook work from anywhere
 execute_notebook_inplace() {
+  # the kernel's log level silences its "Kernel is running over TCP without encryption" warning
   jupyter nbconvert --to notebook --execute --inplace "$1" \
-    --ExecutePreprocessor.kernel_name=python3
+    --ExecutePreprocessor.kernel_name=python3 \
+    '--ExecutePreprocessor.extra_arguments=["--IPKernelApp.log_level=ERROR"]'
 }
