@@ -41,8 +41,8 @@ def _path_commands_for_points_with_one_point(
     left = draw_a - draw_radius
     return [
         f"""M {left.real},{left.imag}""",
-        f"""a {r},{r} 0 0,0 {2*r},{0}""",
-        f"""a {r},{r} 0 0,0 {-2*r},{0}""",
+        f"""a {r},{r} 0 0,0 {2 * r},{0}""",
+        f"""a {r},{r} 0 0,0 {-2 * r},{0}""",
     ]
 
 
@@ -415,7 +415,7 @@ def _patch_svg_viewer_helper_single_patch(
                 f'fill="black" '
                 f'stroke-width="{stroke_width}" '
                 f""" {extra_clip_path_arg} """
-                f"""stroke="{'black' if show_order != 'undirected' else 'none'}" />"""
+                f"""stroke="{"black" if show_order != "undirected" else "none"}" />"""
             )
         if show_data_qubits:
             for d in tile.data_set:
@@ -428,7 +428,7 @@ def _patch_svg_viewer_helper_single_patch(
                     f'fill="black" '
                     f'stroke-width="{stroke_width}" '
                     f""" {extra_clip_path_arg} """
-                    f"""stroke="{'black' if show_order != 'undirected' else 'none'}" />"""
+                    f"""stroke="{"black" if show_order != "undirected" else "none"}" />"""
                 )
 
         if common_basis is None and path_cmd_start is not None:

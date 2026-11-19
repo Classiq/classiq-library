@@ -96,9 +96,9 @@ def _make_circuit(
     return circuit
 
 
-def _simplified_noise_rep_code_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def _simplified_noise_rep_code_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     constructions: dict[str, Callable[[Params], stim.Circuit]] = {}
 
     def _make_simple_circuit(

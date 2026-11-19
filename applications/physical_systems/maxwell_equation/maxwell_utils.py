@@ -58,7 +58,7 @@ def vaildate_block_encoding(
 
     print(f"Fidelity: {quantum_fidelity:.6f}")
     print(
-        f"Encoding Scaling: {np.linalg.norm(vec_expected)/np.linalg.norm(vec_res):.6f}",
+        f"Encoding Scaling: {np.linalg.norm(vec_expected) / np.linalg.norm(vec_res):.6f}",
         f"Expected: {expected_scale:.6f}" if expected_scale is not None else "",
     )
 
@@ -378,9 +378,9 @@ def build_maxwell_evolution_matrix(
                 mat_em[in_, out_] = 0
                 mat_em[out_, in_] = 0
 
-    assert np.isclose(
-        np.sum(np.abs(mat_em + mat_em.T)), 0
-    ), "Matrix is not anti-symmetric"
+    assert np.isclose(np.sum(np.abs(mat_em + mat_em.T)), 0), (
+        "Matrix is not anti-symmetric"
+    )
 
     return mat_em
 

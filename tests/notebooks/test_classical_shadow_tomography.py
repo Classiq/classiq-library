@@ -23,15 +23,15 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # Pauli-shadow protocol with N=400, div=2 should land within ~0.5 of
     # the truth at this sample size with very high probability.
     estimate = tb.ref("estimate")
-    assert (
-        abs(abs(estimate) - 1.0) < 0.5
-    ), f"Pauli-shadow <ZZ> estimate off: got {estimate}, expected |.|≈1"
+    assert abs(abs(estimate) - 1.0) < 0.5, (
+        f"Pauli-shadow <ZZ> estimate off: got {estimate}, expected |.|≈1"
+    )
 
     # Clifford-shadow estimate should be tighter (every shot is informative).
     estimate_clifford = tb.ref("estimate_clifford")
-    assert (
-        abs(abs(estimate_clifford) - 1.0) < 0.5
-    ), f"Clifford-shadow <ZZ> estimate off: got {estimate_clifford}"
+    assert abs(abs(estimate_clifford) - 1.0) < 0.5, (
+        f"Clifford-shadow <ZZ> estimate off: got {estimate_clifford}"
+    )
 
     # Reconstructed density matrix invariants: 4x4, Hermitian, trace ~ 1.
     rho_hat = tb.ref_numpy("reconstructed_state")

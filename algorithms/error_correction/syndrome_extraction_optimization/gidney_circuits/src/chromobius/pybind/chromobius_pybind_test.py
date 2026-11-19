@@ -23,9 +23,11 @@ def test_errors():
     with pytest.raises(ValueError, match="must be a stim.DetectorErrorModel"):
         chromobius.compile_decoder_for_dem(object())
     with pytest.raises(ValueError, match="4th coordinate"):
-        chromobius.compile_decoder_for_dem(stim.DetectorErrorModel("""
+        chromobius.compile_decoder_for_dem(
+            stim.DetectorErrorModel("""
             error(0.1) D0
-        """))
+        """)
+        )
 
 
 def test_decoding():

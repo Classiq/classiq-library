@@ -31,4 +31,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     assert (
         np.abs(parsed_result - expected_payoff)
         <= 0.5 * measured_confidence * confidence_scale_by_alpha
-    ), f"Payoff result is out of the {ALPHA_ASSERTION*100}% confidence interval: |{parsed_result} - {expected_payoff}| > {0.5*measured_confidence * confidence_scale_by_alpha}"
+    ), (
+        f"Payoff result is out of the {ALPHA_ASSERTION * 100}% confidence interval: |{parsed_result} - {expected_payoff}| > {0.5 * measured_confidence * confidence_scale_by_alpha}"
+    )

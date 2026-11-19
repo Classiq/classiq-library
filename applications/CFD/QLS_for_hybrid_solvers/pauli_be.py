@@ -57,7 +57,6 @@ def initialize_paulis_from_csr(rowstt: np.ndarray, col: np.ndarray, nq: int):
     scr_entry = 0
     for i in range(len(rowstt) - 1):
         for j in range(rowstt[i], rowstt[i + 1]):
-
             b1 = np.binary_repr(i, width=nq)[::-1]
             b2 = np.binary_repr(col[j], width=nq)[::-1]
             diffarray = binary_diff_to_elementary(

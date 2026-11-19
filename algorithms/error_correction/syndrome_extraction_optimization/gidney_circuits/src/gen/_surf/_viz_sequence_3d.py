@@ -40,7 +40,7 @@ def _patch_transition_to_floor(
     t: float,
     out_triangles: list[ColoredTriangleData],
     out_lines: list[ColoredLineData],
-    order: int
+    order: int,
 ):
     for q in trans.data_set:
         for d in range(4):
@@ -78,7 +78,7 @@ def _patch_boundary_to_walls(
     t: float,
     dt: float,
     out_triangles: list[ColoredTriangleData],
-    out_lines: list[ColoredLineData]
+    out_lines: list[ColoredLineData],
 ):
     for curve in boundary.region_curves:
         for basis, p1, p2 in curve:

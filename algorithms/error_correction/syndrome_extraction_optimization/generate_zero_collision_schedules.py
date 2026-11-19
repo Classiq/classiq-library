@@ -258,7 +258,7 @@ def main():
     print("\nFirst 5 schedules:")
     for i, sched in enumerate(schedules[:5]):
         print(
-            f"  {i+1}. R={sched['r_schedule']}, G={sched['g_schedule']}, B={sched['b_schedule']}"
+            f"  {i + 1}. R={sched['r_schedule']}, G={sched['g_schedule']}, B={sched['b_schedule']}"
         )
 
 

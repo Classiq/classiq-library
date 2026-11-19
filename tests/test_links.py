@@ -64,7 +64,7 @@ def test_links(notebook_path: str) -> None:
     for cell_index, url in iterate_links_from_notebook(notebook_path):
         if not _test_single_url(url):
             broken_links_messages.append(
-                f'Broken link found! (#{len(broken_links_messages)+1}) in file "{notebook_path}", cell number {cell_index} (counting only markdown cells), broken url: "{url}"'
+                f'Broken link found! (#{len(broken_links_messages) + 1}) in file "{notebook_path}", cell number {cell_index} (counting only markdown cells), broken url: "{url}"'
             )
 
     assert not broken_links_messages, (

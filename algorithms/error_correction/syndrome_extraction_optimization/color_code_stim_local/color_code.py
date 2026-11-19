@@ -1385,8 +1385,7 @@ class ColorCode:
                             detid = int(str(target)[1:])
                             detids.append(detid)
                             if (
-                                detid
-                                in self.cult_detector_ids
+                                detid in self.cult_detector_ids
                                 # + self.interface_detector_ids
                             ):
                                 keep = False

@@ -22,9 +22,9 @@ from clorco.color2surface_code._color2surface_layouts import make_color2surface_
 from clorco.color2surface_code._color2surface_layouts import rgb2xyz
 
 
-def make_named_color2surface_code_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def make_named_color2surface_code_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     constructions: dict[str, Callable[[Params], stim.Circuit]] = {}
 
     def _make_simple_circuit(

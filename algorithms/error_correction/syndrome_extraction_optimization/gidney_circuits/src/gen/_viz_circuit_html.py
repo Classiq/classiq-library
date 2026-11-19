@@ -440,7 +440,9 @@ def _draw_2q(instruction: stim.CircuitInstruction, *, out: _SvgState) -> None:
                 else (
                     "Y"
                     if instruction.name in ["YCZ", "CY"]
-                    else "Z" if instruction.name == "CZ" else "?"
+                    else "Z"
+                    if instruction.name == "CZ"
+                    else "?"
                 )
             )
             x, y = q2i(t)

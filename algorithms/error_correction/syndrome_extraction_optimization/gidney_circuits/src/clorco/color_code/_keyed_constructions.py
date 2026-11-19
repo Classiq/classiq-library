@@ -42,9 +42,9 @@ from clorco.color_code._toric_color_code_circuits import (
 )
 
 
-def make_named_color_code_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def make_named_color_code_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     return {
         **_midout_color_code_circuit_constructions(),
         **_simplified_noise_color_code_constructions(),
@@ -53,9 +53,9 @@ def make_named_color_code_constructions() -> (
     }
 
 
-def _midout_color_code_circuit_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def _midout_color_code_circuit_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     constructions: dict[str, Callable[[Params], stim.Circuit]] = {}
 
     def _chunks_to_circuit(params: Params, chunks: list[gen.Chunk]) -> stim.Circuit:
@@ -153,16 +153,16 @@ def _midout_color_code_circuit_constructions() -> (
 
         return circuit
 
-    constructions["mxyz_color_code"] = (
-        lambda params: make_mxyz_color_code_from_stim_gen(
+    constructions["mxyz_color_code"] = lambda params: (
+        make_mxyz_color_code_from_stim_gen(
             distance=params.diameter,
             rounds=params.rounds,
             noise=params.noise_model,
             convert_to_cz=params.convert_to_cz,
         )
     )
-    constructions["phenom_mxyz_color_code"] = (
-        lambda params: make_mxyz_phenom_color_code(
+    constructions["phenom_mxyz_color_code"] = lambda params: (
+        make_mxyz_phenom_color_code(
             base_width=params.diameter,
             rounds=params.rounds,
             noise=params.noise_strength,
@@ -217,9 +217,9 @@ def _midout_color_code_circuit_constructions() -> (
     return constructions
 
 
-def _superdense_color_code_circuit_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def _superdense_color_code_circuit_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     constructions: dict[str, Callable[[Params], stim.Circuit]] = {}
 
     def _chunks_to_circuit(params: Params) -> stim.Circuit:
@@ -271,9 +271,9 @@ def _superdense_color_code_circuit_constructions() -> (
     return constructions
 
 
-def _simplified_noise_color_code_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def _simplified_noise_color_code_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     constructions: dict[str, Callable[[Params], stim.Circuit]] = {}
 
     def _make_simple_circuit(

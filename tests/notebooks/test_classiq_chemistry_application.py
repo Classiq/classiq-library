@@ -24,7 +24,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    assert (
-        np.abs(tb.ref("optimizer_res") - tb.ref("expected_energy")) < 0.01
-    ), "VQE did not converge to expected ground state."
+    assert np.abs(tb.ref("optimizer_res") - tb.ref("expected_energy")) < 0.01, (
+        "VQE did not converge to expected ground state."
+    )
     pass

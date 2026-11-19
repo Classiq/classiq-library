@@ -861,9 +861,7 @@ class BenchmarkConfig:
         str
     ]  # e.g. 'optimized_parallel', 'tri_optimal_XYZ', 'midout', 'superdense', 'superdense_modified', 'stim_memory_xyz'
     optimized_schedule: Optional[Dict] = None
-    noise_model: str = (
-        "depolarize2_after_cnot"  # or 'tqec_uniform_depolarizing' or 'si1000' or 'temporary'
-    )
+    noise_model: str = "depolarize2_after_cnot"  # or 'tqec_uniform_depolarizing' or 'si1000' or 'temporary'
     max_errors: Optional[int] = None  # Stop early after this many errors
     max_time_per_config: Optional[float] = None  # Stop early after this many seconds
     rounds: Optional[int] = (
@@ -1030,9 +1028,9 @@ def run_benchmark_sinter(
     # Loop: distance -> circuit_type -> decoder -> error_rate
     for d in config.distances:
         rounds = config.rounds if config.rounds is not None else d
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"DISTANCE: d={d}, rounds={rounds}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         for circuit_type in config.circuit_types:
             print(f"\n  Circuit type: {circuit_type}")
@@ -1354,7 +1352,7 @@ def generate_circuit_links_html(
         schedule_info = ""
         if optimized_schedule and "Optimized" in name:
             schedule_info = f"""
-        <p class="schedule">Schedule: R={optimized_schedule['r_schedule']}, G={optimized_schedule['g_schedule']}, B={optimized_schedule['b_schedule']}</p>"""
+        <p class="schedule">Schedule: R={optimized_schedule["r_schedule"]}, G={optimized_schedule["g_schedule"]}, B={optimized_schedule["b_schedule"]}</p>"""
 
         html += f"""
     <div class="circuit">
@@ -1693,7 +1691,7 @@ def plot_error_vs_qubits(df: pd.DataFrame, decoder: str = None, save_path: str =
             # Add distance labels next to points
             for _, row in df_ct.iterrows():
                 ax.annotate(
-                    f'd={int(row["distance"])}',
+                    f"d={int(row['distance'])}",
                     (row["num_qubits"], row["error_rate_per_round"]),
                     textcoords="offset points",
                     xytext=(5, 5),

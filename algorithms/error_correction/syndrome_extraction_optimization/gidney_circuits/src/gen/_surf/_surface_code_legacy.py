@@ -258,9 +258,9 @@ def measure_patch_legacy_detect(
             comparisons = []
         if comparisons is None:
             continue
-        assert isinstance(
-            comparisons, list
-        ), f"Vs exception must be a list but got {comparisons!r} for {m!r}"
+        assert isinstance(comparisons, list), (
+            f"Vs exception must be a list but got {comparisons!r} for {m!r}"
+        )
         child.detector(
             [AtLayer(m, save_layer), *comparisons],
             pos=m,

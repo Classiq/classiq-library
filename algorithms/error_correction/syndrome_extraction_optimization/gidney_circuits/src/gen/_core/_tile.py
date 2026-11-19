@@ -117,7 +117,7 @@ class Tile:
         extra = (
             ""
             if not self.extra_coords
-            else f"\n    extra_coords={self.extra_coords!r}," ""
+            else f"\n    extra_coords={self.extra_coords!r},"
         )
         return f"""gen.Tile(
     ordered_data_qubits={self.ordered_data_qubits!r},

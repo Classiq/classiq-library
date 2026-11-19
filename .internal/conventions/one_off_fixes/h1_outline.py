@@ -20,8 +20,8 @@ for path in sorted(glob.glob("**/*.ipynb", recursive=True)):
     if len(h1s) <= 1:
         continue
 
-    print(f"\n{'='*78}\n{path}   ({len(h1s)} H1s)")
+    print(f"\n{'=' * 78}\n{path}   ({len(h1s)} H1s)")
     for ci, level, text, first in headings:
         marker = "  <-- H1" if level == 1 else ""
         pos = "" if first else " (mid-cell)"
-        print(f"   cell{ci:>3} {'#'*level} {text[:70]}{marker}{pos}")
+        print(f"   cell{ci:>3} {'#' * level} {text[:70]}{marker}{pos}")
