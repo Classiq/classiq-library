@@ -15,6 +15,7 @@ parse_args() {
   fi
 
   notebook_path="$(realpath "$1")"
+  notebook_label="\"$1\"" # for the logs - the path as it was given, which is usually shorter
   is_links_only=$(as_bool has_flag --links-only "$@")
 }
 
@@ -43,11 +44,14 @@ take_links_from_copy() {
   local status=$1
 
   if [[ $status -ne 0 ]]; then
-    echo "NOT updating links for ${notebook_path} since 'jupyter nbconvert' failed with exit code ${status}"
+    echo "[!] Not updating the links of $notebook_label, since its execution failed (exit code $status)" >&2
     return "$status"
   fi
 
-  "$PATCH_DIR/update_links.py" "$notebook_path" "$executed_notebook_path"
+  if ! "$PATCH_DIR/update_links.py" "$notebook_path" "$executed_notebook_path"; then
+    echo "[!] Couldn't update the links of $notebook_label. you may update all of its outputs instead (not links-only)" >&2
+    return 1
+  fi
 }
 
 main() {
@@ -58,7 +62,7 @@ main() {
   prepare_notebook || exit 1
   trap cleanup_notebook EXIT
 
-  time_it "\"$notebook_path\"" execute_notebook_inplace "$executed_notebook_path"
+  time_it "$notebook_label" execute_notebook_inplace "$executed_notebook_path"
   local status=$?
   "$PATCH_DIR/injected_cells.py" remove "$executed_notebook_path"
 

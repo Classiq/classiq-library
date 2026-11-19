@@ -5,7 +5,7 @@
 assert_inside_venv() {
   # `sys.prefix` differs from `sys.base_prefix` only inside a venv (`python -m venv` / `uv venv`)
   if ! python -c "import sys; sys.exit(sys.prefix == sys.base_prefix)"; then
-    echo "Please enter venv" >&2
+    echo "Error: not inside a venv. please activate one (e.g. 'source .venv/bin/activate'), and run again" >&2
     return 1
   fi
 }

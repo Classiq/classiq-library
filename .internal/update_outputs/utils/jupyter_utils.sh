@@ -13,7 +13,7 @@ export_notebook_execution_env() {
 
 assert_python3_kernel_exists() {
   if ! jupyter kernelspec list | tail -n +2 | awk '{print $1}' | grep -xq "python3"; then
-    echo "Kernel python3 not found" >&2
+    echo "Error: the jupyter kernel 'python3' wasn't found. you may install it with 'python -m ipykernel install --user'" >&2
     return 1
   fi
 }

@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+usage: update_links.py <notebook to update> <notebook to take the links from>
+
+copies the platform links into the outputs of a notebook, keeping the rest of its outputs as they are
+"""
 
 import re
 import sys
@@ -32,13 +37,19 @@ def extract_links(cells: list[dict]) -> list[Link]:
 
 def validate_links(old_links: list[Link], new_links: list[Link]) -> bool:
     if len(old_links) != len(new_links):
-        print("Error: Link count mismatch")
+        print(
+            f"Error: the notebook printed {len(new_links)} links, but its outputs have {len(old_links)}",
+            file=sys.stderr,
+        )
         return False
 
     old_cell_indices = [cell_index for cell_index, _, _ in old_links]
     new_cell_indices = [cell_index for cell_index, _, _ in new_links]
     if old_cell_indices != new_cell_indices:
-        print("Error: Link cell indices mismatch")
+        print(
+            "Error: the notebook printed its links in other cells than in its outputs",
+            file=sys.stderr,
+        )
         return False
 
     return True
@@ -57,7 +68,9 @@ def update_links(
                 text[index] = line.replace(old_link, new_link)
                 break
         else:
-            print("Couldn't find link. This shouldn't happen.")
+            print(
+                "Error: couldn't find a link. this shouldn't happen.", file=sys.stderr
+            )
             return False
     return True
 
@@ -84,7 +97,8 @@ def main(dest_file: str, source_file: str) -> bool:
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print(
-            f"Usage: {sys.argv[0]} <file in which we'll update the links> <file from which to take the links>"
+            f"usage: {sys.argv[0]} <notebook to update> <notebook to take the links from>",
+            file=sys.stderr,
         )
         sys.exit(1)
 
