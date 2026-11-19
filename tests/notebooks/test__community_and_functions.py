@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from testbook import testbook  # type: ignore[import]
@@ -11,7 +13,8 @@ def _should_test_notebook(notebook_path: str) -> bool:
     if notebook_path.endswith("/logical_qubits_by_alice_and_bob.ipynb"):
         return False
 
-    return "/functions/" in notebook_path or "/community/" in notebook_path
+    folders = Path(notebook_path).parts
+    return "functions" in folders or "community" in folders
 
 
 def noop(*args, **kwargs):
