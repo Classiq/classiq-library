@@ -23,11 +23,11 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     assert abs(E_exact - (-9.142690)) < 1e-4, f"exact ground energy changed: {E_exact}"
 
     # variational bound: subspace diagonalization can never go below the true ground energy.
-    assert (
-        E_skqd >= E_exact - 1e-9
-    ), "SKQD energy below exact — variational bound violated"
+    assert E_skqd >= E_exact - 1e-9, (
+        "SKQD energy below exact — variational bound violated"
+    )
 
     # accuracy: the sample-based estimate should stay close to exact for the default setup.
-    assert (
-        abs(E_skqd - E_exact) < 5e-2
-    ), f"SKQD error too large: {E_skqd - E_exact:+.2e}"
+    assert abs(E_skqd - E_exact) < 5e-2, (
+        f"SKQD error too large: {E_skqd - E_exact:+.2e}"
+    )
