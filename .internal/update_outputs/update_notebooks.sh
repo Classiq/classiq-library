@@ -55,7 +55,7 @@ else
 fi
 start=$(date +%s)
 
-python -m pip install -U -r requirements.txt -r requirements_tests.txt >"$out_pip"
+python -m pip install -U -r requirements.txt -r requirements_notebooks.txt >"$out_pip"
 
 end=$(date +%s)
 elapsed=$((end - start))

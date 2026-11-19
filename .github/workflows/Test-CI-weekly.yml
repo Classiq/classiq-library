@@ -32,7 +32,7 @@ jobs:
           python -m pip install -U pip
           # Install the lighter version of torch for the CI. We don't have a GPU anyway, and it saves ~2GB
           python -m pip install -U torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install -U -r requirements.txt -r requirements_tests.txt
+          python -m pip install -U -r requirements.txt -r requirements_tests.txt -r requirements_notebooks.txt
 
       - name: Install couenne solver
         env:
