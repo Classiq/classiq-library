@@ -137,6 +137,11 @@ repos:
         # This file has `import classiq ; classiq.__version__`
         exclude: (^|/)stateprep_guassian_using_qsvt\.ipynb$
         entry: "\"\\s*import classiq(?!\\.)"
+      - id: forbid-warning-filters
+        name: forbid    warning filters (fix the warning instead)
+        language: pygrep
+        files: \.ipynb$
+        entry: 'warnings\.(filterwarnings|simplefilter)\('
 
       - id: validate-notebook-names
         name: validate  notebook names
