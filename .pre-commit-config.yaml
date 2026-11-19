@@ -111,6 +111,38 @@ repos:
         additional_dependencies:
           - "nbformat"
         require_serial: true
+      - id: forbid-deprecation-outputs
+        name: forbid    deprecation warnings in outputs
+        entry: .internal/pre_commit_tools/notebook_forbid_deprecation_outputs.py
+        language: python
+        files: \.ipynb$
+        # These notebooks' outputs still show a deprecation warning.
+        # Remove each one once it's fixed and re-run.
+        exclude: |
+          (?x)(^|/)(
+            projected_based_embedding_tutorial|
+            link_monitoring|
+            portfolio_optimization|
+            task_scheduling_problem|
+            integer_linear_programming|
+            evidence_scaling_labs|
+            max_clique|
+            max_k_vertex_cover|
+            set_partition|
+            ising_model|
+            radio_access_network_positioning_antennas|
+            benchmark_dynamical_localization|
+            benchmark_ghz|
+            advection_equation_2nd_place_submission|
+            advection_equation_winning_submission|
+            select_structures_BE|
+            quantum_walks_via_efficient_blockencoding|
+            stateprep_guassian_using_qsvt|
+            modular_exp_example
+          )\.ipynb$
+        additional_dependencies:
+          - "nbformat"
+        require_serial: true
 
       - id: validate-latex
         name: validate  notebook LaTeX
