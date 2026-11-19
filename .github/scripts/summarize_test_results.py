@@ -49,6 +49,11 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
         re.compile(r"\b429\b|rate.?limit", re.IGNORECASE),
         "API error 429",
     ),
+    # Before "broken link", whose 4xx pattern also matches a 401
+    (
+        re.compile(r"\bcode 401\b|not authenticated", re.IGNORECASE),
+        "not authenticated",
+    ),
     (
         re.compile(r"HTTP.*4\d\d|404|broken.*link|link.*broken", re.IGNORECASE),
         "broken link",
