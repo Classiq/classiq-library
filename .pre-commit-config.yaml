@@ -28,6 +28,10 @@ repos:
         name: format    notebook unused imports
         types_or: [jupyter]
         args: [--select, F401, --fix]
+      - id: ruff-check
+        name: format    notebook isort
+        types_or: [jupyter]
+        args: [--select, I, --fix]
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.9.6
     hooks:
@@ -38,13 +42,6 @@ repos:
     hooks:
       - id: black-jupyter
         name: format    notebook black
-  - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.9.1
-    hooks:
-      - id: nbqa-isort
-        name: format    notebook isort
-        additional_dependencies:
-          - isort<9
 
   - repo: local
     hooks:
