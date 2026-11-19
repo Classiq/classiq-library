@@ -29,6 +29,6 @@ docs after the Jupyter to Markdown conversion.
 
 def test_docs_directories():
     dir_list = DOCS_DIRECTORIES.read_text().splitlines()
-    assert all(
-        (ROOT / path).is_dir() for path in dir_list
-    ), f"Make sure all directories in {DOCS_DIRECTORIES} actually exist"
+    assert all((ROOT / path).is_dir() for path in dir_list), (
+        f"Make sure all directories in {DOCS_DIRECTORIES} actually exist"
+    )

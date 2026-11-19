@@ -39,9 +39,9 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # silently zeroing out the result (see git history)
     prob_corner_quantum = tb.ref("prob_corner")
     prob_corner_classical = tb.ref("prob_corner_classical")
-    assert (
-        prob_corner_quantum > 0.3
-    ), f"Quantum hitting probability at the corner is suspiciously low: {prob_corner_quantum}"
+    assert prob_corner_quantum > 0.3, (
+        f"Quantum hitting probability at the corner is suspiciously low: {prob_corner_quantum}"
+    )
     assert prob_corner_quantum > prob_corner_classical, (
         "The quantum walk should reach the opposite corner with higher probability "
         f"than the classical walk ({prob_corner_quantum} vs {prob_corner_classical})"

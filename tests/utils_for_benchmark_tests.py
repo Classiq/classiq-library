@@ -36,9 +36,9 @@ def load_results(results_file: str | Path) -> list[dict]:
 def validate_completed(results: list[dict], expected_count: int) -> None:
     assert len(results) == expected_count, f"Missing results: {results}"
     for result in results:
-        assert (
-            result["status"] == "COMPLETED"
-        ), f"{result['example']} on {result['backend_name']}: {result['status']} {result.get('error_message', '')}"
+        assert result["status"] == "COMPLETED", (
+            f"{result['example']} on {result['backend_name']}: {result['status']} {result.get('error_message', '')}"
+        )
 
 
 def validate_benchmark_results(

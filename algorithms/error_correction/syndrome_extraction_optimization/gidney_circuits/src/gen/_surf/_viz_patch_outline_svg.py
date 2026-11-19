@@ -160,10 +160,10 @@ def patch_outline_svg_viewer(
                         stroke_color = OBS_COLORS[basis]
                         lines.append(
                             f"<line "
-                            f'x1="{a.real + 0.01*k*scale_factor}" '
-                            f'y1="{a.imag + 0.01*k*scale_factor}" '
-                            f'x2="{b.real + 0.01*k*scale_factor}" '
-                            f'y2="{b.imag + 0.01*k*scale_factor}" '
+                            f'x1="{a.real + 0.01 * k * scale_factor}" '
+                            f'y1="{a.imag + 0.01 * k * scale_factor}" '
+                            f'x2="{b.real + 0.01 * k * scale_factor}" '
+                            f'y2="{b.imag + 0.01 * k * scale_factor}" '
                             f'stroke-width="{stroke_width * 3}" '
                             f'stroke-dasharray="0 1 0" '
                             f'stroke="{stroke_color}" />'

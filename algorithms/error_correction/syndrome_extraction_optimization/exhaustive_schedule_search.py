@@ -237,7 +237,7 @@ def exhaustive_search(
             best_distance = distance
             best_configs = [config]
             if verbose:
-                print(f"[{idx+1}/{total}] New best distance: {distance}")
+                print(f"[{idx + 1}/{total}] New best distance: {distance}")
                 print(
                     f"  R: {red_bulk[r_idx]}, G: {green_bulk[g_idx]}, B: {blue_bulk[b_idx]}"
                 )
@@ -250,7 +250,7 @@ def exhaustive_search(
             rate = (idx + 1) / elapsed
             remaining = (total - idx - 1) / rate
             print(
-                f"[{idx+1}/{total}] Elapsed: {elapsed:.1f}s, ETA: {remaining:.1f}s, Best: {best_distance}"
+                f"[{idx + 1}/{total}] Elapsed: {elapsed:.1f}s, ETA: {remaining:.1f}s, Best: {best_distance}"
             )
 
     elapsed = time.time() - start_time
@@ -285,7 +285,7 @@ def exhaustive_search(
     for dist in unique_distances:
         count = distances.count(dist)
         print(
-            f"Distance {dist}: {count} configurations ({100*count/len(distances):.1f}%)"
+            f"Distance {dist}: {count} configurations ({100 * count / len(distances):.1f}%)"
         )
 
     return best_configs, all_results
@@ -341,7 +341,7 @@ def test_configs_on_d(
     for i, cfg in enumerate(configs):
         if verbose:
             print(
-                f"[{i+1}/{len(configs)}] Testing config r={cfg['r_idx']}, g={cfg['g_idx']}, b={cfg['b_idx']} on d={d}..."
+                f"[{i + 1}/{len(configs)}] Testing config r={cfg['r_idx']}, g={cfg['g_idx']}, b={cfg['b_idx']} on d={d}..."
             )
 
         # Build bulk schedules
@@ -589,7 +589,7 @@ def main():
         for dist in unique_distances:
             count = distances.count(dist)
             print(
-                f"  Distance {dist}: {count} configurations ({100*count/len(distances):.1f}%)"
+                f"  Distance {dist}: {count} configurations ({100 * count / len(distances):.1f}%)"
             )
     else:
         print(f"STEP 1: Exhaustive search on d={d1}")

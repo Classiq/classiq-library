@@ -40,10 +40,10 @@ def main() -> None:
         )
         print(f"cell {i}{ref}")
         for ch, n in chars.most_common():
-            print(f"    {ch!r:>6} U+{ord(ch):04X} x{n:<3} {unicodedata.name(ch,'?')}")
+            print(f"    {ch!r:>6} U+{ord(ch):04X} x{n:<3} {unicodedata.name(ch, '?')}")
         for ch, n in in_code_chars.most_common():
             print(
-                f"    {ch!r:>6} U+{ord(ch):04X} x{n:<3} {unicodedata.name(ch,'?')}  [in code — leave]"
+                f"    {ch!r:>6} U+{ord(ch):04X} x{n:<3} {unicodedata.name(ch, '?')}  [in code — leave]"
             )
     if not any_found:
         print("(no non-ASCII in markdown cells)")

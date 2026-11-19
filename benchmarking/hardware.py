@@ -72,8 +72,9 @@ class HardwareRunner:
 
         qc = circuits[0].to_qiskit()
         depth = qc.depth(
-            filter_function=lambda instr: instr.operation.name
-            not in ("measure", "barrier", "reset")
+            filter_function=lambda instr: (
+                instr.operation.name not in ("measure", "barrier", "reset")
+            )
         )
         width = len({q for instr in qc.data for q in instr.qubits})
         two_qubit_gate_count = sum(

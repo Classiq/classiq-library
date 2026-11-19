@@ -144,9 +144,9 @@ class NotebookEdit:
 
             if self.replacements:
                 used_replacements = self._replace_notebook_content()
-                assert (
-                    self.replacements == used_replacements
-                ), f"Not all replacements given were used. The onces used are: {used_replacements}. The unused are {[r for r in self.replacements if r not in used_replacements]}"
+                assert self.replacements == used_replacements, (
+                    f"Not all replacements given were used. The onces used are: {used_replacements}. The unused are {[r for r in self.replacements if r not in used_replacements]}"
+                )
 
             self._inject_code()
 
@@ -161,13 +161,13 @@ class NotebookEdit:
         self._restore_notebook_from_backup()
 
     def _backup_notebook(self) -> None:
-        assert os.path.isfile(
-            self.file_path
-        ), f"This should not happen. '{self.file_path=}' was supposed to be a file. Aborting backup."
+        assert os.path.isfile(self.file_path), (
+            f"This should not happen. '{self.file_path=}' was supposed to be a file. Aborting backup."
+        )
 
-        assert not os.path.exists(
-            self.file_path_copied
-        ), f"notebook copy (for tests) was not cleaned properly. ({self.file_path_copied}). Aborting backup"
+        assert not os.path.exists(self.file_path_copied), (
+            f"notebook copy (for tests) was not cleaned properly. ({self.file_path_copied}). Aborting backup"
+        )
         shutil.copy(self.file_path, self.file_path_copied)
         assert os.path.exists(self.file_path_copied)
 
@@ -210,13 +210,13 @@ class NotebookEdit:
             json.dump(notebook, f, indent=1)
 
     def _restore_notebook_from_backup(self) -> None:
-        assert os.path.isfile(
-            self.file_path_copied
-        ), f"This should not happen. '{self.file_path_copied=}' was supposed to be a file. Aborting restore."
+        assert os.path.isfile(self.file_path_copied), (
+            f"This should not happen. '{self.file_path_copied=}' was supposed to be a file. Aborting restore."
+        )
         shutil.move(self.file_path_copied, self.file_path)
-        assert not os.path.exists(
-            self.file_path_copied
-        ), f"notebook copy (for tests) was not cleaned properly. ({self.file_path_copied}). Aborting restore."
+        assert not os.path.exists(self.file_path_copied), (
+            f"notebook copy (for tests) was not cleaned properly. ({self.file_path_copied}). Aborting restore."
+        )
 
 
 # The purpose of the `cd_decorator` is to execute the test in the same folder as the `ipynb` file
@@ -337,8 +337,8 @@ def validate_quantum_program_size(
 
 def _validate_size(actual: int, expected: int | None, name: str, allow_zero_size: bool):
     if expected is not None:
-        assert (
-            actual <= expected
-        ), f"The {name} of the circuit changed! (for the worse!). From {expected} to {actual}"
+        assert actual <= expected, (
+            f"The {name} of the circuit changed! (for the worse!). From {expected} to {actual}"
+        )
 
     assert allow_zero_size or actual > 0, f"Got a 0-{name} circuit."

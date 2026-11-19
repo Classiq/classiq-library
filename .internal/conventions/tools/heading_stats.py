@@ -68,4 +68,4 @@ for key, level_counts in levels.items():
 print(f"common headers (in >= {MIN_NOTEBOOKS} notebooks), by frequency:\n")
 print(f"  {'#nb':>3}  {'recommend':>9}  {'agree':>5}  header  [level distribution]")
 for n_nb, name, dom, pct, dist in sorted(rows, key=lambda r: -r[0]):
-    print(f"  {n_nb:>3}  {'H'+str(dom):>9}  {pct:>4}%  {name!r}  [{dist}]")
+    print(f"  {n_nb:>3}  {'H' + str(dom):>9}  {pct:>4}%  {name!r}  [{dist}]")

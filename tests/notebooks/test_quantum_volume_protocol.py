@@ -31,6 +31,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     # On an ideal simulator, the heavy output probability is always above 0.5
     for result in results:
         heavy_output_probability = float(result["heavy_output_probability"])
-        assert (
-            heavy_output_probability > 0.5
-        ), f"{result['example']} on {result['backend_name']}: {heavy_output_probability=}"
+        assert heavy_output_probability > 0.5, (
+            f"{result['example']} on {result['backend_name']}: {heavy_output_probability=}"
+        )

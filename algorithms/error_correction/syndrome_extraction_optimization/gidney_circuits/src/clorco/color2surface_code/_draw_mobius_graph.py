@@ -163,7 +163,7 @@ def code_capacity_mobius_graph_helper_piece(
                     b = t2d.get((tiles[0], c2))
                     if a is not None and b is not None:
                         lines.append(
-                            f"""<path d="M {a.real},{a.imag} L {b.real},{b.imag}" stroke="black" stroke-width="{stroke_width*5}" />"""
+                            f"""<path d="M {a.real},{a.imag} L {b.real},{b.imag}" stroke="black" stroke-width="{stroke_width * 5}" />"""
                         )
 
         used = set()
@@ -175,7 +175,7 @@ def code_capacity_mobius_graph_helper_piece(
                 b = t2d.get((tile2, c))
                 if a is not None and b is not None:
                     lines.append(
-                        f"""<path d="M {a.real},{a.imag} L {b.real},{b.imag}" stroke="{BASIS_COLORS_DARKER[c]}" stroke-width="{stroke_width*3}" />"""
+                        f"""<path d="M {a.real},{a.imag} L {b.real},{b.imag}" stroke="{BASIS_COLORS_DARKER[c]}" stroke-width="{stroke_width * 3}" />"""
                     )
                     used.add(c)
 
@@ -199,11 +199,11 @@ def code_capacity_mobius_graph_helper_piece(
                             p2 = p2 + ((a - p2) + (b - p2)) * -0.4
                             if gen.is_colinear(q, center1, center2):
                                 lines.append(
-                                    f"""<path d="M {a.real},{a.imag} L {b.real},{b.imag}" stroke="{BASIS_COLORS_DARKER[rem]}" stroke-width="{stroke_width*3}" fill="none" />"""
+                                    f"""<path d="M {a.real},{a.imag} L {b.real},{b.imag}" stroke="{BASIS_COLORS_DARKER[rem]}" stroke-width="{stroke_width * 3}" fill="none" />"""
                                 )
                             else:
                                 lines.append(
-                                    f"""<path d="M {a.real},{a.imag} C {p2.real} {p2.imag},  {p2.real} {p2.imag}, {b.real},{b.imag}" stroke="{BASIS_COLORS_DARKER[rem]}" stroke-width="{stroke_width*3}" fill="none" />"""
+                                    f"""<path d="M {a.real},{a.imag} C {p2.real} {p2.imag},  {p2.real} {p2.imag}, {b.real},{b.imag}" stroke="{BASIS_COLORS_DARKER[rem]}" stroke-width="{stroke_width * 3}" fill="none" />"""
                                 )
 
     # Draw nodes.

@@ -30,9 +30,9 @@ from clorco.surface_code._xz_surface_code_memory_circuits import (
 )
 
 
-def make_named_surface_code_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def make_named_surface_code_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     constructions: dict[str, Callable[[Params], stim.Circuit]] = {
         **_simplified_noise_surface_code_constructions(),
     }
@@ -54,8 +54,8 @@ def make_named_surface_code_constructions() -> (
         ),
     )
 
-    constructions["surface_code_trans_cx_X"] = (
-        lambda params: make_transversal_cnot_surface_code_circuit(
+    constructions["surface_code_trans_cx_X"] = lambda params: (
+        make_transversal_cnot_surface_code_circuit(
             diameter=params.diameter,
             basis="X",
             pad_rounds=params.rounds,
@@ -63,8 +63,8 @@ def make_named_surface_code_constructions() -> (
             convert_to_z=params.convert_to_cz,
         )
     )
-    constructions["surface_code_trans_cx_Z"] = (
-        lambda params: make_transversal_cnot_surface_code_circuit(
+    constructions["surface_code_trans_cx_Z"] = lambda params: (
+        make_transversal_cnot_surface_code_circuit(
             diameter=params.diameter,
             basis="Z",
             pad_rounds=params.rounds,
@@ -72,8 +72,8 @@ def make_named_surface_code_constructions() -> (
             convert_to_z=params.convert_to_cz,
         )
     )
-    constructions["surface_code_trans_cx_magicEPR"] = (
-        lambda params: make_transversal_cnot_surface_code_circuit(
+    constructions["surface_code_trans_cx_magicEPR"] = lambda params: (
+        make_transversal_cnot_surface_code_circuit(
             diameter=params.diameter,
             basis="MagicEPR",
             pad_rounds=params.rounds,
@@ -189,9 +189,9 @@ def _chunks_to_circuit(params: Params, chunks: list[gen.Chunk]) -> stim.Circuit:
     return noisy_circuit
 
 
-def _simplified_noise_surface_code_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def _simplified_noise_surface_code_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     constructions: dict[str, Callable[[Params], stim.Circuit]] = {}
 
     def _make_simple_circuit(

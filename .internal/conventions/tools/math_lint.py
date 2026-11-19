@@ -24,8 +24,9 @@ def lint_cell(text: str) -> list[str]:
     for env in set(re.findall(r"\\begin\{(\w+\*?)\}", text)) | set(
         re.findall(r"\\end\{(\w+\*?)\}", text)
     ):
-        b, e = len(re.findall(rf"\\begin\{{{re.escape(env)}\}}", text)), len(
-            re.findall(rf"\\end\{{{re.escape(env)}\}}", text)
+        b, e = (
+            len(re.findall(rf"\\begin\{{{re.escape(env)}\}}", text)),
+            len(re.findall(rf"\\end\{{{re.escape(env)}\}}", text)),
         )
         if b != e:
             issues.append(f"\\begin/\\end mismatch for {env}: {b} vs {e}")

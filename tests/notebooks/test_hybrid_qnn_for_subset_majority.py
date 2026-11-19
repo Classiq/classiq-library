@@ -25,7 +25,7 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     )
 
     # test notebook content
-    assert (
-        tb.ref("accuracy") > 0.85
-    ), "The network is not trained, although we load a pre-trained model."
+    assert tb.ref("accuracy") > 0.85, (
+        "The network is not trained, although we load a pre-trained model."
+    )
     pass

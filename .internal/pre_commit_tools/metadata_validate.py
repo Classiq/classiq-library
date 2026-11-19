@@ -123,9 +123,9 @@ def _validate_metadata_fields(metadata: dict, auto_fix: bool, file: str) -> bool
 
     for field_name, value in metadata_copy.items():
         if not Config.SHOULD_ALLOW_EXTRA_FIELDS:
-            assert (
-                field_name in ALL_FIELDS_BY_NAME
-            ), f"Extra field found ({field_name}). Meaning that the previous `_validate_no_extra_fields` failed."
+            assert field_name in ALL_FIELDS_BY_NAME, (
+                f"Extra field found ({field_name}). Meaning that the previous `_validate_no_extra_fields` failed."
+            )
 
         field = ALL_FIELDS_BY_NAME[field_name]
 

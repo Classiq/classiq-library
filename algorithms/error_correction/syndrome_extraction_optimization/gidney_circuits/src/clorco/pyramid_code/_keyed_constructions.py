@@ -22,9 +22,9 @@ from clorco.pyramid_code._pyramid_code_layouts import make_planar_pyramid_code_l
 from clorco.pyramid_code._pyramid_code_layouts import make_toric_pyramid_code_layout
 
 
-def make_named_pyramid_code_constructions() -> (
-    dict[str, Callable[[Params], stim.Circuit]]
-):
+def make_named_pyramid_code_constructions() -> dict[
+    str, Callable[[Params], stim.Circuit]
+]:
     constructions: dict[str, Callable[[Params], stim.Circuit]] = {}
 
     def _make_simple_circuit(

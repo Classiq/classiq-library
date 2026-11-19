@@ -27,4 +27,6 @@ def test_notebook(tb: TestbookNotebookClient) -> None:
     ATOL = 0.05
     assert np.isclose(
         tb.ref("overlap_from_swap_test"), tb.ref("exact_overlap"), atol=ATOL
-    ), f"The quantum result is too far than classical one, by a relative tolerance of {ATOL}. Please verify your parameters"
+    ), (
+        f"The quantum result is too far than classical one, by a relative tolerance of {ATOL}. Please verify your parameters"
+    )

@@ -82,7 +82,11 @@ def gate_counts_for_circuit(circuit: stim.Circuit) -> Counter[str]:
                 p = (
                     "X"
                     if t.is_x_target
-                    else "Y" if t.is_y_target else "Z" if t.is_z_target else "?"
+                    else "Y"
+                    if t.is_y_target
+                    else "Z"
+                    if t.is_z_target
+                    else "?"
                 )
                 if is_continuing:
                     op += p
@@ -152,7 +156,11 @@ def gates_used_by_circuit(circuit: stim.Circuit) -> set[str]:
                 p = (
                     "X"
                     if t.is_x_target
-                    else "Y" if t.is_y_target else "Z" if t.is_z_target else "?"
+                    else "Y"
+                    if t.is_y_target
+                    else "Z"
+                    if t.is_z_target
+                    else "?"
                 )
                 if is_continuing:
                     op += p

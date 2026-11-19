@@ -54,105 +54,87 @@ def test_iter_split_op_moments():
         == []
     )
 
-    assert (
-        list(
-            _iter_split_op_moments(
-                stim.Circuit("""
+    assert list(
+        _iter_split_op_moments(
+            stim.Circuit("""
         H 0
     """),
-                immune_qubit_indices=set(),
-            )
+            immune_qubit_indices=set(),
         )
-        == [[stim.CircuitInstruction("H", [0])]]
-    )
+    ) == [[stim.CircuitInstruction("H", [0])]]
 
-    assert (
-        list(
-            _iter_split_op_moments(
-                stim.Circuit("""
+    assert list(
+        _iter_split_op_moments(
+            stim.Circuit("""
         H 0
         TICK
     """),
-                immune_qubit_indices=set(),
-            )
+            immune_qubit_indices=set(),
         )
-        == [[stim.CircuitInstruction("H", [0])]]
-    )
+    ) == [[stim.CircuitInstruction("H", [0])]]
 
-    assert (
-        list(
-            _iter_split_op_moments(
-                stim.Circuit("""
+    assert list(
+        _iter_split_op_moments(
+            stim.Circuit("""
         H 0 1
         TICK
     """),
-                immune_qubit_indices=set(),
-            )
+            immune_qubit_indices=set(),
         )
-        == [[stim.CircuitInstruction("H", [0, 1])]]
-    )
+    ) == [[stim.CircuitInstruction("H", [0, 1])]]
 
-    assert (
-        list(
-            _iter_split_op_moments(
-                stim.Circuit("""
+    assert list(
+        _iter_split_op_moments(
+            stim.Circuit("""
         H 0 1
         TICK
     """),
-                immune_qubit_indices={3},
-            )
+            immune_qubit_indices={3},
         )
-        == [
-            [stim.CircuitInstruction("H", [0]), stim.CircuitInstruction("H", [1])],
-        ]
-    )
+    ) == [
+        [stim.CircuitInstruction("H", [0]), stim.CircuitInstruction("H", [1])],
+    ]
 
-    assert (
-        list(
-            _iter_split_op_moments(
-                stim.Circuit("""
+    assert list(
+        _iter_split_op_moments(
+            stim.Circuit("""
         H 0
         TICK
         H 1
     """),
-                immune_qubit_indices=set(),
-            )
+            immune_qubit_indices=set(),
         )
-        == [
-            [stim.CircuitInstruction("H", [0])],
-            [stim.CircuitInstruction("H", [1])],
-        ]
-    )
+    ) == [
+        [stim.CircuitInstruction("H", [0])],
+        [stim.CircuitInstruction("H", [1])],
+    ]
 
-    assert (
-        list(
-            _iter_split_op_moments(
-                stim.Circuit("""
+    assert list(
+        _iter_split_op_moments(
+            stim.Circuit("""
         CX rec[-1] 0 1 2 3 4
         MPP X5*X6 Y5
         CX 8 9 10 11
         TICK
         H 0
     """),
-                immune_qubit_indices=set(),
-            )
+            immune_qubit_indices=set(),
         )
-        == [
-            [
-                stim.CircuitInstruction("CX", [stim.target_rec(-1), 0]),
-                stim.CircuitInstruction("CX", [1, 2]),
-                stim.CircuitInstruction("CX", [3, 4]),
-                stim.CircuitInstruction(
-                    "MPP", [stim.target_x(5), stim.target_combiner(), stim.target_x(6)]
-                ),
-                stim.CircuitInstruction("MPP", [stim.target_y(5)]),
-                stim.CircuitInstruction("CX", [8, 9, 10, 11]),
-            ],
-            [
-                stim.CircuitInstruction("H", [0]),
-            ],
-        ]
-    )
+    ) == [
+        [
+            stim.CircuitInstruction("CX", [stim.target_rec(-1), 0]),
+            stim.CircuitInstruction("CX", [1, 2]),
+            stim.CircuitInstruction("CX", [3, 4]),
+            stim.CircuitInstruction(
+                "MPP", [stim.target_x(5), stim.target_combiner(), stim.target_x(6)]
+            ),
+            stim.CircuitInstruction("MPP", [stim.target_y(5)]),
+            stim.CircuitInstruction("CX", [8, 9, 10, 11]),
+        ],
+        [
+            stim.CircuitInstruction("H", [0]),
+        ],
+    ]
 
 
 def test_occurs_in_classical_control_system():
@@ -178,8 +160,8 @@ def test_occurs_in_classical_control_system():
 
 def test_si_1000():
     model = NoiseModel.si1000(1e-3)
-    assert (
-        model.noisy_circuit(stim.Circuit("""
+    assert model.noisy_circuit(
+        stim.Circuit("""
         R 0 1 2 3
         TICK
         ISWAP 0 1 2 3 4 5
@@ -187,8 +169,8 @@ def test_si_1000():
         H 4 5 6 7
         TICK
         M 0 1 2 3
-    """))
-        == stim.Circuit("""
+    """)
+    ) == stim.Circuit("""
         R 0 1 2 3
         X_ERROR(0.002) 0 1 2 3
         DEPOLARIZE1(0.0001) 4 5 6 7
@@ -206,7 +188,6 @@ def test_si_1000():
         DEPOLARIZE1(0.0001) 4 5 6 7
         DEPOLARIZE1(0.002) 4 5 6 7
     """)
-    )
 
 
 def test_measure_any():
@@ -218,8 +199,8 @@ def test_measure_any():
         ),
         measure_rules={"XX": gen.NoiseRule(flip_result=0.375, after={})},
     )
-    assert (
-        model.noisy_circuit(stim.Circuit("""
+    assert model.noisy_circuit(
+        stim.Circuit("""
         H 0
         TICK
         CX 0 1
@@ -227,8 +208,8 @@ def test_measure_any():
         M 0 1
         TICK
         MPP Z0*Z1 X2*X3 X4*X5*X6
-    """))
-        == stim.Circuit("""
+    """)
+    ) == stim.Circuit("""
         H 0
         TICK
         CX 0 1
@@ -241,7 +222,6 @@ def test_measure_any():
         MPP(0.25) X4*X5*X6
         DEPOLARIZE1(0.125) 0 1 4 5 6
     """)
-    )
 
 
 def test_tick_depolarization():
@@ -251,8 +231,8 @@ def test_tick_depolarization():
         tick_noise=gen.NoiseRule(after={"DEPOLARIZE1": 0.375}),
         any_measurement_rule=gen.NoiseRule(after={}),
     )
-    assert (
-        model.noisy_circuit(stim.Circuit("""
+    assert model.noisy_circuit(
+        stim.Circuit("""
         H 0
         TICK
         CX 0 1
@@ -260,8 +240,8 @@ def test_tick_depolarization():
         M 0 1
         TICK
         MPP Z0*Z1 X2*X3 X4*X5*X6
-    """))
-        == stim.Circuit("""
+    """)
+    ) == stim.Circuit("""
         H 0
         DEPOLARIZE1(0.375) 0 1 2 3 4 5 6
         TICK
@@ -274,4 +254,3 @@ def test_tick_depolarization():
         MPP Z0*Z1 X2*X3 X4*X5*X6
         DEPOLARIZE1(0.375) 0 1 2 3 4 5 6
     """)
-    )
