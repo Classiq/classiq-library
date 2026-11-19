@@ -23,9 +23,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
-      VENV_PATH: .venv
-
     concurrency:
       # workflow  : the workflow name
       # event_name: "pull_request" / "workflow_dispatch" / ...
@@ -38,144 +35,19 @@ jobs:
       #
       # Setup Repository
       #
-      - name: Checkout (push / workflow_dispatch)
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+      - name: Checkout
         uses: actions/checkout@v7
-
-      - name: Checkout PR head (pull_request)
-        if: github.event_name == 'pull_request'
-        uses: actions/checkout@v7
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 20 # enough history for `git show BASE_SHA:notebook` (PRs are ~1-4 commits)
-          persist-credentials: false
 
       #
       # Setup Python
       #
       - name: Set up Python
-        id: setup-python
         uses: actions/setup-python@v7
         with:
           python-version-file: .github/.python-version
 
-      - name: Get versions for cache key
-        id: versions
-        shell: python
-        run: |
-          import urllib.request
-          import json
-          import os
-
-          url = 'https://pypi.org/pypi/classiq/json'
-          with urllib.request.urlopen(url) as response:
-              data = json.loads(response.read())
-              classiq_version = data['info']['version']
-
-          output_file = os.environ['GITHUB_OUTPUT']
-          with open(output_file, 'a') as f:
-              f.write(f"LATEST_CLASSIQ_VERSION={classiq_version}\n")
-
-      # The caching we do follows from
-      #   https://stackoverflow.com/questions/59127258/how-can-i-use-pip-cache-in-github-actions
-      - uses: actions/cache@v6
-        id: cache-venv
-        with:
-          path: ${{ env.VENV_PATH }}
-          key: "${{ runner.os }}-venv\
-            -python-${{ steps.setup-python.outputs.python-version }}\
-            -classiq-${{ steps.versions.outputs.LATEST_CLASSIQ_VERSION }}\
-            -requirements-${{ hashFiles('**/requirements*.txt') }}"
-          restore-keys: "${{ runner.os }}-venv\
-            -python-${{ steps.setup-python.outputs.python-version }}\
-            -classiq-${{ steps.versions.outputs.LATEST_CLASSIQ_VERSION }}"
-
-      - name: Enter venv
-        run: echo "$PWD/${{ env.VENV_PATH }}/bin" >> $GITHUB_PATH
-
       - name: Install dependencies
-        if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          set -e
-
-          if [ ! -d "${{ env.VENV_PATH }}" ]; then
-            python -m venv "${{ env.VENV_PATH }}"
-            hash -r  # refresh memory of last process location, to use python from venv
-          fi
-
-          python -m pip install -U pip
-          # Install the lighter version of torch for the CI. We don't have a GPU anyway, and it saves ~2GB
-          python -m pip install -U torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install -U -r requirements.txt -r requirements_tests.txt -r requirements_notebooks.txt
-
-      - name: Install couenne solver
-        env:
-          COIN_DIST_URL: https://github.com/ampl/coin/releases/download/v20191215/coin-linux64.tar.gz
-          LOCAL_BIN: ${{ runner.temp }}/.local/bin
-        run: |
-          set -eux
-          mkdir -p "$LOCAL_BIN"
-          echo "$LOCAL_BIN" >>"$GITHUB_PATH"
-          wget -nv -O- "$COIN_DIST_URL" | tar -C "$RUNNER_TEMP" -xvz
-          cp "${RUNNER_TEMP}/couenne" "${LOCAL_BIN}/couenne"
-          chmod ugo+x "${LOCAL_BIN}/couenne"
-
-      #
-      # Propagate CI information to python tests
-      #
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v47.0.6
-        with:
-          files_yaml: |
-            notebooks:
-              - "**/*.ipynb"
-            tests:
-              - "**/notebooks/**/test_*.py"
-
-      # Narrow the changed-notebook list down to notebooks whose *code* cells changed,
-      # so a markdown-only edit no longer triggers the (expensive) notebook execution.
-      # The cheap link/quick tests above are unaffected - they run on all files.
-      - name: Filter to notebooks whose code cells changed
-        id: code-changed
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          ALL_CHANGED: ${{ steps.changed-files.outputs.notebooks_all_changed_files }}
-          # safety switch: set to "false" to fall back to the old "any change" behavior
-          SKIP_MARKDOWN_ONLY: "true"
-        run: |
-          set -euo pipefail
-
-          # Just the code-cell sources, in order (markdown, outputs, metadata ignored).
-          extract_code_cells () {
-              jq -S '
-                  [ .cells[]
-                    | select(.cell_type == "code")
-                    | .source
-                    | if type == "array" then join("") else . end
-                  ]
-              '
-          }
-
-          kept=()
-          for notebook in $ALL_CHANGED; do
-              if [ "$SKIP_MARKDOWN_ONLY" != "true" ]; then
-                  # feature disabled -> keep every changed notebook
-                  kept+=("$notebook")
-              else
-                  new_code=$(extract_code_cells < "$notebook")
-                  if old_code=$(git show "$BASE_SHA:$notebook" 2>/dev/null | extract_code_cells 2>/dev/null); then
-                      if [ "$old_code" != "$new_code" ]; then
-                          kept+=("$notebook")   # code differs -> keep
-                      fi
-                  else
-                      kept+=("$notebook")       # new notebook -> keep
-                  fi
-              fi
-          done
-
-          echo "list=${kept[*]}" >> "$GITHUB_OUTPUT"
+        run: python -m pip install -U -r requirements_tests.txt
 
       # Run Tests
       - name: Run Notebooks (quick tests)
