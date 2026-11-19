@@ -30,6 +30,7 @@ REPORT = "__import__('mock_classiq_api').report()"
 SKIPPED_NOTEBOOKS = {
     "fault_tolerance_engine_end_to_end.ipynb": "uses the logical-noise API, which has no fake",
     "projected_based_embedding_tutorial.ipynb": "runs chemistry DFT jobs, which have no fake",
+    "adapt_qaoa.ipynb": "loops until the measured gradients are small",
     "adapt_vqe.ipynb": "builds its next model from the measured gradients",
     "bpde.ipynb": "fits a Gaussian to its samples",
     "discrete_log.ipynb": "needs an invertible measured value",
