@@ -237,7 +237,6 @@ main() {
   # validate before making any changes, reporting all the errors at once
   validate_config || is_valid=false
   assert_inside_venv || is_valid=false
-  assert_python3_kernel_exists || is_valid=false
   if [[ "$is_valid" != true ]]; then
     exit 1
   fi
@@ -251,6 +250,8 @@ main() {
   if [[ "$SHOULD_UPDATE_PIP" == true ]]; then
     time_it "Updating pip" silence_if "$SHOULD_SILENCE_PIP" pip_install_requirements requirements.txt requirements_notebooks.txt
   fi
+  # once for all the notebooks, and only after pip, which installs jupyter
+  assert_python3_kernel_exists || exit 1
 
   #
   # 2) Update the notebooks
