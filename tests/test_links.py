@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 _DOMAINS_BLOCKING_CI: dict[str, list[int]] = {
     "https://en.wikipedia.org/": [403],
     "https://pytorch.org/": [403],
+    "https://classiq-community.slack.com/": [403],  # needs a login
 }
 
 # Domains that are unreachable from CI (connection times out)
