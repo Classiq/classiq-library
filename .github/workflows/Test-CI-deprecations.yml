@@ -2,7 +2,7 @@ name: "Test Library CI (deprecations)"
 
 # Will run the notebooks with the classiq API mocked, and fail on deprecation warnings:
 #   PRs: the notebooks whose code changed. Weekly: all notebooks.
-# A placeholder for now: the job is off (`if: false`) until the test exists.
+# The job is off (`if: false`) until the notebooks are free of deprecations.
 
 on:
   # PRs (including forks)
@@ -21,7 +21,7 @@ defaults:
 
 jobs:
   test:
-    if: github.event_name == 'workflow_dispatch' # TEMPORARY: for a full dispatch run; back to `if: false` before review
+    if: false # TODO: remove once the notebooks are free of deprecations
 
     permissions:
       contents: read
