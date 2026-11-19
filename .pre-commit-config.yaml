@@ -18,6 +18,9 @@ repos:
         name: format    end of file
       - id: trailing-whitespace
         name: format    trailing whitespace
+      - id: mixed-line-ending
+        name: format    line endings
+        args: [--fix=lf]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.9
