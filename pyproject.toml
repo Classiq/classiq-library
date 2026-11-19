@@ -1,13 +1,13 @@
-[tool.isort]
-profile = "black"
-combine_as_imports = true
-
-known_classiq = "classiq"
-sections = [
-  "FUTURE",
-  "STDLIB",
-  "THIRDPARTY",
-  "FIRSTPARTY",
-  "CLASSIQ",
-  "LOCALFOLDER",
+[tool.ruff.lint.isort]
+combine-as-imports = true
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "first-party",
+  "classiq",
+  "local-folder",
 ]
+
+[tool.ruff.lint.isort.sections]
+classiq = ["classiq"]
