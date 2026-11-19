@@ -52,19 +52,19 @@ def validate_links_list(
 ) -> bool:
     # verify list length
     if len(old_links) != len(new_links):
-        print("Error: Link count mismatch in force mode")
+        print("Error: Link count mismatch")
         return False
 
     if force:
         # verify cell index
-        old_indices = [i for i, _ in old_links]
-        new_indices = [i for i, _ in new_links]
+        old_indices = [cell_index for cell_index, _, _ in old_links]
+        new_indices = [cell_index for cell_index, _, _ in new_links]
         if old_indices != new_indices:
             print("Error: Link cell indices mismatch")
             return False
 
         # verify link pattern
-        if not all(LINK_PATTERN.match(link) for _, link in new_links):
+        if not all(LINK_PATTERN.match(link) for _, _, link in new_links):
             print("Error: Not all new links match expected pattern")
             return False
 
