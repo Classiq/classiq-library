@@ -31,9 +31,9 @@ executes notebooks, and opens a PR with their updated outputs
 
 which notebooks (one is required):
   [paths...]                                       notebooks and folders, relative to the current folder. '-' reads them from stdin (one per line).
-                                                   files that aren't notebooks are skipped. takes precedence over --folder and --mode
-  --folder <dir>          [UPDATER_FOLDER]         all the notebooks under <dir> (relative to the repo root)
+                                                   files that aren't notebooks are skipped. takes precedence over --mode and UPDATER_FOLDER
   --mode <mode>           [UPDATER_MODE]           'test_small' / 'test_algorithms' / 'test_all'
+                          [UPDATER_FOLDER]         all the notebooks under a folder, relative to the repo root. takes precedence over UPDATER_MODE
 
 steps (all on by default. turn them off to update the notebooks locally, without git / pip):
   --[no-]create-branch    [UPDATER_CREATE_BRANCH]  checkout main, pull, and create a new branch
@@ -53,7 +53,7 @@ each option can also be set by its environment variable (in brackets), and the a
 boolean environment variables can be set to '1' / 'true' or '0' / 'false' (case-insensitive).
 
 examples:
-  git diff --name-only main | $0 -  # from the repo root, since git prints paths relative to it
+  git diff --name-only --relative main | $0 -
   find . -type f -name "*grover*" | $0 - --no-create-branch --no-update-pip --no-create-pr
   $0 algorithms/foundational/ -j 1 --silence-pip
   $0 --mode test_small --no-track-time
@@ -79,7 +79,7 @@ add_paths() {
 # prints an error for each unknown argument, and returns non-zero if there were any
 parse_args() {
   local is_valid=true
-  local options_with_value="--folder|--mode|-j|--max-threads"
+  local options_with_value="--mode|-j|--max-threads"
   local stdin_paths
 
   while [[ $# -gt 0 ]]; do
@@ -99,8 +99,7 @@ parse_args() {
         print_help
         exit 0
         ;;
-      --folder) FOLDER=$2; shift ;;
-      --mode) MODE=$2; shift ;;
+      --mode) MODE=$2; FOLDER=""; shift ;; # as an argument, it takes precedence over UPDATER_FOLDER
       -j | --max-threads) MAX_THREADS=$2; shift ;;
       -j?*) MAX_THREADS=${1#-j} ;;
       # boolean flags - `--flag`, `--no-flag`, or `--flag=<bool>`
@@ -133,7 +132,7 @@ parse_args() {
 add_folder_or_mode_paths() {
   if [[ -n "$FOLDER" ]]; then
     if [[ ! -d "$FOLDER" ]]; then
-      echo "Error: folder '$FOLDER' doesn't exist (note: it's relative to the repo root)" >&2
+      echo "Error: UPDATER_FOLDER '$FOLDER' doesn't exist (note: it's relative to the repo root)" >&2
       return 1
     fi
     add_paths "$FOLDER"
@@ -146,7 +145,7 @@ add_folder_or_mode_paths() {
     test_algorithms) paths=(algorithms) ;;
     test_all) paths=(.) ;;
     "")
-      echo "Error: either paths, --folder, or --mode must be given (see --help)" >&2
+      echo "Error: either paths, --mode, or UPDATER_FOLDER must be given (see --help)" >&2
       return 1
       ;;
     *)
