@@ -1,5 +1,4 @@
 from tests.utils_for_testbook import (
-    validate_quantum_program_size,
     wrap_testbook,
 )
 from testbook.client import TestbookNotebookClient

@@ -3,7 +3,6 @@
 import json
 import re
 import sys
-from pathlib import Path
 
 LINK_PATTERN = re.compile(
     r"Quantum program link: https://platform\.classiq\.io/circuit/\S+\n"

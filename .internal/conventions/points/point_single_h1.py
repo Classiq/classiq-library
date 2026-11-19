@@ -2,7 +2,7 @@
 
 import re
 
-from ._model import Notebook, Point, src, strip_fences
+from ._model import Notebook, Point, src
 
 _H1 = re.compile(r"^#[ \t]+\S")
 

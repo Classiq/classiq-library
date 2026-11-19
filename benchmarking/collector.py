@@ -13,9 +13,7 @@ from errors import StageError, RESULT_TIMEOUT
 from storage import (
     load_results,
     make_df_for_example,
-    section_name,
     dump_results,
-    section_title,
     count_submitted_jobs_in_dir,
 )
 

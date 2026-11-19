@@ -8,7 +8,7 @@ and groups by character with name, counts, and an example — so we can see what
 remains and decide what's fine vs. what to also normalize.
 """
 
-import glob, json, re, sys, unicodedata
+import glob, json, re, unicodedata
 from collections import defaultdict
 
 MAIN = ("algorithms/", "applications/", "tutorials/")

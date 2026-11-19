@@ -1,5 +1,3 @@
-import os
-
 import nbformat
 
 from utils_for_tests import iterate_notebook_names, resolve_notebook_path

@@ -10,7 +10,7 @@ Checks per markdown cell:
   - no leftover \\[ or \\] that became unbalanced
 """
 
-import glob, json, re, sys
+import json, re, sys
 
 
 def lint_cell(text: str) -> list[str]:

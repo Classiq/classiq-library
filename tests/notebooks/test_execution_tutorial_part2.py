@@ -4,8 +4,6 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
-import numpy as np
-
 
 @wrap_testbook("execution_tutorial_part2", timeout_seconds=60)
 def test_notebook(tb: TestbookNotebookClient) -> None:
