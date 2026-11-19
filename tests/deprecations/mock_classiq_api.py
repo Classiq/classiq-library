@@ -27,7 +27,7 @@ DEPRECATIONS = (
 )
 
 # A fake sample returns every combination of the outputs' values, up to this many
-MAX_STATES = 1024
+MAX_STATES = 2**14
 # The size of an output whose size the notebook doesn't set (e.g. `Output[QNum]`)
 UNKNOWN_SIZE = 4
 DEFAULT_NUM_SHOTS = 2048
@@ -481,21 +481,10 @@ def _sample(program, num_shots: int):
     bitstrings = _bitstrings(qubits, max(width, 1))
     parsed_states = parse_states(bitstrings, qubits, output_types)
 
-    backend = str(program.model.execution_preferences.backend_preferences.backend_name)
-    if "statevector" in backend:
-        amplitude = complex(1 / math.sqrt(len(bitstrings)))
-        return ExecutionDetails(
-            vendor_format_result={},
-            state_vector={bitstring: amplitude for bitstring in bitstrings},
-            parsed_state_vector_states=parsed_states,
-            physical_qubits_map=qubits,
-            output_qubits_map=qubits,
-            output_type_map=output_types,
-        )
-    # Each value once (as far as the shots go), and the other shots at random
-    counts = Counter(bitstrings[:num_shots])
+    # Each value once (or a random part of them, if there are fewer shots), and the other shots at random
+    counts = Counter(_random.sample(bitstrings, min(num_shots, len(bitstrings))))
     counts.update(_random.choices(bitstrings, k=num_shots - counts.total()))
-    return ExecutionDetails(
+    details = ExecutionDetails(
         vendor_format_result={},
         counts=dict(counts),
         parsed_states=parsed_states,
@@ -503,6 +492,13 @@ def _sample(program, num_shots: int):
         output_type_map=output_types,
         num_shots=num_shots,
     )
+    backend = str(program.model.execution_preferences.backend_preferences.backend_name)
+    if "statevector" in backend:
+        amplitude = complex(1 / math.sqrt(len(bitstrings)))
+        details.state_vector = {bitstring: amplitude for bitstring in bitstrings}
+        details.parsed_state_vector_states = parsed_states
+        details.physical_qubits_map = qubits
+    return details
 
 
 def _bitstrings(qubits: dict, width: int) -> list[str]:
