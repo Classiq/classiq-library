@@ -46,7 +46,7 @@ jobs:
     env:
       CLASSIQ: ${{ matrix.classiq }}
       # Trivy reads pinned dependencies only from a file named exactly `requirements.txt`
-      PINNED_DIR: ${{ runner.temp }}/pinned
+      PINNED_DIR: pinned
 
     steps:
       - name: Checkout repository
@@ -77,7 +77,7 @@ jobs:
       # Trivy 0.76.2 was released on 2026-11-05
       - name: Scan dependencies
         run: >
-          docker run --rm --volume "$PINNED_DIR:/src:ro" --workdir /src
+          docker run --rm --volume "$PWD/$PINNED_DIR:/src:ro" --workdir /src
           aquasec/trivy:0.76.2 fs .
           --scanners vuln
           --severity HIGH,CRITICAL
