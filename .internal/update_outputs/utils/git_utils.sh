@@ -9,26 +9,15 @@ create_branch_from_main() {
     git checkout -b "$1"
 }
 
-# note: the patterns are git pathspecs, so `*` matches across folders, and gitignored files (like .ipynb_checkpoints) are skipped
-
-# usage: git_restore_by_name <file name pattern>
-git_restore_by_name() {
-  git restore -- "$1"
-}
-
-# usage: git_add_by_name <file name pattern>
-git_add_by_name() {
-  git add -- "$1"
-}
-
-# usage: commit_by_name <file name pattern> <message>
+# usage: commit_files <pathspec> <message>
+# in a pathspec, `*` matches across folders, and gitignored files (like .ipynb_checkpoints) are skipped
 # if pre-commit edited the files, the first commit fails, and the second one includes those edits
-commit_by_name() {
-  local pattern=$1 message=$2
+commit_files() {
+  local pathspec=$1 message=$2
 
-  git_add_by_name "$pattern"
+  git add -- "$pathspec"
   if ! git commit -m "$message"; then
-    git_add_by_name "$pattern"
+    git add -- "$pathspec"
     git commit -m "$message"
   fi
 }

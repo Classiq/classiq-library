@@ -2,12 +2,10 @@
 
 # jupyter helpers for the update_outputs scripts (sourced, not executed)
 
-UTILS_DIR="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
-
 # environment for executing notebooks unattended
 export_notebook_execution_env() {
-  # disable popping browser for `show(qprog)`
-  export BROWSER="$UTILS_DIR/fake_browser.sh"
+  # disable popping browser for `show(qprog)` - python's `webbrowser` runs `true <url>`, which does nothing
+  export BROWSER=true
 
   # trigger circuit creation in backend
   export OPENVSCODE="some-dummy-value"

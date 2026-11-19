@@ -10,7 +10,7 @@ source "$SCRIPT_DIR/utils/jupyter_utils.sh"
 source "$SCRIPT_DIR/utils/python_utils.sh"
 
 # the configuration - taken from the environment variables, and overridden by the arguments (see `parse_args`)
-PATHS=()               # absolute paths of the notebooks / folders given as arguments
+PATHS=()               # absolute paths of the notebooks / folders to update. FOLDER / MODE are converted into it
 ARE_PATHS_GIVEN=false  # true even if all the given paths were skipped, so that we won't fall back to FOLDER / MODE
 FOLDER=${UPDATER_FOLDER:-}
 MODE=${UPDATER_MODE:-}
@@ -128,27 +128,23 @@ parse_args() {
   [[ "$is_valid" == true ]]
 }
 
-# sets `search_root` and `name_pattern`, by which we `find` the notebooks to update
-resolve_notebooks_scope() {
+# converts FOLDER / MODE into PATHS (relative to the repo root)
+# prints an error if neither is valid, and returns non-zero
+add_folder_or_mode_paths() {
   if [[ -n "$FOLDER" ]]; then
-    search_root="$FOLDER"
-    name_pattern="*.ipynb"
-    return 0
+    if [[ ! -d "$FOLDER" ]]; then
+      echo "Error: folder '$FOLDER' doesn't exist (note: it's relative to the repo root)" >&2
+      return 1
+    fi
+    add_paths "$FOLDER"
+    return
   fi
 
+  local paths
   case "$MODE" in
-    test_small)
-      search_root="."
-      name_pattern="*bernstein*.ipynb"
-      ;;
-    test_algorithms)
-      search_root="algorithms/"
-      name_pattern="*.ipynb"
-      ;;
-    test_all)
-      search_root="."
-      name_pattern="*.ipynb"
-      ;;
+    test_small) mapfile -d '' paths < <(find_notebooks . "*bernstein*.ipynb") ;;
+    test_algorithms) paths=(algorithms) ;;
+    test_all) paths=(.) ;;
     "")
       echo "Error: either paths, --folder, or --mode must be given (see --help)" >&2
       return 1
@@ -158,6 +154,7 @@ resolve_notebooks_scope() {
       return 1
       ;;
   esac
+  add_paths "${paths[@]}"
 }
 
 # prints an error for each invalid option, and returns non-zero if there were any
@@ -169,24 +166,19 @@ validate_config() {
     is_valid=false
   fi
 
-  if [[ "$ARE_PATHS_GIVEN" == true ]]; then
-    local path
-    for path in "${PATHS[@]}"; do
-      if [[ "$path" != "$PWD" && "$path" != "$PWD"/* ]]; then
-        echo "Error: '$path' is outside of the repo ('$PWD')" >&2
-        is_valid=false
-      fi
-    done
-  else
-    if [[ -n "$FOLDER" && ! -d "$FOLDER" ]]; then
-      echo "Error: folder '$FOLDER' doesn't exist (note: it's relative to the repo root)" >&2
-      is_valid=false
-    fi
-
-    resolve_notebooks_scope || is_valid=false
+  if [[ "$ARE_PATHS_GIVEN" != true ]]; then
+    add_folder_or_mode_paths || is_valid=false
   fi
 
-  if [[ "$is_valid" == true && $(list_notebooks | head -c1 | wc -c) -eq 0 ]]; then
+  local path
+  for path in "${PATHS[@]}"; do
+    if [[ "$path" != "$PWD" && "$path" != "$PWD"/* ]]; then
+      echo "Error: '$path' is outside of the repo ('$PWD')" >&2
+      is_valid=false
+    fi
+  done
+
+  if [[ "$is_valid" == true && -z "$(list_notebooks | tr -d '\0')" ]]; then
     echo "Error: there are no notebooks to update" >&2
     is_valid=false
   fi
@@ -196,11 +188,6 @@ validate_config() {
 
 # prints the notebooks to update, NUL-separated, relative to the repo root
 list_notebooks() {
-  if [[ "$ARE_PATHS_GIVEN" != true ]]; then
-    find_notebooks "$search_root" "$name_pattern"
-    return
-  fi
-
   local path
   for path in "${PATHS[@]}"; do
     path="$(relative_to_cwd "$path")"
@@ -279,8 +266,8 @@ main() {
   if [[ "$SHOULD_CREATE_PR" == true ]]; then
     print_section "Creating PR"
     # discard the changes to the .synthesis_options.json files
-    git_restore_by_name "*.synthesis_options.json"
-    commit_by_name "*.ipynb" "Updating notebooks output"
+    git restore -- "*.synthesis_options.json"
+    commit_files "*.ipynb" "Updating notebooks output"
     open_pr "Updating output"
   fi
 
