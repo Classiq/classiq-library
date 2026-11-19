@@ -33,16 +33,14 @@ repos:
         name: format    notebook isort
         types_or: [jupyter]
         args: [--select, I, --fix]
+      - id: ruff-format
+        name: format    ruff
+        types_or: [python, pyi, jupyter]
   - repo: https://github.com/rbubley/mirrors-prettier
     rev: v3.9.6
     hooks:
       - id: prettier
         name: format    prettier
-  - repo: https://github.com/psf/black
-    rev: 26.5.1
-    hooks:
-      - id: black-jupyter
-        name: format    notebook black
 
   - repo: local
     hooks:
