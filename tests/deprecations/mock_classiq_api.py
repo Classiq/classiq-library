@@ -478,11 +478,16 @@ def _sample(program, num_shots: int):
     for name, output_type in output_types.items():
         qubits[name] = tuple(range(width, width + output_type.size))
         width += output_type.size
-    bitstrings = _bitstrings(qubits, max(width, 1))
+    width = max(width, 1)
+    bitstrings = _bitstrings(qubits, width)
+    # Keep the states that pass the filters, e.g. of `calculate_state_vector(filters=...)`
+    for name, legal_values in program.model.register_filter_bitstrings.items():
+        start, end = width - qubits[name][-1] - 1, width - qubits[name][0]
+        bitstrings = [b for b in bitstrings if b[start:end] in legal_values]
     parsed_states = parse_states(bitstrings, qubits, output_types)
 
-    # Each value once (or a random part of them, if there are fewer shots), and the other shots at random
-    counts = Counter(_random.sample(bitstrings, min(num_shots, len(bitstrings))))
+    # Each value once (if the shots suffice), and the other shots at random
+    counts = Counter(bitstrings if num_shots >= len(bitstrings) else [])
     counts.update(_random.choices(bitstrings, k=num_shots - counts.total()))
     details = ExecutionDetails(
         vendor_format_result={},
