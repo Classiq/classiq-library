@@ -1,0 +1,58 @@
+name: "Test Library CI (weekly)"
+
+on:
+  schedule:
+    - cron: "30 01 * * 6" # Saturday, 01:30 UTC
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  weekly-test:
+    permissions:
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: .github/.python-version
+
+      - name: Install dependencies
+        run: |
+          set -e
+
+          python -m pip install -U pip
+          # Install the lighter version of torch for the CI. We don't have a GPU anyway, and it saves ~2GB
+          python -m pip install -U torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -U -r requirements.txt -r requirements_tests.txt
+
+      - name: Install couenne solver
+        env:
+          COIN_DIST_URL: https://github.com/ampl/coin/releases/download/v20191215/coin-linux64.tar.gz
+          LOCAL_BIN: ${{ runner.temp }}/.local/bin
+        run: |
+          set -eux
+          mkdir -p "$LOCAL_BIN"
+          echo "$LOCAL_BIN" >>"$GITHUB_PATH"
+          wget -nv -O- "$COIN_DIST_URL" | tar -C "$RUNNER_TEMP" -xvz
+          cp "${RUNNER_TEMP}/couenne" "${LOCAL_BIN}/couenne"
+          chmod ugo+x "${LOCAL_BIN}/couenne"
+
+      # Run Notebook Tests
+      - name: Run Notebooks
+        run: python -m pytest -c tests/config_weekly.ini tests/internal tests/test_*.py
+        env:
+          SHOULD_TEST_ALL_FILES: "true"
+
+      # Summarize results for Slack copy-paste
+      - name: Summarize test results
+        if: always()
+        run: python .github/scripts/summarize_test_results.py --workflow-name "internal"
