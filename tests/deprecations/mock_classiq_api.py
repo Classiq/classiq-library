@@ -11,13 +11,56 @@
 """
 
 import ast
+import base64
 import datetime
+import io
 import math
 import random
 import warnings
 from collections import Counter
 
+from classiq._internals import client
+from classiq._internals.api_wrapper import ApiWrapper
+from classiq._internals.authentication import password_manager, token_manager
+from classiq.interface.analyzer.result import RbResults
+from classiq.interface.compression_utils import compress_pydantic
+from classiq.interface.executor.execution_request import ExecutionJobDetails
+from classiq.interface.executor.execution_result import (
+    ExecuteGeneratedCircuitResults,
+    TaggedEstimationResults,
+    TaggedExecutionDetails,
+    TaggedMinimizeResult,
+    TaggedMultipleExecutionDetails,
+    TaggedUnstructured,
+    TaggedVQESolverResult,
+)
+from classiq.interface.executor.quantum_program_params import TargetCode, TargetLanguage
+from classiq.interface.executor.result import (
+    EstimationResult,
+    EstimationResults,
+    ExecutionDetails,
+    MultipleExecutionDetails,
+)
+from classiq.interface.executor.result_parsing import parse_states
+from classiq.interface.executor.vqe_result import VQEIntermediateData, VQESolverResult
+from classiq.interface.generator.functions.port_declaration import (
+    PortDeclarationDirection,
+)
+from classiq.interface.generator.functions.type_name import TypeName
+from classiq.interface.generator.generated_circuit_data import GeneratedCircuitData
+from classiq.interface.generator.hardware.hardware_data import SynthesisHardwareData
+from classiq.interface.generator.model.model import ExecutionModel
+from classiq.interface.generator.quantum_program import QuantumProgram
+from classiq.interface.ide.visual_model import CircuitMetrics, ProgramData
+from classiq.interface.model.classical_parameter_declaration import (
+    ClassicalParameterDeclaration,
+)
+from classiq.interface.model.quantum_type import (
+    QuantumBitvector,
+    quantum_type_to_register_quantum_type,
+)
 from IPython import get_ipython
+from PIL import Image
 
 DEPRECATIONS = (
     DeprecationWarning,
@@ -88,9 +131,6 @@ def _record_warning(message, category, filename, lineno, file=None, line=None):
 
 
 def _mock_client() -> None:
-    from classiq._internals import client
-    from classiq._internals.authentication import password_manager, token_manager
-
     async def request(self, http_client, method, url, *args, **kwargs):
         raise MockedClassiqApiCall(f"{method.upper()} {url}")
 
@@ -115,8 +155,6 @@ def _mock_client() -> None:
 
 
 def _install_fakes() -> None:
-    from classiq._internals.api_wrapper import ApiWrapper
-
     fakes = {
         "call_generation_task": _synthesize,
         "call_transpilation_task": _same_program,
@@ -157,35 +195,27 @@ def _nothing(*_, **__) -> None:
     pass
 
 
-def _synthesize(model, *_, **__):
-    from classiq.interface.compression_utils import compress_pydantic
-    from classiq.interface.generator.generated_circuit_data import (
-        GeneratedCircuitData,
-    )
-    from classiq.interface.generator.hardware.hardware_data import (
-        SynthesisHardwareData,
-    )
-    from classiq.interface.generator.model.model import ExecutionModel
-    from classiq.interface.generator.quantum_program import QuantumProgram
-    from classiq.interface.model.classical_parameter_declaration import (
-        ClassicalParameterDeclaration,
+def _program(model: ExecutionModel, **fields) -> QuantumProgram:
+    width = sum(output.size for output in model.circuit_output_types.values())
+    return QuantumProgram(
+        outputs={},
+        hardware_data=SynthesisHardwareData(),
+        data=GeneratedCircuitData(width=max(1, width)),
+        model=model,
+        **fields,
     )
 
-    output_types = _output_types(model)
+
+def _synthesize(model, *_, **__) -> QuantumProgram:
     parameters = [
         parameter
         for parameter in model.main_func.positional_arg_declarations
         if isinstance(parameter, ClassicalParameterDeclaration)
     ]
-    program = QuantumProgram(
-        outputs={},
-        hardware_data=SynthesisHardwareData(),
-        data=GeneratedCircuitData(
-            width=max(1, sum(output.size for output in output_types.values()))
-        ),
-        model=ExecutionModel(
+    program = _program(
+        ExecutionModel(
+            circuit_output_types=_output_types(model),
             circuit_outputs=model.main_func.outputs_dict,
-            circuit_output_types=output_types,
             circuit_execution_params={p.name: p for p in parameters},
             execution_preferences=model.execution_preferences,
             classical_execution_code=model.classical_execution_code,
@@ -198,13 +228,6 @@ def _synthesize(model, *_, **__):
 
 def _output_types(model) -> dict:
     """The types of main's outputs, with each struct's fields and a size for each."""
-    from classiq.interface.generator.functions.port_declaration import (
-        PortDeclarationDirection,
-    )
-    from classiq.interface.model.quantum_type import (
-        quantum_type_to_register_quantum_type,
-    )
-
     structs = {struct.name: struct for struct in model.qstructs}
     output_types = {}
     for port in model.main_func.port_declarations:
@@ -221,9 +244,6 @@ def _output_types(model) -> dict:
 
 
 def _with_fields(quantum_type, structs: dict):
-    from classiq.interface.generator.functions.type_name import TypeName
-    from classiq.interface.model.quantum_type import QuantumBitvector
-
     if isinstance(quantum_type, QuantumBitvector):
         _with_fields(quantum_type.element_type, structs)
     elif isinstance(quantum_type, TypeName) and quantum_type.name in structs:
@@ -234,16 +254,11 @@ def _with_fields(quantum_type, structs: dict):
     return quantum_type
 
 
-def _same_program(params, *_, **__):
+def _same_program(params, *_, **__) -> QuantumProgram:
     return params.quantum_program
 
 
-def _export(params, *_, **__):
-    from classiq.interface.executor.quantum_program_params import (
-        TargetCode,
-        TargetLanguage,
-    )
-
+def _export(params, *_, **__) -> TargetCode:
     width = params.quantum_program.data.width
     if params.target_language == TargetLanguage.QASM2:
         code = f'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[{width}];\n'
@@ -252,9 +267,7 @@ def _export(params, *_, **__):
     return TargetCode(code=code)
 
 
-def _circuit_metrics(program, *_, **__):
-    from classiq.interface.ide.visual_model import CircuitMetrics
-
+def _circuit_metrics(program, *_, **__) -> CircuitMetrics:
     width = program.data.width
     model = program.compiled_qmod
     gates = model.preferences.custom_hardware_settings.basis_gates if model else []
@@ -263,21 +276,14 @@ def _circuit_metrics(program, *_, **__):
     )
 
 
-def _transpiled_circuit_metrics(program, *_, **__):
-    from classiq.interface.generator.hardware.hardware_data import (
-        SynthesisHardwareData,
-    )
-    from classiq.interface.ide.visual_model import ProgramData
-
+def _transpiled_circuit_metrics(program, *_, **__) -> ProgramData:
     return ProgramData(
         hardware_data=SynthesisHardwareData(),
         circuit_metrics=_circuit_metrics(program),
     )
 
 
-def _rb_analysis(params, *_, **__):
-    from classiq.interface.analyzer.result import RbResults
-
+def _rb_analysis(params, *_, **__) -> RbResults:
     return RbResults(
         mean_fidelity=0.99,
         average_error=0.01,
@@ -293,7 +299,7 @@ def _convert(program, *_, **__) -> dict:
     return {"program_id": program.program_id}
 
 
-def _execute(execution_input: dict, *_, **__):
+def _execute(execution_input: dict, *_, **__) -> ExecutionJobDetails:
     program = _programs[execution_input["program_id"]]
     return _new_job(program, program.execution_primitives_input)
 
@@ -305,53 +311,34 @@ def _create_session(program, *_, **__) -> str:
 
 
 def _create_openqasm_session(qasm, execution_preferences, *_, **__) -> str:
-    from classiq.interface.generator.generated_circuit_data import (
-        GeneratedCircuitData,
-    )
-    from classiq.interface.generator.hardware.hardware_data import (
-        SynthesisHardwareData,
-    )
-    from classiq.interface.generator.model.model import ExecutionModel
-    from classiq.interface.generator.quantum_program import QuantumProgram
-
-    program = QuantumProgram(
-        outputs={},
-        hardware_data=SynthesisHardwareData(),
-        data=GeneratedCircuitData(width=1),
-        model=ExecutionModel(execution_preferences=execution_preferences),
-    )
+    program = _program(ExecutionModel(execution_preferences=execution_preferences))
     return _create_session(program)
 
 
-def _create_session_job(session_id: str, primitives_input, *_, **__):
+def _create_session_job(session_id, primitives_input, *_, **__) -> ExecutionJobDetails:
     return _new_job(_sessions[session_id], primitives_input)
 
 
-def _new_job(program, primitives_input):
+def _new_job(program, primitives_input) -> ExecutionJobDetails:
     job_id = f"job-{len(_jobs)}"
     _jobs[job_id] = (program, primitives_input)
     return _job_details(job_id)
 
 
-def _job_details(job_id, *_, **__):
-    from classiq.interface.executor.execution_request import ExecutionJobDetails
-
+def _job_details(job_id, *_, **__) -> ExecutionJobDetails:
     job_id = getattr(job_id, "job_id", job_id)
     program, primitives_input = _jobs[job_id]
+    now = datetime.datetime.now(datetime.timezone.utc)
     return ExecutionJobDetails(
         id=job_id,
-        start_time=datetime.datetime.now(datetime.timezone.utc),
-        end_time=datetime.datetime.now(datetime.timezone.utc),
+        start_time=now,
+        end_time=now,
         status="COMPLETED",
         program_id=program.program_id,
     )
 
 
-def _job_result(job_id, *_, **__):
-    from classiq.interface.executor.execution_result import (
-        ExecuteGeneratedCircuitResults,
-    )
-
+def _job_result(job_id, *_, **__) -> ExecuteGeneratedCircuitResults:
     program, primitives_input = _jobs[job_id.job_id]
     if "vqe(" in program.model.classical_execution_code:
         return ExecuteGeneratedCircuitResults(results=_vqe_results(program))
@@ -360,19 +347,6 @@ def _job_result(job_id, *_, **__):
 
 def _vqe_results(program) -> list:
     """The legacy flow: the program's classical code runs VQE, and saves its result and the hamiltonian."""
-    import base64
-    import io
-
-    from classiq.interface.executor.execution_result import (
-        TaggedUnstructured,
-        TaggedVQESolverResult,
-    )
-    from classiq.interface.executor.vqe_result import (
-        VQEIntermediateData,
-        VQESolverResult,
-    )
-    from PIL import Image
-
     sample = _sample(program, DEFAULT_NUM_SHOTS)
     probabilities = {
         bitstring: count / sample.num_shots
@@ -409,22 +383,9 @@ def _vqe_results(program) -> list:
 
 
 def _result(program, primitives_input):
-    from classiq.interface.executor.execution_result import (
-        TaggedEstimationResults,
-        TaggedExecutionDetails,
-        TaggedMinimizeResult,
-        TaggedMultipleExecutionDetails,
-    )
-    from classiq.interface.executor.result import (
-        EstimationResult,
-        EstimationResults,
-        MultipleExecutionDetails,
-    )
-
-    preferences = program.model.execution_preferences
     num_shots = (
         getattr(primitives_input, "num_shots", None)
-        or preferences.num_shots
+        or program.model.execution_preferences.num_shots
         or DEFAULT_NUM_SHOTS
     )
     if primitives_input is not None and primitives_input.estimate is not None:
@@ -468,11 +429,8 @@ def _result(program, primitives_input):
     )
 
 
-def _sample(program, num_shots: int):
+def _sample(program, num_shots: int) -> ExecutionDetails:
     """Every possible value of the outputs, with similar counts."""
-    from classiq.interface.executor.result import ExecutionDetails
-    from classiq.interface.executor.result_parsing import parse_states
-
     output_types = program.model.circuit_output_types
     qubits, width = {}, 0
     for name, output_type in output_types.items():
