@@ -62,7 +62,7 @@ repos:
         additional_dependencies:
           - "nbformat"
         require_serial: true
-      - id: verify-notebook-format-execution-count
+      - id: forbid-negative-execution-count
         name: forbid    negative execution-count
         language: pygrep
         files: \.ipynb$
@@ -77,19 +77,19 @@ repos:
 
   - repo: local
     hooks:
-      - id: verify-platform-links-nightly
+      - id: forbid-nightly-platform-links
         name: forbid    nightly-platform links
         language: pygrep
         files: \.ipynb$
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: https://nightly\.platform\.classiq\.io
-      - id: verify-platform-links-dev
+      - id: forbid-dev-version-links
         name: forbid    dev-version links
         language: pygrep
         files: \.ipynb$
         exclude: (^|/)logical_qubits_by_alice_and_bob\.ipynb$
         entry: '[?&]version=[^ \t\n]*\.dev'
-      - id: verify-platform-links-old
+      - id: forbid-older-version-links
         name: forbid    older-version links
         language: pygrep
         files: \.ipynb$
@@ -106,7 +106,6 @@ repos:
 
       - id: validate-latex
         name: validate  notebook LaTeX
-        description: Ensure LaTeX math expressions in markdown cells are valid
         entry: .internal/pre_commit_tools/notebook_validate_latex.py
         language: python
         files: \.ipynb$
@@ -115,14 +114,14 @@ repos:
           - "nbformat"
         require_serial: true
 
-      - id: validate-classiq-imports
+      - id: forbid-classiq-named-imports
         name: forbid    from classiq import stuff (use `import *`)
         language: pygrep
         files: \.ipynb$
         # This file has `from classiq import A as B`
         exclude: (^|/)qaoa_demonstration\.ipynb$
         entry: "from classiq import [^*]"
-      - id: validate-classiq-raw-import
+      - id: forbid-classiq-raw-import
         name: forbid    import classiq (use `from classiq import *`)
         language: pygrep
         files: \.ipynb$
@@ -144,21 +143,18 @@ repos:
         require_serial: true
       - id: validate-metadata-file
         name: validate  metadata
-        description: Add file if non existant and validate value otherwise
         entry: .internal/pre_commit_tools/metadata_validate.py
         language: python
         files: \.(qmod|ipynb)$
         require_serial: true
       - id: auto-add-tests
         name: format    add tests
-        description: Automatically adding a test to new notebooks
         entry: .internal/pre_commit_tools/auto_add_tests.py
         language: python
         files: \.ipynb$
         require_serial: true
       - id: notebook-uniformity
         name: format    uniformity
-        description: Auto-fix simple uniformity conventions (e.g. plural "References" heading)
         entry: .internal/pre_commit_tools/notebook_uniformity.py
         language: python
         files: \.ipynb$
