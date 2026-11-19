@@ -21,7 +21,7 @@ defaults:
 
 jobs:
   test:
-    if: false # TODO: remove once the test exists
+    if: github.event_name == 'workflow_dispatch' # TEMPORARY: for a full dispatch run; back to `if: false` before review
 
     permissions:
       contents: read
