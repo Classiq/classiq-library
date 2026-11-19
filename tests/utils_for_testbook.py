@@ -228,10 +228,10 @@ def _build_cd_decorator(file_path: str) -> Callable:
             os.chdir(ROOT_DIRECTORY)
             os.chdir(os.path.dirname(file_path))
 
-            result = func(*args, **kwargs)
-
-            os.chdir(previous_dir)
-            return result
+            try:
+                return func(*args, **kwargs)
+            finally:
+                os.chdir(previous_dir)
 
         return inner
 
