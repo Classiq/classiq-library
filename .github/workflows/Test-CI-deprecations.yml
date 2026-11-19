@@ -187,8 +187,12 @@ jobs:
       # Run Tests
       #
       - name: Run Notebooks (mocked API, deprecation warnings)
-        run: echo "TODO - the mocked deprecation test"
+        run: python -m pytest -c tests/config_deprecations.ini --rootdir=.
         env:
           SHOULD_TEST_ALL_FILES: ${{ github.event_name != 'pull_request' }}
           LIST_OF_IPYNB_CHANGED: "${{ steps.code-changed.outputs.list }}"
           LIST_OF_IPYNB_TESTS_CHANGED: "${{ steps.changed-files.outputs.tests_all_changed_files }}"
+          CLASSIQ_TELEMETRY_MODE: disabled
+          CLASSIQ_HOST: http://127.0.0.1:9 # the API is mocked: nothing may reach the platform
+          JUPYTER_PLATFORM_DIRS: "1"
+          PYTHONDONTWRITEBYTECODE: "1"
