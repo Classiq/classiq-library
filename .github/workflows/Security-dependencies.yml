@@ -1,0 +1,86 @@
+name: "Security (dependencies)"
+
+# Scans every dependency (direct and transitive) for known vulnerabilities, using Trivy (https://trivy.dev).
+# The requirements files are unpinned, which Trivy can't resolve, so we let pip pin them first.
+
+on:
+  # PRs (including forks) that change the dependencies
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "requirements*.txt"
+      - .github/workflows/Security-dependencies.yml
+
+  # New vulnerabilities are published all the time
+  schedule:
+    - cron: "00 05 * * 6" # Saturday, 05:00 UTC
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # The notebooks install classiq's extras (`!pip install "classiq[chemistry]"`), which pin some packages
+    # to other versions, so each extra gets its own scan.
+    strategy:
+      fail-fast: false
+      matrix:
+        classiq:
+          - classiq
+          - classiq[chemistry]
+          - classiq[qml]
+          - classiq[qsp]
+          # all the extras (there's no `classiq[all]`)
+          - classiq[analyzer-sdk,chemistry,cudaq,qml,qsp]
+
+    env:
+      CLASSIQ: ${{ matrix.classiq }}
+      # Trivy reads pinned dependencies only from a file named exactly `requirements.txt`
+      PINNED_DIR: ${{ runner.temp }}/pinned
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version-file: .github/.python-version
+
+      # `--dry-run` downloads only the packages' metadata, so it's much faster than installing them.
+      # The result is what a user gets from PyPI, which is what we want to scan (e.g., torch with CUDA).
+      - name: Pin dependencies
+        run: |
+          # The latest pip takes ~20s here; an older one (25.2) downloaded whole packages and took over 10 minutes
+          python -m pip install -U pip
+
+          mkdir -p "$PINNED_DIR"
+          python -m pip install --dry-run --ignore-installed --quiet --report - \
+              -r requirements.txt -r requirements_tests.txt -r requirements_notebooks.txt "$CLASSIQ" \
+            | jq -r '.install[] | "\(.metadata.name)==\(.metadata.version)"' \
+            > "$PINNED_DIR/requirements.txt"
+          cat "$PINNED_DIR/requirements.txt"
+
+      # Fails only on HIGH/CRITICAL vulnerabilities that already have a fixed version (i.e., we can act on them)
+      # Trivy 0.76.2 was released on 2026-11-05
+      - name: Scan dependencies
+        run: >
+          docker run --rm --volume "$PINNED_DIR:/src:ro" --workdir /src
+          aquasec/trivy:0.76.2 fs .
+          --scanners vuln
+          --severity HIGH,CRITICAL
+          --ignore-unfixed
+          --quiet
+          --exit-code 1
