@@ -26,8 +26,9 @@ repos:
     rev: v0.16.9
     hooks:
       - id: ruff-check
-        name: format    notebook unused imports
-        types_or: [jupyter]
+        name: format    unused imports
+        # Third-party code copied into the library
+        exclude: ^algorithms/error_correction/syndrome_extraction_optimization/(gidney_circuits|color_code_stim_local)/
         args: [--select, F401, --fix]
       - id: ruff-check
         name: format    notebook isort
