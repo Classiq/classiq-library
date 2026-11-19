@@ -12,6 +12,7 @@ import datetime
 import math
 import random
 import warnings
+from collections import Counter
 
 from IPython import get_ipython
 
@@ -22,7 +23,7 @@ DEPRECATIONS = (
     SyntaxWarning,
 )
 
-# A fake sample returns every possible bitstring of the outputs, up to this many
+# A fake sample returns every combination of the outputs' values, up to this many
 MAX_STATES = 1024
 # The size of an output whose size the notebook doesn't set (e.g. `Output[QNum]`)
 UNKNOWN_SIZE = 4
@@ -123,6 +124,8 @@ def _install_fakes() -> None:
         "call_get_execution_job_details": _job_details,
         "call_get_execution_job_result": _job_result,
         "call_cancel_execution_job": _nothing,
+        "call_get_all_hardware_devices": lambda *_, **__: [],
+        "call_rb_analysis_task": _rb_analysis,
     }
     for name, fake in fakes.items():
         setattr(ApiWrapper, name, classmethod(_api_call(fake)))
@@ -172,6 +175,7 @@ def _synthesize(model, *_, **__):
             width=max(1, sum(output.size for output in output_types.values()))
         ),
         model=ExecutionModel(
+            circuit_outputs=model.main_func.outputs_dict,
             circuit_output_types=output_types,
             circuit_execution_params={p.name: p for p in parameters},
             execution_preferences=model.execution_preferences,
@@ -226,13 +230,16 @@ def _same_program(params, *_, **__):
 
 
 def _export(params, *_, **__):
-    from classiq.interface.executor.quantum_program_params import TargetCode
+    from classiq.interface.executor.quantum_program_params import (
+        TargetCode,
+        TargetLanguage,
+    )
 
     width = params.quantum_program.data.width
-    if "3" in str(params.target_language):
-        code = f'OPENQASM 3.0;\ninclude "stdgates.inc";\nqubit[{width}] q;\n'
-    else:
+    if params.target_language == TargetLanguage.QASM2:
         code = f'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[{width}];\n'
+    else:
+        code = f'OPENQASM 3.0;\ninclude "stdgates.inc";\nqubit[{width}] q;\n'
     return TargetCode(code=code)
 
 
@@ -240,7 +247,11 @@ def _circuit_metrics(program, *_, **__):
     from classiq.interface.ide.visual_model import CircuitMetrics
 
     width = program.data.width
-    return CircuitMetrics(width=width, depth=width, count_ops={"cx": width, "u": width})
+    model = program.compiled_qmod
+    gates = model.preferences.custom_hardware_settings.basis_gates if model else []
+    return CircuitMetrics(
+        width=width, depth=width, count_ops={str(gate): width for gate in gates}
+    )
 
 
 def _transpiled_circuit_metrics(program, *_, **__):
@@ -252,6 +263,19 @@ def _transpiled_circuit_metrics(program, *_, **__):
     return ProgramData(
         hardware_data=SynthesisHardwareData(),
         circuit_metrics=_circuit_metrics(program),
+    )
+
+
+def _rb_analysis(params, *_, **__):
+    from classiq.interface.analyzer.result import RbResults
+
+    return RbResults(
+        mean_fidelity=0.99,
+        average_error=0.01,
+        A=0.5,
+        B=0.5,
+        success_probability=[0.9] * len(params.num_clifford),
+        parameters_error=(0.01, 0.01, 0.01),
     )
 
 
@@ -320,7 +344,59 @@ def _job_result(job_id, *_, **__):
     )
 
     program, primitives_input = _jobs[job_id.job_id]
+    if "vqe(" in program.model.classical_execution_code:
+        return ExecuteGeneratedCircuitResults(results=_vqe_results(program))
     return ExecuteGeneratedCircuitResults(results=[_result(program, primitives_input)])
+
+
+def _vqe_results(program) -> list:
+    """The legacy flow: the program's classical code runs VQE, and saves its result and the hamiltonian."""
+    import base64
+    import io
+
+    from classiq.interface.executor.execution_result import (
+        TaggedUnstructured,
+        TaggedVQESolverResult,
+    )
+    from classiq.interface.executor.vqe_result import (
+        VQEIntermediateData,
+        VQESolverResult,
+    )
+    from PIL import Image
+
+    sample = _sample(program, DEFAULT_NUM_SHOTS)
+    probabilities = {
+        bitstring: count / sample.num_shots
+        for bitstring, count in sample.counts.items()
+    }
+    convergence_graph = io.BytesIO()
+    Image.new("RGB", (1, 1)).save(convergence_graph, format="PNG")
+    vqe_result = VQESolverResult(
+        energy=0.5,
+        time=1.0,
+        eigenstate={bitstring: math.sqrt(p) for bitstring, p in probabilities.items()},
+        reduced_probabilities=probabilities,
+        optimized_circuit_sample_results=sample,
+        intermediate_results=[
+            VQEIntermediateData(
+                utc_time=datetime.datetime.now(datetime.timezone.utc),
+                iteration_number=1,
+                parameters=[0.0],
+                mean_all_solutions=0.5,
+                solutions=[],
+                standard_deviation=0.1,
+            )
+        ],
+        optimal_parameters={"param_0": 0.0},
+        convergence_graph_str=base64.b64encode(convergence_graph.getvalue()).decode(),
+        num_shots=sample.num_shots,
+    )
+    return [
+        TaggedVQESolverResult(
+            value_type="VQESolverResult", name="vqe_result", value=vqe_result
+        ),
+        TaggedUnstructured(value_type="Unstructured", name="hamiltonian", value=[]),
+    ]
 
 
 def _result(program, primitives_input):
@@ -384,7 +460,7 @@ def _result(program, primitives_input):
 
 
 def _sample(program, num_shots: int):
-    """Every possible value of the outputs (up to MAX_STATES), with similar counts."""
+    """Every possible value of the outputs, with similar counts."""
     from classiq.interface.executor.result import ExecutionDetails
     from classiq.interface.executor.result_parsing import parse_states
 
@@ -393,7 +469,7 @@ def _sample(program, num_shots: int):
     for name, output_type in output_types.items():
         qubits[name] = tuple(range(width, width + output_type.size))
         width += output_type.size
-    bitstrings = _bitstrings(max(width, 1))
+    bitstrings = _bitstrings(qubits, max(width, 1))
     parsed_states = parse_states(bitstrings, qubits, output_types)
 
     backend = str(program.model.execution_preferences.backend_preferences.backend_name)
@@ -407,22 +483,32 @@ def _sample(program, num_shots: int):
             output_qubits_map=qubits,
             output_type_map=output_types,
         )
-    counts = {bitstring: 1 for bitstring in bitstrings}
-    for _ in range(max(0, num_shots - len(bitstrings))):
-        counts[_random.choice(bitstrings)] += 1
+    # Each value once (as far as the shots go), and the other shots at random
+    counts = Counter(bitstrings[:num_shots])
+    counts.update(_random.choices(bitstrings, k=num_shots - counts.total()))
     return ExecutionDetails(
         vendor_format_result={},
-        counts=counts,
+        counts=dict(counts),
         parsed_states=parsed_states,
         output_qubits_map=qubits,
         output_type_map=output_types,
-        num_shots=sum(counts.values()),
+        num_shots=num_shots,
     )
 
 
-def _bitstrings(width: int) -> list[str]:
+def _bitstrings(qubits: dict, width: int) -> list[str]:
+    """Every combination of the outputs' values.
+    If there are too many, every value of each output (up to MAX_STATES), while the others are 0.
+    """
     if 2**width <= MAX_STATES:
         values = range(2**width)
     else:
-        values = sorted({0, *(_random.getrandbits(width) for _ in range(MAX_STATES))})
+        values = sorted(
+            {
+                value << indices[0]
+                for indices in qubits.values()
+                if indices
+                for value in range(min(2 ** len(indices), MAX_STATES))
+            }
+        )
     return [format(value, f"0{width}b") for value in values]
