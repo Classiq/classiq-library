@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import json
 import re
 import sys
+
+from notebook_utils import read_notebook, write_notebook
 
 LINK_PATTERN = re.compile(
     r"Quantum program link: https://platform\.classiq\.io/circuit/\S+\n"
@@ -72,10 +73,8 @@ def validate_links_list(
 
 
 def main(dest_file: str, source_file: str, force: bool = False) -> bool:
-    with open(dest_file) as f:
-        old_nb = json.load(f)
-    with open(source_file) as f:
-        new_nb = json.load(f)
+    old_nb = read_notebook(dest_file)
+    new_nb = read_notebook(source_file)
 
     old_links = extract_links(old_nb["cells"])
     new_links = extract_links(new_nb["cells"])
@@ -86,8 +85,7 @@ def main(dest_file: str, source_file: str, force: bool = False) -> bool:
     if not update_links(old_nb["cells"], old_links, new_links):
         return False
 
-    with open(dest_file, "w") as f:
-        json.dump(old_nb, f, indent=1)
+    write_notebook(dest_file, old_nb)
 
     print(f"Updated notebook written to: {dest_file}")
     return True
