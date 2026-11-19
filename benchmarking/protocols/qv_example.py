@@ -27,7 +27,6 @@ from benchmark import BenchmarkExample
 from reporting import *
 from classiq import *
 from scipy.stats import unitary_group
-from scipy.linalg import qr
 
 
 import numpy as np

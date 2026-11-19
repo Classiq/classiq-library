@@ -4,9 +4,6 @@ from tests.utils_for_testbook import (
 )
 from testbook.client import TestbookNotebookClient
 
-import numpy as np
-import scipy
-
 
 @wrap_testbook(
     "qsvt_fixed_point_amplitude_amplification",

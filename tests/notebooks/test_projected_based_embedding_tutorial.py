@@ -1,5 +1,3 @@
-import numpy as np
-
 from testbook.client import TestbookNotebookClient
 
 from tests.utils_for_testbook import (

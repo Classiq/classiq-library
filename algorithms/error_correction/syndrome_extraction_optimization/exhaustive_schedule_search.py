@@ -9,12 +9,11 @@ are obtained by rotation:
 This exploits the 3-fold rotational symmetry of the color code.
 """
 
-import numpy as np
 from itertools import product
 from color_code_stim import ColorCode
 from compare_schedules import schedule_to_cnot_dict_by_color_and_type
 from ilp_circuit_distance import mip_circuit_distance
-from custom_error_model import apply_custom_error_model, get_edge_ancilla_qids
+from custom_error_model import apply_custom_error_model
 from visualize_minimal_error import visualize_errors_grid, print_minimal_representatives
 import time
 
@@ -28,7 +27,6 @@ def get_red_bulk_schedules():
     Then remaining 2 elements form the middle pair.
     Try both orderings of the middle pair.
     """
-    from itertools import combinations
 
     all_elements = set(range(6))
 
@@ -545,7 +543,6 @@ def visualize_config_minimal_error(
 
 
 def main():
-    import pickle
     import os
 
     # ============================================================

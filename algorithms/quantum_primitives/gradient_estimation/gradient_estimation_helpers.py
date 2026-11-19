@@ -1,12 +1,12 @@
 from classiq import *
-from typing import List
 import numpy as np
 import pandas as pd
 from dataclasses import dataclass
 from matplotlib import pyplot as plt
-from classiq.qmod.symbolic import pi
-import logging
-from typing import Callable
+
+# Re-exported: the notebook gets these through `import *`
+from typing import Callable as Callable
+from classiq.qmod.symbolic import pi as pi
 
 # %matplotlib widget
 

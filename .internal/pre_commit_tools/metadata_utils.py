@@ -1,12 +1,8 @@
-import types
 from dataclasses import dataclass
 from typing import Callable, Any
 import os
-import re
 import json
 import subprocess
-import sys
-from collections.abc import Iterable
 from pathlib import Path
 
 PROJECT_ROOT = Path(subprocess.getoutput("git rev-parse --show-toplevel"))  # noqa: S605
