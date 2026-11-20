@@ -1,0 +1,24 @@
+{
+  "name": "quantum-field-technician-dispatch-platform",
+  "version": "1.0.0",
+  "description": "Quantum Multi-Tier Field-Technician Dispatch (SC-QFCM) Web Simulator & Benchmark Platform",
+  "scripts": {
+    "dev": "node -e \"const { spawn } = require('child_process'); const fs = require('fs'); const venv = 'c:\\\\Users\\\\vladimir.dobrouchkin\\\\.gemini\\\\antigravity-ide\\\\scratch\\\\classiq_env\\\\Scripts\\\\python.exe'; const py = fs.existsSync(venv) ? venv : 'python'; spawn(py, ['applications/logistics/vehicle_routing_problem/web_gui_server.py', '--port', '8080'], { stdio: 'inherit' });\"",
+    "start": "npm run dev",
+    "gui": "node -e \"const { spawn } = require('child_process'); const fs = require('fs'); const venv = 'c:\\\\Users\\\\vladimir.dobrouchkin\\\\.gemini\\\\antigravity-ide\\\\scratch\\\\classiq_env\\\\Scripts\\\\python.exe'; const py = fs.existsSync(venv) ? venv : 'python'; spawn(py, ['applications/logistics/vehicle_routing_problem/gui_multi_depot_dispatch.py'], { stdio: 'inherit' });\"",
+    "test": "node -e \"const { spawn } = require('child_process'); const fs = require('fs'); const venv = 'c:\\\\Users\\\\vladimir.dobrouchkin\\\\.gemini\\\\antigravity-ide\\\\scratch\\\\classiq_env\\\\Scripts\\\\python.exe'; const py = fs.existsSync(venv) ? venv : 'python'; spawn(py, ['-m', 'unittest', 'applications/logistics/vehicle_routing_problem/test_multitier_dispatch.py'], { stdio: 'inherit' });\"",
+    "build": "echo Frontend assets ready in applications/logistics/vehicle_routing_problem/web",
+    "deploy": "npx --yes firebase-tools deploy --only hosting",
+    "deploy:firebase": "npx --yes firebase-tools deploy --only hosting"
+  },
+  "keywords": [
+    "quantum",
+    "classiq",
+    "qfcm",
+    "vrp",
+    "qaoa",
+    "fleet-dispatch"
+  ],
+  "author": "",
+  "license": "Apache-2.0"
+}

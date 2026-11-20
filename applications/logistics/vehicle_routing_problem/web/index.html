@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantum Multi-Tier Field-Technician Dispatch Simulator & Benchmark | Classiq SC-QFCM</title>
+  <meta name="description" content="Nationwide heterogeneous fleet dispatch simulator and benchmark for up to 35,000 field service technicians using Classiq Quantum Fuzzy C-Means (SC-QFCM)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <!-- Chart.js for executive analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Security Gateway Authentication Barrier -->
+  <script src="auth.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Executive Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="quantum-badge">
+          <span class="pulse-dot"></span>
+          <span>Classiq Quantum Engine</span>
+        </div>
+        <h1 class="header-title">Quantum Field-Technician Dispatch Simulator</h1>
+        <p class="header-subtitle">
+          Nationwide Heterogeneous Fleet Routing (Up to 35,000 Techs) • Multi-Tier SC-QFCM • Born's Rule Swap-Test Overlap
+        </p>
+      </div>
+      <div class="header-right">
+        <div class="header-stat">
+          <span class="stat-label">Fleet Capacity</span>
+          <span class="stat-val" id="header-fleet-val">50 Techs</span>
+        </div>
+        <div class="header-stat">
+          <span class="stat-label">Solver Status</span>
+          <span class="stat-val text-cyan" id="header-status-val">Ready</span>
+        </div>
+        <div class="header-stat" id="header-engine-stat" style="cursor: pointer;" title="Backend Connection: Click to view or set custom API URL for published versions">
+          <span class="stat-label">Engine API</span>
+          <span class="stat-val text-emerald" id="header-engine-val" style="font-size: 11px;">● Checking</span>
+        </div>
+        <a href="case-study.html" target="_blank" class="header-stat" style="text-decoration: none; cursor: pointer; border: 1px solid rgba(0, 240, 255, 0.35); background: rgba(0, 240, 255, 0.08);" title="Read the Multi-Depot Quantum Case Study & ROI Report">
+          <span class="stat-label" style="color: #00F0FF;">Report</span>
+          <span class="stat-val" style="color: #F8FAFC; font-size: 11px;">📖 Case Study</span>
+        </a>
+        <a href="https://docs.google.com/document/d/1JrAfOfHbS_Z0FnoEqjX_lGjBSZcXoWZZnGRKD-vPnAg/edit?usp=sharing" target="_blank" class="header-stat" style="text-decoration: none; cursor: pointer; border: 1px solid rgba(96, 165, 250, 0.35); background: rgba(96, 165, 250, 0.08);" title="Open Technical Whitepaper in Google Docs">
+          <span class="stat-label" style="color: #60A5FA;">Whitepaper</span>
+          <span class="stat-val" style="color: #F8FAFC; font-size: 11px;">📄 Google Doc</span>
+        </a>
+        <button class="header-stat btn-lock-session" title="Lock session and sign out" style="cursor: pointer; border: 1px solid rgba(244, 63, 94, 0.4); background: rgba(244, 63, 94, 0.08);">
+          <span class="stat-label" style="color: #F43F5E;">Security</span>
+          <span class="stat-val" style="color: #FDA4AF; font-size: 11px;">🔒 Lock</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Layout -->
+    <div class="workspace-layout">
+      <!-- Left Sidebar: Parameter Controls & Presets -->
+      <aside class="sidebar-panel">
+        <div class="panel-section">
+          <h2 class="section-title">⚡ Quick Presets</h2>
+          <div class="preset-grid">
+            <button class="preset-btn active" id="preset-quantum" data-tasks="1000" data-techs="50" data-hubs="1">
+              <span class="preset-icon">🔬</span>
+              <span class="preset-name">Single Hub (1k / 50)</span>
+            </button>
+            <button class="preset-btn" id="preset-national" data-tasks="250000" data-techs="35000" data-hubs="8">
+              <span class="preset-icon">🇺🇸</span>
+              <span class="preset-name">US National (250k)</span>
+            </button>
+            <button class="preset-btn" id="preset-metro" data-tasks="50000" data-techs="10000" data-hubs="4">
+              <span class="preset-icon">🏙️</span>
+              <span class="preset-name">Metro Fleet (50k)</span>
+            </button>
+            <button class="preset-btn" id="preset-equitable" data-tasks="5000" data-techs="1000" data-hubs="2">
+              <span class="preset-icon">⚖️</span>
+              <span class="preset-name">Regional (5k)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2 class="section-title">🎛️ Dispatch Parameters</h2>
+          
+          <!-- Technicians slider -->
+          <div class="input-group">
+            <div class="input-label-row">
+              <label for="input-techs">Field Technicians ($K$)</label>
+              <span class="val-badge" id="badge-techs">50</span>
+            </div>
+            <input type="range" id="input-techs" min="4" max="35000" step="1" value="50" class="styled-slider" />
+          </div>
+
+          <!-- Customer tasks slider: 500 to 250,000 -->
+          <div class="input-group">
+            <div class="input-label-row">
+              <label for="input-tasks">Customer Tasks ($N$)</label>
+              <span class="val-badge" id="badge-tasks">1,000</span>
+            </div>
+            <input type="range" id="input-tasks" min="500" max="250000" step="500" value="1000" class="styled-slider" />
+          </div>
+
+          <!-- Service Hubs slider: 1 to 5000 -->
+          <div class="input-group">
+            <div class="input-label-row">
+              <label for="input-hubs">Regional Depots ($M$)</label>
+              <span class="val-badge" id="badge-hubs">10</span>
+            </div>
+            <input type="range" id="input-hubs" min="1" max="5000" step="1" value="10" class="styled-slider" />
+          </div>
+
+          <!-- Emergency SLA ratio -->
+          <div class="input-group">
+            <div class="input-label-row">
+              <label for="input-emergency">Emergency 911 SLA Ratio</label>
+              <span class="val-badge" id="badge-emergency">0%</span>
+            </div>
+            <input type="range" id="input-emergency" min="0" max="40" step="5" value="0" class="styled-slider" />
+          </div>
+
+          <!-- Quantum Fuzziness m -->
+          <div class="input-group">
+            <div class="input-label-row">
+              <label for="input-fuzziness">Quantum Fuzziness ($m$)</label>
+              <span class="val-badge" id="badge-fuzziness">2.0</span>
+            </div>
+            <input type="range" id="input-fuzziness" min="1.1" max="3.0" step="0.1" value="2.0" class="styled-slider" />
+          </div>
+
+          <!-- Calculation Method Selector (5 options) -->
+          <div class="input-group">
+            <div class="input-label-row">
+              <label for="select-method">Calculation Paradigm</label>
+              <span class="val-badge" id="badge-method">5. SC-QFCM</span>
+            </div>
+            <select id="select-method" class="styled-select" style="width: 100%; background: #111827; color: #00F0FF; color-scheme: dark; border: 1px solid #1F2937; border-radius: 6px; padding: 7px 10px; font-size: 11.5px; font-weight: bold; margin-top: 4px; outline: none; cursor: pointer;">
+              <option value="quantum_multitier_qfcm" style="background-color: #111827; color: #F1F5F9;" selected>⚡ 5. Fuzzy Means with Quantum (SC-QFCM)</option>
+              <option value="classic_fcm" style="background-color: #111827; color: #F1F5F9;">🌀 4. Fuzzy Means without Quantum (Classical FCM)</option>
+              <option value="quantum_kmeans" style="background-color: #111827; color: #F1F5F9;">⚛️ 3. K-Means with Quantum (Born's Swap-Test)</option>
+              <option value="classic_kmeans" style="background-color: #111827; color: #F1F5F9;">📐 2. Classic K-Means without Quantum</option>
+              <option value="baseline_fifo" style="background-color: #111827; color: #F1F5F9;">⏱️ 1. Classic FIFO Baseline</option>
+              <option value="pure_ga_classical" style="background-color: #111827; color: #F1F5F9;">🧬 6. Pure Classical Genetic Algorithm</option>
+              <option value="pure_ga_quantum" style="background-color: #111827; color: #F1F5F9;">⚛️🧬 7. Pure Quantum Genetic Algorithm (QGA)</option>
+              <option value="kmeans_depot_ga_classical" style="background-color: #111827; color: #F1F5F9;">🏢🧬 8. K-Means + Classical GA (per Depot)</option>
+              <option value="kmeans_depot_ga_quantum" style="background-color: #111827; color: #F1F5F9;">⚛️🏢 9. Quantum K-Means + Quantum GA (per Depot)</option>
+              <option value="simulated_annealing" style="background-color: #111827; color: #F1F5F9;">🔥 10. Simulated Annealing Optimization</option>
+            </select>
+          </div>
+
+          <!-- Active Calculation & Benchmark Options Chooser -->
+          <div class="input-group" style="margin-top: 14px; background: rgba(17, 24, 39, 0.65); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <div class="input-label-row" style="margin-bottom: 6px;">
+              <label style="font-weight: 700; color: #E5E7EB; font-size: 11.5px;">Active Calculation Options</label>
+              <div style="display: flex; gap: 5px;">
+                <button type="button" id="btn-select-all-methods" class="mini-tool-btn" title="Check all 10 algorithms">All</button>
+                <button type="button" id="btn-deselect-all-methods" class="mini-tool-btn" title="Uncheck all algorithms">None</button>
+              </div>
+            </div>
+            <div style="font-size: 10px; color: #9CA3AF; margin-bottom: 7px;">Select algorithms to calculate and benchmark:</div>
+
+            <div class="method-checkbox-list" id="method-checkbox-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; padding-right: 2px;">
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="baseline_fifo" />
+                <span class="method-cb-text"><span class="method-cb-num">1.</span> ⏱️ Classic FIFO Baseline</span>
+              </label>
+
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="classic_kmeans" checked />
+                <span class="method-cb-text"><span class="method-cb-num">2.</span> 📐 Classic Hard K-Means</span>
+              </label>
+
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="quantum_kmeans" checked />
+                <span class="method-cb-text"><span class="method-cb-num">3.</span> ⚛️ Hard K-Means with Quantum</span>
+              </label>
+
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="classic_fcm" />
+                <span class="method-cb-text"><span class="method-cb-num">4.</span> 🌀 Fuzzy Means Classical (FCM)</span>
+              </label>
+
+              <label class="method-cb-label highlight-cb">
+                <input type="checkbox" class="method-cb" value="quantum_multitier_qfcm" checked />
+                <span class="method-cb-text"><span class="method-cb-num">5.</span> ⚡ Quantum SC-QFCM (Flagship)</span>
+              </label>
+
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="pure_ga_classical" />
+                <span class="method-cb-text"><span class="method-cb-num">6.</span> 🧬 Pure Classical Genetic Alg</span>
+              </label>
+
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="pure_ga_quantum" />
+                <span class="method-cb-text"><span class="method-cb-num">7.</span> ⚛️🧬 Pure Quantum GA (QGA)</span>
+              </label>
+
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="kmeans_depot_ga_classical" />
+                <span class="method-cb-text"><span class="method-cb-num">8.</span> 🏢🧬 K-Means + GA per Depot</span>
+              </label>
+
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="kmeans_depot_ga_quantum" />
+                <span class="method-cb-text"><span class="method-cb-num">9.</span> ⚛️🏢 Quantum K-Means + Q-GA</span>
+              </label>
+
+              <label class="method-cb-label">
+                <input type="checkbox" class="method-cb" value="simulated_annealing" />
+                <span class="method-cb-text"><span class="method-cb-num">10.</span> 🔥 Simulated Annealing</span>
+              </label>
+            </div>
+            <div id="active-methods-count" style="font-size: 10px; color: #00F0FF; font-weight: 600; margin-top: 6px; text-align: right;">3 of 10 Active</div>
+          </div>
+
+          <!-- Quantum Function & Kernel Configuration -->
+          <div class="quantum-kernel-panel" id="quantum-kernel-panel">
+            <div class="quantum-kernel-header">
+              <span class="quantum-kernel-title" id="quantum-kernel-panel-title">⚛️ Quantum Distance Function</span>
+              <span class="quantum-kernel-code-badge" id="badge-quantum-kernel-code">SWAP</span>
+            </div>
+
+            <!-- Inactive notice banner (shown when classical method is selected) -->
+            <div class="quantum-kernel-inactive-notice" id="quantum-kernel-inactive-notice" style="display: none;">
+              <span class="inactive-notice-icon">ℹ️</span>
+              <span class="inactive-notice-text">Standby / Inactive for classical solver. Active on Paradigms 3, 5, 7, 9.</span>
+            </div>
+
+            <!-- Function Selector Dropdown -->
+            <div class="input-group" style="margin-top: 6px;">
+              <select id="select-quantum-kernel" class="styled-select" style="width: 100%; font-size: 10.5px; padding: 5px 8px; background: #0F172A; color: #F8FAFC; color-scheme: dark; border: 1px solid rgba(59, 130, 246, 0.45); border-radius: 6px; outline: none; cursor: pointer;">
+                <option value="swap_test" style="background-color: #0F172A; color: #F1F5F9;" selected>1. Swap-Test Overlap Fidelity (D = 1 - |⟨ψ|c⟩|²)</option>
+                <option value="hadamard_test" style="background-color: #0F172A; color: #F1F5F9;">2. Hadamard Interference Kernel (D = 1 - Re⟨ψ|c⟩)</option>
+                <option value="fubini_study" style="background-color: #0F172A; color: #F1F5F9;">3. Fubini-Study Geodesic Angle (D = arccos|⟨ψ|c⟩|)</option>
+                <option value="quantum_euclidean" style="background-color: #0F172A; color: #F1F5F9;">4. Quantum Hilbert-Euclidean (D = ‖|ψ⟩ - |c⟩‖)</option>
+                <option value="zz_feature_map" style="background-color: #0F172A; color: #F1F5F9;">5. Entangled ZZ-Feature Map Kernel (D = 1 - K_ZZ)</option>
+              </select>
+            </div>
+
+            <!-- Mathematical Formula Indicator -->
+            <div class="quantum-formula-box" id="quantum-kernel-formula-display">
+              <span class="formula-label">Formula:</span>
+              <code class="formula-code" id="quantum-kernel-formula-val">D_Q = 1 - |⟨ψ|c⟩|² = 2 · P(|1⟩_ancilla)</code>
+            </div>
+
+            <!-- Quantum Parameters Grid (Shots, Gamma) -->
+            <div class="quantum-params-grid">
+              <div class="qparam-col" id="qparam-col-shots">
+                <div class="input-label-row" style="margin-bottom: 2px;">
+                  <label for="select-quantum-shots" style="font-size: 9.5px;">Sampling Shots</label>
+                  <span class="badge-pill" id="badge-quantum-shots" style="font-size: 8.5px;">2,048</span>
+                </div>
+                <select id="select-quantum-shots" class="styled-select" style="font-size: 9.5px; padding: 3px 5px; background: #0F172A; color: #F8FAFC; color-scheme: dark; border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 4px; outline: none; cursor: pointer;">
+                  <option value="512" style="background-color: #0F172A; color: #F1F5F9;">512 shots (Fast)</option>
+                  <option value="1024" style="background-color: #0F172A; color: #F1F5F9;">1,024 shots</option>
+                  <option value="2048" style="background-color: #0F172A; color: #F1F5F9;" selected>2,048 shots (Balanced)</option>
+                  <option value="4096" style="background-color: #0F172A; color: #F1F5F9;">4,096 shots (Precise)</option>
+                  <option value="8192" style="background-color: #0F172A; color: #F1F5F9;">8,192 shots (Ultra)</option>
+                </select>
+              </div>
+
+              <div class="qparam-col" id="qparam-col-gamma">
+                <div class="input-label-row" style="margin-bottom: 2px;">
+                  <label for="input-quantum-gamma" style="font-size: 9.5px;" id="label-quantum-gamma">Entanglement γ</label>
+                  <span class="badge-pill" id="badge-quantum-gamma" style="font-size: 8.5px;">1.0</span>
+                </div>
+                <input type="range" id="input-quantum-gamma" min="0.1" max="2.0" step="0.1" value="1.0" class="styled-slider" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Random Seed -->
+          <div class="input-group">
+            <div class="input-label-row">
+              <label for="input-seed">Simulation Seed</label>
+              <input type="number" id="input-seed" value="42" min="1" max="9999" class="styled-number" />
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section action-section">
+          <button class="action-btn primary-btn" id="btn-run-dispatch">
+            <span class="btn-icon">🚀</span>
+            <span>Run Quantum Dispatch</span>
+          </button>
+          <button class="action-btn secondary-btn" id="btn-run-benchmark">
+            <span class="btn-icon">📊</span>
+            <span id="btn-run-benchmark-label">Run Benchmark (9 Active)</span>
+          </button>
+          <a class="action-btn export-btn" id="btn-download-pdf" href="#" target="_blank" style="display: none;">
+            <span class="btn-icon">📥</span>
+            <span id="btn-download-pdf-label">Download Exported PDF</span>
+          </a>
+        </div>
+
+        <!-- Calculation Progress HUD Card -->
+        <div class="panel-section progress-section" id="calc-progress-box">
+          <div class="progress-header">
+            <span class="progress-title" id="progress-phase-title">Ready</span>
+            <span class="progress-percent" id="progress-percent-val">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+          <span class="progress-stage-desc" id="progress-stage-desc">Awaiting execution trigger...</span>
+        </div>
+
+        <!-- Live Calculation Telemetry & Audit Console -->
+        <div class="panel-section console-section">
+          <div class="console-header">
+            <div class="console-title-row">
+              <span class="terminal-dot"></span>
+              <span class="console-title">Calculation Audit Log</span>
+              <span class="audit-counter-badge" id="audit-log-counter">1 entry</span>
+            </div>
+            <div class="console-actions">
+              <button type="button" class="console-tool-btn" id="btn-toggle-auto-scroll" title="Toggle Auto-Scroll" data-scroll="on">Scroll: ON</button>
+              <button type="button" class="console-clear-btn" id="btn-clear-logs" title="Clear Console">Clear</button>
+            </div>
+          </div>
+
+          <!-- Audit Detail Customization Checkboxes -->
+          <div class="audit-filter-panel">
+            <div class="audit-filter-header">
+              <span class="audit-filter-label">Filter Log Stream:</span>
+              <div class="audit-filter-actions">
+                <button type="button" class="audit-quick-btn" id="btn-filter-all">All</button>
+                <button type="button" class="audit-quick-btn" id="btn-filter-none">None</button>
+              </div>
+            </div>
+            <div class="audit-filter-grid">
+              <label class="audit-cb-item" title="Show pipeline milestones & execution phases">
+                <input type="checkbox" id="cb-log-phase" class="audit-filter-cb" data-category="phase" checked>
+                <span class="audit-cb-badge badge-phase">Phases</span>
+              </label>
+              <label class="audit-cb-item" title="Show per-algorithm distance, cost, and runtime telemetry">
+                <input type="checkbox" id="cb-log-method" class="audit-filter-cb" data-category="method" checked>
+                <span class="audit-cb-badge badge-method">Algorithms</span>
+              </label>
+              <label class="audit-cb-item" title="Show quantum circuit depth, qubits, fidelity, and rotation angles">
+                <input type="checkbox" id="cb-log-quantum" class="audit-filter-cb" data-category="quantum" checked>
+                <span class="audit-cb-badge badge-quantum">Quantum</span>
+              </label>
+              <label class="audit-cb-item" title="Show MCDA multi-criteria rankings, criteria scores, and winner">
+                <input type="checkbox" id="cb-log-mcda" class="audit-filter-cb" data-category="mcda" checked>
+                <span class="audit-cb-badge badge-mcda">MCDA Rank</span>
+              </label>
+              <label class="audit-cb-item" title="Show OPEX savings, travel time, and CO2 reduction impact">
+                <input type="checkbox" id="cb-log-kpi" class="audit-filter-cb" data-category="kpi" checked>
+                <span class="audit-cb-badge badge-kpi">KPIs & Impact</span>
+              </label>
+              <label class="audit-cb-item" title="Show hyperparameters, random seed, and solver debug parameters">
+                <input type="checkbox" id="cb-log-debug" class="audit-filter-cb" data-category="debug">
+                <span class="audit-cb-badge badge-debug">Verbose/Debug</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="console-body" id="console-log-stream">
+            <div class="log-line" data-category="phase">
+              <span class="log-time">[INIT]</span>
+              <span class="log-phase-badge badge-phase">PHASE</span>
+              <span class="log-msg">System ready. Select a preset or customize parameters above.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend / Skill Tiers -->
+        <div class="panel-section legend-section">
+          <h3 class="legend-title">Skill Tiers & Equipment</h3>
+          <div class="legend-item"><span class="color-dot dot-tier1"></span> Tier 1: Residential (Van)</div>
+          <div class="legend-item"><span class="color-dot dot-tier2"></span> Tier 2: Fiber Splicing (Splicer)</div>
+          <div class="legend-item"><span class="color-dot dot-tier3"></span> Tier 3: Commercial Elec (Bucket)</div>
+          <div class="legend-item"><span class="color-dot dot-tier4"></span> Tier 4: Heavy Infra (Heavy Rig)</div>
+        </div>
+      </aside>
+
+      <!-- Right Main Content Area -->
+      <main class="main-content">
+        <!-- Navigation Tab Bar -->
+        <nav class="tab-nav">
+          <button class="tab-btn active" id="tab-btn-sim" data-tab="tab-sim">
+            <span class="tab-icon">🗺️</span>
+            <span>Territory & Route Simulator</span>
+          </button>
+          <button class="tab-btn" id="tab-btn-bench" data-tab="tab-bench">
+            <span class="tab-icon">📊</span>
+            <span>Detailed Benchmark Dashboard</span>
+          </button>
+          <button class="tab-btn" id="tab-btn-quantum" data-tab="tab-quantum">
+            <span class="tab-icon">⚛️</span>
+            <span>Classiq Quantum Synthesis</span>
+          </button>
+        </nav>
+
+        <!-- Tab 1: Territory & Route Simulator -->
+        <section class="tab-pane active" id="tab-sim">
+          <!-- Top KPI Ribbon -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <span class="kpi-title">Active Fleet / Standby</span>
+              <div class="kpi-val text-cyan" id="kpi-active-techs">0 / 50</div>
+              <span class="kpi-sub" id="kpi-active-sub">50 Technicians Ready</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">Fleet Travel Distance</span>
+              <div class="kpi-val" id="kpi-distance">0.0 km</div>
+              <span class="kpi-sub text-emerald" id="kpi-distance-miles">0.0 miles</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">Windshield Travel Time</span>
+              <div class="kpi-val" id="kpi-windshield">0.0 hrs</div>
+              <span class="kpi-sub" id="kpi-speed-sub">Ready to Dispatch</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">Fleet Operating Cost</span>
+              <div class="kpi-val text-amber" id="kpi-cost">$0.00</div>
+              <span class="kpi-sub" id="kpi-irs-sub">IRS $0.67/mi + Labor</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">CO2 Emissions</span>
+              <div class="kpi-val text-rose" id="kpi-co2">0.0 kg</div>
+              <span class="kpi-sub">EPA 0.404 kg/mi</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">Skill & Shift Compliance</span>
+              <div class="kpi-val text-emerald" id="kpi-compliance">100% / 100%</div>
+              <span class="kpi-sub">0 Feasibility Errors</span>
+            </div>
+          </div>
+
+          <!-- Canvas Map & Simulator Controls -->
+          <div class="map-container">
+            <div class="map-header">
+              <div class="map-title-row">
+                <span class="map-title">US Multi-Depot Geographic Route Topology</span>
+                <span class="map-subtitle" id="map-telemetry">Click any stop or hub to inspect details</span>
+              </div>
+              <div class="map-actions">
+                <button class="map-btn" id="btn-toggle-routes">Toggle Routes</button>
+                <button class="map-btn" id="btn-toggle-halos">Fuzzy Halos</button>
+                <button class="map-btn" id="btn-reset-zoom">Reset View</button>
+              </div>
+            </div>
+
+            <!-- Main High-Res Canvas -->
+            <div class="canvas-wrapper">
+              <canvas id="dispatch-canvas" width="1200" height="720"></canvas>
+              <!-- Interactive Tooltip Overlay -->
+              <div class="map-tooltip" id="map-tooltip"></div>
+            </div>
+
+            <!-- Animated Workday Playback Bar (08:00 - 17:00) -->
+            <div class="timeline-bar">
+              <div class="timeline-controls">
+                <button class="play-btn" id="btn-timeline-play">▶ Play Day</button>
+                <button class="step-btn" id="btn-timeline-step">Step ⏭</button>
+                <div class="clock-display" id="timeline-clock">08:00 AM</div>
+              </div>
+              <div class="timeline-slider-wrapper">
+                <input type="range" id="timeline-slider" min="0" max="540" value="0" class="styled-slider" />
+                <div class="timeline-ticks">
+                  <span>08:00 Start</span>
+                  <span>10:00 Morning</span>
+                  <span>12:00 Midday</span>
+                  <span>14:00 Afternoon</span>
+                  <span>17:00 EOD</span>
+                </div>
+              </div>
+              <div class="speed-control">
+                <label for="timeline-speed">Speed:</label>
+                <select id="timeline-speed" class="styled-select">
+                  <option value="1">1x</option>
+                  <option value="5" selected>5x</option>
+                  <option value="20">20x</option>
+                  <option value="50">50x</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Detailed Benchmark Dashboard -->
+        <section class="tab-pane" id="tab-bench">
+          <div class="benchmark-header">
+            <div class="benchmark-header-row">
+              <div>
+                <h2 class="benchmark-title">Executive 9-Method Multi-Paradigm Benchmark (Classical, Quantum & Genetic Solvers)</h2>
+                <p class="benchmark-desc">
+                  Rigorous comparative evaluation across Classical FIFO, Hard K-Means, Fuzzy C-Means, Pure Genetic Algorithms (Classical & Quantum), and Hybrid K-Means + GA architectures.
+                </p>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="mdf_comprehensive_benchmark.png" target="_blank" class="mini-tool-btn" style="padding: 8px 12px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; color: #00F0FF; border-color: rgba(0, 240, 255, 0.4);" title="View publication-quality 6-panel comprehensive benchmark figure">
+                  🖼️ 6-Panel Benchmark Plot
+                </a>
+                <button class="primary-btn bench-run-btn" id="btn-run-benchmark-tab">📊 Run Benchmark</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Complex Multi-Criteria Winner Showcase Card -->
+          <div class="winner-showcase-card" id="winner-showcase-card">
+            <div class="winner-trophy-col">
+              <div class="winner-trophy-icon">🏆</div>
+              <span class="winner-badge-pill">COMPLEX WINNER</span>
+            </div>
+            <div class="winner-info-col">
+              <div class="winner-headline-row">
+                <h3 class="winner-method-title">Method 5: Multi-Tier Quantum F-Means (SC-QFCM)</h3>
+                <span class="winner-score-pill">🏆 #1 OVERALL (5 OF 5 CATEGORIES WON)</span>
+              </div>
+              <p class="winner-summary">
+                Optimal composite balance across distance minimization, OPEX economics, carbon abatement, inter-depot workload equity ($\sigma$), and 100% SLA compliance.
+              </p>
+              <div class="winner-metrics-pills">
+                <span class="win-pill">Fleet Distance: <strong id="win-dist-val">-- km</strong></span>
+                <span class="win-pill">Fleet OPEX: <strong id="win-cost-val">$--</strong></span>
+                <span class="win-pill">Carbon Footprint: <strong id="win-co2-val">-- kg</strong></span>
+                <span class="win-pill">Depot Equity $\sigma$: <strong id="win-equity-val">--</strong></span>
+                <span class="win-pill">SLA Compliance: <strong id="win-comp-val">100%</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quantum Advantage Highlight Banner -->
+          <div class="advantage-banner" id="advantage-banner">
+            <div class="banner-stat">
+              <span class="banner-title">Distance Reduction</span>
+              <span class="banner-val text-emerald" id="adv-dist-val">--</span>
+              <span class="banner-sub" id="adv-dist-km">Awaiting dispatch solve</span>
+            </div>
+            <div class="banner-stat">
+              <span class="banner-title">Windshield Hours Saved</span>
+              <span class="banner-val text-cyan" id="adv-hours-val">--</span>
+              <span class="banner-sub">Productive time gained</span>
+            </div>
+            <div class="banner-stat">
+              <span class="banner-title">Fleet Operating Savings</span>
+              <span class="banner-val text-amber" id="adv-cost-val">--</span>
+              <span class="banner-sub">Per morning dispatch</span>
+            </div>
+            <div class="banner-stat">
+              <span class="banner-title">Carbon Averted</span>
+              <span class="banner-val text-emerald" id="adv-co2-val">--</span>
+              <span class="banner-sub">EPA emissions factor</span>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3 class="chart-title">Fleet Distance & Windshield Hours</h3>
+              <div class="chart-box">
+                <canvas id="chart-distance"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3 class="chart-title">Daily Operating Cost Breakdown ($)</h3>
+              <div class="chart-box">
+                <canvas id="chart-cost"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3 class="chart-title">Depot & Technician Workload Variance ($\sigma$)</h3>
+              <div class="chart-box">
+                <canvas id="chart-variance"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3 class="chart-title">Environmental Footprint (kg CO2 Averted)</h3>
+              <div class="chart-box">
+                <canvas id="chart-co2"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Comparison Table -->
+          <div class="table-container">
+            <h3 class="table-title">Quantitative Methodology Audit Matrix</h3>
+            <table class="benchmark-table" id="benchmark-table">
+              <thead>
+                <tr>
+                  <th>Rank & Architecture</th>
+                  <th>Composite Score</th>
+                  <th>Total Distance</th>
+                  <th>Windshield Hrs</th>
+                  <th>Operating Cost</th>
+                  <th>CO2 (kg)</th>
+                  <th>Depot Balance ($\sigma$)</th>
+                  <th>Shift Compliance</th>
+                  <th>Runtime</th>
+                </tr>
+              </thead>
+              <tbody id="benchmark-tbody">
+                <!-- Populated via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Tab 3: Classiq Quantum Synthesis Explorer -->
+        <section class="tab-pane" id="tab-quantum">
+          <div class="quantum-header">
+            <h2 class="quantum-title">Classiq Quantum Synthesis Engine Architecture</h2>
+            <p class="quantum-desc">
+              Detailed breakdown of the synthesized intra-route QAOA quantum circuits, swap-test Born's rule overlaps, and Ising Hamiltonians.
+            </p>
+          </div>
+
+          <div class="quantum-cards-grid">
+            <div class="quantum-info-card">
+              <span class="q-card-tag">Ansatz Model</span>
+              <h3 class="q-card-title">Intra-Route QAOA Hamiltonian</h3>
+              <p class="q-card-desc">
+                Combinatorial sub-route permutation mapping $x_{it} \in \{0, 1\}$ with degree and MTZ subtour penalties compiled into Ising Pauli-Z terms.
+              </p>
+              <div class="q-formula">
+                $$H_C = A \sum_{i} \left(1 - \sum_t x_{it}\right)^2 + B \sum_{t} \left(1 - \sum_i x_{it}\right)^2 + C \sum_{i,j,t} d_{ij} x_{it} x_{j,t+1}$$
+              </div>
+            </div>
+
+            <div class="quantum-info-card">
+              <span class="q-card-tag">Circuit Metric</span>
+              <h3 class="q-card-title">Quantum Circuit Synthesis Telemetry</h3>
+              <ul class="q-stat-list">
+                <li><span>Qubits Allocated per Sub-Problem:</span> <strong id="q-qubits">9 - 25 Qubits</strong></li>
+                <li><span>QAOA Variational Layers ($p$):</span> <strong id="q-layers">2 Layers</strong></li>
+                <li><span>Synthesized Circuit Depth:</span> <strong id="q-depth">22 - 58</strong></li>
+                <li><span>2-Qubit Entangling CX Gates:</span> <strong id="q-cx">72 - 300 Gates</strong></li>
+                <li><span>Ancilla Measurement Shots:</span> <strong id="q-shots">2,048 Shots</strong></li>
+              </ul>
+            </div>
+
+            <div class="quantum-info-card">
+              <span class="q-card-tag">Fidelity Metric</span>
+              <h3 class="q-card-title" id="q-kernel-card-title">Born's Rule Swap-Test Overlap</h3>
+              <p class="q-card-desc" id="q-kernel-card-desc">
+                Continuous quantum distance computed via destructive interference probability $P(|1\rangle_{\text{anc}}) = \frac{1 - |\langle \psi_i | c_k \rangle|^2}{2}$.
+              </p>
+              <div class="q-formula" id="q-kernel-card-formula">
+                $$D_Q(\psi_i, c_k) = 2 \cdot P(|1\rangle_{\text{anc}}) = 1.0 - |\langle \psi_i | c_k \rangle|^2$$
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
