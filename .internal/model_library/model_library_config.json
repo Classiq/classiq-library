@@ -1,0 +1,612 @@
+{
+  "vocabulary": {
+    "domain": [
+      "Optimization",
+      "Physical Systems Simulation",
+      "Finance",
+      "Chemistry",
+      "Differential Equations",
+      "Logistics",
+      "Machine Learning",
+      "Telecom",
+      "Cryptography",
+      "Computational Fluid Dynamics (CFD)",
+      "Cybersecurity",
+      "Healthcare & Life Sciences",
+      "Automotive",
+      "Energy",
+      "Image Processing",
+      "Quantum Communication",
+      "Robotics"
+    ],
+    "framework": [
+      "Variational Quantum Algorithm",
+      "QAOA",
+      "Quantum Linear Solver",
+      "QPE",
+      "Hamiltonian Simulation",
+      "QSVT",
+      "Amplitude Estimation",
+      "VQE",
+      "GQSP",
+      "HHL",
+      "Oracle-Query Algorithms",
+      "Amplitude Amplification",
+      "QNN",
+      "Quantum Walk",
+      "Grover Search",
+      "Quantum Kernel (QSVM)",
+      "Classical Shadows",
+      "DQI",
+      "Quantum Gradient Estimation",
+      "Quantum Imaginary Time Evolution",
+      "Quantum Lattice Boltzmann",
+      "VQLS"
+    ],
+    "building_block": [
+      "Block Encoding",
+      "Quantum Arithmetic",
+      "Trotterization",
+      "State Preparation",
+      "Oracle",
+      "Data Encoding",
+      "Grover Operator",
+      "Swap Test",
+      "Qubitization",
+      "Hadamard Test",
+      "Quantum Teleportation"
+    ],
+    "other": [
+      "Foundational",
+      "Tutorial",
+      "Benchmark",
+      "Quantum Metrology",
+      "Application API",
+      "Embedding Methods",
+      "GPU Simulation",
+      "Quantum Learning"
+    ]
+  },
+  "notebooks": {
+    "algorithms/amplitude_amplification_and_estimation/oblivious_amplitude_amplification/oblivious_amplitude_amplification.ipynb": {
+      "title": "Oblivious Amplitude Amplification",
+      "description": "This demo explains the Oblivious Amplitude Amplification algorithm (OAA), which amplifies a block-encoding under the promise that the encoded matrix is unitary (or close to unitary). OAA can be used as a building block in algorithms such as Hamiltonian simulations. The demo starts with a short recap, then shows how to use it in conjunction with the Linear Combination of Unitaries (LCU) algorithm.",
+      "labels": {
+        "domain": [],
+        "framework": ["Amplitude Amplification"],
+        "building_block": ["Block Encoding", "Grover Operator"],
+        "other": []
+      }
+    },
+    "algorithms/amplitude_amplification_and_estimation/qmc_user_defined/qmc_user_defined.ipynb": {
+      "title": "Quantum Monte Carlo Integration (QMCI)",
+      "description": "This notebook demonstrates Quantum Monte Carlo Integration by estimating the expectation value of a given function, illustrating how quantum amplitude estimation can achieve a quadratic speedup over classical Monte Carlo methods.",
+      "labels": {
+        "domain": ["Finance"],
+        "framework": ["Amplitude Estimation", "QPE"],
+        "building_block": ["Grover Operator"],
+        "other": []
+      }
+    },
+    "algorithms/amplitude_amplification_and_estimation/qsvt_fixed_point_amplitude_amplification/qsvt_fixed_point_amplitude_amplification.ipynb": {
+      "title": "Using QSVT for Fixed-Point Amplitude Amplification",
+      "description": "This notebook shows how to use the QSVT framework for search problems; specifically, implementing fixed-point amplitude amplification (FPAA). With FPAA, we do not know in advance the concentration of solutions for the search problem, but we want to sample a solution with high probability. In contrast, for the original Grover search algorithm, too many iterations might 'overshoot' the mark. The demo is based on the paper Grand unification of quantum algorithms.",
+      "labels": {
+        "domain": [],
+        "framework": ["QSVT", "Amplitude Amplification"],
+        "building_block": ["Block Encoding", "Grover Operator", "Oracle"],
+        "other": []
+      }
+    },
+    "algorithms/amplitude_amplification_and_estimation/quantum_counting/quantum_counting.ipynb": {
+      "title": "Quantum Counting Using the Iterative Quantum Amplitude Estimation Algorithm",
+      "description": "Implementation of the quantum counting algorithm, which efficiently estimates the number of valid solutions to a search problem based on amplitude estimation. The example shows both Quantum Phase Estimation (QPE) and Iterative Quantum Amplitude Estimation (IQAE); IQAE reduces qubits and gates at the expense of a polylogarithmic factor in the error. The algorithm is applied to count solutions to a simple arithmetic equation using Classiq's grover_operator and qpe library functions.",
+      "labels": {
+        "domain": [],
+        "framework": ["Amplitude Estimation"],
+        "building_block": ["Grover Operator"],
+        "other": []
+      }
+    },
+    "algorithms/foundational/bernstein_vazirani/bernstein_vazirani.ipynb": {
+      "title": "Bernstein-Vazirani Algorithm",
+      "description": "Implementation of the Bernstein-Vazirani (BV) algorithm, a fundamental quantum algorithm that addresses a special case of the hidden-shift problem and achieves linear speedup over classical in the oracle query model.",
+      "labels": {
+        "domain": [],
+        "framework": ["Oracle-Query Algorithms"],
+        "building_block": ["Oracle"],
+        "other": ["Foundational"]
+      }
+    },
+    "algorithms/foundational/deutsch_jozsa/deutsch_jozsa.ipynb": {
+      "title": "Deutsch-Jozsa Algorithm",
+      "description": "Implementation of the famous Deutsch-Jozsa algorithm. A general quantum algorithm is defined, which takes a quantum predicate as a parameter, and different examples are explored. Using Classiq's quantum arithmetic, compiling both simple and complex functions is equally easy.",
+      "labels": {
+        "domain": [],
+        "framework": ["Oracle-Query Algorithms"],
+        "building_block": ["Oracle"],
+        "other": ["Foundational"]
+      }
+    },
+    "algorithms/foundational/quantum_teleportation/quantum_teleportation.ipynb": {
+      "title": "Quantum Teleportation Algorithm (Protocol)",
+      "description": "Implementation of quantum teleportation protocol, first proposed by bennett et al., is a foundational quantum communication method that enables the transfer of an arbitrary qubit state from one location (alice) to another (bob) using a combination of quantum entanglement and classical communication. it does not involve physically moving the qubit but rather transmitting its quantum information through shared entanglement.",
+      "labels": {
+        "domain": ["Quantum Communication"],
+        "framework": [],
+        "building_block": ["Quantum Teleportation"],
+        "other": ["Foundational"]
+      }
+    },
+    "algorithms/hamiltonian_simulation/hamiltonian_simulation_guide/hamiltonian_simulation_guide.ipynb": {
+      "title": "Hamiltonian Simulation",
+      "description": "Implementation of quantum Hamiltonian simulation: modeling time evolution of quantum systems using Classiq. The guide introduces Suzuki-Trotter decomposition and qDRIFT product formulas, with exponentiation under depth constraints, and links to block-encoding methods. Applications include chemistry, materials science, and algorithms such as HHL and Gibbs state sampling.",
+      "labels": {
+        "domain": ["Physical Systems Simulation"],
+        "framework": ["Hamiltonian Simulation"],
+        "building_block": ["Trotterization"],
+        "other": ["Tutorial"]
+      }
+    },
+    "algorithms/hamiltonian_simulation/hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_gqsp.ipynb": {
+      "title": "Hamiltonian Simulation with Generalized Quantum Signal Processing (GQSP)",
+      "description": "Implementation of time-independent Hamiltonian simulation via the Generalized Quantum Signal Processing (GQSP) method. The algorithm applies a Laurent polynomial transformation to the Szegedy walk operator of a block-encoded Hamiltonian, with polynomial coefficients derived from the Jacobi–Anger expansion. GQSP achieves optimal query complexity O(αt + log(1/ε)) using one auxiliary qubit and no amplitude amplification, making it the most qubit-efficient among the block-encoding-based methods.",
+      "labels": {
+        "domain": ["Physical Systems Simulation"],
+        "framework": ["Hamiltonian Simulation", "GQSP"],
+        "building_block": ["Block Encoding"],
+        "other": []
+      }
+    },
+    "algorithms/hamiltonian_simulation/hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_qsvt.ipynb": {
+      "title": "Hamiltonian Simulation with Quantum Singular Value Transformation (QSVT)",
+      "description": "Implementation of time-independent Hamiltonian simulation via the Quantum Singular Value Transformation (QSVT) method. The algorithm decomposes the time evolution as cos(Ht) - i*sin(Ht), approximates each function separately as Chebyshev polynomials via the Jacobi–Anger expansion, and combines them via an optimized LCU using the qsvt_lcu function. QSVT achieves optimal query complexity without controlled block-encoding calls, using two auxiliary qubits.",
+      "labels": {
+        "domain": ["Physical Systems Simulation"],
+        "framework": ["Hamiltonian Simulation", "QSVT"],
+        "building_block": ["Block Encoding"],
+        "other": []
+      }
+    },
+    "algorithms/hamiltonian_simulation/hamiltonian_simulation_with_block_encoding/hamiltonian_simulation_qubitization.ipynb": {
+      "title": "Hamiltonian Simulation with Qubitization (Chebyshev LCU)",
+      "description": "Implementation of time-independent Hamiltonian simulation via the Qubitization (Chebyshev LCU) method. The algorithm expresses the time evolution as a linear combination of Chebyshev polynomials of the Szegedy walk operator, using the Jacobi–Anger expansion coefficients as LCU weights. Unlike GQSP and QSVT, Qubitization requires no classical angle preprocessing but uses O(log d) ancilla qubits. The select operation over walk operator powers is implemented with an efficient binary-decomposition circuit analogous to QPE.",
+      "labels": {
+        "domain": ["Physical Systems Simulation"],
+        "framework": ["Hamiltonian Simulation"],
+        "building_block": ["Qubitization", "Block Encoding"],
+        "other": []
+      }
+    },
+    "algorithms/number_theory_and_cryptography/elliptic_curves/elliptic_curve_discrete_log.ipynb": {
+      "title": "Solving Elliptic Curve Discrete Logarithm Problem with Shor's Algorithm",
+      "description": "Implementation of solving the Elliptic Curve Discrete Logarithm Problem (ECDLP) with Shor's algorithm, a fundamental cryptographic problem underlying elliptic curve cryptography. Classical algorithms require exponential time; the quantum algorithm runs in polynomial time. The notebook introduces elliptic curves over finite fields and builds the solution using Classiq's modular arithmetic and quantum subroutines.",
+      "labels": {
+        "domain": ["Cryptography"],
+        "framework": [],
+        "building_block": ["Quantum Arithmetic"],
+        "other": []
+      }
+    },
+    "algorithms/number_theory_and_cryptography/shor/shor.ipynb": {
+      "title": "Shor's Factoring Algorithm",
+      "description": "A full implementation of Shor's factoring algorithm, one of the foundational quantum algorithms, providing an exponential speedup over currently known classical algorithms. The quantum component is naturally structured as a Quantum Phase Estimation (QPE) routine, utilizing Classiq's built-in `flexible_qpe` and modular arithmetic.",
+      "labels": {
+        "domain": ["Cryptography"],
+        "framework": ["QPE"],
+        "building_block": ["Quantum Arithmetic"],
+        "other": []
+      }
+    },
+    "algorithms/qml/hybrid_qnn/hybrid_qnn_for_subset_majority.ipynb": {
+      "title": "Hybrid Classical-Quantum Neural Network",
+      "description": "Implementation of a hybrid classical-quantum neural network with PyTorch. The network is constructed, trained and verified on the subset majority function, which returns 1 when most bits in a chosen subset of the input string are 1.",
+      "labels": {
+        "domain": ["Machine Learning"],
+        "framework": ["QNN", "Variational Quantum Algorithm"],
+        "building_block": ["Data Encoding"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_differential_equations_solvers/discrete_poisson_solver/discrete_poisson_solver.ipynb": {
+      "title": "Quantum Algorithm for Solving the Poisson Equation",
+      "description": "Implementation of a quantum solver for the discrete Poisson equation, a partial differential equation (PDE) widely used in physics and engineering. The equation models the distribution of a potential field due to a prescribed source term. The problem is reformulated as a system of linear equations and solved using the HHL algorithm. Leveraging quantum cosine and sine transforms from the open library enables a concise and clear implementation that can be generalized to higher dimensions.",
+      "labels": {
+        "domain": ["Physical Systems Simulation", "Differential Equations"],
+        "framework": ["QPE", "Hamiltonian Simulation", "Quantum Linear Solver"],
+        "building_block": ["Trotterization"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_differential_equations_solvers/lchs/lchs.ipynb": {
+      "title": "Linear Combination of Hamiltonian Simulation (LCHS)",
+      "description": "Implementation of the Linear Combination of Hamiltonian Simulation (LCHS) method for solving linear differential equations du/dt = -Au whose evolution is not unitary. The propagator e^{-At} is written as a linear combination of unitary Hamiltonian evolutions, implemented with block encodings and GQSP, and the solution state is obtained by post-selection.",
+      "labels": {
+        "domain": ["Physical Systems Simulation", "Differential Equations"],
+        "framework": ["Hamiltonian Simulation", "GQSP"],
+        "building_block": ["Block Encoding"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_differential_equations_solvers/time_marching/time_marching.ipynb": {
+      "title": "Time Marching Based Quantum Solvers for Time-Dependent Linear Differential Equations",
+      "description": "This demonstration is based on the paper 'Time-marching based quantum solvers for time-dependent linear differential equations' (Fang et al., Quantum 7, 955, 2023). The notebook was written in collaboration with Prof. Di Fang, the first author of the paper. Time marching is a method for solving differential equations in time by integrating the solution vector through time in small discrete steps, where each timestep depends on previous timesteps. The algorithm applies an evolution matrix sequentially on the state and makes it evolve through time, as done in time-dependent Hamiltonian simulations.",
+      "labels": {
+        "domain": ["Physical Systems Simulation", "Differential Equations"],
+        "framework": ["QSVT", "Quantum Linear Solver"],
+        "building_block": ["Block Encoding", "Quantum Arithmetic"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_linear_solvers/hhl/hhl.ipynb": {
+      "title": "HHL Algorithm",
+      "description": "Implementation of the HHL algorithm (Harrow, Hassidim, Lloyd) for solving linear systems: given a Hermitian matrix and a normalized right-hand-side vector, the algorithm applies quantum phase estimation to the matrix's Hamiltonian evolution and prepares a quantum state proportional to the solution. The notebook builds HHL in Classiq and explains the key steps.",
+      "labels": {
+        "domain": [],
+        "framework": ["HHL", "QPE", "Quantum Linear Solver"],
+        "building_block": ["Trotterization"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_linear_solvers/qsvt_matrix_inversion/qsvt_matrix_inversion.ipynb": {
+      "title": "Matrix Inversion with Quantum Singular Value Transform (QSVT)",
+      "description": "Implementation of a general framework for solving linear systems based on the Quantum Singular Value Transform (QSVT). Given an efficient routine to embed the classical matrix as a quantum function (block-encoding), this algorithm provides a clean and optimal approach to implementing matrix inversion compared to other quantum methods. The use of the qsvt_inversion function from the open library, together with classical auxiliary functions from our qsp application, allows for an easy implementation of the algorithm, given two inputs: a block-encoding quantum function for the matrix and the matrix condition number.",
+      "labels": {
+        "domain": [],
+        "framework": ["QSVT", "Quantum Linear Solver"],
+        "building_block": ["Block Encoding"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_phase_estimation/qpe_for_matrix/qpe_for_matrix.ipynb": {
+      "title": "Quantum Phase Estimation for Solving Matrix Eigenvalues",
+      "description": "Quantum phase estimation (QPE) is a key algorithm in quantum computing, allowing you to estimate the eigenphase of a unitary matrix (or the eigenvalue of a Hermitian matrix). Given a Hermitian matrix and one of its eigenvectors, QPE measures the accumulated phase to calculate the eigenvalue of that eigenvector.",
+      "labels": {
+        "domain": [],
+        "framework": ["QPE"],
+        "building_block": ["Trotterization"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_phase_estimation/qpe_with_qubitization/qpe_for_molecule_with_qubitization.ipynb": {
+      "title": "Qubitization Based Quantum Phase Estimation (QPE) for Solving Molecular Energies",
+      "description": "Implementation of Quantum Phase Estimation for a molecule Hamiltonian using qubitization: given a block-encoding of the Hamiltonian, the algorithm performs efficient QPE. The notebook uses Classiq's Qmod built-in operations (control, power, within_apply, invert) to build the circuit.",
+      "labels": {
+        "domain": ["Chemistry"],
+        "framework": ["QPE"],
+        "building_block": ["Qubitization", "Block Encoding"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_primitives/gqsp/gqsp.ipynb": {
+      "title": "Generalized Quantum Signal Processing (GQSP)",
+      "description": "Implementation of Generalized Quantum Signal Processing (GQSP), which extends QSP to block-encode arbitrary polynomials of unitaries and supports Laurent polynomials. The demo implements a simple instance (state proportional to sum of cos^3) using the gqsp open-library function and Qmod phase assignment in Classiq.",
+      "labels": {
+        "domain": [],
+        "framework": ["GQSP"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "algorithms/quantum_primitives/gradient_estimation/gradient_estimation.ipynb": {
+      "title": "Fast Quantum Algorithm for Numerical Gradient Estimation",
+      "description": "Given a scalar function of d dimensions, computing its gradient classically requires at least d+1 queries to the function. This notebook implements the quantum algorithm by S. P. Jordan, which computes the gradient with a single query: it encodes the function into the phases of a coordinate superposition and applies an inverse QFT to read the gradient out of the same register.",
+      "labels": {
+        "domain": [],
+        "framework": ["Quantum Gradient Estimation"],
+        "building_block": ["Quantum Arithmetic"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_primitives/hadamard_test/hadamard_test.ipynb": {
+      "title": "Hadamard Test",
+      "description": "Implementation of the Hadamard test, a quantum primitive that yields the real (or imaginary) part of the expectation value of a unitary for a given state. The tutorial implements it for the QFT unitary on a 4-qubit state using Classiq's high-level functional blocks, and explains the measurement and post-processing step.",
+      "labels": {
+        "domain": [],
+        "framework": [],
+        "building_block": ["Hadamard Test"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_primitives/quantum_oracle_sketching_boolean/quantum_oracle_sketching_boolean.ipynb": {
+      "title": "Quantum Oracle Sketching for Boolean Functions",
+      "description": "Implementation of Quantum Oracle Sketching for Boolean functions: a data-loading algorithm that builds an approximate quantum oracle for a Boolean function from a stream of classical samples, applying one data-dependent rotation per sample without storing the dataset.",
+      "labels": {
+        "domain": [],
+        "framework": ["QSVT"],
+        "building_block": ["Oracle", "Block Encoding"],
+        "other": ["Quantum Learning"]
+      }
+    },
+    "algorithms/quantum_primitives/swap_test/swap_test.ipynb": {
+      "title": "Swap Test Algorithm",
+      "description": "Implementation of the swap test: a quantum routine that estimates the overlap between two quantum states via a single test qubit. The notebook uses Classiq's swap-test library function and verifies the result against the exact overlap.",
+      "labels": {
+        "domain": [],
+        "framework": [],
+        "building_block": ["Swap Test"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_state_preparation/fermionic_gaussian/fermionic_gaussian.ipynb": {
+      "title": "Preparation of Fermionic Gaussian States",
+      "description": "Preparation of fermionic Gaussian states, the ground states of quadratic fermionic Hamiltonians, used as initial states in electronic-structure simulations (for example Hartree-Fock and BCS states). Given the one-body and pairing matrices, the notebook prepares the ground state on a qubit register under the Jordan-Wigner mapping.",
+      "labels": {
+        "domain": [],
+        "framework": [],
+        "building_block": ["State Preparation"],
+        "other": []
+      }
+    },
+    "algorithms/quantum_state_preparation/gibbs/quantum_thermal_state_preparation.ipynb": {
+      "title": "Quantum Thermal State Preparation Algorithm Implementation",
+      "description": "This implementation is based on the paper \"Quantum Thermal State Preparation\" (Chen, Kastoryano, Brandao and Gilyen, 2023) and was written in collaboration with Chi-Fang (Anthony) Chen, the first author of the paper. Quantum thermal state preparation is the task of preparing the Gibbs state, which is the quantum state in a thermal equilibrium. In difference with ground state preparation, here one looks for properties of a quantum system which is coupled to an environment in a certain temperature.",
+      "labels": {
+        "domain": [],
+        "framework": [],
+        "building_block": ["Trotterization", "State Preparation"],
+        "other": []
+      }
+    },
+    "algorithms/search_and_optimization/QAOA/qaoa.ipynb": {
+      "title": "Quantum Approximate Optimization Algorithm",
+      "description": "Implementation of the Quantum Approximate Optimization Algorithm (QAOA) for combinatorial optimization (e.g. Max-Cut, Knapsack). The notebook demonstrates QAOA in Classiq with cost and mixer layers and classical optimization.",
+      "labels": {
+        "domain": ["Optimization"],
+        "framework": ["QAOA", "Variational Quantum Algorithm"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "algorithms/search_and_optimization/dqi/dqi_max_xorsat.ipynb": {
+      "title": "Decoded Quantum Interferometry Algorithm",
+      "description": "Implementation of the Decoded Quantum Interferometry (DQI) algorithm for combinatorial optimization, focusing on max-LINSAT and its special case max-XORSAT. The notebook demonstrates DQI in the max-XORSAT setting using Classiq.",
+      "labels": {
+        "domain": ["Optimization"],
+        "framework": ["DQI"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "algorithms/search_and_optimization/grover/grover.ipynb": {
+      "title": "Grover's Search Algorithm",
+      "description": "Implementation of Grover's search algorithm, one of the canonical quantum algorithms. A general routine is defined and then applied to generic use cases, including the 3-SAT problem and the Max-Cut problem on a graph. The use of the phase_oracle quantum function from the Classiq open library, together with the Qmod language for high-level arithmetic operations, helps avoid the low-level implementation details typically required on other platforms.",
+      "labels": {
+        "domain": [],
+        "framework": ["Grover Search"],
+        "building_block": ["Oracle", "Grover Operator"],
+        "other": []
+      }
+    },
+    "algorithms/search_and_optimization/grover_mixer_qaoa/gm_qaoa.ipynb": {
+      "title": "Grover Mixers for QAOA",
+      "description": "Implementation of QAOA with Grover mixers (GM-QAOA) for constrained optimization: the mixer is a parameterized Grover diffuser over the feasible subspace. The notebook builds GM-QAOA in Classiq and solves a sample constrained problem.",
+      "labels": {
+        "domain": ["Optimization"],
+        "framework": ["QAOA", "Variational Quantum Algorithm"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/CFD/double_slit_experiment/quantum_double_slit_experiment.ipynb": {
+      "title": "Quantum Double Slit Experiment",
+      "description": "This notebook simulates the double slit experiment with classical and quantum methods. The wave equation is discretized on a 2D grid; the quantum solution uses QSP/QSVT for the linear system. Both solutions are compared and amplitude and phase are visualized.",
+      "labels": {
+        "domain": ["Physical Systems Simulation", "Differential Equations"],
+        "framework": ["QSVT", "Quantum Linear Solver"],
+        "building_block": ["Block Encoding", "Quantum Arithmetic"],
+        "other": ["Tutorial"]
+      }
+    },
+    "applications/CFD/qlbm/qlbm.ipynb": {
+      "title": "Quantum Lattice Boltzmann Method",
+      "description": "This notebook introduces the Quantum Lattice Boltzmann Method (QLBM) for fluid dynamics, focusing on the collisionless case with specular reflections. It explains streaming, collision, and boundary handling and implements an example in Classiq.",
+      "labels": {
+        "domain": [
+          "Physical Systems Simulation",
+          "Computational Fluid Dynamics (CFD)"
+        ],
+        "framework": ["Quantum Lattice Boltzmann"],
+        "building_block": ["Quantum Arithmetic"],
+        "other": []
+      }
+    },
+    "applications/chemistry/molecule_eigensolver/molecule_eigensolver.ipynb": {
+      "title": "Molecule Eigensolver (VQE Method)",
+      "description": "Implementation of VQE for molecular ground states (H2, H2O, LiH). Problem definition, ansatz choice (UCC and hardware-efficient), and optimization are demonstrated; Classiq's chemistry integration yields efficient circuits.",
+      "labels": {
+        "domain": ["Chemistry"],
+        "framework": ["VQE", "Variational Quantum Algorithm"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/chemistry/protein_folding/protein_folding_with_quantum_walk/qfold.ipynb": {
+      "title": "QFold: Quantum Walks and Deep Learning to Solve Protein Folding",
+      "description": "Implementation of QFold: protein folding using Szegedy-type quantum walks combined with deep learning. The quantum walk explores structure space more efficiently than classical search; the notebook implements and runs the algorithm.",
+      "labels": {
+        "domain": ["Healthcare & Life Sciences"],
+        "framework": ["Quantum Walk"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/chemistry/qpe_for_molecules/qpe_for_molecules.ipynb": {
+      "title": "Quantum Phase Estimation (QPE) for Solving Molecular Energies",
+      "description": "This notebook implements Quantum Phase Estimation for molecular energies: given a Hamiltonian and an initial state with overlap to the ground state, QPE yields eigenvalue estimates on the phase register.",
+      "labels": {
+        "domain": ["Chemistry"],
+        "framework": ["QPE"],
+        "building_block": ["Trotterization"],
+        "other": []
+      }
+    },
+    "applications/chemistry/quantum_drude_oscillator/quantum_drude_oscillator.ipynb": {
+      "title": "Quantum Drude Oscillator",
+      "description": "How to adapt the bosonic quantum Drude Oscillator model to quantum computing using qubits",
+      "labels": {
+        "domain": ["Chemistry"],
+        "framework": ["VQE", "Variational Quantum Algorithm"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/chemistry/quantum_walk_fmo/quantum_walk_fmo.ipynb": {
+      "title": "Continuous-Time Quantum Walk in Photosynthetic Energy Transfer",
+      "description": "Continuous-Time Quantum Walk in Photosynthetic Energy Transfer",
+      "labels": {
+        "domain": ["Chemistry"],
+        "framework": ["Quantum Walk", "Hamiltonian Simulation"],
+        "building_block": ["Trotterization"],
+        "other": []
+      }
+    },
+    "applications/chemistry/second_quantized_hamiltonian/second_quantized_hamiltonian.ipynb": {
+      "title": "Second Quantized Hamiltonian",
+      "description": "This notebook shows how to define and use a second-quantized Hamiltonian for chemistry, from Fermionic operators to Pauli form. The constructed Hamiltonian is used in variational (e.g. VQE) circuits.",
+      "labels": {
+        "domain": ["Chemistry"],
+        "framework": ["VQE", "Variational Quantum Algorithm"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/chemistry/tensor_hypercontraction/tensor_hypercontraction.ipynb": {
+      "title": "Even More Efficient Quantum Computations of Chemistry Through Tensor Hypercontraction",
+      "description": "This notebook demonstrates tensor hypercontraction (THC) for more efficient chemistry circuits. It documents the preprocessing (factorization, fitting) and the quantum blocks used in the algorithm.",
+      "labels": {
+        "domain": ["Chemistry"],
+        "framework": [],
+        "building_block": [
+          "Block Encoding",
+          "Quantum Arithmetic",
+          "Qubitization"
+        ],
+        "other": []
+      }
+    },
+    "applications/cybersecurity/whitebox_fuzzing/whitebox_fuzzing.ipynb": {
+      "title": "Using Quantum Computers to Boost Whitebox Fuzzing",
+      "description": "This demo uses Grover's algorithm to speed up whitebox fuzzing for software security, focusing on file and packet parsers. The oracle is derived from the program under test; Classiq synthesizes the search circuit.",
+      "labels": {
+        "domain": ["Cybersecurity"],
+        "framework": ["Grover Search"],
+        "building_block": ["Oracle"],
+        "other": []
+      }
+    },
+    "applications/finance/autocallable_options/partial_exponential_state_preparation.ipynb": {
+      "title": "Prepare Partial Exponential State",
+      "description": "This notebook implements preparation of a partial exponential state on an interval using exact amplitude amplification. It shows full-interval loading and interval extraction with Grover steps, for use in autocallable option pricing.",
+      "labels": {
+        "domain": ["Finance"],
+        "framework": ["Amplitude Amplification"],
+        "building_block": ["State Preparation"],
+        "other": []
+      }
+    },
+    "applications/finance/brownian_chebyshev_polynomials/brownian_chebyshev_polynomials.ipynb": {
+      "title": "Stochastic Modeling of Brownian Motion",
+      "description": "This notebook builds a Geometric Brownian Motion (GBM) price model as a quantum circuit via Chebyshev polynomial approximation. The construction is documented for reuse in option pricing and other finance applications.",
+      "labels": {
+        "domain": ["Finance"],
+        "framework": [],
+        "building_block": ["State Preparation"],
+        "other": []
+      }
+    },
+    "applications/finance/portfolio_optimization_hhl/HHL_portfolio.ipynb": {
+      "title": "Quantum Computational Finance: Quantum Algorithm for Portfolio Optimization",
+      "description": "This notebook implements portfolio optimization using the HHL algorithm: the mean-variance linear system is solved on a quantum computer. It shows how to encode the problem and read out the solution.",
+      "labels": {
+        "domain": ["Finance"],
+        "framework": ["HHL", "QPE", "Quantum Linear Solver"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/logistics/vehicle_routing_problem/vehicle_routing_problem.ipynb": {
+      "title": "Vehicle Routing Problem (VRP)",
+      "description": "This notebook solves the vehicle routing problem (VRP) with QAOA: each vehicle starts and ends at its own depot, and every city is visited exactly once by one vehicle. The route-position and city-visit constraints are encoded; the combinatorial optimization pipeline is demonstrated.",
+      "labels": {
+        "domain": ["Logistics", "Optimization"],
+        "framework": ["QAOA", "Variational Quantum Algorithm"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/optimization/adapt_qaoa/adapt_qaoa.ipynb": {
+      "title": "ADAPT QAOA",
+      "description": "This notebook implements adaptive QAOA: the ansatz is grown iteratively from an operator pool using energy gradients. Adaptive operator selection and parameter optimization are demonstrated.",
+      "labels": {
+        "domain": ["Optimization"],
+        "framework": ["QAOA", "Variational Quantum Algorithm"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/optimization/variational_quantum_imaginary_time_evolution/variational_quantum_imaginary_time_evolution.ipynb": {
+      "title": "Variational Quantum Imaginary Time Evolution (VarQITE) for Combinatorial Problems",
+      "description": "This notebook implements variational quantum imaginary time evolution (VarQITE) for combinatorial optimization (e.g. Max-Cut). The ansatz and cost function are built; parameter optimization and convergence are demonstrated.",
+      "labels": {
+        "domain": ["Optimization"],
+        "framework": [
+          "Quantum Imaginary Time Evolution",
+          "Variational Quantum Algorithm"
+        ],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/physical_systems/fermi_hubbard_model_1D/fermi_hubbard_1D.ipynb": {
+      "title": "One-Dimensional Fermi-Hubbard Model",
+      "description": "Quantum simulation of the one-dimensional Fermi-Hubbard model. A Slater-determinant initial state is prepared with Givens rotations, quenched to the interacting Hamiltonian and evolved with a Trotterized circuit. Charge and spin densities are measured over time to observe spin-charge separation, and the results are checked against exact solutions in two limits.",
+      "labels": {
+        "domain": ["Physical Systems Simulation"],
+        "framework": ["Hamiltonian Simulation"],
+        "building_block": ["Trotterization", "State Preparation"],
+        "other": []
+      }
+    },
+    "applications/physical_systems/hhl_lanchester/hhl_lanchester.ipynb": {
+      "title": "Solve Differential Equations of the Lanchester Model with HHL",
+      "description": "This notebook implements the Lanchester combat model with the HHL algorithm: the linear system governing engagement and attrition is solved on a quantum computer. The model is encoded and the solution is read out.",
+      "labels": {
+        "domain": ["Physical Systems Simulation", "Differential Equations"],
+        "framework": ["HHL", "QPE", "Quantum Linear Solver"],
+        "building_block": ["Swap Test"],
+        "other": []
+      }
+    },
+    "applications/physical_systems/maxwell_equation/maxwell_2d_simulation.ipynb": {
+      "title": "Simulation of the 2D Maxwell Equation Using Quantum Hamiltonian Simulation",
+      "description": "Simulation of the 2D Maxwell equations (transverse-magnetic mode) in a homogeneous medium. The equations are discretized on a Yee lattice, the spatial operator is block-encoded, and the fields are evolved in time with quantum Hamiltonian simulation.",
+      "labels": {
+        "domain": ["Physical Systems Simulation", "Differential Equations"],
+        "framework": ["Hamiltonian Simulation", "GQSP"],
+        "building_block": ["Block Encoding", "Quantum Arithmetic"],
+        "other": []
+      }
+    },
+    "applications/physical_systems/quantum_chaos/quantum_sawtooth_map.ipynb": {
+      "title": "The Quantum Sawtooth Map",
+      "description": "This notebook provides an end-to-end implementation of the quantum sawtooth map on 3 qubits, constructing the Floquet operator as alternating diagonal phases in conjugate bases. It illustrates how Classiq Qmod's language and execution framework, especially Classiq's phase-assignment construct, can be used to easily define and run the dynamics, and to observe localization signatures. We use the simulator as a reference and directly compare the results to runs on real quantum hardware.",
+      "labels": {
+        "domain": ["Physical Systems Simulation"],
+        "framework": ["Hamiltonian Simulation"],
+        "building_block": [],
+        "other": []
+      }
+    },
+    "applications/telecom/resiliency_planning/resiliency_planning.ipynb": {
+      "title": "Quantum-Based Resiliency Planning",
+      "description": "This notebook implements resiliency planning with QAOA. A network graph and single-assignment constraints are encoded; QAOA finds robust configurations that meet resiliency goals.",
+      "labels": {
+        "domain": ["Telecom", "Optimization"],
+        "framework": ["QAOA", "Variational Quantum Algorithm"],
+        "building_block": [],
+        "other": []
+      }
+    }
+  }
+}
