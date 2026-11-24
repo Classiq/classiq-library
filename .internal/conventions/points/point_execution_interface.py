@@ -13,7 +13,7 @@ Note on backends/credentials: the free API is NOT simulator-only. `sample()`,
 so hardware and credentialed backends ARE expressible without a
 `BackendPreferences` object. Exceptions below are kept for real reasons
 (deliberate multi-call sessions, async submit/retrieve, shot-count fidelity,
-grading-frozen cells, non-regenerable hardware paths, or structural rewrites) —
+grading-frozen cells, or non-regenerable hardware paths) —
 never because "the flat API can't express it".
 """
 
