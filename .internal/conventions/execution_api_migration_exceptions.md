@@ -47,7 +47,7 @@ new-interface shape, not an old-API leftover:
   one legitimate session for the ~20-iteration walk loop (`es.sample` per `k` on the
   sampling simulator).
 
-## 2. Shot-count fidelity (3) — preserve a non-default `num_shots`
+## 2. Shot-count fidelity (6) — preserve a non-default `num_shots`
 
 The free helper has no `num_shots` there, so a minimal old-style construct stays
 purely to keep the original shot count (behavior fidelity):
@@ -55,6 +55,8 @@ purely to keep the original shot count (behavior fidelity):
 - `chemistry/molecule_eigensolver` — flat `ExecutionSession(qprog_ucc, num_shots=1_000_000)` for `es.variational_minimize`.
 - `finance_workshops/rainbow_options_workshop_bruteforce` — `iqae.run(..., execution_preferences=ExecutionPreferences(num_shots=20000))`.
 - `telecom/radio_access_network` — migrated to `CombinatorialProblem`; keeps `combi.optimize(execution_preferences=ExecutionPreferences(num_shots=3000), …)`.
+- `optimization/rectangles_packing/rectangles_packing_grid` and `technology_demonstrations/qaoa/qaoa_demonstration` - migrated to `CombinatorialProblem`; keep `combi.optimize(execution_preferences=ExecutionPreferences(num_shots=10000), ...)`.
+- `optimization/qaoa_in_qaoa` - migrated to `CombinatorialProblem`; keeps `combi.optimize(execution_preferences=ExecutionPreferences(random_seed=10), ...)`, the execution seed (`combi.optimize` exposes no other seed parameter).
 
 ## 3. Async submit/retrieve and async batch (3)
 
@@ -95,22 +97,24 @@ stale/broken outputs:
   only fixes (sampling backend, or a `calculate_state_vector` gradient rewrite) change the
   exact/deterministic behavior. Deferred.
 
-## 7. Legacy combinatorial VQE — 3 of 7 kept
+## 7. Legacy combinatorial VQE - all 7 migrated, none kept
 
-Four legacy `construct_combinatorial_optimization_model` notebooks were rewritten to
-`CombinatorialProblem` (`task_scheduling_problem`, `link_monitoring`,
-`evidence_scaling_labs`, `radio_access_network`). Three do not map mechanically:
+All seven legacy `construct_combinatorial_optimization_model` notebooks were rewritten to
+`CombinatorialProblem`. Four mapped mechanically (`task_scheduling_problem`, `link_monitoring`,
+`evidence_scaling_labs`, `radio_access_network`). The last three needed more than an API swap
+(CLS-12656):
 
-- `optimization/qaoa_in_qaoa` — subgraphs keep arbitrary node labels, so `combi.sample()["x"]`
-  is a sparse bounding-box list that misaligns the legacy positional zip, and the maxcut sign
-  flip needs the selection inverted.
-- `technology_demonstrations/qaoa/qaoa_demonstration` — a benchmark reading `VQESolverResult`
-  internals that `CombinatorialProblem` does not expose.
-- `optimization/rectangles_packing/rectangles_packing_grid` — `combi.sample()["place"]` is a
-  nested 3D list vs the legacy flat vector, so the floorplan-viz helpers, markdown, and test
-  need a structural rewrite.
-
-(PR #1643 left all seven untouched.)
+- `optimization/qaoa_in_qaoa` - subgraphs keep arbitrary node labels, so the solution is read
+  by label (`best_solution["x"][node]`) instead of the legacy positional zip, and the best
+  solution is the lowest (minimized) cost instead of the highest objective.
+- `technology_demonstrations/qaoa/qaoa_demonstration` - the benchmark reads depth and CX count
+  from `combi.get_qprog()`, the convergence from `combi.cost_trace`, and times `optimize()`.
+  The Hamiltonian helper and the commented Qiskit generation code that used it were removed
+  (`CombinatorialProblem` does not expose the Hamiltonian); the Qiskit results are still loaded
+  from `qiskit_res.npy`.
+- `optimization/rectangles_packing/rectangles_packing_grid` - `combi.sample()["place"]` is a
+  nested `[r][i][j]` list with fixed positions filled in, so the free-qubit reindexing helpers
+  and their markdown were removed, and the test sums the nested list.
 
 ## 8. Grading-frozen hackathon solutions (4)
 
@@ -135,7 +139,7 @@ groupby), but the cells are intentionally frozen:
 - **Backends via strings:** `quantum_volume` and `quantumwalk_complex_network` now use
   `backend="provider/device"` (+ `config=` for the commented hardware examples) instead of
   `BackendPreferences` objects.
-- **`CombinatorialProblem`:** four combinatorial notebooks (see group 7).
+- **`CombinatorialProblem`:** seven combinatorial notebooks (see group 7).
 - **`verbose=False`** added to `sample`/`observe`/`variational_minimize`/`calculate_state_vector`
   calls that run in loops, so regenerated outputs are not flooded with per-request
   "Submitting job to simulator" logging.

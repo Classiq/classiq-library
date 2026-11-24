@@ -121,6 +121,24 @@ POINT = Point(
             "combi.optimize to preserve the non-default shot count (combi.optimize exposes no other "
             "shots parameter) — same fidelity reason as rainbow_options / molecule_eigensolver",
         ),
+        (
+            "optimization/rectangles_packing/rectangles_packing_grid",
+            "migrated to CombinatorialProblem; keeps ExecutionPreferences(num_shots=10000) passed to "
+            "combi.optimize to preserve the non-default shot count (combi.optimize exposes no other "
+            "shots parameter), as radio_access_network",
+        ),
+        (
+            "technology_demonstrations/qaoa/qaoa_demonstration",
+            "migrated to CombinatorialProblem; keeps ExecutionPreferences(num_shots=NUM_SHOTS) passed "
+            "to combi.optimize to preserve the benchmark's 10k shots (combi.optimize exposes no other "
+            "shots parameter), as radio_access_network",
+        ),
+        (
+            "optimization/qaoa_in_qaoa/qaoa_in_qaoa",
+            "migrated to CombinatorialProblem; keeps ExecutionPreferences(random_seed=10) passed to "
+            "combi.optimize to preserve the execution seed (combi.optimize exposes no other seed "
+            "parameter)",
+        ),
         # --- Deliberate async submit / retrieve-later, and async batch orchestration. ---
         (
             "the_classiq_tutorial/execution_tutorial_part2",
@@ -166,28 +184,6 @@ POINT = Point(
             "classiq 1.28 rejects statevector backends on ExecutionSession, and the only ways to "
             "run it (a sampling backend, or a calculate_state_vector-based gradient rewrite) would "
             "change the exact/deterministic gradients the ADAPT-VQE notebook depends on — deferred",
-        ),
-        # --- Legacy construct_combinatorial_optimization_model + VQE. Most were rewritten to
-        # the CombinatorialProblem API; these three do not map mechanically. ---
-        (
-            "optimization/qaoa_in_qaoa/qaoa_in_qaoa",
-            "legacy construct_combinatorial VQE; does not map cleanly — subgraphs keep arbitrary "
-            "node labels so combi.sample()['x'] is a sparse bounding-box list (holes zero-filled) "
-            "that misaligns the positional zip, and the maxcut sign flip needs the sort inverted; "
-            "a correct rewrite must change node2value's indexing + selection, not just swap the API",
-        ),
-        (
-            "technology_demonstrations/qaoa/qaoa_demonstration",
-            "legacy construct_combinatorial VQE benchmark: reads VQESolverResult internals "
-            "(intermediate_results / mean_all_solutions / time / Hamiltonian) that CombinatorialProblem "
-            "does not expose; the high-level API drops the timing/quality benchmark this notebook exists to show",
-        ),
-        (
-            "optimization/rectangles_packing/rectangles_packing_grid",
-            "legacy construct_combinatorial VQE; the API swap maps but combi.sample()['place'] is a "
-            "nested 3D list vs the legacy flat free-qubit vector, so the floorplan-viz helpers, the "
-            "narrating markdown, and the test (sum(best_solution)==3) all need rewriting — a structural "
-            "pass beyond an API-only migration",
         ),
         # --- Grading-frozen community hackathon solutions ("don't change" cells). The
         # statevector reads are expressible via calculate_state_vector, but the cells are frozen. ---

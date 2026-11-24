@@ -23,5 +23,4 @@ POINT = Point(
     static=False,
     detect=detect,
     status="outdated",
-    exceptions=(("qaoa_in_qaoa", "vqe_result is a keyword-argument name"),),
 )
