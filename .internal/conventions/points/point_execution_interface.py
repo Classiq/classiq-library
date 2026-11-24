@@ -125,7 +125,7 @@ POINT = Point(
             "optimization/rectangles_packing/rectangles_packing_grid",
             "migrated to CombinatorialProblem; keeps ExecutionPreferences(num_shots=10000) passed to "
             "combi.optimize to preserve the non-default shot count (combi.optimize exposes no other "
-            "shots parameter), as radio_access_network",
+            "shots parameter), as radio_access_network; it also shows choosing the backend there",
         ),
         (
             "technology_demonstrations/qaoa/qaoa_demonstration",

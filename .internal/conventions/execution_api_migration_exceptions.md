@@ -55,7 +55,7 @@ purely to keep the original shot count (behavior fidelity):
 - `chemistry/molecule_eigensolver` — flat `ExecutionSession(qprog_ucc, num_shots=1_000_000)` for `es.variational_minimize`.
 - `finance_workshops/rainbow_options_workshop_bruteforce` — `iqae.run(..., execution_preferences=ExecutionPreferences(num_shots=20000))`.
 - `telecom/radio_access_network` — migrated to `CombinatorialProblem`; keeps `combi.optimize(execution_preferences=ExecutionPreferences(num_shots=3000), …)`.
-- `optimization/rectangles_packing/rectangles_packing_grid` and `technology_demonstrations/qaoa/qaoa_demonstration` - migrated to `CombinatorialProblem`; keep `combi.optimize(execution_preferences=ExecutionPreferences(num_shots=10000), ...)`.
+- `optimization/rectangles_packing/rectangles_packing_grid` and `technology_demonstrations/qaoa/qaoa_demonstration` - migrated to `CombinatorialProblem`; keep `combi.optimize(execution_preferences=ExecutionPreferences(num_shots=10000), ...)` (rectangles also shows choosing the backend there).
 
 ## 3. Async submit/retrieve and async batch (3)
 
@@ -108,12 +108,11 @@ All seven legacy `construct_combinatorial_optimization_model` notebooks were rew
   solution is the lowest (minimized) cost instead of the highest objective.
 - `technology_demonstrations/qaoa/qaoa_demonstration` - the benchmark reads depth and CX count
   from `combi.get_qprog()`, the convergence from `combi.cost_trace`, and times `optimize()`.
-  The Hamiltonian helper and the commented Qiskit generation code that used it were removed
-  (`CombinatorialProblem` does not expose the Hamiltonian); the Qiskit results are still loaded
-  from `qiskit_res.npy`.
+  The Hamiltonian helper reads the Hamiltonian from the Pyomo model
+  (`pyo_model_to_hamiltonian`) instead of the execution result, for the commented Qiskit code.
 - `optimization/rectangles_packing/rectangles_packing_grid` - `combi.sample()["place"]` is a
   nested `[r][i][j]` list with fixed positions filled in, so the free-qubit reindexing helpers
-  and their markdown were removed, and the test sums the nested list.
+  were removed (the markdown still explains the qubit saving), and the test sums the nested list.
 
 ## 8. Grading-frozen hackathon solutions (4)
 
