@@ -133,12 +133,6 @@ POINT = Point(
             "to combi.optimize to preserve the benchmark's 10k shots (combi.optimize exposes no other "
             "shots parameter), as radio_access_network",
         ),
-        (
-            "optimization/qaoa_in_qaoa/qaoa_in_qaoa",
-            "migrated to CombinatorialProblem; keeps ExecutionPreferences(random_seed=10) passed to "
-            "combi.optimize to preserve the execution seed (combi.optimize exposes no other seed "
-            "parameter)",
-        ),
         # --- Deliberate async submit / retrieve-later, and async batch orchestration. ---
         (
             "the_classiq_tutorial/execution_tutorial_part2",

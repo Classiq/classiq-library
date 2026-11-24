@@ -18,7 +18,7 @@ uses `sample(qprog, backend="simulator")` with commented `backend="ibm/…"` +
 because "the flat API can't express it".
 
 The convention report shows `execution_interface` at **219/219 (100%)**: every
-notebook is either migrated or one of the **28 reviewed exceptions** registered
+notebook is either migrated or one of the **27 reviewed exceptions** registered
 in `.internal/conventions/points/point_execution_interface.py`. They are grouped
 below by reason.
 
@@ -47,7 +47,7 @@ new-interface shape, not an old-API leftover:
   one legitimate session for the ~20-iteration walk loop (`es.sample` per `k` on the
   sampling simulator).
 
-## 2. Shot-count fidelity (6) — preserve a non-default `num_shots`
+## 2. Shot-count fidelity (5) — preserve a non-default `num_shots`
 
 The free helper has no `num_shots` there, so a minimal old-style construct stays
 purely to keep the original shot count (behavior fidelity):
@@ -56,7 +56,6 @@ purely to keep the original shot count (behavior fidelity):
 - `finance_workshops/rainbow_options_workshop_bruteforce` — `iqae.run(..., execution_preferences=ExecutionPreferences(num_shots=20000))`.
 - `telecom/radio_access_network` — migrated to `CombinatorialProblem`; keeps `combi.optimize(execution_preferences=ExecutionPreferences(num_shots=3000), …)`.
 - `optimization/rectangles_packing/rectangles_packing_grid` and `technology_demonstrations/qaoa/qaoa_demonstration` - migrated to `CombinatorialProblem`; keep `combi.optimize(execution_preferences=ExecutionPreferences(num_shots=10000), ...)`.
-- `optimization/qaoa_in_qaoa` - migrated to `CombinatorialProblem`; keeps `combi.optimize(execution_preferences=ExecutionPreferences(random_seed=10), ...)`, the execution seed (`combi.optimize` exposes no other seed parameter).
 
 ## 3. Async submit/retrieve and async batch (3)
 
