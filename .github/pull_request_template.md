@@ -16,8 +16,8 @@
 - [ ] Please use `rebase` on your branch (no merge commits)
 - [ ] Please link this PR to the relevant issue
 
-- [ ] Please make sure to run `pre-commit` when commiting changes
+- [ ] Please make sure to run `pre-commit` when committing changes
   - [ ] If you're using `git` in the terminal, make sure to install `pre-commit` via running `pip install pre-commit` followed by `pre-commit install`
     - [ ] More info at [the `pre-commit` documentation](https://pre-commit.com/)
   - [ ] Note that Classiq runs automatic code linting. Meaning that one of the tests verifies the output of `pre-commit`.
-  - [ ] Also note that `pre-commit` may minorly alter some files. Make sure to `git add` the changes done by `pre-commit`
+  - [ ] Also note that `pre-commit` may slightly alter some files. Make sure to `git add` the changes done by `pre-commit`
