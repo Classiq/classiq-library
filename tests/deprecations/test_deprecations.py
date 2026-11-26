@@ -1,11 +1,15 @@
 import os
 import re
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import nbformat
 import pytest
 from nbclient.exceptions import CellExecutionError
 from testbook import testbook  # type: ignore[import]
+from testbook.client import TestbookNotebookClient
+from tests.deprecations.mock_classiq_api import INSTALL_MOCK, REPORT
 from tests.utils_for_tests import ROOT_DIRECTORY, iterate_notebooks
 from tests.utils_for_testbook import (
     DEFAULT_CODE_INJECTIONS,
@@ -14,17 +18,6 @@ from tests.utils_for_testbook import (
 )
 
 TIMEOUT: int = 60 * 15  # 15 minutes
-
-PYTHON_CODE_PATTERN = r"(?s)```python\s*\n(.*?)```"
-
-INSTALL_MOCK = (
-    f"import sys; sys.path.insert(0, {str(Path(__file__).parent)!r})\n"
-    "import mock_classiq_api; sys.path.pop(0); mock_classiq_api.install()"
-)
-# NotebookEdit inserts each cell at the top, so the mock is installed right before the notebook's first cell
-INJECTED_CELLS = [INSTALL_MOCK] + DEFAULT_CODE_INJECTIONS
-REPORT = "__import__('mock_classiq_api').report()"
-
 
 # Notebooks that the fakes can't run to their end
 SKIPPED_NOTEBOOKS = {
@@ -41,47 +34,65 @@ SKIPPED_NOTEBOOKS = {
 }
 
 
-def _should_test_notebook(notebook_path: str) -> bool:
-    return os.path.basename(notebook_path) not in SKIPPED_NOTEBOOKS
-
-
-@pytest.mark.parametrize(
-    "notebook_path", list(filter(_should_test_notebook, iterate_notebooks()))
-)
+@pytest.mark.parametrize("notebook_path", iterate_notebooks())
 def test_notebook(notebook_path: str) -> None:
-    _test_notebook(notebook_path)
-
-
-def test_readme(tmp_path: Path) -> None:
-    readme = (ROOT_DIRECTORY / "README.md").read_text()
-    cells = [
-        nbformat.v4.new_code_cell(code)
-        for code in re.findall(PYTHON_CODE_PATTERN, readme)
-    ]
-    notebook_path = str(tmp_path / "README.ipynb")
-    nbformat.write(nbformat.v4.new_notebook(cells=cells), notebook_path)
     _test_notebook(notebook_path)
 
 
 def _test_notebook(notebook_path: str) -> None:
     test = _run_without_deprecations
-    with NotebookEdit(notebook_path, code_injection_at_start=INJECTED_CELLS):
-        test = testbook(notebook_path, timeout=TIMEOUT)(test)
-        test = _build_cd_decorator(notebook_path)(test)
+    # NotebookEdit inserts each cell at the top, so the mock is installed right before the notebook's first cell
+    with NotebookEdit(
+        notebook_path,
+        code_injection_at_start=[INSTALL_MOCK] + DEFAULT_CODE_INJECTIONS,
+    ):
+        for decorator in [
+            testbook(notebook_path, timeout=TIMEOUT),
+            _build_cd_decorator(notebook_path),
+            _build_skip_decorator(notebook_path),
+        ]:
+            test = decorator(test)
     test()
 
 
-def _run_without_deprecations(tb) -> None:
-    error = None
+def _run_without_deprecations(tb: TestbookNotebookClient) -> None:
+    error = ""
     try:
         tb.execute()
     except CellExecutionError as exc:
-        error = exc
+        error = str(exc)
 
-    problems = [
-        f"cell {warning['cell']}: {warning['category']}: {warning['message']} ({warning['location']})"
-        for warning in tb.value(REPORT)
-    ]
-    if error is not None:
-        problems.append(str(error))
+    problems = [*map(_format_warning, tb.value(REPORT)), *filter(bool, [error])]
     assert not problems, "\n".join(problems)
+
+
+def _format_warning(warning: dict) -> str:
+    return f"cell {warning['cell']}: {warning['category']}: {warning['message']} ({warning['location']})"
+
+
+def _build_skip_decorator(notebook_path: str) -> Callable:
+    def skip_decorator(func: Callable) -> Callable:
+        def inner(*args: Any, **kwargs: Any) -> Any:
+            if reason := SKIPPED_NOTEBOOKS.get(os.path.basename(notebook_path)):
+                pytest.skip(reason)
+            return func(*args, **kwargs)
+
+        return inner
+
+    return skip_decorator
+
+
+def test_readme(tmp_path: Path) -> None:
+    _test_notebook(
+        _readme_file_to_notebook_file(ROOT_DIRECTORY / "README.md", tmp_path)
+    )
+
+
+def _readme_file_to_notebook_file(readme_path: Path, folder: Path) -> str:
+    python_blocks = re.findall("(?s)```python\\s*\\n(.*?)```", readme_path.read_text())
+    notebook = nbformat.v4.new_notebook(
+        cells=list(map(nbformat.v4.new_code_cell, python_blocks))
+    )
+    notebook_path = str(folder / f"{readme_path.stem}.ipynb")
+    nbformat.write(notebook, notebook_path)
+    return notebook_path
