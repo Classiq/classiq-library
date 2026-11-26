@@ -1,106 +1,77 @@
 #!/bin/bash
 
-#
-# Parse arguments
-#
-is_links_only=false
-for arg in "$@"; do
-  if [[ "$arg" == "--links-only" ]]; then
-    is_links_only=true
-    break
+# usage: update_single_notebook.sh <notebook path> [--links-only]
+# exits with non-zero if the notebook failed to execute, or if its links failed to update
+
+SCRIPT_DIR="$(realpath "$(dirname "$0")")"
+PATCH_DIR="$SCRIPT_DIR/patch_notebook"
+source "$SCRIPT_DIR/utils/common.sh"
+source "$SCRIPT_DIR/utils/jupyter_utils.sh"
+
+parse_args() {
+  if [[ ! -f "$1" ]]; then
+    echo "Error: notebook '$1' doesn't exist. usage: $0 <notebook path> [--links-only]" >&2
+    return 1
   fi
-done
 
-#
-# Parse file paths
-#
-notebook_relative_path="$1"
-notebook_path="$(realpath "$notebook_relative_path")"
+  notebook_path="$(realpath "$1")"
+  notebook_label="\"$1\"" # for the logs - the path as it was given, which is usually shorter
+  is_links_only=$(as_bool has_flag --links-only "$@")
+}
 
-notebook_dir=$(dirname "$notebook_path")
-notebook_name=$(basename "$notebook_path")
+# in links-only mode, we execute a temporary copy, and later take only the links from it
+prepare_notebook() {
+  if [[ "$is_links_only" == true ]]; then
+    executed_notebook_path="$(copy_notebook "$notebook_path")" || return 1
+  else
+    executed_notebook_path="$notebook_path"
+  fi
 
+  "$PATCH_DIR/injected_cells.py" add "$executed_notebook_path"
+}
 
-current_folder="$(realpath "$(dirname "$0")")"
+# runs on exit, even if interrupted (e.g. by ctrl-c), so that no injected cells or temporary copy is left behind
+cleanup_notebook() {
+  if [[ "$is_links_only" == true ]]; then
+    rm -f "$executed_notebook_path"
+  else
+    "$PATCH_DIR/injected_cells.py" remove "$executed_notebook_path"
+  fi
+}
 
+# usage: take_links_from_copy <exit code of the execution>
+take_links_from_copy() {
+  local status=$1
 
-#
-# Preparations before executing notebook
-#
+  if [[ $status -ne 0 ]]; then
+    echo "[!] Not updating the links of $notebook_label, since its execution failed (exit code $status)" >&2
+    return "$status"
+  fi
 
-# disable popping browser for `show(qprog)`
-export BROWSER="$current_folder/fake_browser.sh"
+  if ! "$PATCH_DIR/update_links.py" "$notebook_path" "$executed_notebook_path"; then
+    echo "[!] Couldn't update the links of $notebook_label. you may update all of its outputs instead (not links-only)" >&2
+    return 1
+  fi
+}
 
-# trigger circuit creation in backend
-export OPENVSCODE="some-dummy-value"
+main() {
+  parse_args "$@" || exit 1
+  assert_python3_kernel_exists || exit 1
+  export_notebook_execution_env
 
-# validations, before starting copy
-if ! jupyter kernelspec list | tail -n +2 | awk '{print $1}' | grep -xq "python3"; then
-  echo "Kernel python3 not found" >&2
-  exit 1
-fi
+  prepare_notebook || exit 1
+  trap cleanup_notebook EXIT
 
-#
-# Editing notebook before execution
-#
+  time_it "$notebook_label" execute_notebook_inplace "$executed_notebook_path"
+  local status=$?
+  "$PATCH_DIR/injected_cells.py" remove "$executed_notebook_path"
 
-# (maybe) make a copy
-if [[ "$is_links_only" == true ]]; then
-	notebook_copy_path="$notebook_path.temp.ipynb"
-	notebook_copy_name=$(basename "$notebook_copy_path")
-	cp "$notebook_path" "$notebook_copy_path"
-else
-	notebook_copy_path="$notebook_path"
-	notebook_copy_name="$notebook_name"
-fi
+  if [[ "$is_links_only" == true ]]; then
+    take_links_from_copy $status
+    status=$?
+  fi
 
-# hook edit notebook
-"$current_folder/injected_cells.py" add "$notebook_copy_path"
+  return $status
+}
 
-#
-# Executing
-#
-
-# (maybe) track timing
-if [ "$UPDATER_TRACK_TIME" = "false" ] || [ "$UPDATER_TRACK_TIME" = "0" ]; then
-  out="/dev/null"
-else
-  out="/dev/stdout"
-fi
-
-# record start time
-start=$(date +%s)
-printf "[*] Starting at %s : \"%s\"\n" "$(date)" "$notebook_path" >"$out"
-
-# execute
-pushd "$notebook_dir" > /dev/null
-jupyter nbconvert --to notebook --execute --inplace "$notebook_copy_name" --ExecutePreprocessor.kernel_name=python3
-status=$?
-popd > /dev/null
-
-# record end time
-end=$(date +%s)
-elapsed=$((end - start))
-
-# format hh:mm:ss
-printf -v duration "%02d:%02d:%02d" $((elapsed/3600)) $((elapsed%3600/60)) $((elapsed%60))
-printf "[*] Ended    at %s : \"%s\" : took %s\n" "$(date)" "$notebook_path" "$duration" >"$out"
-
-#
-# Post execution
-#
-
-"$current_folder/injected_cells.py" remove "$notebook_copy_path"
-
-#
-# if links-only - then merge the diff
-#
-if [[ "$is_links_only" == true ]]; then
-	if [ $status -eq 0 ]; then
-		"$current_folder/update_links.py" "$notebook_path" "$notebook_copy_path"
-	else
-		echo "NOT updating links for ${notebook_path} since 'jupyter nbconvert' failes with exit code ${status}"
-	fi
-
-	rm "$notebook_copy_path"
-fi
+main "$@"

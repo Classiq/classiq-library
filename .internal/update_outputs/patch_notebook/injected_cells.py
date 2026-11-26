@@ -6,9 +6,10 @@ adds cells at the beginning of the notebook, so that they run before its own cel
 then, removes them after the execution
 """
 
-import json
 import sys
 from typing import Callable
+
+from notebook_utils import read_notebook, write_notebook
 
 RANDOM_SEED = 8
 
@@ -40,19 +41,6 @@ for handler in logging.getLogger("classiq.execution.functions.util._logging").ha
 NBFORMAT_VERSION_WITH_CELL_ID = (4, 5)
 
 
-def _read_notebook(path: str) -> dict:
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _write_notebook(path: str, notebook: dict) -> None:
-    # the same format as `nbformat.write` - unescaped unicode, and a trailing newline
-    # so that rewriting a notebook changes only what we've edited
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(notebook, f, indent=1, ensure_ascii=False)
-        f.write("\n")
-
-
 def _make_cell(index: int, source: str, with_id: bool) -> dict:
     cell = {
         "cell_type": "code",
@@ -67,7 +55,7 @@ def _make_cell(index: int, source: str, with_id: bool) -> dict:
 
 
 def add_cells(notebook_path: str) -> None:
-    notebook = _read_notebook(notebook_path)
+    notebook = read_notebook(notebook_path)
 
     nbformat_version = notebook["nbformat"], notebook["nbformat_minor"]
     with_id = nbformat_version >= NBFORMAT_VERSION_WITH_CELL_ID
@@ -77,12 +65,12 @@ def add_cells(notebook_path: str) -> None:
     ]
 
     notebook["cells"][:0] = cells
-    _write_notebook(notebook_path, notebook)
+    write_notebook(notebook_path, notebook)
 
 
 # does nothing if the cells aren't there, so it's safe to call more than once
 def remove_cells(notebook_path: str) -> None:
-    notebook = _read_notebook(notebook_path)
+    notebook = read_notebook(notebook_path)
 
     cells = notebook["cells"]
     injected = cells[: len(INJECTED_CELLS)]
@@ -97,7 +85,7 @@ def remove_cells(notebook_path: str) -> None:
         if type(cell.get("execution_count")) is int:
             cell["execution_count"] -= num_executed
 
-    _write_notebook(notebook_path, notebook)
+    write_notebook(notebook_path, notebook)
 
 
 ACTIONS: dict[str, Callable[[str], None]] = {

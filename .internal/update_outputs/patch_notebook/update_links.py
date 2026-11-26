@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
+"""
+usage: update_links.py <notebook to update> <notebook to take the links from>
 
-import json
+copies the platform links into the outputs of a notebook, keeping the rest of its outputs as they are
+"""
+
 import re
 import sys
+
+from notebook_utils import read_notebook, write_notebook
 
 LINK_PATTERN = re.compile(
     r"Quantum program link: https://platform\.classiq\.io/circuit/\S+\n"
@@ -29,6 +35,26 @@ def extract_links(cells: list[dict]) -> list[Link]:
     return links
 
 
+def validate_links(old_links: list[Link], new_links: list[Link]) -> bool:
+    if len(old_links) != len(new_links):
+        print(
+            f"Error: the notebook printed {len(new_links)} links, but its outputs have {len(old_links)}",
+            file=sys.stderr,
+        )
+        return False
+
+    old_cell_indices = [cell_index for cell_index, _, _ in old_links]
+    new_cell_indices = [cell_index for cell_index, _, _ in new_links]
+    if old_cell_indices != new_cell_indices:
+        print(
+            "Error: the notebook printed its links in other cells than in its outputs",
+            file=sys.stderr,
+        )
+        return False
+
+    return True
+
+
 def update_links(
     cells: list[dict], old_links: list[Link], new_links: list[Link]
 ) -> bool:
@@ -42,68 +68,38 @@ def update_links(
                 text[index] = line.replace(old_link, new_link)
                 break
         else:
-            print("Couldn't find link. This shouldn't happen.")
+            print(
+                "Error: couldn't find a link. this shouldn't happen.", file=sys.stderr
+            )
             return False
     return True
 
 
-def validate_links_list(
-    old_links: list[Link], new_links: list[Link], force: bool
-) -> bool:
-    # verify list length
-    if len(old_links) != len(new_links):
-        print("Error: Link count mismatch in force mode")
-        return False
-
-    if force:
-        # verify cell index
-        old_indices = [i for i, _ in old_links]
-        new_indices = [i for i, _ in new_links]
-        if old_indices != new_indices:
-            print("Error: Link cell indices mismatch")
-            return False
-
-        # verify link pattern
-        if not all(LINK_PATTERN.match(link) for _, link in new_links):
-            print("Error: Not all new links match expected pattern")
-            return False
-
-    return True
-
-
-def main(dest_file: str, source_file: str, force: bool = False) -> bool:
-    with open(dest_file) as f:
-        old_nb = json.load(f)
-    with open(source_file) as f:
-        new_nb = json.load(f)
+def main(dest_file: str, source_file: str) -> bool:
+    old_nb = read_notebook(dest_file)
+    new_nb = read_notebook(source_file)
 
     old_links = extract_links(old_nb["cells"])
     new_links = extract_links(new_nb["cells"])
 
-    if not validate_links_list(old_links, new_links, force):
+    if not validate_links(old_links, new_links):
         return False
 
     if not update_links(old_nb["cells"], old_links, new_links):
         return False
 
-    with open(dest_file, "w") as f:
-        json.dump(old_nb, f, indent=1)
+    write_notebook(dest_file, old_nb)
 
     print(f"Updated notebook written to: {dest_file}")
     return True
 
 
 if __name__ == "__main__":
-    force = False
-    if "--force" in sys.argv:
-        force = True
-        sys.argv.remove("--force")
-
     if len(sys.argv) != 3:
         print(
-            f"Usage: {sys.argv[0]} <file in which we'll update the links> <file from which to take the links> [--force]"
+            f"usage: {sys.argv[0]} <notebook to update> <notebook to take the links from>",
+            file=sys.stderr,
         )
         sys.exit(1)
 
-    if not main(sys.argv[1], sys.argv[2], force):
-        sys.exit(1)
+    sys.exit(not main(sys.argv[1], sys.argv[2]))
