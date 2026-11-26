@@ -1,6 +1,6 @@
 name: "Test Library CI (deprecations)"
 
-# Will run the notebooks with the classiq API mocked, and fail on deprecation warnings:
+# Runs the notebooks with the classiq API mocked, and fails on deprecation warnings:
 #   PRs: the notebooks whose code changed. Weekly: all notebooks.
 # The job is off (`if: false`) until the notebooks are free of deprecations.
 
@@ -28,9 +28,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    env:
-      VENV_PATH: .venv
-
     concurrency:
       # workflow  : the workflow name
       # event_name: "pull_request" / "workflow_dispatch" / ...
@@ -43,73 +40,21 @@ jobs:
       #
       # Setup Repository
       #
-      - name: Checkout (schedule / workflow_dispatch)
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        uses: actions/checkout@v7
-
-      - name: Checkout PR head (pull_request)
-        if: github.event_name == 'pull_request'
+      - name: Checkout
         uses: actions/checkout@v7
         with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 20 # enough history for `git show BASE_SHA:notebook` (PRs are ~1-4 commits)
-          persist-credentials: false
+          fetch-depth: 0 # the full history, to find the changed notebooks
 
       #
       # Setup Python
       #
       - name: Set up Python
-        id: setup-python
         uses: actions/setup-python@v7
         with:
           python-version-file: .github/.python-version
 
-      - name: Get versions for cache key
-        id: versions
-        shell: python
-        run: |
-          import urllib.request
-          import json
-          import os
-
-          url = 'https://pypi.org/pypi/classiq/json'
-          with urllib.request.urlopen(url) as response:
-              data = json.loads(response.read())
-              classiq_version = data['info']['version']
-
-          output_file = os.environ['GITHUB_OUTPUT']
-          with open(output_file, 'a') as f:
-              f.write(f"LATEST_CLASSIQ_VERSION={classiq_version}\n")
-
-      # The caching we do follows from
-      #   https://stackoverflow.com/questions/59127258/how-can-i-use-pip-cache-in-github-actions
-      - uses: actions/cache@v6
-        id: cache-venv
-        with:
-          path: ${{ env.VENV_PATH }}
-          key: "${{ runner.os }}-venv\
-            -python-${{ steps.setup-python.outputs.python-version }}\
-            -classiq-${{ steps.versions.outputs.LATEST_CLASSIQ_VERSION }}\
-            -requirements-${{ hashFiles('**/requirements*.txt') }}"
-          restore-keys: "${{ runner.os }}-venv\
-            -python-${{ steps.setup-python.outputs.python-version }}\
-            -classiq-${{ steps.versions.outputs.LATEST_CLASSIQ_VERSION }}"
-
-      - name: Enter venv
-        run: echo "$PWD/${{ env.VENV_PATH }}/bin" >> $GITHUB_PATH
-
       - name: Install dependencies
-        if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
-          set -e
-
-          if [ ! -d "${{ env.VENV_PATH }}" ]; then
-            python -m venv "${{ env.VENV_PATH }}"
-            hash -r  # refresh memory of last process location, to use python from venv
-          fi
-
-          python -m pip install -U pip
           # Install the lighter version of torch for the CI. We don't have a GPU anyway, and it saves ~2GB
           python -m pip install -U torch torchvision --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -U -r requirements.txt -r requirements_tests.txt -r requirements_notebooks.txt
@@ -130,24 +75,23 @@ jobs:
       # Propagate CI information to python tests
       #
       - name: Get changed files
-        if: github.event_name == 'pull_request'
         id: changed-files
-        uses: tj-actions/changed-files@v47.0.6
-        with:
-          files_yaml: |
-            notebooks:
-              - "**/*.ipynb"
-            tests:
-              - "**/notebooks/**/test_*.py"
+        if: github.event_name == 'pull_request'
+        run: |
+          # Changes since the commit this ref branched from main
+          BASE_SHA=$(git merge-base origin/main HEAD)
+          echo "base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "notebooks=$(git diff --name-only --diff-filter=ACMR "$BASE_SHA" HEAD -- '*.ipynb' | xargs)" >> "$GITHUB_OUTPUT"
+          echo "tests=$(git diff --name-only --diff-filter=ACMR "$BASE_SHA" HEAD -- ':(glob)**/notebooks/**/test_*.py' | xargs)" >> "$GITHUB_OUTPUT"
 
       # Narrow the changed-notebook list down to notebooks whose *code* cells changed,
-      # so a markdown-only edit no longer triggers the (expensive) notebook execution.
+      # so a markdown-only edit doesn't trigger the (expensive) notebook execution.
       - name: Filter to notebooks whose code cells changed
-        if: github.event_name == 'pull_request'
         id: code-changed
+        if: github.event_name == 'pull_request'
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          ALL_CHANGED: ${{ steps.changed-files.outputs.notebooks_all_changed_files }}
+          BASE_SHA: ${{ steps.changed-files.outputs.base_sha }}
+          ALL_CHANGED: ${{ steps.changed-files.outputs.notebooks }}
           # safety switch: set to "false" to fall back to the old "any change" behavior
           SKIP_MARKDOWN_ONLY: "true"
         run: |
@@ -190,9 +134,7 @@ jobs:
         run: python -m pytest -c tests/config_deprecations.ini --rootdir=.
         env:
           SHOULD_TEST_ALL_FILES: ${{ github.event_name != 'pull_request' }}
-          LIST_OF_IPYNB_CHANGED: "${{ steps.code-changed.outputs.list }}"
-          LIST_OF_IPYNB_TESTS_CHANGED: "${{ steps.changed-files.outputs.tests_all_changed_files }}"
+          LIST_OF_IPYNB_CHANGED: ${{ steps.code-changed.outputs.list }}
+          LIST_OF_IPYNB_TESTS_CHANGED: ${{ steps.changed-files.outputs.tests }}
           CLASSIQ_TELEMETRY_MODE: disabled
           CLASSIQ_HOST: http://127.0.0.1:9 # the API is mocked: nothing may reach the platform
-          JUPYTER_PLATFORM_DIRS: "1"
-          PYTHONDONTWRITEBYTECODE: "1"
