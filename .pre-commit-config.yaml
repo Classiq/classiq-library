@@ -171,12 +171,14 @@ repos:
         language: python
         files: \.ipynb$
         require_serial: true
-      - id: validate-model-library-config
-        name: validate  Model Library config
+      - id: validate-model-library
+        name: validate  Model Library lists
         entry: .internal/pre_commit_tools/model_library_validate.py
         language: python
-        files: (^\.internal/model_library/model_library_config\.json|\.ipynb)$
+        files: ^\.internal/model_library/|\.ipynb$
         pass_filenames: false
+        additional_dependencies:
+          - "pydantic"
         require_serial: true
       - id: validate-qmod-names
         name: validate  qmod names
