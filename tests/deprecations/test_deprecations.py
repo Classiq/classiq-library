@@ -33,6 +33,11 @@ SKIPPED_NOTEBOOKS = {
     "vehicle_routing_problem.ipynb": "colors a graph by the sampled solution",
 }
 
+# Deprecation warnings that the library can't fix, and who fixes them. Remove each one once it's fixed
+KNOWN_DEPRECATIONS = {
+    "ExecutionSession.minimize is deprecated": "the SDK: CombinatorialProblem.optimize calls it",
+}
+
 
 @pytest.mark.parametrize("notebook_path", iterate_notebooks())
 def test_notebook(notebook_path: str) -> None:
@@ -62,8 +67,13 @@ def _run_without_deprecations(tb: TestbookNotebookClient) -> None:
     except CellExecutionError as exc:
         error = str(exc)
 
-    problems = [*map(_format_warning, tb.value(REPORT)), *filter(bool, [error])]
+    new_warnings = [w for w in tb.value(REPORT) if not _is_known_deprecation(w)]
+    problems = [*map(_format_warning, new_warnings), *filter(bool, [error])]
     assert not problems, "\n".join(problems)
+
+
+def _is_known_deprecation(warning: dict) -> bool:
+    return any(known in warning["message"] for known in KNOWN_DEPRECATIONS)
 
 
 def _format_warning(warning: dict) -> str:
