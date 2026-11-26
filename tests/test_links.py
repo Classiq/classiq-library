@@ -3,7 +3,6 @@ import os
 import re
 import time
 from collections.abc import Iterable
-from functools import lru_cache
 
 import httpx
 import nbformat
@@ -40,7 +39,6 @@ _URLS_BLOCKING_CI: dict[str, list[int]] = {
     "https://www.mdpi.com/1099-4300/27/5/454": [403],
 }
 
-URL_ALLOW_LIST_FILE = ROOT_DIRECTORY / ".internal" / "url_allow_list.txt"
 URL_GITHUB_PREFIX = "https://github.com/classiq/classiq-library/blob/main/"
 
 # the regex below is taken from this stackoverflow:
@@ -84,16 +82,6 @@ def iterate_links_from_notebook(filename: str) -> Iterable[tuple[int, str]]:
             yield cell_index, url
 
 
-@lru_cache
-def get_url_allow_list() -> list[str]:
-    if URL_ALLOW_LIST_FILE.is_file():
-        with open(URL_ALLOW_LIST_FILE) as f:
-            data = f.read()
-        return data.splitlines()
-    else:
-        return []
-
-
 def should_check_file_instead_of_url(url: str) -> bool:
     return url.lower().startswith(URL_GITHUB_PREFIX)
 
@@ -110,9 +98,6 @@ def _test_single_url(url: str) -> bool:
 
     if os.environ.get("LIMIT_TEST_LINKS_TO_FILES_ONLY", "false").lower() == "true":
         return True  # Don't test anything else. Treat as valid.
-
-    if any(url.startswith(allowed) for allowed in get_url_allow_list()):
-        return True
 
     return _try_url(url)
 
